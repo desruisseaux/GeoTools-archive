@@ -16,28 +16,27 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.awt.geom.AffineTransform;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransformFactory;
-import org.geotools.pt.Envelope;
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.spatialschema.geometry.Envelope;
+
+// Geotools dependencies
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
@@ -69,32 +68,40 @@ public class GridGeometryTest extends TestCase {
     }
 
     /**
-     * Test the construction with an identity transform.
+     * Tests the construction with an identity transform.
      */
-    public void testIdentity() {
-        final MathTransformFactory factory = MathTransformFactory.getDefault();
-        final int[] lower = new int[] {0, 0, 0};
-        final int[] upper = new int[] {100, 200, 10};
-        final MathTransform identity = factory.createIdentityTransform(3);
-        final GridGeometry gg = new GridGeometry(new GridRange(lower,upper), identity);
+    public void testIdentity() throws FactoryException {
+        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
+        final int[] lower = new int[] {0,     0, 2};
+        final int[] upper = new int[] {100, 200, 4};
+        final MathTransform identity = factory.createAffineTransform(new GeneralMatrix(4));
+        GridGeometry2D gg;
+        try {
+            gg = new GridGeometry2D(new GridRange(lower,upper), identity);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // This is the expected dimension.
+        }
+        upper[2] = 3;
+        gg = new GridGeometry2D(new GridRange(lower,upper), identity);
         assertTrue(identity.isIdentity());
         assertTrue(gg.getGridToCoordinateSystem().isIdentity());
         assertTrue(gg.getGridToCoordinateSystem2D().isIdentity());
-        assertEquals(3, gg.getGridToCoordinateSystem().getDimSource());
-        assertEquals(2, gg.getGridToCoordinateSystem2D().getDimSource());
+        assertEquals(3, gg.getGridToCoordinateSystem().getSourceDimensions());
+        assertEquals(2, gg.getGridToCoordinateSystem2D().getSourceDimensions());
         assertTrue(gg.getGridToCoordinateSystem2D() instanceof AffineTransform);
     }
 
     /**
-     * Test the construction from an envelope.
+     * Tests the construction from an envelope.
      */
     public void testEnvelope() {
-        final int[]    lower   = new int[]    {   0,   0,  0};
+        final int[]    lower   = new int[]    {   0,   0,  4};
         final int[]    upper   = new int[]    {  90,  45,  5};
-        final double[] minimum = new double[] {-180, -90,  0};
+        final double[] minimum = new double[] {-180, -90,  9};
         final double[] maximum = new double[] {+180, +90, 10};
-        final GridGeometry  gg = new GridGeometry(new GridRange(lower,upper),
-                                                  new Envelope(minimum, maximum), null);
+        final GridGeometry2D gg = new GridGeometry2D(new GridRange(lower,upper),
+                                                     new GeneralEnvelope(minimum, maximum), null);
         final AffineTransform tr = (AffineTransform) gg.getGridToCoordinateSystem2D();
         assertEquals(AffineTransform.TYPE_UNIFORM_SCALE |
                      AffineTransform.TYPE_TRANSLATION, tr.getType());

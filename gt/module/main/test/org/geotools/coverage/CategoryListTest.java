@@ -17,20 +17,23 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
-// J2SE dependencies
+// J2SE and JAI dependencies
 import java.util.Arrays;
 import java.util.Random;
-
 import javax.media.jai.util.Range;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.resources.XArray;
+// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.resources.XArray;
 
 
 /**
@@ -41,19 +44,27 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class CategoryListTest extends TestCase {
     /**
-     * Small value for comparaisons.
-     */
-    private static final double EPS = 1E-9;
-
-    /**
      * Set to <code>true</code> in order to print diagnostic messages.
      */
     private static final boolean PRINT = false;
 
     /**
+     * Small value for comparaisons.
+     */
+    private static final double EPS = 1E-9;
+
+    /**
      * Random number generator for this test.
      */
-    private Random random;
+    private static final Random random = new Random(1471753385855374101L);
+
+    /**
+     * Run the suite from the command line.
+     */
+    public static void main(String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
+    }
 
     /**
      * Returns the test suite.
@@ -67,14 +78,6 @@ public class CategoryListTest extends TestCase {
      */
     public CategoryListTest(final String name) {
         super(name);
-    }
-
-    /**
-     * Set up common objects used for all tests.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        random = new Random();
     }
 
     /**

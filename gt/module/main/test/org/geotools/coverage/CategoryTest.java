@@ -17,30 +17,35 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.cv;
+package org.geotools.coverage;
 
 // J2SE dependencies
 import java.util.Random;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.ct.MathTransform1D;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * Test the {@link Category} implementation.
+ * Tests the {@link Category} implementation.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CategoryTest extends TestCase {
     /**
-     * Random number generator for this test.
+     * Run the suite from the command line.
      */
-    private Random random;
+    public static void main(String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
+    }
 
     /**
      * Returns the test suite.
@@ -48,20 +53,17 @@ public class CategoryTest extends TestCase {
     public static Test suite() {
         return new TestSuite(CategoryTest.class);
     }
+
+    /**
+     * Random number generator for this test.
+     */
+    private static final Random random = new Random(9119969932919929834L);
     
     /**
      * Constructs a test case with the given name.
      */
     public CategoryTest(final String name) {
         super(name);
-    }
-
-    /**
-     * Set up common objects used for all tests.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        random = new Random();
     }
 
     /**
@@ -75,8 +77,7 @@ public class CategoryTest extends TestCase {
     /**
      * Check if a {@link Comparable} is a number identical to the supplied float value.
      */
-    private static void assertEquals(String message, Comparable number, double expected, double EPS)
-    {
+    private static void assertEquals(String message, Comparable number, double expected, double EPS) {
         assertTrue("Double.class", number instanceof Double);
         final double actual = ((Number)number).doubleValue();
         if (Double.isNaN(expected)) {
@@ -101,7 +102,7 @@ public class CategoryTest extends TestCase {
         for (int pass=0; pass<100; pass++) {
             final int      sample    = random.nextInt(64);
             final Category category1 = new Category("Auto", null, sample);
-            final Category category2 = new Category(category1.getName(null),
+            final Category category2 = new Category(category1.getName(),
                                                     category1.getColors(),
                                                     category1.getRange(),
                                                     category1.getSampleToGeophysics());

@@ -23,7 +23,6 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +35,6 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.GrowableInternationalString;
-import org.geotools.util.WeakHashSet;
 import org.geotools.util.WeakValueHashMap;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
@@ -101,13 +99,6 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * for setting the value to be returned by {@link #getRemarks()}.
      */
     public static final String REMARKS_PROPERTY = "remarks";
-
-    /**
-     * Set of weak references to existing objects (identifiers, CRS, Datum, whatever).
-     * This set is used in order to return a pre-existing object instead of creating a
-     * new one.
-     */
-    static final WeakHashSet POOL = new WeakHashSet();
 
     /**
      * A pool of {@link LocalName} values for given {@link InternationalString}.
@@ -574,31 +565,5 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
             hash = hash*37 + version.hashCode();
         }
         return hash;
-    }
-    
-    /**
-     * Returns the object to use after deserialization. This is usually <code>this</code>.
-     * However, if an identical object was previously deserialized, then this method replace
-     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
-     * This is correct only for immutable objects.
-     *
-     * @return A canonical instance of this object.
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    protected Object readResolve() throws ObjectStreamException {
-        return POOL.canonicalize(this);
-    }
-
-    /**
-     * Returns the object to write during serialization. This is usually <code>this</code>.
-     * However, if identical objects are found in the same graph during serialization, then
-     * they will be replaced by a single instance in order to reduce the amount of data sent
-     * to the output stream. This is correct only for immutable objects.
-     *
-     * @return The object to serialize (usually <code>this</code>).
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    protected Object writeReplace() throws ObjectStreamException {
-        return POOL.canonicalize(this);
     }
 }

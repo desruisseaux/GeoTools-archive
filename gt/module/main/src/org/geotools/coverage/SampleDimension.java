@@ -25,9 +25,8 @@ package org.geotools.coverage;
 
 // J2SE dependencies and extensions
 import java.awt.Color;
-import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
+import java.awt.image.DataBuffer;  // For javadoc
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
@@ -98,22 +97,6 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     private static final String[] EMPTY_METADATA = new String[0];
 
     /**
-     * Ordinal values of {@link SampleDimensionType}. Used for a "switch" statement.
-     * Note: with J2SE 1.5, it may no longer be necessary.
-     */
-    private static final int UNSIGNED_1BIT   =  0,
-                             UNSIGNED_2BITS  =  1,
-                             UNSIGNED_4BITS  =  2,
-                             UNSIGNED_8BITS  =  3,
-                             SIGNED_8BITS    =  4,
-                             UNSIGNED_16BITS =  5,
-                             SIGNED_16BITS   =  6,
-                             UNSIGNED_32BITS =  7,
-                             SIGNED_32BITS   =  8,
-                             REAL_32BITS     =  9,
-                             REAL_64BITS     = 10;
-
-    /**
      * A sample dimension wrapping the list of categories <code>CategoryList.inverse</code>.
      * This object is constructed and returned by {@link #geophysics}. Constructed when first
      * needed, but serialized anyway because it may be a user-supplied object.
@@ -179,12 +162,6 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * value in some conditions.
      */
     private final MathTransform1D sampleToGeophysics;
-
-    /**
-     * OpenGIS object returned by {@link #toOpenGIS}.
-     * It may be a hard or a weak reference.
-     */
-    private transient Object proxy;
 
     /**
      * Construct a sample dimension with no category.
@@ -345,7 +322,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                                                "offset", new Double(offset)));
         }
         if (type == null) {
-            type = getSampleDimensionType(minimum, maximum);
+            type = TypeMap.getSampleDimensionType(minimum, maximum);
         }
         if (color == null) {
             color = ColorInterpretation.PALETTE_INDEX;
@@ -369,7 +346,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                 }
                 name = categories[intValue];
             }
-            final Number value = wrapSample(padValue, type, false);
+            final Number value = TypeMap.wrapSample(padValue, type, false);
             if (name == null) {
                 name = value.toString();
             }
@@ -395,8 +372,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                     continue;
                 }
                 final CharSequence name = categories[lower];
-                Number min = wrapSample(lower,   type, false);
-                Number max = wrapSample(upper-1, type, false);
+                Number min = TypeMap.wrapSample(lower,   type, false);
+                Number max = TypeMap.wrapSample(upper-1, type, false);
                 final Class classe;
                 if (min.equals(max)) {
                     min = max;
@@ -485,8 +462,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
             }
             // If the remaining range is wide enough, add the category.
             if (maximum-minimum > (minIncluded && maxIncluded ? 0 : 1)) {
-                Number min = wrapSample(minimum, type, false);
-                Number max = wrapSample(maximum, type, false);
+                Number min = TypeMap.wrapSample(minimum, type, false);
+                Number max = TypeMap.wrapSample(maximum, type, false);
                 final Class classe = ClassChanger.getWidestClass(min, max);
                 min = ClassChanger.cast(min, classe);
                 max = ClassChanger.cast(max, classe);
@@ -648,183 +625,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         if (range == null) {
             return SampleDimensionType.REAL_32BITS;
         }
-        return getSampleDimensionType(range);
-    }
-
-    /**
-     * Returns the enum for the smallest type capable to hold the specified range of values.
-     *
-     * @param  range The range of values.
-     * @return The enum for the specified range.
-     */
-    public static SampleDimensionType getSampleDimensionType(final Range range) {
-        final Class type = range.getElementClass();
-        if (Double.class.isAssignableFrom(type)) {
-            return SampleDimensionType.REAL_64BITS;
-        }
-        if (Float.class.isAssignableFrom(type)) {
-            return SampleDimensionType.REAL_32BITS;
-        }
-        long min = ((Number) range.getMinValue()).longValue();
-        long max = ((Number) range.getMaxValue()).longValue();
-        if (!range.isMinIncluded()) min++;
-        if (!range.isMaxIncluded()) max--;
-        return getSampleDimensionType(min, max);
-    }
-
-    /**
-     * Returns the enum for a type capable to hold the specified range of values.
-     * An heuristic approach is used for non-integer values.
-     *
-     * @param  min  The lower value, inclusive.
-     * @param  max  The upper value, <strong>inclusive</strong> as well.
-     * @return The enum for the specified range.
-     */
-    private static SampleDimensionType getSampleDimensionType(double min, double max) {
-        final long lgMin = (long) min;
-        if (lgMin == min) {
-            final long lgMax = (long) max;
-            if (lgMax == max) {
-                return getSampleDimensionType(lgMin, lgMax);
-            }
-        }
-        min = Math.abs(min);
-        max = Math.abs(max);
-        if (Math.min(min,max)>=Float.MIN_VALUE && Math.max(min,max)<=Float.MAX_VALUE) {
-            return SampleDimensionType.REAL_32BITS;
-        }
-        return SampleDimensionType.REAL_64BITS;
-    }
-
-    /**
-     * Returns the enum for the smallest type capable to hold the specified range of values.
-     *
-     * @param  min  The lower value, inclusive.
-     * @param  max  The upper value, <strong>inclusive</strong> as well.
-     * @return The enum for the specified range.
-     */
-    private static SampleDimensionType getSampleDimensionType(final long min, final long max) {
-        if (min >= 0) {
-            if (max < (1L <<  1)) return SampleDimensionType.UNSIGNED_1BIT;
-            if (max < (1L <<  2)) return SampleDimensionType.UNSIGNED_2BITS;
-            if (max < (1L <<  4)) return SampleDimensionType.UNSIGNED_4BITS;
-            if (max < (1L <<  8)) return SampleDimensionType.UNSIGNED_8BITS;
-            if (max < (1L << 16)) return SampleDimensionType.UNSIGNED_16BITS;
-            if (max < (1L << 32)) return SampleDimensionType.UNSIGNED_32BITS;
-        } else {
-            if (min>=Byte   .MIN_VALUE && max<=Byte   .MAX_VALUE) return SampleDimensionType.SIGNED_8BITS;
-            if (min>=Short  .MIN_VALUE && max<=Short  .MAX_VALUE) return SampleDimensionType.SIGNED_16BITS;
-            if (min>=Integer.MIN_VALUE && max<=Integer.MAX_VALUE) return SampleDimensionType.SIGNED_32BITS;
-        }
-        return SampleDimensionType.REAL_32BITS;
-    }
-
-    /**
-     * Return the enum for the specified sample model and band number.
-     * If the sample model use an undefined data type, then this method
-     * returns <code>null</code>.
-     *
-     * @param  model The sample model.
-     * @param  band  The band to query.
-     * @return The enum for the specified sample model and band number.
-     * @throws IllegalArgumentException if the band number is not in the valid range.
-     */
-    public static SampleDimensionType getSampleDimensionType(final SampleModel model, final int band)
-        throws IllegalArgumentException
-    {
-        if (band<0 || band>=model.getNumBands()) {
-            throw new IllegalArgumentException(
-                    Resources.format(ResourceKeys.ERROR_BAD_BAND_NUMBER_$1, new Integer(band)));
-        }
-        boolean signed = true;
-        switch (model.getDataType()) {
-            case DataBuffer.TYPE_DOUBLE: return SampleDimensionType.REAL_64BITS;
-            case DataBuffer.TYPE_FLOAT:  return SampleDimensionType.REAL_32BITS;
-            case DataBuffer.TYPE_USHORT: signed=false; // Fall through
-            case DataBuffer.TYPE_INT:
-            case DataBuffer.TYPE_SHORT:
-            case DataBuffer.TYPE_BYTE: {
-                switch (model.getSampleSize(band)) {
-                    case  1: return SampleDimensionType.UNSIGNED_1BIT;
-                    case  2: return SampleDimensionType.UNSIGNED_2BITS;
-                    case  4: return SampleDimensionType.UNSIGNED_4BITS;
-                    case  8: return signed ? SampleDimensionType.SIGNED_8BITS : SampleDimensionType.UNSIGNED_8BITS;
-                    case 16: return signed ? SampleDimensionType.SIGNED_16BITS : SampleDimensionType.UNSIGNED_16BITS;
-                    case 32: return signed ? SampleDimensionType.SIGNED_32BITS : SampleDimensionType.UNSIGNED_32BITS;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Wrap the specified value into a number of the specified data type. If the
-     * value can't fit in the specified type, then a wider type is choosen unless
-     * <code>allowWidening</code> is <code>false</code>.
-     *
-     * @param  value The value to wrap in a {@link Number} object.
-     * @param  type A constant from the {@link SampleDimensionType} code list.
-     * @param  allowWidening <code>true</code> if this method is allowed to returns
-     *         a wider type than the usual one for the specified <code>type</code>.
-     * @return The value as a {@link Number}.
-     * @throws IllegalArgumentException if <code>type</code> is not a recognized constant.
-     * @throws IllegalArgumentException if <code>allowWidening</code> is <code>false</code>
-     *         and the specified <code>value</code> can't fit in the specified sample type.
-     */
-    private static Number wrapSample(final double value,
-                                     final SampleDimensionType type,
-                                     final boolean allowWidening)
-        throws IllegalArgumentException
-    {
-        switch (type.ordinal()) {
-            case UNSIGNED_1BIT:  // Fall through
-            case UNSIGNED_2BITS: // Fall through
-            case UNSIGNED_4BITS: // Fall through
-            case   SIGNED_8BITS: {
-                final byte candidate = (byte) value;
-                if (candidate == value) {
-                    return new Byte(candidate);
-                }
-                if (!allowWidening) break;
-                // Fall through
-            }
-            case UNSIGNED_8BITS: // Fall through
-            case  SIGNED_16BITS: {
-                final short candidate = (short) value;
-                if (candidate == value) {
-                    return new Short(candidate);
-                }
-                if (!allowWidening) break;
-                // Fall through
-            }
-            case UNSIGNED_16BITS: // Fall through
-            case   SIGNED_32BITS: {
-                final int candidate = (int) value;
-                if (candidate == value) {
-                    return new Integer(candidate);
-                }
-                if (!allowWidening) break;
-                // Fall through
-            }
-            case UNSIGNED_32BITS: {
-                final long candidate = (long) value;
-                if (candidate == value) {
-                    return new Long(candidate);
-                }
-                if (!allowWidening) break;
-                // Fall through
-            }
-            case REAL_32BITS: {
-                if (!allowWidening || Math.abs(value) <= Float.MAX_VALUE) {
-                    return new Float((float) value);
-                }
-                // Fall through
-            }
-            case REAL_64BITS: {
-                return new Double(value);
-            }
-        }
-        throw new IllegalArgumentException(String.valueOf(value));
+        return TypeMap.getSampleDimensionType(range);
     }
 
     /**
@@ -1087,8 +888,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @see #getMaximumValue
      *
      * @todo We should do a better job in {@code CategoryList.getRange()} when selecting
-     *       the appropriate data type. {@code getSampleDimensionType(Range)} may be of
-     *       some help.
+     *       the appropriate data type. {@link TypeMap#getSampleDimensionType(Range)}
+     *       may be of some help.
      */
     public NumberRange getRange() {
         return (categories!=null) ? categories.getRange() : null;
@@ -1133,11 +934,11 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @return A string representation of the geophysics value, or <code>null</code> if there is
      *         none.
      *
-     * @task REVISIT: What should we do when the value can't be formatted?
-     *                <code>SampleDimension</code> returns <code>null</code> if there is no
-     *                category or if an exception is thrown, but <code>CategoryList</code>
-     *                returns "Untitled" if the value is an unknow NaN, and try to format
-     *                the number anyway in other cases.
+     * @todo What should we do when the value can't be formatted?
+     *       <code>SampleDimension</code> returns <code>null</code> if there is no
+     *       category or if an exception is thrown, but <code>CategoryList</code>
+     *       returns "Untitled" if the value is an unknow NaN, and try to format
+     *       the number anyway in other cases.
      */
     public String getLabel(final double value, final Locale locale) {
         if (categories != null) {
@@ -1376,63 +1177,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         // with better values for 'band' and 'numBands' constants.
         final int band     = 0;
         final int numBands = 1;
-        return getColorInterpretation(getColorModel(band, numBands), band);
-    }
-    
-    /**
-     * Return the color interpretation code for the specified color model and band number.
-     *
-     * @param  model The color model.
-     * @param  band  The band to query.
-     * @return The code for the specified color model and band number.
-     * @throws IllegalArgumentException if the band number is not in the valid range.
-     */
-    public static ColorInterpretation getColorInterpretation(final ColorModel model, final int band)
-        throws IllegalArgumentException
-    {
-        if (band<0 || band>=model.getNumComponents()) {
-            throw new IllegalArgumentException(
-                    Resources.format(ResourceKeys.ERROR_BAD_BAND_NUMBER_$1, new Integer(band)));
-        }
-        if (model instanceof IndexColorModel) {
-            return ColorInterpretation.PALETTE_INDEX;
-        }
-        switch (model.getColorSpace().getType()) {
-            case ColorSpace.TYPE_GRAY: {
-                switch (band) {
-                    case  0: return ColorInterpretation.GRAY_INDEX;
-                    default: return ColorInterpretation.UNDEFINED;
-                }
-            }
-            case ColorSpace.TYPE_RGB: {
-                switch (band) {
-                    case  0: return ColorInterpretation.RED_BAND;
-                    case  1: return ColorInterpretation.GREEN_BAND;
-                    case  2: return ColorInterpretation.BLUE_BAND;
-                    case  3: return ColorInterpretation.ALPHA_BAND;
-                    default: return ColorInterpretation.UNDEFINED;
-                }
-            }
-            case ColorSpace.TYPE_HSV: {
-                switch (band) {
-                    case  0: return ColorInterpretation.HUE_BAND;
-                    case  1: return ColorInterpretation.SATURATION_BAND;
-                    case  2: return ColorInterpretation.LIGHTNESS_BAND;
-                    default: return ColorInterpretation.UNDEFINED;
-                }
-            }
-            case ColorSpace.TYPE_CMY:
-            case ColorSpace.TYPE_CMYK: {
-                switch (band) {
-                    case  0: return ColorInterpretation.CYAN_BAND;
-                    case  1: return ColorInterpretation.MAGENTA_BAND;
-                    case  2: return ColorInterpretation.YELLOW_BAND;
-                    case  3: return ColorInterpretation.BLACK_BAND;
-                    default: return ColorInterpretation.UNDEFINED;
-                }
-            }
-            default: return ColorInterpretation.UNDEFINED;
-        }
+        return TypeMap.getColorInterpretation(getColorModel(band, numBands), band);
     }
 
     /**
@@ -1474,10 +1219,10 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *         in the <code>{@link #getRange}</code> range. May be <code>null</code> if this
      *         sample dimension has no category.
      *
-     * @task REVISIT: This method may be deprecated in a future version. It it strange to use
-     *                only one <code>SampleDimension</code>  for creating a multi-bands color
-     *                model. Logically, we would expect as many <code>SampleDimension</code>s
-     *                as bands.
+     * @todo This method may be deprecated in a future version. It it strange to use
+     *       only one <code>SampleDimension</code>  for creating a multi-bands color
+     *       model. Logically, we would expect as many <code>SampleDimension</code>s
+     *       as bands.
      */
     public ColorModel getColorModel(final int visibleBand, final int numBands) {
         if (categories != null) {
@@ -1501,10 +1246,10 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *         in the <code>{@link #getRange}</code> range. May be <code>null</code> if this
      *         sample dimension has no category.
      *
-     * @task REVISIT: This method may be deprecated in a future version. It it strange to use
-     *                only one <code>SampleDimension</code>  for creating a multi-bands color
-     *                model. Logically, we would expect as many <code>SampleDimension</code>s
-     *                as bands.
+     * @todo This method may be deprecated in a future version. It it strange to use
+     *       only one <code>SampleDimension</code>  for creating a multi-bands color
+     *       model. Logically, we would expect as many <code>SampleDimension</code>s
+     *       as bands.
      */
     public ColorModel getColorModel(final int visibleBand, final int numBands, final int type) {
         if (categories != null) {

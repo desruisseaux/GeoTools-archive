@@ -351,7 +351,8 @@ public class CoordinateOperation extends IdentifiedObject
                  */
                 synchronized (GeneralDerivedCRS.class) {
                     if (GeneralDerivedCRS.\u00A4COMPARING != null) {
-                        assert GeneralDerivedCRS.\u00A4COMPARING == targetCRS;
+                        // NOTE: the following assertion fails for deserialized objects.
+                        // assert GeneralDerivedCRS.\u00A4COMPARING == targetCRS;
                         return true;
                     }
                     try {

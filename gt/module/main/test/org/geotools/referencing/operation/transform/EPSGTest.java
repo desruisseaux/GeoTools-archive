@@ -23,6 +23,11 @@ package org.geotools.referencing.operation.transform;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -51,12 +56,20 @@ import org.geotools.referencing.factory.epsg.DefaultFactory;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Vadim Semenov
  */
 public class EPSGTest extends TestCase {
     /**
      * The EPSG factory.
      */
     private DefaultFactory factory;
+
+    /**
+     * {@code true} if {@link #setUp} has been invoked at least once and failed to make a
+     * connection. This flag is used in order to log a warning only once and avoid any new
+     * useless tentative to get a connection.
+     */
+    private static boolean noConnection;
     
     /**
      * Run the suite from the command line.
@@ -86,6 +99,11 @@ public class EPSGTest extends TestCase {
      * not throws an exception for peoples who don't have an EPSG database on their machine.
      */
     protected void setUp() {
+        if (noConnection) {
+            // This method was already invoked before and failed.
+            // Do not try again.
+            return;
+        }
         boolean isReady = false;
         try {
             // Do not rely on FactoryFinder: we rely want to test this implementation,
@@ -95,10 +113,11 @@ public class EPSGTest extends TestCase {
             isReady = factory.isReady();
         } catch (RuntimeException error) {
             factory = null;
+            noConnection = true;
             final LogRecord record = new LogRecord(Level.WARNING,
                     "An error occured while setting up the date source for the EPSG database.\n" +
                     "Maybe there is no JDBC-ODBC bridge for the current platform.\n" +
-                    "No test will pe performed for this class.");
+                    "No test will be performed for this class.");
             record.setSourceClassName(EPSGTest.class.getName());
             record.setSourceMethodName("setUp");
             record.setThrown(error);
@@ -107,10 +126,11 @@ public class EPSGTest extends TestCase {
         }
         if (!isReady) {
             factory = null;
+            noConnection = true;
             Logger.getLogger("org.geotools.referencing").warning(
                 "Failed to connect to the EPSG authority factory.\n" +
                 "This is a normal failure when no EPSG database is available on the current machine.\n" +
-                "No test will pe performed for this class.");
+                "No test will be performed for this class.");
         }
     }
 
@@ -208,5 +228,57 @@ public class EPSGTest extends TestCase {
         // Was not in the cache
         assertEquals("4275", factory.createCoordinateReferenceSystem("4275").getIdentifiers()[0].getCode());
         assertTrue(factory.isConnected());
+    }
+
+    /**
+     * Tests the serialization of many {@link CoordinateOperation} objects.
+     */
+    public void testSerialization() throws FactoryException, IOException, ClassNotFoundException {
+        if (factory == null) return;
+        CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
+        CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem("4322");
+        CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory();
+        CoordinateOperation cop = opf.createOperation(crs1, crs2);
+        serialize(cop);
+
+        crs1 = crs2 = null;
+        final String crs1_name  = "4326";
+        final int crs2_ranges[] = {4326,  4326,
+                                   4322,  4322,
+                                   4269,  4269,
+                                   4267,  4267,
+                                   4230,  4230,
+                                  32601, 32660,
+                                  32701, 32760,
+                                   2759,  2930};
+
+        for (int irange=0; irange<crs2_ranges.length; irange+=2) {
+            int range_start = crs2_ranges[irange  ];
+            int range_end   = crs2_ranges[irange+1];
+            for (int isystem2=range_start; isystem2<=range_end; isystem2++) {
+                if (crs1 == null) {
+                    crs1 = factory.createCoordinateReferenceSystem(crs1_name);
+                }
+                String crs2_name = Integer.toString(isystem2);
+                crs2 = factory.createCoordinateReferenceSystem(crs2_name);
+                cop = opf.createOperation(crs1, crs2);
+                serialize(cop);
+            }
+        }
+    }
+
+    /**
+     * Tests the serialization of the specified object.
+     */
+    private static void serialize(final Object object) throws IOException, ClassNotFoundException {
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        final ObjectOutputStream out = new ObjectOutputStream(buffer);
+        out.writeObject(object);
+        out.close();
+        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+        final Object read = in.readObject();
+        in.close();
+        assertEquals(object,            read);
+        assertEquals(object.hashCode(), read.hashCode());
     }
 }

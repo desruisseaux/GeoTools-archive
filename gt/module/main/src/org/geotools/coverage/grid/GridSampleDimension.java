@@ -46,6 +46,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimension;
+import org.geotools.coverage.TypeMap;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -127,7 +128,7 @@ final class GridSampleDimension extends SampleDimension {
         final SampleModel model = image.getSampleModel();
         this.band     = bandNumber;
         this.numBands = model.getNumBands();
-        this.type     = getSampleDimensionType(model, bandNumber);
+        this.type     = TypeMap.getSampleDimensionType(model, bandNumber);
     }
 
     /**
@@ -412,7 +413,7 @@ final class GridSampleDimension extends SampleDimension {
      * Returns the color interpretation of the sample dimension.
      */
     public ColorInterpretation getColorInterpretation() {
-        return getColorInterpretation(getColorModel(band, numBands), band);
+        return TypeMap.getColorInterpretation(getColorModel(band, numBands), band);
     }
 
     /**

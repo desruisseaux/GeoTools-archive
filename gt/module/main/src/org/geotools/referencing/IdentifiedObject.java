@@ -810,30 +810,4 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                         ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1, unit));
         }
     }
-    
-    /**
-     * Returns the object to use after deserialization. This is usually <code>this</code>.
-     * However, if an identical object was previously deserialized, then this method replace
-     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
-     * This is correct only for immutable objects.
-     *
-     * @return A canonical instance of this object.
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    protected Object readResolve() throws ObjectStreamException {
-        return org.geotools.referencing.Identifier.POOL.canonicalize(this);
-    }
-
-    /**
-     * Returns the object to write during serialization. This is usually <code>this</code>.
-     * However, if identical objects are found in the same graph during serialization, then
-     * they will be replaced by a single instance in order to reduce the amount of data sent
-     * to the output stream. This is correct only for immutable objects.
-     *
-     * @return The object to serialize (usually <code>this</code>).
-     * @throws ObjectStreamException if this object can't be replaced.
-     */
-    protected Object writeReplace() throws ObjectStreamException {
-        return org.geotools.referencing.Identifier.POOL.canonicalize(this);
-    }
 }

@@ -23,14 +23,14 @@
 #
 # Image operation descriptors :
 #
-descriptor  org.geotools.gp.jai.CombineDescriptor
-descriptor  org.geotools.gp.jai.HysteresisDescriptor
-descriptor  org.geotools.gp.jai.NodataFilterDescriptor
+#descriptor  org.geotools.gp.jai.CombineDescriptor
+#descriptor  org.geotools.gp.jai.HysteresisDescriptor
+#descriptor  org.geotools.gp.jai.NodataFilterDescriptor
 
 
 #
 # "rendered" factory objects
 #
-rendered  org.geotools.gp.jai.CombineCRIF       org.geotools  org.geotools.Combine       Combine
-rendered  org.geotools.gp.jai.HysteresisCRIF    org.geotools  org.geotools.Hysteresis    Hysteresis
-rendered  org.geotools.gp.jai.NodataFilterCRIF  org.geotools  org.geotools.NodataFilter  NodataFilter
+#rendered  org.geotools.gp.jai.CombineCRIF       org.geotools  org.geotools.Combine       Combine
+#rendered  org.geotools.gp.jai.HysteresisCRIF    org.geotools  org.geotools.Hysteresis    Hysteresis
+#rendered  org.geotools.gp.jai.NodataFilterCRIF  org.geotools  org.geotools.NodataFilter  NodataFilter

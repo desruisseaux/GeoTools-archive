@@ -221,7 +221,8 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                  */
                 synchronized (GeneralDerivedCRS.class) {
                     if (\u00A4COMPARING != null) {
-                        assert \u00A4COMPARING == conversionFromBase;
+                        // NOTE: the following assertion fails for deserialized objects.
+                        // assert \u00A4COMPARING == conversionFromBase;
                         return true;
                     }
                     try {
