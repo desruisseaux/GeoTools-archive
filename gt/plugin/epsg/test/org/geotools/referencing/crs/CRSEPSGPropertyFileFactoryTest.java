@@ -18,9 +18,12 @@
  */
 package org.geotools.referencing.crs;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import junit.framework.TestCase;
 
@@ -57,11 +60,32 @@ public class CRSEPSGPropertyFileFactoryTest extends TestCase {
         assertEquals( "Geotools", vendor.getTitle().toString() );
         assert( vendor.getIdentifiers().contains( "EPSG" ) );                        
     }
+    
     public void testCodes() throws Exception {
         Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
         
         assertNotNull( codes );
-        System.out.println( codes.size() );
-                               
+        assertEquals( 2704, codes.size() );                               
+    }
+    
+    public void test26910() throws Exception {
+        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("26910");
+        assertNotNull( crs );                
+    }
+    public void testSuccess() throws Exception {
+        Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
+        int total = codes.size();
+        int count = 0;
+        
+        for( Iterator i=codes.iterator(); i.hasNext(); ){           
+            CoordinateReferenceSystem crs;
+            try {
+                crs = (CoordinateReferenceSystem) factory.createObject( (String) i.next() );
+                if( crs != null ) count ++;                
+            } catch (Throwable e) {
+                System.err.println("WARNING:"+e );
+            }            
+        }
+        System.out.println( "sucess:" + count + "/" + total );                
     }
 }
