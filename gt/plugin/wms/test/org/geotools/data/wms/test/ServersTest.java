@@ -9,6 +9,7 @@ package org.geotools.data.wms.test;
 import java.io.IOException;
 import java.net.URL;
 
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
 
 import junit.framework.TestCase;
@@ -33,13 +34,13 @@ public class ServersTest extends TestCase {
 //    	servers[8] = new URL("http://globe.digitalearth.gov/viz-bin/wmt.cgi?VERSION=1.1.0&Request=GetCapabilities");
 //    	servers[9] = new URL("http://www.geographynetwork.ca/wmsconnector/com.esri.wsit.WMSServlet/Geobase_NRN_NewfoundlandAndLabrador_I_Detail?request=GetCapabilities");
 //    	servers[10] = new URL("http://gisdata.usgs.net/servlet/com.esri.wms.Esrimap?REQUEST=GetCapabilities&VERSION=1.3.0&SERVICE=WMS");
-    	servers[11] = new URL("http://www.refractions.net:8080/geoserver/wms/?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"); //$NON-NLS-1$
+//   	servers[11] = new URL("http://www.refractions.net:8080/geoserver/wms/?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"); //$NON-NLS-1$
     	
     	for (int i = 0; i < servers.length; i++) {
     		if (servers[i] != null) {
     		    WebMapServer wms = new WebMapServer(servers[i], true);
     			//assertNotNull("Missing Capabilities",wms.getCapabilities());
-    		    wms.getCapabilities();
+    		    WMSCapabilities capabilities = wms.getCapabilities();
     			Exception problem = wms.getProblem();
 
     			if(problem!=null && !(problem instanceof IOException))

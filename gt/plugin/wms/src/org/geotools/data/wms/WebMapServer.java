@@ -446,6 +446,7 @@ public class WebMapServer implements Catalog {
 
         try {
             SAXBuilder builder = new SAXBuilder(false);
+            
             URLConnection connection = url.openConnection();
 
             document = builder.build(connection.getInputStream());
