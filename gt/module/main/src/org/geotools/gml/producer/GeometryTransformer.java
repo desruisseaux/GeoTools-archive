@@ -73,7 +73,31 @@ public class GeometryTransformer extends TransformerBase {
             encode(bounds, null);
         }
 
-        public void encode(Envelope bounds, String srsName) {
+        public void encode(Envelope bounds, String srsName) 
+        {
+        	// DJB: old behavior for null bounds:
+        	//
+        	//<gml:Box srsName="http://www.opengis.net/gml/srs/epsg.xml#0">
+        	//<gml:coordinates decimal="." cs="," ts=" ">0,0 -1,-1</gml:coordinates>
+			//</gml:Box>
+        	//
+        	// new behavior:
+        	// <gml:null>unknown</gml:null>
+        	if(bounds.isNull()) 
+        	{
+        		start("null");
+        		String text = "unknown";
+        		try{
+        			contentHandler.characters(text.toCharArray(), 0, text.length());
+        		}
+        		catch(Exception e) //this shouldnt happen!!
+				{
+        			System.out.println("got exception while writing null boundedby:"+e.getLocalizedMessage());
+        			e.printStackTrace();
+				}
+				end("null");
+				return; // we're done!
+        	}
             String boxName = "Box";
 
             if ((srsName == null) || srsName.equals("")) {
