@@ -361,7 +361,7 @@ public class ValidationProcessor {
      * iterated through then run on each Feature, with the ValidationResults
      * coming along for the ride, collecting error information.
      * </p>
-     * @param typeRefs List of modified features
+     * @param typeRefs List of modified features, or null to use stores.keySet()
      * @param stores the Map of effected features (Map of key=typeRef,
      *        value="featureSource"
      * @param envelope The bounding box that contains all modified Features
@@ -380,9 +380,14 @@ public class ValidationProcessor {
     	LOGGER.fine("Marshalled "+stores.size()+" FeatureSources for testing" );
     	LOGGER.fine("Testing limited to "+envelope );
     	
-    	if( typeRefs == null || typeRefs.isEmpty() ){
+    	if( typeRefs == null ){
+			LOGGER.finer("Using default typeRegs for stores" );
+    		typeRefs = stores.keySet();
+    	}
+    	else if( typeRefs.isEmpty() ){
     		LOGGER.finer("Validation test abandond - nothing was modified" );    		
     	}
+    	
         // convert each HashMap element into FeatureSources
     	//
     	List tests = new ArrayList();

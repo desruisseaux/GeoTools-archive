@@ -5,6 +5,8 @@
 package org.geotools.validation;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
@@ -97,7 +99,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}
 		
 		try {
-			processor.runFeatureTests(this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
+			processor.runFeatureTests("road", this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -134,7 +136,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		} catch (IllegalAttributeException e) {}
 		
 		try {
-			processor.runFeatureTests(this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests("road", this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);
@@ -158,7 +160,7 @@ public class ValidationPlugInTester extends DataTestCase {
 					= new LineNoSelfOverlappingValidation();
         selfOverlappingValidatorRoads.setName("RoadSelfIntersect");
         selfOverlappingValidatorRoads.setDescription("Tests to see if a road intersects itself, which is bad!");
-        selfOverlappingValidatorRoads.setLineTypeRef("road");
+        selfOverlappingValidatorRoads.setTypeRef("road");
 	
 		try {
 			processor.addValidation(selfOverlappingValidatorRoads);
@@ -167,7 +169,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}
 	
 		try {
-			processor.runFeatureTests(this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
+			processor.runFeatureTests( "id", this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -189,7 +191,7 @@ public class ValidationPlugInTester extends DataTestCase {
         = new LineNoSelfOverlappingValidation();
         selfOverlappingValidatorRoads.setName("RoadSelfIntersect");
         selfOverlappingValidatorRoads.setDescription("Tests to see if a road intersects itself, which is bad!");
-        selfOverlappingValidatorRoads.setLineTypeRef("road");
+        selfOverlappingValidatorRoads.setTypeRef("road");
         
 
 		try {
@@ -206,7 +208,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		} catch (IllegalAttributeException e) {}
 	
 		try {
-			processor.runFeatureTests(this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests( "datastoreId", this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);
@@ -238,7 +240,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}*/
 	
 		try {
-			processor.runFeatureTests(this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
+			processor.runFeatureTests("dataStoreId",this.roadType, DataUtilities.collection(new Feature[] {this.newRoad}), roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -268,7 +270,7 @@ public class ValidationPlugInTester extends DataTestCase {
 		}*/
 	
 		try {
-			processor.runFeatureTests(this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
+			processor.runFeatureTests("dataStoreId",this.roadType, DataUtilities.collection(this.roadFeatures), roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);
@@ -323,8 +325,8 @@ public class ValidationPlugInTester extends DataTestCase {
 		
 		HashMap layers = new HashMap();
 		try {
-			layers.put("road", DataUtilities.source(new Feature[] {newRoad}));
-			layers.put("river", DataUtilities.source(riverFeatures));
+			layers.put("dataStoreId:road", DataUtilities.source(new Feature[] {newRoad}));
+			layers.put("dataStoreId:river", DataUtilities.source(riverFeatures));
 		}
 		catch (Exception e) {
 			assertTrue(false);
@@ -332,7 +334,7 @@ public class ValidationPlugInTester extends DataTestCase {
 	
 	
 		try {
-			processor.runIntegrityTests(layers, null, roadValidationResults);
+			processor.runIntegrityTests( null, layers, null, roadValidationResults);
 		} catch (Exception e1) {
 			assertTrue(false);
 		}
@@ -367,8 +369,8 @@ public class ValidationPlugInTester extends DataTestCase {
 	
 		HashMap layers = new HashMap();
 		try {
-			layers.put("road", store.getFeatureSource("road"));
-			layers.put("river", store.getFeatureSource("river"));
+			layers.put("dataStoreId:road", store.getFeatureSource("road"));					
+			layers.put("dataStoreId:river", store.getFeatureSource("river"));			
 		}
 		catch (Exception e) {
 			assertTrue(false);
@@ -376,7 +378,7 @@ public class ValidationPlugInTester extends DataTestCase {
 	
 	
 		try {
-			processor.runIntegrityTests(layers, null, roadValidationResults);
+			processor.runIntegrityTests( null, layers, null, roadValidationResults);
 			}
 		catch (Exception e1) {
 			assertTrue(false);

@@ -93,7 +93,7 @@ public class XMLReaderTest extends TestCase {
             fr = new FileReader(
                     "C:/Java/workspace/geoserver/conf/validation/RoadTestSuite.xml");
 
-            TestSuiteDTO testsuite = XMLReader.readTestSuite(fr, m);
+            TestSuiteDTO testsuite = XMLReader.readTestSuite("test", fr, m);
             assertTrue("TestSuite Name read",
                 "RoadTestSuite".equals(testsuite.getName()));
 

@@ -351,7 +351,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 	 * @throws FactoryConfigurationError
 	 * @throws IllegalFilterException
 	 */
-	Filter filterBBox(Envelope bBox, FeatureType ft)
+	static Filter filterBBox(Envelope bBox, FeatureType ft)
 		throws FactoryConfigurationError, IllegalFilterException
 	{
 		FilterFactory ff = FilterFactory.createFilterFactory();

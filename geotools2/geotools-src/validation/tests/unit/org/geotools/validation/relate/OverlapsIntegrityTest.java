@@ -28,6 +28,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.Feature;
+import org.geotools.filter.Filter;
+
 
 import com.vividsolutions.jts.geom.Envelope;
 

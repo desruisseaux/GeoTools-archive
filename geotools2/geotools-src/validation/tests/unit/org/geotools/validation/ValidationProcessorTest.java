@@ -73,7 +73,7 @@ public class ValidationProcessorTest extends DataTestCase {
 		processor = new ValidationProcessor(); // was true as param
 		
 	// test the correct roads
-		processor.runFeatureTests(this.roadType, DataUtilities.collection(this.roadFeatures), validationResults);
+		processor.runFeatureTests( "dataStoreId", this.roadType, DataUtilities.collection(this.roadFeatures), validationResults);
 		assertTrue(validationResults.getFailedMessages().length == 0);
 		
 	// test the broken road
@@ -85,7 +85,7 @@ public class ValidationProcessorTest extends DataTestCase {
 		} catch (IllegalAttributeException e) {}
 		Feature[] singleRoad = new Feature[1];
 		singleRoad[0] = this.newRoad;
-		processor.runFeatureTests(this.roadType, DataUtilities.collection(singleRoad), validationResults);
+		processor.runFeatureTests( "dataStoreId", this.roadType, DataUtilities.collection(singleRoad), validationResults);
 		assertTrue(validationResults.getFailedMessages().length > 0);
 
 
@@ -97,7 +97,7 @@ public class ValidationProcessorTest extends DataTestCase {
 			map.put(typeNames[i], this.store.getFeatureSource(typeNames[i]));
 		map.put("newThing", this.store.getFeatureSource(typeNames[0]));
 			
-		processor.runIntegrityTests(map, null, validationResults);
+		processor.runIntegrityTests(null, map, null, validationResults);
 		assertTrue(validationResults.getFailedMessages().length > 0);
 		/*
 		String[] messages = validationResults.getFailedMessages();
