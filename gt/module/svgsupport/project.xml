@@ -39,6 +39,21 @@
       <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
     </dependency>
     <dependency>
+      <id>units</id>
+      <version>0.01</version>
+      <url>http://jsr-108.sourceforge.net</url>
+    </dependency>
+    <dependency>
+      <id>opengis+legacy</id>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <id>geoapi</id>
+      <version>1.0.0</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+    <dependency>
       <id>vecmath</id>
       <version>1.2.1</version>
       <url>http://java.sun.com/products/java-media/3D/</url>
@@ -70,8 +85,9 @@
       </includes>
       <resources>
         <resource>
-          <directory>${basedir}/tests/unit/</directory>
+          <directory>${basedir}/test</directory>
           <includes>
+            <include>**/test-data/</include>
             <include>**/*.svg</include>
             <include>**/*.sld</include>
             <include>**/*.gml</include>

@@ -37,6 +37,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.URL;
 
@@ -87,7 +88,7 @@ public class SVGTest extends TestCase {
         try {
             GenerateSVG gen = new GenerateSVG();
             URL url = TestData.getResource( this, gmlfile );
-            
+            if( url == null ) throw new FileNotFoundException( "test-data: "+gmlfile );
             DataSource ds = new GMLDataSource(url);
             FeatureCollection fc = ds.getFeatures(Query.ALL);
 
