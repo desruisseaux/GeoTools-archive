@@ -518,11 +518,17 @@ public class WebMapServer implements Discovery {
     /**
      * Utility method to return each layer that has a name. This method maintains no hierarchy at all.
      * 
-     * @return A list of type Layer, each value has a it's name property set
+     * @return An array of Layers, each value has a it's name property set or an empty array if there are none. It will return null if there is no capabilities document
+     * 
      */
     public Layer[] getNamedLayers() {
+    	
+    	if (capabilities == null) {
+    		return null;
+    	}
+    	
         List namedLayersList = new ArrayList();
-
+        
         Layer[] layers = capabilities.getLayers();
 
         for( int i = 0; i < layers.length; i++ ) {
