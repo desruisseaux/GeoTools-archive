@@ -22,6 +22,7 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,8 @@ import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.NoSuchAuthorityCodeException;
 import org.geotools.cs.PrimeMeridian;
+import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.factory.FactoryFinder;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.units.Unit;
@@ -66,11 +69,26 @@ public class CRSService {
 	List authorities = new ArrayList();
 	
 	/**
-	 * Default Reprojection Service using EPSG and AUTO.
+	 * Construct a CRSService (will find CRSAuthoritySpi on classpath).
+	 * <p>
+	 * Default Geotools install provides EPSG and AUTO authorities.
+	 * </p>
 	 */
 	public CRSService(){
-		register( CSAUTOFactory.getDefault() );
-		register( CSEPSGFactory.getDefault() );		
+		// register( CSAUTOFactory.getDefault() );
+		// register( CSEPSGFactory.getDefault() );
+        Set available = new HashSet();
+        Iterator it = FactoryFinder.factories(CRSAuthoritySpi.class);
+        CoordinateSystemAuthorityFactory factory = null;
+        while (it.hasNext()) {
+            try {
+                factory = (CoordinateSystemAuthorityFactory) it.next();
+                register( factory );
+            }
+            catch( Throwable t ){
+                System.err.println("Could not register "+factory );
+            }
+        }
 	}
 		
 	public void register( CoordinateSystemAuthorityFactory factory ){
