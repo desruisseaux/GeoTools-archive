@@ -6,9 +6,6 @@ F:\projects\schema\sld\1.0.0\StyledLayerDescriptor.xsd" version="1.0.0">
 	<Name>My Layer</Name>
 	<Title>A layer by me</Title>
 	<Abstract>this is a sample layer</Abstract>
-	<NamedLayer>
-		<Name>test</Name>
-	</NamedLayer>
 	<UserLayer>
 		<LayerFeatureConstraints>
 			<FeatureTypeConstraint/>
