@@ -161,7 +161,7 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
     private String ISSN;
 
     /**
-     * Construct a citation with the specified title.
+     * Constructs a citation with the specified title.
      *
      * @param title The title, as a {@link String} or an {@link InternationalString} object.
      */
@@ -466,6 +466,9 @@ public class Citation extends MetadataEntity implements org.opengis.metadata.cit
      * Compare this citation with the specified object for equality.
      */
     public synchronized boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
         if (object!=null && object.getClass().equals(getClass())) {
             final Citation that = (Citation) object;
             return Utilities.equals(this.title,                   that.title                  ) &&

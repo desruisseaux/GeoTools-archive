@@ -23,9 +23,6 @@ package org.geotools.metadata.citation;
 
 // Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
-import org.geotools.util.CheckedHashSet;
-import org.geotools.util.CheckedHashMap;
-import org.geotools.util.CheckedArrayList;
 import org.geotools.resources.Utilities;
 
 
@@ -37,6 +34,11 @@ import org.geotools.resources.Utilities;
  */
 public class Telephone extends MetadataEntity implements org.opengis.metadata.citation.Telephone {
     /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = -8237503664554861494L;
+    
+    /**
      * Telephone number by which individuals can speak to the responsible organization or individual.
      */
     private String voice;
@@ -47,18 +49,83 @@ public class Telephone extends MetadataEntity implements org.opengis.metadata.ci
     private String facsimile;
 
     /**
-     * Telephone number by which individuals can speak to the responsible organization or individual.
+     * Constructs a default telephone.
+     */
+    public Telephone() {
+    }
+
+    /**
+     * Returns the telephone number by which individuals can speak to the responsible
+     * organization or individual.
      */
     public String getVoice() {
         return voice;
     }
+
+    /**
+     * Set the telephone number by which individuals can speak to the responsible
+     * organization or individual.
+     */
+    public synchronized void setVoice(final String voice) {
+        checkWritePermission();
+        this.voice = voice;
+    }
+
+    /**
+     * Returns the telephone number of a facsimile machine for the responsible organization
+     * or individual.
+     */
     public String getFacsimile() {
-            return facsimile;
+        return facsimile;
     }
-    public void setFacsimile(String facsimile) {
-            this.facsimile = facsimile;
+
+    /**
+     * Set the telephone number of a facsimile machine for the responsible organization
+     * or individual.
+     */
+    public synchronized void setFacsimile(final String facsimile) {
+        checkWritePermission();
+        this.facsimile = facsimile;
     }
-    public void setVoice(String voice) {
-            this.voice = voice;
+
+    /**
+     * Declare this metadata and all its attributes as unmodifiable.
+     */
+    protected void freeze() {
+        super.freeze();
+        voice     = (String) unmodifiable(voice);
+        facsimile = (String) unmodifiable(facsimile);
+    }
+
+    /**
+     * Compare this telephone with the specified object for equality.
+     */
+    public synchronized boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object!=null && object.getClass().equals(getClass())) {
+            final Telephone that = (Telephone) object;
+            return Utilities.equals(this.voice,     that.voice    ) &&
+                   Utilities.equals(this.facsimile, that.facsimile);
+        }
+        return false;
+    }
+
+    /**
+     * Returns a hash code value for this telephone.
+     */
+    public synchronized int hashCode() {
+        int code = (int)serialVersionUID;
+        if (voice     != null) code ^= voice    .hashCode();
+        if (facsimile != null) code ^= facsimile.hashCode();
+        return code;
+    }
+
+    /**
+     * Returns a string representation of this telephone.
+     */
+    public String toString() {
+        return String.valueOf(voice);
     }
 }
