@@ -24,6 +24,7 @@ import java.util.Set;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
+import org.geotools.xml.gml.GMLSchema;
 
 
 /**
@@ -289,7 +290,7 @@ public abstract class FeatureTypeFactory implements Factory {
      */
     public static FeatureType newFeatureType(AttributeType[] types, String name)
         throws FactoryConfigurationError, SchemaException {
-        return newFeatureType(types, name, null, false);
+        return newFeatureType(types, name, GMLSchema.NAMESPACE, false);
     }
 
     /**

@@ -30,6 +30,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
+import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -114,7 +115,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         
         FeatureType schema = firstFeature(features).getFeatureType();
         assertTrue(schema.isDescendedFrom(BasicFeatureTypes.POLYGON));
-        assertTrue(schema.isDescendedFrom(null,"polygonFeature"));
+        assertTrue(schema.isDescendedFrom(GMLSchema.NAMESPACE,"polygonFeature"));
     }
     
     private ShapefileDataStore createDataStore(File f) throws Exception {
