@@ -15,6 +15,7 @@ import org.w3c.dom.NodeList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Level;
+import org.geotools.resources.TestData;
 
 /**
  *
@@ -65,10 +66,12 @@ public class SLDStyleTest extends TestCase {
     
     /** Test of parseStyle method, of class org.geotools.styling.SLDStyle. */
     public void testParseStyle() throws Exception{
-        java.net.URL base = getClass().getResource("testData/");
-        
+        //java.net.URL base = getClass().getResource("testData/");
+       // base = getClass().getResource("testData");
+       // base = getClass().getResource("/testData");
         StyleFactory factory = StyleFactory.createStyleFactory();
-        java.net.URL surl = new java.net.URL(base + "/test-sld.xml");
+        //java.net.URL surl = new java.net.URL(base + "/test-sld.xml");
+        java.net.URL surl = TestData.getResource(this, "test-sld.xml");
         SLDStyle stylereader = new SLDStyle(factory, surl);
         StyledLayerDescriptor sld = stylereader.parseSLD();
         assertEquals("My Layer", sld.getName());

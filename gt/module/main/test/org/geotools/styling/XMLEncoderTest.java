@@ -12,6 +12,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.logging.Logger;
 import junit.framework.*;
+import org.geotools.resources.TestData;
 
 /**
  *
@@ -38,9 +39,10 @@ public class XMLEncoderTest extends TestCase {
     // public void testHello() {}
     
     public void testSimpleEncoder() throws Exception{
-        java.net.URL base = getClass().getResource("testData/");
+
         StyleFactory factory = StyleFactory.createStyleFactory();
-        java.net.URL surl = new java.net.URL(base + "markTest.sld");
+        
+        java.net.URL surl = TestData.getResource(this, "markTest.sld");
         LOGGER.info("reading "+surl);
         SLDStyle stylereader = new SLDStyle(factory,surl);
         Style[] style = stylereader.readXML();
@@ -58,9 +60,10 @@ public class XMLEncoderTest extends TestCase {
     
     }
     public void testComplexEncoder() throws Exception{
-        java.net.URL base = getClass().getResource("testData/");
+        
         StyleFactory factory = StyleFactory.createStyleFactory();
-        java.net.URL surl = new java.net.URL(base + "sample.sld");
+       
+        java.net.URL surl = TestData.getResource(this, "sample.sld");
         LOGGER.info("reading "+surl);
         SLDStyle stylereader = new SLDStyle(factory,surl);
         Style[] style = stylereader.readXML();
@@ -72,9 +75,9 @@ public class XMLEncoderTest extends TestCase {
     
     }
     public void testComplexTextEncoder() throws Exception{
-        java.net.URL base = getClass().getResource("testData/");
         StyleFactory factory = StyleFactory.createStyleFactory();
-        java.net.URL surl = new java.net.URL(base + "textTest.sld");
+        java.net.URL surl = TestData.getResource(this, "textTest.sld");
+        
         LOGGER.info("reading "+surl);
         SLDStyle stylereader = new SLDStyle(factory,surl);
         Style[] style = stylereader.readXML();
