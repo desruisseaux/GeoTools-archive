@@ -22,19 +22,10 @@
  */
 package org.geotools.data.arcgrid;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-
-import javax.imageio.ImageIO;
 
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
@@ -42,7 +33,6 @@ import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.cs.DatumType;
 import org.geotools.cs.LocalDatum;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.arcgrid.ArcGridFormat;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.factory.FactoryConfigurationError;
@@ -51,7 +41,6 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -60,7 +49,6 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.geotools.units.Unit;
-import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
@@ -123,9 +111,8 @@ public class ArcGridRenderTest extends TestCaseSupport {
         StyleFactory sFac = StyleFactory.createStyleFactory();
         
         Format format = reader.getFormat();
-        OperationParameterGroup params = format.getReadParameters();
-        ParameterValueGroup values = (ParameterValueGroup) params.createValue();         
-        GridCoverage gc = reader.read( values );
+        ParameterValueGroup params = format.getReadParameters();        
+        GridCoverage gc = reader.read( params );
         Raster raster = gc.getRenderedImage().getData();
         
         org.geotools.pt.Envelope ex1 = gc.getEnvelope();

@@ -9,8 +9,6 @@ import org.geotools.data.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.resources.TestData;
-import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -74,19 +72,16 @@ public class ArcGridReaderTest extends TestCaseSupport {
     public void testGZIPReadStringParameterArray() throws Exception {
         URL gzipUrl = TestData.getResource( this, GZIP_TESTFILE );
         reader=format.getReader( gzipUrl );
-        OperationParameterGroup params = format.getReadParameters();
-        ParameterValueGroup values = (ParameterValueGroup) params.createValue();
+        ParameterValueGroup params = format.getReadParameters();
         
-        OperationParameter grassInfo = params.getParameter( "GRASS" );
-        ParameterValue grass = values.getValue( "GRASS" );
+        ParameterValue grass = params.parameter( "GRASS" );
         grass.setValue( true );
         
         
-        OperationParameter compressInfo = params.getParameter( "Compressed" );
-        ParameterValue compress = values.getValue( "Compressed" );
+        ParameterValue compress = params.parameter( "Compressed" );
         compress.setValue( true );
         
-        params.createValue();
+//        params.createValue();
     }
 
 }
