@@ -7,13 +7,17 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.ows.FilterCapabilities;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.Any;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.DefaultAny;
 import org.geotools.xml.schema.DefaultChoice;
 import org.geotools.xml.schema.DefaultSequence;
 import org.geotools.xml.schema.Element;
@@ -25,9 +29,13 @@ import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.helpers.AttributesImpl;
+import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterSchema.FilterAttribute;
 import org.geotools.xml.ogc.FilterSchema.FilterComplexType;
 import org.geotools.xml.ogc.FilterSchema.FilterElement;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * <p> 
@@ -894,7 +902,7 @@ public class FilterComplexTypes {
                 return;
             FunctionExpression me = (FunctionExpression)value;
             AttributesImpl ai = new AttributesImpl();
-            
+            ai.addAttribute(element.getNamespace().toString(),"name",null,"string",me.getName());
             output.startElement(element.getNamespace(),element.getName(),ai);
             for(int i=0;i<me.getArgCount();i++)
                 elems[0].getType().encode(null,me.getArgs()[i],output,hints);
@@ -905,18 +913,38 @@ public class FilterComplexTypes {
         private static final ComplexType instance = new LiteralType();
         public static ComplexType getInstance(){return instance;}
         
+//        <xsd:complexType name="LiteralType">
+//        <xsd:complexContent mixed="true">
+//          <xsd:extension base="ogc:ExpressionType">
+//            <xsd:sequence>
+//              <xsd:any minOccurs="0"/>
+//            </xsd:sequence>
+//          </xsd:extension>
+//        </xsd:complexContent>
+//        </xsd:complexType>
+        
+        private static Any any = new DefaultAny(null,0,1);
+        
+        private static Sequence seq = new DefaultSequence(new ElementGrouping[]{any,});
+        
+        public boolean isMixed(){
+            return true;
+        }
+        
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
+        
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return seq;
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
         /**
@@ -936,27 +964,58 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return LiteralExpression.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof LiteralExpression;
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+                return;
+            LiteralExpression me = (LiteralExpression)value;
+            AttributesImpl ai = new AttributesImpl();
+            output.startElement(element.getNamespace(),element.getName(),ai);
+            
+            switch(me.getType()){
+            case LiteralExpression.LITERAL_GEOMETRY:
+                if(me.getLiteral() instanceof Geometry){
+                    GMLSchema.getInstance().getElements()[29].getType().encode(GMLSchema.getInstance().getElements()[29],me.getLiteral(),output,hints);
+                	break;
+                }
+            case LiteralExpression.LITERAL_DOUBLE:
+            case LiteralExpression.LITERAL_INTEGER:
+            case LiteralExpression.LITERAL_STRING:
+                output.characters(me.getLiteral().toString());
+            	break;
+            }
+            
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class PropertyNameType extends FilterComplexType{
         private static final ComplexType instance = new PropertyNameType();
         public static ComplexType getInstance(){return instance;}
+        
+//        <xsd:complexType name="PropertyNameType">
+//          <xsd:complexContent mixed="true">
+//            <xsd:extension base="ogc:ExpressionType"/>
+//          </xsd:complexContent>
+//        </xsd:complexType>
+        
+
+        public boolean isMixed(){
+            return true;
+        }
+        
+        public Type getParent(){
+            return ExpressionType.getInstance();
+        }
         
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
@@ -986,38 +1045,25 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return String.class;
+            return AttributeExpression.class;
         }
         /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            return value instanceof String && element.getType()!=null && getName().equals(element.getType().getName());
+            return value instanceof AttributeExpression && element.getType()!=null && getName().equals(element.getType().getName());
         }
         /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output, Map hints) throws IOException, OperationNotSupportedException {
-            if(canEncode(element,value,hints)){
-                String name = (String)value;
-                output.startElement(element.getNamespace(),element.getName(),null);
-                output.characters(name);
-                output.endElement(element.getNamespace(),element.getName());
-            }else{
+            if(!canEncode(element,value,hints))
                 throw new OperationNotSupportedException("Cannot encode "+(element==null?"null":element.getName()));
-            }
-        }
-        /**
-         * @see org.geotools.xml.schema.ComplexType#isMixed()
-         */
-        public boolean isMixed() {
-            return true;
-        }
-        /**
-         * @see org.geotools.xml.schema.ComplexType#getParent()
-         */
-        public Type getParent() {
-            return ExpressionType.getInstance();
+            AttributeExpression name = (AttributeExpression)value;
+            
+            output.startElement(element.getNamespace(),element.getName(),null);
+            output.characters(name.getAttributePath());
+            output.endElement(element.getNamespace(),element.getName());
         }
     }
     public static class ServiceExceptionType extends FilterComplexType{

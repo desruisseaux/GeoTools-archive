@@ -849,7 +849,7 @@ public class GMLComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            return false;
+            return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Geometry;
         }
 
         /**
@@ -859,7 +859,10 @@ public class GMLComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            throw new OperationNotSupportedException();
+            if(!canEncode(element,value,hints))
+                throw new OperationNotSupportedException();
+            Geometry g = (Geometry)value;
+            GMLComplexTypes.encode(null, g, output);
         }
     }
 
