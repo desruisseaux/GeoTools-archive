@@ -1172,15 +1172,15 @@ public class FilterOpsComplexTypes {
             GeometryFilter lf = (GeometryFilter)value;
                         
             output.startElement(element.getNamespace(),element.getName(),null);
-            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
-                elems[0].getType().encode(elems[0],lf.getLeftGeometry(),output,hints); // prop name
-                elems[1].getType().encode(elems[1],lf.getRightGeometry(),output,hints); // geom
+            if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY){
+                elems[0].getType().encode(elems[0],lf.getRightGeometry(),output,hints); // prop name
+                elems[1].getType().encode(elems[1],lf.getLeftGeometry(),output,hints); // geom
             }else{
-                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_STRING){
-                    elems[0].getType().encode(elems[0],lf.getRightGeometry(),output,hints); // prop name
-                    elems[1].getType().encode(elems[1],lf.getLeftGeometry(),output,hints); // geom
+                if(lf.getRightGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY){
+                    elems[0].getType().encode(elems[0],lf.getLeftGeometry(),output,hints); // prop name
+                    elems[1].getType().encode(elems[1],lf.getRightGeometry(),output,hints); // geom
                 }else{
-                    throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name");
+                    throw new OperationNotSupportedException("Either the left or right expr must be a literal for the property name : BBOXType");
                 }
             }
             

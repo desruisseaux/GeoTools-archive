@@ -241,17 +241,19 @@ public class WFSDataStore extends AbstractDataStore{
         
         String query = getUrl.getQuery().toUpperCase();
         String url = getUrl.toString();
-        if(query == null){
-            url += "?SERVICE=WFS";
+        if(query == null || "".equals(query)){
+        	if(url==null || !url.endsWith("?"))
+        		url += "?";
+            url += "SERVICE=WFS";
         }else{
             if(query.indexOf("SERVICE")==-1){
                 url += "&SERVICE=WFS";
  	        }
         }
-        if(query.indexOf("VERSION")==-1){
+        if(query==null || query.indexOf("VERSION")==-1){
             url += "&VERSION=1.0.0";
 	    }
-        if(query.indexOf("REQUEST")==-1){
+        if(query==null || query.indexOf("REQUEST")==-1){
             url += "&REQUEST=DescribeFeatureType";
 	    }
         url += "&TYPENAME="+typeName;
@@ -377,17 +379,19 @@ public class WFSDataStore extends AbstractDataStore{
 		
         String query = getUrl.getQuery().toUpperCase();
         String url = getUrl.toString();
-        if(query == null){
-            url += "?SERVICE=WFS";
+        if(query == null || "".equals(query)){
+        	if(url == null || !url.endsWith("?"))
+        		url += "?";
+            url += "SERVICE=WFS";
         }else{
             if(query.indexOf("SERVICE")==-1){
                 url += "&SERVICE=WFS";
  	        }
         }
-        if(query.indexOf("VERSION")==-1){
+        if(query==null || query.indexOf("VERSION")==-1){
             url += "&VERSION=1.0.0";
 	    }
-        if(query.indexOf("REQUEST")==-1){
+        if(query==null || query.indexOf("REQUEST")==-1){
             url += "&REQUEST=GetFeature";
 	    }
         url += "&TYPENAME="+typeName;
