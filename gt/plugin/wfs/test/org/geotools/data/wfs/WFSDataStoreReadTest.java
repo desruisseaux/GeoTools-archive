@@ -66,19 +66,21 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     public void testPostGetFeature() throws OperationNotSupportedException, IOException, SAXException{
-        StringWriter w = new StringWriter();
+        
         Map hints = new HashMap();
         Element e = WFSSchema.getInstance().getElements()[2];
         hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[2]); // GetFeature
         System.out.println("HINT NAME = "+e.getName());
         System.out.println("Can encode"+e.getType().canEncode(e,new String[]{"topp:bc_roads"},hints));
 
-        Query query = new DefaultQuery("topp:bc_roads");
+        DefaultQuery query = new DefaultQuery("topp:bc_roads");
+        query.setPropertyNames(new String[]{"geom","length"}); // no acurate ...
+        StringWriter w = new StringWriter();
         DocumentWriter.writeDocument(query,WFSSchema.getInstance(),w,hints);
         System.out.print(w.getBuffer());
     }
     
-    public void testGaldos() throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void testGaldos() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
         System.out.println("\nGaldos");
         doFeatureType(url,false,false);
@@ -87,7 +89,7 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("");
     }
     
-    public void testGeoServer() throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void testGeoServer() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
         
         System.out.println("\nGeoServer");
@@ -97,7 +99,7 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("");
     }
     
-    public void testESRI() throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void testESRI() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://dev.geographynetwork.ca/ogcwfs/servlet/com.esri.ogc.wfs.WFSServlet?Request=GetCapabilities");
         
         System.out.println("\nESRI");
@@ -108,7 +110,7 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("");
     }
     
-    public void testInterGraph() throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void testInterGraph() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://ogc.intergraph.com/OregonDOT_wfs/request.asp?VERSION=0.0.14&request=GetCapabilities");
         
         System.out.println("\nInterGraph");
@@ -122,7 +124,7 @@ public class WFSDataStoreReadTest extends TestCase {
     
     
     
-    public void testGeomatics() throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void testGeomatics() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://gws2.pcigeomatics.com/wfs1.0.0/wfs?service=WFS&request=getcapabilities");
         System.out.println("\nGeomatics");
         doFeatureType(url,true,false);
@@ -192,7 +194,7 @@ public class WFSDataStoreReadTest extends TestCase {
         ft.close();}
     }
     
-    public void doFeatureReaderWithFilter(URL url, boolean get, boolean post) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public void doFeatureReaderWithFilter(URL url, boolean get, boolean post) throws NoSuchElementException, IllegalAttributeException, OperationNotSupportedException, IOException, SAXException{
         DataStore wfs = null;
     if(get){
         // 	get
@@ -201,7 +203,8 @@ public class WFSDataStoreReadTest extends TestCase {
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[1]);
         FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
-        String[] props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(0).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(1).getName():ft.getAttributeType(0).getName()};
+        // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
+        String[] props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(4).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(5).getName():ft.getAttributeType(4).getName()};
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
         FeatureReader fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
@@ -214,9 +217,17 @@ public class WFSDataStoreReadTest extends TestCase {
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[1]);
         FeatureType ft = wfs.getSchema(wfs.getTypeNames()[1]);
-        String[] props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(0).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(1).getName():ft.getAttributeType(0).getName()};
+        // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
+        String[] props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(4).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(5).getName():ft.getAttributeType(4).getName()};
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
+
+        Map hints = new HashMap();
+        hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[2]); // GetFeature
+        StringWriter w = new StringWriter();
+        DocumentWriter.writeDocument(query,WFSSchema.getInstance(),w,hints);
+        System.out.print(w.getBuffer());
+        
         FeatureReader fr = wfs.getFeatureReader(query,Transaction.AUTO_COMMIT);
         assertNotNull("FeatureType was null",ft);
         assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);

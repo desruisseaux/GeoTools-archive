@@ -17,6 +17,7 @@
 package org.geotools.xml.wfs;
 
 import org.geotools.data.Query;
+import org.geotools.filter.Filter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.gml.GMLComplexTypes;
 import org.geotools.xml.ogc.FilterSchema;
@@ -519,9 +520,11 @@ public class WFSBasicComplexTypes {
                 output.startElement(element.getNamespace(),element.getName(),attributes);
                 
                 String[] propNames = query.getPropertyNames();
+                if(Query.ALL_NAMES!=propNames)
                 if(propNames!=null)
                     for(int i=0;i<propNames.length;i++)
                         elems[0].getType().encode(elems[0],propNames[i],output,hints);
+                if(Filter.NONE!=query.getFilter())
                 if(query.getFilter()!=null)
                     elems[1].getType().encode(elems[1],query.getFilter(),output,hints);
                 

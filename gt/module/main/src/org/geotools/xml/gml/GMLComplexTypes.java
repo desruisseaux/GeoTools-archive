@@ -6254,8 +6254,8 @@ public class GMLComplexTypes {
         if ((geometryAttribute == null)
                 && attrs[i].isGeometry()) {
             if (!attrs[i].getName()
-                             .equalsIgnoreCase(BoxType.getInstance()
-                                                          .getName())) {
+//                    .equalsIgnoreCase(BoxType.getInstance().getName())) {
+                .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                 geometryAttribute = (GeometryAttributeType) attrs[i];
             }
         }
@@ -6303,8 +6303,8 @@ public class GMLComplexTypes {
             if ((geometryAttribute == null)
                 && attrs[i].isGeometry()) {
                 if (!attrs[i].getName()
-                             .equalsIgnoreCase(BoxType.getInstance()
-                                                          .getName())) {
+//                  .equalsIgnoreCase(BoxType.getInstance().getName())) {
+                    .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                     geometryAttribute = (GeometryAttributeType) attrs[i];
                 }
             }
