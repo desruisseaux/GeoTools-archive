@@ -66,7 +66,7 @@ public class BatchValidator {
     private static Properties transProp;
     
     private static Validator validator;
-    private static Repository dataRepository;
+    private static DefaultRepository dataRepository;
 
 
     public static void main(String[] args) {
@@ -114,7 +114,7 @@ public class BatchValidator {
 		validator = new Validator(dataRepository, v);
 		/** validator is now ready to go */
 		
-		it = dataRepository.getDataStores().iterator();
+		it = dataRepository.getDataStores().values().iterator();
 		/** do the feature type validation dance */
 		while (it.hasNext())
 		{
