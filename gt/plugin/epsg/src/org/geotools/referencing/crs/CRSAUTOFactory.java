@@ -29,7 +29,6 @@ import java.util.TreeSet;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.cs.CoordinateSystemAUTOFactory;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;

@@ -46,7 +46,7 @@ import org.opengis.util.InternationalString;
 //not quite sure how I am going to create a new factory (what should the geoapi method be)
 public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
    
-//would be nice to cache crs objects for codes that have already been requested    
+    //would be nice to cache crs objects for codes that have already been requested    
     
     /**
      * The default coordinate system authority factory.

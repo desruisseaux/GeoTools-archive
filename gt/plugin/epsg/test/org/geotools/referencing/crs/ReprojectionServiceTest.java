@@ -20,9 +20,8 @@ package org.geotools.referencing.crs;
 
 import junit.framework.TestCase;
 
-import org.geotools.cs.NoSuchAuthorityCodeException;
-import org.geotools.ct.MathTransform;
 import org.geotools.referencing.FactoryFinder;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
