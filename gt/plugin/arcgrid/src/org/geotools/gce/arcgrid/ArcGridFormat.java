@@ -48,12 +48,11 @@ import java.util.HashMap;
  *  @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
  */
 public class ArcGridFormat extends AbstractGridFormat implements Format {
-    /**Authority factory for CRS*/
-    private static CRSAuthorityFactory factory = null;
+
     public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //calss of the object we will pass
             null, //list of valid values not provided
-            ArcGridFormat.getDefaultCRS() //default value
+            getDefaultCRS()//default value
         );
 
     /** Indicates whether the arcgrid data is compressed with GZIP */
@@ -251,23 +250,5 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
         return writeParameters;
     }
 
-    /**getDefaultCRS
-     *
-     * This method provides the user with a default crs WGS84
-     */
-    static CoordinateReferenceSystem getDefaultCRS() {
-        try {
-            if (ArcGridFormat.factory != null) {
-                return factory.createCoordinateReferenceSystem("4326");
-            }
-            else {
-                factory = FactoryFinder.getCRSAuthorityFactory("EPSG");
 
-                return factory.createCoordinateReferenceSystem("4326");
-            }
-        }
-        catch (Exception e) {
-            return GeographicCRS.WGS84;
-        }
-    }
 }
