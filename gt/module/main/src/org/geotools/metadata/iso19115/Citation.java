@@ -6,7 +6,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
+import org.geotools.util.ListOf;
+import org.geotools.util.MapOf;
+import org.geotools.util.SetOf;
 import org.opengis.util.InternationalString;
+import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.PresentationForm;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Series;
@@ -18,7 +22,7 @@ public class Citation extends MetaData implements
 	private Set citedResponsibleParties = new SetOf( ResponsibleParty.class );
 	
 	private InternationalString title;
-	private Map dates = new HashMap();
+	private Map dates = new MapOf( DateType.class, Date.class );
 	private InternationalString edition;
 	private Date editionDate;
 	private Set identifiers = new SetOf( String.class );
