@@ -114,7 +114,7 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	protected boolean featureValidation(	String dsid, 
+	public boolean featureValidation(String dsid, 
 										FeatureReader features)
 		throws IOException, Exception//, WfsTransactionException 
 	{
@@ -130,12 +130,12 @@ public class Validator
 		
 		final Map failed = new TreeMap();
 		/** Set up our validation results */
-		ValidationResults results = getFeatureValidationResults(failed);
+		ValidationResults results = makeFeatureValidationResults(failed);
 
 		try {
 			validationProcessor.runFeatureTests(dsid, type, features, results);
 		} catch (Exception badIdea) {
-			// ValidationResults should of handled stuff will redesign :-)
+			// ValidationResults should have handled stuff, will redesign :-)
 			throw new DataSourceException("Validation Failed", badIdea);
 		}
 
@@ -175,7 +175,7 @@ public class Validator
 	 * @param failed
 	 * @return
 	 */
-	private ValidationResults getFeatureValidationResults(final Map failed)
+	private ValidationResults makeFeatureValidationResults(final Map failed)
 	{
 		ValidationResults results = new ValidationResults() 
 		{
@@ -214,12 +214,12 @@ public class Validator
 	 * 
 	 * Author: bowens<br>
 	 * Created on: Jun 26, 2004<br>
-	 * @param stores
-	 * @param check
+	 * @param stores Map of required FeatureStores by typeRef (dataStoreId:typeName)
+	 * @param bBox
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	protected boolean integrityValidation(Map stores, Envelope bBox)
+	public boolean integrityValidation(Map stores, Envelope bBox)
 		throws IOException, Exception// WfsTransactionException 
 	{
 		//Data catalog = request.getWFS().getData();
@@ -240,8 +240,9 @@ public class Validator
 			typeRefs.add( typeRef );
         
 			Set dependencies = validationProcessor.getDependencies( typeRef );
-			LOGGER.finer( "typeRef "+typeRef+" requires "+dependencies);            
-			typeRefs.addAll( dependencies ); 
+			LOGGER.finer( "typeRef "+typeRef+" requires "+dependencies);
+			if (dependencies != null && dependencies.size() > 0)
+				typeRefs.addAll( dependencies ); 
 		}
 
 		// Grab a source for each typeName we need to check
@@ -282,7 +283,7 @@ public class Validator
 		}
 		LOGGER.finer( "Total of "+sources.size()+" featureSource marshalled for testing" );
 		final Map failed = new TreeMap();
-		ValidationResults results = getIntegrityValidationResults(failed);
+		ValidationResults results = makeIntegrityValidationResults(failed);
 
 		try {
 			//should never be null, but confDemo is giving grief, and I 
@@ -338,7 +339,7 @@ public class Validator
 	 * @param failed the map of failed features
 	 * @return
 	 */
-	private ValidationResults getIntegrityValidationResults(final Map failed)
+	private ValidationResults makeIntegrityValidationResults(final Map failed)
 	{
 		ValidationResults results = new ValidationResults() 
 		{
