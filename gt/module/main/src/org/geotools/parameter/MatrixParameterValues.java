@@ -20,6 +20,9 @@
 package org.geotools.parameter;
 
 // OpenGIS dependencies
+import java.util.ArrayList;
+import java.util.List;
+
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.util.InternationalString;
@@ -49,14 +52,13 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  *
  * @see MatrixParameters
  */
-public class MatrixParameterValues extends ParameterGroup implements ParameterDescriptorGroup {
-    
+public class MatrixParameterValues extends ParameterGroup implements ParameterDescriptorGroup {    
     private static final long serialVersionUID = 1L;
-
+    
     /**
      * The parameter values. Will be constructed only when first requested.
      */
-    private ParameterValue[][] values;
+    private ParameterValue[][] matrixValues;
 
     /**
      * The value for the {@link MatrixParameters#numRow} parameter.
@@ -75,7 +77,7 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      * {@linkplain MatrixParameters matrix parameters}.
      */
     public MatrixParameterValues(final MatrixParameters descriptor) {
-        super(descriptor);
+        super(descriptor);        
         numRow = (ParameterValue) getValue(0);
         numCol = (ParameterValue) getValue(1);
     }
@@ -207,8 +209,7 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
             throws IndexOutOfBoundsException
     {
         return getValue(row, column, numRow.intValue(), numCol.intValue());
-    }
-
+    }   
     /**
      * Implementation of {@link #getValue(int,int)}.
      *
@@ -225,18 +226,18 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
     {
         MatrixParameters.checkIndice("row",    row,    numRow);
         MatrixParameters.checkIndice("column", column, numCol);
-        if (values == null) {
-            values = new ParameterValue[numRow][];
+        if (matrixValues == null) {
+            matrixValues = new ParameterValue[numRow][];
         }
-        if (row >= values.length) {
-            values = (ParameterValue[][]) XArray.resize(values, numRow);
+        if (row >= matrixValues.length) {
+            matrixValues = (ParameterValue[][]) XArray.resize(matrixValues, numRow);
         }
-        ParameterValue[] rowValues = values[row];
+        ParameterValue[] rowValues = matrixValues[row];
         if (rowValues == null) {
-            values[row] = rowValues = new ParameterValue[numCol];
+            matrixValues[row] = rowValues = new ParameterValue[numCol];
         }
         if (column >= rowValues.length) {
-            values[row] = rowValues = (ParameterValue[]) XArray.resize(rowValues, numCol);
+            matrixValues[row] = rowValues = (ParameterValue[]) XArray.resize(rowValues, numCol);
         }
         ParameterValue param = rowValues[column];
         if (param == null) {
@@ -245,7 +246,22 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
         }
         return param;
     }
-
+    public final void delValue(final int row, final int column){
+        delValue(row, column, numRow.intValue(), numCol.intValue());
+	}     
+    public void delValue( int row, int column, int numRow, int numCol ){
+        if( matrixValues == null ){
+            return; // nothing to remove
+        }
+        final ParameterValue[] rowValues = matrixValues[column];
+        if( rowValues == null ){
+            // nothing there
+            return;
+        }
+        if ( row < rowValues.length) {
+            rowValues[row] = null;
+        }
+    }
     /**
      * Returns the parameters descriptors in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
@@ -255,6 +271,17 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
                                                              numCol.intValue());
     }
 
+    /* (non-Javadoc)
+     * @see org.geotools.parameter.ParameterGroup#values()
+     */
+    public List values() {
+        GeneralParameterValue[] params = getValues();
+        List list = new ArrayList();
+        for( int i=0; i<params.length; i++ ){
+            list.add( params[i] );
+        }        
+        return list;
+    }
     /**
      * Returns the parameters values in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
@@ -269,10 +296,10 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
         int k = 0;
         parameters[k++] = this.numRow;
         parameters[k++] = this.numCol;
-        if (values != null) {
-            final int maxRow = Math.min(numRow, values.length);
+        if (matrixValues != null) {
+            final int maxRow = Math.min(numRow, matrixValues.length);
             for (int j=0; j<maxRow; j++) {
-                final ParameterValue[] rowValues = values[j];
+                final ParameterValue[] rowValues = matrixValues[j];
                 if (rowValues != null) {
                     final int maxCol = Math.min(numCol, rowValues.length);
                     for (int i=0; i<maxCol; i++) {
@@ -286,7 +313,7 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
         }
         return (ParameterValue[]) XArray.resize(parameters, k);
     }
-
+    
     /**
      * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
      * specified at construction time.
@@ -304,9 +331,9 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
         final int numRow = this.numRow.intValue();
         final int numCol = this.numCol.intValue();
         final GeneralMatrix matrix = new GeneralMatrix(numRow, numCol);
-        if (values != null) {
+        if (matrixValues != null) {
             for (int j=0; j<numRow; j++) {
-                final ParameterValue[] row = values[j];
+                final ParameterValue[] row = matrixValues[j];
                 if (row != null) {
                     for (int i=0; i<numCol; i++) {
                         final ParameterValue element = row[i];
@@ -328,29 +355,44 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      * @param matrix The matrix to copy in this group of parameters.
      */
     public void setMatrix(final Matrix matrix) {
-        final MatrixParameters descriptor = ((MatrixParameters) this.descriptor);
+        final MatrixParameters matrixDescriptor = ((MatrixParameters) this.descriptor);
         final int numRow = matrix.getNumRow();
         final int numCol = matrix.getNumCol();
         this.numRow.setValue(numRow);
-        this.numCol.setValue(numCol);
-        for (int j=0; j<numRow; j++) {
-            for (int i=0; i<numCol; i++) {
-                final double element = matrix.getElement(j,i);
-                final Object def = descriptor.getParameter(j,i, numRow, numCol).getDefaultValue();
-                if (!(def instanceof Number) || element != ((Number)def).doubleValue()) {
-                    getValue(j,i, numRow, numCol).setValue(element);
-                } else {
-                    /*
-                     * The matrix element has the default value. Delete the corresponding
-                     * entry from this parameter value group.
-                     */
-                    if (values!=null && j<values.length) {
-                        final ParameterValue[] rowValues = values[j];
-                        if (rowValues!=null && i<rowValues.length) {
-                            rowValues[i] = null;
+        this.numCol.setValue(numCol);        
+        for (int row=0; row<numRow; row++) {
+            for (int col=0; col<numCol; col++) {
+                final double element = matrix.getElement(row,col);
+                ParameterDescriptor descriptor = matrixDescriptor.getParameter( row, col );
+                final Object defaultValue = descriptor.getDefaultValue();
+                if( defaultValue instanceof Number ){
+                    double value = ((Number) defaultValue ).doubleValue();
+                    if( element != value ){
+                        // ParameterValue paramValue = getValue( row, col );
+                        if( matrixValues == null ){
+                            matrixValues = new ParameterValue[ numRow ][];
+                        }
+                        if( matrixValues[ row] == null ){
+                            matrixValues[ row ] = new ParameterValue[ numCol ]; 
+                        }
+                        ParameterValue realValue = new ParameterReal( descriptor, element );
+                        matrixValues[ row ][ col ] = realValue;                                                        
+                    }
+                    else {
+                        // remove entry to keep things sparse
+                        if( matrixValues != null && matrixValues[row] != null &&
+                            matrixValues[row][col] != null ){
+                            matrixValues[row][col] = null;
                         }
                     }
-                }
+                }                
+                else {
+                    // remove entry
+                    if( matrixValues != null && matrixValues[row] != null &&
+                        matrixValues[row][col] != null ){
+                        matrixValues[row][col] = null;
+                    }
+                }               
             }
         }
     }
@@ -385,14 +427,14 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      */
     public Object clone() {
         final MatrixParameterValues copy = (MatrixParameterValues) super.clone();
-        if (copy.values != null) {
+        if (copy.matrixValues != null) {
             copy.numRow = (ParameterValue)     copy.getValue(0);
             copy.numCol = (ParameterValue)     copy.getValue(1);
-            copy.values = (ParameterValue[][]) copy.values.clone();
-            for (int j=0; j<copy.values.length; j++) {
-                ParameterValue[] array = copy.values[j];
+            copy.matrixValues = (ParameterValue[][]) copy.matrixValues.clone();
+            for (int j=0; j<copy.matrixValues.length; j++) {
+                ParameterValue[] array = copy.matrixValues[j];
                 if (array != null) {
-                    copy.values[j] = array = (ParameterValue[]) array.clone();
+                    copy.matrixValues[j] = array = (ParameterValue[]) array.clone();
                     for (int i=0; i<array.length; i++) {
                         if (array[i] != null) {
                             array[i] = (ParameterValue) array[i].clone();
