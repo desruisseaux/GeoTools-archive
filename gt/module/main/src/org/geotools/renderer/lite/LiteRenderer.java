@@ -75,7 +75,6 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.gc.GridCoverage;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.renderer.Renderer;
@@ -104,6 +103,7 @@ import org.geotools.styling.Symbol;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextMark;
 import org.geotools.styling.TextSymbolizer;
+import org.opengis.coverage.grid.GridCoverage;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

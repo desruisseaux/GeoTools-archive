@@ -23,8 +23,8 @@ import java.awt.image.RenderedImage;
 
 import javax.media.jai.ImageMIPMap;
 
-import org.geotools.gc.GridCoverage;
 import org.geotools.resources.geometry.XAffineTransform;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.operation.MathTransform2D;
 
 
@@ -93,12 +93,13 @@ public final class GridCoverageRenderer {
     public GridCoverageRenderer(GridCoverage gridCoverage) {
         this.gridCoverage = gridCoverage;
 
-        try {
-            image = gridCoverage.geophysics(false).getRenderedImage();
-        } catch (Exception e) {
-            System.out.println("Using geophysics image");
-            image = gridCoverage.getRenderedImage();
-        }
+//  FIXME
+//        try {
+//            image = gridCoverage.geophysics(false).getRenderedImage();
+//        } catch (Exception e) {
+//            System.out.println("Using geophysics image");
+//            image = gridCoverage.getRenderedImage();
+//        }
 
         if (USE_PYRAMID) {
             AffineTransform at = AffineTransform.getScaleInstance(
@@ -126,8 +127,8 @@ public final class GridCoverageRenderer {
      */
     public void paint(final Graphics2D graphics) {
         final MathTransform2D mathTransform;
-        mathTransform = gridCoverage.getGridGeometry()
-                                    .getGridToCoordinateSystem2D();
+        mathTransform = (MathTransform2D) gridCoverage.getGridGeometry()
+                                    .getGridToCoordinateSystem();
 
         if (!(mathTransform instanceof AffineTransform)) {
             throw new UnsupportedOperationException(
@@ -137,16 +138,17 @@ public final class GridCoverageRenderer {
         AffineTransform gridToCoordinate = (AffineTransform) mathTransform;
 
         if (images == null) {
-            final AffineTransform transform;
-            transform = new AffineTransform(gridToCoordinate);
-            transform.translate(-0.5, -0.5); // Map to upper-left corner.
-
-            try {
-                graphics.drawRenderedImage(image, transform);
-            } catch (Exception e) {
-                image = getGoodImage(image);
-                graphics.drawRenderedImage(image, transform);
-            }
+//  FIXME
+//            final AffineTransform transform;
+//            transform = new AffineTransform(gridToCoordinate);
+//            transform.translate(-0.5, -0.5); // Map to upper-left corner.
+//
+//            try {
+//                graphics.drawRenderedImage(image, transform);
+//            } catch (Exception e) {
+//                image = getGoodImage(image);
+//                graphics.drawRenderedImage(image, transform);
+//            }
         } else {
             /*
              * Compute the most appropriate level as a function of the required

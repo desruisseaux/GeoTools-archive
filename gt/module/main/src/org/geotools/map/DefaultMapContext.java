@@ -41,7 +41,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.gc.GridCoverage;
 import org.geotools.geometry.JTS;
 import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapLayerEvent;
@@ -51,6 +50,7 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.styling.Style;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
@@ -234,12 +234,13 @@ public class DefaultMapContext implements MapContext {
             .instance();
         GeometryFactory gf = new GeometryFactory(pm, 0);
         Coordinate[] coord = new Coordinate[5];
-        Rectangle2D rect = gc.getEnvelope().toRectangle2D();
-        coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
-        coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
-        coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
-        coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
-        coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
+        
+        org.opengis.spatialschema.geometry.Envelope env=gc.getEnvelope();
+        coord[0] = new Coordinate(env.getMinimum(0), env.getMinimum(1));
+        coord[1] = new Coordinate(env.getMaximum(0), env.getMinimum(1));
+        coord[2] = new Coordinate(env.getMaximum(0), env.getMaximum(1));
+        coord[3] = new Coordinate(env.getMinimum(0), env.getMaximum(1));
+        coord[4] = new Coordinate(env.getMinimum(0), env.getMinimum(1));
 
         LinearRing ring = new LinearRing(csf.create(coord), gf);
         Polygon bounds = new Polygon(ring, null, gf);
@@ -254,11 +255,7 @@ public class DefaultMapContext implements MapContext {
         AttributeType[] attTypes = { geom, grid };
 
         // Fix the schema name
-        String typeName = gc.getName(null);
-
-        if (typeName == null) {
-            typeName = "GridCoverage";
-        }
+        String typeName = "GridCoverage";
 
         try {
             schema = FeatureTypeFactory.newFeatureType(attTypes, typeName);
@@ -503,7 +500,7 @@ public class DefaultMapContext implements MapContext {
                             env = JTS.transform(env, transform);
                         }
                     }
-                } catch (TransformException e) {
+                } catch (Exception e) {
                     LOGGER.log(Level.SEVERE,
                         "Data source and map context coordinate system differ, yet it was not possible to get a projected bounds estimate...",
                         e);

@@ -22,11 +22,11 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.gc.GridCoverage;
 import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapBoundsListener;
 import org.geotools.map.event.MapLayerListListener;
 import org.geotools.styling.Style;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
