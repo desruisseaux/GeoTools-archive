@@ -78,7 +78,7 @@ public class CoordinateSystemAUTOFactory extends CoordinateSystemAuthorityFactor
         switch (c.code) {
             case 42001: return Unit.DEGREE;
         }
-        throw new NoSuchAuthorityCodeException(code);
+        throw new NoSuchAuthorityCodeException(code, "Unit");
     }
 
     /**
@@ -89,7 +89,7 @@ public class CoordinateSystemAUTOFactory extends CoordinateSystemAuthorityFactor
         switch (c.code) {
             case 42001: return Ellipsoid.WGS84;
         }
-        throw new NoSuchAuthorityCodeException(code);
+        throw new NoSuchAuthorityCodeException(code, "Ellipsoid");
     }
 
     /**
@@ -100,7 +100,7 @@ public class CoordinateSystemAUTOFactory extends CoordinateSystemAuthorityFactor
         switch (c.code) {
             case 42001: return PrimeMeridian.GREENWICH;
         }
-        throw new NoSuchAuthorityCodeException(code);
+        throw new NoSuchAuthorityCodeException(code, "PrimeMeridian");
     }
 
     /**
@@ -111,18 +111,18 @@ public class CoordinateSystemAUTOFactory extends CoordinateSystemAuthorityFactor
         switch (c.code) {
             case 42001: return HorizontalDatum.WGS84;
         }
-        throw new NoSuchAuthorityCodeException(code);
+        throw new NoSuchAuthorityCodeException(code, "Datum");
     }
 
     /**
      * {@inheritDoc}
      */
     public CoordinateSystem createCoordinateSystem(final String code) throws FactoryException {
-        final Code c = new Code(code, "Datum");
+        final Code c = new Code(code, "CoordinateSystem");
         switch (c.code) {
             case 42001: return create42001(c);
         }
-        throw new NoSuchAuthorityCodeException(code);
+        throw new NoSuchAuthorityCodeException(code, "CoordinateSystem");
     }
 
     /**
