@@ -2206,6 +2206,9 @@ public class GMLComplexTypes {
 
                 CoordinateSequence c = (CoordinateSequence) t;
                 // TODO -- be forgiving
+                if(c.size() == 1){
+                    c = DefaultCoordinateSequenceFactory.instance().create(new Coordinate[]{c.getCoordinate(0),c.getCoordinate(0)});
+                }
                 p = gf.createLineString(c);
             }
 

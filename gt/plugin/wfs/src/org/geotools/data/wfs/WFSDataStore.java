@@ -411,7 +411,7 @@ public class WFSDataStore extends AbstractDataStore{
  	    os.close();
  	    
  	    InputStream is = getInputStream(hc,auth);
- 	    System.out.println("ready?"+is.available());
+// 	    System.out.println("ready?"+is.available());
 
  	    WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize);
  	    

@@ -124,7 +124,7 @@ public class SchemaHandler extends XSIElementHandler {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
-System.out.println("NS = "+targetNamespace);
+//System.out.println("NS = "+targetNamespace);
         if ((prefixCache != null) && (targetNamespace != null)
                 && (!targetNamespace.equals(""))) {
             Iterator i = prefixCache.keySet().iterator();
@@ -1331,7 +1331,7 @@ System.out.println("NS = "+targetNamespace);
      */
     public void endElement(String namespaceURI, String localName)
         throws SAXException {
-System.out.println("NS END = "+targetNamespace);
+//System.out.println("NS END = "+targetNamespace);
     }
 
     /**

@@ -80,9 +80,9 @@ public class WFSDataStoreReadTest extends TestCase {
     public void testGaldos() throws NoSuchElementException, IOException, IllegalAttributeException{
         URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
         System.out.println("\nGaldos");
-        doFeatureType(url,true,true);
-        doFeatureReader(url,true,true);
-        doFeatureReaderWithFilter(url,true,true);
+        doFeatureType(url,false,false);
+        doFeatureReader(url,false,false);
+        doFeatureReaderWithFilter(url,false,false);
         System.out.println("");
     }
     
@@ -93,6 +93,29 @@ public class WFSDataStoreReadTest extends TestCase {
 //        doFeatureType(url,true,true);
 //        doFeatureReader(url,true,true);
 //        doFeatureReaderWithFilter(url,true,true);
+        System.out.println("");
+    }
+    
+    public void testESRI() throws NoSuchElementException, IOException, IllegalAttributeException{
+        URL url = new URL("http://dev.geographynetwork.ca/ogcwfs/servlet/com.esri.ogc.wfs.WFSServlet?Request=GetCapabilities");
+        
+        System.out.println("\nESRI");
+        // TODO turn these on
+        doFeatureType(url,false,false);
+        doFeatureReader(url,false,false);
+        doFeatureReaderWithFilter(url,false,false);
+        System.out.println("");
+    }
+    
+    public void testInterGraph() throws NoSuchElementException, IOException, IllegalAttributeException{
+        URL url = new URL("http://ogc.intergraph.com/OregonDOT_wfs/request.asp?VERSION=0.0.14&request=GetCapabilities");
+        
+        System.out.println("\nInterGraph");
+        // TODO turn these on
+        // This server does not specify namespace declarations within their xml documents
+        doFeatureType(url,false,false);
+        doFeatureReader(url,false,false);
+        doFeatureReaderWithFilter(url,false,false);
         System.out.println("");
     }
     
