@@ -27,9 +27,14 @@ import java.util.logging.Logger;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.ObjectFactory;
+
+// Geotools dependencies
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -68,5 +73,22 @@ public class AbstractFactory implements Factory, org.geotools.factory.Factory {
      */
     public Citation getVendor() {
         return org.geotools.metadata.citation.Citation.GEOTOOLS;
+    }
+
+    /**
+     * Makes sure that an argument is non-null. This is a
+     * convenience method for subclass methods.
+     *
+     * @param  name   Argument name.
+     * @param  object User argument.
+     * @throws InvalidParameterValueException if <code>object</code> is null.
+     */
+    protected static void ensureNonNull(final String name, final Object object)
+        throws IllegalArgumentException
+    {
+        if (object == null) {
+            throw new InvalidParameterValueException(Resources.format(
+                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name), name, object);
+        }
     }
 }

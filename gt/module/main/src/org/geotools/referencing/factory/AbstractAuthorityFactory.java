@@ -31,7 +31,6 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -73,8 +72,6 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.NameFactory;
 
@@ -893,22 +890,5 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
                 "No code \""+code+"\" from the authority \""+authority+
                 "\" was found for object of type "+Utilities.getShortName(type)+".",
                 authority, code);
-    }
-
-    /**
-     * Makes sure that an argument is non-null. This is a
-     * convenience method for subclass methods.
-     *
-     * @param  name   Argument name.
-     * @param  object User argument.
-     * @throws InvalidParameterValueException if <code>object</code> is null.
-     */
-    protected static void ensureNonNull(final String name, final Object object)
-        throws IllegalArgumentException
-    {
-        if (object == null) {
-            throw new InvalidParameterValueException(Resources.format(
-                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name), name, object);
-        }
     }
 }
