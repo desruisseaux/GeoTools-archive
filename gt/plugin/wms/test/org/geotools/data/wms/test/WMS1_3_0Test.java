@@ -6,8 +6,10 @@
  */
 package org.geotools.data.wms.test;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.LatLonBoundingBox;
@@ -15,6 +17,11 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMS1_3_0;
 import org.geotools.data.wms.WMSParser;
+import org.geotools.data.wms.xml.WMSSchema;
+import org.geotools.resources.TestData;
+import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.SchemaFactory;
+import org.geotools.xml.schema.Schema;
 
 /**
  * @author Kefka
@@ -133,4 +140,17 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
 		assertEquals(bbox.getMaxY(), 68.6906585693359, 0.0);
 	}
 
+    protected WMSCapabilities createCapabilities( String capFile ) throws Exception {		
+        File getCaps = TestData.file(this, capFile);
+        URL getCapsURL = getCaps.toURL();
+		Object object = DocumentFactory.getInstance(getCapsURL.toURI(), null, Level.FINE);
+
+        Schema schema = WMSSchema.getInstance();
+		SchemaFactory.getInstance(WMSSchema.NAMESPACE);
+				
+		assertTrue("Capabilities failed to parse", object instanceof WMSCapabilities);
+		
+		WMSCapabilities capabilities = (WMSCapabilities) object;
+		return capabilities;
+    }
 }
