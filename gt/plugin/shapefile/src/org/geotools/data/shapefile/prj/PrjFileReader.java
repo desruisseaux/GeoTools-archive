@@ -62,7 +62,7 @@ public class PrjFileReader {
         charBuffer.flip();
         
         String wkt = charBuffer.toString();
-        wkt = rewrite(wkt);
+     
         cs = FactoryFinder.getCRSFactory().createFromWKT(wkt);
     }
     
@@ -70,15 +70,7 @@ public class PrjFileReader {
         return cs;
     }
     
-    /**
-     * rewrites the wkt to fix some incompatabilities between prj and 'standard' wkt.
-     * @TODO: revisit works for LLC that have 2 SPs but will probably fail if only one is given
-     */ 
-    public String rewrite(String wkt){
-        String fixed = wkt;
-        fixed = wkt.replaceAll("Lambert_Conformal_Conic\"", "Lambert_Conformal_Conic_2SP\"");
-        return fixed;
-    }
+   
     
     private int fill(ByteBuffer buffer,ReadableByteChannel channel) throws IOException {
         int r = buffer.remaining();
