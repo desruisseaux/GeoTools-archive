@@ -71,8 +71,8 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.FactoryGroup;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;

@@ -49,8 +49,8 @@ import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.Factory;
-import org.geotools.referencing.FactoryGroup;
+import org.geotools.referencing.factory.AbstractFactory;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
@@ -69,7 +69,7 @@ import org.geotools.util.WeakHashSet;
  * @author <A HREF="http://www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
-public abstract class AbstractCoordinateOperationFactory extends Factory
+public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
         implements org.opengis.referencing.operation.CoordinateOperationFactory
 {
     /**

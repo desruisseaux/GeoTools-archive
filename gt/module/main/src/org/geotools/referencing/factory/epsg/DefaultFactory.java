@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing.epsg;
+package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies and extensions
 import java.io.File;
@@ -90,8 +90,8 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.nature.Units;
 import org.geotools.metadata.extent.GeographicBoundingBox;
-import org.geotools.referencing.AuthorityFactory;
-import org.geotools.referencing.FactoryGroup;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.projection.MapProjection;
@@ -127,7 +127,7 @@ import org.geotools.util.ScopedName;
  * @author Rueben Schulz
  */
 // TODO: vérifier noSuchAuthorityCode, new FactoryException
-public class DefaultFactory extends AuthorityFactory
+public class DefaultFactory extends AbstractAuthorityFactory
         implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory
 {
     ////////////////////////////////////////////////////////////////////////////////////////////

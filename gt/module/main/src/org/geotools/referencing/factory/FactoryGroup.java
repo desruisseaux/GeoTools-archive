@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.referencing;
+package org.geotools.referencing.factory;
 
 // J2SE dependencies
 import java.util.Collection;
@@ -56,6 +56,8 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.util.Singleton;
 
 

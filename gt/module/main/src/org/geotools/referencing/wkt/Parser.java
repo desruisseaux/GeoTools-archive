@@ -68,10 +68,10 @@ import org.opengis.referencing.operation.OperationMethod;
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.FactoryGroup;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;

@@ -36,7 +36,9 @@ import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransformFactory;
@@ -102,9 +104,10 @@ public final class FactoryFinder {
                     DatumFactory.class,
                     CSFactory.class,
                     CRSFactory.class,
+                    DatumAuthorityFactory.class,
+                    CSAuthorityFactory.class,
                     CRSAuthorityFactory.class,
                     MathTransformFactory.class,
-                    AuthorityFactory.class,
                     CoordinateOperationFactory.class}));
         }
         return registry;

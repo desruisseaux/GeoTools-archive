@@ -20,10 +20,11 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing;
+package org.geotools.referencing.factory;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.Factory;
 
 
 /**
@@ -41,11 +42,11 @@ import org.opengis.metadata.citation.Citation;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Factory implements org.opengis.referencing.Factory {
+public class AbstractFactory implements Factory {
     /**
      * Construct a default factory.
      */
-    protected Factory() {
+    protected AbstractFactory() {
     }
 
     /**

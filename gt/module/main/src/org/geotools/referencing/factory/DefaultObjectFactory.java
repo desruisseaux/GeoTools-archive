@@ -20,7 +20,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing;
+package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
 import java.text.ParseException;
@@ -33,7 +33,9 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -76,8 +78,10 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
+import org.geotools.util.WeakHashSet;
 
 
 
@@ -87,7 +91,7 @@ import org.geotools.referencing.wkt.Symbols;
  * {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate reference systems} or
  * {@linkplain org.geotools.referencing.datum.Datum} that cannot be created by an {@link AuthorityFactory}.
  * This factory is very flexible, whereas the authority factory is easier to use. So
- * {@link AuthorityFactory} can be used to make "standard" object, and <code>ObjectFactory</code>
+ * {@link AuthorityFactory} can be used to make "standard" object, and {@link ObjectFactory}
  * can be used to make "special" objects.
  * <br><br>
  * Most methods expect a {@link Map} argument. The map is often (but is not required to be) a
@@ -140,12 +144,21 @@ import org.geotools.referencing.wkt.Symbols;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ObjectFactory extends Factory implements CSFactory, DatumFactory, CRSFactory {
+public class DefaultObjectFactory extends AbstractFactory
+            implements CSFactory, DatumFactory, CRSFactory
+{
     /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
      * Will be created only when first needed.
      */
     private transient Parser parser;
+
+    /**
+     * Set of weak references to existing objects (identifiers, CRS, Datum, whatever).
+     * This set is used in order to return a pre-existing object instead of creating a
+     * new one.
+     */
+    private final WeakHashSet pool = new WeakHashSet();
 
     /**
      * Construct a default factory. This method is public in order to allows instantiations
@@ -158,7 +171,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * {@linkplain CRSFactory}   factory = FactoryFinder.{@linkplain FactoryFinder#getCRSFactory   getCRSFactory()};
      * </pre></blockquote>
      */
-    public ObjectFactory() {
+    public DefaultObjectFactory() {
     }
 
 
@@ -190,7 +203,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) canonicalize(ellipsoid);
+        ellipsoid = (Ellipsoid) pool.canonicalize(ellipsoid);
         return ellipsoid;
     }
 
@@ -215,7 +228,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        ellipsoid = (Ellipsoid) canonicalize(ellipsoid);
+        ellipsoid = (Ellipsoid) pool.canonicalize(ellipsoid);
         return ellipsoid;
     }
 
@@ -237,7 +250,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        meridian = (PrimeMeridian) canonicalize(meridian);
+        meridian = (PrimeMeridian) pool.canonicalize(meridian);
         return meridian;
     }
 
@@ -260,7 +273,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (GeodeticDatum) canonicalize(datum);
+        datum = (GeodeticDatum) pool.canonicalize(datum);
         return datum;
     }
 
@@ -280,7 +293,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (VerticalDatum) canonicalize(datum);
+        datum = (VerticalDatum) pool.canonicalize(datum);
         return datum;
     }
 
@@ -300,7 +313,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (TemporalDatum) canonicalize(datum);
+        datum = (TemporalDatum) pool.canonicalize(datum);
         return datum;
     }
 
@@ -318,7 +331,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (EngineeringDatum) canonicalize(datum);
+        datum = (EngineeringDatum) pool.canonicalize(datum);
         return datum;
     }
 
@@ -339,7 +352,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        datum = (ImageDatum) canonicalize(datum);
+        datum = (ImageDatum) pool.canonicalize(datum);
         return datum;
     }
 
@@ -371,7 +384,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        axis = (CoordinateSystemAxis) canonicalize(axis);
+        axis = (CoordinateSystemAxis) pool.canonicalize(axis);
         return axis;
     }
 
@@ -393,7 +406,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CartesianCS) canonicalize(cs);
+        cs = (CartesianCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -417,7 +430,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CartesianCS) canonicalize(cs);
+        cs = (CartesianCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -439,7 +452,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (AffineCS) canonicalize(cs);
+        cs = (AffineCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -463,7 +476,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (AffineCS) canonicalize(cs);
+        cs = (AffineCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -485,7 +498,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (PolarCS) canonicalize(cs);
+        cs = (PolarCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -511,7 +524,6 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * Creates a cylindrical coordinate system from the given set of axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain ObjectFactory listed there}.
      * @param  axis0 The first  axis.
      * @param  axis1 The second axis.
      * @param  axis2 The third  axis.
@@ -528,7 +540,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (CylindricalCS) canonicalize(cs);
+        cs = (CylindricalCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -552,7 +564,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (SphericalCS) canonicalize(cs);
+        cs = (SphericalCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -574,7 +586,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (EllipsoidalCS) canonicalize(cs);
+        cs = (EllipsoidalCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -598,7 +610,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (EllipsoidalCS) canonicalize(cs);
+        cs = (EllipsoidalCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -618,7 +630,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (VerticalCS) canonicalize(cs);
+        cs = (VerticalCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -638,7 +650,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (TimeCS) canonicalize(cs);
+        cs = (TimeCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -658,7 +670,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (LinearCS) canonicalize(cs);
+        cs = (LinearCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -680,7 +692,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (UserDefinedCS) canonicalize(cs);
+        cs = (UserDefinedCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -704,7 +716,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (UserDefinedCS) canonicalize(cs);
+        cs = (UserDefinedCS) pool.canonicalize(cs);
         return cs;
     }
 
@@ -734,7 +746,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (CompoundCRS) canonicalize(crs);
+        crs = (CompoundCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -756,7 +768,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (EngineeringCRS) canonicalize(crs);
+        crs = (EngineeringCRS) pool.canonicalize(crs);
         return crs;
     }
     
@@ -778,7 +790,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (ImageCRS) canonicalize(crs);
+        crs = (ImageCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -800,7 +812,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (TemporalCRS) canonicalize(crs);
+        crs = (TemporalCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -822,7 +834,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (VerticalCRS) canonicalize(crs);
+        crs = (VerticalCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -845,7 +857,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeocentricCRS) canonicalize(crs);
+        crs = (GeocentricCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -868,7 +880,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeocentricCRS) canonicalize(crs);
+        crs = (GeocentricCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -892,7 +904,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (GeographicCRS) canonicalize(crs);
+        crs = (GeographicCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -951,7 +963,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (DerivedCRS) canonicalize(crs);
+        crs = (DerivedCRS) pool.canonicalize(crs);
         return crs;
     }
     
@@ -1000,7 +1012,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        crs = (ProjectedCRS) canonicalize(crs);
+        crs = (ProjectedCRS) pool.canonicalize(crs);
         return crs;
     }
 
@@ -1120,17 +1132,5 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
             }
             throw new FactoryException(exception);
         }
-    }
-
-    /**
-     * Returns a canonical instance of the specified object. This method is invoked
-     * after the creation of each immutable object. It maintains a pool of previously
-     * created objects through {@linkplain java.lang.ref.WeakReference weak references}.
-     *
-     * @param  info The object to canonicalize.
-     * @return An unique instance of the specified object.
-     */
-    private static Object canonicalize(final org.opengis.referencing.IdentifiedObject info) {
-        return org.geotools.referencing.Identifier.POOL.canonicalize(info);
     }
 }

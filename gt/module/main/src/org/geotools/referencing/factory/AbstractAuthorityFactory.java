@@ -20,7 +20,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing;
+package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
 import java.util.Iterator;
@@ -31,6 +31,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -97,8 +98,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class AuthorityFactory extends Factory
-        implements org.opengis.referencing.AuthorityFactory, RegisterableService
+public abstract class AbstractAuthorityFactory extends AbstractFactory
+        implements AuthorityFactory, RegisterableService
 {
     /**
      * The minimum priority that a factory can have. Factories with lowest priority will be used
@@ -137,7 +138,7 @@ public abstract class AuthorityFactory extends Factory
      * @param priority The priority for this factory, as a number between
      *        {@link #MIN_PRIORITY} and {@link #MAX_PRIORITY} inclusive.
      */
-    protected AuthorityFactory(final FactoryGroup factories, final int priority) {
+    protected AbstractAuthorityFactory(final FactoryGroup factories, final int priority) {
         this.factories = factories;
         this.priority  = priority;
         ensureNonNull("factories", factories);
@@ -751,8 +752,8 @@ public abstract class AuthorityFactory extends Factory
     public void onRegistration(final ServiceRegistry registry, final Class category) {
         for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {
             final Object provider = it.next();
-            if (provider instanceof AuthorityFactory) {
-                final AuthorityFactory factory = (AuthorityFactory) provider;
+            if (provider instanceof AbstractAuthorityFactory) {
+                final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) provider;
                 final Citation vendor    = getVendor();
                 final Citation authority = getAuthority();
                 if (vendor    != null  &&  vendor   .equals(factory.getVendor   ()) &&
