@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
@@ -19,7 +20,7 @@ import org.xml.sax.SAXException;
  * @author dzwiers
  *
  */
-public class WFSDataStoreFactory implements DataStoreFactorySpi{
+public class WFSDataStoreFactory extends AbstractDataStoreFactory{//implements DataStoreFactorySpi{
 
     // note one of the two is required
     public static final Param GET_CAPABILITIES_URL = new Param("WFSDataStoreFactory:GET_CAPABILITIES_URL",URL.class,"Represents a URL to the getCapabilities document. This URL does not need to be altered in any way. GET_CAPABILITIES_URL and SERVER_URL are mutually exclusive. One of the two is required.",false);
