@@ -305,7 +305,7 @@ public abstract class CoordinateSystem extends Info
     }    
     
     /** For compatibility with GeoAPI interfaces. */
-    public org.geotools.util.InternationalString getScope() {
+    public org.opengis.util.InternationalString getScope() {
         return null;
     }
     
