@@ -6,12 +6,9 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import java.io.FileFilter;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.geotools.catalog.AbstractCatalog;
 import org.geotools.catalog.CatalogEntry;
@@ -23,9 +20,7 @@ import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.opengis.coverage.grid.Format;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -38,6 +33,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 		GridCoverageExchange {
 
 	private static Set extensions;
+	FormatManager formatManager=FormatManager.getFormatManager();
 	
 	private File root;
 
@@ -58,7 +54,7 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 
 	private void refresh(File file, boolean recursive) {
 
-		File[] files = file.listFiles(new GridFileFormatFilter());
+		File[] files = file.listFiles(formatManager.getFileFilter());
 		for (int j = 0; j < files.length; j++) {
 			if (files[j].isFile())
 				entries.add(new FSCatalogEntry(files[j]));
@@ -104,12 +100,10 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 		CatalogEntry entry=(CatalogEntry) source;
 		Format format= ((FileMetadata)entry.getMetadata(0)).getFormat();
 		
-		Iterator iter=GridFormatFinder.getAvailableFormats();
-		while( iter.hasNext() ){
-			GridFormatFactorySpi factory=(GridFormatFactorySpi)iter.next();
-			if( factory.canCreate(format) )
-				return factory.createReader(new FileReader((File)entry.getResource()));
-		}
+		GridFormatFactorySpi factory=formatManager.getFactory(format);
+		if( factory != null)
+		    return factory.createReader(entry.getResource());
+		
 		return null;
 	}
 
@@ -124,12 +118,10 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 		assert (destination instanceof File) || (destination instanceof FileOutputStream)
 		|| (destination instanceof FileWriter);
 
-		Iterator iter=GridFormatFinder.getAvailableFormats();
-		while( iter.hasNext() ){
-			GridFormatFactorySpi factory=(GridFormatFactorySpi)iter.next();
-			if( factory.canCreate(format) )
-				return factory.createWriter(destination);
-		}
+		GridFormatFactorySpi factory=formatManager.getFactory(format);
+		if( factory != null)
+		    return factory.createWriter(destination);
+
 		return null;
 		
 	}
@@ -164,29 +156,13 @@ public class FileSystemGridCoverageExchange extends AbstractCatalog implements
 
 	}
 
-	
-	public class GridFileFormatFilter implements FileFilter {
-		
-		public GridFileFormatFilter() {
-				extensions = new HashSet();
-				extensions.add("asc");
-		}
+    /* (non-Javadoc)
+     * @see org.geotools.data.coverage.grid.GridCoverageExchange#isAvailable()
+     */
+    public boolean isAvailable() {
+        return true;
+    }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.io.FileFilter#accept(java.io.File)
-		 */
-		public boolean accept(File pathname) {
-			if (pathname.isDirectory())
-				return true;
-			String ext = pathname.getName();
-			ext = ext.substring(ext.lastIndexOf('.') + 1);
-			if (extensions.contains(ext))
-				return true;
-			return false;
-		}
 
-	}
 
 }

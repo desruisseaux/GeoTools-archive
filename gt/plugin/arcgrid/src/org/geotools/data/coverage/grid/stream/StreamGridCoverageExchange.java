@@ -167,4 +167,11 @@ public class StreamGridCoverageExchange implements GridCoverageExchange {
      */
     public void dispose() throws IOException {
     }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.coverage.grid.GridCoverageExchange#isAvailable()
+     */
+    public boolean isAvailable() {
+        return true;
+    }
 }

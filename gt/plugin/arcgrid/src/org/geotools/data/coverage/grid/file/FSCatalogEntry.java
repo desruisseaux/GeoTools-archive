@@ -7,16 +7,10 @@
 package org.geotools.data.coverage.grid.file;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
-import java.util.Properties;
 
 import org.geotools.catalog.CatalogEntry;
-import org.geotools.data.GridFormatFactorySpi;
-import org.geotools.data.arcgrid.ArcGridFormatFactory;
 import org.geotools.metadata.Metadata;
-import org.opengis.coverage.grid.Format;
 
 /**
  * @author jeichar
@@ -26,15 +20,15 @@ import org.opengis.coverage.grid.Format;
  */
 public class FSCatalogEntry implements CatalogEntry{
 	
+    FormatManager formatManager=FormatManager.getFormatManager();
 	private File resource;
 	private FileMetadata metadata;
-	private static Properties properties;
 	
 	public FSCatalogEntry( File f ){
 		resource=f;
 		String ext=f.getName();
 		ext=ext.substring(ext.lastIndexOf('.')+1);
-		metadata=new FileMetadataImpl(f, FSCatalogEntry.getFormat(ext));
+		metadata=new FileMetadataImpl(f, formatManager.getFormat(f));
 	}
 	
 	/* (non-Javadoc)
@@ -88,13 +82,6 @@ public class FSCatalogEntry implements CatalogEntry{
 		if( index < 0)
 			return null;
 		return metadata;
-	}
-	
-	public static Format getFormat(String extension){
-
-	    GridFormatFactorySpi factory=new ArcGridFormatFactory();
-	    
-		return factory.createFormat();
 	}
 	
 	private class FSIterator implements Iterator{

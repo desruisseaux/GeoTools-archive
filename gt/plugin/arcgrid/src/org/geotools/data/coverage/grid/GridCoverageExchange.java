@@ -91,4 +91,17 @@ public interface GridCoverageExchange {
      *         (for example closing a database connection).
      */
     void dispose() throws IOException;
+    
+    /**
+     * Test to see if this GridCoverageExchange is available, if it has all the
+     * appropriate libraries to construct a GridCoverageExchange.
+     * <p>
+     * Most GridCoverageExchange should return true, because geotools will 
+     * distribute the appropriate libraries.  Though it's not a bad idea for 
+     * GridCoverageExchange to check to make sure that the  libraries are there.
+     * </p>
+     * @return <tt>true</tt> if and only if this GridCoverageExchange has all the
+     *         appropriate jars on the classpath
+     */
+    public boolean isAvailable();
 }
