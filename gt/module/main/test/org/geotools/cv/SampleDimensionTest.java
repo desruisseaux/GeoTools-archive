@@ -54,7 +54,7 @@ import junit.framework.TestSuite;
  * rely on {@link CategoryList} for many of its work, many <code>SampleDimension</code>
  * tests are actually <code>CategoryList</code> tests.
  *
- * @version $Id: SampleDimensionTest.java,v 1.9 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class SampleDimensionTest extends TestCase {

@@ -51,7 +51,7 @@ import org.geotools.renderer.geom.CompressionLevel;
 /**
  * Test the <code>org.geotools.renderer.array</code> package.
  *
- * @version $Id: PointArrayTest.java,v 1.6 2003/05/27 18:22:44 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class PointArrayTest extends TestCase {

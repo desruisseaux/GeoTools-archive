@@ -47,7 +47,7 @@ import junit.framework.TestSuite;
  * Test the {@link WeakHashSet}. A standard {@link HashSet} object
  * is used for comparaison purpose.
  *
- * @version $Id: WeakHashSetTest.java,v 1.3 2003/08/06 17:30:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class WeakHashSetTest extends TestCase {

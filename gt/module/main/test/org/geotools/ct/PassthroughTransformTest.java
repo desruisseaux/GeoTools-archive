@@ -48,7 +48,7 @@ import junit.framework.TestSuite;
  *   <li>{@link MathTransformFactory#createFilterTransform}</li>
  * </ul>
  *
- * @version $Id: PassthroughTransformTest.java,v 1.2 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class PassthroughTransformTest extends TransformationTest {

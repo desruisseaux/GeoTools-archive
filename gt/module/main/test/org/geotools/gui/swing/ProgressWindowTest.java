@@ -44,7 +44,7 @@ import org.geotools.util.ProgressListener;
 /**
  * Test {@link ProgressWindow}.
  *
- * @version $Id: ProgressWindowTest.java,v 1.2 2003/05/13 11:01:40 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ProgressWindowTest extends TestCase {

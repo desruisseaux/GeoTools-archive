@@ -67,7 +67,7 @@ import junit.framework.TestSuite;
  * Visual test of the "Resample" operation. A remote sensing image is projected from a fitted
  * coordinate system to a geographic one.
  *
- * @version $Id: ResampleTest.java,v 1.12 2003/11/12 14:13:53 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

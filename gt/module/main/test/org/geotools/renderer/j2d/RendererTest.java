@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * Test the {@link Renderer} class.
  *
- * @version $Id: RendererTest.java,v 1.3 2003/09/02 12:34:12 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class RendererTest extends TestCase {

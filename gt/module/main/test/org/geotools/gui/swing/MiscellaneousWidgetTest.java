@@ -52,7 +52,7 @@ import org.geotools.resources.image.ColorUtilities;
 /**
  * Tests a set of widgets.
  *
- * @version $Id: MiscellaneousWidgetTest.java,v 1.8 2003/08/07 16:57:46 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class MiscellaneousWidgetTest extends TestCase {

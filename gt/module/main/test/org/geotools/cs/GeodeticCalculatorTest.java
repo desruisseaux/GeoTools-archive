@@ -37,7 +37,7 @@ import org.geotools.resources.XMath;
 /**
  * Test the geodetic calculator.
  *
- * @version $Id: GeodeticCalculatorTest.java,v 1.1 2004/03/08 17:48:27 desruisseaux Exp $
+ * @version $Id$
  */
 public class GeodeticCalculatorTest extends TestCase {
     /**

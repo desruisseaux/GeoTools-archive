@@ -44,7 +44,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link DisjointSet} class.
  *
- * @version $Id: DisjointSetTest.java,v 1.3 2003/08/06 17:30:17 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class DisjointSetTest extends TestCase {

@@ -39,7 +39,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link Category} implementation.
  *
- * @version $Id: CategoryTest.java,v 1.5 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CategoryTest extends TestCase {

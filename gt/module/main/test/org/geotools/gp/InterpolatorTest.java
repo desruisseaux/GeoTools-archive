@@ -58,7 +58,7 @@ import junit.framework.TestSuite;
  * will be performed on {@link Interpolator} objects instead of default
  * {@link GridCoverage}.
  *
- * @version $Id: InterpolatorTest.java,v 1.3 2003/05/13 10:59:54 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class InterpolatorTest extends GridCoverageTest {

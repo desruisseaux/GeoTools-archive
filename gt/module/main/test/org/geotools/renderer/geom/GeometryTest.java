@@ -53,7 +53,7 @@ import org.geotools.renderer.geom.ShapePanel;
  * Performs a visual check of {@link ShapeUtilities} computations. Those computations are
  * an essential part of {@link org.geotools.renderer.geom.Polygon} internal working.
  *
- * @version $Id: GeometryTest.java,v 1.3 2003/08/11 20:04:16 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class GeometryTest extends TestCase implements ShapePanel.Producer {

@@ -41,7 +41,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link LocalizationGrid} implementation.
  *
- * @version $Id: LocalizationGridTest.java,v 1.9 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

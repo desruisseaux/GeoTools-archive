@@ -46,7 +46,7 @@ import junit.framework.TestSuite;
  *   <li>{@link MatrixTransform}</li>
  * </ul>
  *
- * @version $Id: LinearTransformTest.java,v 1.3 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class LinearTransformTest extends TransformationTest {

@@ -45,7 +45,7 @@ import org.geotools.resources.Arguments;
 /**
  * Test the creation of {@link CoordinateSystem} objects.
  *
- * @version $Id: CreationTest.java,v 1.1 2003/08/04 22:10:09 desruisseaux Exp $
+ * @version $Id$
  */
 public class CreationTest extends TestCase {
     /**

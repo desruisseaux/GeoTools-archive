@@ -44,7 +44,7 @@ import junit.framework.AssertionFailedError;
  * spherical tests here tests real spheres (tests in <code>"Simple_TestScript"</code>
  * are not exactly spherical).
  *
- * @version $Id: ProjectionTest.java,v 1.3 2004/01/25 21:39:00 desruisseaux Exp $
+ * @version $Id$
  * @author Rueben Schulz
  */
 public class ProjectionTest extends TestCase {

@@ -42,7 +42,7 @@ import junit.framework.TestSuite;
  * Test the {@link SampleTranscoder} implementation. Image adapter depends
  * heavily on {@link CategoryList}, so this one should be tested first.
  *
- * @version $Id: SampleTranscoderTest.java,v 1.3 2003/05/13 10:59:54 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class SampleTranscoderTest extends TestCase {

@@ -52,7 +52,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link Adapters} implementation.
  *
- * @version $Id: AdaptersTest.java,v 1.3 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class AdaptersTest extends TestCase {

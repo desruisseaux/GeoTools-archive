@@ -51,7 +51,7 @@ import junit.framework.TestSuite;
  * Test the {@link ScaledColorSpace} implementation.
  * This is a visual test.
  *
- * @version $Id: ScaledColorSpaceTest.java,v 1.2 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ScaledColorSpaceTest extends TestCase {

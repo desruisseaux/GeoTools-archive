@@ -48,7 +48,7 @@ import junit.framework.TestSuite;
  *   <li>{@link Ellipsoid}</li>
  * </ul>
  *
- * @version $Id: GeocentricTransformTest.java,v 1.5 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class GeocentricTransformTest extends TransformationTest {

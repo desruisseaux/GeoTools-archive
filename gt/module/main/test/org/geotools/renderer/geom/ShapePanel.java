@@ -67,7 +67,7 @@ import java.awt.event.ActionEvent;
  * origin (0,0) is located in the lower left corner, as in the usual geometric
  * convention.
  *
- * @version $Id: ShapePanel.java,v 1.2 2003/05/13 11:00:48 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ShapePanel extends JPanel {

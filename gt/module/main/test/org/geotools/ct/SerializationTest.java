@@ -36,7 +36,7 @@ import junit.framework.TestSuite;
 /**
  * Test serialization of a {@link CoordinateTransformation} class.
  *
- * @version $Id: SerializationTest.java,v 1.5 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Vadim Semenov
  * @author Martin Desruisseaux
  */

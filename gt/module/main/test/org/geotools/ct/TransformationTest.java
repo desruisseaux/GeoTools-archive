@@ -38,7 +38,7 @@ import junit.framework.TestSuite;
 /**
  * Base class for transformation test classes.
  *
- * @version $Id: TransformationTest.java,v 1.9 2004/03/08 11:30:56 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class TransformationTest extends TestCase {

@@ -74,7 +74,7 @@ import org.opengis.referencing.operation.TransformException;
  *
  * This is probably the most important test case for the whole CTS module.
  *
- * @version $Id: ScriptTest.java,v 1.5 2004/02/23 12:28:23 desruisseaux Exp $
+ * @version $Id$
  * @author Yann Cézard
  * @author Remi Eve
  * @author Martin Desruisseaux

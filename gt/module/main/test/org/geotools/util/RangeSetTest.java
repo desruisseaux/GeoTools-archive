@@ -44,7 +44,7 @@ import org.geotools.resources.Arguments;
 /**
  * Test the {@link RangeSet} implementation.
  *
- * @version $Id: RangeSetTest.java,v 1.2 2003/07/23 13:43:29 desruisseaux Exp $
+ * @version $Id$
  * @author Andrea Aime
  */
 public class RangeSetTest extends TestCase {

@@ -43,7 +43,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link CategoryList} implementation.
  *
- * @version $Id: CategoryListTest.java,v 1.6 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CategoryListTest extends TestCase {

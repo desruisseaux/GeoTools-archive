@@ -47,7 +47,7 @@ import org.geotools.resources.TestData;
 /**
  * Test the {@link WKTParser} implementation.
  *
- * @version $Id: WKTParserTest.java,v 1.4 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Yann Cézard
  * @author Remi Eve
  * @author Martin Desruisseaux

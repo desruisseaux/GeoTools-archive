@@ -40,7 +40,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link ExponentialTransform1D} and {@link LogarithmicTransform1D} classes.
  *
- * @version $Id: ExponentialTransformTest.java,v 1.3 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ExponentialTransformTest extends TransformationTest {

@@ -40,7 +40,7 @@ import junit.framework.TestSuite;
  * {@link ConcatenatedTransform}, each optimized for special cases.   This
  * test try to test a wide range of subclasses.
  *
- * @version $Id: ConcatenatedTransformTest.java,v 1.2 2003/05/13 10:58:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ConcatenatedTransformTest extends TransformationTest {

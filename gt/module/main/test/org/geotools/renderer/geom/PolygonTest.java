@@ -55,7 +55,7 @@ import org.geotools.resources.Arguments;
 /**
  * Visual check of {@link Polygon}.
  *
- * @version $Id: PolygonTest.java,v 1.4 2003/05/27 18:22:44 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class PolygonTest extends TestCase {

@@ -57,7 +57,7 @@ import org.geotools.resources.Utilities;
  * capability, no user interaction and ignores the coordinate system. It is just
  * for quick test of grid coverage.
  *
- * @version $Id: Viewer.java,v 1.6 2003/05/13 10:59:54 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Viewer extends JPanel {

@@ -61,7 +61,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link OperationJAI} implementation.
  *
- * @version $Id: OperationTest.java,v 1.11 2003/08/08 17:58:21 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class OperationTest extends GridCoverageTest {

@@ -41,7 +41,7 @@ import junit.framework.TestSuite;
 /**
  * Test the Unit class.
  *
- * @version $Id: UnitTest.java,v 1.4 2003/05/13 10:58:21 desruisseaux Exp $
+ * @version $Id$
  * @author Philip Crotwell
  */
 public class UnitTest extends TestCase {

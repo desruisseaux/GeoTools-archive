@@ -70,7 +70,7 @@ import org.geotools.resources.TestData;
  *  <li>{@link #getExample}</li>
  * </ul>
  *
- * @version $Id: GridCoverageTest.java,v 1.10 2003/09/03 17:57:19 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class GridCoverageTest extends TestCase {

@@ -47,7 +47,7 @@ import junit.framework.TestSuite;
 /**
  * Test the {@link GridGeometry} implementation.
  *
- * @version $Id: GridGeometryTest.java,v 1.2 2003/05/13 10:59:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class GridGeometryTest extends TestCase {

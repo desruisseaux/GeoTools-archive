@@ -34,7 +34,7 @@ import org.geotools.resources.Arguments;
 /**
  * Test the {@link MonolineFormatter} class.
  *
- * @version $Id: MonolineFormatterTest.java,v 1.4 2003/05/13 10:58:21 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class MonolineFormatterTest extends TestCase {
