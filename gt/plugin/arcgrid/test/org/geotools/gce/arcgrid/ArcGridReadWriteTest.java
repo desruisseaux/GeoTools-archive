@@ -20,6 +20,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.Envelope;
 import java.net.URL;
+import org.geotools.geometry.GeneralEnvelope;
 
 /**
  * Test reading and writing arcgrid grid coverages.
@@ -146,11 +147,16 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
      */
     void compare(GridCoverage gc1, GridCoverage gc2) throws Exception {
 
-        Envelope e1 = gc1.getEnvelope();
-        Envelope e2 = gc2.getEnvelope();
-//       if (!e1.equals(e2)) {
-//            throw new Exception("GridCoverage Envelopes are not equal" + e1.toString() + e2.toString());
-//        }
+        GeneralEnvelope e1 =(GeneralEnvelope) gc1.getEnvelope();
+        GeneralEnvelope e2 =(GeneralEnvelope) gc2.getEnvelope();
+        if (e1.getLowerCorner().getOrdinate(0)!=e1.getLowerCorner().getOrdinate(0)||
+        e1.getLowerCorner().getOrdinate(1)!=e1.getLowerCorner().getOrdinate(1)||
+    e1.getUpperCorner().getOrdinate(0)!=e1.getUpperCorner().getOrdinate(0)||
+    e1.getUpperCorner().getOrdinate(1)!=e1.getUpperCorner().getOrdinate(1))
+            throw new Exception("GridCoverage Envelopes are not equal" + e1.toString() + e2.toString());
+        if(e1.getCoordinateReferenceSystem().toWKT().compareToIgnoreCase(e2.getCoordinateReferenceSystem().toWKT())!=0)
+          throw new Exception("GridCoverage Envelopes are not equal" + e1.getCoordinateReferenceSystem().toWKT() + e2.getCoordinateReferenceSystem().toWKT());
+       
         double[] values1 = null;
         double[] values2 = null;
         Raster r1 = ((GridCoverage2D)gc1).getRenderedImage().getData();
