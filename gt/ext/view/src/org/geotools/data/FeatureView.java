@@ -212,6 +212,11 @@ public interface FeatureView {
 	 * (for use with the as( attribue, xpath )? Or should that be a separate
 	 * define/combine opperation?
 	 * </li>
+	 * <li>
+	 * Actually what would make the most sense is to have a default match
+	 * by FeatureID when joinging two views derived from the same
+	 * source data - probably called append :-)
+	 * </li>
 	 * </p>
 	 * @param view
 	 * @return 
