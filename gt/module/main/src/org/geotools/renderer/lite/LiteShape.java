@@ -19,10 +19,13 @@ package org.geotools.renderer.lite;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryCollectionIterator;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
+
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -46,6 +49,14 @@ public class LiteShape implements Shape {
     private AffineTransform transform = null;
     private boolean generalize = false;
     private double maxDistance = 1;
+    
+    // cached iterators
+    private LineIterator lineIterator = new LineIterator();
+    private GeomCollectionIterator collIterator = new GeomCollectionIterator();
+
+	private float xScale;
+
+	private float yScale;
 
     
 
@@ -77,6 +88,16 @@ public class LiteShape implements Shape {
         this.geometry = geom;
         this.transform = at;
         this.generalize = generalize;
+        if (at==null){
+        	yScale=xScale=1;
+        	return;
+        }
+        xScale = (float) Math.sqrt(
+                (at.getScaleX() * at.getScaleX())
+                + (at.getShearX() * at.getShearX()));
+        yScale = (float) Math.sqrt(
+                (at.getScaleY() * at.getScaleY())
+                + (at.getShearY() * at.getShearY()));
     }
 
     /**
@@ -389,14 +410,25 @@ public class LiteShape implements Shape {
             pi = new PolygonIterator((Polygon) geometry, combined, generalize,
                     maxDistance);
         } else if (this.geometry instanceof LinearRing) {
-            pi = new LineIterator((LinearRing) geometry, combined, generalize,
-                    maxDistance);
+            lineIterator.init((LinearRing) geometry, combined, generalize,
+                    (float) maxDistance);
+            pi = lineIterator;
         } else if (this.geometry instanceof LineString) {
-            pi = new LineIterator((LineString) geometry, combined, generalize,
-                    maxDistance);
+//        	if(((LineString) geometry).getCoordinateSequence() instanceof PackedCoordinateSequence.Double)
+//	            pi = new PackedLineIterator((LineString) geometry, combined, generalize,
+//	                    (float) maxDistance);
+//        	else
+        	if(combined == transform)
+        		lineIterator.init((LineString) geometry, combined, generalize,
+	                    (float) maxDistance, xScale, yScale);
+        	else 
+        		lineIterator.init((LineString) geometry, combined, generalize,
+	                    (float) maxDistance);
+        	pi = lineIterator;
         } else if (this.geometry instanceof GeometryCollection) {
-            pi = new GeomCollectionIterator((GeometryCollection) geometry,
+            collIterator.init((GeometryCollection) geometry,
                     combined, generalize, maxDistance);
+            pi = collIterator;
         }
 
         return pi;

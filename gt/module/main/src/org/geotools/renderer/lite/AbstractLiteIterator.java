@@ -16,6 +16,7 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
 
@@ -28,6 +29,7 @@ import java.awt.geom.PathIterator;
  */
 public abstract class AbstractLiteIterator implements PathIterator {
     protected double[] dcoords = new double[2];
+    protected static final AffineTransform NO_TRANSFORM = new AffineTransform();
 
     /**
      * @see java.awt.geom.PathIterator#currentSegment(float[])

@@ -188,6 +188,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
     /** Set to false if the reprojection fails */
     private boolean canTransform=true;
+
+	private boolean memoryPreloadingEnabled;
+
+	private IndexedFeatureResults indexedFeatureResults;
     
     /**
      * Creates a new instance of LiteRenderer without a context. Use it only to
@@ -457,15 +461,13 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      *
      * @throws IllegalFilterException if something goes wrong constructing the
      *         bbox filter
-     * @throws IOException if something goes wrong consulting the map layer's
-     *         feature source or the mixing the bbox and the layer's
-     *         definition query
-     *
+     * @throws IOException
+     * @throws IllegalAttributeException
      * @see MapLayer#setQuery(org.geotools.data.Query)
      */
     FeatureResults queryLayer(MapLayer currLayer, Envelope envelope,
         CoordinateReferenceSystem destinationCrs)
-        throws IllegalFilterException, IOException {
+        throws IllegalFilterException, IOException, IllegalAttributeException {
         FeatureResults results = null;
         FeatureSource featureSource = currLayer.getFeatureSource();
         FeatureType schema = featureSource.getSchema();
@@ -491,11 +493,17 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     // unprojected geometries
                     MathTransform2D transform = (MathTransform2D) CRSService.reproject(destinationCrs,
                             sourceCrs, true);
-                    envelope = CRSService.transform(envelope, transform);
+                    if( transform!=null)
+                    	envelope = CRSService.transform(envelope, transform);
                 }
 
-                BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
-                Filter filter = createBBoxFilters(schema, attributes, rightBBox);
+                Filter filter = null;
+                if(!memoryPreloadingEnabled) {
+                	BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
+                	filter = createBBoxFilters(schema, attributes, rightBBox);
+                } else {
+                	filter = Filter.NONE;
+                }
 
                 // now build the query using only the attributes and the bounding
                 // box needed
@@ -527,7 +535,17 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             }
         }
 
-        results = featureSource.getFeatures(query);
+        if(memoryPreloadingEnabled) {
+        	// TODO: attache a feature listener, we must erase the memory cache if
+        	// anything changes in the data store
+        	if(indexedFeatureResults == null) {
+        		indexedFeatureResults = new IndexedFeatureResults(featureSource.getFeatures(query));
+        	}
+        	indexedFeatureResults.setQueryBounds(envelope);
+        	results = indexedFeatureResults;
+        } else {
+        	results = featureSource.getFeatures(query);
+        }
 
         return results;
     }
@@ -961,7 +979,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     private Shape getTransformedShape(Geometry g, MathTransform2D transform)
         throws TransformException {
-        LiteShape base = new LiteShape(g, null, false);
+        LiteShape base = new LiteShape(g, new AffineTransform(), false);
 
         return transform.createTransformedShape(base);
     }
@@ -1200,4 +1218,12 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     public void setGeneralizationDistance(double d) {
         generalizationDistance = d;
     }
+
+	/**
+	 * @param enabled
+	 */
+	public void setMemoryPreloadingEnabled(boolean enabled) {
+		this.memoryPreloadingEnabled = enabled;
+		
+	}
 }

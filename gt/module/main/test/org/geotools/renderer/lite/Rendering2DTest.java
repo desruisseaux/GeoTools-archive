@@ -29,9 +29,11 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.Query;
+import org.geotools.data.crs.CRSService;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -46,6 +48,7 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.LineSymbolizer;
@@ -99,7 +102,7 @@ public class Rendering2DTest extends TestCase {
         return suite;
     }
 
-    private Style createTestStyle() throws IllegalFilterException
+    Style createTestStyle() throws IllegalFilterException
     {
         StyleFactory sFac = StyleFactory.createStyleFactory();
         //The following is complex, and should be built from
@@ -155,7 +158,7 @@ public class Rendering2DTest extends TestCase {
         return style;
     }
 
-    private FeatureCollection createTestFeatureCollection() throws Exception
+    FeatureCollection createTestFeatureCollection( CoordinateReferenceSystem crs) throws Exception
     {
         // Request extent
         Envelope ex = new Envelope(5, 15, 5, 15);
@@ -192,7 +195,10 @@ public class Rendering2DTest extends TestCase {
         Feature ringFeature = lrType.create(new Object[]{ring, "centerline"});
         
         GeometryCollection coll = makeSampleGeometryCollection(geomFac);
-        types[0] = AttributeTypeFactory.newAttributeType("collection", coll.getClass());
+        if( crs!=null )
+        	types[0] = new DefaultAttributeType.Geometric("collection", coll.getClass(), false, 0, null, crs );
+        else 
+        	types[0] = AttributeTypeFactory.newAttributeType("collection", coll.getClass());
         types[1] = AttributeTypeFactory.newAttributeType("name", String.class);
         FeatureType collType = FeatureTypeFactory.newFeatureType(types, "collfeature");
         Feature collFeature = collType.create(new Object[]{coll, "collection"});
@@ -214,7 +220,7 @@ public class Rendering2DTest extends TestCase {
         //same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
     	
-    	FeatureCollection ft = createTestFeatureCollection();
+    	FeatureCollection ft = createTestFeatureCollection(null);
         Style style = createTestStyle();
         
 		MapContext map = new DefaultMapContext();

@@ -365,7 +365,6 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         s = new ShapefileDataStore(tmpFile.toURL());
         FeatureCollection fc = loadFeatures(s);
         FeatureIterator fci = fc.features();
-        
         // verify
         while (fci.hasNext()) {
             Feature f = fci.next();

@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <id>JTS</id>
-      <version>1.4</version>
+      <version>1.6-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

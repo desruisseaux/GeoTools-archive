@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
 import org.geotools.data.TypeEntry;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.resources.TestData;
@@ -54,7 +55,7 @@ public class ShpXmlFileReaderTest extends TestCase {
         //assertNotNull( "source works", actual );
         //assertTrue( "expected contains actual", expected.contains( actual ));
         //assertEquals( "featuresource optimized", expected, actual );
-        
+        int i=source.getCount(Query.ALL);
         // accurate
         actual = source.getFeatures().getBounds();
         assertNotNull( "contents calculates", actual );        

@@ -43,7 +43,7 @@ class GeomCollectionIterator implements PathIterator {
     private GeometryCollection gc;
     
     /** The current geometry */
-    private int currentGeom = 0;
+    private int currentGeom;
 
     /** The current sub-iterator */
     private PathIterator currentIterator;
@@ -56,21 +56,20 @@ class GeomCollectionIterator implements PathIterator {
 
     /** Maximum distance for point elision when generalizing */
     private double maxDistance = 1.0;
+    
+    private LineIterator lineIterator = new LineIterator();
 
+    
+    GeomCollectionIterator() {
+    	
+    }
 
     /**
-     * Creates a new instance of GeomCollectionIterator
-     *
-     * @param gc The geometry collection the iterator will use
-     * @param at The affine transform applied to coordinates during iteration
-     */
-    public GeomCollectionIterator(GeometryCollection gc, AffineTransform at) {
-        int numGeometries = gc.getNumGeometries();
-//        geoms = new Geometry[numGeometries];
-//
-//        for (int i = 0; i < numGeometries; i++) {
-//            geoms[i] = gc.getGeometryN(i);
-//        }
+	 * @param gc
+	 * @param at
+	 */
+	public void init(GeometryCollection gc, AffineTransform at, boolean generalize, double maxDistance) {
+		int numGeometries = gc.getNumGeometries();
         
         this.gc = gc;
 
@@ -79,22 +78,13 @@ class GeomCollectionIterator implements PathIterator {
         }
 
         this.at = at;
+        this.generalize = generalize;
+        this.maxDistance = maxDistance;
+        currentGeom = 0;
+        done = false;
 
         currentIterator = getIterator(gc.getGeometryN(0));
-    }
-
-    /**
-     * Creates a new instance of GeomCollectionIterator
-     *
-     * @param gc The geometry collection the iterator will use
-     * @param at The affine transform applied to coordinates during iteration
-     * @param generalize if true apply simple distance based generalization
-     */
-    public GeomCollectionIterator(
-        GeometryCollection gc, AffineTransform at, boolean generalize) {
-        this(gc, at);
-        this.generalize = generalize;
-    }
+	}
 
     /**
      * Creates a new instance of GeomCollectionIterator
@@ -107,9 +97,8 @@ class GeomCollectionIterator implements PathIterator {
      */
     public GeomCollectionIterator(
         GeometryCollection gc, AffineTransform at, boolean generalize,
-        double maxDistance) {
-        this(gc, at, generalize);
-        this.maxDistance = maxDistance;
+		double maxDistance) {
+        init(gc, at, generalize, maxDistance);
     }
 
     /**
@@ -150,10 +139,12 @@ class GeomCollectionIterator implements PathIterator {
             pi = new GeomCollectionIterator(gc, at, generalize, maxDistance);
         } else if (g instanceof LineString) {
             LineString ls = (LineString) g;
-            pi = new LineIterator(ls, at, generalize, maxDistance);
+            lineIterator.init(ls, at, generalize, (float) maxDistance);
+            pi = lineIterator;
         } else if (g instanceof LinearRing) {
             LinearRing lr = (LinearRing) g;
-            pi = new LineIterator(lr, at, generalize, maxDistance);
+            lineIterator.init(lr, at, generalize, (float) maxDistance);
+            pi = lineIterator;
         } else if (g instanceof Point) {
             Point p = (Point) g;
             pi = new PointIterator(p, at);

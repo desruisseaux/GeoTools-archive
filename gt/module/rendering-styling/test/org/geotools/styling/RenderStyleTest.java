@@ -34,6 +34,8 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.j2d.StyledMapRenderer;
 import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.renderer.lite.LiteRenderer2;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -410,7 +412,6 @@ public class RenderStyleTest extends junit.framework.TestCase {
         renderer.setInteractive(false);
         performTestOnRenderer(renderer, "builder", 400, 350, 400, 350);
     }
-
     /**
      * Perform test on the passed renderer, which must be already configured with its context
      *

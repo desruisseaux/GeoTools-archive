@@ -189,7 +189,7 @@ public class RobustGeometryPropertiesTest extends TestCase {
         coordinates2[2] = new Coordinate(2.0d,2.0d);
         coordinates2[3] = new Coordinate(2.0d,1.0d);
         coordinates2[4] = new Coordinate(1.0d,1.0d);
-        linearRing1 = new LinearRing(null,precisionModel1,SRID);
+//        linearRing1 = new LinearRing(null,precisionModel1,SRID);
         linearRings1 = new LinearRing[1];
         try {
             linearRing1 = geometryFactory1.createLinearRing(coordinates1);

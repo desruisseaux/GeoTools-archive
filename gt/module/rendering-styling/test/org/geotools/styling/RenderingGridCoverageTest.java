@@ -68,6 +68,7 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.j2d.StyledMapRenderer;
 import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.renderer.lite.LiteRenderer2;
 import org.geotools.units.Unit;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -134,6 +135,22 @@ public class RenderingGridCoverageTest extends TestCase {
         ctx.addLayer(fc, style);
         
         LiteRenderer renderer = new LiteRenderer(ctx);
+        performTestOnRenderer(renderer, "", 300, 300, 100, 100);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
+     */
+    public void testEmtpyStyleLiteRenderer2() throws Exception {
+        FeatureCollection fc = wrapGcInFeatureCollection(createGrid());
+        Style style = createEmtpyRasterStyle();
+        
+        MapContext ctx = new DefaultMapContext();
+        ctx.addLayer(fc, style);
+        
+        LiteRenderer2 renderer = new LiteRenderer2(ctx);
         performTestOnRenderer(renderer, "", 300, 300, 100, 100);
     }
     

@@ -37,6 +37,7 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.j2d.StyledMapRenderer;
 import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.renderer.lite.LiteRenderer2;
 
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.resources.TestData;
@@ -206,6 +207,26 @@ public class DefaultMarkTest extends junit.framework.TestCase {
     }
 
     /**
+     * Test lite renderer and style loaded from xml file
+     */
+    public void testLiteRenderer2Xml() throws Exception {
+        MapContext context = new DefaultMapContext();
+        context.addLayer(buildFeatureCollection(), loadStyleFromXml());
+        
+        performTestOnRenderer(new LiteRenderer2(context), "xml");
+    }
+    
+    /**
+     * Test lite renderer and style created with the style builder
+     */
+    public void testLiteRenderer2Builder() throws Exception {
+        MapContext context = new DefaultMapContext();
+        context.addLayer(buildFeatureCollection(), buildStyle());
+        
+        performTestOnRenderer(new LiteRenderer2(context), "builder");
+    }
+
+    /**
      * Test j2d renderer
      */
     public void testJ2DRendererXml() throws Exception {
@@ -241,6 +262,16 @@ public class DefaultMarkTest extends junit.framework.TestCase {
         at.translate(0, 400);
         at.scale(9, -9);
 
+        int w = 400;
+        int h = 400;
+        final java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(w, h,
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = (Graphics2D) image.getGraphics();
+        g.setColor(java.awt.Color.white);
+        g.fillRect(0, 0, w, h);
+        renderer.paint(g, new java.awt.Rectangle(0, 0, w, h), at);
+
+
         if(INTERACTIVE) {
             java.awt.Frame frame = new java.awt.Frame("Mark test (" + renderer.getClass().getName());
             frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -249,7 +280,11 @@ public class DefaultMarkTest extends junit.framework.TestCase {
                     }
                 });
 
-            java.awt.Panel p = new java.awt.Panel();
+            java.awt.Panel p = new java.awt.Panel(){
+            	public void paint(java.awt.Graphics g){
+            		g.drawImage(image,0,0,null);
+            	}
+            };
             frame.add(p);
             frame.setSize(400, 400);
             frame.setLocation(0, 0);
@@ -259,25 +294,14 @@ public class DefaultMarkTest extends junit.framework.TestCase {
             
             // Thread.sleep(5000);
             frame.dispose();
-        }
-
-        int w = 400;
-        int h = 400;
-        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(w, h,
-                java.awt.image.BufferedImage.TYPE_INT_RGB);
-        java.awt.Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setColor(java.awt.Color.white);
-        g.fillRect(0, 0, w, h);
-        renderer.paint(g, new java.awt.Rectangle(0, 0, w, h), at);
-
-            
+        }            
         
 
         java.io.File file = new java.io.File(base.getPath(),
                 "DefaultMarkTest_" + renderer.getClass().getName().replace('.', '_') + "_" + fileSuffix + ".png");
         java.io.FileOutputStream out = new java.io.FileOutputStream(file);
         boolean fred = javax.imageio.ImageIO.write(image, "png", out);
-
+        out.flush();
         if (!fred) {
             System.out.println("Failed to write image to " + file.toString());
         }
