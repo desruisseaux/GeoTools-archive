@@ -95,6 +95,8 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Rueben Schulz
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.AlbersEqualArea}.
  */
 public class AlbersEqualArea extends ConicProjection {
     
