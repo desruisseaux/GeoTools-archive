@@ -33,6 +33,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.pt.Envelope;
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
@@ -232,9 +233,8 @@ public class WMSReader implements GridCoverageReader {
             
             if (paramName.equals("SRS")) {
             	String srs = value.stringValue();
-            	
             	try {
-					crs = new CRSService().createCRS(srs);
+            		crs = FactoryFinder.decode(srs);
 				} catch (FactoryException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
