@@ -31,6 +31,7 @@ import jj2000.j2k.NotImplementedError;
 
 import org.geotools.measure.AngleFormat;
 import org.geotools.cs.CoordinateSystem;
+import org.geotools.data.crs.CRSAuthoritySpi;
 import org.geotools.units.Unit;
 
 
@@ -38,7 +39,7 @@ import org.geotools.units.Unit;
  * Default implementation for a coordinate system factory backed
  * by the EPSG property file.
  */
-public class CSEPSGFactory extends CoordinateSystemAuthorityFactory {
+public class CSEPSGFactory extends CoordinateSystemAuthorityFactory implements CRSAuthoritySpi  {
     /**
      * The default coordinate system authority factory.
      * Will be constructed only when first requested.
@@ -47,7 +48,9 @@ public class CSEPSGFactory extends CoordinateSystemAuthorityFactory {
     
     Properties epsg = new Properties();
     
-    
+    public CSEPSGFactory(){
+        this( CoordinateSystemFactory.getDefault() );
+    }
     public CSEPSGFactory(final CoordinateSystemFactory factory ) {
     	this( factory, CSEPSGFactory.class.getResource("epsg.properties"));
     }

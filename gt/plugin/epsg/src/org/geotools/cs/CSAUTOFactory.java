@@ -28,6 +28,7 @@ import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.units.Unit;
+import org.geotools.data.crs.CRSAuthoritySpi;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.pt.CoordinatePoint;
@@ -53,7 +54,7 @@ import org.geotools.pt.CoordinatePoint;
  * @version $Id$
  * @author Jody Garnett
  */
-public class CSAUTOFactory extends CoordinateSystemAuthorityFactory {
+public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements CRSAuthoritySpi {
 	/**
      * The default coordinate system authority factory.
      * Will be constructed only when first requested.
@@ -67,6 +68,9 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory {
      */
     private final Map facts = new HashMap();
 	 
+    public CSAUTOFactory(){
+        this( CoordinateSystemFactory.getDefault() );
+    }
     /**
      * Construct a authority factory backed by the specified factory.
      *

@@ -2,21 +2,17 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-reprojection</name>
-  <id>reprojection</id>
+  <name>geotools-epsg</name>
+  <id>epsg</id>
   <currentVersion>2.1.x</currentVersion>
-  <versions>
-    <version>
-      <id>b1</id>
-      <name>2.1.x</name>
-      <tag>GT_2_0_B6_DEV</tag>
-    </version>
-  </versions>
-  <package>org.geotools</package>
-  <shortDescription>Reprojection serives for GeoServer and other clients.</shortDescription>
+  <package>org.geotools.cs</package>
+  <shortDescription>EPSG Authoriy Service</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>
-  Reprojection Serives are presented as a series of convience methods.
+  EPSG and AUTO CRSAuthoritySpi are defined for data.crs.CRSService.
+  These codes are used to provide CoordinateRegerenceSystem for GCE and
+  DataStore implementations that do not define their own native definition.
+  
   Contains a Property file based CoordinateSystemAuthority (the property file is too
   large to be included in the main geotools release). This class will need to be
   ported to the new GeoAPI CoordinateReferenceSystem interfaces.</description>
