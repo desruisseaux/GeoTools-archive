@@ -54,10 +54,10 @@ public class PostDemo {
              "xmlns:gml=\"http://www.opengis.net/gml\" " +
              "xmlns:ogc=\"http://www.opengis.net/ogc\" version=\"1.0.0\" " +
              "service=\"WFS\" outputFormat=\"XMLSCHEMA\">" +
-             "<TypeName>van:Airport</TypeName></DescribeFeatureType>";
+             "<TypeName>envirodat</TypeName></DescribeFeatureType>";
         
         System.out.println(s+"\n\n\n");
-        URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http");
+        URL url = new URL("http://map.ns.ec.gc.ca/envdat/map.aspx?");
 
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         connection.setRequestMethod("POST");

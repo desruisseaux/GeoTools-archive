@@ -56,6 +56,7 @@ import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Group;
 import org.geotools.xml.schema.Sequence;
+import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
@@ -613,6 +614,7 @@ public class GMLComplexTypes {
          * Should not be called
          */
         private DefaultChoice() {
+            // Should not be called
         }
 
         /**
@@ -692,6 +694,7 @@ public class GMLComplexTypes {
          * Should not be called
          */
         private DefaultSequence() {
+            // Should not be called
         }
 
         /**
@@ -780,7 +783,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new AbstractGeometryType();
 
         // static list of attributes
-        private static Attribute[] attributes = {
+        protected static Attribute[] attributes = {
                 new GMLSchema.GMLAttribute("gid",
                     XSISimpleTypes.ID.getInstance()),
                 new GMLSchema.GMLAttribute("srsName",
@@ -924,7 +927,7 @@ public class GMLComplexTypes {
             return null;
         }
 
-        private static final Attribute[] attributes = {
+        protected static final Attribute[] attributes = {
                 new GMLSchema.GMLAttribute("gid",
                     XSISimpleTypes.ID.getInstance()),
                 new GMLSchema.GMLAttribute("srsName",
@@ -1042,7 +1045,7 @@ public class GMLComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -1072,7 +1075,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new GeometryAssociationType();
 
         // the static attribute list
-        private static final Attribute[] attributes = loadAttributes();
+        protected static final Attribute[] attributes = loadAttributes();
 
         // the static element list
         private static final Element[] elems = {
@@ -3988,7 +3991,7 @@ public class GMLComplexTypes {
         }
 
         // static attribute list
-        private static final Attribute[] attributes = {
+        protected static final Attribute[] attributes = {
                 new GMLAttribute("fid", XSISimpleTypes.ID.getInstance(),
                     Attribute.OPTIONAL),
             };
@@ -4472,7 +4475,7 @@ public class GMLComplexTypes {
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints){
             if ((hints == null) || (hints.get(STREAM_HINT) == null)) {
                 return getCollection(value);
             }
@@ -4594,11 +4597,6 @@ public class GMLComplexTypes {
             FeatureCollection fc = (FeatureCollection) value;
 
             if (fc.getBounds() != null) {
-            	Envelope e = fc.getBounds();
-            	Geometry g = (new GeometryFactory()).toGeometry(e);
-            	// start -- not sure if this is required ... not for gt
-//            	FeatureIterator fi = fc.features();
-//            	g.setUserData();
                 BoundingShapeType.getInstance().encode(null, fc.getBounds(),
                     output, hints);
             }else{
@@ -4851,7 +4849,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new FeatureAssociationType();
 
         // static attribute list
-        private static final Attribute[] attributes = loadAttributes();
+        protected static final Attribute[] attributes = loadAttributes();
 
         // static element list
         private static final Element[] elements = {
@@ -6317,7 +6315,7 @@ public class GMLComplexTypes {
 //            }
 //        }
 
-        AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
+        AttributeType[] attrs = (AttributeType[])getAttributes(element.getName(),child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){
         	if(attrs[i]!=null){
         		typeFactory.addType(attrs[i]);
@@ -6356,18 +6354,8 @@ public class GMLComplexTypes {
         GeometryAttributeType geometryAttribute = null;
 
         ElementGrouping child = (element).getChild();
-//        FeatureType parent = null;
-//        if(element.getParent()instanceof ComplexType)
-//            parent = createFeatureType((ComplexType)element.getParent());
 
-//        if(parent != null && parent.getAttributeTypes()!=null){
-//            typeFactory.addTypes(parent.getAttributeTypes());
-//            if(parent.getDefaultGeometry()!=null){
-//                geometryAttribute = parent.getDefaultGeometry();
-//            }
-//        }
-
-        AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
+        AttributeType[] attrs = (AttributeType[])getAttributes(element.getName(),child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){
         	if(attrs[i]!=null){
             typeFactory.addType(attrs[i]);
@@ -6375,7 +6363,6 @@ public class GMLComplexTypes {
             if ((geometryAttribute == null)
                 && attrs[i].isGeometry()) {
                 if (!attrs[i].getName()
-//                  .equalsIgnoreCase(BoxType.getInstance().getName())) {
                     .equalsIgnoreCase(AbstractFeatureType.getInstance().getChildElements()[2].getName())){
                     geometryAttribute = (GeometryAttributeType) attrs[i];
                 }
@@ -6395,60 +6382,178 @@ public class GMLComplexTypes {
         }
     }
 
-    private static List getAttributes(ElementGrouping eg){
-        ElementGrouping[] elems = null;
-    	List l = new LinkedList();
-
+    private static List getAttributes(String name, ElementGrouping eg){
+        List l = new LinkedList();
+        AttributeType t = null;
         switch(eg.getGrouping()){
 
         case ElementGrouping.CHOICE:
-            // assume for most cases the first is chosen
-            // TODO make a better solution
-            return getAttributes(((Choice)eg).getChildren()[0]);
+            t = getAttribute(name, (Choice)eg);
+            if(t!=null)
+                l.add(t);
+            break;
         case ElementGrouping.GROUP:
-            return getAttributes(((Group)eg).getChild());
+            l.addAll(getAttributes(name,((Group)eg).getChild()));
         case ElementGrouping.ELEMENT:
-            // AttributeType
-            Object o = getAttribute((Element)eg);
-        	if(o!=null)
-        	    l.add(o);
+            t = getAttribute((Element)eg);
+            if(t!=null)
+                l.add(t);
         	return l;
 
         case ElementGrouping.ALL:
-            elems = ((All)eg).getElements();
+            Element[] elems = ((All)eg).getElements();
+            if(elems!=null)
+                for(int i=0;i<elems.length;i++)
+                    l.add(getAttribute(elems[i]));
         	break;
         case ElementGrouping.SEQUENCE:
-            elems = ((Sequence)eg).getChildren();
+            ElementGrouping[] children = ((Sequence)eg).getChildren();
+            if(children!=null)
+                for(int i=0;i<children.length;i++)
+                    l.addAll(getAttributes(name, children[i]));
     	break;
         }
-    	if(elems!=null)
-        	for(int i=0;i<elems.length;i++)
-        	    l.addAll(getAttributes(elems[i]));
         return l;
     }
 
     private static AttributeType getAttribute(Element eg){
     	if(eg.getNamespace() == GMLSchema.NAMESPACE && (AbstractFeatureType.getInstance().getChildElements()[0] == eg || AbstractFeatureType.getInstance().getChildElements()[1] == eg || AbstractFeatureType.getInstance().getChildElements()[2] == eg))
     		return null;
-
-    	AttributeType at = null;
-		if(eg.getType() instanceof ComplexType && eg.getType().getInstanceType().equals(Object[].class)){
-			ComplexType ct = (ComplexType)eg.getType();
-
-			switch(ct.getChild().getGrouping()){
-			case ElementGrouping.SEQUENCE:
-			case ElementGrouping.CHOICE:
-			case ElementGrouping.ALL:
-			case ElementGrouping.GROUP:
-				List l =  getAttributes(ct.getChild());
-				Iterator i = l==null?null:l.iterator();
-				if(i!=null && i.hasNext()){
-				    AttributeType att = (AttributeType)i.next(); // HACK
-				    return AttributeTypeFactory.newAttributeType(eg.getName(),att.getType(),att.isNillable());
-				}
-
-		}}
+        
+        Class type = Object.class;
+        if(eg.getType() instanceof SimpleType){
+            type = eg.getType().getInstanceType();
+        }else{
+            if(Object.class.equals(eg.getType().getInstanceType()) || Object[].class.equals(eg.getType().getInstanceType())){
+                // some work now
+                ElementGrouping child = ((ComplexType)eg.getType()).getChild();
+                if(child != null){
+                    List l = getAttributes(eg.getName(),child);
+                    if(l.isEmpty()){
+                        // who knows ... this really shouldn't happen
+                        type = eg.getType().getInstanceType();
+                    }else{
+                        if(l.size() == 1){
+                            return (AttributeType)l.iterator().next();
+                        }
+                        // Do some magic to find the type
+                        type = getCommonType(l);
+                    }
+                }else{
+                    // who knows ... this really shouldn't happen
+                    type = eg.getType().getInstanceType();
+                }
+            }else{
+                // we have a real type
+                type = eg.getType().getInstanceType();
+            }
+        }
+        if(type == null)
+            type = Object.class;
+        
 			// nillable should really be nillable, but in gt2.X nillable in an attribute is equivalent to minOccurs == 0 as well
-        return AttributeTypeFactory.newAttributeType(eg.getName(),eg.getType().getInstanceType(),(eg.isNillable()||eg.getMinOccurs() == 0));
+        return AttributeTypeFactory.newAttributeType(eg.getName(),type,(eg.isNillable()||eg.getMinOccurs() == 0));
+    }
+
+    private static AttributeType getAttribute(String name, Choice eg){
+        
+        List l = new LinkedList();
+        ElementGrouping[] children = eg.getChildren();
+        if(children!=null)
+            for(int i=0;i<children.length;i++){
+                l.addAll(getAttributes(name, children[i]));
+            }
+        
+        if(l.isEmpty()){
+            // who knows ... this really shouldn't happen
+            return null;
+        }
+        if(l.size() == 1){
+            return (AttributeType)l.iterator().next();
+        }
+            // Do some magic to find the type
+            Class type = Object.class;
+            type = getCommonType(l);
+            if(type == null)
+                type = Object.class;
+            // Take the first name ... cause we need one anyways
+            // nillable should really be nillable, but in gt2.X nillable in an attribute is equivalent to minOccurs == 0 as well
+            boolean nillable = eg.getMinOccurs() == 0;
+            if(!nillable && children != null){
+                for(int i=0;i<children.length && !nillable;i++){
+                    if(eg.getMinOccurs() == 0)
+                        nillable = true;
+                }
+            }
+            return AttributeTypeFactory.newAttributeType(name,type,nillable);
+    }
+    
+    // takes List<AttributeType>
+    private static Class getCommonType(List attributeTypes){
+        if(attributeTypes == null || attributeTypes.isEmpty())
+            return null;
+        if(attributeTypes.size() == 1)
+            return attributeTypes.iterator().next().getClass();
+        
+        Class common = null;
+        AttributeType at = null;
+        Iterator i = attributeTypes.iterator();
+        while(i.hasNext()){
+            at = (AttributeType)i.next();
+            if(at!= null){
+                if(common == null){
+                    common = at.getType();
+                }else{
+                    // merge two types
+                    Class t = at.getType();
+                    if(t!=null){
+                        if(!common.isAssignableFrom(t)){
+                            // either t is super class .. or they share one
+                            if(t.isAssignableFrom(common)){
+                                common = t;
+                            }else{
+                                common = findCommon(common,t);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return common;
+    }
+    
+    private static Class findCommon(Class c1, Class c2){
+        if(Object.class == c1)
+            return c2;
+        if(Object.class == c2)
+            return c1;
+        
+        Class p1 = c1.getSuperclass();
+        if(p1.isAssignableFrom(c2))
+            return p1;
+        Class p2 = c2.getSuperclass();
+        if(p2.isAssignableFrom(c1))
+            return p2;
+        
+        Class t = findCommon(p1,p2);
+        if(!(t == Object.class))
+            return t;
+        
+            // interfaces?
+        Class[] it1 = c1.getInterfaces();
+        Class[] it2 = c2.getInterfaces();
+        
+        if(it1 != null && it1.length>0 && it2 != null && it2.length>0){
+            for(int i=0;i<it1.length;i++){
+                for(int j=0;j<it2.length;j++){
+                    if(it1[i].isAssignableFrom(it2[j]))
+                        return it1[i];
+                    if(it2[j].isAssignableFrom(it1[i]))
+                        return it2[j];
+                }
+            }
+        }
+            
+        return Object.class;
     }
 }

@@ -135,12 +135,10 @@ public class ElementHandlerFactory {
      * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
      *      java.lang.String)
      */
-    protected void startPrefixMapping(String prefix, Schema targ)
-        throws SAXException {
+    protected void startPrefixMapping(String prefix, Schema targ){
         logger.finest("Target == '" + targ + "'");
         	if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
             	defaultNS = targ.getTargetNamespace();
-//System.out.println("DEFAULT NS = "+defaultNS);
         	}
             targSchemas.put(targ.getTargetNamespace(), targ);
             prefixURIs.put(prefix, targ.getTargetNamespace()); 
@@ -219,15 +217,13 @@ public class ElementHandlerFactory {
             throw new SAXException("Type not found for " + eth.getName() + " ");
         }
         
-        // putting complextype first as it is less restrictive ... 
-        // see XSISimpleTypes.AnyType
+        if (type instanceof SimpleType) {
+            return new SimpleElementHandler(eth);
+        }
         if (type instanceof ComplexType) {
             return new ComplexElementHandler(this, eth);
         }
 
-        if (type instanceof SimpleType) {
-            return new SimpleElementHandler(eth);
-        }
 
         return new IgnoreHandler(eth);
     }

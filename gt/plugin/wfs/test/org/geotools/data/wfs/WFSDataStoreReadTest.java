@@ -35,7 +35,7 @@ public class WFSDataStoreReadTest extends TestCase {
     public static WFSDataStore getDataStore(URL server) throws IOException{
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,server);
-        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000));
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(1000000));
         return (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
     }
         
@@ -92,7 +92,13 @@ public class WFSDataStoreReadTest extends TestCase {
         assertNotNull("Null featureType in [0]",wfs.getTypeNames()[i]);
         FeatureType ft = wfs.getSchema(wfs.getTypeNames()[i]);
         // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
-        String[] props = new String[] {ft.getDefaultGeometry().getName(),ft.getAttributeType(4).getName().equals(ft.getDefaultGeometry().getName())?ft.getAttributeType(5).getName():ft.getAttributeType(4).getName()};
+        
+        String[] props;
+        if(ft.getAttributeCount()==1)
+            props = new String[] {ft.getDefaultGeometry().getName()};
+        else
+            props = new String[] {ft.getDefaultGeometry().getName(), ft.getAttributeType(ft.getAttributeCount()-1).getName()};
+        
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
         

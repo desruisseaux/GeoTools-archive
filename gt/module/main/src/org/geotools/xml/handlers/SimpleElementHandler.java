@@ -24,7 +24,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
@@ -44,6 +43,10 @@ import javax.naming.OperationNotSupportedException;
  * @see XMLElementHandler
  */
 public class SimpleElementHandler extends XMLElementHandler {
+    
+    /** <code>serialVersionUID</code> field */
+    private static final long serialVersionUID = SimpleElementHandler.class.hashCode();
+    
     private SimpleType type; // save casting all over
     private Element elem;
     private String text = "";
@@ -80,7 +83,7 @@ public class SimpleElementHandler extends XMLElementHandler {
     /**
      * @see org.geotools.xml.XMLElementHandler#getValue()
      */
-    public Object getValue() throws SAXException {
+    public Object getValue(){
         return value;
     }
 
@@ -94,7 +97,7 @@ public class SimpleElementHandler extends XMLElementHandler {
     /**
      * @see org.geotools.xml.XMLElementHandler#characters(java.lang.String)
      */
-    public void characters(String text) throws SAXException {
+    public void characters(String text){
         if (this.text != null) {
             this.text = this.text.concat(text);
         } else {
@@ -124,8 +127,7 @@ public class SimpleElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(URI namespaceURI, String localName, Attributes attr)
-        throws SAXException {
+    public void startElement(URI namespaceURI, String localName, Attributes attr){
         this.attr = new AttributesImpl(attr);
     }
 

@@ -55,6 +55,7 @@ public class GaldosTest extends TestCase {
         url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
     }
     
+    // Galdos is inconsistent wth there namespaces.
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
 //        WFSDataStoreReadTest.doFeatureType(url,false,true,1);
     }

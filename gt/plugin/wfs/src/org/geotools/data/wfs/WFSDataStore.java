@@ -58,10 +58,8 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -373,6 +371,7 @@ public class WFSDataStore extends AbstractDataStore {
         url += ("&TYPENAME=" + typeName);
 
         getUrl = new URL(url);
+System.out.println(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
         InputStream is = hc.getInputStream();
@@ -553,7 +552,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         getUrl = new URL(url);
-
+System.out.println(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
         InputStream is = hc.getInputStream();

@@ -55,13 +55,14 @@ public class MapServerTest extends TestCase {
         url = new URL("http://map.ns.ec.gc.ca/MapServer/mapserv.exe?map=/mapserver/services/envdat/config.map&service=WFS&version=1.0.0&request=GetCapabilities");
     }
     
+    // POST is buggy ... and returns HTML, doesn't seem to recognize the request
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
         WFSDataStoreReadTest.doFeatureType(url,true,false,0);
     }
     public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
         WFSDataStoreReadTest.doFeatureReader(url,true,false,0);
     }
-    public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
+    public void testFeatureReaderWithFilter() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
         WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,false,0);
     }
 }

@@ -58,6 +58,8 @@ public class OrdinanceTest extends TestCase {
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
         WFSDataStoreReadTest.doFeatureType(url,true,true,0);
     }
+    
+    // TIMES OUT
     public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
 //        WFSDataStoreReadTest.doFeatureReader(url,true,true,0);
     }
