@@ -116,4 +116,13 @@ public class NullFIDMapper extends AbstractFIDMapper {
     public void initSupportStructures() {
         // nothing to do        
     }
+    
+    
+    /**
+     * This FID mappers generates unique IDs out of the blue using {@link UID UID}
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isVolatile()
+     */
+    public boolean isVolatile() {
+        return false;
+    }
 }

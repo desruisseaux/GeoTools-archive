@@ -191,6 +191,12 @@ public abstract class JDBCDataStore implements DataStore {
     protected FeatureTypeHandler typeHandler = null;
 
     /**
+     * When true, writes are allowed also on tables with volatile FID mappers. False by default
+     * @see FIDMapper#isVolatile()
+     */
+    protected boolean allowWriteOnVolatileFIDs;
+
+    /**
      * DOCUMENT ME!
      *
      * @param connectionPool
@@ -205,7 +211,7 @@ public abstract class JDBCDataStore implements DataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * 
      *
      * @param connectionPool
      * @param databaseSchemaName
@@ -221,7 +227,7 @@ public abstract class JDBCDataStore implements DataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * 
      *
      * @param connectionPool
      * @param databaseSchemaName
@@ -241,7 +247,7 @@ public abstract class JDBCDataStore implements DataStore {
     }
 
     /**
-     * DOCUMENT ME!
+     * 
      *
      * @param connectionPool
      * @param databaseSchemaName
@@ -411,15 +417,19 @@ public abstract class JDBCDataStore implements DataStore {
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
     public FeatureSource getFeatureSource(String typeName) throws IOException {
-        if (getLockingManager() != null) {
-            // Use default JDBCFeatureLocking that delegates all locking
-            // the getLockingManager
-            //
-            return new JDBCFeatureLocking(this, getSchema(typeName));
+        if(typeHandler.getFIDMapper(typeName).isVolatile() || allowWriteOnVolatileFIDs) {
+            if (getLockingManager() != null) {
+                // Use default JDBCFeatureLocking that delegates all locking
+                // the getLockingManager
+                //
+                return new JDBCFeatureLocking(this, getSchema(typeName));
+            } else {
+                // subclass should provide a FeatureLocking implementation
+                // but for now we will simply forgo all locking
+                return new JDBCFeatureStore(this, getSchema(typeName));
+            }
         } else {
-            // subclass should provide a FeatureLocking implementation
-            // but for now we will simply forgo all locking
-            return new JDBCFeatureStore(this, getSchema(typeName));
+            return new JDBCFeatureSource(this, getSchema(typeName));
         }
     }
 
@@ -543,7 +553,7 @@ public abstract class JDBCDataStore implements DataStore {
      * @return A FeatureReader that contains features defined by the query.
      *
      * @throws IOException If an error occurs executing the query.
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws DataSourceException 
      */
     public FeatureReader getFeatureReader(Query query, Transaction trans) throws IOException {
         String typeName = query.getTypeName();
@@ -709,7 +719,7 @@ public abstract class JDBCDataStore implements DataStore {
      * @return
      *
      * @throws IOException
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws DataSourceException 
      */
     protected FeatureReader createFeatureReader(
         FeatureType schema,
@@ -800,17 +810,17 @@ public abstract class JDBCDataStore implements DataStore {
      * overriden, but Im not sure
      * </p>
      *
-     * @param tableName DOCUMENT ME!
+     * @param tableName 
      * @param sqlQuery The SQL query to execute.
      * @param transaction The Transaction is included here for handling
      *        transaction connections at a later stage.  It is not currently
      *        used.
-     * @param resultSetType DOCUMENT ME!
-     * @param concurrency DOCUMENT ME!
+     * @param resultSetType 
+     * @param concurrency 
      *
      * @return The QueryData object that contains the resources for the query.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException 
      * @throws DataSourceException If an error occurs performing the query.
      *
      * @task HACK: This is just protected for postgis FeatureWriter purposes.
@@ -881,11 +891,11 @@ public abstract class JDBCDataStore implements DataStore {
     /**
      * Gets a connection from the connection pool.
      *
-     * @param transaction DOCUMENT ME!
+     * @param transaction 
      *
      * @return A single use connection.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException 
      * @throws DataSourceException If the connection is not an
      *         OracleConnection.
      */
@@ -973,7 +983,7 @@ public abstract class JDBCDataStore implements DataStore {
      *
      * @return The FeatureType for the table.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException 
      * @throws DataSourceException This can occur if there is an SQL error or
      *         an error constructing the FeatureType.
      *
@@ -1126,7 +1136,7 @@ public abstract class JDBCDataStore implements DataStore {
      *
      * @return The SRID for the geometry column in the table or -1.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException 
      */
     protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
         return -1;
@@ -1302,7 +1312,7 @@ public abstract class JDBCDataStore implements DataStore {
      *
      * @throws IOException If typeName could not be located
      * @throws NullPointerException If the provided filter is null
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws DataSourceException 
      *
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      org.geotools.filter.Filter, org.geotools.data.Transaction)

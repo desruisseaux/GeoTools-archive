@@ -35,4 +35,14 @@ public abstract class AbstractFIDMapper implements FIDMapper {
 
         return false;
     }
+
+    /**
+     * Convenience since most FID mappers should be persistent, override on the
+     * specific ones that aren't.
+     *
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isVolatile()
+     */
+    public boolean isVolatile() {
+        return true;
+    }
 }
