@@ -32,14 +32,12 @@ public class OIDFidMapper extends AbstractFIDMapper {
     }
 
     /**
+     * Will always return an emtpy array since OIDs are not updatable, 
+     * so we don't try to parse the Feature ID at all.
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getPKAttributes(java.lang.String)
      */
     public Object[] getPKAttributes(String FID) throws IOException {
-        try {
-            return new Object[] { new Long(FID) };
-        } catch (NumberFormatException e) {
-            throw new DataSourceException("FID incompabile with OID column, not numeric", e);
-        }
+        return new Object[0];
     }
 
     /**
