@@ -42,6 +42,7 @@ import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.data.wms.response.GetStylesResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.geometry.GeneralEnvelope;
@@ -83,9 +84,6 @@ import org.xml.sax.SAXException;
 public class WebMapServer implements Discovery {
     private final URL serverURL;
     private WMSCapabilities capabilities;
-
-    private Request currentRequest;
-    private AbstractResponse currentResponse;
 
     protected Specification[] specs;
     private Specification specification;
@@ -369,16 +367,8 @@ public class WebMapServer implements Discovery {
      * @throws IOException
      * @throws SAXException
      */
-    public AbstractResponse issueRequest( Request request ) throws IOException, SAXException {
-        this.currentRequest = request;
-
-        issueRequest();
-
-        return currentResponse;
-    }
-
-    private void issueRequest() throws IOException, SAXException {
-        URL finalURL = currentRequest.getFinalURL();
+    private AbstractResponse internalIssueRequest( Request request ) throws IOException, SAXException {
+        URL finalURL = request.getFinalURL();
 
         URLConnection connection = finalURL.openConnection();
         InputStream inputStream = connection.getInputStream();
@@ -387,22 +377,47 @@ public class WebMapServer implements Discovery {
             inputStream = new GZIPInputStream(inputStream);
         }
 
-
         String contentType = connection.getContentType();
-
-        if (currentRequest instanceof GetFeatureInfoRequest) {
-            currentResponse = new GetFeatureInfoResponse(contentType, inputStream);
-        } else if (currentRequest instanceof GetMapRequest) {
-            currentResponse = new GetMapResponse(contentType, inputStream);
-        } else if (currentRequest instanceof DescribeLayerRequest) {
-            currentResponse = new DescribeLayerResponse(contentType, inputStream);
-        } else if (currentRequest instanceof GetLegendGraphicRequest) {
-            currentResponse = new GetLegendGraphicResponse(contentType, inputStream);
-        } else if (currentRequest instanceof PutStylesRequest) {
-            currentResponse = new PutStylesResponse(contentType, inputStream);
+        
+        if (request instanceof GetFeatureInfoRequest) {
+            return new GetFeatureInfoResponse(contentType, inputStream);
+        } else if (request instanceof GetMapRequest) {
+            return new GetMapResponse(contentType, inputStream);
+        } else if (request instanceof DescribeLayerRequest) {
+            return new DescribeLayerResponse(contentType, inputStream);
+        } else if (request instanceof GetLegendGraphicRequest) {
+            return new GetLegendGraphicResponse(contentType, inputStream);
+        } else if (request instanceof GetStylesRequest) {
+            return new GetStylesResponse(contentType, inputStream);
+        } else if (request instanceof PutStylesRequest) {
+            return new PutStylesResponse(contentType, inputStream);
         } else {
             throw new RuntimeException("Request is an invalid type. I do not know it.");
         }
+    }
+    
+    public GetMapResponse issueRequest(GetMapRequest request) throws IOException, SAXException {
+        return (GetMapResponse) internalIssueRequest(request);
+    }
+    
+    public GetFeatureInfoResponse issueRequest(GetFeatureInfoRequest request) throws IOException, SAXException {
+        return (GetFeatureInfoResponse) internalIssueRequest(request);
+    }
+    
+    public DescribeLayerResponse issueRequest(DescribeLayerRequest request) throws IOException, SAXException {
+        return (DescribeLayerResponse) internalIssueRequest(request);
+    }
+    
+    public GetLegendGraphicResponse issueRequest(GetLegendGraphicRequest request) throws IOException, SAXException {
+        return (GetLegendGraphicResponse) internalIssueRequest(request);
+    }
+    
+    public GetStylesResponse issueRequest(GetStylesRequest request) throws IOException, SAXException {
+        return (GetStylesResponse) internalIssueRequest(request);
+    }
+    
+    public PutStylesResponse issueRequest(PutStylesRequest request) throws IOException, SAXException {
+        return (PutStylesResponse) internalIssueRequest(request);
     }
 
     /**

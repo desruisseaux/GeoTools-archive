@@ -1502,6 +1502,12 @@ public class WMSComplexTypes {
 	protected static class _UserDefinedSymbolizationType extends WMSComplexType {
 		private static final WMSComplexType instance = new __ExtendedCapabilitiesType();
 
+        private static Element[] elems = new Element[] {
+            new WMSElement("SupportedSLDVersion", XSISimpleTypes.String.getInstance(), 0, Integer.MAX_VALUE) 
+        };
+        
+        private static Sequence seq = new SequenceGT(elems);
+        
 		public static WMSComplexType getInstance() {
 			return instance;
 		}
@@ -1518,7 +1524,11 @@ public class WMSComplexTypes {
 						Attribute.OPTIONAL, "0", null, false),
 				new WMSAttribute(null, "RemoteWFS", WMSSchema.NAMESPACE,
 						XSISimpleTypes.Boolean.getInstance(),
-						Attribute.OPTIONAL, "0", null, false) };
+						Attribute.OPTIONAL, "0", null, false),
+                new WMSAttribute(null, "RemoteWCS", WMSSchema.NAMESPACE,
+                        XSISimpleTypes.Boolean.getInstance(),
+                        Attribute.OPTIONAL, "0", null, false) };
+
 
 		/*
 		 * (non-Javadoc)
@@ -1535,7 +1545,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.ComplexType#getChild()
 		 */
 		public ElementGrouping getChild() {
-			return null;
+			return seq;
 		}
 
 		/*
@@ -1544,7 +1554,7 @@ public class WMSComplexTypes {
 		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
 		 */
 		public Element[] getChildElements() {
-			return null;
+			return elems;
 		}
 
 		/*

@@ -148,6 +148,7 @@ public class WMSSchema implements Schema {
         new WMSElement("Capability", _CapabilityType.getInstance()),
         new WMSElement("VendorSpecificCapabilities", _VendorSpecificCapabilitiesType.getInstance()),
         new WMSElement("UserDefinedSymbolization", _UserDefinedSymbolizationType.getInstance()),
+        new WMSElement("SupportedSLDVersion", XSISimpleTypes.String.getInstance()),
         new WMSElement("Request", _RequestType.getInstance()),
         
         new WMSElement("Capabilities", OperationType.getInstance()),

@@ -101,10 +101,31 @@ public interface GetMapRequest extends Request{
     /** Represents the STYLES parameter */
     public static final String STYLES = "STYLES"; //$NON-NLS-1$
     
+    
     /** Represents the EXCEPTION_INIMAGE value */
     public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage"; //$NON-NLS-1$
     /** Represents the EXCEPTION_BLANK value */
     public static final String EXCEPTION_BLANK = "application/vnd.ogc.se_blank"; //$NON-NLS-1$
+    
+
+    /** =============== BEGIN SLD SPECIFICATION PARAMETERS =============== **/
+    /** Represents the SLD parameter */
+    public static final String SLD = "SLD";
+    /** Represents the SLD_BODY parameter */
+    public static final String SLD_BODY = "SLD_BODY";
+    /** Represents the WFS parameter mentioned briefly in 1.1.1 */
+    public static final String WFS = "WFS";
+    /** Represents REMOTE_OWS_TYPE parameter */
+    public static final String REMOTE_OWS_TYPE = "REMOTE_OWS_TYPE";
+    /** Represents REMOTE_OWS_URL parameter */
+    public static final String REMOVE_OWS_URL = "REMOTE_OWS_URL";
+    
+    
+    /** <code>REMOTE_OWS_WFS</code> indicates WFS as a REMOTE_OWS_TYPE */
+    public static final String REMOTE_OWS_WFS = "WFS";
+    /** <code>REMOTE_OWS_WCS</code> indicates WCS as a REMOTE_OWS_TYPE */
+    public static final String REMOTE_OWS_WCS = "WCS";
+    /** =============== END SLD SPECIFICATION PARAMETERS =============== **/
     
     /**
      * Sets the version number of the request.
