@@ -44,12 +44,13 @@ import java.awt.geom.Rectangle2D;
 import junit.framework.*;
 
 // Geotools dependencies
-import org.geotools.resources.Geometry;
+//import org.geotools.resources.Geometry;
+import org.geotools.resources.geometry.ShapeUtilities;
 import org.geotools.renderer.geom.ShapePanel;
 
 
 /**
- * Performs a visual check of {@link Geometry} computations. Those computations are
+ * Performs a visual check of {@link ShapeUtilities} computations. Those computations are
  * an essential part of {@link org.geotools.renderer.geom.Polygon} internal working.
  *
  * @version $Id: GeometryTest.java,v 1.3 2003/08/11 20:04:16 desruisseaux Exp $
@@ -126,7 +127,7 @@ public final class GeometryTest extends TestCase implements ShapePanel.Producer 
                 return new Object[] {
                     a,
                     b,
-                    Geometry.intersectionPoint(a,b)
+                    ShapeUtilities.intersectionPoint(a,b)
                 };
             }
             //////////////////////////////////
@@ -139,7 +140,7 @@ public final class GeometryTest extends TestCase implements ShapePanel.Producer 
                 QuadCurve2D curve;
                 do {
                     points = ShapePanel.getPoints(3,args); args=null;
-                    curve  = Geometry.fitParabol(points[0], points[1], points[2], Geometry.PARALLEL);
+                    curve  = ShapeUtilities.fitParabol(points[0], points[1], points[2], ShapeUtilities.PARALLEL);
                 } while (curve == null);
                 return new Object[] {
                     curve,
@@ -166,7 +167,7 @@ public final class GeometryTest extends TestCase implements ShapePanel.Producer 
             case 2: {
                 final Point2D[] points=ShapePanel.getPoints(3,args); args=null;
                 return new Object[] {
-                    Geometry.fitCircle(points[0], points[1], points[2]),
+                    ShapeUtilities.fitCircle(points[0], points[1], points[2]),
                                        points[0], points[1], points[2]
                 };
             }
