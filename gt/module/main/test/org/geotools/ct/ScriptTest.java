@@ -98,6 +98,16 @@ public class ScriptTest extends TestCase {
     /**
      * A test file to parse and execute for stereographic projection.
      */
+    private static final String MERCATOR_SCRIPT = "Mercator_TestScript.txt";
+    
+    /**
+     * A test file to parse and execute for stereographic projection.
+     */
+    private static final String TRANSVERSE_MERCATOR_SCRIPT = "TransverseMercator_TestScript.txt";
+    
+    /**
+     * A test file to parse and execute for stereographic projection.
+     */
     private static final String STEREOGRAPHIC_SCRIPT = "Stereographic_TestScript.txt";
     
     /**
@@ -111,9 +121,19 @@ public class ScriptTest extends TestCase {
     private static final String ALBERS_SCRIPT = "AlbersEqualArea_TestScript.txt";
     
     /**
+     * A test file to parse and execute for Lambert conic projection.
+     */
+    private static final String LAMBERT_SCRIPT = "LambertConic_TestScript.txt";
+    
+    /**
      * The OpenGIS test file to parse and execute.
      */
     private static final String OPENGIS_SCRIPT = "OpenGIS_TestScript.txt";
+    
+    /**
+     * A test file to parse and execute for projections as math transforms.
+     */
+    private static final String MT_PROJ_SCRIPT = "MT_Projection_TestScript.txt";
     
     /**
      * The coordinate system factory to use for the test.
@@ -143,6 +163,20 @@ public class ScriptTest extends TestCase {
      * Those fields are updated many times by {@link #runInstruction}.
      */
     private CoordinateSystem sourceCS, targetCS;
+    
+    /** 
+     * The Math Transform for the current test. This is only used for tests 
+     * that do not use a source and target coordinate reference system.
+     * This field is updated many times by {@link #runInstruction}.
+     */
+    private MathTransform transform;
+    
+    /*
+     * <code>true</code> if tests are using a math transform instead of a 
+     * source and target coordinate reference system. This field is updated 
+     * many times by {@link #runInstruction}.
+     */
+    private boolean usingMathTransform = false;
     
     /**
      * Source and target coordinate points for the test currently executed.
@@ -232,6 +266,18 @@ public class ScriptTest extends TestCase {
             return (CoordinateSystem) cs;
         }
         throw new FactoryException("No coordinate system defined for \""+name+"\".");
+    }
+    
+    /**
+     * Returns a math transform for the specified name. The math transform
+     * must has been previously defined with a call to {@link #addDefinition}.
+     */
+    private MathTransform getMathTransform(final String name) throws FactoryException {
+        final Object mt = definitions.get(name);
+        if (mt instanceof MathTransform) {
+            return (MathTransform) mt;
+        }
+        throw new FactoryException("No math transform defined for \""+name+"\".");
     }
     
     /**
@@ -360,7 +406,17 @@ public class ScriptTest extends TestCase {
      *   pt_target      = (-1, -2)
      * </pre>
      *
-     * The "<code>pt_target</code>" instruction trig the computation.
+     * or
+     * 
+     * <pre>
+     *   math_transform = _mt_merc1_
+     *   test_tolerance = 1e-6
+     *   pt_source      = (1, 2)
+     *   pt_target      = (-1, -2)
+     * </pre>
+     *
+     * The "<code>pt_target</code>" instruction triggers the computation.
+     * <br><br>
      *
      * @param  text The instruction to parse.
      * @param  lineNumber The line number, for error output.
@@ -377,10 +433,17 @@ public class ScriptTest extends TestCase {
         final String value = st.nextToken().trim();
         if (name.equals("cs_source")) {
             sourceCS = getCoordinateSystem(value);
+            usingMathTransform = false;
             return;
         }
         if (name.equals("cs_target")) {
             targetCS = getCoordinateSystem(value);
+            usingMathTransform = false;
+            return;
+        }
+        if (name.equals("math_transform")) {
+            transform = getMathTransform(value);
+            usingMathTransform = true;
             return;
         }
         if (name.equals("test_tolerance")) {
@@ -392,18 +455,22 @@ public class ScriptTest extends TestCase {
             return;
         }
         if (!name.equals("pt_target")) {
-            throw new FactoryException("Unknow instruction: "+name);
+            throw new FactoryException("Unknown instruction: "+name);
         }
         targetPT = new CoordinatePoint(parseVector(value));
         /*
-         * The "pt_target" instruction trig the test.
+         * The "pt_target" instruction triggers the test.
          */
         CoordinatePoint    computed = null;
         CoordinateTransformation tr = null;
         try {
             testRun++;
-            tr = ctFactory.createFromCoordinateSystems(sourceCS, targetCS);
-            computed = tr.getMathTransform().transform(sourcePT, computed);
+            if (usingMathTransform) {
+                computed = transform.transform(sourcePT, computed);
+            } else {
+                tr = ctFactory.createFromCoordinateSystems(sourceCS, targetCS);
+                computed = tr.getMathTransform().transform(sourcePT, computed);
+            }
             assertEquals(targetPT, computed, tolerance);
             testPassed++;
         } catch (TransformException exception) {
@@ -422,8 +489,12 @@ public class ScriptTest extends TestCase {
             out.print("----TEST FAILED AT LINE ");
             out.print(String.valueOf(lineNumber));
             out.println("-------------------------------------------------------");
-            out.println("cs_source : " + sourceCS);
-            out.println("cs_target : " + targetCS);
+            if (usingMathTransform) {
+                out.println("math_transform : " + transform);
+            } else {
+                out.println("cs_source : " + sourceCS);
+                out.println("cs_target : " + targetCS);
+            }
             out.println("pt_source = " + sourcePT);
             out.println("pt_target = " + targetPT);
             out.println("computed  = " + computed);
@@ -447,11 +518,11 @@ public class ScriptTest extends TestCase {
             InputStream in = getClass().getClassLoader().getResourceAsStream(script);
             if (in == null) {
                 // Then we are being run by maven
-                File dataFolder;
-                dataFolder = new File(System.getProperty("basedir", "."));
-                dataFolder = new File(dataFolder, "/tests/unit/");
-                dataFolder = new File(dataFolder, script);
-//              in = new FileInputStream(dataFolder);
+//                File dataFolder;
+//                dataFolder = new File(System.getProperty("basedir", "."));
+//                dataFolder = new File(dataFolder, "/tests/unit/");
+//                dataFolder = new File(dataFolder, script);
+//                in = new FileInputStream(dataFolder);
                 Reader scriptReader = TestData.getReader( BasicTest.class, script);
                 if( scriptReader == null ){
                 	throw new FileNotFoundException("Could not locate test-data "+script );
@@ -507,6 +578,28 @@ public class ScriptTest extends TestCase {
     }
     
     /**
+     * Run the {@link #MERCATOR_SCRIPT}.
+     *
+     * @throws IOException If {@link #MERCATOR_SCRIPT} can't be read.
+     * @throws FactoryException if a line can't be parsed.
+     * @throws TransformException if the transformation can't be run.
+     */
+    public void testMercator() throws IOException, FactoryException {
+        runScript(MERCATOR_SCRIPT);
+    }
+    
+    /**
+     * Run the {@link #TRANSVERSE_MERCATOR_SCRIPT}.
+     *
+     * @throws IOException If {@link #TRANSVERSE_MERCATOR_SCRIPT} can't be read.
+     * @throws FactoryException if a line can't be parsed.
+     * @throws TransformException if the transformation can't be run.
+     */
+    public void testTransverseMercator() throws IOException, FactoryException {
+        runScript(TRANSVERSE_MERCATOR_SCRIPT);
+    }   
+    
+    /**
      * Run the {@link #STEREOGRAPHIC_SCRIPT}.
      *
      * @throws IOException If {@link #STEREOGRAPHIC_SCRIPT} can't be read.
@@ -531,12 +624,23 @@ public class ScriptTest extends TestCase {
     /**
      * Run the {@link #ALBERS_SCRIPT}.
      *
-     * @throws IOException If {@link #STEREOGRAPHIC_SCRIPT} can't be read.
+     * @throws IOException If {@link #ALBERS_SCRIPT} can't be read.
      * @throws FactoryException if a line can't be parsed.
      * @throws TransformException if the transformation can't be run.
      */
     public void testAlbersEqualArea() throws IOException, FactoryException {
         runScript(ALBERS_SCRIPT);
+    }
+    
+    /**
+     * Run the {@link #LAMBERT_SCRIPT}.
+     *
+     * @throws IOException If {@link #LAMBERT_SCRIPT} can't be read.
+     * @throws FactoryException if a line can't be parsed.
+     * @throws TransformException if the transformation can't be run.
+     */
+    public void testLambertConic() throws IOException, FactoryException {
+        runScript(LAMBERT_SCRIPT);
     }
     
     /**
@@ -549,6 +653,18 @@ public class ScriptTest extends TestCase {
     public void testOpenGIS() throws IOException, FactoryException {
         runScript(OPENGIS_SCRIPT);
     }
+    
+    /**
+     * Run the {@link #MT_PROJ_SCRIPT}.
+     *
+     * @throws IOException If {@link #MT_PROJ_SCRIPT} can't be read.
+     * @throws FactoryException if a line can't be parsed.
+     * @throws TransformException if the transformation can't be run.
+     */
+    public void testMTproj() throws IOException, FactoryException {
+        runScript(MT_PROJ_SCRIPT);
+    }
+    
     
     /**
      * Run the test from the command line. By default, this method run all tests. In order
@@ -576,6 +692,14 @@ public class ScriptTest extends TestCase {
             test.testSimple();
             done = true;
         }
+        if (script==null || script.equalsIgnoreCase("Mercator")) {
+            test.testMercator();
+            done = true;
+        } 
+        if (script==null || script.equalsIgnoreCase("TransverseMercator")) {
+            test.testTransverseMercator();
+            done = true;
+        } 
         if (script==null || script.equalsIgnoreCase("Stereographic")) {
             test.testStereographic();
             done = true;
@@ -588,8 +712,16 @@ public class ScriptTest extends TestCase {
             test.testAlbersEqualArea();
             done = true;
         }
+        if (script==null || script.equalsIgnoreCase("LambertConic")) {
+            test.testLambertConic();
+            done = true;
+        }
         if (script==null || script.equalsIgnoreCase("OpenGIS")) {
             test.testOpenGIS();
+            done = true;
+        }
+        if (script==null || script.equalsIgnoreCase("MT_Projection")) {
+            test.testMTproj();
             done = true;
         }
         if (script!=null && !done) {
