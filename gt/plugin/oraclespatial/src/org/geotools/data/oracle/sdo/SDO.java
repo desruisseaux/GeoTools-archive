@@ -34,6 +34,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import java.lang.reflect.Array;
+import java.text.Format;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -1888,6 +1890,99 @@ public final class SDO {
         return elemInfo[(triplet * 3) + 0];
     }
 
+    /**
+     * A version of assert that indicates range pre/post condition.
+     * <p>
+     * Works like assert exception IllegalArgumentException is thrown indicating this
+     * is a required check.
+     * </p>
+     * <p>
+     * Example phrased as a positive statement of the requirement to be met:
+     * <pre><code>
+     * ensure( "STARTING_OFFSET {1} must indicate a valid ordinate between {0} and {2}.
+     * </code></pre>
+     * </p>
+     * @param condition MessageFormat pattern - positive statement of requirement
+     * @param min minimum acceptable value ({0} in message format)
+     * @param actual value supplied ({1} in message format)
+     * @param max maximum acceptable value ({2} in message format)
+     * @throws IllegalArgumentException unless min <= actual <= max
+     */
+    private static void ensure( String condition, int min, int actual, int max  ){
+        if( !(min <= actual && actual <= max) ){
+            String msg = MessageFormat.format( condition,
+                    new Object[]{ new Integer(min), new Integer(actual), new Integer(max) } );
+            throw new IllegalArgumentException( msg );
+        }
+    }
+    /**
+     * A version of assert that indicates range pre/post condition.
+     * <p>
+     * Works like assert exception IllegalArgumentException is thrown indicating this
+     * is a required check.
+     * </p>
+     * <p>
+     * Example phrased as a positive statement of the requirement to be met:
+     * <pre><code>
+     * ensure( "INTERPRETATION {0} must be on of {1}.
+     * </code></pre>
+     * </p>
+     * @param condition MessageFormat pattern - positive statement of requirement
+     * @param actual value supplied ({0} in message format)
+     * @param set Array of acceptable values ({1} in message format)
+     * @throws IllegalArgumentException unless actual is a member of set
+     */
+    private static void ensure( String condition, int actual, int[] set ){
+        if( set == null ) return; // don't apparently care
+        for( int i=0; i<set.length;i++){
+            if( set[i] == actual ) return; // found it
+        }
+        StringBuffer array = new StringBuffer();        
+        for( int i=0; i<set.length;i++){
+            array.append( set[i] );
+            if( i<set.length){
+                array.append( "," );
+            }
+        }
+        String msg = MessageFormat.format( condition,
+                new Object[]{ new Integer(actual), array } );        
+        throw new IllegalArgumentException( msg );
+    }
+    /** Returns the "length" of the ordinate array used for the
+     * CoordianteSequence, GTYPE is used to determine the dimension.
+     * <p>
+     * This is most often used to check the STARTING_OFFSET value to ensure
+     * that is falls within allowable bounds.
+     * </p>
+     * <p>
+     * Example:<pre><code>
+     * if (!(STARTING_OFFSET >= 1) ||
+     *     !(STARTING_OFFSET <= ordinateSize( coords, GTYPE ))){
+     *     throw new IllegalArgumentException(
+     *         "ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+ 
+     *         "inconsistent with COORDINATES length "+size( coords, GTYPE ) );
+     * } 
+     * </code></pre>
+     * </p>
+     * @param coords
+     * @param GTYPE
+     * @return
+     */
+    private static int ordinateSize( CoordinateSequence coords, int GTYPE ){
+        if( coords == null ){
+            return 0;
+        }
+        return coords.size() * D(GTYPE);
+    }
+    /**
+     * ETYPE access for the elemInfo triplet indicated.
+     * <p>
+     * @see ETYPE for an indication of possible values
+     * 
+     * @param elemInfo
+     * @param triplet
+     * @return ETYPE for indicated triplet
+     */ 
     private static int ETYPE(int[] elemInfo, int triplet) {
         if (((triplet * 3) + 1) >= elemInfo.length) {
             return -1;
@@ -2420,11 +2515,19 @@ public final class SDO {
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
-		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR)){
-			throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
-		}
+        ensure( "ELEM_INFO STARTING_OFFSET {1} must be in the range {0}..{1} of COORDINATES",
+                1,STARTING_OFFSET, ordinateSize( coords, GTYPE ) );        
+//        if( !(1 <= STARTING_OFFSET && STARTING_OFFSET <= ordinateSize( coords, GTYPE ))){
+//            throw new IllegalArgumentException(
+//                    "ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+
+//                    "inconsistent with COORDINATES length "+ordinateSize( coords, GTYPE ) );
+//        } 
+        ensure( "ETYPE {0} must be expected POLYGON or POLYGON_EXTERIOR (one of {1})",
+                eTYPE, new int[]{ ETYPE.POLYGON, ETYPE.POLYGON_EXTERIOR } );
+//		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR)){
+//			throw new IllegalArgumentException(
+//			        "ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
+//		}        
 		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3)){
 		    LOGGER.warning( "Could not create JTS Polygon with INTERPRETATION "+INTERPRETATION+" - we can only support 1 for straight edges, and 2 for rectangle");
 			return null;
