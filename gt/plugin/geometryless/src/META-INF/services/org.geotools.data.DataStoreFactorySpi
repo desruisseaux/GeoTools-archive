@@ -1,1 +1,2 @@
+org.geotools.data.geometryless.LocationsXYDataStoreFactory
 org.geotools.data.geometryless.JDBCDataStoreFactory

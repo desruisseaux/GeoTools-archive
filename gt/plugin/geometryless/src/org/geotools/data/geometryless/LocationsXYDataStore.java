@@ -21,6 +21,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
+import org.geotools.filter.SQLEncoderLocationsXY;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -149,7 +150,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
     	
     
-        SQLEncoder encoder = new SQLEncoder();
+        SQLEncoder encoder = new SQLEncoderLocationsXY(XCoordColumnName,YCoordColumnName);
         encoder.setFIDMapper(getFIDMapper(typeName));
         return new GeometrylessSQLBuilder(encoder);
     }
