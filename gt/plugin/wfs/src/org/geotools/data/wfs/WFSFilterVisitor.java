@@ -27,7 +27,9 @@ import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * @author dzwiers
@@ -266,12 +268,12 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        case FilterType.GEOMETRY_BBOX:
 	
 	            if ((fcs.getSpatialOps() & FilterCapabilities.BBOX) != FilterCapabilities.BBOX) {
-	                if ((parent.getDefaultGeometry() == null)
-	                        || (parent.getDefaultGeometry().getCoordinateSystem() == null)) {
-	                    postStack.push(filter);
-	
-	                    return;
-	                }
+//	                if ((parent.getDefaultGeometry() == null)
+//	                        || (parent.getDefaultGeometry().getCoordinateSystem() == null)) {
+//	                    postStack.push(filter);
+//	
+//	                    return;
+//	                }
 	
 	                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
 	                    LiteralExpression le = (LiteralExpression) filter
@@ -284,18 +286,18 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                        return;
 	                    }
 	
-	                    Geometry bbox = (Geometry) le.getLiteral();
+//	                    Geometry bbox = (Geometry) le.getLiteral();
 	
-	                    if ((!parent.getDefaultGeometry().getCoordinateSystem()
-	                                    .equals(bbox.getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
-	                    	postStack.push(filter);
-	
-	                        return;
-	                    }
+//	                    if ((!parent.getDefaultGeometry().getCoordinateSystem()
+//	                                    .equals(bbox.getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
+//	                    	postStack.push(filter);
+//	
+//	                        return;
+//	                    }
 	                } else {
 	                    if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
 	                        LiteralExpression le = (LiteralExpression) filter
-	                            .getLeftGeometry();
+	                            .getRightGeometry();
 	
 	                        if ((le == null) || (le.getLiteral() == null)
 	                                || !(le.getLiteral() instanceof Geometry)) {
@@ -304,15 +306,15 @@ public class WFSFilterVisitor implements FilterVisitor {
 	                            return;
 	                        }
 	
-	                        Geometry bbox = (Geometry) le.getLiteral();
+//	                        Geometry bbox = (Geometry) le.getLiteral();
 	
-	                        if ((!parent.getDefaultGeometry()
-	                                        .getCoordinateSystem().equals(bbox
-	                                    .getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
-	                        	postStack.push(filter);
-	
-	                            return;
-	                        }
+//	                        if ((!parent.getDefaultGeometry()
+//	                                        .getCoordinateSystem().equals(bbox
+//	                                    .getUserData()))) { // || !(!parent.getDefaultGeometry().getCoordinateSystem().equals(bbox.getSRID()))){
+//	                        	postStack.push(filter);
+//	
+//	                            return;
+//	                        }
 	                    } else {
 	                    	postStack.push(filter);
 	
@@ -751,4 +753,232 @@ public class WFSFilterVisitor implements FilterVisitor {
 	
 	        return and.not();
 	    }
-	}
+
+    public static class WFSBBoxFilterVisitor implements FilterVisitor{
+        Envelope maxbbox;
+        public WFSBBoxFilterVisitor(Envelope fsd){
+            maxbbox = fsd;
+        }public void visit(Filter filter) {
+            if (Filter.NONE == filter) {
+                return;
+            }
+                switch (filter.getFilterType()) {
+                case FilterType.BETWEEN:
+                    visit((BetweenFilter) filter);
+    
+                    break;
+    
+                case FilterType.COMPARE_EQUALS:
+                case FilterType.COMPARE_GREATER_THAN:
+                case FilterType.COMPARE_GREATER_THAN_EQUAL:
+                case FilterType.COMPARE_LESS_THAN:
+                case FilterType.COMPARE_LESS_THAN_EQUAL:
+                case FilterType.COMPARE_NOT_EQUALS:
+                    visit((BetweenFilter) filter);
+    
+                    break;
+    
+                case FilterType.FID:
+                    visit((BetweenFilter) filter);
+    
+                    break;
+    
+                case FilterType.GEOMETRY_BBOX:
+                case FilterType.GEOMETRY_BEYOND:
+                case FilterType.GEOMETRY_CONTAINS:
+                case FilterType.GEOMETRY_CROSSES:
+                case FilterType.GEOMETRY_DISJOINT:
+                case FilterType.GEOMETRY_DWITHIN:
+                case FilterType.GEOMETRY_EQUALS:
+                case FilterType.GEOMETRY_INTERSECTS:
+                case FilterType.GEOMETRY_OVERLAPS:
+                case FilterType.GEOMETRY_TOUCHES:
+                case FilterType.GEOMETRY_WITHIN:
+                    visit((GeometryFilter) filter);
+    
+                    break;
+    
+                case FilterType.LIKE:
+                    visit((LikeFilter) filter);
+    
+                    break;
+    
+                case FilterType.LOGIC_AND:
+                case FilterType.LOGIC_NOT:
+                case FilterType.LOGIC_OR:
+                    visit((LogicFilter) filter);
+    
+                    break;
+    
+                case FilterType.NULL:
+                    visit((NullFilter) filter);
+    
+                    break;
+    
+                default:
+            }
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
+         */
+        public void visit( BetweenFilter filter ) {
+            if(filter!=null){
+                if(filter.getLeftValue()!=null)
+                        filter.getLeftValue().accept(this);
+                if(filter.getRightValue()!=null)
+                    filter.getRightValue().accept(this);
+                if(filter.getMiddleValue()!=null)
+                    filter.getMiddleValue().accept(this);
+            }
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.CompareFilter)
+         */
+        public void visit( CompareFilter filter ) {
+            if(filter!=null){
+                if(filter.getLeftValue()!=null)
+                        filter.getLeftValue().accept(this);
+                if(filter.getRightValue()!=null)
+                    filter.getRightValue().accept(this);
+            }
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
+         */
+        public void visit( GeometryFilter filter ) {
+            if(filter!=null){
+                switch (filter.getFilterType()) {
+                
+                            case FilterType.GEOMETRY_BBOX:
+                                // find literal side and deal ...
+                                Envelope bbox = null;
+                                LiteralExpression le = null;
+                                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
+                                    le = (LiteralExpression) filter.getLeftGeometry();
+                                    if(le != null &&  le.getLiteral() != null && le.getLiteral() instanceof Geometry){                
+                                        bbox = ((Geometry) le.getLiteral()).getEnvelopeInternal();
+                                    }
+                                } else {
+                                    if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
+                                        le = (LiteralExpression) filter.getRightGeometry();
+                                        if(le != null &&  le.getLiteral() != null && le.getLiteral() instanceof Geometry){
+                                            Geometry g = (Geometry) le.getLiteral();
+                                            bbox = g.getEnvelopeInternal();
+                                        }
+                                    }
+                                }
+                                if(bbox!=null){
+                                    boolean changed = false;
+                                    double minx,miny,maxx,maxy;
+                                    minx = bbox.getMinX();
+                                    miny = bbox.getMinY();
+                                    maxx = bbox.getMaxX();
+                                    maxy = bbox.getMaxY();
+                                    if(minx < maxbbox.getMinX()){
+                                        minx = maxbbox.getMinX();
+                                        changed = true;
+                                    }
+                                    if(maxx > maxbbox.getMaxX()){
+                                        minx = maxbbox.getMaxX();
+                                        changed = true;
+                                    }
+                                    if(miny < maxbbox.getMinY()){
+                                        miny = maxbbox.getMinY();
+                                        changed = true;
+                                    }
+                                    if(maxy > maxbbox.getMaxY()){
+                                        maxy = maxbbox.getMaxY();
+                                        changed = true;
+                                    }
+                                    if(changed){
+                                        Envelope tmp = new Envelope(minx,maxx,miny,maxy);
+                                        try {
+                                            le.setLiteral((new GeometryFactory()).toGeometry(tmp));
+                                        } catch (IllegalFilterException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                                return;
+                            case FilterType.GEOMETRY_BEYOND:
+                            case FilterType.GEOMETRY_CONTAINS:
+                            case FilterType.GEOMETRY_CROSSES:
+                            case FilterType.GEOMETRY_DISJOINT:
+                            case FilterType.GEOMETRY_DWITHIN:
+                            case FilterType.GEOMETRY_EQUALS:
+                            case FilterType.GEOMETRY_INTERSECTS:
+                            case FilterType.GEOMETRY_OVERLAPS:
+                            case FilterType.GEOMETRY_TOUCHES:
+                            case FilterType.GEOMETRY_WITHIN:
+                            default:
+                                if(filter.getLeftGeometry()!=null)
+                                    filter.getLeftGeometry().accept(this);
+                                if(filter.getRightGeometry()!=null)
+                                    filter.getRightGeometry().accept(this);
+                                
+                }
+            }
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
+         */
+        public void visit( LikeFilter filter ) {
+            if(filter!=null){
+                if(filter.getValue()!=null)
+                    filter.getValue().accept(this);
+            }
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
+         */
+        public void visit( LogicFilter filter ) {
+            if(filter!=null){
+                Iterator i = filter.getFilterIterator();
+                while(i.hasNext()){
+                    Filter tmp = (Filter)i.next();
+                    tmp.accept(this);
+                }
+            }
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
+         */
+        public void visit( NullFilter filter ) {
+            if(filter!=null){
+                if(filter.getNullCheckValue()!=null)
+                    filter.getNullCheckValue().accept(this);
+            }
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FidFilter)
+         */
+        public void visit( FidFilter filter ) {
+            // do nothing
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
+         */
+        public void visit( AttributeExpression expression ) {
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
+         */
+        public void visit( Expression expression ) {
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
+         */
+        public void visit( LiteralExpression expression ) {
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
+         */
+        public void visit( MathExpression expression ) {
+        }
+        /*
+         * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
+         */
+        public void visit( FunctionExpression expression ) {
+        }
+    }
+}

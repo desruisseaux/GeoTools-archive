@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 import org.geotools.ct.CannotCreateTransformException;
+import org.geotools.ct.MathTransform;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
@@ -29,9 +30,10 @@ import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.crs.CRSService;
-import org.geotools.data.crs.ReprojectFeatureReader;
+import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.WFSFilterVisitor.WFSBBoxFilterVisitor;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
@@ -52,6 +54,8 @@ import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -299,19 +303,11 @@ public class WFSDataStore extends AbstractDataStore {
             throw new IOException(sax.toString());
         
         //set crs?
-        List l = capabilities.getFeatureTypes();
-        Iterator i = l.iterator();
+        FeatureSetDescription fsd = getFSD(typeName);
         String crsName = null;
         String ftName = null;
-
-        while (i.hasNext() && crsName==null) {
-            	FeatureSetDescription fsd = (FeatureSetDescription) i.next();
-//System.out.println(typeName+"***"+fsd.getName());
-            	if (typeName.equals(fsd.getName()) || (fsd.getName()!=null && typeName.equals(fsd.getName().substring(typeName.indexOf(':')+1)))) {
-            	    crsName = fsd.getSRS();
-            	    ftName = fsd.getName();
-            	}
-        }
+        crsName = fsd.getSRS();
+        ftName = fsd.getName();
         
         CoordinateReferenceSystem crs;
         try {
@@ -340,6 +336,21 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         return t;
+    }
+    
+    private FeatureSetDescription getFSD(String typename){
+        List l = capabilities.getFeatureTypes();
+        Iterator i = l.iterator();
+        String crsName = null;
+        String ftName = null;
+
+        while (i.hasNext() && crsName==null) {
+                FeatureSetDescription fsd = (FeatureSetDescription) i.next();
+                if (typename.equals(fsd.getName()) || (fsd.getName()!=null && typename.equals(fsd.getName().substring(typename.indexOf(':')+1)))) {
+                    return fsd;
+                }
+        }
+        return null;
     }
 
     private FeatureType getSchemaGet(String typeName)
@@ -729,6 +740,30 @@ System.out.println("GET URL = "+url); // url to request
         Filter[] filters = splitFilters(query,transaction); // [server][post] 
         
         query = new DefaultQuery(query);
+        // TODO modify bbox requests here
+        FeatureSetDescription fsd = getFSD(query.getTypeName());
+        
+        Envelope maxbbox = fsd.getLatLongBoundingBox();
+        if(fsd.getSRS()!=null){
+            // reproject this
+            try {
+                CoordinateReferenceSystem crs = getCRSService().createCRS(fsd.getSRS());
+                MathTransform mt = getCRSService().reproject(getCRSService().GEOGRAPHIC,crs,false);
+                maxbbox = getCRSService().transform(maxbbox,mt);
+            } catch (FactoryException e) {
+                e.printStackTrace();maxbbox = null;
+            } catch (CannotCreateTransformException e) {
+                e.printStackTrace();maxbbox = null;
+            } catch (MismatchedDimensionException e) {
+                e.printStackTrace();maxbbox = null;
+            } catch (TransformException e) {
+                e.printStackTrace();maxbbox = null;
+            }
+        }
+        if(maxbbox!=null){
+            WFSBBoxFilterVisitor bfv = new WFSBBoxFilterVisitor(maxbbox);
+            filters[0].accept(bfv);
+        }
         ((DefaultQuery)query).setFilter(filters[0]);
         if (((protos & POST_FIRST) == POST_FIRST) && (t == null)) {
             try {
@@ -802,20 +837,29 @@ System.out.println("GET URL = "+url); // url to request
         if (t.hasNext()) { // opportunity to throw exception
 
             if (t.getFeatureType() != null) {
-                if(query.getCoordinateSystemReproject()!=null && t.getFeatureType().getDefaultGeometry()!=null && t.getFeatureType().getDefaultGeometry().getCoordinateSystem()!=null){
+//                if(query.getCoordinateSystemReproject()!=null && t.getFeatureType().getDefaultGeometry()!=null && t.getFeatureType().getDefaultGeometry().getCoordinateSystem()!=null){
+//                    FeatureReader tmp = t;
+//                    try {
+//                        t = new ReprojectFeatureReader(t,query.getCoordinateSystemReproject());
+//                    } catch (CannotCreateTransformException e1) {
+//                        e1.printStackTrace();
+//                        t = tmp;
+//                    } catch (SchemaException e1) {
+//                        e1.printStackTrace();
+//                        t = tmp;
+//                    }
+//                }
+                if (!filters[1].equals( Filter.NONE ) ) {
+                    t = new FilteringFeatureReader(t, filters[1]);
+                }
+                if (query.getCoordinateSystem()!=null){
                     FeatureReader tmp = t;
                     try {
-                        t = new ReprojectFeatureReader(t,query.getCoordinateSystemReproject());
-                    } catch (CannotCreateTransformException e1) {
-                        e1.printStackTrace();
-                        t = tmp;
-                    } catch (SchemaException e1) {
-                        e1.printStackTrace();
+                        t = new ForceCoordinateSystemFeatureReader(t,query.getCoordinateSystem());
+                    } catch (SchemaException e) {
+                        e.printStackTrace();
                         t = tmp;
                     }
-                }
-            	if (!filters[1].equals( Filter.NONE ) ) {
-                    t = new FilteringFeatureReader(t, filters[1]);
                 }
             	return t;
             }
