@@ -18,6 +18,8 @@ package org.geotools.data.postgis.fidmapper;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
@@ -41,6 +43,19 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
     protected FIDMapper buildLastResortFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo[] colInfos) {
         return new OIDFidMapper();
+    }
+    
+    /**
+     *  see@DefaultFIDMapperFactory in main module (jdbc)
+     *   This version pre-double quotes the column name and table name and passes it to the superclass's version.
+     */
+    protected boolean isAutoIncrement(String catalog, String schema,
+            String tableName, Connection conn, ResultSet tableInfo,
+            String columnName, int dataType) throws SQLException 
+	{
+    	return super.isAutoIncrement( catalog, schema, "\""+tableName+"\"",conn, tableInfo,
+    			"\""+columnName+"\"",dataType);
+    
     }
 //
 //    /**

@@ -76,7 +76,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     public void sqlColumns(StringBuffer sql, FIDMapper mapper,
         AttributeType[] attributes) {
         for (int i = 0; i < mapper.getColumnCount(); i++) {
-            sql.append(mapper.getColumnName(i));
+            sql.append("\""+mapper.getColumnName(i)+"\""); //DJB: add quotes in.  NOTE: if FID  mapper isnt oid (ie. PK - Primary Key), you could be requesting PK columns multiple times 
 
             if ((attributes.length > 0) || (i < (mapper.getColumnCount() - 1))) {
                 sql.append(", ");
