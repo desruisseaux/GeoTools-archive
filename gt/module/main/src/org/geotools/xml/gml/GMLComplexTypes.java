@@ -6405,6 +6405,7 @@ public class GMLComplexTypes {
             break;
         case ElementGrouping.GROUP:
             l.addAll(getAttributes(name,((Group)eg).getChild()));
+            break;
         case ElementGrouping.ELEMENT:
             t = getAttribute((Element)eg);
             if(t!=null)
