@@ -18,8 +18,6 @@ package org.geotools.catalog;
 
 import org.geotools.xml.XPath;
 import org.opengis.catalog.MetadataEntity;
-import org.opengis.catalog.MetadataEntity.EntityType;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -121,6 +119,10 @@ public class MetadataXPath extends XPath {
 
         if (o instanceof MetadataEntity.EntityType) {
             entity = (MetadataEntity.EntityType) o;
+        }
+
+        if (o instanceof MetadataEntity.Element) {
+            entity = ((MetadataEntity.Element) o).getEntityType();
         }
 
         if (entity == null) {

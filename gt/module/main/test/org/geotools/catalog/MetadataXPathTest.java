@@ -56,7 +56,8 @@ public class MetadataXPathTest extends TestCase {
         XPath xpath=new MetadataXPath("fileData/name");
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
         List result=xpath.find(data.getEntityType());
-        assertEquals(result.size(),1);
+        assertEquals(1,result.size());
+        
         Element elem=(Element)result.get(0);
         assertNotNull(elem);
         assertEquals(elem.getName(),"name");
@@ -80,7 +81,7 @@ public class MetadataXPathTest extends TestCase {
     public void testMatchStringMetadata() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
         List result=XPathFactory.find("fileData/name",data);
-        assertEquals(result.size(),1);
+        assertEquals(1,result.size());
         Element elem=(Element)result.get(0);
         assertNotNull(elem);
         assertEquals(elem.getName(),"name");
@@ -94,7 +95,7 @@ public class MetadataXPathTest extends TestCase {
     public void testMatchStringMetadataWildCards() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
         List result=XPathFactory.find("fileData/\\w*",data);
-        assertEquals(result.size(),3);
+        assertEquals(3,result.size());
 
         result=XPathFactory.find("\\w*/name",data);
         assertEquals(result.size(),1);
