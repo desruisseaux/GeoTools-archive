@@ -64,9 +64,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author Martin Desruisseaux
  *
  * @see org.geotools.parameter.ParameterDescriptor
- * @see org.geotools.parameter.ParameterValueGroup
+ * @see org.geotools.parameter.ParameterGroup
  */
-public class ParameterValue extends GeneralParameterValue
+public class Parameter extends AbstractParameter
                          implements org.opengis.parameter.ParameterValue
 {
     /**
@@ -111,7 +111,7 @@ public class ParameterValue extends GeneralParameterValue
      * @param name  The parameter name.
      * @param value The parameter value.
      */
-    public ParameterValue(final String name, final int value) {
+    public Parameter(final String name, final int value) {
         this(new org.geotools.parameter.ParameterDescriptor(name,
                  0, Integer.MIN_VALUE, Integer.MAX_VALUE));
         this.value = wrap(value);
@@ -127,7 +127,7 @@ public class ParameterValue extends GeneralParameterValue
      * @param value The parameter value.
      * @param unit  The unit for the parameter value.
      */
-    public ParameterValue(final String name, final double value, final Unit unit) {
+    public Parameter(final String name, final double value, final Unit unit) {
         this(new org.geotools.parameter.ParameterDescriptor(name,
                  Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, normalize(unit)));
         this.value = wrap(value);
@@ -143,7 +143,7 @@ public class ParameterValue extends GeneralParameterValue
      * @param name  The parameter name.
      * @param value The parameter value.
      */
-    public ParameterValue(final String name, final CodeList value) {
+    public Parameter(final String name, final CodeList value) {
         this(new org.geotools.parameter.ParameterDescriptor(name, value));
         this.value = value;
     }
@@ -154,7 +154,7 @@ public class ParameterValue extends GeneralParameterValue
      *
      * @param descriptor The abstract definition of this parameter.
      */
-    public ParameterValue(final ParameterDescriptor descriptor) {
+    public Parameter(final ParameterDescriptor descriptor) {
         super(descriptor);
         value = descriptor.getDefaultValue();
         unit  = descriptor.getUnit();
@@ -616,7 +616,7 @@ public class ParameterValue extends GeneralParameterValue
      */
     public boolean equals(final Object object) {
         if (super.equals(object)) {
-            final ParameterValue that = (ParameterValue) object;
+            final Parameter that = (Parameter) object;
             return Utilities.equals(this.value, that.value) &&
                    Utilities.equals(this.unit,  that.unit);
         }

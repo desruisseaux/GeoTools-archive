@@ -286,7 +286,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
          * to synchronize since it is not a big deal if the same parameter is constructed twice.
          */
         param = new org.geotools.parameter.ParameterDescriptor(prefix + row + separator + column,
-                Double.TYPE, org.geotools.parameter.ParameterValue.wrap(row==column ? 1.0 : 0.0),
+                Double.TYPE, org.geotools.parameter.Parameter.wrap(row==column ? 1.0 : 0.0),
                 null, null, Unit.ONE);
         if (index >= 0) {
             parameters[index] = param;

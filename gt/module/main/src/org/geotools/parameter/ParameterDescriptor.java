@@ -59,10 +59,10 @@ import org.geotools.resources.rsc.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.ParameterValue
+ * @see org.geotools.parameter.Parameter
  * @see org.geotools.parameter.ParameterGroupDescriptor
  */
-public class ParameterDescriptor extends GeneralParameterDescriptor implements org.opengis.parameter.ParameterDescriptor {
+public class ParameterDescriptor extends AbstractParameterDescriptor implements org.opengis.parameter.ParameterDescriptor {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -78,7 +78,7 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
      * The class that describe the type of the parameter, maybe as a primitive. This is the
      * value class that the user specified at construction time.  This is usually identical
      * to <code>valueClass</code>. However, some optimization may be done for some primitive
-     * types, for example a special implementation of {@link ParameterValue} for the
+     * types, for example a special implementation of {@link Parameter} for the
      * <code>double</code> type.
      */
     private final Class primitiveClass;
@@ -150,9 +150,9 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
                               final int minimum,
                               final int maximum)
     {
-        this(name, Integer.class, ParameterValue.wrap(defaultValue),
-             minimum == Integer.MIN_VALUE ? null : ParameterValue.wrap(minimum),
-             maximum == Integer.MAX_VALUE ? null : ParameterValue.wrap(maximum), null);
+        this(name, Integer.class, Parameter.wrap(defaultValue),
+             minimum == Integer.MIN_VALUE ? null : Parameter.wrap(minimum),
+             maximum == Integer.MAX_VALUE ? null : Parameter.wrap(maximum), null);
     }
 
     /**
@@ -173,9 +173,9 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
                               final Unit   unit)
     {
         this(name, Double.class,
-             Double.isNaN(defaultValue)          ? null : ParameterValue.wrap(defaultValue),
-             minimum == Double.NEGATIVE_INFINITY ? null : ParameterValue.wrap(minimum),
-             maximum == Double.POSITIVE_INFINITY ? null : ParameterValue.wrap(maximum), unit);
+             Double.isNaN(defaultValue)          ? null : Parameter.wrap(defaultValue),
+             minimum == Double.NEGATIVE_INFINITY ? null : Parameter.wrap(minimum),
+             maximum == Double.POSITIVE_INFINITY ? null : Parameter.wrap(maximum), unit);
     }
 
     /**
@@ -298,14 +298,14 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
         this.minimum        = minimum;
         this.maximum        = maximum;
         this.unit           = unit;
-        GeneralParameterValue.ensureNonNull("valueClass",  valueClass);
+        AbstractParameter.ensureNonNull("valueClass",  valueClass);
         if (valueClass.isPrimitive()) {
             valueClass = ClassChanger.toWrapper(valueClass);
         }
         this.valueClass = valueClass;
-        GeneralParameterValue.ensureValidClass(valueClass, defaultValue);
-        GeneralParameterValue.ensureValidClass(valueClass, minimum);
-        GeneralParameterValue.ensureValidClass(valueClass, maximum);
+        AbstractParameter.ensureValidClass(valueClass, defaultValue);
+        AbstractParameter.ensureValidClass(valueClass, minimum);
+        AbstractParameter.ensureValidClass(valueClass, maximum);
         if (minimum!=null && maximum!=null) {
             if (minimum.compareTo(maximum) > 0) {
                 throw new IllegalArgumentException(Resources.format(
@@ -316,7 +316,7 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
             final Set valids = new HashSet(Math.max(validValues.length*4/3 + 1, 8), 0.75f);
             for (int i=0; i<validValues.length; i++) {
                 final Object value = validValues[i];
-                GeneralParameterValue.ensureValidClass(valueClass, value);
+                AbstractParameter.ensureValidClass(valueClass, value);
                 valids.add(value);
             }
             this.validValues = Collections.unmodifiableSet(valids);
@@ -326,9 +326,9 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
     }
 
     /**
-     * Creates a new instance of {@linkplain org.geotools.parameter.ParameterValue parameter value}
+     * Creates a new instance of {@linkplain org.geotools.parameter.Parameter parameter value}
      * initialized with the {@linkplain #getDefaultValue default value}.
-     * The {@linkplain org.geotools.parameter.ParameterValue#getDescriptor parameter value
+     * The {@linkplain org.geotools.parameter.Parameter#getDescriptor parameter value
      * descriptor} for the created parameter value will be <code>this</code> object.
      * <br><br>
      * If the {@linkplain #getValueClass value class} specified at construction time was
@@ -340,9 +340,9 @@ public class ParameterDescriptor extends GeneralParameterDescriptor implements o
      */
     public org.opengis.parameter.GeneralParameterValue createValue() {
         if (Double.TYPE.equals(primitiveClass)) {
-            return new ParameterRealValue(this);
+            return new ParameterReal(this);
         }
-        return new ParameterValue(this);
+        return new Parameter(this);
     }
 
     /**

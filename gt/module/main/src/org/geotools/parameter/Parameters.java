@@ -46,7 +46,9 @@ import org.opengis.referencing.IdentifiedObject;
  * @author Jody Garnett, Refractions Research
  */
 public class Parameters {
-
+    /** Empty ParameterGroup */
+    public static ParameterDescriptorGroup EMPTY_GROUP = new ParameterGroupDescriptor( "empty", new GeneralParameterDescriptor[0] );
+    
     /** Locate by GeneralParameterDescriptor by ID (rather than name).
      * <p>
      * Name is localized - and not especially useful as a key to retrive

@@ -41,7 +41,7 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  * The values for a group of {@linkplain MatrixParameters matrix parameters}. This value group
  * is extensible, i.e. the number of <code>"elt_<var>row</var>_<var>col</var>"</code> parameters
  * depends on the <code>"num_row"</code> and <code>"num_col"</code> parameter values. Concequently,
- * this {@linkplain ParameterValueGroup parameter value group} is also its own mutable
+ * this {@linkplain ParameterGroup parameter value group} is also its own mutable
  * {@linkplain ParameterGroupDescriptor operation parameter group}.
  *
  * @version $Id$
@@ -49,7 +49,7 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  *
  * @see MatrixParameters
  */
-public class MatrixParameterValues extends ParameterValueGroup implements ParameterDescriptorGroup {
+public class MatrixParameterValues extends ParameterGroup implements ParameterDescriptorGroup {
     
     private static final long serialVersionUID = 1L;
 
@@ -240,7 +240,7 @@ public class MatrixParameterValues extends ParameterValueGroup implements Parame
         }
         ParameterValue param = rowValues[column];
         if (param == null) {
-            rowValues[column] = param = new ParameterRealValue(
+            rowValues[column] = param = new ParameterReal(
                     ((MatrixParameters) descriptor).getParameter(row, column, numRow, numCol));
         }
         return param;

@@ -39,7 +39,7 @@ import org.opengis.parameter.InvalidParameterValueException;
 
 /**
  * A parameter value as a real number. This class provides the same functionalities than
- * {@link ParameterValue}, except that:
+ * {@link Parameter}, except that:
  * <ul>
  *   <li>Values are always floating point numbers of type <code>double</code>.</li>
  *   <li>Units are the same than the {@linkplain ParameterDescriptor#getUnit default units}.</li>
@@ -51,9 +51,9 @@ import org.opengis.parameter.InvalidParameterValueException;
  * @author Martin Desruisseaux
  *
  * @see org.geotools.parameter.ParameterDescriptor
- * @see org.geotools.parameter.ParameterValueGroup
+ * @see org.geotools.parameter.ParameterGroup
  */
-public class ParameterRealValue extends GeneralParameterValue
+public class ParameterReal extends AbstractParameter
                              implements org.opengis.parameter.ParameterValue
 {
     /**
@@ -74,7 +74,7 @@ public class ParameterRealValue extends GeneralParameterValue
      * @param  descriptor The abstract definition of this parameter.
      * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
      */
-    public ParameterRealValue(final ParameterDescriptor descriptor) {
+    public ParameterReal(final ParameterDescriptor descriptor) {
         super(descriptor);
         final Class type = descriptor.getValueClass();
         final Class expected = Double.class;
@@ -95,7 +95,7 @@ public class ParameterRealValue extends GeneralParameterValue
      * @param  value The parameter value.
      * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
      */
-    public ParameterRealValue(final ParameterDescriptor descriptor, final double value) {
+    public ParameterReal(final ParameterDescriptor descriptor, final double value) {
         this(descriptor);
         setValue(value);
     }
@@ -124,10 +124,10 @@ public class ParameterRealValue extends GeneralParameterValue
         final Unit thisUnit = getUnit();
         if (thisUnit == null) {
             throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, ParameterValue.getName(descriptor)));
+                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, Parameter.getName(descriptor)));
         }
-        final int expectedID = ParameterValue.getUnitMessageID(thisUnit);
-        if (ParameterValue.getUnitMessageID(unit) != expectedID) {
+        final int expectedID = Parameter.getUnitMessageID(thisUnit);
+        if (Parameter.getUnitMessageID(unit) != expectedID) {
             throw new IllegalArgumentException(Resources.format(expectedID, unit));
         }
         return thisUnit.getConverterTo(unit).convert(value);
@@ -208,7 +208,7 @@ public class ParameterRealValue extends GeneralParameterValue
      */
     public URL valueFile() throws InvalidParameterTypeException {
         throw new InvalidParameterTypeException(getClassTypeError(),
-                  ParameterValue.getName(descriptor));
+                  Parameter.getName(descriptor));
     }
 
     /**
@@ -240,14 +240,14 @@ public class ParameterRealValue extends GeneralParameterValue
         final Unit thisUnit = ((ParameterDescriptor) descriptor).getUnit();
         if (thisUnit == null) {
             throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, ParameterValue.getName(descriptor)));
+                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, Parameter.getName(descriptor)));
         }
-        final int expectedID = ParameterValue.getUnitMessageID(thisUnit);
-        if (ParameterValue.getUnitMessageID(unit) != expectedID) {
+        final int expectedID = Parameter.getUnitMessageID(thisUnit);
+        if (Parameter.getUnitMessageID(unit) != expectedID) {
             throw new IllegalArgumentException(Resources.format(expectedID, unit));
         }
         value = unit.getConverterTo(thisUnit).convert(value);
-        ParameterValue.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
+        Parameter.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
         this.value = value;
     }
 
@@ -259,7 +259,7 @@ public class ParameterRealValue extends GeneralParameterValue
      *         (for example a value out of range).
      */
     public void setValue(final double value) throws InvalidParameterValueException {
-        ParameterValue.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
+        Parameter.ensureValidValue((ParameterDescriptor) descriptor, new Double(value));
         this.value = value;
     }
 
@@ -293,7 +293,7 @@ public class ParameterRealValue extends GeneralParameterValue
      *         the value is numeric and out of range).
      */
     public void setValue(final Object value) throws InvalidParameterValueException {
-        ParameterValue.ensureValidValue((ParameterDescriptor) descriptor, value);
+        Parameter.ensureValidValue((ParameterDescriptor) descriptor, value);
         this.value = ((Number) value).doubleValue();
     }
 
@@ -302,7 +302,7 @@ public class ParameterRealValue extends GeneralParameterValue
      */
     public void setValue(double[] values, final Unit unit) throws InvalidParameterValueException {
         throw new InvalidParameterTypeException(getClassTypeError(),
-                  ParameterValue.getName(descriptor));
+                  Parameter.getName(descriptor));
     }
     
     /**
@@ -313,7 +313,7 @@ public class ParameterRealValue extends GeneralParameterValue
      */
     public boolean equals(final Object object) {
         if (super.equals(object)) {
-            final ParameterRealValue that = (ParameterRealValue) object;
+            final ParameterReal that = (ParameterReal) object;
             return Double.doubleToLongBits(this.value) ==
                    Double.doubleToLongBits(that.value);
         }

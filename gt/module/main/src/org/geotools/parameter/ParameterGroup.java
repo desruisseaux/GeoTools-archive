@@ -53,16 +53,16 @@ import org.geotools.resources.cts.ResourceKeys;
  * A group of related parameter values. The same group can be repeated more than once in an
  * {@linkplain org.geotools.referencing.operation.Operation operation} or higher level
  * <code>ParameterValueGroup</code>, if those instances contain different values of one
- * or more {@link org.geotools.parameter.ParameterValue}s which suitably distinquish among
+ * or more {@link org.geotools.parameter.Parameter}s which suitably distinquish among
  * those groups.
  *  
  * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see org.geotools.parameter.ParameterGroupDescriptor
- * @see org.geotools.parameter.ParameterValue
+ * @see org.geotools.parameter.Parameter
  */
-public class ParameterValueGroup extends org.geotools.parameter.GeneralParameterValue
+public class ParameterGroup extends org.geotools.parameter.AbstractParameter
                               implements org.opengis.parameter.ParameterValueGroup
 {
     /**
@@ -84,7 +84,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      *
      * @param descriptor The descriptor for this group.
      */
-    public ParameterValueGroup(final ParameterDescriptorGroup descriptor) {
+    public ParameterGroup(final ParameterDescriptorGroup descriptor) {
         super(descriptor);
         final GeneralParameterDescriptor[] parameters = descriptor.getParameters();
         values = new GeneralParameterValue[parameters.length];
@@ -99,7 +99,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * @param descriptor The descriptor for this group.
      * @param values The list of parameter values.
      */
-    public ParameterValueGroup(final ParameterGroupDescriptor descriptor,
+    public ParameterGroup(final ParameterDescriptorGroup descriptor,
                                      GeneralParameterValue[] values)
     {
         super(descriptor);
@@ -122,7 +122,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      *        to construct from the list of parameters.
      * @param values The list of parameter values.
      */
-    public ParameterValueGroup(final Map properties, final GeneralParameterValue[] values) {
+    public ParameterGroup(final Map properties, final GeneralParameterValue[] values) {
         super(createDescriptor(properties, values));
         this.values = (GeneralParameterValue[]) values.clone();
     }
@@ -224,7 +224,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
 
     /**
      * Returns the first value in this group for the specified {@linkplain Identifier#getCode
-     * identifier code}. If no {@linkplain org.geotools.parameter.ParameterValue parameter value}
+     * identifier code}. If no {@linkplain org.geotools.parameter.Parameter parameter value}
      * is found for the given code, then this method search recursively in subgroups (if any).
      * This convenience method provides a way to get and set parameter values by name. For example
      * the following idiom fetches a floating point value for the <code>"false_easting"</code>
@@ -232,7 +232,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * <br><br>
      * <blockquote><code>
      * double value = getValue("false_easting").{@linkplain
-     * org.geotools.parameter.ParameterValue#doubleValue() doubleValue()};
+     * org.geotools.parameter.Parameter#doubleValue() doubleValue()};
      * </code></blockquote>
      *
      * @param  name The case insensitive {@linkplain Identifier#getCode identifier code} of the
@@ -283,7 +283,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      */
     public boolean equals(final Object object) {
         if (super.equals(object)) {
-            final ParameterValueGroup that = (ParameterValueGroup) object;
+            final ParameterGroup that = (ParameterGroup) object;
             // TODO: We should use Arrays.deepEquals instead in J2SE 1.5.
             if (this.values.length == that.values.length) {
                 for (int i=0; i<values.length; i++) {
@@ -319,7 +319,7 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
      * @return A copy of this group of parameter values.
      */
     public Object clone() {
-        final ParameterValueGroup copy = (ParameterValueGroup) super.clone();
+        final ParameterGroup copy = (ParameterGroup) super.clone();
         copy.values = (GeneralParameterValue[]) copy.values.clone();
         for (int i=0; i<copy.values.length; i++) {
             copy.values[i] = (GeneralParameterValue) copy.values[i].clone();

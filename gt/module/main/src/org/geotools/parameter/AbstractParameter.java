@@ -36,13 +36,17 @@ import org.geotools.resources.cts.ResourceKeys;
 
 /**
  * Abstract parameter value or group of parameter values.
- *  
+ * <p>
+ * This maps directly to opengis GeneralParameterValue, the name is changed to protect
+ * developers from confusing the two. This class does need to be subclassed before
+ * it is considered useable.
+ * </p>
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.GeneralParameterDescriptor
+ * @see org.geotools.parameter.AbstractParameterDescriptor
  */
-public class GeneralParameterValue implements org.opengis.parameter.GeneralParameterValue, Serializable {
+public abstract class AbstractParameter implements org.opengis.parameter.GeneralParameterValue, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -58,7 +62,7 @@ public class GeneralParameterValue implements org.opengis.parameter.GeneralParam
      *
      * @param descriptor The abstract definition of this parameter or group of parameters.
      */
-    protected GeneralParameterValue(GeneralParameterDescriptor descriptor) {
+    protected AbstractParameter(GeneralParameterDescriptor descriptor) {
         this.descriptor = descriptor;
         ensureNonNull("descriptor", descriptor);
     }
@@ -151,7 +155,7 @@ public class GeneralParameterValue implements org.opengis.parameter.GeneralParam
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final GeneralParameterValue that = (GeneralParameterValue) object;
+            final AbstractParameter that = (AbstractParameter) object;
             return Utilities.equals(this.descriptor, that.descriptor);
         }
         return false;

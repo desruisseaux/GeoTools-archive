@@ -35,13 +35,16 @@ import org.geotools.resources.rsc.ResourceKeys;
 
 /**
  * Abstract definition of a parameter or group of parameters used by an operation method.
- *  
+ * <p>
+ * This class maps directly to opengis GeneralParameterDescriptor - the name
+ * has changed to prevent confusion.
+ * </p>
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.GeneralParameterValue
+ * @see org.geotools.parameter.AbstractParameter
  */
-public abstract class GeneralParameterDescriptor extends IdentifiedObject
+public abstract class AbstractParameterDescriptor extends IdentifiedObject
         implements org.opengis.parameter.GeneralParameterDescriptor, Serializable
 {
     /**
@@ -71,7 +74,7 @@ public abstract class GeneralParameterDescriptor extends IdentifiedObject
      * @param maximumOccurs The {@linkplain #getMaximumOccurs maximum number of times}
      *        that values for this parameter group or parameter are required.
      */
-    protected GeneralParameterDescriptor(final Map properties,
+    protected AbstractParameterDescriptor(final Map properties,
                                         final int minimumOccurs,
                                         final int maximumOccurs)
     {
@@ -86,16 +89,21 @@ public abstract class GeneralParameterDescriptor extends IdentifiedObject
 
     /**
      * Creates a new instance of
-     * {@linkplain org.geotools.parameter.GeneralParameterValue parameter value or group}
+     * {@linkplain org.geotools.parameter.AbstractParameter parameter value or group}
      * initialized with the
      * {@linkplain org.geotools.parameter.ParameterDescriptor#getDefaultValue default value(s)}. The
-     * {@linkplain org.geotools.parameter.GeneralParameterValue#getDescriptor parameter value
+     * {@linkplain org.geotools.parameter.AbstractParameter#getDescriptor parameter value
      * descriptor} for the created parameter value(s) will be <code>this</code> object.
+     * <p>
+     * Example implementation:
+     * <pre><code>
+     * <b>return</b> new AbstractParameter(this);
+     * </code></pre>
+     * </p>
      */
-    public org.opengis.parameter.GeneralParameterValue createValue() {
-        return new GeneralParameterValue(this);
-    }
-
+    public abstract org.opengis.parameter.GeneralParameterValue createValue();
+    // 
+    
     /**
      * The minimum number of times that values for this parameter group or
      * parameter are required. The default value is one. A value of 0 means
@@ -131,7 +139,7 @@ public abstract class GeneralParameterDescriptor extends IdentifiedObject
      */
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
-            final GeneralParameterDescriptor that = (GeneralParameterDescriptor) object;
+            final AbstractParameterDescriptor that = (AbstractParameterDescriptor) object;
             return this.minimumOccurs == that.minimumOccurs &&
                    this.maximumOccurs == that.maximumOccurs;
         }

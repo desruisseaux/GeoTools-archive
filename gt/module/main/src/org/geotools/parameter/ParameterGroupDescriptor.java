@@ -48,10 +48,10 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.ParameterValueGroup
+ * @see org.geotools.parameter.ParameterGroup
  * @see org.geotools.parameter.ParameterDescriptor
  */
-public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralParameterDescriptor
+public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractParameterDescriptor
                                   implements org.opengis.parameter.ParameterDescriptorGroup
 {
     /**
@@ -120,14 +120,14 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.GeneralPara
 
     /**
      * Creates a new instance of
-     * {@linkplain org.geotools.parameter.ParameterValueGroup parameter value group}
+     * {@linkplain org.geotools.parameter.ParameterGroup parameter value group}
      * initialized with the
      * {@linkplain org.geotools.parameter.ParameterDescriptor#getDefaultValue default values}. The
-     * {@linkplain org.geotools.parameter.ParameterValueGroup#getDescriptor parameter value descriptor}
+     * {@linkplain org.geotools.parameter.ParameterGroup#getDescriptor parameter value descriptor}
      * for the created group will be <code>this</code> object.
      */
     public GeneralParameterValue createValue() {
-        return new ParameterValueGroup(this);
+        return new ParameterGroup(this);
     }
 
     /**
