@@ -824,7 +824,7 @@ public class DataUtilities {
             same = type.getName().equals(properties[i])
                 && (((override != null)
                 && type instanceof GeometryAttributeType)
-                ? ((GeometryAttributeType) type).getCoordinateSystem().equals(override)
+                ? assertEquals(override, ((GeometryAttributeType) type).getCoordinateSystem())
                 : true);
         }
 
@@ -847,6 +847,11 @@ public class DataUtilities {
         if( namespace == null ) namespace = featureType.getNamespaceURI();
         
         return FeatureTypeFactory.newFeatureType(types, typeName, namespace);
+    }
+    
+    private static boolean assertEquals(Object o1, Object o2){
+    	return o1 == null && o2 == null? true :
+    		(o1 != null? o1.equals(o2) : false);
     }
 
     /**
