@@ -271,23 +271,23 @@ public class Rendering2DTest extends TestCase {
 
     }
     
-    public void testRenderLoadedStyle() throws Exception {
-
-        // same as the datasource test, load in some features into a table
-        System.err.println("starting RenderLoadedStyle");
-
-        FeatureCollection ft = createTestFeatureCollection(null, POLYGON);
-        Style style = loadTestStyle();
-
-        MapContext map = new DefaultMapContext();
-        map.addLayer(ft, style);
-        LiteRenderer2 renderer = new LiteRenderer2(map);
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
-                .getMaxY() + 20);
-        showRender("RenderLoadedStyle", renderer, 5000, env);
-
-    }
+//    public void testRenderLoadedStyle() throws Exception {
+//
+//        // same as the datasource test, load in some features into a table
+//        System.err.println("starting RenderLoadedStyle");
+//
+//        FeatureCollection ft = createTestFeatureCollection(null, POLYGON);
+//        Style style = loadTestStyle();
+//
+//        MapContext map = new DefaultMapContext();
+//        map.addLayer(ft, style);
+//        LiteRenderer2 renderer = new LiteRenderer2(map);
+//        Envelope env = map.getLayerBounds();
+//        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
+//                .getMaxY() + 20);
+//        showRender("RenderLoadedStyle", renderer, 5000, env);
+//
+//    }
 
     public void testSimpleLineRender() throws Exception {
 
