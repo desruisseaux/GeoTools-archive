@@ -22,6 +22,7 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 import org.geotools.data.wms.Parser1_1_1;
+import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.resources.TestData;
 import org.jdom.Document;
@@ -50,7 +51,7 @@ public class Parser1_1_1Test extends TestCase {
 		
 		Parser1_1_1 parser = new Parser1_1_1();
 		
-		Capabilities capabilities = parser.constructCapabilities( document );
+		Capabilities capabilities = parser.constructCapabilities( document, new WMSBuilder() );
 		assertNotNull(capabilities);
 		assertEquals(capabilities.getService().getName(), "OGC:WMS");
 		assertEquals(capabilities.getService().getKeywordList().length, 6);

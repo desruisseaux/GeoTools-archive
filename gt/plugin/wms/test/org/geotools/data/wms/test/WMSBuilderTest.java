@@ -7,6 +7,8 @@
 package org.geotools.data.wms.test;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.capabilities.Capabilities;
@@ -33,8 +35,9 @@ public class WMSBuilderTest extends TestCase {
 		builder.buildCapabilities("1.1.1");
 		builder.buildService("FakeService", "Test", new URL("http://online.com"), "nothin", null);
 		builder.buildGetCapabilitiesOperation(null, new URL("http://get.com"), new URL("http://post.com"));
-		String[] formats = {"image/jpeg"};
-		builder.buildGetMapOperation(formats, new URL("http://get.com"), new URL("http://post.com"));
+		List formats = new ArrayList();
+		formats.add( "image/jpeg" );
+		builder.buildGetMapOperation( formats, new URL("http://get.com"), new URL("http://post.com"));
 		builder.buildLayer("Layer1", "layer1", true, null);
 		builder.buildSRS("EPSG:blah");
 		builder.buildSRS("EPSG:2");
