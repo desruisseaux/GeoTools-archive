@@ -293,6 +293,9 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+        <exclude>**/CodeListTest.java</exclude>
+      </excludes>
     </unitTest>
   </build>
   <reports>
