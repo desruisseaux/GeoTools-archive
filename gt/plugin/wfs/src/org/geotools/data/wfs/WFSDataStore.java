@@ -127,7 +127,7 @@ public class WFSDataStore extends AbstractDataStore{
  	    if(host.getQuery() == null){
  	        url += "?SERVICE=WFS&VERSION=1.0.0&REQUEST=GetCapabilities";
  	    }else{
- 	        String t = host.getQuery();
+ 	        String t = host.getQuery().toUpperCase();
  	        if(t.indexOf("SERVICE")==-1){
  	           url += "&SERVICE=WFS";
  	        }
@@ -210,7 +210,7 @@ public class WFSDataStore extends AbstractDataStore{
     private FeatureType getSchemaGet(String typeName) throws SAXException, IOException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
         
-        String query = getUrl.getQuery();
+        String query = getUrl.getQuery().toUpperCase();
         String url = getUrl.toString();
         if(query == null){
             url += "?SERVICE=WFS";
@@ -323,7 +323,7 @@ public class WFSDataStore extends AbstractDataStore{
     private FeatureReader getFeatureReaderGet(String typeName) throws SAXException, IOException{
         URL getUrl = capabilities.getGetFeature().getGet();
         
-        String query = getUrl.getQuery();
+        String query = getUrl.getQuery().toUpperCase();
         String url = getUrl.toString();
         if(query == null){
             url += "?SERVICE=WFS";
