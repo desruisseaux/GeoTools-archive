@@ -1396,8 +1396,8 @@ public final class SDO {
      * @return
      */
     public static double[] ordinates(List list, Geometry geom) {
-        System.out.println("ordinates D:" + D(geom));
-        System.out.println("ordinates L:" + L(geom));
+        LOGGER.finest( "ordinates D:" + D(geom));
+        LOGGER.finest("ordinates L:" + L(geom));
 
         if (D(geom) == 3) {
             return ordinates3d(list, L(geom));
@@ -2226,15 +2226,12 @@ public final class SDO {
      * @param coords
      * @param N Number of triplets (-1 for unknown/don't care)
      *
-     * @return Geometry as encoded
+     * @return Geometry as encoded, or null w/ log if it cannot be represented via JTS
      */
     public static Geometry create(GeometryFactory gf, final int GTYPE,
         final int SRID, final int[] elemInfo, final int triplet,
         CoordinateSequence coords, final int N) {
         switch (SDO.TT(GTYPE)) {
-        case TT.UNKNOWN: // Extend for your own custom types
-            break;
-
         case TT.POINT:
             return createPoint(gf, GTYPE, SRID, elemInfo, triplet, coords);
 
@@ -2257,9 +2254,12 @@ public final class SDO {
         case TT.COLLECTION:
             return createCollection(gf, GTYPE, SRID, elemInfo, triplet, coords,
                 N);
-        }
-
-        return null;
+        
+        case TT.UNKNOWN:  
+        default:
+            LOGGER.warning( "Cannot represent provided SDO STRUCT (GTYPE ="+GTYPE+") using JTS Geometry");
+            return null;    
+        }        
     }
 
     /**
@@ -2281,18 +2281,14 @@ public final class SDO {
         final int etype = ETYPE(elemInfo, element);
         final int INTERPRETATION = INTERPRETATION(elemInfo, element);
 
-		//HACK: made backwards compatible to work with java 1.3
-//        assert ((STARTING_OFFSET >= 1) && (STARTING_OFFSET <= coords.size()));
-//        assert (etype == ETYPE.POINT);
-//        assert (INTERPRETATION == 1);
-
-		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-			return null;
+		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if (etype != ETYPE.POINT)
+		    throw new IllegalArgumentException("ETYPE "+etype+" inconsistent with expected POINT");
+		if (INTERPRETATION != 1){
+		    LOGGER.warning( "Could not create JTS Point with INTERPRETATION "+INTERPRETATION+" - we only expect 1 for a single point");
 			return null;
-		if (INTERPRETATION != 1)
-			return null;
+		}
 
 
         Point point = new Point(subList(gf.getCoordinateSequenceFactory(),
@@ -2325,15 +2321,12 @@ public final class SDO {
         final int etype = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		//HACK: made backwards compatible to work with java 1.3
-//        assert (etype == ETYPE.LINE);
-//        assert (INTERPRETATION == 1);
-
-		// assert replacement code
 		if (etype != ETYPE.LINE)
 			return null;
-		if (INTERPRETATION != 1)
+		if (INTERPRETATION != 1){
+		    LOGGER.warning( "Could not create JTS LineString with INTERPRETATION "+INTERPRETATION+" - we can only support 1 for straight edges");
 			return null;
+		}
 			
 
         if (INTERPRETATION != 1) {
@@ -2427,21 +2420,13 @@ public final class SDO {
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		//HACK: made backwards compatible to work with java 1.3
-//        assert ((STARTING_OFFSET >= 1) && (STARTING_OFFSET <= coords.size()));
-//        assert ((eTYPE == ETYPE.POLYGON) || (eTYPE == ETYPE.POLYGON_EXTERIOR));
-//        assert ((INTERPRETATION == 1) // straight edges
-//        || (INTERPRETATION == 3) // rectangle
-//        );
-
-		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-			throw new IllegalArgumentException("ELEM_INFO inconsistent with ORDINATES");
-		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
-			throw new IllegalArgumentException("POLYGON or POLYGON_EXTERIOR ETYPE Expected");
+		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
+		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR)){
+			throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
+		}
 		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3)){
-		    // we cannot represent INTERPRETATION == 2 (curves) using JTS
-		    LOGGER.warning( "Could not create Polygon with INTERPRETATION == 2 (curves)");
+		    LOGGER.warning( "Could not create JTS Polygon with INTERPRETATION "+INTERPRETATION+" - we can only support 1 for straight edges, and 2 for rectangle");
 			return null;
 		}
 
@@ -2521,25 +2506,17 @@ HOLES:
         final int STARTING_OFFSET = STARTING_OFFSET(elemInfo, triplet);
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
-
-
-		// HACK: made backwards compatible to work with java 1.3
-//        assert ((STARTING_OFFSET >= 1) && (STARTING_OFFSET <= coords.size()));
-//        assert ((eTYPE == ETYPE.POLYGON) || (eTYPE == ETYPE.POLYGON_EXTERIOR)
-//        || (eTYPE == ETYPE.POLYGON_INTERIOR));
-//        assert ((INTERPRETATION == 1) // straight edges
-//        || (INTERPRETATION == 3) // rectangle
-//        );
         
-        
-		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
+		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
+		if(!(eTYPE == ETYPE.POLYGON) &&
+		   !(eTYPE == ETYPE.POLYGON_EXTERIOR) && !(eTYPE == ETYPE.POLYGON_INTERIOR)){
+		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON, POLYGON_EXTERIOR or POLYGON_INTERIOR");
+		}
+		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3)){
+		    LOGGER.warning( "Could not create LinearRing with INTERPRETATION "+INTERPRETATION+" - we can only support 1 for straight edges");
 			return null;
-		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
-			return null;
-		if (!(INTERPRETATION == 1) && !(INTERPRETATION == 3))
-			return null;
-
+		}
         LinearRing ring;
 
         if (INTERPRETATION == 1) {
@@ -2607,19 +2584,14 @@ HOLES:
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		// HACK: made backwards compatible to work with java 1.3
-//        assert ((STARTING_OFFSET >= 1) && (STARTING_OFFSET <= coords.size()));
-//        assert (eTYPE == ETYPE.POINT);
-//        assert (INTERPRETATION > 1);
-
-		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-			return null;
+		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POINT))
+		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POINT");
+		if (!(INTERPRETATION > 1)){
+		    LOGGER.warning( "Could not create MultiPoint with INTERPRETATION "+INTERPRETATION+" - representing the number of points");
 			return null;
-		if (!(INTERPRETATION > 1))
-			return null;
-
+		}
 
         final int LEN = D(GTYPE) + L(GTYPE);
 
@@ -2671,19 +2643,16 @@ HOLES:
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		// HACK: made backwards compatible to work with java 1.3
-//        assert ((STARTING_OFFSET >= 1) && (STARTING_OFFSET <= coords.size()));
-//        assert (eTYPE == ETYPE.LINE);
-//        assert (INTERPRETATION > 1);
-
 		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-			return null;
+		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.LINE))
+		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected LINE");
+		if (!(INTERPRETATION > 1)){
+            // we cannot represent INTERPRETATION > 1 
+		    LOGGER.warning( "Could not create MultiLineString with INTERPRETATION "+INTERPRETATION+" - we can only represent 1 for straight edges");
 			return null;
-		if (!(INTERPRETATION > 1))
-			return null;
-			
+		}
 
         final int LEN = D(GTYPE) + L(GTYPE);
         final int endTriplet = (N != -1) ? (triplet + N) : (elemInfo.length / 3);
@@ -2746,19 +2715,16 @@ LINES: 		// bad bad gotos jody
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		// HACK: made backwards compatible to work with java 1.3
-//        assert ((STARTING_OFFSET >= 1) && (STARTING_OFFSET <= coords.size()));
-//        assert ((eTYPE == ETYPE.POLYGON) || (eTYPE == ETYPE.POLYGON_EXTERIOR));
-//        assert (INTERPRETATION > 1);
-
 		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-			return null;
+		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
+		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
+		if (!(INTERPRETATION > 1)){
+            // we cannot represent INTERPRETATION > 1 
+		    LOGGER.warning( "Could not create MultiPolygon with INTERPRETATION "+INTERPRETATION +" - we can only represent 1 for straight edges");
 			return null;
-		if (!(INTERPRETATION > 1))
-			return null;
-
+		}
 
         final int LEN = D(GTYPE) + L(GTYPE);
         final int endTriplet = (N != -1) ? (triplet + N)
@@ -2808,6 +2774,8 @@ POLYGONS:
      * 
      * <p></p>
      *
+     * TODO: Confirm that createCollection is not getting cut&paste mistakes from polygonCollection
+     * 
      * @param gf Used to construct MultiLineString
      * @param GTYPE Encoding of <b>D</b>imension, <b>L</b>RS and <b>TT</b>ype
      * @param SRID Spatial Reference System
@@ -2827,18 +2795,15 @@ POLYGONS:
         final int eTYPE = ETYPE(elemInfo, triplet);
         final int INTERPRETATION = INTERPRETATION(elemInfo, triplet);
 
-		// HACK: made backwards compatible to work with java 1.3
-//        assert ((STARTING_OFFSET >= 1) && (STARTING_OFFSET <= coords.size()));
-//        assert ((eTYPE == ETYPE.POLYGON) || (eTYPE == ETYPE.POLYGON_EXTERIOR));
-//        assert (INTERPRETATION > 1);
-
-		// assert replacement code
 		if (!(STARTING_OFFSET >= 1) || !(STARTING_OFFSET <= coords.size()))
-			return null;
+		    throw new IllegalArgumentException("ELEM_INFO STARTING_OFFSET "+STARTING_OFFSET+" inconsistent with ORDINATES length "+coords.size());
 		if(!(eTYPE == ETYPE.POLYGON) && !(eTYPE == ETYPE.POLYGON_EXTERIOR))
+		    throw new IllegalArgumentException("ETYPE "+eTYPE+" inconsistent with expected POLYGON or POLYGON_EXTERIOR");
+		if (!(INTERPRETATION > 1)) {
+            // we cannot represent INTERPRETATION > 1 
+		    LOGGER.warning( "Could not create GeometryCollection with INTERPRETATION "+INTERPRETATION);
 			return null;
-		if (!(INTERPRETATION > 1))
-			return null;
+		}
 
 
         final int LEN = D(GTYPE) + L(GTYPE);
