@@ -30,14 +30,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @since 2.1.M3
  * @version 2.1.M3
  */
-public class CRSAutoFactoryTest extends TestCase {
-    CRSAUTOFactory factory;
+public class AUTOTest extends TestCase {
+    AUTOCRSAuthorityFactory factory;
     /*
      * @see junit.framework.TestCase#setUp()
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = new CRSAUTOFactory();
+        factory = new AUTOCRSAuthorityFactory();
     }
     /** UDIG requires this to work */
     public void test42001() throws Exception {

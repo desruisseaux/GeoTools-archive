@@ -51,6 +51,16 @@ public class Contact extends MetadataEntity
      *
      * @see org.geotools.metadata.citation.OnLineResource#OPEN_GIS
      */
+    public static final Contact OGC = new Contact();
+    static {
+        OGC.setOnLineResource(org.geotools.metadata.citation.OnLineResource.OGC );
+        OGC.freeze();
+    }    
+    /**
+     * Contact informations for the <A HREF="http://www.opengis.org">OpenGIS consortium</A>.
+     *
+     * @see org.geotools.metadata.citation.OnLineResource#OPEN_GIS
+     */
     public static final Contact OPEN_GIS = new Contact();
     static {
         OPEN_GIS.setOnLineResource(org.geotools.metadata.citation.OnLineResource.OPEN_GIS);
@@ -133,6 +143,8 @@ public class Contact extends MetadataEntity
      * Constructs an initially empty contact.
      */
     public Contact() {
+        // empty constructor, please use set methods and call
+        // freeze before returning this instance to client code
     }
 
     /**

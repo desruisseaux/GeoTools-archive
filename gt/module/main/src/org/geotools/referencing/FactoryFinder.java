@@ -138,6 +138,7 @@ public final class FactoryFinder {
              * category, otherwise we should have found at least the Geotools implementation.
              * Scans the plugin now, but for this category only.
              */
+            //System.out.println("No "+category.toString()+ " found ... scanning for plugins");
             scanForPlugins(category);
             iterator = services.getServiceProviders(category, false);
         }
@@ -328,7 +329,7 @@ public final class FactoryFinder {
 	private static void scanForPlugins(Class class1) {
         ClassLoader[] loaders=org.geotools.factory.FactoryFinder.findClassLoaders();
     	for (int i = 0; i < loaders.length; i++) {
-    		scanForPlugins(loaders[i],class1); 
+            scanForPlugins(loaders[i],class1); 
     	}
 	}
 
@@ -341,11 +342,14 @@ public final class FactoryFinder {
      * @todo localize log messages and group them together.
      */
     private static void scanForPlugins(final ClassLoader loader, final Class category) {
+        //System.out.append("...scanning "+loader );
+        
         final Logger    logger = Logger.getLogger("org.opengis");
         final Iterator    iter = ServiceRegistry.lookupProviders(category, loader);
         final String classname = Utilities.getShortName(category);
-        while (iter.hasNext()) {
+        while (iter.hasNext()) {            
             Object factory = iter.next();
+            //System.out.println(" ...found "+factory.getClass().toString() );
             if (true) {
                 /*
                  * If the factory implements more than one interface and an instance were

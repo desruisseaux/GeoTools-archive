@@ -49,6 +49,12 @@ public class OnLineResource extends MetadataEntity
     private static final long serialVersionUID = 5412370008274334799L;
     
     /**
+     * The online resources for the <A HREF="http://www.opengis.org">Open Geospatial Consortium</A>.
+     * @see OPEN_GIS
+     */
+    public static final OnLineResource OGC = new OnLineResource();
+    
+    /**
      * The online resources for the <A HREF="http://www.opengis.org">OpenGIS consortium</A>.
      */
     public static final OnLineResource OPEN_GIS = new OnLineResource();
@@ -76,6 +82,7 @@ public class OnLineResource extends MetadataEntity
     public static final OnLineResource GEOTOOLS = new OnLineResource();
     static {
         try {
+            OGC.     setLinkage(new URL("http://www.opengeospatial.org/"      ));
             OPEN_GIS.setLinkage(new URL("http://www.opengis.org"              ));
             EPSG    .setLinkage(new URL("http://www.epsg.org"                 ));
             GEOTIFF .setLinkage(new URL("http://www.remotesensing.org/geotiff"));
@@ -85,12 +92,14 @@ public class OnLineResource extends MetadataEntity
             // Should never happen.
             throw new ExceptionInInitializerError(exception);
         }
+        OGC.     setFunction(OnLineFunction.INFORMATION);
         OPEN_GIS.setFunction(OnLineFunction.DOWNLOAD);
         EPSG    .setFunction(OnLineFunction.DOWNLOAD);
         GEOTIFF .setFunction(OnLineFunction.DOWNLOAD);
         ESRI    .setFunction(OnLineFunction.INFORMATION);
         GEOTOOLS.setFunction(OnLineFunction.DOWNLOAD);
         
+        OGC     .freeze();
         OPEN_GIS.freeze();
         EPSG    .freeze();
         GEOTIFF .freeze();

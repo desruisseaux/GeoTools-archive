@@ -33,14 +33,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @since 2.1.M3
  * @version 2.1.M3
  */
-public class CRSEPSGPropertyFileFactoryTest extends TestCase {
-    CRSEPSGPropertyFileFactory factory;
+public class EPSGTest extends TestCase {
+    EPSGCRSAuthorityFactory factory;
     /*
      * @see junit.framework.TestCase#setUp()
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = new CRSEPSGPropertyFileFactory();
+        factory = new EPSGCRSAuthorityFactory();
     }    
     public void testAuthority(){
         Citation authority = factory.getAuthority();

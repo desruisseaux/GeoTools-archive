@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -147,12 +148,16 @@ public class CRS {
         
         // FIXME: FactoryFinder does not appear to work for other modules
         //
-        //for( Iterator i = FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); ){
-        for( Iterator i=FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); ){
+        for( Iterator i = FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); ){        
             CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
-            if( !factory.getAuthority().getIdentifierTypes().contains( AUTHORITY ) ) continue;
-            
             try {
+                Citation authority = factory.getAuthority();
+                System.out.println("Checking "+AUTHORITY+ " authority against "+authority );
+                System.out.println(" is "+AUTHORITY+ " in "+authority.getIdentifiers() );
+                System.out.println(" ..."+authority.getIdentifiers().contains( AUTHORITY ) );
+                if( !authority.getIdentifiers().contains( AUTHORITY ) ) continue;
+                
+                System.out.println("Lookup "+code+ " authority "+factory.getClass().toString() );
                 CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code );
                 if( crs != null ) return crs;
             } catch (FactoryException e) {
@@ -161,7 +166,8 @@ public class CRS {
             catch (Throwable e) {
                 trouble = e;
             }            
-        }        
+        }
+        
         if( trouble instanceof NoSuchAuthorityCodeException){
             throw (NoSuchAuthorityCodeException) trouble;
         }

@@ -43,29 +43,9 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * @author Jody Garnett
  */
-public class ReprojectionServiceTest extends TestCase {
-    CRSEPSGPropertyFileFactory epsg;
-    CRSAUTOFactory auto;
-    
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-        epsg = new CRSEPSGPropertyFileFactory();
-        auto = new CRSAUTOFactory();
-        FactoryFinder.addAuthority( epsg );
-        FactoryFinder.addAuthority( auto );
-	}
-    /*
-     * @see junit.framework.TestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        FactoryFinder.removeAuthority( epsg );
-        FactoryFinder.removeAuthority( auto );
-        super.tearDown();
-    }
-	public void testEPSG42102() throws Exception {
+public class CRSTest extends TestCase {
+	
+    public void testEPSG42102() throws Exception {
 	    CoordinateReferenceSystem bc = CRS.decode("EPSG:42102");
 		assertNotNull( "bc", bc );
 	}
@@ -88,10 +68,10 @@ public class ReprojectionServiceTest extends TestCase {
     }
     
     public void testManditoryTranform() throws Exception {                
-        CoordinateReferenceSystem WGS84 = (CoordinateReferenceSystem) epsg.createObject("EPSG:4326"); // latlong
-        CoordinateReferenceSystem NAD83 = (CoordinateReferenceSystem) epsg.createObject("EPSG:4269");
-        CoordinateReferenceSystem NAD83_UTM10 = (CoordinateReferenceSystem) epsg.createObject("EPSG:26910");
-        CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) epsg.createObject("EPSG:42102");
+        CoordinateReferenceSystem WGS84 = (CoordinateReferenceSystem) CRS.decode("EPSG:4326"); // latlong
+        CoordinateReferenceSystem NAD83 = (CoordinateReferenceSystem) CRS.decode("EPSG:4269");
+        CoordinateReferenceSystem NAD83_UTM10 = (CoordinateReferenceSystem) CRS.decode("EPSG:26910");
+        CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) CRS.decode("EPSG:42102");
                 
         CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory().createOperation( WGS84, WGS84 );
         MathTransform math = op.getMathTransform();

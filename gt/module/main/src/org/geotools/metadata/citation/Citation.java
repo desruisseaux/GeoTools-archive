@@ -23,8 +23,12 @@
 package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -38,8 +42,10 @@ import org.geotools.util.CheckedHashMap;
 import org.geotools.util.CheckedHashSet;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.PresentationForm;
 import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Series;
 import org.opengis.util.InternationalString;
 
@@ -69,21 +75,120 @@ public class Citation extends MetadataEntity
         OPEN_GIS.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
         OPEN_GIS.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("OGC")));
         OPEN_GIS.setCitedResponsibleParties(Collections.singleton(
-                 org.geotools.metadata.citation.ResponsibleParty.OPEN_GIS));
+                 org.geotools.metadata.citation.ResponsibleParty.OGC));
         OPEN_GIS.freeze();
     }
-
+   
+    private static ResponsibleParty ogc( Role role, OnLineFunction function, String url ){
+        try {
+            return org.geotools.metadata.citation.ResponsibleParty.ogc( role, function, new URL( url ) );
+        }
+        catch( MalformedURLException badContact ){
+            return org.geotools.metadata.citation.ResponsibleParty.OGC;
+        }
+    }
+    /**
+     * The <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A>
+     * (01-068r3) "Automatic Projections" Authority.
+     * <p>
+     * Here is the assumptions used by the CRSAuthorityFactory to locate an
+     * authority on AUTO data:
+     * <ul>
+     * <li>getTitle() returns something human readable
+     * <li>getIdentifiers().contains( "AUTO" )
+     * </ul>
+     * </p>
+     * <p>
+     * Warning: different from AUTO2 used for WMS 1.3.0.
+     * </p>
+     * @see http://www.opengeospatial.org/
+     * @see http://www.opengis.org/docs/01-068r3.pdf
+     * @see org.geotools.metadata.citation.ResponsibleParty#OGC
+     */
+    public static final Citation AUTO = new Citation("Automatic Projections");
+    static { // Sanity check ensure that all @see tags are actually available in the metadata
+        try {
+            AUTO.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
+            
+            List titles = new ArrayList();
+            titles.add( new SimpleInternationalString("AUTO"));        
+            titles.add( new SimpleInternationalString("WMS 1.1.1"));
+            titles.add( new SimpleInternationalString("OGC 01-068r2"));                
+            AUTO.setAlternateTitles( titles );
+            
+            Set parties = new HashSet();
+            parties.add( ogc( Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/" ));
+            parties.add( ogc( Role.OWNER, OnLineFunction.INFORMATION, "http://www.opengis.org/docs/01-068r3.pdf" ));
+            AUTO.setCitedResponsibleParties( parties );
+            
+            AUTO.setIdentifiers( Collections.singleton("AUTO") );        
+            AUTO.freeze();
+        }
+        catch( Throwable t ){
+            t.printStackTrace();
+        }
+    }
+    
+    /**
+     * The <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A>
+     * (01-068r3) "Automatic Projections" Authority.
+     * <p>
+     * Here is the assumptions used by the CRSAuthorityFactory to locate an
+     * authority on AUTO2 data:
+     * <ul>
+     * <li>getTitle() returns something human readable
+     * <li>getIdentifiers().contains( "AUTO2" )
+     * </ul>
+     * </p>
+     * <p>
+     * Warning: different from AUTO used for WMS 1.1.1. and earlier.
+     * </p>
+     * @see http://portal.opengis.org/files/?artifact_id=5316
+     * @see org.geotools.metadata.citation.ResponsibleParty#OGC
+     */
+    public static final Citation AUTO2 = new Citation("Automatic Projections");
+    static {
+        try {
+            AUTO2.setPresentationForm(Collections.singleton(PresentationForm.MODEL_DIGITAL));
+            
+            List titles = new ArrayList();
+            titles.add( new SimpleInternationalString("AUTO2"));        
+            titles.add( new SimpleInternationalString("WMS 1.3.0"));
+            titles.add( new SimpleInternationalString("OGC 04-024"));                
+            AUTO2.setAlternateTitles( titles );
+            
+            Set parties = new HashSet();
+            parties.add( ogc( Role.POINT_OF_CONTACT, OnLineFunction.INFORMATION, "http://www.opengeospatial.org/" ));
+            parties.add( ogc( Role.OWNER, OnLineFunction.INFORMATION, "http://portal.opengis.org/files/?artifact_id=5316" ));
+            AUTO2.setCitedResponsibleParties( parties );
+            
+            AUTO2.setIdentifiers( Collections.singleton("AUTO2") );        
+            AUTO2.freeze();
+        }
+        catch( Throwable t ){
+            t.printStackTrace();
+        }
+    }
+    
     /**
      * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
-     *
-     * @see org.geotools.metadata.citation.ResponsibleParty#EPSG
-     */
+     * <p>
+     * Here is the assumptions used by the CRSAuthorityFactory to locate an
+     * authority on EPSG data:
+     * <ul>
+     * <li>getTitle() returns something human readable
+     * <li>getIdentifiers().contains( "EPSG" )
+     * </ul>
+     * </p>
+     * @see org.geotools.metadata.citation.ResponsibleParty#OGC
+     */    
     public static final Citation EPSG = new Citation("European Petroleum Survey Group");
     static {
         EPSG.setPresentationForm(Collections.singleton(PresentationForm.TABLE_DIGITAL));
         EPSG.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("EPSG")));
         EPSG.setCitedResponsibleParties(Collections.singleton(
              org.geotools.metadata.citation.ResponsibleParty.EPSG));
+        EPSG.setIdentifiers( Collections.singleton("EPSG") );        
         EPSG.freeze();
     }
 

@@ -1,2 +1,2 @@
-org.geotools.referencing.crs.CRSAUTOFactory
-org.geotools.referencing.crs.CRSEPSGPropertyFileFactory
+org.geotools.referencing.crs.AUTOCRSAuthorityFactory
+org.geotools.referencing.crs.EPSGCRSAuthorityFactory

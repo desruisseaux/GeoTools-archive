@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
 
+import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -47,7 +48,7 @@ import org.opengis.util.InternationalString;
  * @author Rueben Schulz
  */
 //not quite sure how I am going to create a new factory (what should the geoapi method be)
-public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
+public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
     public static final String AUTHORITY = "EPSG";
     public static final String AUTHORITY_PREFIX = "EPSG:";
     //would be nice to cache crs objects for codes that have already been requested    
@@ -56,7 +57,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      * The default coordinate system authority factory.
      * Will be constructed only when first requested.
      */
-    protected static CRSEPSGPropertyFileFactory DEFAULT;
+    protected static EPSGCRSAuthorityFactory DEFAULT;
     
     /**
      * The properties object for our properties file. Keys are the EPSG
@@ -75,7 +76,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      * Loads from epsg.properties if the file exists, defaults to internal defintions
      * exported from postgis and cubeworks.
      */
-    public CRSEPSGPropertyFileFactory() {
+    public EPSGCRSAuthorityFactory() {
         this(FactoryFinder.getCRSFactory());
     }
     
@@ -83,7 +84,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      * Loads from epsg.properties if the file exists, defaults to internal defintions
      * exported from postgis and cubeworks.
      */
-    protected CRSEPSGPropertyFileFactory(final CRSFactory factory ) {
+    protected EPSGCRSAuthorityFactory(final CRSFactory factory ) {
         this.crsFactory = factory;
         try {
             loadDefault();
@@ -96,7 +97,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
     /** 
      *
      */
-    protected CRSEPSGPropertyFileFactory(final CRSFactory factory,
+    protected EPSGCRSAuthorityFactory(final CRSFactory factory,
                        	 URL definition) throws FactoryException {
         this( factory );
         
@@ -124,7 +125,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
         }        
         // Use the built-in property defintions
         //
-        URL url = CRSEPSGPropertyFileFactory.class.getResource("epsg.properties");
+        URL url = EPSGCRSAuthorityFactory.class.getResource("epsg.properties");
         epsg.load( url.openStream() );
     }
     
@@ -136,7 +137,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      */
     public synchronized static CRSAuthorityFactory getDefault() {
         if (DEFAULT == null) {        	
-            DEFAULT = new CRSEPSGPropertyFileFactory();
+            DEFAULT = new EPSGCRSAuthorityFactory();
         }            
         return DEFAULT;
     }

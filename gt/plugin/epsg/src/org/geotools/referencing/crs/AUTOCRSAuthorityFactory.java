@@ -70,7 +70,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
  * @author Rueben Schulz
  */
 //how is this going to work with the factory finder
-public class CRSAUTOFactory implements CRSAuthorityFactory {
+public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
     
     private CRSFactory crsFactory;
     private MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory();
@@ -79,7 +79,7 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
      * The default coordinate system authority factory.
      * Will be constructed only when first requested.
      */
-    private static CRSAUTOFactory DEFAULT;
+    private static AUTOCRSAuthorityFactory DEFAULT;
     
     /**
      * Map of Factlets by Integer code (from AUTO:code)
@@ -91,7 +91,7 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
     /**
      * Construct <code>CRSAUTOFactory</code>.
      */
-    public CRSAUTOFactory(){
+    public AUTOCRSAuthorityFactory(){
         this(FactoryFinder.getCRSFactory());
     }
     
@@ -100,7 +100,7 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
      *
      * @param factory The underlying factory used for objects creation.
      */
-    public CRSAUTOFactory(final CRSFactory factory) {
+    public AUTOCRSAuthorityFactory(final CRSFactory factory) {
         this.crsFactory = factory;
         facts.put( new Integer(42001), new Auto42001() );
         facts.put( new Integer(42002), new Auto42002() );
@@ -115,7 +115,7 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
      */
     public synchronized static CRSAuthorityFactory getDefault() {
         if (DEFAULT == null) {        	
-            DEFAULT = new CRSAUTOFactory();
+            DEFAULT = new AUTOCRSAuthorityFactory();
         }            
         return DEFAULT;
     }
@@ -134,7 +134,7 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
     }
      
     public org.opengis.metadata.citation.Citation getAuthority() {
-        return org.geotools.metadata.citation.Citation.OPEN_GIS;
+        return org.geotools.metadata.citation.Citation.AUTO;
     }
     
     /**
