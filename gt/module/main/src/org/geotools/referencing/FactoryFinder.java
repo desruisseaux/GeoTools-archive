@@ -117,7 +117,7 @@ public final class FactoryFinder {
              * category, otherwise we should have found at least the Geotools implementation.
              * Scans the plugin now, but for this category only.
              */
-            scanForPlugins(Thread.currentThread().getContextClassLoader(), category);
+            scanForPlugins(category);
             iterator = registry.getServiceProviders(category, false);
         }
         return iterator;
@@ -284,14 +284,24 @@ public final class FactoryFinder {
          * be required.
          */
         if (registry != null) {
-            final ClassLoader loader = Thread.currentThread().getContextClassLoader();
             for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
-                scanForPlugins(loader, (Class)categories.next());
+                    scanForPlugins((Class)categories.next());					
+
             }
         }
     }
 
     /**
+	 * @param class1
+	 */
+	private static void scanForPlugins(Class class1) {
+        ClassLoader[] loaders=org.geotools.factory.FactoryFinder.findClassLoaders();
+    	for (int i = 0; i < loaders.length; i++) {
+    		scanForPlugins(loaders[i],class1); 
+    	}
+	}
+
+	/**
      * Scans for factory plug-ins of the given category.
      *
      * @param loader The class loader to use.
