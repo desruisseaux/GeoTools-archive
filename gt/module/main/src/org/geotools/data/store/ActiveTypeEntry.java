@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.AbstractFeatureStore;
@@ -34,6 +33,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
@@ -163,7 +163,7 @@ final class ActiveTypeEntry implements TypeEntry {
             }
             try {
                 CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
-                bbox = CRSService.toGeographic( bbox, cs );
+                bbox = FactoryFinder.toGeographic(bbox,cs);
             }
             catch (Error badRepoject ) {
                 badRepoject.printStackTrace();
@@ -279,7 +279,6 @@ final class ActiveTypeEntry implements TypeEntry {
         Filter filter = query.getFilter();
         String typeName = query.getTypeName();
         String propertyNames[] = query.getPropertyNames();
-        CoordinateSystem cs = null;
 
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
@@ -297,9 +296,9 @@ final class ActiveTypeEntry implements TypeEntry {
         }
         FeatureType featureType = schema;
 
-        if( propertyNames != null || cs != null ){
+        if( propertyNames != null || query.getCoordinateSystem() != null ){
             try {
-                featureType = DataUtilities.createSubType( featureType, propertyNames, cs );
+                featureType = DataUtilities.createSubType( featureType, propertyNames, query.getCoordinateSystem() );
             } catch (SchemaException e) {
                 LOGGER.log( Level.FINEST, e.getMessage(), e);
                 throw new DataSourceException( "Could not create Feature Type for query", e );

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
@@ -201,7 +202,7 @@ public class DefaultTypeEntry implements TypeEntry {
             }
             try {
                 CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
-                bbox = CRSService.toGeographic( bbox, cs );
+                bbox = FactoryFinder.toGeographic(bbox,cs);
             }
             catch (Throwable badRepoject ) {
                 badRepoject.printStackTrace();

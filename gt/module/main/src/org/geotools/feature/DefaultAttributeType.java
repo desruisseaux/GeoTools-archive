@@ -27,8 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.LocalCoordinateSystem;
+import org.geotools.referencing.crs.GeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -468,7 +467,6 @@ public class DefaultAttributeType implements AttributeType {
 
         protected Object parseFromString(String value)
             throws IllegalArgumentException {
-            Number parsed = null;
 
             if (type == Byte.class) {
                 return Byte.decode(value);
@@ -705,18 +703,18 @@ public class DefaultAttributeType implements AttributeType {
              */
         }
 
-        public Geometric(GeometryAttributeType copy, CoordinateSystem override) {
+        public Geometric(GeometryAttributeType copy, CoordinateReferenceSystem override) {
             super(copy);
-            coordinateSystem = (CoordinateSystem) copy.getCoordinateSystem();
+            coordinateSystem = copy.getCoordinateSystem();
 
             if (override != null) {
                 coordinateSystem = override;
             }
 
             if (coordinateSystem == null) {
-                coordinateSystem = LocalCoordinateSystem.PROMISCUOUS;
+                coordinateSystem = GeocentricCRS.CARTESIAN;
             }
-            geometryFactory = (coordinateSystem == LocalCoordinateSystem.PROMISCUOUS)
+            geometryFactory = (coordinateSystem == GeocentricCRS.CARTESIAN)
                 ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(coordinateSystem);            
         }
 
@@ -759,17 +757,11 @@ public class DefaultAttributeType implements AttributeType {
  */
 class CSGeometryFactory extends GeometryFactory {
     
-    /**
-     * Temporary remove of CARESIAN as I cannot get LocalCoordinateSystem to work in Geoserver
-     */  
-    //static public GeometryFactory DEFAULT = new CSGeometryFactory(LocalCoordinateSystem.CARTESIAN);
     static public GeometryFactory DEFAULT = new GeometryFactory();    
     static public PrecisionModel DEFAULT_PRECISON_MODEL = new PrecisionModel();
-    private CoordinateReferenceSystem coordinateSystem;
 
     public CSGeometryFactory(CoordinateReferenceSystem cs) {
         super(toPrecisionModel(cs), toSRID(cs));
-        coordinateSystem = (cs != null) ? cs : LocalCoordinateSystem.PROMISCUOUS;
     }
 
     public GeometryCollection createGeometryCollection(Geometry[] geometries) {
@@ -792,7 +784,7 @@ class CSGeometryFactory extends GeometryFactory {
     // And so on
     // Utility Functions
     private static int toSRID(CoordinateReferenceSystem cs) {
-        if ((cs == null) || (cs == LocalCoordinateSystem.PROMISCUOUS)) {
+        if ((cs == null) || (cs == GeocentricCRS.CARTESIAN)) {
             return 0;
         }
 
@@ -801,7 +793,7 @@ class CSGeometryFactory extends GeometryFactory {
     }
 
     private static PrecisionModel toPrecisionModel(CoordinateReferenceSystem cs) {
-        if ((cs == null) || (cs == LocalCoordinateSystem.PROMISCUOUS)) {
+        if ((cs == null) || (cs == GeocentricCRS.CARTESIAN)) {
             return DEFAULT_PRECISON_MODEL;
         }
 

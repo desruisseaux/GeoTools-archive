@@ -60,6 +60,7 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -798,13 +799,13 @@ public class DataUtilities {
      * @throws SchemaException
      */
     public static FeatureType createSubType(FeatureType featureType,
-            String[] properties, CoordinateSystem override)
+            String[] properties, CoordinateReferenceSystem override)
             throws SchemaException {
         return createSubType( featureType, properties, override, featureType.getTypeName(), featureType.getNamespaceURI() );
     }
 
     public static FeatureType createSubType(FeatureType featureType,
-        String[] properties, CoordinateSystem override, String typeName, URI namespace )
+        String[] properties, CoordinateReferenceSystem override, String typeName, URI namespace )
         throws SchemaException {
         
         if ((properties == null) && (override == null)) {
