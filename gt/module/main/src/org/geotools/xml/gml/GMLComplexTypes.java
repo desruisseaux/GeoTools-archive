@@ -4021,21 +4021,21 @@ public class GMLComplexTypes {
                 ft = loadFeatureType(element, value, attrs);
             }
 
-            Element[] elements = ((ComplexType)element.getType()).getChildElements();
-            Object[] values = new Object[elements.length];
+            Object[] values = new Object[ft.getAttributeCount()];
             for(int i=0;i<values.length;i++)
                 values[i] = null;
 
             for (int i = 0; i < value.length; i++){
                 //find index for value
                 int j = -1;
-                for (int k=0;k<elements.length && j==-1;k++){
+                for (int k=0;k<ft.getAttributeCount() && j==-1;k++){
                     // TODO use equals
-                    if((elements[k].getName()==null && value[i].getElement().getName()==null ||
-                            elements[k].getName().equals(value[i].getElement().getName())))
+//System.out.print(k+"");
+                    if((ft.getAttributeType(k).getName()==null && value[i].getElement().getName()==null) ||
+                            ft.getAttributeType(k).getName().equals(value[i].getElement().getName()))
                         j = k;
                 }
-System.out.print(j+"");
+//System.out.print(j+" "+(j!=-1?ft.getAttributeType(j).getName()+"  ":"")+value[i].getElement().getName()+" ");
                 if(j!=-1)
                     values[j] = value[i].getValue();
             }
@@ -4045,7 +4045,7 @@ System.out.print(j+"");
             if ((fid == null) || "".equals(fid)) {
                 fid = attrs.getValue(GMLSchema.NAMESPACE, "fid");
             }
-System.out.println("\n"+values.length);
+//System.out.println("\n"+values.length);
             if ((fid != null) || !"".equals(fid)) {
                 try {
                     return ft.create(values, fid);
@@ -4112,7 +4112,7 @@ System.out.println("\n"+values.length);
             FeatureType ft = createFeatureType(element);
                 featureTypeMappings.put(element.getType().getNamespace() + "#"
                     + element.getName(), ft);
-
+//System.out.println(ft);
                 return ft;
         }
 
@@ -6224,12 +6224,12 @@ System.out.println("\n"+values.length);
         if(((ComplexType)element.getType()).getParent()instanceof ComplexType)
             parent = createFeatureType((ComplexType)((ComplexType)element.getType()).getParent());
         
-        if(parent != null && parent.getAttributeTypes()!=null){
-            typeFactory.addTypes(parent.getAttributeTypes());
-            if(parent.getDefaultGeometry()!=null){
-                geometryAttribute = parent.getDefaultGeometry();
-            }
-        }
+//        if(parent != null && parent.getAttributeTypes()!=null){
+//            typeFactory.addTypes(parent.getAttributeTypes());
+//            if(parent.getDefaultGeometry()!=null){
+//                geometryAttribute = parent.getDefaultGeometry();
+//            }
+//        }
         
         AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){
@@ -6273,12 +6273,12 @@ System.out.println("\n"+values.length);
         if(element.getParent()instanceof ComplexType)
             parent = createFeatureType((ComplexType)element.getParent());
         
-        if(parent != null && parent.getAttributeTypes()!=null){
-            typeFactory.addTypes(parent.getAttributeTypes());
-            if(parent.getDefaultGeometry()!=null){
-                geometryAttribute = parent.getDefaultGeometry();
-            }
-        }
+//        if(parent != null && parent.getAttributeTypes()!=null){
+//            typeFactory.addTypes(parent.getAttributeTypes());
+//            if(parent.getDefaultGeometry()!=null){
+//                geometryAttribute = parent.getDefaultGeometry();
+//            }
+//        }
         
         AttributeType[] attrs = (AttributeType[])getAttributes(child).toArray(new AttributeType[]{,});
         for(int i=0;i<attrs.length;i++){

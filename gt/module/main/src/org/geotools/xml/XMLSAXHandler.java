@@ -186,7 +186,7 @@ public class XMLSAXHandler extends DefaultHandler {
             logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
-e.printStackTrace();
+//e.printStackTrace();
             throw new SAXException(e);
         }
     }
