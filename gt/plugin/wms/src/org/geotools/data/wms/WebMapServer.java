@@ -45,15 +45,25 @@ import org.geotools.data.wms.response.GetMapResponse;
 import org.jdom.JDOMException;
 
 /**
- * @author rgould
+ * WebMapServer is a class representing a WMS.
  * 
+ * <p>
  * When performing the GetCapabilities request, all query parameters
  * are saved and over-ride the defaults:
+ * <pre><code>
  * service=WMS
  * version=1.1.1
- * request=GetCapabilities 
+ * request=GetCapabilities
+ * </code></pre> 
+ * </p>
  * 
- * WebMapServer is a class representing a WMS.
+ * <p>
+ * The current implementation is targeted towards the 1.3.0 OGC WMS
+ * Implementation Specification. There are plans to generalize this support
+ * for previous revisions.
+ * </p>
+ * 
+ * @author Richard Gould, Refractions Research
  */
 public class WebMapServer {
 	
