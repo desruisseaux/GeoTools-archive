@@ -73,6 +73,8 @@ import java.util.logging.LogRecord;
 import java.rmi.RemoteException;
 import java.rmi.ServerException;  // For Javadoc
 import java.io.NotSerializableException; // For Javadoc
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.io.StringWriter;
 import java.io.IOException;
 
@@ -170,21 +172,31 @@ public class GridCoverage extends Coverage {
     private static final GridCoverage[] EMPTY_LIST = new GridCoverage[0];
     
     /**
-     * Sources grid coverage.
+     * Sources grid coverage, or <code>null</code> if none.
+     * This information is lost during serialization.
      */
-    private final GridCoverage[] sources;
+    private final transient GridCoverage[] sources;
 
     /**
      * A grid coverage using the sample dimensions <code>SampleDimension.inverse</code>.
      * This object is constructed and returned by {@link #geophysics}. Constructed when
-     * first needed. May also appears also in the <code>sources</code> list.
+     * first needed. May appears also in the <code>sources</code> list.
      */
-    private GridCoverage inverse;
+    private transient GridCoverage inverse;
     
     /**
      * The raster data.
+     *
+     * @todo This field should be final. It is not only for internal reason (namely:
+     *       deserialization). Consider making this field private in a future version.
      */
-    protected final PlanarImage image;
+    protected transient PlanarImage image;
+
+    /**
+     * The serialized image, as an instance of {@link SerializableRenderedImage}.
+     * This image will be created only when first needed during serialization.
+     */
+    private RenderedImage serializedImage;
     
     /**
      * The grid geometry.
@@ -567,7 +579,7 @@ public class GridCoverage extends Coverage {
         if (sources != null) {
             this.sources = (GridCoverage[]) sources.clone();
         } else {
-            this.sources = EMPTY_LIST;
+            this.sources = null;
         }
         this.image = image;
         /*
@@ -700,7 +712,7 @@ public class GridCoverage extends Coverage {
      * as well as to trace back to the "raw data".
      */
     public GridCoverage[] getSources() {
-        return (GridCoverage[]) sources.clone();
+        return (sources!=null) ? (GridCoverage[]) sources.clone() : EMPTY_LIST;
     }
     
     /**
@@ -1308,7 +1320,30 @@ testLinear: for (int i=0; i<numBands; i++) {
         // This method is overriden by org.geotools.gp.Interpolator
         return coverage;
     }
-    
+
+    /**
+     * Construct the {@link PlanarImage} from the {@linkplain SerializableRenderedImage}
+     * after deserialization.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        image = PlanarImage.wrapRenderedImage(serializedImage);
+    }
+
+    /**
+     * Serialize this grid coverage. Before serialization, a {@linkplain SerializableRenderedImage
+     * serializable rendered image} is created if it was not already done.
+     *
+     * @todo Check image's sources in case the planar image is just a wrapper around
+     *       an existing {@linkplain SerializableRenderedImage}.
+     */
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        if (serializedImage == null) {
+            serializedImage = new SerializableRenderedImage(image, false, null, "gzip", null, null);
+        }
+        out.defaultWriteObject();
+    }
+
     /**
      * Returns a string représentation of this coverage. This string is
      * for debugging purpose only and may change in future version.
