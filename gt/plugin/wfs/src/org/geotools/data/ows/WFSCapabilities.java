@@ -25,8 +25,7 @@ public class WFSCapabilities {
     private OperationType lockFeature;
     
     private String vendorSpecificCapabilities;
-//    private FilterCapabilities filterCapabilities;
-    private Object filterCapabilities;
+    private FilterCapabilities filterCapabilities;
 
     /**
      * @return Returns the featureTypes.
@@ -43,13 +42,13 @@ public class WFSCapabilities {
 /**
  * @return Returns the filterCapabilities.
  */
-public Object getFilterCapabilities() {
+public FilterCapabilities getFilterCapabilities() {
     return filterCapabilities;
 }
 /**
  * @param filterCapabilities The filterCapabilities to set.
  */
-public void setFilterCapabilities(Object filterCapabilities) {
+public void setFilterCapabilities(FilterCapabilities filterCapabilities) {
     this.filterCapabilities = filterCapabilities;
 }
     /**

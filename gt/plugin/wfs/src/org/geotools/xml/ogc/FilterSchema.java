@@ -56,6 +56,9 @@ import org.geotools.xml.schema.Type;
  *
  */
 public class FilterSchema implements Schema {
+	
+	// hint key for FilterCapabilities
+	public static final String FILTER_CAP_KEY = "FilterSchema.FilterCapabilities";
     
     public static final URI NAMESPACE = makeURI("http://www.opengis.net/ogc");
 

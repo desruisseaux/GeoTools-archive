@@ -18,6 +18,7 @@ package org.geotools.xml.wfs;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.ows.FeatureSetDescription;
+import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.ows.Service;
@@ -1234,7 +1235,6 @@ public class WFSCapabilitiesComplexTypes {
 
             FeatureSetDescription fsd = new FeatureSetDescription();
             List llbb = new LinkedList();
-//            List mdurl = new LinkedList();
 
             for (int i = 0; i < value.length; i++) {
                 if (value[i].getElement() == null) {
@@ -1279,7 +1279,7 @@ public class WFSCapabilitiesComplexTypes {
                                         if (elements[6].getName().equals(value[i].getElement()
                                                                                      .getName())) {
                                             // LatLongBoundingBox
-                                            llbb.add((Envelope) value[i]
+                                            llbb.add(value[i]
                                                 .getValue());
                                         } else {
                                             if (elements[7].getName().equals(value[i].getElement()
@@ -1307,8 +1307,10 @@ public class WFSCapabilitiesComplexTypes {
             }
 
             if (llbb.size() > 0) {
-                fsd.setLatLongBoundingBox((Envelope[]) llbb.toArray(
-                        new Envelope[llbb.size()]));
+            	Envelope e = (Envelope)llbb.get(0);
+            	for(int i=1;i<llbb.size();i++)
+            		e.expandToInclude((Envelope)llbb.get(i));
+                fsd.setLatLongBoundingBox(e);
             }
 
 //            if (mdurl.size() > 0) {
@@ -2053,7 +2055,7 @@ public class WFSCapabilitiesComplexTypes {
                     if (elements[1].getName().equals(value[i].getElement()
                                                                  .getName())) {
                         // featureType
-                        fts.add((FeatureSetDescription) value[i].getValue());
+                        fts.add(value[i].getValue());
                     } else {
                         // error
                         throw new SAXException("An error occured here");
@@ -2421,7 +2423,7 @@ public class WFSCapabilitiesComplexTypes {
                             if (elements[3].getName().equals(value[i].getElement()
                                                                          .getName())) {
                                 // Filter_Capabilities
-                                result.setFilterCapabilities(value[i].getValue());
+                                result.setFilterCapabilities((FilterCapabilities)value[i].getValue());
                             } else {
                                 // error
                                 throw new SAXException("The element "
@@ -2511,7 +2513,6 @@ public class WFSCapabilitiesComplexTypes {
 
             // TODO merge one with only post, and one with only get?
             List l = new LinkedList();
-            List sdl = null;
 
             for (int i = 0; i < value.length; i++) {
 //System.out.println(value[i].getElement().getName()+" "+value[i].getValue().getClass());

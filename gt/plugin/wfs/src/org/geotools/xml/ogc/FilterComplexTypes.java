@@ -697,6 +697,11 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if(fc.getScalarOps()== FilterCapabilities.NO_OP)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Expression;
         }
         /**
@@ -804,6 +809,11 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.SIMPLE_ARITHMETIC)!= FilterCapabilities.SIMPLE_ARITHMETIC)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof MathExpression;
         }
         /**
@@ -894,6 +904,11 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.FUNCTIONS)!= FilterCapabilities.FUNCTIONS)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof FunctionExpression;
         }
         /**

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
@@ -94,6 +95,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.SIMPLE_COMPARISONS)!= FilterCapabilities.SIMPLE_COMPARISONS)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && (value instanceof CompareFilter || value instanceof BetweenFilter || value instanceof NullFilter || value instanceof LikeFilter);
         }
         /**
@@ -178,6 +184,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if(fc.getSpatialOps()==0)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryFilter;
         }
         /**
@@ -266,6 +277,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.LOGICAL)!= FilterCapabilities.LOGICAL)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof LogicFilter;
         }
         /**
@@ -358,6 +374,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if(fc.getScalarOps()==0 && fc.getSpatialOps()==0)
+        			return false;
+        	}
         	return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Filter;
         }
         /**
@@ -544,6 +565,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & (FilterCapabilities.SIMPLE_COMPARISONS | FilterCapabilities.SIMPLE_ARITHMETIC))!= (FilterCapabilities.SIMPLE_COMPARISONS | FilterCapabilities.SIMPLE_ARITHMETIC))
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof CompareFilter;
         }
         /**
@@ -637,6 +663,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.LIKE)!= FilterCapabilities.LIKE)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof LikeFilter;
         }
         /**
@@ -719,6 +750,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.NULL_CHECK)!= FilterCapabilities.NULL_CHECK)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof NullFilter;
         }
         /**
@@ -798,6 +834,11 @@ public class FilterOpsComplexTypes {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.BETWEEN)!= FilterCapabilities.BETWEEN)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof BetweenFilter;
         }
         /**
@@ -863,6 +904,11 @@ public class FilterOpsComplexTypes {
             return Expression.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if(fc.getScalarOps()== FilterCapabilities.NO_OP)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Expression;
         }
         /**
@@ -926,6 +972,11 @@ public class FilterOpsComplexTypes {
             return Expression.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if(fc.getScalarOps()== FilterCapabilities.NO_OP)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof Expression;
         }
         /**
@@ -1005,6 +1056,12 @@ public class FilterOpsComplexTypes {
             return GeometryFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		int elementkey = FilterCapabilities.findOperation(element.getName());
+        		if(elementkey == 0 || (fc.getSpatialOps() & elementkey) != elementkey)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryFilter;
         }
         /**
@@ -1096,6 +1153,11 @@ public class FilterOpsComplexTypes {
             return GeometryFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getSpatialOps() & FilterCapabilities.BBOX)!= FilterCapabilities.BBOX)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryFilter;
         }
         /**
@@ -1183,6 +1245,11 @@ public class FilterOpsComplexTypes {
             return GeometryDistanceFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getSpatialOps() & (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))!= (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryDistanceFilter;
         }
         /**
@@ -1263,6 +1330,11 @@ public class FilterOpsComplexTypes {
             return GeometryDistanceFilter.class;
         }
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getSpatialOps() & (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))!= (FilterCapabilities.BEYOND | FilterCapabilities.DWITHIN))
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof GeometryDistanceFilter;
         }
         /**
@@ -1348,6 +1420,11 @@ public Type getParent() {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.LOGICAL)!= FilterCapabilities.LOGICAL)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof LogicFilter;
         }
         /**
@@ -1434,6 +1511,11 @@ public Type getParent() {
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
+        	if(hints.containsKey(FilterSchema.FILTER_CAP_KEY)){
+        		FilterCapabilities fc = (FilterCapabilities)hints.get(FilterSchema.FILTER_CAP_KEY);
+        		if((fc.getScalarOps() & FilterCapabilities.LOGICAL)!= FilterCapabilities.LOGICAL)
+        			return false;
+        	}
             return element.getType()!=null && getName().equals(element.getType().getName()) && value instanceof LogicFilter;
         }
         /**

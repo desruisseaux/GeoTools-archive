@@ -27,7 +27,7 @@ public class FeatureSetDescription {
     private String _abstract;
     private String SRS;
     private List keywords;
-    private Envelope[] latLongBoundingBox;
+    private Envelope latLongBoundingBox;
     private int operations;
 //    private MetadataURL[] metadataURL;
     
@@ -107,13 +107,13 @@ public class FeatureSetDescription {
     /**
      * @return Returns the latLongBoundingBox.
      */
-    public Envelope[] getLatLongBoundingBox() {
+    public Envelope getLatLongBoundingBox() {
         return latLongBoundingBox;
     }
     /**
      * @param latLongBoundingBox The latLongBoundingBox to set.
      */
-    public void setLatLongBoundingBox(Envelope[] latLongBoundingBox) {
+    public void setLatLongBoundingBox(Envelope latLongBoundingBox) {
         this.latLongBoundingBox = latLongBoundingBox;
     }
     /**

@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi;
 import org.xml.sax.SAXException;
 
 /**

@@ -132,14 +132,15 @@ public class WFSDataStoreReadTest extends TestCase {
         System.out.println("");
     }
     
-    public void testMapServer() throws NoSuchElementException, IOException, IllegalAttributeException{
-        URL url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
-        System.out.println("\nMapServer");
-        doFeatureType(url,true,false);
-        doFeatureReader(url,true,false);
-        doFeatureReaderWithFilter(url,true,false);
-        System.out.println("");
-    }
+    // Permission issues
+//    public void testMapServer() throws NoSuchElementException, IOException, IllegalAttributeException{
+//        URL url = new URL("http://www2.dmsolutions.ca/cgi-bin/mswfs_gmap?version=1.0.0&request=getcapabilities&service=wfs");
+//        System.out.println("\nMapServer");
+//        doFeatureType(url,true,false);
+//        doFeatureReader(url,true,false);
+//        doFeatureReaderWithFilter(url,true,false);
+//        System.out.println("");
+//    }
     
     public void doFeatureType(URL url,boolean get, boolean post) throws IOException{
         DataStore wfs = null;
