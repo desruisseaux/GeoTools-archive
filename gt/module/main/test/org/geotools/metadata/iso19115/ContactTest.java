@@ -17,8 +17,8 @@ public class ContactTest extends TestCase {
 		assertEquals( phone, contact.getPhone() );
 		assertEquals( "n/a", contact.getContactInstruction() );
 		
-		assertEquals( 21, contact.getElements( null ).size() );
-		System.out.println( contact.getEntity().getElements() );
+		assertEquals( 21, contact.elements().size() );
+		System.out.println( contact.getEntityType().getElements() );
 	}
 	public void xtestElementAccess(){
 		Telephone phone = new Telephone();

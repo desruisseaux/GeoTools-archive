@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.catalog;
 
 
 import junit.framework.Test;

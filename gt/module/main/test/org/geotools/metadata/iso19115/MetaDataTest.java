@@ -2,15 +2,16 @@ package org.geotools.metadata.iso19115;
 
 import java.util.List;
 
-import org.geotools.metadata.Metadata.Entity;
+import org.geotools.catalog.MetadataEntity.EntityType;
 
 import junit.framework.TestCase;
+
 
 public class MetaDataTest extends TestCase {
 
 	public void testMetadataEntity(){
 		MetaData mdata = new MetaData();
-		Entity entity = mdata.getEntity(); 
+		EntityType entity = mdata.getEntityType(); 
 		assertNotNull( entity );
 		List elements = entity.getElements();
 		assertEquals( 21, elements.size() );

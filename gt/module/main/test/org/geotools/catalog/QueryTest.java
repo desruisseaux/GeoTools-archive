@@ -1,4 +1,4 @@
-package org.geotools.metadata;
+package org.geotools.catalog;
 
 import java.io.IOException;
 
@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
-import org.geotools.metadata.Query;
+import org.geotools.catalog.Query;
 
 
 /**

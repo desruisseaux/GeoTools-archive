@@ -14,13 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.catalog;
 
 import java.util.List;
-
-import org.geotools.metadata.Metadata;
-import org.geotools.metadata.XPath;
-
+import org.geotools.catalog.MetadataEntity.Element;
 
 import junit.framework.TestCase;
 
@@ -49,23 +46,23 @@ public class XPathTest extends TestCase {
     }
 
     /*
-     * Class under test for Metadata.Element match(Metadata, int)
+     * Class under test for Element match(Metadata, int)
      */
     public void testMatchMetadataint() {
         XPath xpath=new XPath("fileData/name");
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        List result=xpath.getElement(data.getEntity());
+        List result=xpath.getElement(data.getEntityType());
         assertEquals(result.size(),1);
-        Metadata.Element elem=(Metadata.Element)result.get(0);
+        Element elem=(Element)result.get(0);
         assertNotNull(elem);
         assertEquals(elem.getName(),"name");
         assertEquals(elem.getType(),String.class);
         
         xpath=new XPath("fileData");
         data=new StupidNestedMetadataImpl();
-        result=xpath.getElement(data.getEntity());
+        result=xpath.getElement(data.getEntityType());
         assertEquals(result.size(),1);
-        elem=(Metadata.Element)result.get(0);
+        elem=(Element)result.get(0);
         assertNotNull(elem);
         assertEquals(elem.getName(),"fileData");
         assertEquals(elem.getType(),StupidFileData.class);
@@ -74,20 +71,20 @@ public class XPathTest extends TestCase {
     }
 
     /*
-     * Class under test for Metadata.Element match(String, Metadata)
+     * Class under test for Element match(String, Metadata)
      */
     public void testMatchStringMetadata() {
         StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
         List result=XPath.getElement("fileData/name",data);
         assertEquals(result.size(),1);
-        Metadata.Element elem=(Metadata.Element)result.get(0);
+        Element elem=(Element)result.get(0);
         assertNotNull(elem);
         assertEquals(elem.getName(),"name");
         assertEquals(elem.getType(),String.class);
     }
 
     /*
-     * Class under test for Metadata.Element match(String, Metadata)
+     * Class under test for Element match(String, Metadata)
      * Wildcards in xpath tested
      */
     public void testMatchStringMetadataWildCards() {
@@ -97,13 +94,13 @@ public class XPathTest extends TestCase {
 
         result=XPath.getElement("\\w*/name",data);
         assertEquals(result.size(),1);
-        Metadata.Element element=(Metadata.Element)result.get(0);
+        Element element=(Element)result.get(0);
         assertEquals(element.getType(),String.class);
     
         result=XPath.getElement("\\w*",data);
         assertEquals(result.size(),2);
-        element=(Metadata.Element)result.get(0);
-        Metadata.Element element1=(Metadata.Element)result.get(1);
+        element=(Element)result.get(0);
+        Element element1=(Element)result.get(1);
         if( element.getType().isAssignableFrom(String.class) )
             assertEquals(StupidFileData.class, element1.getType());
         else

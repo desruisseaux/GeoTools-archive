@@ -14,9 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
-
-import org.geotools.metadata.Metadata;
+package org.geotools.catalog;
 
 /**
  * TODO type description
@@ -24,7 +22,7 @@ import org.geotools.metadata.Metadata;
  * @author jeichar
  *
  */
-public interface StupidNestedMetadata extends Metadata {
+public interface StupidNestedMetadata extends MetadataEntity {
     StupidFileData getFileData();
     String getData();
 }

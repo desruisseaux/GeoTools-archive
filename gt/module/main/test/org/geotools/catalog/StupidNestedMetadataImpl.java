@@ -14,9 +14,8 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.catalog;
 
-import org.geotools.metadata.AbstractMetadata;
 
 
 
@@ -26,7 +25,7 @@ import org.geotools.metadata.AbstractMetadata;
  * @author jeichar
  *
  */
-public class StupidNestedMetadataImpl extends AbstractMetadata implements
+public class StupidNestedMetadataImpl extends DefaultMetadataEntity implements
         StupidNestedMetadata {
 
     /** 
