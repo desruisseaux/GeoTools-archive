@@ -37,19 +37,31 @@ import java.util.logging.Logger;
 public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements DataStoreFactorySpi{
 
     // note one of the two is required
+    /**
+     * url
+     */
     public static final Param GET_CAPABILITIES_URL = new Param("WFSDataStoreFactory:GET_CAPABILITIES_URL",
             URL.class,
             "Represents a URL to the getCapabilities document. This URL does not need to be altered in any way. GET_CAPABILITIES_URL and SERVER_URL are mutually exclusive. One of the two is required.",
             false);
+    /**
+     * url
+     */
     public static final Param SERVER_URL = new Param("WFSDataStoreFactory:SERVER_URL",
             URL.class,
             "Represents a URL to the wfs server. This URL represents the server bases url, and should have the capability request post-pended. GET_CAPABILITIES_URL and SERVER_URL are mutually exclusive. One of the two is required.");
 
     // note may not have both, when neither is specified will prefer post
+    /**
+     * boolean
+     */
     public static final Param USE_POST = new Param("WFSDataStoreFactory:USE_POST",
             Boolean.class,
             "This specifies whether to use the POST portions of the getCapabilities document. When false the POST portion of the document should be ignored. When true, the POST portion should be used first. If this attribute is missing, and GET is specified, POST requests will be attempted when GET requests are not supported and POST requests are. If neither USE_POST or USE_GET are included, post will be prefered. USE_POST and USE_GET are muttually exclusive.",
             false);
+    /**
+     * boolean
+     */
     public static final Param USE_GET = new Param("WFSDataStoreFactory:USE_GET",
             Boolean.class,
             "This specifies whether to use the GET portions of the getCapabilities document. When false the GET portion of the document should be ignored. When true, the GET portion should be used first. If this attribute is missing, and POST is specified, GET requests will be attempted when POST requests are not supported and GET requests are. If neither USE_POST or USE_GET are included, post will be prefered. USE_POST and USE_GET are muttually exclusive.",
@@ -57,22 +69,34 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements
 
     // password stuff -- see java.net.Authentication
     // either both or neither
+    /**
+     * String
+     */
     public static final Param USERNAME = new Param("WFSDataStoreFactory:USERNAME",
             String.class,
             "This allows the user to specify a username. This param should not be used without the PASSWORD param.",
             false);
+    /**
+     * String
+     */
     public static final Param PASSWORD = new Param("WFSDataStoreFactory:PASSWORD",
             String.class,
             "This allows the user to specify a username. This param should not be used without the USERNAME param.",
             false);
 
     // timeout -- optional
+    /**
+     * Integer
+     */
     public static final Param TIMEOUT = new Param("WFSDataStoreFactory:TIMEOUT",
             Integer.class,
             "This allows the user to specify a timeout in milliseconds. This param has a default value of 1000ms.",
             false);
 
     // buffer size -- optional
+    /**
+     * Integer
+     */
     public static final Param BUFFER_SIZE = new Param("WFSDataStoreFactory:BUFFER_SIZE",
             Integer.class,
             "This allows the user to specify a buffer size in features. This param has a default value of 10 features.",
@@ -95,8 +119,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
      */
-    public DataSourceMetadataEnity createMetadata(Map params)
-        throws IOException {
+    public DataSourceMetadataEnity createMetadata(Map params){
         URL host = null;
 
         if (params.containsKey(SERVER_URL.key)) {

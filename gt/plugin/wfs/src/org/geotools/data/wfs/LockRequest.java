@@ -14,12 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on Sep 15, 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.geotools.data.wfs;
 
 import org.geotools.data.FeatureLock;
@@ -30,8 +24,7 @@ import java.util.Map;
 /**
  * DOCUMENT ME!
  *
- * @author polio TODO To change the template for this generated type comment go
- *         to Window - Preferences - Java - Code Style - Code Templates
+ * @author dzwiers
  */
 public class LockRequest implements FeatureLock {
     private long duration = 0;
@@ -40,6 +33,7 @@ public class LockRequest implements FeatureLock {
     private String lockId = null;
 
     private LockRequest() {
+        // should not be used
     }
 
     protected LockRequest(long duration, Map dataSets) {
@@ -57,7 +51,8 @@ public class LockRequest implements FeatureLock {
         this.filters = filters;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureLock#getAuthorization()
      */
     public String getAuthorization() {
@@ -68,17 +63,26 @@ public class LockRequest implements FeatureLock {
         lockId = auth;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureLock#getDuration()
      */
     public long getDuration() {
         return duration;
     }
 
+    /**
+     * 
+     * @return Type Names
+     */
     public String[] getTypeNames() {
         return types;
     }
 
+    /**
+     * 
+     * @return Filters
+     */
     public Filter[] getFilters() {
         return filters;
     }

@@ -1,9 +1,4 @@
-/*
- * Created on Oct 6, 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
 package org.geotools.data.wfs;
 
 import java.util.Iterator;
@@ -36,9 +31,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author dzwiers
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WFSFilterVisitor implements FilterVisitor {
 	    private Stack postStack = new Stack();
@@ -178,7 +170,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
 	     */
 	    public void visit(BetweenFilter filter) {
@@ -227,7 +220,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.CompareFilter)
 	     */
 	    public void visit(CompareFilter filter) {
@@ -263,7 +257,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(filter);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
 	     */
 	    public void visit(GeometryFilter filter) {
@@ -459,7 +454,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(filter);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
 	     */
 	    public void visit(LikeFilter filter) {
@@ -483,7 +479,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(filter);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
 	     */
 	    public void visit(LogicFilter filter) {
@@ -566,7 +563,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        }
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
 	     */
 	    public void visit(NullFilter filter) {
@@ -588,7 +586,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(filter);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FidFilter)
 	     */
 	    public void visit(FidFilter filter) {
@@ -600,7 +599,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(filter);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
 	     */
 	    public void visit(AttributeExpression expression) {
@@ -625,7 +625,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(expression);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
 	     */
 	    public void visit(Expression expression) {
@@ -634,7 +635,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	            "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)");
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
 	     */
 	    public void visit(LiteralExpression expression) {
@@ -644,7 +646,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(expression);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
 	     */
 	    public void visit(MathExpression expression) {
@@ -679,7 +682,8 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(expression);
 	    }
 	
-	    /* (non-Javadoc)
+	    /**
+	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
 	     */
 	    public void visit(FunctionExpression expression) {
@@ -713,6 +717,12 @@ public class WFSFilterVisitor implements FilterVisitor {
 	        preStack.push(expression);
 	    }
 	
+	    /**
+	     * 
+	     * @param filter
+	     * @return Or Filter
+	     * @throws IllegalFilterException
+	     */
 	    public Filter translateOr(LogicFilter filter)
 	        throws IllegalFilterException {
 	        if (filter.getFilterType() != FilterType.LOGIC_OR) {

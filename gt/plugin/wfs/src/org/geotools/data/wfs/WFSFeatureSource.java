@@ -14,12 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on 28-Sep-2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.geotools.data.wfs;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -43,8 +37,7 @@ import java.io.IOException;
 /**
  * DOCUMENT ME!
  *
- * @author dzwiers TODO To change the template for this generated type comment
- *         go to Window - Preferences - Java - Code Style - Code Templates
+ * @author dzwiers 
  */
 public class WFSFeatureSource extends AbstractFeatureSource {
     protected WFSDataStore ds;
@@ -55,115 +48,143 @@ public class WFSFeatureSource extends AbstractFeatureSource {
         this.ft = ft;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#getDataStore()
      */
     public DataStore getDataStore() {
         return ds;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#addFeatureListener(org.geotools.data.FeatureListener)
      */
     public void addFeatureListener(FeatureListener listener) {
         ds.listenerManager.addFeatureListener(this, listener);
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#removeFeatureListener(org.geotools.data.FeatureListener)
      */
     public void removeFeatureListener(FeatureListener listener) {
         ds.listenerManager.removeFeatureListener(this, listener);
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#getSchema()
      */
     public FeatureType getSchema() {
         return ft;
     }
 
+    /**
+     * 
+     * @see org.geotools.data.FeatureSource#getBounds()
+     */
     public Envelope getBounds() throws IOException {
         return getBounds((ft == null) ? Query.ALL
                                       : new DefaultQuery(ft.getTypeName()));
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#getBounds(org.geotools.data.Query)
      */
     public Envelope getBounds(Query query) throws IOException {
         return ds.getBounds(namedQuery(query));
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
-    public FeatureResults getFeatures() throws IOException {
+    public FeatureResults getFeatures(){
         return getFeatures(new DefaultQuery(ft.getTypeName(), Filter.NONE));
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
-    public FeatureResults getFeatures(Filter filter) throws IOException {
+    public FeatureResults getFeatures(Filter filter){
         return getFeatures(new DefaultQuery(ft.getTypeName(), filter));
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
     public FeatureResults getFeatures(Query query) {
         return new WFSFeatureResults(this, query);
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.AbstractFeatureSource#getTransaction()
      */
     public Transaction getTransaction() {
         return Transaction.AUTO_COMMIT;
     }
 
+    /**
+     * 
+     * @author dzwiers
+     */
     public static class WFSFeatureResults implements FeatureResults {
         private WFSFeatureSource fs;
         private Query query;
 
         private WFSFeatureResults() {
+            // should not be used
         }
 
+        /**
+         * 
+         * @param fs
+         * @param query
+         */
         public WFSFeatureResults(WFSFeatureSource fs, Query query) {
             this.query = query;
             this.fs = fs;
         }
 
-        /* (non-Javadoc)
+        /**
+         * 
          * @see org.geotools.data.FeatureResults#getSchema()
          */
-        public FeatureType getSchema() throws IOException {
+        public FeatureType getSchema(){
             return fs.ft;
         }
 
-        /* (non-Javadoc)
+        /**
+         * 
          * @see org.geotools.data.FeatureResults#reader()
          */
         public FeatureReader reader() throws IOException {
             return fs.ds.getFeatureReader(query, fs.getTransaction());
         }
 
-        /* (non-Javadoc)
+        /**
+         * 
          * @see org.geotools.data.FeatureResults#getBounds()
          */
         public Envelope getBounds() throws IOException {
             return fs.getBounds(query);
         }
 
-        /* (non-Javadoc)
+        /**
+         * 
          * @see org.geotools.data.FeatureResults#getCount()
          */
         public int getCount() throws IOException {
             return fs.getCount(query);
         }
 
-        /* (non-Javadoc)
+        /**
+         * 
          * @see org.geotools.data.FeatureResults#collection()
          */
         public FeatureCollection collection() throws IOException {

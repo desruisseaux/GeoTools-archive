@@ -14,12 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on 21-Sep-2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.geotools.data.wfs;
 
 import org.geotools.filter.FidFilter;
@@ -29,24 +23,40 @@ import org.xml.sax.SAXException;
 /**
  * DOCUMENT ME!
  *
- * @author dzwiers TODO To change the template for this generated type comment
- *         go to Window - Preferences - Java - Code Style - Code Templates
+ * @author dzwiers
  */
 public class TransactionResult {
+    /**
+     * no status
+     */
     public static final int NO_STATUS = 0;
+    /**
+     * success
+     */
     public static final int SUCCESS = 1;
+    /**
+     * failed
+     */
     public static final int FAILED = 2;
+    /**
+     * partial
+     */
     public static final int PARTIAL = 4;
     private FidFilter insertResult;
     private int status;
 
-    //	private String locator;
-    //	private String message;
     private SAXException error;
 
     private TransactionResult() {
+        // should not be used
     }
 
+    /**
+     * 
+     * @param status
+     * @param insertResult
+     * @param error
+     */
     public TransactionResult(int status, FidFilter insertResult,
         SAXException error) {
         this.status = status;
@@ -54,7 +64,13 @@ public class TransactionResult {
         this.error = error;
     }
 
-    // locator nullable
+    /**
+     * 
+     * @param status
+     * @param insertResult
+     * @param locator nullable
+     * @param message
+     */
     public TransactionResult(int status, FidFilter insertResult,
         String locator, String message) {
         this.status = status;
@@ -63,6 +79,11 @@ public class TransactionResult {
                 + ((locator == null) ? "" : locator));
     }
 
+    /**
+     * 
+     * @param s
+     * @return one of the constant status'
+     */
     public static int parseStatus(String s) {
         if ("SUCCESS".equalsIgnoreCase(s)) {
             return SUCCESS;
@@ -79,6 +100,11 @@ public class TransactionResult {
         return NO_STATUS;
     }
 
+    /**
+     * 
+     * @param i
+     * @return String representation of the constant value in i
+     */
     public static String printStatus(int i) {
         switch (i) {
         case SUCCESS:

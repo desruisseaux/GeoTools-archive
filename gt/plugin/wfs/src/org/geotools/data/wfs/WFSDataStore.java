@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -412,55 +413,9 @@ public class WFSDataStore extends AbstractDataStore {
 
         return ft;
     }
-
-    /**
-     * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
-     */
-
-    //    protected FeatureReader getFeatureReader(String typeName) throws IOException {
-    //        WFSFeatureReader t = null;
-    //        if((protos & POST_FIRST) == POST_FIRST && t == null){
-    //            try {
-    //                t = getFeatureReaderPost(typeName,null);
-    //            } catch (SAXException e) {
-    //                logger.warning(e.toString());
-    //                throw new IOException(e.toString());
-    //            }
-    //        }
-    //
-    //        if((protos & GET_FIRST) == GET_FIRST && t == null)
-    //            try {
-    //                t = getFeatureReaderGet(typeName,null);
-    //            } catch (SAXException e) {
-    //                logger.warning(e.toString());
-    //                throw new IOException(e.toString());
-    //            }
-    //        
-    //        if((protos & POST_OK) == POST_OK && t == null)
-    //            try {
-    //                t = getFeatureReaderPost(typeName,null);
-    //            } catch (SAXException e) {
-    //                logger.warning(e.toString());
-    //                throw new IOException(e.toString());
-    //            }
-    //
-    //        if((protos & GET_OK) == GET_OK && t == null)
-    //            try {
-    //                t = getFeatureReaderGet(typeName,null);
-    //            } catch (SAXException e) {
-    //                logger.warning(e.toString());
-    //                throw new IOException(e.toString());
-    //            }
-    //            
-    //        if(t.hasNext()){ // opportunity to throw exception
-    //            if(t.getFeatureType()!=null)
-    //                return t;
-    //            throw new IOException("There are features but no feature type ... odd");
-    //        }
-    //        return null;
-    //    }
+    
     private WFSFeatureReader getFeatureReaderGet(Query request,
-        Transaction transaction) throws SAXException, IOException {
+        Transaction transaction) throws UnsupportedEncodingException, IOException, SAXException{
         URL getUrl = capabilities.getGetFeature().getGet();
 
         if (getUrl == null) {
@@ -666,6 +621,9 @@ public class WFSDataStore extends AbstractDataStore {
         return getFeatureReader(query, Transaction.AUTO_COMMIT);
     }
 
+    /**
+     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query, org.geotools.data.Transaction)
+     */
     public FeatureReader getFeatureReader(Query query, Transaction transaction)
         throws IOException {
         WFSFeatureReader t = null;
@@ -810,7 +768,8 @@ public class WFSDataStore extends AbstractDataStore {
 		}
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
     public FeatureSource getFeatureSource(String typeName)
@@ -833,6 +792,12 @@ public class WFSDataStore extends AbstractDataStore {
         	// not called
         }
 
+        /**
+         * 
+         * @param user
+         * @param pass
+         * @param host
+         */
         public WFSAuthenticator(String user, String pass, URL host) {
             pa = new PasswordAuthentication(user, pass.toCharArray());
             this.host = host;

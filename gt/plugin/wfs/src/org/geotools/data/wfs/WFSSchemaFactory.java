@@ -46,6 +46,10 @@ public class WFSSchemaFactory extends SchemaFactory {
     }
 
     protected static class WFSXSISAXHandler extends XSISAXHandler {
+        /**
+         * 
+         * @param uri
+         */
         public WFSXSISAXHandler(URI uri) {
             super(uri);
             rootHandler = new WFSRootHandler(uri);
@@ -53,12 +57,24 @@ public class WFSSchemaFactory extends SchemaFactory {
     }
 
     protected static class WFSRootHandler extends RootHandler {
+        /**
+         * Comment for <code>serialVersionUID</code>
+         */
+        private static final long serialVersionUID = "org.geotools.data.wfs.WFSSchemaFactory.WFSRootHandler".hashCode();
         private ServiceExceptionReportHandler se = null;
 
+        /**
+         * 
+         * @param uri
+         */
         public WFSRootHandler(URI uri) {
             super(uri);
         }
 
+        /**
+         * 
+         * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
+         */
         public XSIElementHandler getHandler(String namespaceURI,
             String localName) throws SAXException {
             XSIElementHandler r = null;
@@ -82,6 +98,10 @@ public class WFSSchemaFactory extends SchemaFactory {
             return null;
         }
 
+        /**
+         * 
+         * @see org.geotools.xml.handlers.xsi.RootHandler#getSchema()
+         */
         public Schema getSchema() throws SAXException {
             if (se != null) {
                 if (se.getException() != null) {
@@ -94,6 +114,10 @@ public class WFSSchemaFactory extends SchemaFactory {
     }
 
     private static class ServiceExceptionReportHandler extends XSIElementHandler {
+        /**
+         * Comment for <code>serialVersionUID</code>
+         */
+        private static final long serialVersionUID = "org.geotools.data.wfs.WFSSchemaFactory.ServiceExceptionReportHandler".hashCode();
         private ServiceException exception;
         private boolean inside = false;
 
@@ -112,8 +136,7 @@ public class WFSSchemaFactory extends SchemaFactory {
          * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
          *      java.lang.String)
          */
-        public void endElement(String namespaceURI, String localName)
-            throws SAXException {
+        public void endElement(String namespaceURI, String localName){
             inside = false;
         }
 
@@ -122,7 +145,7 @@ public class WFSSchemaFactory extends SchemaFactory {
          *      java.lang.String, org.xml.sax.Attributes)
          */
         public void startElement(String namespaceURI, String localName,
-            Attributes attr) throws SAXException {
+            Attributes attr){
             if ("ServiceException".equalsIgnoreCase(localName)) {
                 inside = true;
 
@@ -147,7 +170,7 @@ public class WFSSchemaFactory extends SchemaFactory {
         /**
          * @see org.geotools.xml.XSIElementHandler#characters(java.lang.String)
          */
-        public void characters(String text) throws SAXException {
+        public void characters(String text){
             if (inside) {
                 exception = new ServiceException(text, exception.getCode(),
                         exception.getLocator());
@@ -159,7 +182,7 @@ public class WFSSchemaFactory extends SchemaFactory {
          *      java.lang.String)
          */
         public XSIElementHandler getHandler(String namespaceURI,
-            String localName) throws SAXException {
+            String localName){
             if ("ServiceException".equalsIgnoreCase(localName)
                     && FilterSchema.NAMESPACE.toString().equalsIgnoreCase(namespaceURI)) {
                 return this;

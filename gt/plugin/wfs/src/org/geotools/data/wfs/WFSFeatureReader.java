@@ -58,6 +58,15 @@ public class WFSFeatureReader extends FCBuffer {
         ts = trans;
     }
 
+    /**
+     * 
+     * @param document
+     * @param capacity
+     * @param timeout
+     * @param transaction
+     * @return WFSFeatureReader
+     * @throws SAXException
+     */
     public static FeatureReader getFeatureReader(URI document, int capacity,
         int timeout, WFSTransactionState transaction) throws SAXException {
         HttpURLConnection hc;
@@ -76,6 +85,15 @@ public class WFSFeatureReader extends FCBuffer {
         }
     }
 
+    /**
+     * 
+     * @param is
+     * @param capacity
+     * @param timeout
+     * @param transaction
+     * @return WFSFeatureReader
+     * @throws SAXException
+     */
     public static WFSFeatureReader getFeatureReader(InputStream is,
         int capacity, int timeout, WFSTransactionState transaction)
         throws SAXException {
@@ -119,7 +137,8 @@ public class WFSFeatureReader extends FCBuffer {
         }
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureReader#hasNext()
      */
     public boolean hasNext() throws IOException {
@@ -224,7 +243,8 @@ public class WFSFeatureReader extends FCBuffer {
         return next != null;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature next()
@@ -244,6 +264,10 @@ public class WFSFeatureReader extends FCBuffer {
     }
     
     private FeatureType ft = null;
+    /**
+     * 
+     * @see org.geotools.data.FeatureReader#getFeatureType()
+     */
     public FeatureType getFeatureType() {
         if(ft!=null)
             return ft;

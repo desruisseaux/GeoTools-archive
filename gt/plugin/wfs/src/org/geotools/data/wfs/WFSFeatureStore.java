@@ -14,12 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on 28-Sep-2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.geotools.data.wfs;
 
 import org.geotools.data.FeatureReader;
@@ -45,17 +39,22 @@ import java.util.Set;
 /**
  * DOCUMENT ME!
  *
- * @author dzwiers TODO To change the template for this generated type comment
- *         go to Window - Preferences - Java - Code Style - Code Templates
+ * @author dzwiers 
  */
 public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
     protected Transaction trans = Transaction.AUTO_COMMIT;
 
+    /**
+     * 
+     * @param ds
+     * @param ft
+     */
     public WFSFeatureStore(WFSDataStore ds, FeatureType ft) {
         super(ds, ft);
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.AbstractFeatureSource#getTransaction()
      */
     public Transaction getTransaction() {
@@ -110,7 +109,8 @@ e.printStackTrace();
         return r;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureStore#removeFeatures(org.geotools.filter.Filter)
      */
     public void removeFeatures(Filter filter) throws IOException {
@@ -129,7 +129,8 @@ e.printStackTrace();
         }
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType[], java.lang.Object[], org.geotools.filter.Filter)
      */
     public void modifyFeatures(AttributeType[] type, Object[] value,
@@ -155,7 +156,8 @@ e.printStackTrace();
         }
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType, java.lang.Object, org.geotools.filter.Filter)
      */
     public void modifyFeatures(AttributeType type, Object value, Filter filter)
@@ -164,7 +166,8 @@ e.printStackTrace();
             filter);
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureStore#setFeatures(org.geotools.data.FeatureReader)
      */
     public void setFeatures(FeatureReader reader) throws IOException {
@@ -193,7 +196,8 @@ e.printStackTrace();
         }
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.FeatureStore#setTransaction(org.geotools.data.Transaction)
      */
     public void setTransaction(Transaction transaction) {

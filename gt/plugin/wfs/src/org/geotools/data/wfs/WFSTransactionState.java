@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -59,15 +58,19 @@ public class WFSTransactionState implements State {
     private LinkedList actions = new LinkedList();
 
     private WFSTransactionState() {
+        // should not be used
     }
 
+    /**
+     * 
+     * @param ds
+     */
     public WFSTransactionState(WFSDataStore ds) {
         this.ds = ds;
     }
 
-    //	private String authId;
-
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.Transaction.State#setTransaction(org.geotools.data.Transaction)
      */
     public void setTransaction(Transaction transaction) {
@@ -79,18 +82,25 @@ public class WFSTransactionState implements State {
         actions = new LinkedList();
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.Transaction.State#addAuthorization(java.lang.String)
      */
-    public void addAuthorization(String AuthID) throws IOException {
+    public void addAuthorization(String AuthID){
         //		authId = AuthID;
     }
 
+    /**
+     * Not implemented
+     * 
+     * @return String
+     */
     public String getLockId() {
         return null; // add this later
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.Transaction.State#commit()
      */
     public void commit() throws IOException {
@@ -199,22 +209,35 @@ public class WFSTransactionState implements State {
         return ft;
     }
 
-    /* (non-Javadoc)
+    /**
+     * 
      * @see org.geotools.data.Transaction.State#rollback()
      */
-    public void rollback() throws IOException {
+    public void rollback(){
         fids = null;
         actions = new LinkedList();
     }
 
+    /**
+     * 
+     * @return Fid Set
+     */
     public String[] getFids() {
         return fids;
     }
 
+    /**
+     * 
+     * @param a
+     */
     public void addAction(Action a) {
         actions.add(a);
     }
 
+    /**
+     * 
+     * @return List of Actions
+     */
     public List getActions() {
         return new LinkedList(actions);
     }
