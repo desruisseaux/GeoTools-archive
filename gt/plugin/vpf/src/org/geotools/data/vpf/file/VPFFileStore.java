@@ -141,7 +141,7 @@ public class VPFFileStore extends AbstractDataStore {
         ArrayList matches = new ArrayList();
         matches.add("");  // Need to start with something in the list
         StringTokenizer st = new StringTokenizer(pathName, File.separator);
-        while (st.hasMoreTokens()) {
+        while (st.hasMoreTokens() && !matches.isEmpty()) {
             String curr = st.nextToken();
             String currUpper = curr.toUpperCase();
             String currLower = curr.toLowerCase();
@@ -152,20 +152,23 @@ public class VPFFileStore extends AbstractDataStore {
             for(Iterator it = matches.iterator(); it.hasNext(); ) {
                 String match = (String)it.next();
                 String tmp = match + File.separator + curr;
-                
+
                 if (new File(tmp).exists())
                     newMatches.add(tmp);
+                else {
+                    // For performance reasons only do the upper and lower case checks
+                    // if the "as-is" check fails.  
+                    if (useUpper) {
+                        tmp = match + File.separator + currUpper;
+                        if (new File(tmp).exists())
+                            newMatches.add(tmp);
+                    }
                 
-                if (useUpper) {
-                    tmp = match + File.separator + currUpper;
-                    if (new File(tmp).exists())
-                        newMatches.add(tmp);
-                }
-                
-                if (useLower) {
-                    tmp = match + File.separator + currLower;
-                    if (new File(tmp).exists())
-                        newMatches.add(tmp);
+                    if (useLower) {
+                        tmp = match + File.separator + currLower;
+                        if (new File(tmp).exists())
+                            newMatches.add(tmp);
+                    }
                 }
             }
             matches = newMatches;
