@@ -60,12 +60,11 @@ public class FilteringFeatureWriter implements FeatureWriter {
             next = null;
 
             return current;
-        } else {
+        }
             // FilteringFeatureWriter Does not support the creation
             // of new content
             throw new NoSuchElementException(
                 "FeatureWriter does not have additional content");
-        }
     }
 
     public void remove() throws IOException {
@@ -139,10 +138,6 @@ public class FilteringFeatureWriter implements FeatureWriter {
                 return true; // we have a match!
             }
         }
-
-        // FilterFeatureWriter does not support adding content
-        // writer will be closed when contents are exhausted 
-        close();
 
         return false;
     }

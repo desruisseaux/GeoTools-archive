@@ -40,8 +40,6 @@ public class ShapefileDataStoreFactory
     implements FileDataStoreFactorySpi {
     public static final Param URLP = new Param("url", URL.class,
         "url to a .shp file");
-    public static final Param MEMORY_MAPPED = new Param("memory mapped buffer",
-        Boolean.class, "enable/disable the use of memory-mapped io",false);
 
     /**
      * Takes a list of params which describes how to access a restore and
@@ -86,10 +84,7 @@ public class ShapefileDataStoreFactory
         URL url = null;
         try {
             url = (URL) URLP.lookUp(params);
-            Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
-            if (mm == null)
-                mm = Boolean.TRUE;
-            ds = new ShapefileDataStore(url,mm.booleanValue());
+            ds = new ShapefileDataStore(url);
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
                 + url, mue);
@@ -108,7 +103,7 @@ public class ShapefileDataStoreFactory
      * @throws IOException DOCUMENT ME!
      * @throws UnsupportedOperationException
      */
-    public DataStore createNewDataStore(Map params) throws IOException {
+    public DataStore createNewDataStore(Map params){
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -168,7 +163,7 @@ public class ShapefileDataStoreFactory
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[] { URLP, MEMORY_MAPPED };
+        return new Param[] { URLP};
     }
 
     /**
@@ -191,7 +186,7 @@ public class ShapefileDataStoreFactory
     public DataStore createDataStore(URL url)  throws IOException{
         DataStore ds = null;
         try {
-            ds = new ShapefileDataStore(url,Boolean.TRUE.booleanValue());
+            ds = new ShapefileDataStore(url);
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
                 + url, mue);

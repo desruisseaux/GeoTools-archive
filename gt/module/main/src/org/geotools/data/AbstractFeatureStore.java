@@ -263,11 +263,10 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
         String typeName = getSchema().getTypeName();
         FeatureWriter writer = getDataStore().getFeatureWriter(typeName,
                 filter, getTransaction());
-        Feature feature;
 
         try {
             while (writer.hasNext()) {
-                feature = writer.next();
+                writer.next();
                 writer.remove();
             }
         } finally {

@@ -27,8 +27,9 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
+
+import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.AbstractAttributeIO;
-import org.geotools.data.AbstractDataStore;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.AbstractFeatureStore;
@@ -75,7 +76,6 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -85,7 +85,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.shapefile.prj.PrjFileReader;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.type.BasicFeatureTypes;
@@ -100,13 +99,12 @@ import org.opengis.referencing.FactoryException;
  * @todo fix file creation bug
  */
 public class ShapefileDataStore extends AbstractFileDataStore {
-    private final URL shpURL;
-    private final URL dbfURL;
-    private final URL shxURL;
-    private final URL prjURL;
-    private final URL xmlURL;
-    private final boolean useMemoryMappedBuffer;
-    private FeatureType schema;
+    protected final URL shpURL;
+    protected final URL dbfURL;
+    protected final URL shxURL;
+    protected final URL prjURL;
+    protected final URL xmlURL;
+    protected FeatureType schema; // read only
     
     /**
      * Creates a new instance of ShapefileDataStore.
@@ -116,11 +114,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @throws java.net.MalformedURLException If computation of related URLs
      *         (dbf,shx) fails.
      */
-    public ShapefileDataStore(URL url) throws java.net.MalformedURLException {
-        this(url, true);
-    }
-    
-    public ShapefileDataStore(URL url, boolean useMemoryMappedBuffer)
+    public ShapefileDataStore(URL url)
     throws java.net.MalformedURLException {
         String filename = null;
         
@@ -160,7 +154,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         prjURL = new URL(filename + prjext);
         xmlURL = new URL(filename + xmlext);
         
-        this.useMemoryMappedBuffer = useMemoryMappedBuffer;
     }
     
     /**
@@ -312,7 +305,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      *
      * @throws IOException DOCUMENT ME!
      */
-    private WritableByteChannel getWriteChannel(URL url)
+    protected WritableByteChannel getWriteChannel(URL url)
     throws IOException {
         WritableByteChannel channel;
 
@@ -384,13 +377,12 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             } catch (SchemaException se) {
                 throw new DataSourceException("Error creating schema", se);
             }
-        } else {
-            return super.getFeatureReader(typeName, query);
         }
+        return super.getFeatureReader(typeName, query);
     }
     
     protected FeatureReader createFeatureReader(String typeName, Reader r,
-    FeatureType readerSchema) throws SchemaException, IOException {
+    FeatureType readerSchema) throws SchemaException{
         return new org.geotools.data.FIDFeatureReader(r,
         new DefaultFIDReader(typeName), readerSchema);
     }
@@ -412,9 +404,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             atts = new AttributeType[] { schema.getDefaultGeometry() };
             
             return new Reader(atts, openShapeReader(), null);
-        } else {
-            return new Reader(atts, openShapeReader(), openDbfReader());
         }
+        return new Reader(atts, openShapeReader(), openDbfReader());
     }
     
     /**
@@ -638,11 +629,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             try {
                 shp.close();
             } catch (IOException ioe) {
+                // do nothing
             }
             
             try {
                 dbf.close();
             } catch (IOException ioe) {
+                // do nothing
             }
         }
     }
@@ -699,6 +692,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     in.close();
                 }
             } catch (IOException ioe) {
+                // do nothing
             }
         }
     }
@@ -706,9 +700,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected Envelope getBounds(Query query) throws IOException {
         if (query == Query.ALL) {
             return getBounds();
-        } else {
-            return null; // too expensive
         }
+        return null; // too expensive
+        // TODO should we just return the layer? matches the javadocs
     }
     
     /**
@@ -743,7 +737,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                         return ShapefileDataStore.this.getBounds(query);
                     }
                 };
-            } else {
+            }
                 return new AbstractFeatureStore() {
                     public DataStore getDataStore() {
                         return ShapefileDataStore.this;
@@ -767,8 +761,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                         return ShapefileDataStore.this.getBounds(query);
                     }
                 };
-            }
-        } else {
+        }
             return new AbstractFeatureSource() {
                 public DataStore getDataStore() {
                     return ShapefileDataStore.this;
@@ -791,7 +784,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     return ShapefileDataStore.this.getBounds(query);
                 }
             };
-        }
     }
     
     /**
@@ -873,9 +865,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     
                     if (row != null) {
                         return row.read(param - 1);
-                    } else {
-                        return null;
                     }
+                    return null;
             }
         }
     }
@@ -915,9 +906,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         // required header
         private int shapefileLength = 100;
         
-        // hold the defaultGeometry index in the FeatureType
-        private int defaultGeometryIdx;
-        
         // keep track of the number of records written
         private int records = 0;
         
@@ -938,7 +926,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 featureReader = createFeatureReader(typeName, attReader, schema);
                 temp = System.currentTimeMillis();
             } catch (Exception e) {
-                FeatureType schema = getSchema(typeName);
+                getSchema(); // load it
                 
                 if (schema == null) {
                     throw new IOException(
@@ -1022,8 +1010,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             {
                 GeometryAttributeType geometryAttributeType = featureType.getDefaultGeometry();
                                                                                 
-                Class featureType = geometryAttributeType.getType();
-                shapeType = JTSUtilities.getShapeType(featureType);
+                Class gat = geometryAttributeType.getType();
+                shapeType = JTSUtilities.getShapeType(gat);
             }
 
             shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);

@@ -1,7 +1,5 @@
 package org.geotools.data.mysql;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,6 +10,8 @@ import java.util.logging.Logger;
 
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
+
+import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 /**
  * Creates ConnectionPool objects for a certain MySQL database instance.
