@@ -2,8 +2,8 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-validation</name>
-  <id>validation</id>
+  <name>geotools-experimental</name>
+  <id>experiment</id>
   <currentVersion>2.1.x</currentVersion>
   <versions>
     <version>
@@ -13,12 +13,10 @@
     </version>
   </versions>
   <package>org.geotools</package>
-  <shortDescription>Validation Processor and Framework.</shortDescription>
+  <shortDescription>Geotools experiments</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>
-  Validation module (and validator batch tool) for use with geotools2.
-  This library has been ported to geotools2 as part of the VWFS project
-  sponcered by Geo Innovations.
+	Multiple interface experiments with inovative implementations
   </description>
   <developers>
     <developer>
@@ -54,11 +52,6 @@
   <dependencies>
     <dependency>
       <artifactId>main</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.1.x</version>
-    </dependency>
-    <dependency>
-      <artifactId>experiment</artifactId>
       <groupId>gt2</groupId>
       <version>2.1.x</version>
     </dependency>

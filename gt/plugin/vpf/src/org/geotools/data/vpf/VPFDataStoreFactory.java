@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.vpf.ifc.FileConstants;
@@ -104,15 +103,15 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
      *  (non-Javadoc)
      * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
      */
-    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-        if( !canProcess( params )){
-            throw new IOException( "Provided params cannot be used to connect");
-        }
-        File dir = (File) DIR.lookUp( params );
-        String parent = dir.getParent();
-        String name = dir.getName();        
-        return new DataSourceMetadataEnity( parent, name, "VPF data source access for " + dir );
-    }
+//    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//        if( !canProcess( params )){
+//            throw new IOException( "Provided params cannot be used to connect");
+//        }
+//        File dir = (File) DIR.lookUp( params );
+//        String parent = dir.getParent();
+//        String name = dir.getName();        
+//        return new DataSourceMetadataEnity( parent, name, "VPF data source access for " + dir );
+//    }
     /**
      * Creates a data store.
      * @param params A <code>Map</code> of parameters which must be verified and 

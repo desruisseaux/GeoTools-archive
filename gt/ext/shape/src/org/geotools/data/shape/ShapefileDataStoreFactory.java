@@ -21,7 +21,6 @@
 package org.geotools.data.shape;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 
 import java.io.IOException;
@@ -139,25 +138,25 @@ public class ShapefileDataStoreFactory
         return "ESRI(tm) Shapefiles (*.shp)";
     }
 
-    public DataSourceMetadataEnity createMetadata( Map params )
-            throws IOException {
-        
-        URL url = (URL) URLP.lookUp(params);
-        Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
-        Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);
-        
-        String server;
-        String name;
-        if( url.getProtocol().equals("file")){
-            server = "localhost";
-            name = url.getPath();
-        }
-        else {
-            server = url.getHost()+":"+url.getPort();
-            name = url.getFile();
-        }
-        return new DataSourceMetadataEnity( server, name, "Shapefile access for "+url );
-    }
+//    public DataSourceMetadataEnity createMetadata( Map params )
+//            throws IOException {
+//        
+//        URL url = (URL) URLP.lookUp(params);
+//        Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
+//        Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);
+//        
+//        String server;
+//        String name;
+//        if( url.getProtocol().equals("file")){
+//            server = "localhost";
+//            name = url.getPath();
+//        }
+//        else {
+//            server = url.getHost()+":"+url.getPort();
+//            name = url.getFile();
+//        }
+//        return new DataSourceMetadataEnity( server, name, "Shapefile access for "+url );
+//    }
     /**
      * Test to see if this datastore is available, if it has all the
      * appropriate libraries to construct a datastore.  This datastore just

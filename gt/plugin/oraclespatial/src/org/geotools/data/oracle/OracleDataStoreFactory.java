@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFactorySpi.Param;
@@ -199,14 +198,14 @@ public class OracleDataStoreFactory
     public String getDescription() {
         return "Oracle Spatial Database";
     }
-	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-	    String host = (String) HOST.lookUp( params );
-        String port = (String) PORT.lookUp( params );
-        String instance = (String) INSTANCE.lookUp( params );
-        String user = (String) USER.lookUp( params );
-        String schema = (String) SCHEMA.lookUp( params ); // checks uppercase        
-        return new DataSourceMetadataEnity( host+":"+port, instance, "Connect to oracle using schema '"+schema+"' as  "+user );
-	}
+//	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//	    String host = (String) HOST.lookUp( params );
+//        String port = (String) PORT.lookUp( params );
+//        String instance = (String) INSTANCE.lookUp( params );
+//        String user = (String) USER.lookUp( params );
+//        String schema = (String) SCHEMA.lookUp( params ); // checks uppercase        
+//        return new DataSourceMetadataEnity( host+":"+port, instance, "Connect to oracle using schema '"+schema+"' as  "+user );
+//	}
     /**
      * Returns whether the OracleDataStoreFactory would actually be able to
      * generate a DataStore.  Depends on whether the appropriate libraries

@@ -19,7 +19,6 @@ package org.geotools.data.vpf.file;
 import java.io.IOException;
 import java.util.Map;
 
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
@@ -53,11 +52,11 @@ public class VPFFileFactory implements DataStoreFactorySpi {
     /* (non-Javadoc)
      * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
      */
-    public DataSourceMetadataEnity createMetadata(Map params)
-        throws IOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    public DataSourceMetadataEnity createMetadata(Map params)
+//        throws IOException {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 
     /* (non-Javadoc)
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)

@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
@@ -29,7 +28,7 @@ import org.geotools.data.DataStoreFactorySpi;
 /**
  * DOCUMENT ME!
  *
- * @author Gabriel Roldán
+ * @author Gabriel Roldï¿½n
  * @version $Id: ArcSDEDataStoreFactory.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
@@ -148,22 +147,22 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     public String getDisplayName() {
     	return "ArcSDE";
 	}
-    /** Interpret connection params as a metadata entity */
-    public DataSourceMetadataEnity createMetadata( Map params )
-            throws IOException {
-        
-        ConnectionConfig config;
-        try {
-            config = new ConnectionConfig(params);
-        } catch (NullPointerException ex) {
-            throw new IOException( "Cannot use provided params to connect" );
-        } catch (IllegalArgumentException ex) {
-            throw new DataSourceException( "Cannot use provided params to connect:"+ex.getMessage(), ex );
-        }        
-        String description =
-            "Connection to "+config.getDatabaseName()+ " at "+config.getServerName()+":"+config.getPortNumber()+ " as "+ config.getUserName();
-        return new DataSourceMetadataEnity( config.getServerName(), config.getDatabaseName(), description );
-    }
+//    /** Interpret connection params as a metadata entity */
+//    public DataSourceMetadataEnity createMetadata( Map params )
+//            throws IOException {
+//        
+//        ConnectionConfig config;
+//        try {
+//            config = new ConnectionConfig(params);
+//        } catch (NullPointerException ex) {
+//            throw new IOException( "Cannot use provided params to connect" );
+//        } catch (IllegalArgumentException ex) {
+//            throw new DataSourceException( "Cannot use provided params to connect:"+ex.getMessage(), ex );
+//        }        
+//        String description =
+//            "Connection to "+config.getDatabaseName()+ " at "+config.getServerName()+":"+config.getPortNumber()+ " as "+ config.getUserName();
+//        return new DataSourceMetadataEnity( config.getServerName(), config.getDatabaseName(), description );
+//    }
     /**
      * A human friendly name for this data source factory
      *

@@ -115,21 +115,21 @@ public interface DataStoreFactorySpi extends Factory {
      */
     DataStore createDataStore(Map params) throws IOException;
 
-    /**
-     * Construct a simple MetadataEntity providing internationlization information
-     * for the data source that *would* be created by createDataStore.
-     * <p>
-     * Suitable for use by CatalogEntry, unknown if this will make
-     * a DataStore behind the scenes or not. It is possible it will
-     * communicate with the data source though (hense the IOException).
-     * </p>
-     * @param params The full set of information needed to construct a live
-     *        data store
-     * @return MetadataEntity with descriptive information (including
-     *         internationlization support). 
-     * @throws IOException
-     */
-    DataSourceMetadataEnity createMetadata( Map params ) throws IOException;
+//    /**
+//     * Construct a simple MetadataEntity providing internationlization information
+//     * for the data source that *would* be created by createDataStore.
+//     * <p>
+//     * Suitable for use by CatalogEntry, unknown if this will make
+//     * a DataStore behind the scenes or not. It is possible it will
+//     * communicate with the data source though (hense the IOException).
+//     * </p>
+//     * @param params The full set of information needed to construct a live
+//     *        data store
+//     * @return MetadataEntity with descriptive information (including
+//     *         internationlization support). 
+//     * @throws IOException
+//     */
+//    DataSourceMetadataEnity createMetadata( Map params ) throws IOException;
     
     /**
      * Construct a <b>new</b> data source using the params specified.

@@ -18,7 +18,6 @@ package org.geotools.data.geometryless;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.jdbc.ConnectionPool;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -307,13 +306,13 @@ public class LocationsXYDataStoreFactory
         return "GeometrylessJDBC";
     }
     
-    	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-	    String host = (String) HOST.lookUp(params);
-        String user = (String) USER.lookUp(params);
-        String port = (String) PORT.lookUp(params);
-        String database = (String) DATABASE.lookUp(params);
-        return new DataSourceMetadataEnity( host+":"+port, database, "Connection to "+getDisplayName()+" on "+host+" as "+user );
-	}
+//    	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//	    String host = (String) HOST.lookUp(params);
+//        String user = (String) USER.lookUp(params);
+//        String port = (String) PORT.lookUp(params);
+//        String database = (String) DATABASE.lookUp(params);
+//        return new DataSourceMetadataEnity( host+":"+port, database, "Connection to "+getDisplayName()+" on "+host+" as "+user );
+//	}
     /**
      * Test to see if this datastore is available, if it has all the
      * appropriate libraries to construct a datastore.  This datastore just

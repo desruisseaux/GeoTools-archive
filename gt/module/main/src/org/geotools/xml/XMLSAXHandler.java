@@ -16,17 +16,6 @@
  */
 package org.geotools.xml;
 
-import org.geotools.xml.handlers.DocumentHandler;
-import org.geotools.xml.handlers.ElementHandlerFactory;
-import org.geotools.xml.handlers.IgnoreHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringBufferInputStream;
 import java.net.URI;
@@ -37,6 +26,16 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.xml.handlers.DocumentHandler;
+import org.geotools.xml.handlers.ElementHandlerFactory;
+import org.geotools.xml.handlers.IgnoreHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 
 /**
@@ -71,6 +70,16 @@ public class XMLSAXHandler extends DefaultHandler {
     // the stack of handlers
     private Stack handlers = new Stack();
 
+    /**
+     * 
+     * TODO summary sentence for resolveEntity ...
+     * 
+     * @see org.xml.sax.EntityResolver#resolveEntity(java.lang.String, java.lang.String)
+     * @param pubId
+     * @param sysId
+     * @return InputSource
+     * @throws SAXException
+     */
     public InputSource resolveEntity( String pubId, String sysId ) throws SAXException {
 //System.out.println("***"+pubId+"*"+sysId+"*");
         // avoid dtd files
@@ -134,24 +143,21 @@ public class XMLSAXHandler extends DefaultHandler {
     /**
      * Implementation of endDocument.
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ContentHandler#endDocument()
      */
-    public void endDocument() throws SAXException {
+    public void endDocument(){
         document = ((DocumentHandler) handlers.pop());
     }
 
     /**
      * Implementation of startDocument.
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ContentHandler#startDocument()
      */
-    public void startDocument() throws SAXException {
+    public void startDocument(){
         try {
-            handlers.push(new DocumentHandler(ehf));
+            document = new DocumentHandler(ehf);
+            handlers.push(document);
         } catch (RuntimeException e) {
             e.printStackTrace();
             throw e;
@@ -334,7 +340,7 @@ public class XMLSAXHandler extends DefaultHandler {
      * parse ...
      * </p>
      *
-     * @return
+     * @return Object parsed
      *
      * @throws SAXException
      *
@@ -349,11 +355,9 @@ public class XMLSAXHandler extends DefaultHandler {
      *
      * @param exception
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
      */
-    public void error(SAXParseException exception) throws SAXException {
+    public void error(SAXParseException exception){
         logger.severe("ERROR " + exception.getMessage());
         logger.severe("col " + locator.getColumnNumber() + ", line "
             + locator.getLineNumber());
@@ -381,11 +385,9 @@ public class XMLSAXHandler extends DefaultHandler {
      *
      * @param exception
      *
-     * @throws SAXException
-     *
      * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
      */
-    public void warning(SAXParseException exception) throws SAXException {
+    public void warning(SAXParseException exception){
         logger.warning("WARN " + exception.getMessage());
         logger.severe("col " + locator.getColumnNumber() + ", line "
             + locator.getLineNumber());
@@ -404,7 +406,7 @@ public class XMLSAXHandler extends DefaultHandler {
     /**
      * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
      */
-    public void endPrefixMapping(String prefix) throws SAXException {
+    public void endPrefixMapping(String prefix){
         ehf.endPrefixMapping(prefix);
     }
 
@@ -412,8 +414,7 @@ public class XMLSAXHandler extends DefaultHandler {
      * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
      *      java.lang.String)
      */
-    public void startPrefixMapping(String prefix, String uri)
-        throws SAXException {
+    public void startPrefixMapping(String prefix, String uri){
         if ("http://www.w3.org/2001/XMLSchema-instance".equals(uri)) {
             return;
         }

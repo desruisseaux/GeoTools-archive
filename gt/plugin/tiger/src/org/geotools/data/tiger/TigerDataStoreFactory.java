@@ -19,7 +19,6 @@
  */
 package org.geotools.data.tiger;
 
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import java.io.File;
@@ -117,13 +116,13 @@ public class TigerDataStoreFactory implements DataStoreFactorySpi {
     public static final Param DIRECTORY = new Param("directory", File.class,
     "Directory containing TIGER/Line 2002 files.");
 
-    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-        if( !canProcess( params )){
-            throw new IOException( "Provided params cannot be used to connect");
-        }
-        File dir = (File) DIRECTORY.lookUp( params );
-        return new DataSourceMetadataEnity( dir, "Tiger data source access for " + dir );
-    }
+//    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//        if( !canProcess( params )){
+//            throw new IOException( "Provided params cannot be used to connect");
+//        }
+//        File dir = (File) DIRECTORY.lookUp( params );
+//        return new DataSourceMetadataEnity( dir, "Tiger data source access for " + dir );
+//    }
     /**
      * getParametersInfo
      *

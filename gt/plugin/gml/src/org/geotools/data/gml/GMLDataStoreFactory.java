@@ -7,7 +7,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStoreFactorySpi;
 
@@ -51,15 +50,15 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
     public String getDescription() {
         return "Read only data store for validating gml 2.x data";
     }
-    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-        URL url = (URL) URLP.lookUp( params );
-        if( "file".equals(url.getProtocol())){
-            String parent = url.getPath();
-            String name = url.getFile();
-            return new DataSourceMetadataEnity( parent, name, "Access to GML file "+url.toString());
-        }
-        return new DataSourceMetadataEnity( url.getHost(), url.getFile(),  "Access to GML "+url.toString());
-    }
+//    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//        URL url = (URL) URLP.lookUp( params );
+//        if( "file".equals(url.getProtocol())){
+//            String parent = url.getPath();
+//            String name = url.getFile();
+//            return new DataSourceMetadataEnity( parent, name, "Access to GML file "+url.toString());
+//        }
+//        return new DataSourceMetadataEnity( url.getHost(), url.getFile(),  "Access to GML "+url.toString());
+//    }
 //    public static final Param DIRECTORY = new Param("directory", File.class,
 //            "Directory containing gml files", true);
 

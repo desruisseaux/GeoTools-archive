@@ -17,7 +17,6 @@
 package org.geotools.data.wfs;
 
 import org.geotools.data.AbstractDataStoreFactory;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.xml.sax.SAXException;
 import java.io.IOException;
@@ -114,22 +113,6 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory { //implements
         }
 
         return createNewDataStore(params);
-    }
-
-    /**
-     * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
-     */
-    public DataSourceMetadataEnity createMetadata(Map params){
-        URL host = null;
-
-        if (params.containsKey(SERVER_URL.key)) {
-            host = (URL) params.get(SERVER_URL.key);
-        } else {
-            host = ((URL) params.get(GET_CAPABILITIES_URL.key));
-        }
-
-        return new DataSourceMetadataEnity(host.toString(), getDisplayName(),
-            getDescription());
     }
 
     /**

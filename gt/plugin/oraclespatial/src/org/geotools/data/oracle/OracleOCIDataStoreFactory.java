@@ -18,7 +18,6 @@ package org.geotools.data.oracle;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.jdbc.ConnectionPool;
 import java.io.IOException;
@@ -200,12 +199,12 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
         return "Oracle Spatial w/ OCI (thick) connection";
     }
 
-	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-	    String alias = (String) ALIAS.lookUp( params );
-         String user = (String) USER.lookUp( params );
-        String schema = (String) SCHEMA.lookUp( params ); // checks uppercase        
-        return new DataSourceMetadataEnity( alias, alias, "Connect to oracle using schema '"+schema+"' as  "+user );
-	}
+//	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//	    String alias = (String) ALIAS.lookUp( params );
+//         String user = (String) USER.lookUp( params );
+//        String schema = (String) SCHEMA.lookUp( params ); // checks uppercase        
+//        return new DataSourceMetadataEnity( alias, alias, "Connect to oracle using schema '"+schema+"' as  "+user );
+//	}
 
 
     /**

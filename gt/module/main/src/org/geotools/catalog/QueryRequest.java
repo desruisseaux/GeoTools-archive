@@ -3,7 +3,7 @@ package org.geotools.catalog;
 import java.io.IOException;
 import java.net.URI;
 
-import org.geotools.expr.Expr;
+//import org.geotools.expr.Expr;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -44,15 +44,19 @@ import com.vividsolutions.jts.geom.Geometry;
  * @version 2.1
  */
 public class QueryRequest {
-	Expr expr;
+//	Expr expr;
     public static QueryRequest ALL = new QueryRequest( null ) {
         public boolean accepts( MetadataEntity meta ) {
             return true;
         }
     };
-    public QueryRequest( Expr expr ){
-		this.expr = expr;
-	}	
+//  public QueryRequest( Expr expr ){
+//	this.expr = expr;
+//}	
+    public QueryRequest( Filter expr ){
+        this.filter = expr;
+    }
+    Filter filter;
     public boolean match( Object bean ) {
         if( bean instanceof MetadataEntity ) {
             return matchMetadata( (MetadataEntity) bean );
@@ -65,14 +69,14 @@ public class QueryRequest {
         return false; // need Jese to implement XPATH bean lookup
     }
     protected boolean matchMetadata( MetadataEntity meta ) {
-        Expr query = expr.resolve( meta );
-        Filter filter;
-        try {
-            filter = query.filter( fakeFeatureType );
+//        Expr query = expr.resolve( meta );
+//        Filter filter;
+//        try {
+//            filter = query.filter( fakeFeatureType );
             return filter.contains( fakeFeature );            
-        } catch (IOException e) {
-            return false;
-        }        
+//        } catch (IOException e) {
+//            return false;
+//        }        
 	}
 	static FeatureType fakeFeatureType = new FeatureType(){
 		public String getNamespace() {

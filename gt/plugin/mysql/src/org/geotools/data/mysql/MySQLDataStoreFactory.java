@@ -21,7 +21,6 @@
 package org.geotools.data.mysql;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
 import java.io.IOException;
@@ -263,16 +262,16 @@ public class MySQLDataStoreFactory
         return "MySQL Database";
     }
 
-    /**
-     *
-     */
-    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-        String host = (String) HOST.lookUp(params);
-        String user = (String) USER.lookUp(params);
-        String port = (String) PORT.lookUp(params);
-        String database = (String) DATABASE.lookUp(params);
-        return new DataSourceMetadataEnity( host+"port", database, "MySQL connection to "+host+" as "+user );
-    }
+//    /**
+//     *
+//     */
+//    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//        String host = (String) HOST.lookUp(params);
+//        String user = (String) USER.lookUp(params);
+//        String port = (String) PORT.lookUp(params);
+//        String database = (String) DATABASE.lookUp(params);
+//        return new DataSourceMetadataEnity( host+"port", database, "MySQL connection to "+host+" as "+user );
+//    }
 
     /**
      * Test to see if this datastore is available, if it has all the

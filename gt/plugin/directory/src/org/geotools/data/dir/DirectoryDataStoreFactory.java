@@ -16,7 +16,6 @@
  */
 package org.geotools.data.dir;
 
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import java.io.File;
@@ -71,18 +70,18 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
         return new DirectoryDataStore(f, strs);
     }
 
-    /**
-     * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
-     */
-    public DataSourceMetadataEnity createMetadata(Map params)
-        throws IOException {
-        File url = (File) DIRECTORY.lookUp(params);
-        String parent = url.getParent();
-        String name = url.getName();
-
-        return new DataSourceMetadataEnity(parent, name,
-            "Access to Directory " + url.toString());
-    }
+//    /**
+//     * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
+//     */
+//    public DataSourceMetadataEnity createMetadata(Map params)
+//        throws IOException {
+//        File url = (File) DIRECTORY.lookUp(params);
+//        String parent = url.getParent();
+//        String name = url.getName();
+//
+//        return new DataSourceMetadataEnity(parent, name,
+//            "Access to Directory " + url.toString());
+//    }
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createNewDataStore(java.util.Map)

@@ -18,8 +18,8 @@ import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
-import org.geotools.expr.Expr;
-import org.geotools.expr.Exprs;
+//import org.geotools.expr.Expr;
+//import org.geotools.expr.Exprs;
 import org.geotools.catalog.QueryRequest;
 import org.geotools.resources.TestData;
 
@@ -83,28 +83,28 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 		assertNotNull(arcgrid);
 	}
 
-	public void testQuery()throws Exception {
-		init();
-		
-		Expr expr=Exprs.meta("Name");
-		QueryRequest query=new QueryRequest(expr);
-		
-		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
-		assertNotNull(result);
-		assertEquals(2, result.getNumEntries());
-	}
+//	public void testQuery()throws Exception {
+//		init();
+//		
+//		Expr expr=Exprs.meta("Name");
+//		QueryRequest query=new QueryRequest(expr);
+//		
+//		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
+//		assertNotNull(result);
+//		assertEquals(2, result.getNumEntries());
+//	}
 
-	public void testGetReader() throws Exception {
-		init();
-
-		Expr expr=Exprs.meta("Name");
-		QueryRequest query=new QueryRequest(expr);
-		
-		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
-		
-		GridCoverageReader reader=exchange.getReader(result.getEntry(0));
-		assertNotNull(reader);
-	}
+//	public void testGetReader() throws Exception {
+//		init();
+//
+//		Expr expr=Exprs.meta("Name");
+//		QueryRequest query=new QueryRequest(expr);
+//		
+//		QueryResult result=exchange.query(new DefaultQueryDefinition(query));
+//		
+//		GridCoverageReader reader=exchange.getReader(result.getEntry(0));
+//		assertNotNull(reader);
+//	}
 
 	public void testGetWriter() throws Exception{
 		init();

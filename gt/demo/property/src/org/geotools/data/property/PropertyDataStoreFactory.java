@@ -1,6 +1,5 @@
 package org.geotools.data.property;
 
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import java.io.File;
@@ -40,14 +39,14 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
     public String getDescription() {
         return "Allows access to Java Property files containing Feature information";
     }
-    public DataSourceMetadataEnity createMetadata( Map params )
-            throws IOException {
-        if( !canProcess( params )){
-            throw new IOException( "Provided params cannot be used to connect");
-        }
-        File dir = (File) DIRECTORY.lookUp( params );
-        return new DataSourceMetadataEnity( dir, "Property file access for " + dir );        
-    }    
+//    public DataSourceMetadataEnity createMetadata( Map params )
+//            throws IOException {
+//        if( !canProcess( params )){
+//            throw new IOException( "Provided params cannot be used to connect");
+//        }
+//        File dir = (File) DIRECTORY.lookUp( params );
+//        return new DataSourceMetadataEnity( dir, "Property file access for " + dir );        
+//    }    
     Param DIRECTORY = new Param("directory", File.class,
             "Directory containting property files", true);
     public Param[] getParametersInfo() {

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -179,15 +178,15 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
     public String getDescription() {
         return "GeoMedia Spatial Database";
     }
-    // TODO: have a clue
-	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-	    String databaseDriver = (String) DBDRIVER.lookUp( params );
-        String databasePoolKey = (String) DBKEY.lookUp( params );
-        
-        String user = (String) USER.lookUp( params );        
-        
-	    return new DataSourceMetadataEnity( databasePoolKey, "GeoMedia "+user, "GeoMedia connection to "+databasePoolKey+" as "+user );
-	}
+//    // TODO: have a clue
+//	public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
+//	    String databaseDriver = (String) DBDRIVER.lookUp( params );
+//        String databasePoolKey = (String) DBKEY.lookUp( params );
+//        
+//        String user = (String) USER.lookUp( params );        
+//        
+//	    return new DataSourceMetadataEnity( databasePoolKey, "GeoMedia "+user, "GeoMedia connection to "+databasePoolKey+" as "+user );
+//	}
 	/**
 	 * Test to see if this datastore is available, if it has all the
 	 * appropriate libraries to construct a datastore.  This datastore just

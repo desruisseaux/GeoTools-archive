@@ -162,7 +162,7 @@ public class ElementHandlerFactory {
     public XMLElementHandler createElementHandler(URI namespaceURI,
         String localName) throws SAXException {
 
-//System.out.println("making $"+namespaceURI+"$ -> "+localName);
+System.out.println("making $"+namespaceURI+"$ -> "+localName);
 
         if (localName == null) {
             return null;
