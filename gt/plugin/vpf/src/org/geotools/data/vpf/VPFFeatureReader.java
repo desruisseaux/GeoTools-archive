@@ -43,63 +43,18 @@ public class VPFFeatureReader implements FeatureReader {
     private boolean hasNext = true;
     private Feature currentFeature = null;
     private final VPFFeatureType featureType;
-//    private VPFReader reader;
-//    /**
-//     * The current values for this iterator 
-//     */
-//    private final AbstractList values;
-//    private FeatureType type = null;
-//    private int attributeCount = 0;
-
-//    /** Creates a new instance of VPFFeatureReader */
-//    public VPFFeatureReader(String typeName, VPFDataBase dataBase, 
-//                            FeatureType type) {
-//        this.type = type;
-//        checkFeatureType(dataBase, typeName);
-//    }
 
     /** Creates a new instance of VPFFeatureReader */
     public VPFFeatureReader(VPFFeatureType type) {
         this.featureType = type;
     }
 
-//    /**
-//     * @param dataBase
-//     * @param typename
-//     */
-//    private void checkFeatureType(VPFDataBase dataBase, String typename) {
-//        try {
-////            System.out.println("Typename er: " + typename);
-//
-//            VPFFeatureClass vpfclass = dataBase.getFeatureClass(typename);
-//
-//            if (vpfclass != null) {
-//                reader = vpfclass.getReader();
-//                attributeCount = reader.getAttributeCount();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureReader#close()
      */
     public void close() throws IOException {
         reset();
-//        reader.close();
     }
-
-//    /**
-//     * Destroys the ressources associated to the iterator. Can be called several
-//     * times. I don't know what to do here since the factory technically manages
-//     * these streams
-//     * 
-//     * @throws SQLException
-//     *             if something wrong occurs.
-//     */
-//    public void destroy() throws SQLException {
-//    }
 
     /**
      * Put together a map of VPF files and their corresponding
@@ -148,83 +103,6 @@ public class VPFFeatureReader implements FeatureReader {
         return featureType;
     }
 
-//    /**
-//     * Retrieves the tile name for a particular row
-//     * @deprecated
-//     * @param row
-//     *            a row that hopefully contains a tile_id
-//     * @return the tile name
-//     */
-//    private Integer getTileNumber(Feature row) throws SQLException {
-//    	Integer result = null;
-//        result = row.getAttribute("tile_id")
-//    	AttributeType[] columns = featureType.getFeatureClass().getAttributeTypes();
-//    	Iterator tileColumnIter = columns.iterator();
-//    	int index = -1;
-//    	while (tileColumnIter.hasNext()) {
-//    		VPFColumn column = (VPFColumn) tileColumnIter.next();
-//    		if (column.getName().toLowerCase().equals("tile_id")) {
-//    			index = columns.indexOf(column);
-//    			break;
-//    		}
-//    	}
-//    	if (index >= 0) {
-//    		result = new Integer(((RowField) row.get(index)).intValue());
-//    	} else {
-//    		throw new SQLException("Table row does not contain a tile_id");
-//    	}
-//    	return result;
-//    }
-//
-//    /**
-//     * Returns the column value for a given column index.
-//     * 
-//     * @param columnIndex
-//     *            index of the column.
-//     * @return the column value.
-//     * @throws SQLException
-//     *             if something wrong occurs.
-//     */
-//    public Object getValue(int columnIndex) throws SQLException {
-//    	try {
-//    		return values.get(columnIndex);
-//    	} catch (RuntimeException exp) {
-//    		return new String();
-//    	}
-//    }
-
-//    /**
-//     * Returns the column value for a given column name. Note: if there are
-//     * multiple columns with the same name (usually indicitive of a join) the
-//     * first will be returned
-//     * 
-//     * @param columnName
-//     *            name of the column.
-//     * @return the value at that column.
-//     * @throws SQLException
-//     *             if the column is not there.
-//     */
-//    public Object getValue(String columnName) throws SQLException {
-//    	Object result = null;
-//    	VPFColumn column;
-//    	Iterator iter = featureType.getFeatureClass().getColumns().iterator();
-//    	int count = -1;
-//    	while (iter.hasNext()) {
-//    		count++;
-//    		column = (VPFColumn) iter.next();
-//    		if (column.getName().equals(columnName)) {
-//    			break;
-//    		}
-//    	}
-//    	if ((count >= 0) && (count < values.size())) {
-//    		result = values.get(count);
-//    	} else {
-//    		throw new SQLException("Row " + columnName
-//    				+ " does not exist in this table.");
-//    	}
-//    	return result;
-//    }
-
     /* (non-Javadoc)
      * @see org.geotools.data.FeatureReader#hasNext()
      */
@@ -246,39 +124,7 @@ public class VPFFeatureReader implements FeatureReader {
     public Feature next() throws IOException, IllegalAttributeException, 
                                  NoSuchElementException {
         return currentFeature;
-//        reader.next();
-//
-//        String fid = reader.getFeatureID();
-//        Object[] values = new Object[attributeCount];
-//
-//        for (int i = 0; i < attributeCount; i++) {
-//            values[i] = reader.read(i);
-//        }
-//
-//        Feature f = null;
-//
-//        try {
-//            f = type.create(values, fid);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return f;
     }
-//
-//    /**
-//     * Retrieves data for the next element
-//     * 
-//     * @return true if it succeeds. False if no next value is available
-//     * @throws SQLException
-//     *             if something wrong occurs.
-//     */
-//    public boolean next() throws SQLException {
-//    	values.clear();
-//    	return next(false);
-//    }
-
-    //TODO: simplify this convoluted mess Venture with caution!
     /**
      * Read a row and determine if it matches the feature type
      * Three possibilities here:
