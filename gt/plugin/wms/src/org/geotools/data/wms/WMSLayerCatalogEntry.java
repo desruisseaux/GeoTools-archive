@@ -40,9 +40,12 @@ public class WMSLayerCatalogEntry implements CatalogEntry {
      * @see org.opengis.catalog.CatalogEntry#getResource()
      */
     public Object getResource() {
-        return wms;
+        return layer;
     }
 
+    public WebMapServer getWMS() {
+        return wms;
+    }
     /* (non-Javadoc)
      * @see org.opengis.catalog.CatalogEntry#getDataName()
      */
@@ -90,5 +93,29 @@ public class WMSLayerCatalogEntry implements CatalogEntry {
      */
     public Iterator iterator() {
         return metadatas.iterator();
+    }
+    
+    public boolean equals( Object obj ) {
+        if (obj == null || !(obj instanceof WMSLayerCatalogEntry)) {
+            return false;
+        }
+        WMSLayerCatalogEntry other = (WMSLayerCatalogEntry) obj; 
+        // wms is currently identity
+        return (wms == null? other.wms == null :
+                              wms.equals(other.wms)) &&
+               (layer == null? other.layer == null :
+                               layer.equals(other.layer));
+    }
+    /**
+     * To to base on the same things as equals
+     * hascode on wms, layer and metadatas.
+     * 
+     * @see java.lang.Object#hashCode()
+     * @return hasCode of WMSLayerCatalogEntry
+     */
+    public int hashCode() {
+        return (wms == null? 0 : wms.hashCode() ) |
+               (layer == null?  0 : layer.hashCode() << 30 ) |
+               (metadatas == null ? 0 : metadatas.hashCode() << 60 );
     }
 }
