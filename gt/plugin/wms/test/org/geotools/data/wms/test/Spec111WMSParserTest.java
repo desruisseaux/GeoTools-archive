@@ -21,7 +21,7 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Spec111WMSParser;
 import org.geotools.data.wms.WMSBuilder;
 import org.geotools.resources.TestData;
@@ -50,12 +50,12 @@ public class Spec111WMSParserTest extends TestCase {
 		
 		Spec111WMSParser parser = new Spec111WMSParser();
 		
-		Capabilities capabilities = parser.constructCapabilities( document, new WMSBuilder() );
+		WMSCapabilities capabilities = parser.constructCapabilities( document, new WMSBuilder() );
 		assertNotNull(capabilities);
 		assertEquals(capabilities.getService().getName(), "OGC:WMS");
 		assertEquals(capabilities.getService().getKeywordList().length, 6);
 		
-		assertEquals(capabilities.getRequest().getGetCapabilities().getFormats().length, 1);
+		assertEquals(capabilities.getRequest().getGetCapabilities().getFormatStrings().length, 1);
 		assertEquals(capabilities.getLayers()[0].getTitle(), "Microsoft TerraServer Map Server");
 		
 		assertEquals(capabilities.getVersion(), "1.1.1");

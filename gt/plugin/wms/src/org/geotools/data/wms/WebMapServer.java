@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
@@ -104,7 +104,7 @@ import org.jdom.input.SAXBuilder;
 public class WebMapServer {
 	
 	private final URL serverURL;
-	private Capabilities capabilities;
+	private WMSCapabilities capabilities;
 	private Exception problem;
 	
 	private WMSParser[] parsers;
@@ -384,7 +384,7 @@ public class WebMapServer {
 	 * 
 	 * @return a WMT_MS_Capabilities, or null if there was an error
 	 */
-	public Capabilities getCapabilities() {
+	public WMSCapabilities getCapabilities() {
 		if (capabilities == null) {
 			if (requestRetriever != null && requestRetriever.isAlive()) {
 				try {
@@ -512,7 +512,7 @@ public class WebMapServer {
 							  getCapabilities().getVersion(),
 							  Utils.findDrawableLayers(getCapabilities().getLayers()),
 							  getSRSs(),
-							  getCapabilities().getRequest().getGetMap().getFormats(),
+							  getCapabilities().getRequest().getGetMap().getFormatStrings(),
 							  getExceptions()
 							  );
 		
@@ -533,7 +533,7 @@ public class WebMapServer {
 					getCapabilities().getRequest().getGetFeatureInfo().getGet(),
 					getMapRequest,
 					getQueryableLayers(),
-					getCapabilities().getRequest().getGetFeatureInfo().getFormats()
+					getCapabilities().getRequest().getGetFeatureInfo().getFormatStrings()
 					);
 		return request;
 	}

@@ -25,7 +25,7 @@ import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageExchange;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.ParseCapabilitiesException;
 import org.geotools.data.wms.WebMapServer;
 import org.jdom.JDOMException;
@@ -39,7 +39,7 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
     private Format[] formats;
     
     /** Parsed WMS Capabilities document */
-    private Capabilities capabilities;
+    private WMSCapabilities capabilities;
     
     /** Web Map Server proxy */
     private WebMapServer wms;
@@ -67,8 +67,8 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
    					throw (ParseCapabilitiesException) e;
    				}
    			}
-    	} else if (source instanceof Capabilities) {
-    		capabilities = (Capabilities) source;
+    	} else if (source instanceof WMSCapabilities) {
+    		capabilities = (WMSCapabilities) source;
     	}
     	WMSFormatFactory factory = new WMSFormatFactory( capabilities );
     	if( !factory.isAvailable() ){
@@ -129,7 +129,7 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
 		}
 		return false;
 	}
-	public Capabilities getCapabilities() {
+	public WMSCapabilities getCapabilities() {
 		return capabilities;
 	}
 }

@@ -23,7 +23,7 @@ package org.geotools.data.ows;
  */
 public class WMSCapabilities {
     private Service service;
-    private Request request;
+    private WMSRequest request;
     private Layer[] layers;
     
 	/**
@@ -41,13 +41,13 @@ public class WMSCapabilities {
 	/**
 	 * @return Returns the request.
 	 */
-	public Request getRequest() {
+	public WMSRequest getRequest() {
 		return request;
 	}
 	/**
 	 * @param request The request to set.
 	 */
-	public void setRequest(Request request) {
+	public void setRequest(WMSRequest request) {
 		this.request = request;
 	}
 	/**

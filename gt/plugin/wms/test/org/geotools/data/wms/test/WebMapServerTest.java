@@ -17,11 +17,6 @@
 package org.geotools.data.wms.test;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -32,12 +27,10 @@ import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
 
 /**
@@ -106,7 +99,7 @@ public class WebMapServerTest extends TestCase {
 	public void testIssueGetMapRequest() throws Exception {
 	    WebMapServer wms = new WebMapServer(serverURL);
 	    
-	    Capabilities capabilities = wms.getCapabilities();
+	    WMSCapabilities capabilities = wms.getCapabilities();
 	    
 	    GetMapRequest request = wms.createGetMapRequest();
 	    

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.Utils;
 import org.opengis.metadata.Identifier;
@@ -36,9 +36,9 @@ import org.opengis.parameter.GeneralOperationParameter;
  */
 public class WMSParameterMaker {
 
-	private Capabilities capabilities;
+	private WMSCapabilities capabilities;
 	
-	public WMSParameterMaker(Capabilities capabilities) {
+	public WMSParameterMaker(WMSCapabilities capabilities) {
 		this.capabilities = capabilities;
 	}
 	
@@ -68,7 +68,7 @@ public class WMSParameterMaker {
         param.remarks = "Value contains the desired format";
         param.validValues = new TreeSet();
         List formats = new ArrayList();
-		String[] formatStrings = capabilities.getRequest().getGetMap().getFormats();
+		String[] formatStrings = capabilities.getRequest().getGetMap().getFormatStrings();
 		for(int i = 0; i < formatStrings.length; i++) {
 			formats.add(formatStrings[i]);
 		}

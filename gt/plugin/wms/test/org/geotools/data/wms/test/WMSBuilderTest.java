@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMSBuilder;
 
 import junit.framework.TestCase;
@@ -49,12 +49,12 @@ public class WMSBuilderTest extends TestCase {
 		builder.buildSRS("EPSG:3");
 		builder.buildStyle("Style3");
 		
-		Capabilities capabilities = builder.finish();
+		WMSCapabilities capabilities = builder.finish();
 		assertEquals(capabilities.getVersion(), "1.1.1");
 		assertEquals(capabilities.getService().getName(), "FakeService");
 		assertEquals(capabilities.getService().getTitle(), "Test");
 		assertEquals(capabilities.getRequest().getGetCapabilities().getGet(), new URL("http://get.com"));
-		assertEquals(capabilities.getRequest().getGetMap().getFormats()[0], "image/jpeg");
+		assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[0], "image/jpeg");
 		assertEquals(capabilities.getLayers()[0].getName(), "layer1");
 		assertEquals(capabilities.getLayers()[1].getTitle(), "Layer2");
 		assertEquals((String) capabilities.getLayers()[1].getSrs().get(0), "EPSG:3" );

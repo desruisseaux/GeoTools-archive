@@ -20,10 +20,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.OperationType;
-import org.geotools.data.ows.Request;
+import org.geotools.data.ows.WMSRequest;
 import org.geotools.data.ows.Service;
 
 /**
@@ -50,12 +50,12 @@ import org.geotools.data.ows.Service;
  */
 public class WMSBuilder {
 
-	private Capabilities capabilities;
+	private WMSCapabilities capabilities;
 	private Service service;
-	private Request request;
-	private OperationType getCapabilities;
-	private OperationType getMap;
-	private OperationType getFeatureInfo;
+	private WMSRequest request;
+	private WMSOperationType getCapabilities;
+	private WMSOperationType getMap;
+	private WMSOperationType getFeatureInfo;
 	private List layers;
 	
 	private Layer layer;
@@ -65,11 +65,11 @@ public class WMSBuilder {
 
 	public WMSBuilder() {
 		layers = new ArrayList();
-		request = new Request();
+		request = new WMSRequest();
 	}
 	
 	public void buildCapabilities(String version) {
-		capabilities = new Capabilities();
+		capabilities = new WMSCapabilities();
 		capabilities.setVersion(version);
 	}
 	
@@ -90,25 +90,25 @@ public class WMSBuilder {
 	 * @param post
 	 */
 	public void buildGetCapabilitiesOperation(List formats, URL get, URL post) {
-		getCapabilities = new OperationType();
-		buildOperationType( getCapabilities, formats, get, post);
+		getCapabilities = new WMSOperationType();
+		buildWMSOperationType( getCapabilities, formats, get, post);
 	}
 	
 	public void buildGetMapOperation(List formats, URL get, URL post) {
-		getMap = new OperationType();
-		buildOperationType(getMap, formats, get, post);
+		getMap = new WMSOperationType();
+		buildWMSOperationType(getMap, formats, get, post);
 	}
 	
 	public void buildGetFeatureInfo(List formats, URL get, URL post) {
-		getFeatureInfo = new OperationType();
-		buildOperationType(getFeatureInfo, formats, get, post);
+		getFeatureInfo = new WMSOperationType();
+		buildWMSOperationType(getFeatureInfo, formats, get, post);
 	}
 	
-	private void buildOperationType(OperationType operationType, List formats, URL get, URL post) {
+	private void buildWMSOperationType(WMSOperationType operationType, List formats, URL get, URL post) {
 	    String formatStrings[] = (String[]) formats.toArray( new String[ formats.size() ] );
-	    buildOperationType( operationType, formatStrings, get, post );		
+	    buildWMSOperationType( operationType, formatStrings, get, post );		
 	}
-	private void buildOperationType(OperationType operationType, String[] formats, URL get, URL post) {
+	private void buildWMSOperationType(WMSOperationType operationType, String[] formats, URL get, URL post) {
 		operationType.setFormats(formats);
 		operationType.setGet(get);
 		operationType.setPost(post);
@@ -155,7 +155,7 @@ public class WMSBuilder {
 		styles.add(styles);
 	}
 	
-	public Capabilities finish() {
+	public WMSCapabilities finish() {
 		capabilities.setService(service);
 		
 		request.setGetCapabilities(getCapabilities);

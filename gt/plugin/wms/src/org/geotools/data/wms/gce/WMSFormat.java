@@ -23,7 +23,7 @@ import java.net.URL;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.opengis.parameter.GeneralOperationParameter;
 
 /**
@@ -38,7 +38,7 @@ import org.opengis.parameter.GeneralOperationParameter;
  */
 public class WMSFormat extends AbstractGridFormat {
 	/** Parsed Capabilities Document */
-	private Capabilities capabilities;
+	private WMSCapabilities capabilities;
 
 	/**
 	 * TODO: What does this mean? How can I have a WMSFormat without knowing
@@ -59,7 +59,7 @@ public class WMSFormat extends AbstractGridFormat {
 	 * 
 	 * @param capabilities Parsed Capabilties document from a Web Map Server
 	 */
-	public WMSFormat(Capabilities capabilities) {
+	public WMSFormat(WMSCapabilities capabilities) {
 		this.capabilities = capabilities;
 	}
 	
@@ -111,7 +111,7 @@ public class WMSFormat extends AbstractGridFormat {
 			return true;
 		}
 		
-		if (input instanceof Capabilities) { 
+		if (input instanceof WMSCapabilities) { 
 			return true;
 		}
 		return false;

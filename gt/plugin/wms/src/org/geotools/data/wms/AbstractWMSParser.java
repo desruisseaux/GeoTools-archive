@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.OperationType;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -110,7 +110,7 @@ public abstract class AbstractWMSParser implements WMSParser {
 	 * </p>
 	 * @param document Document to parse
 	 */
-	public Capabilities constructCapabilities(Document document, WMSBuilder builder ) throws ParseCapabilitiesException {
+	public WMSCapabilities constructCapabilities(Document document, WMSBuilder builder ) throws ParseCapabilitiesException {
 	    Element capabilitiesElement = document.getRootElement();
 		try {		    
 			String version = capabilitiesElement.getAttributeValue("version");

@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.OperationType;
-import org.geotools.data.ows.Request;
+import org.geotools.data.ows.WMSRequest;
 import org.geotools.data.ows.Service;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -50,7 +50,7 @@ public class Spec111WMSParser implements WMSParser {
      * to use of JDom
      * </p>
      */
-    Capabilities parse(InputStream stream) throws ParseCapabilitiesException {
+    WMSCapabilities parse(InputStream stream) throws ParseCapabilitiesException {
         Document document;
 		try {
 		    SAXBuilder builder = new SAXBuilder();
@@ -104,8 +104,8 @@ public class Spec111WMSParser implements WMSParser {
 	 * </p>
 	 * @param document Document to parse
 	 */
-	public Capabilities constructCapabilities(Document document, WMSBuilder builder ) throws ParseCapabilitiesException {
-		Capabilities capabilities;
+	public WMSCapabilities constructCapabilities(Document document, WMSBuilder builder ) throws ParseCapabilitiesException {
+		WMSCapabilities capabilities;
 		Element capabilitiesElement = document.getRootElement();
 		//Populate the Capabilities object with data from the XML string.
 		try {
@@ -117,7 +117,7 @@ public class Spec111WMSParser implements WMSParser {
 			
 			//Parse Request
 	        Element requestElement = capabilityElement.getChild("Request");
-	        Request request = parseRequest(requestElement);
+	        WMSRequest request = parseRequest(requestElement);
 
 			//Parse Layer
 	        Element layerElement = capabilityElement.getChild("Layer");
@@ -127,7 +127,7 @@ public class Spec111WMSParser implements WMSParser {
 
 	        Layer[] layers = (Layer[]) layerList.toArray(new Layer[layerList.size()]);
 	        
-			capabilities = new Capabilities();
+			capabilities = new WMSCapabilities();
 			capabilities.setService(service);
 			capabilities.setRequest(request);
 			capabilities.setLayers(layers);
@@ -202,9 +202,9 @@ public class Spec111WMSParser implements WMSParser {
      * @param requestElement an Element representing a request element
      * @return a Request object constructed from the passed-in element
      */
-    protected Request parseRequest(Element requestElement) throws MalformedURLException {
-        Request request = new Request();
-        OperationType operationType;
+    protected WMSRequest parseRequest(Element requestElement) throws MalformedURLException {
+        WMSRequest request = new WMSRequest();
+        WMSOperationType operationType;
         
         operationType = parseOperationType(requestElement.getChild("GetCapabilities"));
         request.setGetCapabilities(operationType);
@@ -220,8 +220,8 @@ public class Spec111WMSParser implements WMSParser {
         return request;
     }
 
-    protected OperationType parseOperationType(Element element) throws MalformedURLException {
-        OperationType operationType = new OperationType();
+    protected WMSOperationType parseOperationType(Element element) throws MalformedURLException {
+    	WMSOperationType operationType = new WMSOperationType();
         Iterator iter;
         
         List formats = new ArrayList();

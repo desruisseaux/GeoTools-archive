@@ -18,7 +18,7 @@ package org.geotools.data.wms.gce;
 
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 
 /**
  * Factory for the creation of a Format for use with WebMapServer.
@@ -30,7 +30,7 @@ import org.geotools.data.ows.Capabilities;
  * @author Richard Gould, Refractions Research
  */
 public class WMSFormatFactory implements GridFormatFactorySpi {
-    private Capabilities capabilities;
+    private WMSCapabilities capabilities;
 
 	/**
      * WMSFormatFactory constructions based on parsed CapabilitiesDocument.
@@ -40,7 +40,7 @@ public class WMSFormatFactory implements GridFormatFactorySpi {
      * </p>
      * @param capabilities Capabilities Document used to determine supported formats 
      */
-    public WMSFormatFactory(Capabilities capabilities) {
+    public WMSFormatFactory(WMSCapabilities capabilities) {
         
     	this.capabilities = capabilities;
     }

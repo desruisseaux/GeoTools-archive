@@ -18,7 +18,7 @@ package org.geotools.data.wms;
 
 import java.io.IOException;
 
-import org.geotools.data.ows.Capabilities;
+import org.geotools.data.ows.WMSCapabilities;
 import org.jdom.Document;
 
 /**
@@ -78,6 +78,6 @@ public interface WMSParser {
 	 * </p>
 	 * @param document Document to parse
 	 */
-	public Capabilities constructCapabilities(Document docuemnt, WMSBuilder builder )
+	public WMSCapabilities constructCapabilities(Document docuemnt, WMSBuilder builder )
 	    throws ParseCapabilitiesException;
 }
