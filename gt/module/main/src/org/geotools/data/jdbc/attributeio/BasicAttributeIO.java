@@ -18,8 +18,10 @@ package org.geotools.data.jdbc.attributeio;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import org.geotools.data.DataSourceException;
 
@@ -61,4 +63,22 @@ public class BasicAttributeIO implements AttributeIO {
             throw new DataSourceException("Sql problem.", e);
         }
     }
+
+    /**
+     * @see org.geotools.data.jdbc.attributeio.AttributeIO#write(java.sql.PreparedStatement, int, java.lang.Object)
+     */
+    public void write(PreparedStatement ps, int position, Object value) throws IOException {
+        try {
+            if (value == null) {
+                ps.setNull(position, Types.OTHER);
+            } else {
+                ps.setObject(position, value);
+            }
+        } catch (Exception e) {
+            throw new DataSourceException("Sql problem.", e);
+        }
+        
+    }
+    
+    
 }

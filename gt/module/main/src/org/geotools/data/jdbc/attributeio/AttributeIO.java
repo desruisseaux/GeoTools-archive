@@ -17,6 +17,7 @@
 package org.geotools.data.jdbc.attributeio;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 
@@ -49,5 +50,17 @@ public interface AttributeIO {
      * @throws IOException - if some exception occurs while writing the attribute
      */
     public void write(ResultSet rs, int position, Object value)
+        throws IOException;
+    
+    /**
+     * Writes a feature attribute into a PreparedStatement
+     *
+     * @param ps - the result set to be modified
+     * @param position - the position in which the attribute will inserted into the result set  
+     * @param value - the attribute that will be written into the resultset
+     *
+     * @throws IOException - if some exception occurs while writing the attribute
+     */
+    public void write(PreparedStatement ps, int position, Object value)
         throws IOException;
 }
