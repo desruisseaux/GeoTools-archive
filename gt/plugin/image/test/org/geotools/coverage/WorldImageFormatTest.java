@@ -10,7 +10,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.geotools.coverage.TestCaseSupport;
+import junit.framework.TestCase;
 
 import org.geotools.coverage.WorldImageFormat;
 
@@ -21,7 +21,7 @@ import org.geotools.coverage.WorldImageFormat;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WorldImageFormatTest extends TestCaseSupport {
+public class WorldImageFormatTest extends TestCase {
 
 	private WorldImageFormat format;
 

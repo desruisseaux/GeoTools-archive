@@ -8,7 +8,10 @@ package org.geotools.coverage;
 
 import java.io.File;
 
+import junit.framework.TestCase;
+
 import org.geotools.coverage.WorldImageWriter;
+import org.geotools.resources.TestData;
 
 /**
  * @author rgould
@@ -16,7 +19,7 @@ import org.geotools.coverage.WorldImageWriter;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class WorldImageWriterTest extends TestCaseSupport {
+public class WorldImageWriterTest extends TestCase {
 
 
 	WorldImageWriter writer;
@@ -28,7 +31,7 @@ public class WorldImageWriterTest extends TestCaseSupport {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		destination = new File(getTestResource("etoto.png").toExternalForm());
+		destination = TestData.file(this, "etopo.png");
 		writer = new WorldImageWriter ((File) destination);
 	}
 
