@@ -115,8 +115,8 @@ public class GroupGT implements Group {
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
     public Element findChildElement(String name) {
-System.out.println("GroupGT "+this.name+" "+this.namespace);
-System.out.println("GroupGT ... "+child.getClass().getName());
+//System.out.println("GroupGT "+this.name+" "+this.namespace);
+//System.out.println("GroupGT ... "+child.getClass().getName());
         return (child == null) ? null : child.findChildElement(name);
     }
 }
