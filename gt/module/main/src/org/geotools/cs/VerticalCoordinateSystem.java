@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -54,11 +42,13 @@ import java.rmi.RemoteException;
 /**
  * A one-dimensional coordinate system suitable for vertical measurements.
  *
- * @version $Id: VerticalCoordinateSystem.java,v 1.11 2003/11/20 22:18:25 jive Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_VerticalCoordinateSystem
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.VerticalCRS}.
  */
 public class VerticalCoordinateSystem extends CoordinateSystem {
     /**
@@ -150,6 +140,8 @@ public class VerticalCoordinateSystem extends CoordinateSystem {
      * Gets the vertical datum, which indicates the measurement method.
      *
      * @see org.opengis.cs.CS_VerticalCoordinateSystem#getVerticalDatum()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.VerticalCRS#getDatum}.
      */
     public VerticalDatum getVerticalDatum() {
         return datum;
@@ -181,6 +173,8 @@ public class VerticalCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_VerticalCoordinateSystem#getUnits(int)
      * @see org.opengis.cs.CS_VerticalCoordinateSystem#getVerticalUnit()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getUnit}.
      */
     public Unit getUnits(final int dimension) {
         final int maxDim = getDimension();

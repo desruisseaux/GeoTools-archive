@@ -60,7 +60,7 @@ import java.util.logging.LogRecord;
 import java.util.Locale;
 
 // OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;  // For javadoc
+import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies (CTS and GCS)
 import org.geotools.pt.*;

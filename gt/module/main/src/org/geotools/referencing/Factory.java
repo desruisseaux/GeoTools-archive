@@ -29,8 +29,11 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.metadata.citation.Citation;
 
 
@@ -103,7 +106,7 @@ import org.opengis.metadata.citation.Citation;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Factory implements CSFactory, DatumFactory {
+public class Factory implements CSFactory, DatumFactory, CRSFactory {
     /**
      * The citation for Geotools 2.
      */
@@ -137,7 +140,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a coordinate system axis from an abbreviation and a unit.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  abbreviation The coordinate axis abbreviation.
      * @param  direction The axis direction.
      * @param  unit The coordinate axis unit.
@@ -162,7 +164,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a two dimensional cartesian coordinate system from the given pair of axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis0 The first  axis.
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
@@ -185,7 +186,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a three dimensional cartesian coordinate system from the given set of axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis0 The first  axis.
      * @param  axis1 The second axis.
      * @param  axis2 The third  axis.
@@ -210,7 +210,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a polar coordinate system from the given pair of axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis0 The first  axis.
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
@@ -234,7 +233,6 @@ public class Factory implements CSFactory, DatumFactory {
      * perpendicular axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  polarCS The polar coordinate system.
      * @param  axis The perpendicular axis.
      * @throws FactoryException if the object creation failed.
@@ -257,7 +255,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a spherical coordinate system from the given set of axis.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis0 The first  axis.
      * @param  axis1 The second axis.
      * @param  axis2 The third  axis.
@@ -282,7 +279,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates an ellipsoidal coordinate system without ellipsoidal height.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis0 The first  axis.
      * @param  axis1 The second axis.
      * @throws FactoryException if the object creation failed.
@@ -305,7 +301,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates an ellipsoidal coordinate system with ellipsoidal height.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis0 The first  axis.
      * @param  axis1 The second axis.
      * @param  axis2 The third  axis.
@@ -330,7 +325,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a vertical coordinate system.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis The axis.
      * @throws FactoryException if the object creation failed.
      */
@@ -351,7 +345,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a temporal coordinate system.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  axis The axis.
      * @throws FactoryException if the object creation failed.
      */
@@ -372,7 +365,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates an ellipsoid from radius values.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  semiMajorAxis Equatorial radius in supplied linear units.
      * @param  semiMinorAxis Polar radius in supplied linear units.
      * @param  unit Linear units of ellipsoid axes.
@@ -398,7 +390,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates an ellipsoid from an major radius, and inverse flattening.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  semiMajorAxis Equatorial radius in supplied linear units.
      * @param  inverseFlattening Eccentricity of ellipsoid.
      * @param  unit Linear units of major axis.
@@ -424,7 +415,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a prime meridian, relative to Greenwich. 
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  longitude Longitude of prime meridian in supplied angular units East of Greenwich.
      * @param  angularUnit Angular units of longitude.
      * @throws FactoryException if the object creation failed.
@@ -447,7 +437,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates geodetic datum from ellipsoid and (optionaly) Bursa-Wolf parameters. 
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  ellipsoid Ellipsoid to use in new geodetic datum.
      * @param  primeMeridian Prime meridian to use in new geodetic datum.
      * @throws FactoryException if the object creation failed.
@@ -470,7 +459,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a vertical datum from an enumerated type value.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  type The type of this vertical datum (often “geoidal”).
      * @throws FactoryException if the object creation failed.
      */
@@ -491,7 +479,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates a temporal datum from an enumerated type value.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  origin The date and time origin of this temporal datum.
      * @throws FactoryException if the object creation failed.
      */
@@ -512,7 +499,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates an engineering datum.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @throws FactoryException if the object creation failed.
      */
     public EngineeringDatum createEngineeringDatum(Map properties) throws FactoryException
@@ -531,7 +517,6 @@ public class Factory implements CSFactory, DatumFactory {
      * Creates an image datum.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain Factory listed there}.
      * @param  pixelInCell Specification of the way the image grid is associated
      *         with the image data attributes.
      * @throws FactoryException if the object creation failed.
@@ -547,6 +532,320 @@ public class Factory implements CSFactory, DatumFactory {
         }
         datum = (ImageDatum) canonicalize(datum);
         return datum;
+    }
+
+    /**
+     * Creates a compound coordinate reference system from an ordered
+     * list of <code>CoordinateReferenceSystem</code> objects.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  elements ordered array of <code>CoordinateReferenceSystem</code> objects.
+     * @throws FactoryException if the object creation failed.
+     */
+    public CompoundCRS createCompoundCRS(Map                       properties,
+                                         CoordinateReferenceSystem[] elements) throws FactoryException
+    {
+        CompoundCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.CompoundCRS(properties, elements);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (CompoundCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a engineering coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Engineering datum to use in created CRS.
+     * @param  cs The coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public EngineeringCRS createEngineeringCRS(Map         properties,
+                                               EngineeringDatum datum,
+                                               CoordinateSystem    cs) throws FactoryException
+    {
+        EngineeringCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.EngineeringCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (EngineeringCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a geocentric coordinate reference system from a {@linkplain CartesianCS
+     * cartesian coordinate system}.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Geodetic datum to use in created CRS.
+     * @param  cs The cartesian coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public GeocentricCRS createGeocentricCRS(Map      properties,
+                                             GeodeticDatum datum,
+                                             CartesianCS      cs) throws FactoryException
+    {
+        GeocentricCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.GeocentricCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (GeocentricCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a geocentric coordinate reference system from a {@linkplain SphericalCS
+     * spherical coordinate system}.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Geodetic datum to use in created CRS.
+     * @param  cs The spherical coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public GeocentricCRS createGeocentricCRS(Map      properties,
+                                             GeodeticDatum datum,
+                                             SphericalCS      cs) throws FactoryException
+    {
+        GeocentricCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.GeocentricCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (GeocentricCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a geographic coordinate reference system.
+     * It could be <var>Latitude</var>/<var>Longitude</var> or
+     * <var>Longitude</var>/<var>Latitude</var>.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Geodetic datum to use in created CRS.
+     * @param  cs The ellipsoidal coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public GeographicCRS createGeographicCRS(Map      properties,
+                                             GeodeticDatum datum,
+                                             EllipsoidalCS    cs) throws FactoryException
+    {
+        GeographicCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.GeographicCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (GeographicCRS) canonicalize(crs);
+        return crs;
+    }
+    
+    /**
+     * Creates an image coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Image datum to use in created CRS.
+     * @param  cs The Cartesian or Oblique Cartesian coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     *
+     * @deprecated Provided for compatibility with GeoAPI 1.0, but will be removed in GeoAPI 1.1.
+     */
+    public ImageCRS createImageCRS(Map      properties,
+                                   ImageDatum    datum,
+                                   CoordinateSystem cs) throws FactoryException
+    {
+        return createImageCRS(properties, datum, (ObliqueCartesianCS) cs);
+    }
+    
+    /**
+     * Creates an image coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Image datum to use in created CRS.
+     * @param  cs The Cartesian or Oblique Cartesian coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public ImageCRS createImageCRS(Map        properties,
+                                   ImageDatum      datum,
+                                   ObliqueCartesianCS cs) throws FactoryException
+    {
+        ImageCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.ImageCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (ImageCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a derived coordinate reference system. If the transformation is an affine
+     * map performing a rotation, then any mixed axes must have identical units.
+     * For example, a (<var>lat_deg</var>, <var>lon_deg</var>, <var>height_feet</var>)
+     * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
+     * affected axes are in degrees.  But you should not rotate this coordinate system
+     * in any other plane.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     *         Properties for the {@link Conversion} object to be created can be specified
+     *         with the <code>"conversion."</code> prefix added in front of property names
+     *         (example: <code>"conversion.name"</code>).
+     * @param  base Coordinate reference system to base the derived CRS on.
+     * @param  baseToDerived The transform from the base CRS to returned CRS.
+     * @param  derivedCS The coordinate system for the derived CRS. The number
+     *         of axes must match the target dimension of the transform
+     *         <code>baseToDerived</code>.
+     * @throws FactoryException if the object creation failed.
+     */
+    public DerivedCRS createDerivedCRS(Map                 properties,
+                                       CoordinateReferenceSystem base,
+                                       MathTransform    baseToDerived,
+                                       CoordinateSystem     derivedCS) throws FactoryException
+    {
+        DerivedCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.DerivedCRS(properties, base, baseToDerived, derivedCS);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (DerivedCRS) canonicalize(crs);
+        return crs;
+    }
+                                       
+    
+    /**
+     * Creates a projected coordinate reference system from a transform.
+     * 
+     * @param  properties Name and other properties to give to the new object.
+     *         Properties for the {@link Conversion} object to be created can be specified
+     *         with the <code>"conversion."</code> prefix added in front of property names
+     *         (example: <code>"conversion.name"</code>).
+     * @param  geoCRS Geographic coordinate reference system to base projection on.
+     * @param  toProjected The transform from the geographic to the projected CRS.
+     * @param  cs The coordinate system for the projected CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public ProjectedCRS createProjectedCRS(Map            properties,
+                                           GeographicCRS      geoCRS,
+                                           MathTransform toProjected,
+                                           CartesianCS            cs) throws FactoryException
+    {
+        ProjectedCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.ProjectedCRS(properties, geoCRS, toProjected, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (ProjectedCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a projected coordinate reference system from a projection name.
+     * 
+     * @param  properties Name and other properties to give to the new object.
+     *         Properties for the {@link Conversion} object to be created can be specified
+     *         with the <code>"conversion."</code> prefix added in front of property names
+     *         (example: <code>"conversion.name"</code>).
+     * @param  geoCRS Geographic coordinate reference system to base projection on.
+     * @param  projectionName The classification name for the projection to be created
+     *         (e.g. "Transverse_Mercator", "Mercator_1SP", "Oblique_Stereographic", etc.).
+     * @param  parameterValues The parameter value to give to the projection. Should includes
+     *         "central_meridian", "latitude_of_origin", "scale_factor", "false_easting",
+     *         "false_northing" and any other parameters specific to the projection.
+     * @param  cs The coordinate system for the projected CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public ProjectedCRS createProjectedCRS(Map                          properties,
+                                           GeographicCRS                    geoCRS,
+                                           String                   projectionName,
+                                           GeneralParameterValue[] parameterValues,
+                                           CartesianCS                          cs) throws FactoryException
+    {
+        ProjectedCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.ProjectedCRS(properties, geoCRS, projectionName, parameterValues, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (ProjectedCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a temporal coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Temporal datum to use in created CRS.
+     * @param  cs The Temporal coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public TemporalCRS createTemporalCRS(Map      properties,
+                                         TemporalDatum datum,
+                                         TemporalCS       cs) throws FactoryException
+    {
+        TemporalCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.TemporalCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (TemporalCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a vertical coordinate reference system. 
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  datum Vertical datum to use in created CRS.
+     * @param  cs The Vertical coordinate system for the created CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public VerticalCRS createVerticalCRS(Map     properties,
+                                         VerticalDatum datum,
+                                         VerticalCS       cs) throws FactoryException
+    {
+        VerticalCRS crs;
+        try {
+            crs = new org.geotools.referencing.crs.VerticalCRS(properties, datum, cs);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        crs = (VerticalCRS) canonicalize(crs);
+        return crs;
+    }
+
+    /**
+     * Creates a coordinate reference system object from a XML string.
+     *
+     * @param  xml Coordinate reference system encoded in XML format.
+     * @throws FactoryException if the object creation failed.
+     */
+    public CoordinateReferenceSystem createFromXML(String xml) throws FactoryException {
+        // TODO: Not yet implemented.
+        throw new FactoryException("Not yet implemented");
+    }
+
+    /**
+     * Creates a coordinate reference system object from a string.
+     * The <A HREF="../doc-files/WKT.html">definition for WKT</A>
+     * is shown using Extended Backus Naur Form (EBNF).
+     *
+     * @param  wkt Coordinate system encoded in Well-Known Text format.
+     * @throws FactoryException if the object creation failed.
+     */
+    public CoordinateReferenceSystem createFromWKT(String wkt) throws FactoryException {
+        // TODO: Code not yet ported from legact CTS code.
+        throw new FactoryException("Not yet implemented");
     }
 
     /**

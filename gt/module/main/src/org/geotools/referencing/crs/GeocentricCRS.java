@@ -71,8 +71,8 @@ public class GeocentricCRS extends CoordinateReferenceSystem implements org.open
      * The <var>Z</var> axis points North.
      */
     public static final GeocentricCRS CARTESIAN = new GeocentricCRS("Cartesian",
-                        org.geotools.referencing.cs.CartesianCS.GEOCENTRIC,
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84);
+                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
+                        org.geotools.referencing.cs.CartesianCS.GEOCENTRIC);
     
     /**
      * The default geocentric CRS with a
@@ -80,35 +80,35 @@ public class GeocentricCRS extends CoordinateReferenceSystem implements org.open
      * Prime meridian is Greenwich, geodetic datum is WGS84 and linear units are metres.
      */
     public static final GeocentricCRS SPHERICAL = new GeocentricCRS("Spherical",
-                        org.geotools.referencing.cs.SphericalCS.GEOCENTRIC,
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84);
+                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
+                        org.geotools.referencing.cs.SphericalCS.GEOCENTRIC);
 
     /**
      * Constructs a geocentric CRS from a name.
      *
      * @param name The name.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public GeocentricCRS(final String        name,
-                         final CartesianCS   coordinateSystem,
-                         final GeodeticDatum datum)
+    public GeocentricCRS(final String         name,
+                         final GeodeticDatum datum,
+                         final CartesianCS      cs)
     {
-        this(Collections.singletonMap("name", name), coordinateSystem, datum);
+        this(Collections.singletonMap("name", name), datum, cs);
     }
 
     /**
      * Constructs a geocentric CRS from a name.
      *
      * @param name The name.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public GeocentricCRS(final String        name,
-                         final SphericalCS   coordinateSystem,
-                         final GeodeticDatum datum)
+    public GeocentricCRS(final String         name,
+                         final GeodeticDatum datum,
+                         final SphericalCS      cs)
     {
-        this(Collections.singletonMap("name", name), coordinateSystem, datum);
+        this(Collections.singletonMap("name", name), datum, cs);
     }
 
     /**
@@ -116,14 +116,14 @@ public class GeocentricCRS extends CoordinateReferenceSystem implements org.open
      * The properties are given unchanged to the super-class constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public GeocentricCRS(final Map           properties,
-                         final CartesianCS   coordinateSystem,
-                         final GeodeticDatum datum)
+    public GeocentricCRS(final Map      properties,
+                         final GeodeticDatum datum,
+                         final CartesianCS      cs)
     {
-        super(properties, coordinateSystem, datum);
+        super(properties, datum, cs);
     }
 
     /**
@@ -131,14 +131,14 @@ public class GeocentricCRS extends CoordinateReferenceSystem implements org.open
      * The properties are given unchanged to the super-class constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public GeocentricCRS(final Map           properties,
-                         final SphericalCS   coordinateSystem,
-                         final GeodeticDatum datum)
+    public GeocentricCRS(final Map      properties,
+                         final GeodeticDatum datum,
+                         final SphericalCS      cs)
     {
-        super(properties, coordinateSystem, datum);
+        super(properties, datum, cs);
     }
     
     /**
@@ -160,12 +160,16 @@ public class GeocentricCRS extends CoordinateReferenceSystem implements org.open
      * @return The WKT element name, which is "GEOCCS"
      */
     protected String formatWKT(final Formatter formatter) {
+        final Unit unit = getUnit();
         formatter.append(datum);
         formatter.append(((GeodeticDatum)datum).getPrimeMeridian());
-        formatter.append(getUnit());
+        formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();
         for (int i=0; i<dimension; i++) {
             formatter.append(coordinateSystem.getAxis(i));
+        }
+        if (unit == null) {
+            formatter.setInvalidWKT();
         }
         return "GEOCCS";
     }

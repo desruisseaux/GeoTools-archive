@@ -57,6 +57,14 @@ public class VerticalCS extends CoordinateSystem implements org.opengis.referenc
 
     /**
      * A one-dimensional vertical CS with
+     * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#ELLIPSOIDAL_HEIGHT
+     * ellipsoidal height}</var> axis in metres.
+     */
+    public static VerticalCS ELLIPSOIDAL_HEIGHT = new VerticalCS("Ellipsoidal height",
+                    org.geotools.referencing.cs.CoordinateSystemAxis.ELLIPSOIDAL_HEIGHT);
+
+    /**
+     * A one-dimensional vertical CS with
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#GRAVITY_RELATED_HEIGHT
      * gravity-related height}</var> axis in metres.
      */

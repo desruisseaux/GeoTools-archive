@@ -33,13 +33,14 @@ import java.text.SimpleDateFormat;
 import javax.units.Unit;
 import javax.units.SI;
 import javax.units.NonSI;
+import javax.units.Converter;
 
 // OpenGIS dependencies
+import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.datum.TemporalDatum;
-import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -48,6 +49,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.crs.TemporalCRS;
 
 
 /**
@@ -72,7 +74,7 @@ public class CoordinateFormat extends Format {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -8826750502538985873L;
+    private static final long serialVersionUID = -1334894996513164253L;
     
     /**
      * The output coordinate reference system.
@@ -102,6 +104,12 @@ public class CoordinateFormat extends Format {
      * The time epochs. Non-null only if at least one ordinate is a date.
      */
     private long[] epochs;
+
+    /**
+     * Conversions from temporal axis units to milliseconds.
+     * Non-null only if at least one ordinate is a date.
+     */
+    private Converter[] toMillis;
 
     /**
      * Dummy field position.
@@ -186,9 +194,10 @@ public class CoordinateFormat extends Format {
              * Create a new array of 'Format' objects, one for each dimension.
              * The format subclasses are infered from coordinate system axis.
              */
-            epochs  = null;
-            formats = new Format[cs.getDimension()];
-            types   = new byte[formats.length];
+            epochs   = null;
+            toMillis = null;
+            formats  = new Format[cs.getDimension()];
+            types    = new byte[formats.length];
             for (int i=0; i<formats.length; i++) {
                 final Unit unit = cs.getAxis(i).getUnit();
                 /////////////////
@@ -213,21 +222,24 @@ public class CoordinateFormat extends Format {
                 ////  Date  ////
                 ////////////////
                 if (SI.SECOND.isCompatible(unit)) {
-                    final CoordinateReferenceSystem tcs = CRSUtilities.getSubCRS(crs, i, i+1);
-                    if (tcs instanceof TemporalCRS) {
-                        if (epochs == null) {
-                            epochs = new long[formats.length];
+                    final Datum datum = CRSUtilities.getSubCRS(crs, i, i+1).getDatum();
+                    if (datum instanceof TemporalDatum) {
+                        if (toMillis == null) {
+                            toMillis = new Converter[formats.length];
+                            epochs   = new long     [formats.length];
                         }
-/*covariance*/          epochs[i] = ((TemporalDatum)((TemporalCRS) tcs).getDatum()).getOrigin().getTime();
+                        toMillis[i] = unit.getConverterTo(TemporalCRS.MILLISECOND);
+                        epochs  [i] = ((TemporalDatum) datum).getOrigin().getTime();
                         if (dateFormat == null) {
                             dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
                         }
                         formats[i] = dateFormat;
-                        types[i] = DATE;
+                        types  [i] = DATE;
                         continue;
                     }
                     types[i] = TIME;
                     // Fallthrough: formatted as number for now.
+                    // TODO: Provide ellapsed time formatting later.
                 }
                 //////////////////
                 ////  Number  ////
@@ -359,8 +371,7 @@ public class CoordinateFormat extends Format {
                 case ANGLE:     object=new Angle    (value); break;
                 case DATE: {
                     final CoordinateSystemAxis axis = crs.getCoordinateSystem().getAxis(i);
-                    long offset = Math.round(axis.getUnit().getConverterTo(
-                               org.geotools.referencing.cs.TemporalCS.MILLISECOND).convert(value));
+                    long offset = Math.round(toMillis[i].convert(value));
                     if (AxisDirection.PAST.equals(axis.getDirection())) {
                         offset = -offset;
                     }

@@ -82,8 +82,8 @@ public class EngineeringCRS extends org.geotools.referencing.crs.CoordinateRefer
         private static final long serialVersionUID = -1773381554353809683L;
 
         /** Construct a coordinate system with the given name. */
-        public Cartesian(final String name, final CoordinateSystem coordinateSystem) {
-            super(name, coordinateSystem, org.geotools.referencing.datum.EngineeringDatum.UNKNOW);
+        public Cartesian(final String name, final CoordinateSystem cs) {
+            super(name, org.geotools.referencing.datum.EngineeringDatum.UNKNOW, cs);
         }
 
         /** Returns the localized name for "Cartesian". */
@@ -154,14 +154,14 @@ public class EngineeringCRS extends org.geotools.referencing.crs.CoordinateRefer
      * Constructs an engineering CRS from a name.
      *
      * @param name The name.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public EngineeringCRS(final String           name,
-                          final CoordinateSystem coordinateSystem,
-                          final EngineeringDatum datum)
+    public EngineeringCRS(final String            name,
+                          final EngineeringDatum datum,
+                          final CoordinateSystem    cs)
     {
-        this(Collections.singletonMap("name", name), coordinateSystem, datum);
+        this(Collections.singletonMap("name", name), datum, cs);
     }
 
     /**
@@ -169,14 +169,14 @@ public class EngineeringCRS extends org.geotools.referencing.crs.CoordinateRefer
      * The properties are given unchanged to the super-class constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public EngineeringCRS(final Map              properties,
-                          final CoordinateSystem coordinateSystem,
-                          final EngineeringDatum datum)
+    public EngineeringCRS(final Map         properties,
+                          final EngineeringDatum datum,
+                          final CoordinateSystem    cs)
     {
-        super(properties, coordinateSystem, datum);
+        super(properties, datum, cs);
     }
     
     /**
@@ -198,16 +198,7 @@ public class EngineeringCRS extends org.geotools.referencing.crs.CoordinateRefer
      * @return The WKT element name, which is "LOCAL_CS"
      */
     protected String formatWKT(final Formatter formatter) {
-        final Unit unit = getUnit();
-        formatter.append(datum);
-        formatter.append(unit);
-        final int dimension = coordinateSystem.getDimension();
-        for (int i=0; i<dimension; i++) {
-            formatter.append(coordinateSystem.getAxis(i));
-        }
-        if (unit == null) {
-            formatter.setInvalidWKT();
-        }
+        super.formatWKT(formatter);
         return "LOCAL_CS";
     }
 }

@@ -83,19 +83,19 @@ public class CoordinateReferenceSystem extends ReferenceSystem
      * The properties are given unchanged to the super-class constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public CoordinateReferenceSystem(final Map              properties,
-                                     final CoordinateSystem coordinateSystem,
-                                     final Datum            datum)
+    public CoordinateReferenceSystem(final Map      properties,
+                                     final Datum         datum,
+                                     final CoordinateSystem cs)
     {
         super(properties);
-        this.coordinateSystem = coordinateSystem;
         this.datum = datum;
+        this.coordinateSystem = cs;
         if (!acceptNulls()) {
-            ensureNonNull("coordinateSystem", coordinateSystem);
             ensureNonNull("datum", datum);
+            ensureNonNull("cs",    cs);
         }
     }
 
@@ -184,16 +184,27 @@ public class CoordinateReferenceSystem extends ReferenceSystem
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element. The default implementation write all
-     * {@linkplain CoordinateSystem coordinate system}'s axis.
+     * Known Text</cite> (WKT)</A> element. The default implementation write the following elements:
+     * <ul>
+     *   <li>The {@linkplain #getDatum datum}.</li>
+     *   <li>The unit if all axis use the same unit. Otherwise the unit is omitted and
+     *       the WKT format is {@linkplain Formatter#isInvalidWKT flagged as invalid}.</li>
+     *   <li>All {@linkplain CoordinateSystem coordinate system}'s axis.</li>
+     * </ul>
      *
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
+        final Unit unit = getUnit();
+        formatter.append(datum);
+        formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();
         for (int i=0; i<dimension; i++) {
             formatter.append(coordinateSystem.getAxis(i));
+        }
+        if (unit == null) {
+            formatter.setInvalidWKT();
         }
         return super.formatWKT(formatter);
     }

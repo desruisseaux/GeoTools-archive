@@ -68,8 +68,8 @@ public class GeographicCRS extends CoordinateReferenceSystem
      * prime meridian is Greenwich.
      */
     public static final GeographicCRS WGS84 = new GeographicCRS("WGS84",
-                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D,
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84);
+                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
+                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D);
 
     /**
      * A three-dimensional geographic coordinate reference system using WGS84 datum.
@@ -79,21 +79,21 @@ public class GeographicCRS extends CoordinateReferenceSystem
      * prime meridian is Greenwich.
      */
     public static final GeographicCRS WGS84_3D = new GeographicCRS("WGS84",
-                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_3D,
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84);
+                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
+                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_3D);
 
     /**
      * Constructs a geographic CRS from a name.
      *
      * @param name The name.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public GeographicCRS(final String        name,
-                         final EllipsoidalCS coordinateSystem,
-                         final GeodeticDatum datum)
+    public GeographicCRS(final String         name,
+                         final GeodeticDatum datum,
+                         final EllipsoidalCS    cs)
     {
-        this(Collections.singletonMap("name", name), coordinateSystem, datum);
+        this(Collections.singletonMap("name", name), datum, cs);
     }
 
     /**
@@ -101,14 +101,14 @@ public class GeographicCRS extends CoordinateReferenceSystem
      * The properties are given unchanged to the super-class constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param coordinateSystem The coordinate system.
      * @param datum The datum.
+     * @param cs The coordinate system.
      */
-    public GeographicCRS(final Map           properties,
-                         final EllipsoidalCS coordinateSystem,
-                         final GeodeticDatum datum)
+    public GeographicCRS(final Map      properties,
+                         final GeodeticDatum datum,
+                         final EllipsoidalCS    cs)
     {
-        super(properties, coordinateSystem, datum);
+        super(properties, datum, cs);
     }
     
     /**
@@ -131,7 +131,8 @@ public class GeographicCRS extends CoordinateReferenceSystem
      */
     protected String formatWKT(final Formatter formatter) {
         Unit unit = NonSI.DEGREE_ANGLE;
-        for (int i=coordinateSystem.getDimension(); --i>=0;) {
+        final int dimension = coordinateSystem.getDimension();
+        for (int i=dimension; --i>=0;) {
             final CoordinateSystemAxis axis = coordinateSystem.getAxis(i);
             final Unit candidate = axis.getUnit();
             if (NonSI.DEGREE_ANGLE.isCompatible(unit)) {
@@ -147,7 +148,9 @@ public class GeographicCRS extends CoordinateReferenceSystem
         formatter.append(((GeodeticDatum)datum).getPrimeMeridian());
         formatter.setContextualUnit(oldUnit);
         formatter.append(unit);
-        super.formatWKT(formatter);
+        for (int i=0; i<dimension; i++) {
+            formatter.append(coordinateSystem.getAxis(i));
+        }
         if (!unit.equals(getUnit())) {
             formatter.setInvalidWKT();
         }

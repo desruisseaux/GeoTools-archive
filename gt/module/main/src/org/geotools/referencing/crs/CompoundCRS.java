@@ -70,7 +70,7 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
     public CompoundCRS(final Map properties,
                        CoordinateReferenceSystem[] crs)
     {
-        super(properties, createCoordinateSystem(crs), null);
+        super(properties, null, createCoordinateSystem(crs));
         ensureNonNull("crs", crs);
         this.crs = crs = (CoordinateReferenceSystem[]) crs.clone();
         for (int i=0; i<crs.length; i++) {

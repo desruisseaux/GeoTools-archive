@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.awt.geom.Rectangle2D;
 
 // Geotools dependencies
+import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -63,10 +64,33 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
     private CoordinateReferenceSystem crs;
     
     /**
-     * Construct a copy of the specified envelope.
+     * Construct a new envelope with the same data than the specified envelope.
      */
-    private Envelope(final Envelope envelope) {
-        ordinates = (double[]) envelope.ordinates.clone();
+    private Envelope(final org.opengis.spatialschema.geometry.Envelope envelope) {
+        if (envelope instanceof Envelope) {
+            final Envelope e = (Envelope) envelope;
+            ordinates = (double[]) e.ordinates.clone();
+            crs = e.crs;
+        } else {
+            // TODO: See if we can simplify this code with GeoAPI 1.1
+            final org.opengis.spatialschema.geometry.DirectPosition lower, upper;
+            lower = envelope.getLowerCorner();
+            upper = envelope.getUpperCorner();
+            crs   = lower.getCoordinateReferenceSystem();
+            final int dimension = lower.getDimension();
+            if (!Utilities.equals(crs, upper.getCoordinateReferenceSystem()) ||
+                dimension != upper.getDimension())
+            {
+                // TODO: provides a localized message.
+                throw new IllegalArgumentException("Malformed envelope");
+            }
+            ordinates = new double[2*dimension];
+            for (int i=0; i<dimension; i++) {
+                ordinates[i]           = lower.getOrdinate(i);
+                ordinates[i+dimension] = upper.getOrdinate(i);
+            }
+            checkCoherence();
+        }
     }
     
     /**

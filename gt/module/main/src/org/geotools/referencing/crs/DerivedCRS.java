@@ -42,7 +42,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
+public class DerivedCRS extends GeneralDerivedCRS
                      implements org.opengis.referencing.crs.DerivedCRS
 {
     /**
@@ -53,7 +53,7 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
     /**
      * Constructs a derived CRS from a name.
      *
-     * @param name The name.
+     * @param  name The name.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -73,7 +73,7 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
     }
 
     /**
-     * Constructs a geographic CRS from a set of properties.
+     * Constructs a derived CRS from a set of properties.
      * The properties are given unchanged to the super-class constructor.
      *
      * @param  properties Name and other properties to give to the new object.

@@ -24,9 +24,6 @@ package org.geotools.referencing.cs;
 
 // J2SE dependencies
 import java.util.Map;
-import javax.units.SI;
-import javax.units.Unit;
-import javax.units.UnitFormat;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
@@ -60,13 +57,6 @@ public class TemporalCS extends CoordinateSystem implements org.opengis.referenc
      */
     public static TemporalCS DAYS = new TemporalCS("Temporal",
                     org.geotools.referencing.cs.CoordinateSystemAxis.TIME);
-
-    /**
-     * Unit for milliseconds.
-     *
-     * @todo This declaration may moves in {@link javax.units.NonSI} in a future version.
-     */
-    public static Unit MILLISECOND = UnitFormat.label(SI.SECOND.multiply(1./1000), "ms");
 
     /**
      * Construct a coordinate system from a name.

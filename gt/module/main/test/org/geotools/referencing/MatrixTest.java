@@ -310,50 +310,44 @@ public class MatrixTest extends TestCase {
                                  0,
                                  -Math.sin(Math.PI/3)), p1);
 
-        if (!DISCREPANCY) {
-            /*
-             * From this point, all remaining tests fails with Sun's implementation.
-             */
-            return;
-        }
         // Mat <-> Quat <-> Axis
         a1.set(1, 2, -3, Math.PI/3);
-        mat3dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat3dQuatAxisAngle(a1);
 
         // Mat <-> Quat <-> Axis (near PI case)
         a1.set(1, 2, 3, Math.PI);
-        mat3dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat3dQuatAxisAngle(a1);
         // Mat <-> Quat <-> Axis (near PI, X major case )
         a1.set(1, .1, .1, Math.PI);
-        mat3dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat3dQuatAxisAngle(a1);
         // Mat <-> Quat <-> Axis (near PI, Y major case )
         a1.set(.1, 1, .1, Math.PI);
-        mat3dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat3dQuatAxisAngle(a1);
         // Mat <-> Quat <-> Axis (near PI, Z major case )
         a1.set(.1, .1, 1, Math.PI);
-        mat3dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat3dQuatAxisAngle(a1);
 
         // isometric view 3 times 2/3 turn
         a1.set(1, 1, 1, 2*Math.PI/3);
         m1.set(a1);
         p1.set(1, 0, 0);
         m1.transform(p1);
-        assertEquals(new Point3d(0,1,0), p1);
+        if (DISCREPANCY) assertEquals(new Point3d(0,1,0), p1);
         m1.transform(p1);
-        assertEquals(new Point3d(0,0,1), p1);
+        if (DISCREPANCY) assertEquals(new Point3d(0,0,1), p1);
         m1.transform(p1);
-        assertEquals(new Point3d(1,0,0), p1);
+        if (DISCREPANCY) assertEquals(new Point3d(1,0,0), p1);
 
         // check normalize, normalizeCP
         m1.set(a1);
-        assertEquals(1, m1.determinant());
-        assertEquals(1, m1.getScale());
+        if (DISCREPANCY) assertEquals(1, m1.determinant());
+        if (DISCREPANCY) assertEquals(1, m1.getScale());
         m2.set(a1);
         m2.normalize();
-        assertEquals(m1, m2);
+        if (DISCREPANCY) assertEquals(m1, m2);
         m2.set(a1);
         m2.normalizeCP();
-        assertEquals(m1, m2);
+        if (DISCREPANCY) assertEquals(m1, m2);
         double scale = 3.0;
         m2.rotZ(-Math.PI/4);
         m2.mul(scale);
@@ -374,7 +368,7 @@ public class MatrixTest extends TestCase {
         m1.set(a1);
         m2.invert(m1);
         m1.transpose();
-        assertEquals(m1, m2);
+        if (DISCREPANCY) assertEquals(m1, m2);
     }
 
     private static void mat3dQuatAxisAngle(AxisAngle4d a1) {
@@ -561,27 +555,21 @@ public class MatrixTest extends TestCase {
                                  0,
                                  -Math.sin(Math.PI/3)), p1);
 
-        if (!DISCREPANCY) {
-            /*
-             * From this point, all remaining tests fails with Sun's implementation.
-             */
-            return;
-        }
         // Mat <-> Quat <-> Axis
         a1.set(1,2,-3,Math.PI/3);
         mat4dQuatAxisAngle(a1);
         // Mat <-> Quat <-> Axis (near PI case)
         a1.set(1,2,3,Math.PI);
-        mat4dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat4dQuatAxisAngle(a1);
         // Mat <-> Quat <-> Axis (near PI, X major case )
         a1.set(1,.1,.1,Math.PI);
-        mat4dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat4dQuatAxisAngle(a1);
         // Mat <-> Quat <-> Axis (near PI, Y major case )
         a1.set(.1,1,.1,Math.PI);
-        mat4dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat4dQuatAxisAngle(a1);
         // Mat <-> Quat <-> Axis (near PI, Z major case )
         a1.set(.1,.1,1,Math.PI);
-        mat4dQuatAxisAngle(a1);
+        if (DISCREPANCY) mat4dQuatAxisAngle(a1);
 
         // isometric view 3 times 2/3 turn
         a1.set(1,1,1,2*Math.PI/3);
@@ -615,8 +603,8 @@ public class MatrixTest extends TestCase {
         m2.set(n1, v1, 0.4);
         Vector3d v2 = new Vector3d();
         double s = m1.get(n2, v2);
-        assertEquals(n2, n1);
-        assertEquals(0.4, s);
+        if (DISCREPANCY) assertEquals(n2, n1);
+        if (DISCREPANCY) assertEquals(0.4, s);
         assertEquals(v2, v1);
         assertEquals(m2, m1); // not modified
 
@@ -706,13 +694,7 @@ public class MatrixTest extends TestCase {
 
         GVector p = new GVector(4);
         m1.LUD(m2, p);
-        if (!DISCREPANCY) {
-            /*
-             * From this point, all remaining tests fails with Sun's implementation.
-             */
-            return;
-        }
-        checkLUD(m1, m2, p);
+        if (DISCREPANCY) checkLUD(m1, m2, p);
         GVector xx = new GVector(4);
         xx.LUDBackSolve(m2, b, p);
         assertEquals(xx, x);
@@ -722,9 +704,9 @@ public class MatrixTest extends TestCase {
         GMatrix v = new GMatrix(m1.getNumCol(), m1.getNumCol());
         int rank = m1.SVD(u, w, v);
         assertEquals(4, rank);
-        checkSVD(m1, u, w, v);
+        if (DISCREPANCY) checkSVD(m1, u, w, v);
         xx.SVDBackSolve(u, w, v, b);
-        assertEquals(xx, x);
+        if (DISCREPANCY) assertEquals(xx, x);
 
         // overwrite m1 -LUD-> m1
         // m1.LUD(m1, p);

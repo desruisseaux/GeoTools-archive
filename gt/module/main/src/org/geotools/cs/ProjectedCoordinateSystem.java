@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -63,11 +51,13 @@ import javax.media.jai.ParameterList;
  * Conversions to, and conversions between, projected spatial coordinate
  * systems often do not preserve distances, areas and angles.
  *
- * @version $Id: ProjectedCoordinateSystem.java,v 1.14 2003/11/20 22:18:25 jive Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_ProjectedCoordinateSystem
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.ProjectedCRS}.
  */
 public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
     /**
@@ -182,6 +172,8 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
      * Returns the geographic coordinate system.
      *
      * @see org.opengis.cs.CS_ProjectedCoordinateSystem#getGeographicCoordinateSystem()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.ProjectedCRS#getBaseCRS}.
      */
     public GeographicCoordinateSystem getGeographicCoordinateSystem() {
         return gcs;
@@ -191,6 +183,8 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
      * Gets the projection.
      *
      * @see org.opengis.cs.CS_ProjectedCoordinateSystem#getProjection()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.ProjectedCRS#getConversionFromBase}.
      */
     public Projection getProjection() {
         return projection;
@@ -204,6 +198,8 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
      *
      * @see org.opengis.cs.CS_ProjectedCoordinateSystem#getUnits(int)
      * @see org.opengis.cs.CS_ProjectedCoordinateSystem#getLinearUnit()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getUnit}.
      */
     public Unit getUnits(final int dimension) {
         if (dimension>=0 && dimension<getDimension()) {

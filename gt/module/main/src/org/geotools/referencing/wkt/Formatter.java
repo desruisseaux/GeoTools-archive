@@ -36,6 +36,8 @@ import org.opengis.referencing.Info;
 import org.opengis.referencing.Identifier;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -102,7 +104,7 @@ public class Formatter {
      * element. This value is set for example by "GEOGCS", which force its enclosing "PRIMEM" to
      * take the same units than itself.
      */
-    private Unit unit;
+    private Unit contextualUnit;
 
     /**
      * The format to use for formatting units.
@@ -279,14 +281,25 @@ public class Formatter {
     /**
      * Append a {@linkplain ParameterValue parameter} in WKT form.
      */
-    public void append(final ParameterValue parameter) {
-        if (parameter != null) {
+    public void append(final GeneralParameterValue parameter) {
+        if (parameter instanceof ParameterValueGroup) {
+            final GeneralParameterValue[] parameters = ((ParameterValueGroup)parameter).getValues();
+            for (int i=0; i<parameters.length; i++) {
+                append(parameters[i]);
+            }
+        }
+        if (parameter instanceof ParameterValue) {
+            final ParameterValue param = (ParameterValue) parameter;
             if (buffer.length() != 0) {
                 buffer.append(SEPARATOR);
                 buffer.append(SPACE);
             }
-            final OperationParameter descriptor = (OperationParameter) parameter.getDescriptor();
-            final Unit unit = descriptor.getUnit();
+            // TODO: Remove cast if covariance is allowed.
+            final OperationParameter descriptor = (OperationParameter) param.getDescriptor();
+            Unit unit = descriptor.getUnit();
+            if (unit!=null && contextualUnit!=null && unit.isCompatible(contextualUnit)) {
+                unit = contextualUnit;
+            }
             buffer.append("PARAMETER");
             buffer.append(OPEN);
             buffer.append(QUOTE);
@@ -295,9 +308,9 @@ public class Formatter {
             buffer.append(SEPARATOR);
             buffer.append(SPACE);
             if (unit != null) {
-                buffer.append(parameter.doubleValue(unit));
+                buffer.append(param.doubleValue(unit));
             } else {
-                buffer.append(parameter.getValue());
+                buffer.append(param.getValue());
             }
             buffer.append(CLOSE);
         }
@@ -369,7 +382,7 @@ public class Formatter {
      * @return The unit for measure. Default value is <code>null</code>.
      */
     public Unit getContextualUnit() {
-        return unit;
+        return contextualUnit;
     }
 
     /**
@@ -378,7 +391,7 @@ public class Formatter {
      * @param unit The new unit, or <code>null</code>.
      */
     public void setContextualUnit(final Unit unit) {
-        this.unit = unit;
+        contextualUnit = unit;
     }
 
     /**

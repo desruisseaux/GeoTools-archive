@@ -113,7 +113,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
                              final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
-        super(properties, derivedCS, base.getDatum());
+        super(properties, base.getDatum(), derivedCS);
         ensureNonNull("base",          base); // TODO: useless test, because of 'base.getDatum()' above...
         ensureNonNull("baseToDerived", baseToDerived);
         this.baseCRS            = base;
