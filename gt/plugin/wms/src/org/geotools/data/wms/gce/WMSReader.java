@@ -26,6 +26,7 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.crs.CRSService;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
@@ -37,6 +38,8 @@ import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -133,6 +136,8 @@ public class WMSReader implements GridCoverageReader {
         String miny = "";
         String maxx = "";
         String maxy = "";
+        
+        CoordinateReferenceSystem crs = null;
 
         List values = parameters.values();
 
@@ -225,6 +230,17 @@ public class WMSReader implements GridCoverageReader {
             if (value.getValue() == null) {
                 continue;
             }
+            
+            if (paramName.equals("SRS")) {
+            	String srs = value.stringValue();
+            	
+            	try {
+					crs = new CRSService().createCRS(srs);
+				} catch (FactoryException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
 
             request.setProperty(value.getDescriptor().getName().toString(),
                 value.stringValue());
@@ -244,7 +260,14 @@ public class WMSReader implements GridCoverageReader {
 
         Envelope envelope = new Envelope(new double[] { 366800, 2170400 },
                 new double[] { 816000, 2460400 });
-        CoordinateSystem cs = GeographicCoordinateSystem.WGS84;
+        
+        CoordinateSystem cs;
+        if (crs != null) {
+        	cs = (CoordinateSystem) crs;
+        } else {
+        	cs = GeographicCoordinateSystem.WGS84;
+        }
+        
 
         hasNext = false;
 
