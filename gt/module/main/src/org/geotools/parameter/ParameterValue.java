@@ -23,6 +23,9 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Set;
 import java.util.Arrays;
@@ -40,22 +43,28 @@ import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
+import org.geotools.data.DataSourceException;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * A parameter value used by an operation method. Most parameter values are numeric, but
- * other types of parameter values are possible. The parameter type can be fetch with the
+ * A parameter value used by an operation method.
+ * <p>
+ * Most CRS parameter values are numeric, but other types of parameter values are possible. The parameter type can be fetch with the
  * <code>{@linkplain #getValue()}.{@linkplain Object#getClass() getClass()}</code> idiom.
  * The {@link #getValue()} and {@link #setValue(Object)} methods can be invoked at any time.
  * Others getters and setters are parameter-type dependents.
- *  
+ * </p>
+ * <p>
+ * This implementation extends the capabilities of the geoapi interface with an additional
+ * functionality proivded by parse( text ), and text() methods.
+ * </p> 
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.OperationParameter
+ * @see org.geotools.parameter.ParameterDescriptor
  * @see org.geotools.parameter.ParameterValueGroup
  */
 public class ParameterValue extends GeneralParameterValue
@@ -96,31 +105,31 @@ public class ParameterValue extends GeneralParameterValue
 
     /**
      * Construct a parameter from the specified name and value. This convenience constructor
-     * creates a default {@link org.geotools.parameter.OperationParameter} object. But if such
+     * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code>
-     * is to invokes {@link org.geotools.parameter.OperationParameter#createValue}.
+     * is to invokes {@link org.geotools.parameter.ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
      * @param value The parameter value.
      */
     public ParameterValue(final String name, final int value) {
-        this(new org.geotools.parameter.OperationParameter(name,
+        this(new org.geotools.parameter.ParameterDescriptor(name,
                  0, Integer.MIN_VALUE, Integer.MAX_VALUE));
         this.value = wrap(value);
     }
 
     /**
      * Construct a parameter from the specified name and value. This convenience constructor
-     * creates a default {@link org.geotools.parameter.OperationParameter} object. But if such
+     * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code> is
-     * to invokes {@link org.geotools.parameter.OperationParameter#createValue}.
+     * to invokes {@link org.geotools.parameter.ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
      * @param value The parameter value.
      * @param unit  The unit for the parameter value.
      */
     public ParameterValue(final String name, final double value, final Unit unit) {
-        this(new org.geotools.parameter.OperationParameter(name,
+        this(new org.geotools.parameter.ParameterDescriptor(name,
                  Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, normalize(unit)));
         this.value = wrap(value);
         this.unit  = unit;
@@ -128,15 +137,15 @@ public class ParameterValue extends GeneralParameterValue
 
     /**
      * Construct a parameter from the specified enumeration. This convenience constructor
-     * creates a default {@link org.geotools.parameter.OperationParameter} object. But if
+     * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if
      * such an object was available, then the preferred way to get a <code>ParameterValue</code>
-     * is to invokes {@link org.geotools.parameter.OperationParameter#createValue}.
+     * is to invokes {@link org.geotools.parameter.ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
      * @param value The parameter value.
      */
     public ParameterValue(final String name, final CodeList value) {
-        this(new org.geotools.parameter.OperationParameter(name, value));
+        this(new org.geotools.parameter.ParameterDescriptor(name, value));
         this.value = value;
     }
 
@@ -193,10 +202,10 @@ public class ParameterValue extends GeneralParameterValue
     /**
      * Ensures that the given value is valid according the specified parameter descriptor.
      * This convenience method ensures that <code>value</code> is assignable to the
-     * {@linkplain org.geotools.parameter.OperationParameter#getValueClass expected class}, is between the
-     * {@linkplain org.geotools.parameter.OperationParameter#getMinimumValue minimum} and
-     * {@linkplain org.geotools.parameter.OperationParameter#getMaximumValue maximum} values and is one of the
-     * {@linkplain org.geotools.parameter.OperationParameter#getValidValues set of valid values}.
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValueClass expected class}, is between the
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumValue minimum} and
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMaximumValue maximum} values and is one of the
+     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValidValues set of valid values}.
      * If the value fails any of those tests, then an exception is thrown.
      *
      * @param  descriptor The parameter descriptor to check against.
@@ -627,4 +636,89 @@ public class ParameterValue extends GeneralParameterValue
         if (unit  != null) code += 37*unit.hashCode();
         return code;
     }
+    
+    /**
+     * Set the Parameter value of the provided text.
+     * 
+     * @param text parsed using valueOf( text )
+     */
+    public void parse( String text ) throws IOException {
+        setValue( valueOf( text ) );
+    }
+    /** Text representation of parameter value.
+     * <p>
+     * Should be suitable for use with parse( text )
+     * @return
+     */
+    public String text(){
+        Object obj = getValue();
+        if( obj == null ){
+            return null;
+        }
+        return obj.toString();
+    }
+    /**
+     * Parses the text into a value for this Parameter.
+     * <p>
+     * Default implementation uses reflection to look for a constructor
+     * that takes a single String.
+     * </p>
+     * @param text Text to parse
+     * @return value value of type getDescriptor().getValueClass()
+     * 
+     * @throws IOException If text could not be parsed to getDescriptor().getValueClass()
+     */
+    protected Object valueOf( String text ) throws IOException {
+        
+        OperationParameter descriptor =
+            (OperationParameter) this.getDescriptor();
+        
+        Class type = descriptor.getValueClass();
+        
+        if (text == null) {            
+            return null;
+        }
+        if (type == String.class) {
+            return text;
+        }
+        if (text.length() == 0) {
+            return null;
+        }
+
+        Constructor constructor;
+
+        try {
+            constructor = type.getConstructor(new Class[] { String.class });
+        } catch (SecurityException e) {
+            //  type( String ) constructor is not public
+            throw new IOException("Could not create " + type.getName()
+                + " from text");
+        } catch (NoSuchMethodException e) {
+            // No type( String ) constructor
+            throw new IOException("Could not create " + type.getName()
+                + " from text");
+        }
+
+        try {
+            return constructor.newInstance(new Object[] { text, });
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new DataSourceException("Could not create "
+                + type.getName() + ": from '" + text + "'",
+                illegalArgumentException);
+        } catch (InstantiationException instantiaionException) {
+            throw new DataSourceException("Could not create "
+                + type.getName() + ": from '" + text + "'",
+                instantiaionException);
+        } catch (IllegalAccessException illegalAccessException) {
+            throw new DataSourceException("Could not create "
+                + type.getName() + ": from '" + text + "'",
+                illegalAccessException);
+        } catch (InvocationTargetException targetException) {
+            Throwable cause = targetException.getCause();
+            throw new DataSourceException( cause );
+            
+        }
+    }
+               
 }
+
