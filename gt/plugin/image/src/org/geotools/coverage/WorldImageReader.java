@@ -18,6 +18,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author rgould
@@ -131,7 +132,7 @@ public class WorldImageReader implements GridCoverageReader {
 	 * @param parameters WorldImage supports no parameters, it ignores this param
 	 * @return a new GridCoverage read from the source
 	 */
-	public GridCoverage read(GeneralParameterValue[] parameters)
+	public GridCoverage read( ParameterValueGroup parameters)
 			throws IllegalArgumentException, IOException {
 		
 		URL sourceURL = null;

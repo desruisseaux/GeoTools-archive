@@ -17,6 +17,7 @@ import org.geotools.gc.GridCoverage;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.FileFormatNotCompatibleWithGridCoverageException;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author rgould
@@ -102,7 +103,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 	 * @param coverage the GridCoverage to write.
 	 * @param parameters no parameters are accepted. Currently ignored.
 	 */
-	public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
+	public void write(GridCoverage coverage, ParameterValueGroup parameters)
 			throws IllegalArgumentException, IOException {
 		
 		RenderedImage image = coverage.getRenderedImage();
