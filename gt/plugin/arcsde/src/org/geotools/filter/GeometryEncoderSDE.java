@@ -31,11 +31,12 @@ import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeShapeFilter;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
- * Encodes the geometry and FID related parts of a filter into a set of
+ * Encodes the geometry related parts of a filter into a set of
  * <code>SeFilter</code> objects and provides a method to get the resulting
  * filters suitable to set up an SeQuery's spatial constraints.
  * 
@@ -255,10 +256,22 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
         geom = geom.intersection(layerEnv); // does the work
 
         // Now make an SeShape
-        gb = GeometryBuilder.builderFor(geom.getClass());
-
-        SeShape filterShape = gb.constructShape(geom, sdeLayer.getCoordRef());
-
+	SeShape filterShape;
+        
+        //this is a bit hacky, but I don't yet know this code well enough
+        //to do it right.  Basically if the geometry collection is completely
+        //outside of the area of the layer then an intersection will return
+        //a geometryCollection (two seperate geometries not intersecting will
+        //be a collection of two).  Passing this into GeometryBuilder causes
+        //an exception.  So what I did was just look to see if it is a gc
+        //and if so then just make a null seshape, as it shouldn't match
+        //any features in arcsde. -ch
+        if (geom.getClass() == GeometryCollection.class) {
+            filterShape = new SeShape(sdeLayer.getCoordRef());
+        } else {
+            gb = GeometryBuilder.builderFor(geom.getClass());
+            filterShape = gb.constructShape(geom, sdeLayer.getCoordRef());
+        }
         // Add the filter to our list
         SeShapeFilter shapeFilter = new SeShapeFilter(getLayerName(),
                 sdeLayer.getSpatialColumn(), filterShape, sdeMethod, truth);
