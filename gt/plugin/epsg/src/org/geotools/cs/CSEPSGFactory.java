@@ -25,10 +25,10 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.Properties;
 
+// OpenGIS 
 import org.opengis.referencing.FactoryException;
 
-import jj2000.j2k.NotImplementedError;
-
+//geotools
 import org.geotools.measure.AngleFormat;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.crs.CRSAuthoritySpi;
@@ -85,45 +85,45 @@ public class CSEPSGFactory extends CoordinateSystemAuthorityFactory implements C
         }            
         return DEFAULT;
     }
-   
+
     /**
      * Returns the authority name, which is <code>"EPSG"</code>.
      */
     public String getAuthority() {
         return "EPSG";
     }
-	public Unit createUnit(String code) throws FactoryException {
-		throw new NotImplementedError("Not implemented");
-	}
-	public Ellipsoid createEllipsoid(String code) throws FactoryException {
-		throw new NotImplementedError("Not implemented");
-	}
-	public PrimeMeridian createPrimeMeridian(String code) throws FactoryException {
-		throw new NotImplementedError("Not implemented");
-	}
-	public Datum createDatum(String code) throws FactoryException {
-		throw new NotImplementedError("Not implemented");
-	}
-	/**
-	 * Create Coordiante System from code.
-	 * <p>
-	 * Note the leading "EPSG:" part should of been removed by now.
-	 * </p>
-	 * @see org.geotools.cs.CoordinateSystemAuthorityFactory#createCoordinateSystem(java.lang.String)
-	 */
-	public CoordinateSystem createCoordinateSystem(String code) throws FactoryException {		
-		if (code== null) {
-			return null;
-		}		
-		if (code.startsWith("EPSG:")) { // EPSG:26907
-			code = code.substring( 6 );
-		}
-		code = code.trim();
-		String wkt = epsg.getProperty( code );
-		if( wkt == null ) {
-			throw new FactoryException("Unknonwn EPSG code: '"+code+"'" );
-		}
-		return factory.createFromWKT( wkt );
-	}
-
+    public Unit createUnit(String code) throws FactoryException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    public Ellipsoid createEllipsoid(String code) throws FactoryException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    public PrimeMeridian createPrimeMeridian(String code) throws FactoryException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    public Datum createDatum(String code) throws FactoryException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+    /**
+     * Create Coordiante System from code.
+     * <p>
+     * Note the leading "EPSG:" part should of been removed by now.
+     * </p>
+     * @see org.geotools.cs.CoordinateSystemAuthorityFactory#createCoordinateSystem(java.lang.String)
+     */
+    public CoordinateSystem createCoordinateSystem(String code) throws FactoryException {
+        if (code== null) {
+            return null;
+        }
+        if (code.startsWith("EPSG:")) { // EPSG:26907
+            code = code.substring( 6 );
+        }
+        code = code.trim();
+        String wkt = epsg.getProperty( code );
+        if( wkt == null ) {
+            throw new FactoryException("Unknonwn EPSG code: '"+code+"'" );
+        }
+        return factory.createFromWKT( wkt );
+    }
+    
 }
