@@ -72,6 +72,11 @@ import java.util.logging.Logger;
  * provided, the search mechanism uses first Thread.getContextClassLoader and
  * then falls back on the system ClassLoader. <br>
  *
+ * @deprecated The proposed replacement is {@link FactoryRegistry}, which is built
+ *             on top of a J2SE class ({@link javax.imageio.spi.ServiceRegistry}).
+ *             Guidlines are provided in the {@link org.geotools.factory} package
+ *             description.
+ *
  * @author Ian Schneider
  * @version $Id: FactoryFinder.java,v 1.4 2003/08/05 20:59:23 cholmesny Exp $
  */

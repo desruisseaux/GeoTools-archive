@@ -29,7 +29,7 @@ package org.geotools.factory;
  *
  * @see java.lang.Error
  *
- * @todo This error is used by {@link FactoryFinder}. The proposed replacement
+ * @deprecated This error was used by {@link FactoryFinder}. The proposed replacement
  *       ({@link FactoryRegistry}) uses an exception ({@link FactoryRegistryException}) instead of
  *       an error. There is two reasons why we switched back to an exception instead of an error:
  *       <ul>

@@ -31,9 +31,9 @@ com.mycompany.MyDatumFactory3</PRE></BLOCKQUOTE>
     <P ALIGN="justify">The ordering is initially unspecified. Users can
     {@linkplain javax.imageio.spi.ServiceRegistry#setOrdering set an ordering}
     explicitly themselves, or implementations can do that automatically
-    {@linkplain javax.imageio.spi.ServiceRegistry#onRegistration on registration}.
+    {@linkplain javax.imageio.spi.RegisterableService#onRegistration on registration}.
     The {@link org.geotools.factory.AbstractFactory} class provides a simple way to setup ordering
-    on registration on the basis of a {@linkplain rg.geotools.factory.AbstractFactory#priority priority}
+    on registration on the basis of a {@linkplain org.geotools.factory.AbstractFactory#priority priority}
     number.</P>
     
     <P ALIGN="justify">If a user wants a specific implementation, he can
@@ -62,7 +62,7 @@ com.mycompany.MyDatumFactory3</PRE></BLOCKQUOTE>
           are checked recursively.</P></LI>
 
       <LI><P ALIGN="justify"><U>Optionally</U>, if no factory matches the given hints, a new instance can be
-          {@linkplain org.geotols.factory.FactoryCreator#createServiceProvider automatically created}.
+          {@linkplain org.geotools.factory.FactoryCreator#createServiceProvider automatically created}.
           However, those new instances are not registered. If creation of new instances at every
           {@link org.geotools.factory.FactoryRegistry#getServiceProvider getServiceProvider(...)}
           method invocation is undesired, an implementation matching the expected

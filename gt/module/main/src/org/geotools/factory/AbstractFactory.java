@@ -34,14 +34,14 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * Skeletal implementation of factories. This base classe provides no {@code createFoo} methods,
  * (they must be provided by subclasses), but provides two convenience features:
- * <br><br>
+ * <br>
  * <ul>
  *   <li>An initially empty {@linkplain #hints map of hints} to be filled by subclasses
  *       constructors.</li>
  *   <li>An automatic {@linkplain ServiceRegistry#setOrdering ordering} applied
  *       on the basis of subclasses-provided {@linkplain #priority} rank.</li>
  * </ul>
- * <br><br>
+ * <br>
  * When more than one factory implementation is {@linkplain ServiceRegistry#registerServiceProvider
  * registered} for the same category (i.e. they implement the same {@link Factory} sub-interface),
  * the actual instance to be used is selected according their
@@ -59,7 +59,7 @@ import org.geotools.resources.cts.ResourceKeys;
  */
 public class AbstractFactory implements Factory, RegisterableService {
     /**
-     * The minimum priority for a factory. Factories with lowest priority
+     * The minimum priority for a factory, which is {@value}. Factories with lowest priority
      * will be used only if there is no other factory in the same
      * {@linkplain ServiceRegistry#getCategories category}.
      *
@@ -68,14 +68,14 @@ public class AbstractFactory implements Factory, RegisterableService {
     public static final int MINIMUM_PRIORITY = 1;
 
     /**
-     * The default priority.
+     * The default priority, which is {@value}.
      *
      * @see #onRegistration
      */
     public static final int NORMAL_PRIORITY = 50;
 
     /**
-     * The maximum priority for a factory. Factories with highest
+     * The maximum priority for a factory, which is {@value}. Factories with highest
      * priority will be preferred to any other factory in the same
      * {@linkplain ServiceRegistry#getCategories category}.
      *

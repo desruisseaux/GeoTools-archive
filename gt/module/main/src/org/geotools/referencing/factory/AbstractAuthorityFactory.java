@@ -832,7 +832,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      *
      * @see #MINIMUM_PRIORITY
      * @see #MAXIMUM_PRIORITY
-     * @see FactoryFinder
+     * @see org.geotools.referencing.FactoryFinder
      */
     public void onRegistration(final ServiceRegistry registry, final Class category) {
         for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {

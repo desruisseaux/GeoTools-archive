@@ -24,14 +24,14 @@ import java.util.Map;
  * Each concrete implementation shall be registered for use in a <cite>service registry</cite>.
  * Service registries don't need to be a Geotools implementation. They can be (but are not limited
  * to) {@link FactoryRegistry}. The steps to follows are:
- * <br><br>
+ * <br>
  * <ul>
  *   <li>Provide a public no-arguments constructor.</li>
  *   <li>Add the fully qualified name of the <u>implementation</u> class in the
  *       {@code META-INF/services}<var>classname</var> where <var>classname</var>
  *       is the fully qualified name of the <u>interface</u> class.</li>
  * </ul>
- * <br><br>
+ * <br>
  * In addition, implementations may provide a constructor expecting a single {@link Hints} argument.
  * This optional argument gives to the user some control on factory's low-level details (for example
  * the {@linkplain org.opengis.referencing.datum.DatumFactory datum factory} backing an
