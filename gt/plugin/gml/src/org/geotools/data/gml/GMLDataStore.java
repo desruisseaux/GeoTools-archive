@@ -38,7 +38,7 @@ public class GMLDataStore extends AbstractFileDataStore {
      * @throws URISyntaxException
      */
     public GMLDataStore(URL url) throws URISyntaxException{
-        this.uri = url.toURI(); // this is a url if it came from the factory
+        this.uri = new URI(url.toString()); // this is a url if it came from the factory
     }
     
     /**
@@ -47,7 +47,7 @@ public class GMLDataStore extends AbstractFileDataStore {
      * @param dir
      * @throws URISyntaxException
      */
-    protected GMLDataStore(URI url) throws URISyntaxException{
+    protected GMLDataStore(URI url){
         this.uri = url;
     }
 

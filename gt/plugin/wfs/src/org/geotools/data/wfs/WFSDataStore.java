@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class WFSDataStore extends AbstractDataStore{
     private WFSCapabilities capabilities = null;
-    private static Logger logger = Logger.getLogger("org.geotools.data.wfs"); 
+    protected static final Logger logger = Logger.getLogger("org.geotools.data.wfs"); 
  	
     private int protos = 0;
  	private static final int POST_FIRST = 1;
@@ -469,12 +469,30 @@ public class WFSDataStore extends AbstractDataStore{
 		
         HttpURLConnection hc = (HttpURLConnection)postUrl.openConnection();
         hc.setRequestMethod("POST");
+        
         OutputStream os = getOutputStream(hc,auth);
         // write request
         
         Writer w = new OutputStreamWriter(os);
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[2]); // GetFeature
+//
+//Writer sw = new StringWriter();
+//try{
+//	if(query == null){
+//		query = new DefaultQuery(typeName);
+//   	}else{
+//    if(!typeName.equals(query.getTypeName())){
+//    	logger.warning("typeName != query.getTypeName() :: causes conflict");
+//    }}
+//    DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
+//}catch(OperationNotSupportedException e){
+//    logger.warning(e.toString());
+//    throw new SAXException(e);
+//}
+//System.out.println(sw);
+//        
+        
         try{
         	if(query == null){
         		query = new DefaultQuery(typeName);

@@ -1,6 +1,7 @@
 package org.geotools.data.gml;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -26,7 +27,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
         URL url = (URL) URLP.lookUp( params ); // try early error        
         if( testURL(url)){  
             try{
-                return new GMLDataStore( url.toURI() );
+                return new GMLDataStore( new URI(url.toString()) );
             }catch(URISyntaxException e){
                 throw new IOException(e.toString());
             }
@@ -135,7 +136,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
     public DataStore createDataStore(URL url) throws IOException {        
         if(canProcess(url))
             try{
-            return new GMLDataStore(url.toURI());
+            return new GMLDataStore(new URI(url.toString()));
 
             }catch(URISyntaxException e){
                 throw new IOException(e.toString());
