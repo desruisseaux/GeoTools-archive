@@ -65,4 +65,74 @@ public final class UnmodifiableArrayList extends AbstractList implements Seriali
     public Object get(final int index) {
         return array[index];
     }
+
+    /**
+     * Returns the index in this list of the first occurence of the specified
+     * element, or -1 if the list does not contain this element. This method
+     * is overriden only for performance reason (the default implementation
+     * would work as well).
+     */
+    public int indexOf(final Object object) {
+        if (object == null) {
+            for (int i=0; i<array.length; i++) {
+                if (array[i] == null) {
+                    return i;
+                }
+            }
+        } else {
+            for (int i=0; i<array.length; i++) {
+                if (object.equals(array[i])) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the index in this list of the last occurence of the specified
+     * element, or -1 if the list does not contain this element. This method
+     * is overriden only for performance reason (the default implementation
+     * would work as well).
+     */
+    public int lastIndexOf(final Object object) {
+        int i = array.length;
+        if (object == null) {
+            while (--i >= 0) {
+                if (array[i] == null) {
+                    break;
+                }
+            }
+        } else {
+            while (--i >= 0) {
+                if (object.equals(array[i])) {
+                    break;
+                }
+            }
+        }
+        return i;
+    }
+
+    /**
+     * Returns <code>true</code> if this collection contains the specified element.
+     * This method is overriden only for performance reason (the default implementation
+     * would work as well).
+     */
+    public boolean contains(final Object object) {
+        int i = array.length;
+        if (object == null) {
+            while (--i >= 0) {
+                if (array[i] == null) {
+                    return true;
+                }
+            }
+        } else {
+            while (--i >= 0) {
+                if (object.equals(array[i])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

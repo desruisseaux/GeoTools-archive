@@ -332,10 +332,11 @@ public class ParameterTest extends TestCase {
         Collection               content;
         Map                      properties;
         Parameter                automatic;
+
         /* --------------------------------------------- *
          * Case (v1, v2, v3) where:
          *    - v1   is mandatory
-         *    - v2   is mandatory and can appears twice
+         *    - v2   is mandatory
          *    - v3   is optional
          * --------------------------------------------- */
         properties = Collections.singletonMap("name", "group");
@@ -351,6 +352,7 @@ public class ParameterTest extends TestCase {
         assertSame  ("p2",  p2, descriptor.descriptor("2"));
         assertSame  ("p3",  p3, descriptor.descriptor("3"));
 
+        // Checks default values
         content = group.values();
         assertEquals("values", 3, content.size());
         assertTrue  ("v1",  content.contains(v1 ));
@@ -366,8 +368,34 @@ public class ParameterTest extends TestCase {
         assertEquals("v2",  20, group.parameter("2").intValue());
         assertEquals("v3",  30, group.parameter("3").intValue());
 
-        assertEquals("new", group, group=new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3}));
+        // Tests the replacement of some values
+        assertFalse("v1b", group.values().remove(v1b));
+//        try {
+//            assertTrue(group.values().remove(v1));
+//            fail("v1 is a mandatory parameter; it should not be removeable.");
+//        } catch (InvalidParameterCardinalityException e) {
+//            // This is the expected exception.
+//        }
+        assertTrue  ("v1b", group.values().add(v1b));
+        assertTrue  ("v2b", group.values().add(v2b));
+        assertTrue  ("v3b", group.values().add(v3b));
+        assertFalse ("v1b", group.values().add(v1b)); // Already present
+        assertFalse ("v2b", group.values().add(v2b)); // Already present
+        assertFalse ("v3b", group.values().add(v3b)); // Already present
+        assertEquals("v1b", -10, group.parameter("1").intValue());
+        assertEquals("v2b", -20, group.parameter("2").intValue());
+        assertEquals("v3b", -30, group.parameter("3").intValue());
+        assertEquals("values", 3, content.size());
 
+        // Tests equality
+        assertEquals("new", group, group=new ParameterGroup(descriptor, new Parameter[] {v1b, v2b, v3b}));
+
+        /* --------------------------------------------- *
+         * Case (v1, v2) where:
+         *    - v1   is mandatory
+         *    - v2   is mandatory
+         *    - v3   is optional and initially omitted
+         * --------------------------------------------- */
         group      = new ParameterGroup(descriptor, new Parameter[] {v1, v2});
         descriptor = (ParameterDescriptorGroup) group.getDescriptor();
         content    = group.values();
@@ -384,6 +412,18 @@ public class ParameterTest extends TestCase {
         assertFalse    ("automatic",  content.contains(automatic));
         assertNotEquals("v3",   v3,   group.parameter ("3")); // Should have automatically created.
         assertTrue     ("automatic",  content.contains(automatic));
+
+        // Tests the replacement of some values
+        assertTrue  ("v1b", group.values().add(v1b));
+        assertTrue  ("v2b", group.values().add(v2b));
+        assertTrue  ("v3b", group.values().add(v3b));
+        assertFalse ("v1b", group.values().add(v1b)); // Already present
+        assertFalse ("v2b", group.values().add(v2b)); // Already present
+        assertFalse ("v3b", group.values().add(v3b)); // Already present
+        assertEquals("v1b", -10, group.parameter("1").intValue());
+        assertEquals("v2b", -20, group.parameter("2").intValue());
+        assertEquals("v3b", -30, group.parameter("3").intValue());
+        assertEquals("values", 3, content.size());
 if (true) return;
 
         group      = new ParameterGroup(descriptor, new Parameter[] {v1, v2, v3, v2b});

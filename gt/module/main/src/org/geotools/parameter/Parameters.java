@@ -51,7 +51,8 @@ public class Parameters {
             new org.geotools.parameter.ParameterDescriptorGroup("empty",
             new GeneralParameterDescriptor[0]);
     
-    /** Locate by GeneralParameterDescriptor by ID (rather than name).
+    /**
+     * Locate by GeneralParameterDescriptor by ID (rather than name).
      * <p>
      * Name is localized - and not especially useful as a key to retrive
      * parameters. This lookup offers a bridge allowing you to lookup a
@@ -59,19 +60,27 @@ public class Parameters {
      * </p>
      * @param type
      * @return
+     *
+     * @deprecated In latest implementation, names are no longer localized.
      */
     public static GeneralParameterDescriptor id( ParameterDescriptorGroup type, String id ){
 //        GeneralParameterDescriptor types[] = type.descriptors();
-        
         return null;
     }
+
+    /**
+     * @deprecated Not yet implemented.
+     */
     public static IdentifiedObject id( IdentifiedObject objs[], String id ){
         for( int i=0; i<objs.length; i++){
             IdentifiedObject obj = objs[i];
-            
         }
         return null;
     }
+
+    /**
+     * @deprecated Use <code>group.descriptors().contains(type)</code> instead.
+     */
     public static boolean allowed( ParameterDescriptorGroup group, GeneralParameterDescriptor type){
         List types = group.descriptors();
         for(final Iterator it=types.iterator(); it.hasNext();) {
@@ -82,30 +91,41 @@ public class Parameters {
         return false;
     }
     
-    /** Used to handle code that expexted group.getValues() */
-    public static GeneralParameterValue[] array( ParameterValueGroup group ){
+    /**
+     * Used to handle code that expexted group.getValues().
+     *
+     * @deprecated This method was provided as a bridge between the old API (array-based) to the
+     *             new API (list-based). New code should work directly on the list instead.
+     */
+    public static GeneralParameterValue[] array(ParameterValueGroup group) {
         List params = group.values(); 
         return (GeneralParameterValue[]) params.toArray( new GeneralParameterValue[ params.size()] );
     }
+
     /**
      * Number of type in group.
      * 
      * @param group
      * @param type
      * @return count of type in group
+     *
+     * @deprecated Use <code>ParameterValueGroup.groups(type.getName().getCode())</code>
+     *             instead. It allows to fetch groups by name independently of the actual
+     *             descriptor implementation. The returned list can be used for many operation,
+     *             including fetching the count with <code>size()</code>.
      */ 
-    public static int count( ParameterValueGroup group, GeneralParameterDescriptor type){
-        GeneralParameterValue[] params = array( group );
-        ParameterDescriptorGroup groupType = (ParameterDescriptorGroup) group.getDescriptor();        
+    public static int count(ParameterValueGroup group, GeneralParameterDescriptor type) {
+        final GeneralParameterValue[] params = array( group );
         int count = 0;
         for (int i=0; i<params.length; i++) {
             final GeneralParameterValue param = params[i];
-            if( param.getDescriptor() == type ){
+            if (param.getDescriptor() == type) {
                 count++;
             }
         }
         return count;
     }
+
     /**
      * Check a ParameterValue against its ParameterDescriptor.
      * <p>
@@ -151,7 +171,8 @@ public class Parameters {
             isValidValue( value, descriptor );
         }
         return true;
-    }    
+    }
+
     /**
      * Called on a single ParameterValue, or on elements of a ParameterValue
      * <p>
@@ -178,6 +199,7 @@ public class Parameters {
         }
         return true;        
     }
+
     /**
      * Search for an exact match for the provided GeneralParameterDescriptor.
      * <p>
@@ -198,7 +220,8 @@ public class Parameters {
             }
         }
         return -1;
-    }    
+    }
+
     /**
      * Search for an exact match for the provided GeneralParameterDescriptor.
      * <p>
@@ -221,6 +244,7 @@ public class Parameters {
         }
         return list;
     }
+
     /**
      * Search for an exact match for the provided GeneralParameterDescriptor.
      * <p>
