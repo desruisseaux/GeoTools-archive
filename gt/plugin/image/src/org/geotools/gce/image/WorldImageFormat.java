@@ -61,7 +61,7 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
     public static final ParameterDescriptor CRS =new ParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //calss of the object we will pass
             null, //list of valid values not provided
-            WorldImageFormat.getDefaultCRS() //default value
+            getDefaultCRS() //default value
         );
 
     public static final ParameterDescriptor ENVELOPE = new ParameterDescriptor("envelope",
@@ -204,16 +204,4 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
         return null;
     }
 
-    /**
-     * getDefaultCRS
-     */
-    static CoordinateReferenceSystem getDefaultCRS() {
-        try{
-            return org.geotools.referencing.CRS.decode("EPSG:4326");
-        }
-        catch(org.opengis.referencing.NoSuchAuthorityCodeException e)
-        {
-            return GeographicCRS.WGS84;
-        }
-    }
 }
