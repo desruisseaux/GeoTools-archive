@@ -115,6 +115,8 @@ public interface Metadata {
          *
          */
         boolean isMetadataEntity();
+        
+        Entity getEntity();
     }    
     
 }

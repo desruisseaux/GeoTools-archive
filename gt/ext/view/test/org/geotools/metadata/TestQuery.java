@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
+import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 
 import junit.framework.TestCase;
 
@@ -42,11 +43,16 @@ public class TestQuery extends TestCase {
      * Class under test for boolean accepts(Metadata)
      */
     public void testAcceptsMetadata() throws IOException{
-        /*StupidNestedMetadata mdata=new StupidNestedMetadataImpl();
+        StupidNestedMetadata mdata=new StupidNestedMetadataImpl();
         Expr expr=Exprs.meta("FileData/Name");
         Query q= new Query(expr);
-        q.accepts(mdata);
-        */
+        assertTrue(q.accepts(mdata));
+        
+        expr=Exprs.meta("Data");
+        q= new Query(expr);
+        assertTrue(q.accepts(mdata));
+
+        
     }
 
 }

@@ -45,9 +45,14 @@ public abstract class AbstractMetadata implements Metadata {
     /**
      * @see org.geotools.metadata.Metadata#getElement(java.lang.String)
      */
-    public final Object getElement(String xPath) {
-        // TODO do a *real* xpath get element
-        return invoke(((ElementImpl) type.getElement(xPath)).getGetMethod());
+    public final Object getElement(String xpath) {
+        List elements=XPath.match(xpath,this);
+        if( elements.isEmpty() )
+            return null;
+        if( elements.size() == 1){
+            return elements.get(0);
+        }
+        return elements;
     }
 
     /**
@@ -170,9 +175,12 @@ public abstract class AbstractMetadata implements Metadata {
          * @see org.geotools.metadata.Metadata.Entity#getElement(java.lang.String)
          */
         public Object getElement(String xpath) {
-            return elemMap.get(xpath);
-
-            //TODO implement for more complicated xpaths
+            List result = XPath.match(xpath, this);
+            if(result.isEmpty())
+                return null;
+            if(result.size()==1)
+                return result.get(0);
+            return result;
         }
 
         /**
@@ -195,7 +203,7 @@ public abstract class AbstractMetadata implements Metadata {
         
         private boolean nillable;
         
-        private boolean isMetadataEntity=false;
+        private Entity entity;
 
         /**
          * @param elementClass
@@ -205,7 +213,7 @@ public abstract class AbstractMetadata implements Metadata {
             type = elementClass;
             name = method.getName().substring(3);
             if( Metadata.class.isAssignableFrom(elementClass))
-                isMetadataEntity=true;
+                entity=EntityImpl.getEntity(elementClass);
 
         }
 
@@ -242,8 +250,11 @@ public abstract class AbstractMetadata implements Metadata {
          * @see org.geotools.metadata.Metadata.Element#isMetadataEntity()
          */
         public boolean isMetadataEntity() {
-            return isMetadataEntity;
+            return entity==null?false:true;
         }
-
+        
+        public Entity getEntity(){
+            return entity;
+        }
     }
 }

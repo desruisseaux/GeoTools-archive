@@ -44,9 +44,9 @@ public class XPath {
         terms[index] = newTerm;
     }
 
-    private List match(Metadata metadata, int index) {
+    private List match(Metadata metadata, Metadata.Entity entity, int index) {
 
-        List elements = metadata.getEntity().getElements();
+        List elements = entity.getElements();
         List result = new ArrayList();
 
         String term = terms[index];
@@ -70,17 +70,22 @@ public class XPath {
              */
             if (index < terms.length - 1){
                 if (element.isMetadataEntity()) {
-                    metadata = (Metadata) metadata.getElement(element);
-                    result.addAll(match(metadata, index + 1));
+                    if( metadata != null )
+                        metadata = (Metadata) metadata.getElement(element);
+                    result.addAll(match(metadata, element.getEntity(), index + 1));
                 }else
                     return result;
-            }else
-                result.add(element);
+            }else{
+                if( metadata==null )
+                    result.add(element);
+                else
+                    result.add(metadata.getElement(element));
+            }
             
         }
         return result;
     }
-
+    
     private List find(String term, List elements) {
         List result = new ArrayList();
 
@@ -94,13 +99,44 @@ public class XPath {
         return result;
     }
 
-    public List match(Metadata metadata) {
-        return match(metadata, 0);
+    /**
+     * Returns a List of the Metadata.Elements that satisfy the XPath expression
+     * represented by this object
+     *  
+     * @param entity the Metadata.Entity that used as the root of the XPath evaluation 
+     * @return List of the Metadata.Elements that satisfy the XPath expression
+     * represented by this object
+     */
+    public List match(Metadata.Entity entity) {
+        return match(null, entity, 0);
     }
-
+    
+    /**
+     * Returns a List of Objects which are the values of the Metadata.Element indicated by
+     * the XPath expression which this object represents
+     * 
+     * @param metadata The Metadata class that is the root of the evaluation.
+     * @return List of Objects which are the values of the Metadata.Element indicated by
+     * the XPath expression which this object represents
+     */
+    public List match(Metadata metadata) {
+        return match(metadata, metadata.getEntity(), 0);
+    }
+    
+    /**
+     * 
+     * @param expr
+     * @param metadata
+     * @return
+     */
     public static List match(String expr, Metadata metadata) {
         XPath xpath = new XPath(expr);
         return xpath.match(metadata);
+    }
+
+    public static List match(String expr, Metadata.Entity entity) {
+        XPath xpath = new XPath(expr);
+        return xpath.match(entity);
     }
 
     private class Term {

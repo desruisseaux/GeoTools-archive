@@ -199,28 +199,22 @@ public class TestFileMetadataImpl extends TestCase {
      * Class under test for Object getElement(String)
      */
     public void testGetElementString() {
-        File f=new File(resource.getFile());
-        assertNotNull(f);
-        FileMetadataImpl metadata=new FileMetadataImpl( f, "ArcGrid" );
-        assertNotNull(metadata);
 
-        // test begins
-        Entity entity=metadata.getEntity();
-        List elements=entity.getElements();
-        List values=metadata.getElements(null);
-        int i=0;
-        for (Iterator iter = elements.iterator(); iter.hasNext();i++) {
-            Metadata.Element element = (Metadata.Element) iter.next();
-            String name=element.getName();
-            Object value=metadata.getElement(name);
-            assertEquals(value, values.get(i));
-        }//for
+        StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
+        String element=(String)data.getElement("FileData/Name");
+        assertEquals("ArcGrid.asc",element);
         
-        
- /*       StupidNestedMetadataImpl data=new StupidNestedMetadataImpl();
-        Metadata.Element element=(Metadata.Element)data.getElement("FileData/Name");
-        assertEquals(element.getType(), String.class);
-        assertEquals(element.getName(), "Name");
-*/    }
+        //Test xpath with wildcards
+        List list=(List) data.getElement("FileData/\\w*");
+        assertEquals(5,list.size());
+
+        String name=(String) data.getElement("\\w*/Name");
+        assertEquals("ArcGrid.asc",name);
+
+        //Test xpath with wildcards
+        list=(List) data.getElement("\\w*/\\w*");
+        assertEquals(5,list.size());
+
+    }
 
  }
