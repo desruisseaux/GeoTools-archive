@@ -18,7 +18,8 @@ package org.geotools.metadata.test;
 
 import java.io.IOException;
 
-import org.geotools.data.coverage.grid.TestCaseSupport;
+import junit.framework.TestCase;
+
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
 import org.geotools.metadata.Query;
@@ -30,7 +31,7 @@ import org.geotools.metadata.Query;
  * @author jeichar
  *
  */
-public class QueryTest extends TestCaseSupport {
+public class QueryTest extends TestCase {
 
     /*
      * @see TestCase#setUp()
