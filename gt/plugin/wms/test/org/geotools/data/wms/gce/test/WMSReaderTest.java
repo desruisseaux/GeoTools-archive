@@ -15,7 +15,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.data.wms.SimpleLayer;
-import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSOperationParameter;
@@ -33,7 +33,7 @@ import org.opengis.parameter.GeneralOperationParameter;
  */
 public class WMSReaderTest extends TestCase {
 
-	WMT_MS_Capabilities capabilities;
+	Capabilities capabilities;
 	WMSReader reader;
 	URL server;
 	WMSFormat format;

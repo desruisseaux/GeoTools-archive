@@ -23,71 +23,45 @@ package org.geotools.data.wms.capabilities;
  */
 public class Request {
     
-    /** 
-     * For each operation offered by the server, list the available output 
-     * formats and the online resource.
-     */
-    
-    private GetCapabilities getCapabilities;
-    private GetMap getMap;
-    private GetFeatureInfo getFeatureInfo;
+    private OperationType getCapabilities;
+    private OperationType getMap;
+    private OperationType getFeatureInfo;
 
-    /** The following optional operations only apply to SLD-enabled WMS */
-    private DescribeLayer describeLayer;
-    private GetLegendGraphic getLegendGraphic;
-    private GetStyles getStyles;
-    private PutStyles putStyles;
     
-    /**
-     * @param getCapabilities
-     * @param getMap
-     */
-    public Request(GetCapabilities getCapabilities, GetMap getMap) {
-        super();
-        this.getCapabilities = getCapabilities;
-        this.getMap = getMap;
-    }
-    
-    public DescribeLayer getDescribeLayer() {
-        return describeLayer;
-    }
-    public void setDescribeLayer(DescribeLayer describeLayer) {
-        this.describeLayer = describeLayer;
-    }
-    public GetCapabilities getGetCapabilities() {
-        return getCapabilities;
-    }
-    public void setGetCapabilities(GetCapabilities getCapabilities) {
-        this.getCapabilities = getCapabilities;
-    }
-    public GetFeatureInfo getGetFeatureInfo() {
-        return getFeatureInfo;
-    }
-    public void setGetFeatureInfo(GetFeatureInfo getFeatureInfo) {
-        this.getFeatureInfo = getFeatureInfo;
-    }
-    public GetLegendGraphic getGetLegendGraphic() {
-        return getLegendGraphic;
-    }
-    public void setGetLegendGraphic(GetLegendGraphic getLegendGraphic) {
-        this.getLegendGraphic = getLegendGraphic;
-    }
-    public GetMap getGetMap() {
-        return getMap;
-    }
-    public void setGetMap(GetMap getMap) {
-        this.getMap = getMap;
-    }
-    public GetStyles getGetStyles() {
-        return getStyles;
-    }
-    public void setGetStyles(GetStyles getStyles) {
-        this.getStyles = getStyles;
-    }
-    public PutStyles getPutStyles() {
-        return putStyles;
-    }
-    public void setPutStyles(PutStyles putStyles) {
-        this.putStyles = putStyles;
-    }
+	/**
+	 * @return Returns the getCapabilities.
+	 */
+	public OperationType getGetCapabilities() {
+		return getCapabilities;
+	}
+	/**
+	 * @param getCapabilities The getCapabilities to set.
+	 */
+	public void setGetCapabilities(OperationType getCapabilities) {
+		this.getCapabilities = getCapabilities;
+	}
+	/**
+	 * @return Returns the getFeatureInfo.
+	 */
+	public OperationType getGetFeatureInfo() {
+		return getFeatureInfo;
+	}
+	/**
+	 * @param getFeatureInfo The getFeatureInfo to set.
+	 */
+	public void setGetFeatureInfo(OperationType getFeatureInfo) {
+		this.getFeatureInfo = getFeatureInfo;
+	}
+	/**
+	 * @return Returns the getMap.
+	 */
+	public OperationType getGetMap() {
+		return getMap;
+	}
+	/**
+	 * @param getMap The getMap to set.
+	 */
+	public void setGetMap(OperationType getMap) {
+		this.getMap = getMap;
+	}
 }

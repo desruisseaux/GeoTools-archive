@@ -44,16 +44,6 @@ public class Service {
 	/** Abstract allows a description providing more information about the Service */
 	private String _abstract;
 	
-	/** Information about a contact person for the service. */
-	private ContactInformation contactInformation;
-	
-	/** Defaults to "none" if no fees are specified */
-	private String fees = "none";
-	
-	/** Defaults to "none" if no access constraints are specified */
-	private String accessConstraints = "none";
-	
-	
     /**
      * @param name
      * @param title
@@ -70,24 +60,6 @@ public class Service {
     }
     public void set_abstract(String _abstract) {
         this._abstract = _abstract;
-    }
-    public String getAccessConstraints() {
-        return accessConstraints;
-    }
-    public void setAccessConstraints(String accessConstraints) {
-        this.accessConstraints = accessConstraints;
-    }
-    public ContactInformation getContactInformation() {
-        return contactInformation;
-    }
-    public void setContactInformation(ContactInformation contactInformation) {
-        this.contactInformation = contactInformation;
-    }
-    public String getFees() {
-        return fees;
-    }
-    public void setFees(String fees) {
-        this.fees = fees;
     }
     public List getKeywordList() {
         return keywordList;

@@ -23,7 +23,7 @@ import java.net.URL;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.Capabilities;
 import org.opengis.parameter.GeneralOperationParameter;
 
 /**
@@ -34,7 +34,7 @@ import org.opengis.parameter.GeneralOperationParameter;
  */
 public class WMSFormat extends AbstractGridFormat {
 	
-	private WMT_MS_Capabilities capabilities;
+	private Capabilities capabilities;
 
 	public WMSFormat() {
 		
@@ -43,7 +43,7 @@ public class WMSFormat extends AbstractGridFormat {
 	/**
 	 * @param capabilities
 	 */
-	public WMSFormat(WMT_MS_Capabilities capabilities) {
+	public WMSFormat(Capabilities capabilities) {
 		this.capabilities = capabilities;
 	}
 	
@@ -90,7 +90,7 @@ public class WMSFormat extends AbstractGridFormat {
 			return true;
 		}
 		
-		if (input instanceof WMT_MS_Capabilities) { 
+		if (input instanceof Capabilities) { 
 			return true;
 		}
 		return false;

@@ -20,7 +20,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.geotools.data.wms.CapabilitiesParser;
-import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.resources.TestData;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -49,23 +49,15 @@ public class CapabilitiesParserTest extends TestCase {
 		Document document = builder.build(getCapsURL);
 
 		Element root = document.getRootElement(); //Root = "WMT_MS_Capabilities"
-		WMT_MS_Capabilities capabilities = CapabilitiesParser.parseCapabilities(root);
+		Capabilities capabilities = CapabilitiesParser.parseCapabilities(root);
 		assertNotNull(capabilities);
 		assertEquals(capabilities.getService().getName(), "OGC:WMS");
 		assertEquals(capabilities.getService().getKeywordList().size(), 6);
-		assertEquals(capabilities.getService().getContactInformation().getContactPersonPrimary().getContactOrganization(), "Microsoft");
-		assertEquals(capabilities.getService().getFees(), "none");
 		
-		assertEquals(capabilities.getCapability().getRequest().getGetCapabilities().getFormats().size(), 1);
-		assertEquals(capabilities.getCapability().getException().getFormats().size(), 4);
-		assertEquals(capabilities.getCapability().getLayer().getTitle(), "Microsoft TerraServer Map Server");
-		
-		assertEquals(capabilities.getCapability().getLayer().getAttribution().getTitle(), "U.S. Geological Survey");
-		assertEquals(capabilities.getCapability().getLayer().getAttribution().getLogoURL().getFormat(), "image/gif");
-		assertEquals(capabilities.getCapability().getLayer().getSubLayers().size(), 3);
+		assertEquals(capabilities.getRequest().getGetCapabilities().getFormats().length, 1);
+		assertEquals(capabilities.getLayers()[0].getTitle(), "Microsoft TerraServer Map Server");
 		
 		assertEquals(capabilities.getVersion(), "1.1.1");
-		assertEquals(capabilities.getUpdateSequence(), "0");
 	}
 
 }

@@ -34,7 +34,7 @@ import junit.framework.TestCase;
 
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
@@ -106,7 +106,7 @@ public class WebMapServerTest extends TestCase {
 	public void testIssueGetMapRequest() throws Exception {
 	    WebMapServer wms = new WebMapServer(serverURL);
 	    
-	    WMT_MS_Capabilities capabilities = wms.getCapabilities();
+	    Capabilities capabilities = wms.getCapabilities();
 	    
 	    GetMapRequest request = wms.createGetMapRequest();
 	    

@@ -33,7 +33,7 @@ import java.util.TreeSet;
 import org.geotools.data.wms.capabilities.DCPType;
 import org.geotools.data.wms.capabilities.Get;
 import org.geotools.data.wms.capabilities.Layer;
-import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
@@ -68,7 +68,7 @@ import org.jdom.JDOMException;
 public class WebMapServer {
 	
 	private final URL serverURL;
-	private WMT_MS_Capabilities capabilities;
+	private Capabilities capabilities;
 	private Exception problem;
 	
 	public static final int IN_PROGRESS = 1;
@@ -154,7 +154,7 @@ public class WebMapServer {
 	 * 
 	 * @return a WMT_MS_Capabilities, or null if there was an error
 	 */
-	public WMT_MS_Capabilities getCapabilities() {
+	public Capabilities getCapabilities() {
 		if (capabilities == null) {
 			if (requestRetriever != null && requestRetriever.isAlive()) {
 				try {

@@ -17,6 +17,7 @@
 package org.geotools.data.wms.gce;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,7 @@ import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Utils;
 import org.geotools.data.wms.capabilities.Layer;
 import org.geotools.data.wms.capabilities.Style;
-import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.Capabilities;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralOperationParameter;
 
@@ -38,9 +39,9 @@ import org.opengis.parameter.GeneralOperationParameter;
  */
 public class WMSParameterMaker {
 
-	private WMT_MS_Capabilities capabilities;
+	private Capabilities capabilities;
 	
-	public WMSParameterMaker(WMT_MS_Capabilities capabilities) {
+	public WMSParameterMaker(Capabilities capabilities) {
 		this.capabilities = capabilities;
 	}
 	
@@ -69,7 +70,11 @@ public class WMSParameterMaker {
         param.minOccurs = 1;
         param.remarks = "Value contains the desired format";
         param.validValues = new TreeSet();
-        List formats = capabilities.getCapability().getRequest().getGetMap().getFormats();
+        List formats = new ArrayList();
+		String[] formatStrings = capabilities.getRequest().getGetMap().getFormats();
+		for(int i = 0; i < formatStrings.length; i++) {
+			formats.add(formatStrings[i]);
+		}
         param.validValues.addAll(formats);
 
         Identifier id = null;
@@ -100,7 +105,7 @@ public class WMSParameterMaker {
         param.remarks = "Value contains the desired SRS for the entire map";
         
         Set srs = new TreeSet();
-        retrieveSRSs(capabilities.getCapability().getLayer(), srs);
+        retrieveSRSs(capabilities.getLayers(), srs);
         param.validValues = srs;
         
         Identifier id = null;
