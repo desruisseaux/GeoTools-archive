@@ -43,6 +43,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * {@link org.geotools.data.DataStore interface DataStore} for DataStore usage details.
  * @author Gary Sheppard garysheppard@psu.edu
  * @author Andrea Aime aaime@users.sourceforge.net
+ * @author Debasish Sahu debasish.sahu@rmsi.com
  */
 
 public class MySQLDataStore extends JDBCDataStore {
@@ -244,11 +245,15 @@ public class MySQLDataStore extends JDBCDataStore {
         }
     }
 
+	 /**
+     * @see org.geotools.data.jdbc.JDBCDataStore#getSqlBuilder(java.lang.String)
+     */
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
         //SQLEncoder encoder = new SQLEncoderMySQL(); replace with this once
 	//it is fully tested, the test cases work, but I don't have a live
         //mysql database. -ch
-        SQLEncoder encoder = new SQLEncoder();
+        //SQLEncoder encoder = new SQLEncoder();
+		SQLEncoderMySQL encoder = new SQLEncoderMySQL(); 
         encoder.setFIDMapper(getFIDMapper(typeName));
         return new MySQLSQLBuilder(encoder);
     }
