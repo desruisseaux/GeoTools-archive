@@ -26,9 +26,7 @@ import java.util.NoSuchElementException;
 
 
 /**
- * A mutable set containing only one element. Any call to the {@link #add}
- * method will discard the previous element. This set can't contains null
- * element.
+ * A mutable set containing only one element. This set can't contains null element.
  *
  * @author Martin Desruisseaux
  * @version $Id$
@@ -80,14 +78,25 @@ public class Singleton extends AbstractSet {
     }
 
     /**
-     * Ensures that this singleton contains the specified element.
-     * This method discard any previous element.
+     * Adds the specified element to this set if it is not already present.
+     * If this set already contains an other element, an exception is thrown.
+     *
+     * @throws NullPointerException if the argument is null.
+     * @throws IllegalArgumentException if this set already contains an other element.
      */
     public boolean add(final Object object) {
-        // Note: the NullPointerException if object is null is a wanted behavior.
-        final boolean changed = !object.equals(element);
-        element = object;
-        return changed;
+        if (object == null) {
+            throw new NullPointerException();
+        }
+        if (element == null) {
+            element = object;
+            return true;
+        }
+        if (element.equals(object)) {
+            element = object;
+            return false;
+        }
+        throw new IllegalArgumentException();
     }
 
     /**

@@ -149,16 +149,16 @@ import org.geotools.util.Singleton;
  */
 public class ObjectFactory extends Factory implements CSFactory, DatumFactory, CRSFactory {
     /**
+     * The math transform factory to use for creating the conversion of projected CRS.
+     * If null, then a default factory will be created only when first needed.
+     */
+    private MathTransformFactory mtFactory;
+
+    /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
      * Will be created only when first needed.
      */
     private transient Parser parser;
-
-    /**
-     * The math transform factory to use for creating the conversion of projected CRS.
-     * Will be fetched only when first needed.
-     */
-    private transient MathTransformFactory mtFactory;
 
     /**
      * Construct a default factory. This method is public in order to allows instantiations
@@ -172,6 +172,15 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * </pre></blockquote>
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Construct a factory using the specified math transform factory. The later is used for
+     * the construction of conversion objects in projected CRS.
+     */
+    public ObjectFactory(final MathTransformFactory mtFactory) {
+        IdentifiedObject.ensureNonNull("mtFactory", mtFactory);
+        this.mtFactory = mtFactory;
     }
 
 
@@ -852,14 +861,9 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * in any other plane.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
-     *         be created can be specified with the <code>"conversion."</code> prefix added in
-     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
-     * @param  derivedCS The coordinate system for the derived CRS. The number
-     *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     * @param  derivedCS The coordinate system for the derived CRS.
      * @throws FactoryException if the object creation failed.
      *
      * @deprecated Use the method with an {@link OperationMethod} argument instead.
@@ -883,16 +887,11 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * in any other plane.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
-     *         be created can be specified with the <code>"conversion."</code> prefix added in
-     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
      *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
-     * @param  derivedCS The coordinate system for the derived CRS. The number
-     *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     * @param  derivedCS The coordinate system for the derived CRS.
      * @throws FactoryException if the object creation failed.
      */
     public DerivedCRS createDerivedCRS(Map                 properties,
@@ -916,9 +915,6 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * Creates a projected coordinate reference system from a transform.
      * 
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
-     *         be created can be specified with the <code>"conversion."</code> prefix added in
-     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  geoCRS Geographic coordinate reference system to base projection on.
      * @param  toProjected The transform from the geographic to the projected CRS.
      * @param  cs The coordinate system for the projected CRS.
@@ -940,26 +936,23 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * Creates a projected coordinate reference system from a transform.
      * 
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
-     *         be created can be specified with the <code>"conversion."</code> prefix added in
-     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
-     *         conversion}.
-     * @param  geoCRS Geographic coordinate reference system to base projection on.
-     * @param  toProjected The transform from the geographic to the projected CRS.
-     * @param  cs The coordinate system for the projected CRS.
+     *         projection}.
+     * @param  base Geographic coordinate reference system to base projection on.
+     * @param  baseToDerived The transform from the geographic to the projected CRS.
+     * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      */
-    public ProjectedCRS createProjectedCRS(Map            properties,
-                                           OperationMethod    method,
-                                           GeographicCRS      geoCRS,
-                                           MathTransform toProjected,
-                                           CartesianCS            cs) throws FactoryException
+    public ProjectedCRS createProjectedCRS(Map              properties,
+                                           OperationMethod      method,
+                                           GeographicCRS          base,
+                                           MathTransform baseToDerived,
+                                           CartesianCS       derivedCS) throws FactoryException
     {
         ProjectedCRS crs;
         try {
             crs = new org.geotools.referencing.crs.ProjectedCRS(properties, method,
-                                                                geoCRS, toProjected, cs);
+                                                                base, baseToDerived, derivedCS);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -971,11 +964,8 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * Creates a projected coordinate reference system from a projection name.
      * 
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
-     *         be created can be specified with the <code>"conversion."</code> prefix added in
-     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  geoCRS Geographic coordinate reference system to base projection on.
-     * @param  classification The classification name for the projection to be created
+     * @param  method The method name for the projection to be created
      *         (e.g. "Transverse_Mercator", "Mercator_1SP", "Oblique_Stereographic", etc.).
      * @param  parameters The parameter values to give to the projection. May includes
      *         "central_meridian", "latitude_of_origin", "scale_factor", "false_easting",
@@ -983,18 +973,18 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * @param  cs The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      *
-     * @deprecated Replaced by {@link #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)}
+     * @deprecated Replaced by {@link #createProjectedCRS(Map,GeographicCRS,String,ParameterValueGroup,CartesianCS)}
      *             for concistency with the rest of the API, which work with {@link ParameterValueGroup}
      *             rather than an array of {@link GeneralParameterValue}.
      */
     public ProjectedCRS createProjectedCRS(Map                     properties,
                                            GeographicCRS               geoCRS,
-                                           String              classification,
+                                           String                      method,
                                            GeneralParameterValue[] parameters,
                                            CartesianCS                     cs)
             throws FactoryException
     {
-        final ParameterValueGroup group = getDefaultProjectionParameters(classification);
+        final ParameterValueGroup group = getDefaultParameters(method);
         for (int i=0; i<parameters.length; i++) {
             final GeneralParameterValue gp = parameters[i];
             if (gp instanceof ParameterValue) {
@@ -1004,40 +994,28 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
                 throw new UnsupportedOperationException();        
             }
         }
-        return createProjectedCRS(properties, geoCRS, group, cs);
+        return createProjectedCRS(properties, geoCRS, method, group, cs);
     }
 
     /**
-     * Creates a projected coordinate reference system from a set of parameters. The classification
-     * name is inferred either from the {@linkplain ParameterDescriptorGroup#getName parameter
-     * group name}, or any other implementation dependent way.
-     * <br><br>
+     * Creates a projected coordinate reference system from a set of parameters.
      * The client must supply at least the <code>"semi_major"</code> and <code>"semi_minor"</code>
-     * parameters for cartographic projection transforms. Example:
-     *
-     * <blockquote><pre>
-     * ParameterValueGroup parameters = factory.{@linkplain #getDefaultProjectionParameters getDefaultProjectionParameters}("Transverse_Mercator");
-     * p.parameter("semi_major").setValue(6378137.000);
-     * p.parameter("semi_minor").setValue(6356752.314);
-     * ProjectedCRS crs = factory.createProjectedCRS(..., parameters, ...);
-     * </pre></blockquote>
+     * parameters for cartographic projection.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain ObjectFactory listed there}.
-     *         Properties for the {@link Projection} object to be created can be specified
-     *         with the <code>"conversion."</code> prefix added in front of property names
-     *         (example: <code>"conversion.name"</code>).
-     * @param  geoCRS Geographic coordinate reference system to base projection on.
+     * @param  base Geographic coordinate reference system to base projection on.
+     * @param  methodName The name of the method for the projection.
      * @param  parameters The parameter values to give to the projection.
-     * @param  cs The coordinate system for the projected CRS.
+     * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      *
-     * @see #getDefaultProjectionParameters
+     * @see #getDefaultParameters
      */
     public ProjectedCRS createProjectedCRS(Map                 properties,
-                                           GeographicCRS           geoCRS,
+                                           GeographicCRS             base,
+                                           String              methodName,
                                            ParameterValueGroup parameters,
-                                           CartesianCS                 cs)
+                                           CartesianCS          derivedCS)
             throws FactoryException
     {
         /*
@@ -1047,13 +1025,13 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
          * coordinates.
          */
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final EllipsoidalCS geoCS = (EllipsoidalCS) geoCRS.getCoordinateSystem();
+        final EllipsoidalCS geoCS = (EllipsoidalCS) base.getCoordinateSystem();
         final Matrix swap1, swap3;
         try {
             swap1 = org.geotools.referencing.cs.EllipsoidalCS.swapAndScaleAxis(geoCS,
                     org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D);
             swap3 = org.geotools.referencing.cs.CartesianCS.swapAndScaleAxis(
-                    org.geotools.referencing.cs.CartesianCS.PROJECTED, cs);
+                    org.geotools.referencing.cs.CartesianCS.PROJECTED, derivedCS);
         } catch (IllegalArgumentException cause) {
             // User-specified axis don't match.
             throw new FactoryException(cause);
@@ -1079,19 +1057,16 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
              */
             final Singleton methods = new Singleton();
             step2 = ((org.geotools.referencing.operation.MathTransformFactory)mtFactory)
-                    .createParameterizedTransform(parameters, methods);
+                    .createParameterizedTransform(methodName, parameters, methods);
             method = (OperationMethod) methods.get();
         } else {
             /*
              * Non-geotools implementation : iterate over all methods know to the factory.
-             * This is slower and less robust, since we assume that the parameter group
-             * name is the classification name, which is not garantee.
              */
-            step2 = mtFactory.createParameterizedTransform(parameters);
-            final String classification = parameters.getDescriptor().getName().getCode();
-            for (final Iterator it=mtFactory.getAvailableTransforms().iterator(); it.hasNext();) {
+            step2 = mtFactory.createParameterizedTransform(methodName, parameters);
+            for (final Iterator it=mtFactory.getAvailableMethods(null).iterator(); it.hasNext();) {
                 final OperationMethod candidate = (OperationMethod) it.next();
-                if (IdentifiedObject.nameMatches(candidate, classification)) {
+                if (IdentifiedObject.nameMatches(candidate, methodName)) {
                     method = candidate;
                     break;
                 }
@@ -1105,55 +1080,23 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         final MathTransform step3 = mtFactory.createAffineTransform(swap3);
         final MathTransform mt    = mtFactory.createConcatenatedTransform(
                                     mtFactory.createConcatenatedTransform(step1, step2), step3);
-        return createProjectedCRS(properties, method, geoCRS, mt, cs);
+        return createProjectedCRS(properties, method, base, mt, derivedCS);
     }
 
     /**
-     * Returns the default parameter values for a projection of the given classification.
-     * The classification may be the name of any operation method returned by the
-     * {@link #getAvailableProjections} method. A typical example is
-     * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
-     * <br><br>
-     * This method creates new parameter instances at every call.
-     * It is intented to be modified by the user before to be passed to
-     * <code>{@linkplain #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)
-     * createProjectedCRS}(..., parameters, ...)</code>.
+     * Returns the default parameter values for a derived or projected CRS using the given method.
      *
-     * @param  classification The case insensitive classification to search for.
+     * @param  method The case insensitive name of the method to search for.
      * @return The default parameter values.
-     * @throws NoSuchIdentifierException if there is no projection registered for the specified
-     *         classification.
-     *
-     * @see #getAvailableProjections
-     * @see #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)
-     *
-     * @todo Check if the classification is a projection operation:
+     * @throws NoSuchIdentifierException if there is no operation registered for the specified method.
      */
-    public ParameterValueGroup getDefaultProjectionParameters(String classification)
+    public ParameterValueGroup getDefaultParameters(final String method)
             throws NoSuchIdentifierException
     {
         if (mtFactory == null) {
             mtFactory = FactoryFinder.getMathTransformFactory();
         }
-        return mtFactory.getDefaultParameters(classification);
-    }
-
-    /**
-     * Returns a set of all available {@linkplain Projection projection} methods. For each
-     * element in this set, the {@linkplain OperationMethod#getName operation method name}
-     * is a classification name to be recognized by the {@link #getDefaultProjectionParameters}
-     * method.
-     *
-     * @return All {@linkplain Projection projection} methods available in this factory.
-     *
-     * @see #getDefaultProjectionParameters
-     * @see #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)
-     *
-     * @todo Not yet implemented. We need to ask to the math transform factory, and then to
-     *       filter the returned set to keep only the projections.
-     */
-    public Set/*<OperationMethod>*/ getAvailableProjections() {
-        throw new UnsupportedOperationException();        
+        return mtFactory.getDefaultParameters(method);
     }
 
     /**
@@ -1183,8 +1126,10 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
         //       Since we share a single instance of this parser, we must
         //       synchronize.
         if (parser == null) {
-            parser = new Parser(Symbols.DEFAULT, this, this, this,
-                                FactoryFinder.getMathTransformFactory());
+            if (mtFactory == null) {
+                mtFactory = FactoryFinder.getMathTransformFactory();
+            }
+            parser = new Parser(Symbols.DEFAULT, this, this, this, mtFactory);
         }
         try {
             return parser.parseCoordinateReferenceSystem(wkt);

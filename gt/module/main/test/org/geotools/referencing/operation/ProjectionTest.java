@@ -175,7 +175,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("scale_factor")    .setValue(      0.997);
         params.parameter("false_easting")   .setValue(3900000.0  );
         params.parameter("false_northing")  .setValue( 900000.0  );
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Mercator_1SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }
@@ -189,7 +189,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("scale_factor")    .setValue(   1.0);
         params.parameter("false_easting")   .setValue(   0.0);
         params.parameter("false_northing")  .setValue(   0.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Mercator_1SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }
@@ -203,7 +203,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("scale_factor")    .setValue(      1.0);
         params.parameter("false_easting")   .setValue(      0.0);
         params.parameter("false_northing")  .setValue(      0.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Mercator_1SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    
@@ -225,7 +225,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("standard_parallel_1").setValue(     42.0);
         params.parameter("false_easting")      .setValue(      0.0);
         params.parameter("false_northing")     .setValue(      0.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Mercator_2SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    
@@ -240,7 +240,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("standard_parallel_1").setValue(      60.0);
         params.parameter("false_easting")      .setValue( -500000.0);
         params.parameter("false_northing")     .setValue(-1000000.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Mercator_2SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    
@@ -272,7 +272,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("scale_factor")      .setValue(      1.0);
         params.parameter("false_easting")     .setValue( 250000.0);
         params.parameter("false_northing")    .setValue( 150000.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Lambert_Conformal_Conic_1SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    
@@ -287,7 +287,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("scale_factor")      .setValue(      1.0);
         params.parameter("false_easting")     .setValue( 500000.0);
         params.parameter("false_northing")    .setValue(1000000.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Lambert_Conformal_Conic_1SP", params);
         if (VERBOSE) {
             System.out.println(transform.toString());
         }    
@@ -311,7 +311,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("standard_parallel_2").setValue(     30.283333333);
         params.parameter("false_easting")      .setValue( 609601.218);        //metres
         params.parameter("false_northing")     .setValue(      0.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Lambert_Conformal_Conic_2SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    
@@ -327,7 +327,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("standard_parallel_2").setValue(     60.0);
         params.parameter("false_easting")      .setValue(      0.0);
         params.parameter("false_northing")     .setValue(      0.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Lambert_Conformal_Conic_2SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    
@@ -343,7 +343,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("standard_parallel_2").setValue(    -40.0);
         params.parameter("false_easting")      .setValue( 100000.0);
         params.parameter("false_northing")     .setValue(      0.0);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Lambert_Conformal_Conic_2SP", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    
@@ -367,7 +367,7 @@ public class ProjectionTest extends TestCase {
         params.parameter("standard_parallel_2").setValue(     51.166666666);
         params.parameter("false_easting")      .setValue( 150000.01);
         params.parameter("false_northing")     .setValue(5400088.44);
-        transform = mtFactory.createParameterizedTransform(params);
+        transform = mtFactory.createParameterizedTransform("Lambert_Conformal_Conic_2SP_Belgium", params);
         if (VERBOSE) {
             System.out.println(transform);
         }    

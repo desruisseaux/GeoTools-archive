@@ -53,6 +53,7 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.Projection;
 
 // Geotools dependencies
 import org.geotools.referencing.operation.projection.MapProjection;
@@ -104,10 +105,9 @@ public class CreationTest extends TestCase {
         out.println("---------------------");
         out.println();
         out.println("create Coodinate Reference System....1: ");
-        final         DatumFactory datumFactory = FactoryFinder.getDatumFactory();
-        final            CSFactory    csFactory = FactoryFinder.getCSFactory();
-        final           CRSFactory   crsFactory = FactoryFinder.getCRSFactory();
-        final MathTransformFactory    mtFactory = FactoryFinder.getMathTransformFactory();
+        final DatumFactory datumFactory = FactoryFinder.getDatumFactory();
+        final    CSFactory    csFactory = FactoryFinder.getCSFactory();
+        final   CRSFactory   crsFactory = FactoryFinder.getCRSFactory();
 
         final Ellipsoid airy1830;
         final Unit meters = SI.METER;
@@ -148,17 +148,16 @@ public class CreationTest extends TestCase {
         out.println(geogCRS.toWKT());
 
         final MathTransform p;
-        final ParameterValueGroup param = mtFactory.getDefaultParameters("Transverse_Mercator");
+        final ParameterValueGroup param = crsFactory.getDefaultParameters("Transverse_Mercator");
         param.parameter("semi_major")        .setValue(airy1830.getSemiMajorAxis());
         param.parameter("semi_minor")        .setValue(airy1830.getSemiMinorAxis());
         param.parameter("central_meridian")  .setValue(     49);
         param.parameter("latitude_of_origin").setValue(     -2);
         param.parameter("false_easting")     .setValue( 400000);
         param.parameter("false_northing")    .setValue(-100000);
-        p = mtFactory.createParameterizedTransform(param);
         out.println();
         out.println("create Coodinate System....7: ");
-        out.println(p.toWKT());
+        out.println(param);
 
         // NOTE: we could use the following pre-defined constant instead:
         //       org.geotools.referencing.cs.CartesianCS.PROJECTED;
@@ -171,7 +170,8 @@ public class CreationTest extends TestCase {
         out.println(cartCS); // No WKT for coordinate systems
             
         final ProjectedCRS projCRS;
-        projCRS = crsFactory.createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS, p, cartCS);
+        projCRS = crsFactory.createProjectedCRS(name("Great_Britian_National_Grid"), geogCRS,
+                                                "Transverse_Mercator", param, cartCS);
         out.println();
         out.println("create Coodinate System....9: ");
         out.println(projCRS.toWKT());
@@ -185,7 +185,7 @@ public class CreationTest extends TestCase {
         out.println("Testing classification names");
         out.println("----------------------------");
         final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory();
-        final Collection methods = mtFactory.getAvailableTransforms();
+        final Collection methods = mtFactory.getAvailableMethods(Projection.class);
         for (final Iterator it=methods.iterator(); it.hasNext();) {
             final OperationMethod    method = (OperationMethod) it.next();
             final String     classification = method.getName().getCode();
@@ -198,7 +198,7 @@ public class CreationTest extends TestCase {
             }
             final MathTransform mt;
             try {
-                mt = mtFactory.createParameterizedTransform(param);
+                mt = mtFactory.createParameterizedTransform(classification, param);
             } catch (FactoryException e) {
                 // Probably not a map projection. This test is mostly about projection, so ignore.
                 continue;

@@ -22,10 +22,9 @@ package org.geotools.referencing.wkt;
 // J2SE dependencies
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.util.Iterator;
 
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -34,6 +33,14 @@ import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.OperationMethod;
+
+// Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.util.Singleton;
 
 
 /**
@@ -51,6 +58,18 @@ public class MathTransformParser extends AbstractParser {
      * The factory to use for creating math transforms.
      */   
     protected final MathTransformFactory mtFactory;
+
+    /**
+     * The classification of the last math transform or projection parsed,
+     * or <code>null</code> if none.
+     */
+    String classification;
+
+    /**
+     * The method for the last math transform passed.
+     * @see #getOperationMethod();
+     */
+    private final Singleton method = new Singleton();
     
     /**
      * Construct a parser using the default set of symbols.
@@ -117,6 +136,8 @@ public class MathTransformParser extends AbstractParser {
     final MathTransform parseMathTransform(final Element element, final boolean required)
             throws ParseException
     {
+        method.clear();
+        classification = null;
         final Object key = element.peek();
         if (key instanceof Element) {
             final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
@@ -144,7 +165,7 @@ public class MathTransformParser extends AbstractParser {
      */
     private MathTransform parseParamMT(final Element parent) throws ParseException {     
         final Element element = parent.pullElement("PARAM_MT");
-        final String classification = element.pullString("classification");
+        classification = element.pullString("classification");
         final ParameterValueGroup parameters;
         try {
             parameters = mtFactory.getDefaultParameters(classification);
@@ -170,8 +191,18 @@ public class MathTransformParser extends AbstractParser {
             param.close();
         }
         element.close();
+        /*
+         * We now have all informations for constructing the math transform. If the factory is
+         * a Geotools implementation, we will use a special method that returns the operation
+         * method used. Otherwise, we will use the ordinary method and will performs a slower
+         * search for the operation method later if the user ask for it.
+         */
         try {
-            return mtFactory.createParameterizedTransform(parameters);
+            if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
+                return ((org.geotools.referencing.operation.MathTransformFactory) mtFactory)
+                       .createParameterizedTransform(classification, parameters, method);
+            }
+            return mtFactory.createParameterizedTransform(classification, parameters);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
@@ -248,5 +279,32 @@ public class MathTransformParser extends AbstractParser {
         }
         element.close();
         return transform;
+    }
+
+    /**
+     * Returns the operation method for the last math transform parsed. This is used by
+     * {@link Parser} in order to built {@link org.opengis.referencing.crs.DerivedCRS}.
+     */
+    final OperationMethod getOperationMethod() {
+        /*
+         * Information available if the math transform used was a Geotools implementation.
+         */
+        if (!method.isEmpty()) {
+            return (OperationMethod) method.get();
+        }
+        /*
+         * Not a Geotools implementation. Unfortunatly, there is no obvious way to get this
+         * information using GeoAPI interfaces at this time. Performs a slower and less robust
+         * check.
+         */
+        if (classification != null) {
+            for (final Iterator it=mtFactory.getAvailableMethods(null).iterator(); it.hasNext();) {
+                final OperationMethod method = (OperationMethod) it.next();
+                if (IdentifiedObject.nameMatches(method, classification)) {
+                    return method;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -28,19 +28,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.Identifier;
-import org.geotools.referencing.datum.BursaWolfParameters;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
@@ -71,6 +63,17 @@ import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.OperationMethod;
+
+// Geotools dependencies
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -461,9 +464,9 @@ public class Parser extends MathTransformParser {
                                                 final Unit      angularUnit)
         throws ParseException
     {                
-        final Element   element = parent.pullElement("PROJECTION");
-        final String  classname = element.pullString("name");
-        final Map    properties = parseAuthority(element, classname);
+        final Element element = parent.pullElement("PROJECTION");
+               classification = element.pullString("name");
+        final Map  properties = parseAuthority(element, classification);
         element.close();
         /*
          * Set the list of parameters.  NOTE: Parameters are defined in
@@ -477,7 +480,7 @@ public class Parser extends MathTransformParser {
          */
         final ParameterValueGroup parameters;
         try {
-            parameters = mtFactory.getDefaultParameters(classname);
+            parameters = mtFactory.getDefaultParameters(classification);
         } catch (NoSuchIdentifierException exception) {
             throw element.parseFailed(exception, null);
         }
@@ -788,7 +791,7 @@ public class Parser extends MathTransformParser {
                 axis1 = createAxis("Y", AxisDirection.NORTH, linearUnit);
             }
             element.close();
-            return crsFactory.createProjectedCRS(properties, geoCRS, projection,
+            return crsFactory.createProjectedCRS(properties, geoCRS, classification, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
@@ -840,6 +843,7 @@ public class Parser extends MathTransformParser {
         Map  properties = parseAuthority(element, name);
         final CoordinateReferenceSystem base = parseCoordinateReferenceSystem(element);
         final MathTransform toBase = parseMathTransform(element, true);
+        final OperationMethod method = getOperationMethod();
         element.close();
         /*
          * WKT provides no informations about the underlying CS of a derived CRS.
@@ -860,8 +864,7 @@ public class Parser extends MathTransformParser {
                     Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, buffer.toString()),
                     number, AxisDirection.OTHER, Unit.ONE);
             }
-            // TODO: fetch the OperationMethod from the math transform.
-            return crsFactory.createDerivedCRS(properties, base, toBase.inverse(),
+            return crsFactory.createDerivedCRS(properties, method, base, toBase.inverse(),
                    new org.geotools.referencing.cs.CoordinateSystem(properties, axis));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);

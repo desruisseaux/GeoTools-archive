@@ -26,18 +26,22 @@ package org.geotools.referencing.operation.transform;
 // J2SE dependencies
 import java.io.Serializable;
 
-import org.geotools.metadata.citation.Citation;
-import org.geotools.parameter.ParameterReal;
-import org.geotools.referencing.Identifier;
-import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Transformation;
+
+// Geotools dependencies
+import org.geotools.metadata.citation.Citation;
+import org.geotools.parameter.ParameterReal;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -404,6 +408,13 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          */
         public Provider() {
             super(3, 3, PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type.
+         */
+        protected Class getOperationType() {
+            return Transformation.class;
         }
         
         /**

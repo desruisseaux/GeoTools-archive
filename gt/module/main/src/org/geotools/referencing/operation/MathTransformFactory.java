@@ -39,9 +39,12 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.Projection;
 
 // Geotools dependencies
 import org.geotools.parameter.ParameterWriter;
@@ -57,6 +60,7 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.geotools.util.DerivedSet;
 import org.geotools.util.WeakHashSet;
 
 
@@ -152,17 +156,83 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
 
     /**
-     * Returns a set of all available {@linkplain MathTransform math transform} methods. For each
-     * element in this set, the {@linkplain OperationMethod#getName operation method name} will be
-     * a classification name known to the {@link #getDefaultParameters} method in this factory.
+     * Returns a set of all available methods for {@linkplain MathTransform math transform}. For
+     * each element in this set, the {@linkplain OperationMethod#getName operation method name}
+     * must be known to the {@link #getDefaultParameters} method in this factory.
+     * The set of available methods is implementation dependent.
      *
+     * @return All {@linkplain MathTransform math transform} methods available in this factory.
+     *
+     * @deprecated Replaced by {@link #getAvailableMethods}. The old name was misleading, since
+     *             a transform is an instantiation of an operation method with a given set of
+     *             parameters. There is usually much less operation method in a system than
+     *             transforms.
+     */
+    public Set getAvailableTransforms() {
+        return getAvailableMethods(Operation.class);
+    }
+
+    /**
+     * Returns a set of available methods for {@linkplain MathTransform math transforms}. For
+     * each element in this set, the {@linkplain OperationMethod#getName operation method name}
+     * must be known to the {@link #getDefaultParameters} method in this factory.
+     * The set of available methods is implementation dependent.
+     *
+     * @param  type <code>{@linkplain Operation}.class</code> for fetching all operation methods,
+     *           or <code>{@linkplain Projection}.class</code> for fetching only map projection
+     *           methods.
      * @return All {@linkplain MathTransform math transform} methods available in this factory.
      *
      * @see #getDefaultParameters
      * @see #createParameterizedTransform
      */
-    public Set getAvailableTransforms() {
-        return new LazySet(getProviders(MathTransformProvider.class));
+    public Set/*<OperationMethod>*/ getAvailableMethods(final Class type) {
+        Set methods = new LazySet(getProviders(MathTransformProvider.class));
+        if (type != null) {
+            methods = new FilteredSet(methods, type);
+        }
+        return methods;
+    }
+
+    /**
+     * A set of available projections backed by the set of available operations.
+     */
+    private static final class FilteredSet extends DerivedSet {
+        /**
+         * The expected type ({@link Projection.class}) for projections).
+         */
+        private final Class type;
+
+        /**
+         * Constructs a set of projection methods from the specified set of math operations methods.
+         */
+        public FilteredSet(final Set methods, final Class type) {
+            super(methods);
+            this.type = type;
+        }
+ 
+        /**
+         * Returns the generic math transform method as a projection method,
+         * or <code>null</code> if the specified method is not an operation
+         * method of the expected type. Returning null will force the filtered
+         * set to skip it.
+         */
+        protected Object baseToDerived(final Object element) {
+            if (element instanceof MathTransformProvider) {
+                final Class t = ((MathTransformProvider) element).getOperationType();
+                if (!type.isAssignableFrom(t)) {
+                    return null;
+                }
+            }
+            return element;
+        }
+
+        /**
+         * Returns the projection method as a generic math transform method.
+         */
+        protected Object derivedToBase(final Object element) {
+            return element;
+        }
     }
 
     /**
@@ -184,91 +254,104 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
 
     /**
      * Returns the math transform provider for the specified operation method.
-     * This provider can be used in order to query parameter for a classification
-     * code (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
+     * This provider can be used in order to query parameter for a method name
+     * (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
      * or any of the alias in a given locale.
      *
-     * @param  classification The case insensitive {@linkplain Identifier#getCode identifier code}
+     * @param  method The case insensitive {@linkplain Identifier#getCode identifier code}
      *         of the operation method to search for (e.g. <code>"Transverse_Mercator"</code>).
      * @return The math transform provider.
      * @throws NoSuchIdentifierException if there is no provider registered for the specified
-     *         classification.
+     *         method.
      */
-    private MathTransformProvider getProvider(final String classification)
+    private MathTransformProvider getProvider(final String method)
             throws NoSuchIdentifierException
     {
         MathTransformProvider provider = last; // Avoid synchronization
-        if (provider!=null && provider.nameMatches(classification)) {
+        if (provider!=null && provider.nameMatches(method)) {
             return provider;
         }
         final Iterator providers = getProviders(MathTransformProvider.class);        
         while (providers.hasNext()) {
             provider = (MathTransformProvider) providers.next();            
-            if (provider.nameMatches(classification)) {
+            if (provider.nameMatches(method)) {
                 return last = provider;
             }
         }
         throw new NoSuchIdentifierException(Resources.format(
-                  ResourceKeys.ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1, classification),
-                  classification);
+                  ResourceKeys.ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1, method), method);
     }
     
     /**
-     * Returns the default parameter values for a math transform of the given classification.
-     * The classification may be the name of any operation method returned by the
-     * {@link #getAvailableTransforms} method. A typical example is
+     * Returns the default parameter values for a math transform using the given method.
+     * The method argument is the name of any operation method returned by the
+     * {@link #getAvailableMethods} method. A typical example is
      * <code>"<A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">Transverse_Mercator</A>"</code>).
-     *
-     * <P>The {@link #createParameterizedTransform createParameterizedTransform} method
-     * in this factory shall be able to infer the classification from the parameter group
-     * returned by this method. For this purpose, the current implementation set the
-     * {@linkplain ParameterDescriptorGroup#getName parameter group name} to the classification
-     * name.</P>
      *
      * <P>This method creates new parameter instances at every call. It is intented to be modified
      * by the user before to be passed to <code>{@linkplain #createParameterizedTransform
-     * createParameterizedTransform}(parameters)</code>.</P>
+     * createParameterizedTransform}(method, parameters)</code>.</P>
      *
-     * @param  classification The case insensitive classification to search for.
+     * @param  method The case insensitive name of the method to search for.
      * @return The default parameter values.
      * @throws NoSuchIdentifierException if there is no transform registered for the specified
-     *         classification.
+     *         method.
      *
-     * @see #getAvailableTransforms
+     * @see #getAvailableMethods
      * @see #createParameterizedTransform
      * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getParameterValues
      */
-    public ParameterValueGroup getDefaultParameters(final String classification)
+    public ParameterValueGroup getDefaultParameters(final String method)
             throws NoSuchIdentifierException
     {
         // Remove the cast when we will be allowed to compile for J2SE 1.5.
-        return (ParameterValueGroup) getProvider(classification).getParameters().createValue();
+        return (ParameterValueGroup) getProvider(method).getParameters().createValue();
     }
 
     /**
-     * Creates a transform from a group of parameters. The classification name is inferred from
-     * the {@linkplain ParameterDescriptorGroup#getName parameter group name}. Example:
+     * Creates a transform from a group of parameters. The method name is inferred from
+     * the {@linkplain ParameterDescriptorGroup#getName parameter group name}.
+     *
+     * @param  parameters The parameter values.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
+     *
+     * @deprecated Use {@link #createParameterizedTransform(String,ParameterValueGroup)} instead.
+     */
+    public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
+            throws FactoryException
+    {
+        return createParameterizedTransform(parameters.getDescriptor().getName().getCode(),
+                                            parameters);
+    }
+
+    /**
+     * Creates a transform from a group of parameters. Example:
      *
      * <blockquote><pre>
      * ParameterValueGroup p = factory.getDefaultParameters("Transverse_Mercator");
      * p.parameter("semi_major").setValue(6378137.000);
      * p.parameter("semi_minor").setValue(6356752.314);
-     * MathTransform mt = factory.createParameterizedTransform(p);
+     * MathTransform mt = factory.createParameterizedTransform("Transverse_Mercator", p);
      * </pre></blockquote>
      *
+     * @param  method The case insensitive name of the method to search for.
      * @param  parameters The parameter values.
      * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the classification.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
      * @throws FactoryException if the object creation failed. This exception is thrown
      *         if some required parameter has not been supplied, or has illegal value.
      *
      * @see #getDefaultParameters
-     * @see #getAvailableTransforms
+     * @see #getAvailableMethods
      */
-    public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
+    public MathTransform createParameterizedTransform(final String method,
+                                                      ParameterValueGroup parameters)
             throws FactoryException
     {
-        return createParameterizedTransform(parameters, null);
+        return createParameterizedTransform(method, parameters, null);
     }
 
     /**
@@ -277,20 +360,21 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * the client to keep trace of any {@linkplain OperationMethod operation method}
      * used by this factory. 
      *
+     * @param  method The case insensitive name of the method to search for.
      * @param  parameters The parameter values.
      * @param  methods A collection where to add the operation method that apply to the transform,
      *                 or <code>null</code> if none.
      * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the classification.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
      * @throws FactoryException if the object creation failed. This exception is thrown
      *         if some required parameter has not been supplied, or has illegal value.
      */
-    public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
+    public MathTransform createParameterizedTransform(String              method,
+                                                      ParameterValueGroup parameters,
                                                       Collection          methods)
             throws FactoryException
     {
-        final String classification = parameters.getDescriptor().getName().getCode();
-        final MathTransformProvider provider = getProvider(classification);
+        final MathTransformProvider provider = getProvider(method);
         MathTransform tr;
         try {
             parameters = provider.ensureValidValues(parameters);
@@ -448,7 +532,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         for (final Iterator categories=registry.getCategories(); categories.hasNext();) {
             final Class category = (Class) categories.next();
-            for (final Iterator providers=ServiceRegistry.lookupProviders(category, loader); providers.hasNext();) {
+            final Iterator providers = ServiceRegistry.lookupProviders(category, loader);
+            while (providers.hasNext()) {
                 registry.registerServiceProvider(providers.next(), category);
             }
         }
@@ -456,18 +541,22 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     }
 
     /**
-     * Dump to the standard output stream a list of available math transforms.
+     * Dump to the standard output stream a list of available operation method.
      * This method can be invoked from the command line. It provides a mean to
      * verify which transforms were found in the classpath. The syntax is:
      * <BR>
      * <BLOCKQUOTE><CODE>
      * java org.geotools.referencing.operation.MathTransformFactory
-     * <VAR>&lt;options&gt;</VAR> <VAR>&lt;classification&gt;</VAR>
+     * <VAR>&lt;options&gt;</VAR> <VAR>&lt;method&gt;</VAR>
      * </CODE></BLOCKQUOTE>
      *
      * <P>where options are:</P>
      *
      * <TABLE CELLPADDING='0' CELLSPACING='0'>
+     *   <TR><TD NOWRAP><CODE>-projections</CODE></TD>
+     *       <TD NOWRAP>&nbsp;List only projections</TD></TR>
+     *   <TR><TD NOWRAP><CODE>-conversions</CODE></TD>
+     *       <TD NOWRAP>&nbsp;List only conversions</TD></TR>
      *   <TR><TD NOWRAP><CODE>-all</CODE></TD>
      *       <TD NOWRAP>&nbsp;List the parameters for all transforms</TD></TR>
      *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
@@ -476,9 +565,9 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *       <TD NOWRAP>&nbsp;Set the language for the output (e.g. "fr" for French)</TD></TR>
      * </TABLE>
      *
-     * <P>and <VAR>&lt;classification&gt;</VAR> is the optional name of a math
-     * transform (e.g. <CODE>"Affine"</CODE>, <CODE>"EPSG:9624"</CODE> or just
-     * <CODE>"9624"</CODE> for the affine transform).</P>
+     * <P>and <VAR>&lt;method&gt;</VAR> is the optional name of an operation method
+     * (e.g. <CODE>"Affine"</CODE>, <CODE>"EPSG:9624"</CODE> or just
+     * <CODE>"9624"</CODE> for the affine transform method).</P>
      *
      * <P><strong>Note for Windows users:</strong> If the output contains strange
      * symbols, try to supply an "<code>-encoding</code>" argument. Example:</P>
@@ -499,6 +588,9 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
          */
         final Arguments arguments = new Arguments(args);
         final boolean printAll = arguments.getFlag("-all");
+        Class type = null;
+        if (arguments.getFlag("-projections")) type = Projection.class;
+        if (arguments.getFlag("-conversions")) type = Conversion.class;
         args = arguments.getRemainingArguments(1);
         try {
             final MathTransformFactory factory = new MathTransformFactory();
@@ -507,7 +599,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             Set transforms = Collections.EMPTY_SET;
             if (printAll || args.length==0) {
                 transforms = new TreeSet(IdentifiedObject.NAME_COMPARATOR);
-                transforms.addAll(factory.getAvailableTransforms());
+                transforms.addAll(factory.getAvailableMethods(type));
                 writer.summary(transforms);
             }
             if (!printAll) {

@@ -39,6 +39,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
@@ -650,6 +651,13 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         public Provider(final ParameterDescriptorGroup parameters) {
             super(3, 3, parameters);
         }
+
+        /**
+         * Returns the operation type.
+         */
+        protected Class getOperationType() {
+            return Conversion.class;
+        }
         
         /**
          * Creates a transform from the specified group of parameter values.
@@ -697,6 +705,13 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          */
         public ProviderInverse() {
             super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type.
+         */
+        protected Class getOperationType() {
+            return Conversion.class;
         }
         
         /**

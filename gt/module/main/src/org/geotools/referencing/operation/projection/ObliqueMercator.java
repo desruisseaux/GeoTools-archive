@@ -48,18 +48,21 @@ package org.geotools.referencing.operation.projection;
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
-
 import javax.units.NonSI;
 
-import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.Identifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 /**
  * Oblique Mercator Projection. A conformal, oblique, cylindrical projection 
@@ -366,6 +369,13 @@ public class ObliqueMercator extends MapProjection {
         }
 
         /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
+        }
+
+        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
@@ -415,6 +425,13 @@ public class ObliqueMercator extends MapProjection {
          */
         public Provider_Hotine() {
             super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
         }
 
         /**
@@ -526,6 +543,13 @@ public class ObliqueMercator extends MapProjection {
         }
 
         /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
+        }
+
+        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
@@ -573,6 +597,13 @@ public class ObliqueMercator extends MapProjection {
          */
         public Provider_Hotine_TwoPoint() {
             super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
         }
 
         /**

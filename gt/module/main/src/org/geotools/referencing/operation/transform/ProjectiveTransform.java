@@ -23,16 +23,26 @@
  */
 package org.geotools.referencing.operation.transform;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.vecmath.SingularMatrixException;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
 import org.geotools.metadata.citation.Citation;
 import org.geotools.parameter.MatrixParameterDescriptors;
 import org.geotools.parameter.MatrixParameterValues;
@@ -42,13 +52,6 @@ import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
@@ -488,6 +491,13 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             super(MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
                   MatrixParameterDescriptors.DEFAULT_MATRIX_SIZE-1,
                   PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type.
+         */
+        protected Class getOperationType() {
+            return Conversion.class;
         }
 
         /**

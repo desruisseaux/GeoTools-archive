@@ -50,15 +50,19 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.Identifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 /**
  * Transverse Mercator Projection (EPSG code 9807). This
@@ -206,6 +210,13 @@ public class TransverseMercator extends MapProjection {
          */
         public Provider() {
             super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return CylindricalProjection.class;
         }
 
         /**

@@ -28,11 +28,23 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Collection;
-
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
+// OpenGIS dependencies
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.metadata.citation.Citation;
@@ -42,15 +54,6 @@ import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.XMath;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -1133,6 +1136,13 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public Provider(final ParameterDescriptorGroup parameters) {
             super(2, 2, parameters);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return Projection.class;
         }
 
         /**

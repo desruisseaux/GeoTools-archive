@@ -1148,10 +1148,11 @@ public class CoordinateOperationFactory extends Factory
         final Ellipsoid         ellipsoid = datum.getEllipsoid();
         final Unit                   unit = ellipsoid.getAxisUnit();
         final ParameterValueGroup   param = factory.getDefaultParameters("Ellipsoid_To_Geocentric");
+        final MathTransform     transform;
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim").setValue(normSourceCRS.getCoordinateSystem().getDimension());
-        final MathTransform transform = factory.createParameterizedTransform(param);
+        transform = factory.createParameterizedTransform("Ellipsoid_To_Geocentric", param);
 
         final CoordinateOperation step1, step2, step3;
         step1 = createOperationStep    (    sourceCRS, normSourceCRS);
@@ -1181,10 +1182,11 @@ public class CoordinateOperationFactory extends Factory
         final Ellipsoid         ellipsoid = datum.getEllipsoid();
         final Unit                   unit = ellipsoid.getAxisUnit();
         final ParameterValueGroup   param = factory.getDefaultParameters("Geocentric_To_Ellipsoid");
+        final MathTransform     transform;
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim").setValue(normTargetCRS.getCoordinateSystem().getDimension());
-        final MathTransform transform = factory.createParameterizedTransform(param);
+        transform = factory.createParameterizedTransform("Geocentric_To_Ellipsoid", param);
 
         final CoordinateOperation step1, step2, step3;
         step1 = createOperationStep    (    sourceCRS, normSourceCRS);

@@ -24,12 +24,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import javax.units.Unit;
 
-import org.geotools.resources.XArray;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -43,7 +40,13 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.util.GenericName;
+
+//
+import org.geotools.resources.XArray;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -114,6 +117,21 @@ public abstract class MathTransformProvider extends OperationMethod {
         properties.put(IDENTIFIERS_PROPERTY, parameters.getIdentifiers());
         properties.put(ALIAS_PROPERTY,       parameters.getAlias());
         return properties;
+    }
+
+    /**
+     * Returns the operation type. It may be
+     * <code>{@linkplain org.opengis.referencing.operation.Operation}.class</code>,
+     * <code>{@linkplain org.opengis.referencing.operation.Conversion}.class</code>,
+     * <code>{@linkplain org.opengis.referencing.operation.Projection}.class</code>,
+     * <cite>etc</cite>.
+     *
+     * The default implementation returns <code>Operation.class</code>.
+     * Subclass should overrides this methods and returns the appropriate
+     * OpenGIS interface type (<strong>not</strong> the implementation type).
+     */
+    protected Class getOperationType() {
+        return Operation.class;
     }
 
     /**

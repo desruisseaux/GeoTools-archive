@@ -27,19 +27,22 @@ package org.geotools.referencing.operation.projection;
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
-
 import javax.units.NonSI;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.ConicProjection;
+import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -157,7 +160,14 @@ public class LambertConformal extends MapProjection{
         public Provider1SP() {
             super(PARAMETERS);
         }     
-            
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return ConicProjection.class;
+        }
+
         /**
          * Creates a transform from the specified group of parameter values.
          *
@@ -240,7 +250,14 @@ public class LambertConformal extends MapProjection{
         protected Provider2SP(final ParameterDescriptorGroup params) {
             super(params);
         }
-           
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return ConicProjection.class;
+        }
+
         /**
          * Creates a transform from the specified group of parameter values.
          *
@@ -289,7 +306,14 @@ public class LambertConformal extends MapProjection{
         public Provider2SP_Belgium() {
             super(PARAMETERS);
         }
-           
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return ConicProjection.class;
+        }
+
         /**
          * Creates a transform from the specified group of parameter values.
          *
@@ -337,7 +361,14 @@ public class LambertConformal extends MapProjection{
         public Provider2SP_ESRI() {
             super(PARAMETERS);
         }
-           
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return ConicProjection.class;
+        }
+
         /**
          * Creates a transform from the specified group of parameter values.
          *

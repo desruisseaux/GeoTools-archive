@@ -26,18 +26,22 @@ package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
 import java.util.Collection;
-
 import javax.units.NonSI;
 
-import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.Identifier;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.PlanarProjection;
+
+// Geotools dependencies
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+
 
 /**
  * Stereographic Projection. The directions starting from the central point are true,
@@ -193,6 +197,13 @@ public abstract class Stereographic extends MapProjection {
         }
 
         /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return PlanarProjection.class;
+        }
+
+        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
@@ -264,6 +275,13 @@ public abstract class Stereographic extends MapProjection {
          */
         public Provider_Polar_A() {
             super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return PlanarProjection.class;
         }
 
         /**
@@ -339,6 +357,13 @@ public abstract class Stereographic extends MapProjection {
         }
 
         /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return PlanarProjection.class;
+        }
+
+        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
@@ -402,6 +427,13 @@ public abstract class Stereographic extends MapProjection {
         }
 
         /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return PlanarProjection.class;
+        }
+
+        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
@@ -451,6 +483,13 @@ public abstract class Stereographic extends MapProjection {
          */
         public Provider_South_Pole() {
             super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return PlanarProjection.class;
         }
         
         /**
@@ -502,6 +541,13 @@ public abstract class Stereographic extends MapProjection {
          */
         public Provider_USGS() {
             super(PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type for this map projection.
+         */
+        protected Class getOperationType() {
+            return PlanarProjection.class;
         }
 
         /**
