@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.resources;
 
@@ -105,14 +92,13 @@ public class Arguments {
      * @param args Command line arguments. Arguments "-encoding" and "-locale" will
      *             be automatically parsed.
      */
-    public Arguments(final String[] args)
-    {
+    public Arguments(final String[] args) {
         this.arguments     = (String[]) args.clone();
         this.locale        = getLocale(getOptionalString("-locale"));
         String encoding    = getOptionalString("-encoding");
         String destination = getOptionalString("-Xout"); // Non-supported parameter.
-        PrintWriter out = null;
-        Exception error = null;
+        PrintWriter out    = null;
+        Exception error    = null;
         try {
             /*
              * If a destination file was specified,  open the file using the platform
@@ -164,8 +150,7 @@ public class Arguments {
      * @return The locale, or the default one if <code>locale</code> was null.
      * @throws IllegalArgumentException if the locale string is invalid.
      */
-    private Locale getLocale(final String locale) throws IllegalArgumentException
-    {
+    private Locale getLocale(final String locale) throws IllegalArgumentException {
         if (locale != null) {
             final String[] s = Pattern.compile("_").split(locale);
             switch (s.length) {
@@ -173,7 +158,7 @@ public class Arguments {
                 case 2:  return new Locale(s[0], s[1]);
                 case 3:  return new Locale(s[0], s[1], s[2]);
                 default: illegalArgument(new IllegalArgumentException(Resources.format(
-                                          ResourceKeys.ERROR_BAD_LOCALE_$1, locale)));
+                                         ResourceKeys.ERROR_BAD_LOCALE_$1, locale)));
             }
         }
         return Locale.getDefault();
@@ -224,7 +209,7 @@ public class Arguments {
                         split = 0;
                     }
                     illegalArgument(new IllegalArgumentException(Resources.getResources(locale).
-                                 getString(ResourceKeys.ERROR_MISSING_PARAMETER_VALUE_$1, arg)));
+                                    getString(ResourceKeys.ERROR_MISSING_PARAMETER_VALUE_$1, arg)));
                     return null;
                 }
             }
@@ -397,8 +382,9 @@ public class Arguments {
      */
     public static Writer getWriter(final OutputStream out) {
         try {
-            final String encoding = Preferences.userNodeForPackage(Arguments.class).get(ENCODING, null);
-            if (encoding!=null) {
+            final String encoding;
+            encoding = Preferences.userNodeForPackage(Arguments.class).get(ENCODING, null);
+            if (encoding != null) {
                 return new OutputStreamWriter(out, encoding);
             }
         } catch (UnsupportedEncodingException exception) {
@@ -423,7 +409,7 @@ public class Arguments {
             if (arg != null) {
                 if (count >= max) {
                     illegalArgument(new IllegalArgumentException(Resources.getResources(locale).
-                                  format(ResourceKeys.ERROR_UNKNOW_PARAMETER_$1, arguments[i])));
+                                    format(ResourceKeys.ERROR_UNKNOW_PARAMETER_$1, arguments[i])));
                 }
                 left[count++] = arg;
             }

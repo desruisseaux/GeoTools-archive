@@ -37,6 +37,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.measure.AngleFormat;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.Utilities;
@@ -130,6 +133,7 @@ public final class CRSUtilities {
      *
      * @param  crs  The coordinate reference system (CRS) to examine.
      * @param  type The CRS type to look for.
+     *         Must be a subclass of {@link CoordinateReferenceSystem}.
      * @return The dimension range of the specified CRS type, or <code>-1</code> if none.
      * @throws IllegalArgumentException if the <code>type</code> is not legal.
      */
@@ -166,8 +170,7 @@ public final class CRSUtilities {
      *         be decomposed for dimensions in the range <code>[lower..upper]</code>.
      */
     public static CoordinateReferenceSystem getSubCRS(CoordinateReferenceSystem crs,
-                                                      int lower,
-                                                      int upper)
+                                                      int lower, int upper)
     {
         int dimension = crs.getCoordinateSystem().getDimension();
         if (lower<0 || lower>upper || upper>dimension) {
@@ -198,9 +201,9 @@ public final class CRSUtilities {
     
     /**
      * Returns a two-dimensional coordinate reference system representing the two first dimensions
-     * of the specified coordinate reference system. If <code>crs</code> is already a two-dimensional
-     * CRS, then it is returned unchanged. Otherwise, if it is a {@link CompoundCRS}, then the head
-     * coordinate system is examined.
+     * of the specified coordinate reference system. If <code>crs</code> is already a
+     * two-dimensional CRS, then it is returned unchanged. Otherwise, if it is a
+     * {@link CompoundCRS}, then the head coordinate system is examined.
      *
      * @param  crs The coordinate system, or <code>null</code>.
      * @return A two-dimensional coordinate reference system that represents the two first
@@ -434,9 +437,10 @@ public final class CRSUtilities {
             int n = ++coordinateNumber;
             for (int i=sourceDim; --i>=0;) {
                 switch (n % 3) {
-                    case 0: sourcePt.setOrdinate(i, envelope.getMinimum(i)); n/=3; break;
-                    case 1: sourcePt.setOrdinate(i, envelope.getCenter (i)); continue loop;
-                    case 2: sourcePt.setOrdinate(i, envelope.getMaximum(i)); continue loop;
+                    case 0:  sourcePt.setOrdinate(i, envelope.getMinimum(i)); n/=3; break;
+                    case 1:  sourcePt.setOrdinate(i, envelope.getCenter (i)); continue loop;
+                    case 2:  sourcePt.setOrdinate(i, envelope.getMaximum(i)); continue loop;
+                    default: throw new AssertionError(); // Should never happen
                 }
             }
             break;
@@ -463,14 +467,14 @@ public final class CRSUtilities {
                                         final Rectangle2D     dest)
             throws TransformException
     {
-        if (source==null) {
+        if (source == null) {
             return null;
         }
-        double xmin=Double.POSITIVE_INFINITY;
-        double ymin=Double.POSITIVE_INFINITY;
-        double xmax=Double.NEGATIVE_INFINITY;
-        double ymax=Double.NEGATIVE_INFINITY;
-        final Point2D.Double point=new Point2D.Double();
+        double xmin = Double.POSITIVE_INFINITY;
+        double ymin = Double.POSITIVE_INFINITY;
+        double xmax = Double.NEGATIVE_INFINITY;
+        double ymax = Double.NEGATIVE_INFINITY;
+        final Point2D.Double point = new Point2D.Double();
         for (int i=0; i<8; i++) {
             /*
              *   (0)----(5)----(1)
@@ -493,7 +497,7 @@ public final class CRSUtilities {
             if (point.y<ymin) ymin=point.y;
             if (point.y>ymax) ymax=point.y;
         }
-        if (dest!=null) {
+        if (dest != null) {
             dest.setRect(xmin, ymin, xmax-xmin, ymax-ymin);
             return dest;
         }
@@ -543,29 +547,32 @@ public final class CRSUtilities {
      * form "45°00.00'N-50°00.00'N 30°00.00'E-40°00.00'E". If a map projection is required in
      * order to obtain this representation, it will be automatically applied.  This string is
      * mostly used for debugging purpose.
+     *
+     * @todo Uncomment the transformation block once CoordinateTransformationFactory is implemented.
      */
-//    public static String toWGS84String(CoordinateReferenceSystem crs, Rectangle2D bounds) {
-//        StringBuffer buffer = new StringBuffer();
-//        try {
-//            cs = getCoordinateSystem2D(crs);
-//            if (!GeographicCoordinateSystem.WGS84.equals(cs, false)) {
+    public static String toWGS84String(CoordinateReferenceSystem crs, Rectangle2D bounds) {
+        StringBuffer buffer = new StringBuffer();
+        try {
+            crs = getCRS2D(crs);
+            if (!equalsIgnoreMetadata(org.geotools.referencing.crs.GeographicCRS.WGS84, crs)) {
+                throw new UnsupportedOperationException("Not yet implemented"); // TODO: to remove
 //                final CoordinateTransformation tr = CoordinateTransformationFactory.getDefault().
 //                               createFromCoordinateSystems(cs, GeographicCoordinateSystem.WGS84);
 //                bounds = transform((MathTransform2D) tr.getMathTransform(), bounds, null);
-//            }
-//            final AngleFormat fmt = new AngleFormat("DD°MM.m'");
-//            buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
-//            buffer = fmt.format(new  Latitude(bounds.getMaxY()), buffer, null); buffer.append(' ');
-//            buffer = fmt.format(new Longitude(bounds.getMinX()), buffer, null); buffer.append('-');
-//            buffer = fmt.format(new Longitude(bounds.getMaxX()), buffer, null);
-//        } catch (TransformException exception) {
-//            buffer.append(Utilities.getShortClassName(exception));
-//            final String message = exception.getLocalizedMessage();
-//            if (message != null) {
-//                buffer.append(": ");
-//                buffer.append(message);
-//            }
-//        }
-//        return buffer.toString();
-//    }
+            }
+            final AngleFormat fmt = new AngleFormat("DD°MM.m'");
+            buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
+            buffer = fmt.format(new  Latitude(bounds.getMaxY()), buffer, null); buffer.append(' ');
+            buffer = fmt.format(new Longitude(bounds.getMinX()), buffer, null); buffer.append('-');
+            buffer = fmt.format(new Longitude(bounds.getMaxX()), buffer, null);
+        } catch (TransformException exception) {
+            buffer.append(Utilities.getShortClassName(exception));
+            final String message = exception.getLocalizedMessage();
+            if (message != null) {
+                buffer.append(": ");
+                buffer.append(message);
+            }
+        }
+        return buffer.toString();
+    }
 }

@@ -39,7 +39,7 @@ import java.io.Serializable;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated This interface was used by the legacy CRS packages, whic are going to be removed.
+ * @deprecated This interface was used by the legacy CTS packages, which are going to be removed.
  */
 public interface RemoteProxy extends Remote {
     /**

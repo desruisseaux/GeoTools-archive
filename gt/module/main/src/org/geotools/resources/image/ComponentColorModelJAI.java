@@ -16,10 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.resources.image;
 
@@ -58,9 +54,9 @@ import javax.media.jai.ComponentSampleModelJAI;
  * returns {@link ComponentSampleModelJAI} instead of {@link ComponentSampleModel} when
  * <code>float</code> or <code>double</code> datatype is requested.
  *
- * @task PATCH: Remove this patch when JAI will recognize J2SE 1.4 classes.
+ * @todo Remove this patch when JAI will recognize J2SE 1.4 classes.
  *
- * @version $ID$
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ComponentColorModelJAI extends ComponentColorModel {
@@ -115,6 +111,7 @@ public class ComponentColorModelJAI extends ComponentColorModel {
     /**
      * Returns the <code>String</code> representation of the contents of
      * this <code>ColorModel</code>object.
+     *
      * @return a <code>String</code> representing the contents of this
      * <code>ColorModel</code> object.
      */
@@ -124,7 +121,6 @@ public class ComponentColorModelJAI extends ComponentColorModel {
                          + " color space = "+ super.getColorSpace()
                          + " transparency = "+ super.getTransparency()
                          + " has alpha = "+ super.hasAlpha()
-                         + " isAlphaPre = "+ super.isAlphaPremultiplied()
-                         );
+                         + " isAlphaPre = "+ super.isAlphaPremultiplied());
     }
 }

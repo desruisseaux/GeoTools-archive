@@ -39,7 +39,7 @@ import org.geotools.resources.XMath;
  * Static utilities methods. Those methods operate on geometric
  * shapes from the <code>java.awt.geom</code> package.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class ShapeUtilities {
@@ -47,7 +47,7 @@ public final class ShapeUtilities {
      * Valeur limite pour détecter si des points sont
      * colinéaires ou si des coordonnées sont identiques.
      */
-    private static final double EPS=1E-6;
+    private static final double EPS = 1E-6;
 
     /**
      * Constante pour les calculs de paraboles. Cette constante indique que l'axe des

@@ -31,7 +31,7 @@ import java.util.logging.LogRecord;
 /**
  * A set of miscellaneous methods.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Utilities {
@@ -261,7 +261,8 @@ public final class Utilities {
     public static void unexpectedException(final String   paquet,
                                            final String   classe,
                                            final String   method,
-                                           final Throwable error) {
+                                           final Throwable error)
+    {
         final StringBuffer buffer = new StringBuffer(getShortClassName(error));
         final String message = error.getLocalizedMessage();
         if (message!=null) {

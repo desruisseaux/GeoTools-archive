@@ -34,7 +34,10 @@ import junit.textui.TestRunner;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ReferencingSuite extends TestCase {
+public class AllTests extends TestCase {
+    /** No need to construct this class. */
+    private AllTests() {}        
+
     /**
      * Run the suite from the command line.
      */
@@ -44,24 +47,11 @@ public class ReferencingSuite extends TestCase {
     }
 
     /**
-     * Construct a suite.
-     */
-    public ReferencingSuite(final String name) {
-        super(name);
-    }        
-
-    /**
      * Returns all suites.
      */
     public static Test suite() {
-        final TestSuite suite = new TestSuite("All referencing tests");
-        suite.addTest(org.geotools.resources                      .NumberParserTest      .suite());
-//      suite.addTest(org.geotools.util                           .MonolineFormatterTest .suite());
-        suite.addTest(org.geotools.util                           .RangeSetTest          .suite());
-        suite.addTest(org.geotools.util                           .DisjointSetTest       .suite());
-        suite.addTest(org.geotools.util                           .WeakHashSetTest       .suite());
-        suite.addTest(org.geotools.util                           .WeakValueHashMapTest  .suite());
-        suite.addTest(org.geotools.measure                        .FormatTest            .suite());
+        final TestSuite suite = new TestSuite("org.geotools.referencing");
+        suite.addTest(org.geotools.measure                        .AllTests              .suite());
         suite.addTest(org.geotools.referencing                    .BasicTest             .suite());
         suite.addTest(org.geotools.referencing                    .ParameterTest         .suite());
         suite.addTest(org.geotools.referencing.operation          .MatrixTest            .suite());

@@ -53,12 +53,19 @@ public class MonolineFormatterTest extends TestCase {
     }
 
     /**
+     * Set to <code>true</code> if this is run has a JUnit test
+     * (i.e. not from the command line).
+     */
+    private static boolean runFromJUnit;
+
+    /**
      * Set up common objects used for all tests. This initialization is performed by
      * JUnit, but is <strong>not</strong> performed when the test is run from the
      * command line. Instead, the initialization on command line is controled by
      * the optional "-init" argument.
      */
     protected void setUp() throws Exception {
+        runFromJUnit = true;
         super.setUp();
         MonolineFormatter.init("org.geotools");
     }
@@ -67,6 +74,10 @@ public class MonolineFormatterTest extends TestCase {
      * Run the test. This is only a visual test.
      */
     public void testInitialization() {
+        if (runFromJUnit) {
+            // Avoid polluting the output stream during JUnit tests.
+            return;
+        }
         final String[] namespaces = {
             "org.geotools.core",
             "org.geotools.resources",

@@ -18,12 +18,15 @@
  */
 package org.geotools.resources;
 
+// J2SE dependencies
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLDecoder;
+
 
 /**
  * Provides access to test-data directories associated
@@ -53,7 +56,7 @@ import java.net.URL;
  * </ul>
  * </p>
  * <p>
- * By convention you should try and locate testdata near the junit test
+ * By convention you should try and locate test-data near the junit test
  * cases that uses it.
  * </p>
  * @version $Id$
@@ -61,99 +64,108 @@ import java.net.URL;
  */
 public class TestData {
     /**
-     * Provided a BufferedReader for named test data.
+     * Provided a {@link BufferedReader} for named test data.
+     * It is the caller responsability to close this reader after usage.
      * 
-     * @param caller Object associated with named data
-     * @param name of test data to load
+     * @param caller The class of the object associated with named data.
+     * @param name of test data to load.
+     * @return The reader, or <code>null</code> if the named test data are not found.
+     * @throws IOException if an error occurs during an input operation.
      */
-    public static final BufferedReader getReader(final Class caller, final String name) throws IOException {
-    	URL url = caller.getResource("test-data/"+name);
-    	if( url == null ) {
+    public static final BufferedReader getReader(final Class caller, final String name)
+            throws IOException
+    {
+        final URL url = getResource(caller, name);
+        if (url == null) {
             return null; // echo handling of getResource( ... )    		
-    	}
-    	return new BufferedReader(new InputStreamReader( url.openStream()));
+        }
+        return new BufferedReader(new InputStreamReader(url.openStream()));
     }	
+
     /**
-     * Provided a BufferedReader for named test data.
+     * Provided a {@link BufferedReader} for named test data.
+     * It is the caller responsability to close this reader after usage.
      * 
      * @param host Object associated with named data
      * @param name of test data to load
+     * @return The reader, or <code>null</code> if the named test data are not found.
+     * @throws IOException if an error occurs during an input operation.
      */
-    public static final BufferedReader getReader(final Object host, final String name) throws IOException {
-    	URL url = host.getClass().getResource("test-data/"+name);
-    	if( url == null ) {
-            return null; // echo handling of getResource( ... )    		
-    	}
-    	return new BufferedReader(new InputStreamReader( url.openStream()));
+    public static final BufferedReader getReader(final Object host, final String name)
+            throws IOException
+    {
+        return getReader(host.getClass(), name);
     }
 
-    // REVISIT: Should this be getURL() - or simply url
-    // I tend to save getX method for accessors.
     /**
      * Locate named test-data resource for caller.
      *
-     * @param caller Class used to locate test-data
-     * @param name name of test-data 
-     * @return URL or null of named test-data could not be found
+     * @param caller Class used to locate test-data.
+     * @param name name of test-data.
+     * @return URL or null of named test-data could not be found.
+     *
+     * @todo Should this be getURL() - or simply url?
+     *       I tend to save getX method for accessors.
      */
-    public static final URL getResource(final Class caller, final String name) throws IOException {
-    	if( name == null ){
-    		return caller.getResource("test-data");
-    	}
-    	else {
-    		return caller.getResource("test-data/"+name);
-    	}
+    public static final URL getResource(final Class caller, String name) {
+        if (name == null) {
+            name = "test-data";
+        } else {
+            name = "test-data/" + name;
+        }
+        return caller.getResource(name);
     }
 
-    // REVISIT: Should this be getURL() - or simply url
-    // I tend to save getX method for accessors.
     /** 
      * Locate named test-data resource for caller.
+     *
      * @param caller Object used to locate test-data
      * @param name name of test-data
-     * 
      * @return URL or null of named test-data could not be found 
+     *
+     * @todo Should this be getURL() - or simply url?
+     *       I tend to save getX method for accessors.
      */
-    public static final URL getResource(final Object caller, final String name) throws IOException {
-    	if( name == null ){
-    		return caller.getClass().getResource("test-data");
-    	}
-    	else {
-    		return caller.getClass().getResource("test-data/"+name);
-    	}
+    public static final URL getResource(final Object caller, final String name) {
+        return getResource(caller.getClass(), name);
     }
+
     /**
-     * Access to getResource( caller, path ) as a File.
+     * Access to <code>getResource(caller, path)</code> as a {@link File}.
      * <p>
      * You can access the test-data directory with:
      * <pre><code>
      * TestData.file( this, null )
      * </code></pre>
      * </p>
+     *
      * @param caller Calling object used to locate test-data
      * @param path Path to file in testdata
      * @return File from test-data
-     * @throws IOException
+     * @throws IOException if the file is not found.
      */
-    public static final File file( final Object caller, final String path ) throws IOException {
-    	URL url = getResource( caller, path );
-    	if( url == null ) {
-    		throw new FileNotFoundException("Could not locate test-data: "+path );    		
-    	}    	
-    	// Based SVGTest
-    	File file = new File(java.net.URLDecoder.decode( url.getFile(),"UTF-8"));
-    	if( !file.exists() ) {
-    		throw new FileNotFoundException("Could not locate test-data: "+path );    		
-    	}
-    	return file;    	
+    public static final File file(final Object caller, final String path) throws IOException {
+        final URL url = getResource(caller, path);
+        if (url != null) {
+            // Based SVGTest
+            final File file = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
+            if (file.exists()) {
+                return file;
+            }
+        }
+        throw new FileNotFoundException("Could not locate test-data: "+path);
     }
-    public static final File temp( final Object caller, final String name ) throws IOException{
-    	File testData = file( caller, null );
-    	int split = name.lastIndexOf(".");
-    	String prefix = split == -1 ? name : name.substring(0,split);
-    	String suffix = split == -1 ? null : name.substring(split+1);
-    	File tmp = File.createTempFile( prefix, suffix, testData );
-    	tmp.deleteOnExit();    	
-    	return tmp;
+
+    /**
+     * Creates a temporary file with the given name.
+     */
+    public static final File temp(final Object caller, final String name) throws IOException {
+        File testData = file(caller, null);
+        int split = name.lastIndexOf('.');
+        String prefix = split == -1 ? name : name.substring(0,split);
+        String suffix = split == -1 ? null : name.substring(split+1);
+        File tmp = File.createTempFile( prefix, suffix, testData );
+        tmp.deleteOnExit();    	
+        return tmp;
     }
 }

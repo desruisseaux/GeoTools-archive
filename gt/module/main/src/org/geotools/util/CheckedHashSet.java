@@ -32,6 +32,7 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * Acts as a typed {@link java.util.Set} while we wait for Java 5.0.
  * 
+ * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
  *

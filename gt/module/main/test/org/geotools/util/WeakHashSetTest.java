@@ -109,7 +109,7 @@ public class WeakHashSetTest extends TestCase {
         for (int pass=0; pass<2; pass++) {
             final WeakHashSet weakSet = new WeakHashSet();
             final HashSet   strongSet = new HashSet();
-            for (int i=0; i<1000; i++) {
+            for (int i=0; i<500; i++) {
                 final Integer value = new Integer(random.nextInt(500));
                 if (random.nextBoolean()) {
                     /*
@@ -149,8 +149,8 @@ public class WeakHashSetTest extends TestCase {
                 assertTrue("containsAll", weakSet.containsAll(strongSet));
             }
             // Do our best to lets GC finish its work.
-            for (int i=0; i<5; i++) {
-                Thread.sleep(100);
+            for (int i=0; i<4; i++) {
+                Thread.sleep(50);
                 System.gc();
             }
             assertTrue("equals", strongSet.equals(weakSet));

@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.resources;
 
@@ -59,7 +46,7 @@ public final class XMath {
      * Natural logarithm of 10.
      * Approximately equal to 2.302585.
      */
-    public static final double LN10=2.3025850929940456840179914546844;
+    public static final double LN10 = 2.3025850929940456840179914546844;
     
     /**
      * Table of some integer powers of 10. Used
@@ -81,6 +68,8 @@ public final class XMath {
      * Combute the cubic root of the specified value. This is method will be removed if
      * <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4633024.html">RFE
      * 4633024</A> is implemented.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static double cbrt(final double x) {
         return Math.pow(x, 1.0/3);
@@ -88,6 +77,8 @@ public final class XMath {
     
     /**
      * Compute the hypotenuse (<code>sqrt(x²+y²)</code>).
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static double hypot(final double x, final double y) {
         return Math.sqrt(x*x + y*y);
@@ -96,17 +87,19 @@ public final class XMath {
     /**
      * Compute the logarithm in base 10. See
      * http://developer.java.sun.com/developer/bugParade/bugs/4074599.html.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static double log10(final double x) {
-        return Math.log(x)/LN10;
+        return Math.log(x) / LN10;
     }
     
     /**
      * Compute 10 power <var>x</var>.
      */
     public static double pow10(final double x) {
-        final int ix=(int) x;
-        if (ix==x) {
+        final int ix = (int) x;
+        if (ix == x) {
             return pow10(ix);
         } else {
             return Math.pow(10, x);
@@ -152,6 +145,8 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null or <code>NaN</code> and
      *    +1 if <var>x</var> is positive.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static int sgn(final double x) {
         if (x>0) return +1;
@@ -164,6 +159,8 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null or <code>NaN</code> and
      *    +1 if <var>x</var> is positive.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static int sgn(final float x) {
         if (x>0) return +1;
@@ -176,6 +173,8 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static int sgn(long x) {
         if (x>0) return +1;
@@ -188,6 +187,8 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static int sgn(int x) {
         if (x>0) return +1;
@@ -200,6 +201,8 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static short sgn(short x) {
         if (x>0) return (short) +1;
@@ -212,6 +215,8 @@ public final class XMath {
      *    -1 if <var>x</var> is negative,
      *     0 if <var>x</var> is null and
      *    +1 if <var>x</var> is positive.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static byte sgn(byte x) {
         if (x>0) return (byte) +1;
@@ -248,6 +253,8 @@ public final class XMath {
      * or the greatest float less than d (if positive == false).
      * If NaN, returns same value. This code is an adaptation of
      * {@link java.text.ChoiceFormat#nextDouble}.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     private static float next(final float f, final boolean positive) {
         final int SIGN             = 0x80000000;
@@ -289,6 +296,8 @@ public final class XMath {
     /**
      * Finds the least float greater than <var>f</var>.
      * If <code>NaN</code>, returns same value.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static float next(final float f) {
         return next(f, true);
@@ -297,6 +306,8 @@ public final class XMath {
     /**
      * Finds the greatest float less than <var>f</var>.
      * If <code>NaN</code>, returns same value.
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static float previous(final float f) {
         return next(f, false);
@@ -307,6 +318,8 @@ public final class XMath {
      * If <code>NaN</code>, returns same value.
      *
      * @see java.text.ChoiceFormat#nextDouble
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static double next(final double f) {
         return ChoiceFormat.nextDouble(f);
@@ -317,6 +330,8 @@ public final class XMath {
      * If <code>NaN</code>, returns same value.
      *
      * @see java.text.ChoiceFormat#previousDouble
+     *
+     * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
     public static double previous(final double f) {
         return ChoiceFormat.previousDouble(f);

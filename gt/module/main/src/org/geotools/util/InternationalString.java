@@ -311,7 +311,7 @@ public class InternationalString implements org.opengis.util.InternationalString
      * @return The string in the specified locale, or in a default locale.
      */
     public String toString(Locale locale) {
-        String text = null;
+        String text;
         while (locale != null) {
             text = (String) localMap.get(locale);
             if (text != null) {
@@ -332,6 +332,9 @@ public class InternationalString implements org.opengis.util.InternationalString
         }
         
         // Try an Empty Locale
+        // TODO: Remove this block. The Locale("", "", "") is used temporarily
+        //       by IdentifiedObject, but this is strictly an internal use and
+        //       should never appears outside IdentifiedObject.
         locale = new Locale( "", "", "" ); // IdentifiedObject does this to us
         text = (String) localMap.get(locale);
         if (text != null) {
@@ -393,11 +396,18 @@ public class InternationalString implements org.opengis.util.InternationalString
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        if (localMap.size() == 1) {
-            // For now, we do not apply this operation on singleton map since they are immutable.
-            final Map.Entry[] entries;
-            entries = (Map.Entry[]) localMap.entrySet().toArray(new Map.Entry[localMap.size()]);
-            localMap = new HashMap(); //TODO: Used to be localMap.clear() to recover space     
+        final int size = localMap.size();
+        if (size == 0) {
+            return;
+        }
+        final Map.Entry[] entries;
+        entries = (Map.Entry[]) localMap.entrySet().toArray(new Map.Entry[size]);
+        if (size == 1) {
+            final Map.Entry entry = entries[0];
+            localMap = Collections.singletonMap(canonicalize((Locale)entry.getKey()),
+                                                                     entry.getValue());
+        } else {
+            localMap.clear();
             for (int i=0; i<entries.length; i++) {
                 final Map.Entry entry = entries[i];
                 localMap.put(canonicalize((Locale)entry.getKey()), entry.getValue());

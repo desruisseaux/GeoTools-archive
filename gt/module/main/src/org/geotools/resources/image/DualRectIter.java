@@ -16,22 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.resources.image;
 
@@ -52,8 +36,8 @@ import javax.media.jai.iterator.WritableRectIter;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @task REVISIT: This implementation is referenced in a public API.
- *                Consider moving it somewhere else.
+ * @todo This implementation is referenced in a public API.
+ *       Consider moving it somewhere else.
  */
 public final class DualRectIter implements WritableRectIter {
     /**
@@ -356,4 +340,3 @@ public final class DualRectIter implements WritableRectIter {
         dst.setSample(b, s);
     }
 }
-

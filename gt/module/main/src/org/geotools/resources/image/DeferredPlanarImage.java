@@ -201,8 +201,8 @@ public final class DeferredPlanarImage extends PlanarImage
     /**
      * Wrap the specified image in a vector.
      *
-     * @task TODO: Should be inlined in the constructor if only Sun was to fix RFE #4093999
-     *             ("Relax constraint on placement of this()/super() call in constructors").
+     * @todo Should be inlined in the constructor if only Sun was to fix RFE #4093999
+     *       ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static Vector toVector(final RenderedImage image) {
         final Vector vector = new Vector(1);

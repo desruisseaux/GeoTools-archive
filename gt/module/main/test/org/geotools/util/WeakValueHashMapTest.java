@@ -149,8 +149,8 @@ public class WeakValueHashMapTest extends TestCase {
                 }
             }
             // Do our best to lets GC finish its work.
-            for (int i=0; i<5; i++) {
-                Thread.sleep(100);
+            for (int i=0; i<4; i++) {
+                Thread.sleep(50);
                 System.gc();
             }
             assertTrue("equals", strongMap.equals(weakMap));

@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.resources;
 
@@ -77,12 +64,13 @@ public final class XArray {
      */
     private static Object doResize(final Object array, final int length) {
         final int current = array == null ? 0 : Array.getLength(array);
-        if (current!=length) {
+        if (current != length) {
             final Object newArray=Array.newInstance(array.getClass().getComponentType(), length);
             System.arraycopy(array, 0, newArray, 0, Math.min(current, length));
             return newArray;
+        } else {
+            return array;
         }
-        else return array;
     }
 
     /**
@@ -315,13 +303,13 @@ public final class XArray {
      *                table.
      */
     private static Object doRemove(final Object array, final int index, final int length) {
-        if (length==0) {
+        if (length == 0) {
             return array;
         }
-        int array_length=Array.getLength(array);
-        final Object newArray=Array.newInstance(array.getClass().getComponentType(), array_length-=length);
-        System.arraycopy(array, 0,            newArray, 0,                  index);
-        System.arraycopy(array, index+length, newArray, index, array_length-index);
+        int   arrayLength     = Array.getLength(array);
+        final Object newArray = Array.newInstance(array.getClass().getComponentType(), arrayLength-=length);
+        System.arraycopy(array, 0,            newArray, 0,                 index);
+        System.arraycopy(array, index+length, newArray, index, arrayLength-index);
         return newArray;
     }
 
@@ -493,13 +481,13 @@ public final class XArray {
      *                created table.
      */
     private static Object doInsert(final Object array, final int index, final int length) {
-        if (length==0) {
+        if (length == 0) {
             return array;
         }
-        final int array_length=Array.getLength(array);
-        final Object newArray=Array.newInstance(array.getClass().getComponentType(), array_length+length);
-        System.arraycopy(array, 0,     newArray, 0,            index             );
-        System.arraycopy(array, index, newArray, index+length, array_length-index);
+        final int arrayLength = Array.getLength(array);
+        final Object newArray = Array.newInstance(array.getClass().getComponentType(), arrayLength+length);
+        System.arraycopy(array, 0,     newArray, 0,            index            );
+        System.arraycopy(array, index, newArray, index+length, arrayLength-index);
         return newArray;
     }
 
@@ -692,15 +680,17 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    private static Object doInsert(final Object src, final int src_pos, final Object dst, final int dst_pos, final int length) {
-        if (length==0) {
+    private static Object doInsert(final Object src, final int src_pos,
+                                   final Object dst, final int dst_pos, final int length)
+    {
+        if (length == 0) {
             return dst;
         }
-        final int dst_length=Array.getLength(dst);
-        final Object newArray=Array.newInstance(dst.getClass().getComponentType(), dst_length+length);
-        System.arraycopy(dst, 0,       newArray, 0,              dst_pos           );
-        System.arraycopy(src, src_pos, newArray, dst_pos,        length            );
-        System.arraycopy(dst, dst_pos, newArray, dst_pos+length, dst_length-dst_pos);
+        final int   dstLength = Array.getLength(dst);
+        final Object newArray = Array.newInstance(dst.getClass().getComponentType(), dstLength+length);
+        System.arraycopy(dst, 0,       newArray, 0,              dst_pos          );
+        System.arraycopy(src, src_pos, newArray, dst_pos,        length           );
+        System.arraycopy(dst, dst_pos, newArray, dst_pos+length, dstLength-dst_pos);
         return newArray;
     }
 
@@ -722,7 +712,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static Object[] insert(final Object[] src, final int src_pos, final Object[] dst, final int dst_pos, final int length) {
+    public static Object[] insert(final Object[] src, final int src_pos,
+                                  final Object[] dst, final int dst_pos, final int length)
+    {
         return (Object[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -744,7 +736,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static double[] insert(final double[] src, final int src_pos, final double[] dst, final int dst_pos, final int length) {
+    public static double[] insert(final double[] src, final int src_pos,
+                                  final double[] dst, final int dst_pos, final int length)
+    {
         return (double[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -766,7 +760,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static float[] insert(final float[] src, final int src_pos, final float[] dst, final int dst_pos, final int length) {
+    public static float[] insert(final float[] src, final int src_pos,
+                                 final float[] dst, final int dst_pos, final int length)
+    {
         return (float[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -788,7 +784,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static long[] insert(final long[] src, final int src_pos, final long[] dst, final int dst_pos, final int length) {
+    public static long[] insert(final long[] src, final int src_pos,
+                                final long[] dst, final int dst_pos, final int length)
+    {
         return (long[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -810,7 +808,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static int[] insert(final int[] src, final int src_pos, final int[] dst, final int dst_pos, final int length) {
+    public static int[] insert(final int[] src, final int src_pos,
+                               final int[] dst, final int dst_pos, final int length)
+    {
         return (int[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -832,7 +832,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static short[] insert(final short[] src, final int src_pos, final short[] dst, final int dst_pos, final int length) {
+    public static short[] insert(final short[] src, final int src_pos,
+                                 final short[] dst, final int dst_pos, final int length)
+    {
         return (short[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -854,7 +856,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static byte[] insert(final byte[] src, final int src_pos, final byte[] dst, final int dst_pos, final int length) {
+    public static byte[] insert(final byte[] src, final int src_pos,
+                                final byte[] dst, final int dst_pos, final int length)
+    {
         return (byte[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -876,7 +880,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static char[] insert(final char[] src, final int src_pos, final char[] dst, final int dst_pos, final int length) {
+    public static char[] insert(final char[] src, final int src_pos,
+                                final char[] dst, final int dst_pos, final int length)
+    {
         return (char[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 
@@ -898,7 +904,9 @@ public final class XArray {
      *                <code>dst</code>, but never <code>src</code>. It most
      *                often returns a newly created table.
      */
-    public static boolean[] insert(final boolean[] src, final int src_pos, final boolean[] dst, final int dst_pos, final int length) {
+    public static boolean[] insert(final boolean[] src, final int src_pos,
+                                   final boolean[] dst, final int dst_pos, final int length)
+    {
         return (boolean[]) doInsert(src, src_pos, dst, dst_pos, length);
     }
 

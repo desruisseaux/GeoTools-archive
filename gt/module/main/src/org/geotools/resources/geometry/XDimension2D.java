@@ -44,7 +44,7 @@ public final class XDimension2D {
      * temporary;  it will disappear if <em>JavaSoft</em> implements
      * <code>Dimension2D.Float</code> and <code>Dimension2D.Double</code>.
      *
-     * @version 1.0
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static final class Float extends Dimension2D implements Serializable {
@@ -113,7 +113,7 @@ public final class XDimension2D {
      * temporary; it will disappear if <em>JavaSoft</em> implements
      * <code>Dimension2D.Float</code> and <code>Dimension2D.Double</code>.
      *
-     * @version 1.0
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static final class Double extends Dimension2D implements Serializable {
