@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <artifactId>export-wizzard</artifactId>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-export-wizzard-demo</name>
+  <id>export-demo</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>Swing wizzard to export features</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>A swing gui based wizzard to export a set of features from one DataStore to another, with reprojection option.</description>
+  <developers>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>gt2</groupId>
+      <artifactId>main</artifactId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <groupId>JTS</groupId>
+      <artifactId>JTS</artifactId>
+      <version>1.6-SNAPSHOT</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+      <properties>
+        <release.bundle>true</release.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>opengis</groupId>
+      <artifactId>opengis-legacy</artifactId>
+      <version>0.1</version>
+      <url>http://www.opengis.org</url>
+    </dependency>
+    <dependency>
+      <groupId>geoapi</groupId>
+      <artifactId>geoapi</artifactId>
+      <version>SNAPSHOT</version>
+      <url>http://geoapi.sourceforge.net</url>
+    </dependency>
+  </dependencies>
+  <contributors>
+  </contributors>
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>META-INF/MANIFEST.MF</include>
+            <include>**/test-data/</include>
+          </includes>
+          <filtering>false</filtering>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>
+
