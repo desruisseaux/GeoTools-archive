@@ -164,7 +164,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         ElementValue[] vals = new ElementValue[elements.size()
             + (type.isMixed() ? 1 : 0)];
 
-        for (int i = 0; i < vals.length; i++) {
+        for (int i = 0; i < elements.size(); i++) {
             XMLElementHandler xeh = (XMLElementHandler) elements.get(i);
             vals[i] = new DefaultElementValue(xeh.getElement(), xeh.getValue());
         }
