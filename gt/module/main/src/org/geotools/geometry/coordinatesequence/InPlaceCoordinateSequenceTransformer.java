@@ -59,15 +59,18 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
         throw new TransformException(cs.getClass().getName()+" is not a implementation that is known to be transformable in place");
     }
 
-    FlyWeightDirectPosition position=new FlyWeightDirectPosition();
+    FlyWeightDirectPosition start=new FlyWeightDirectPosition(2);
+    FlyWeightDirectPosition dest=new FlyWeightDirectPosition(2);
     private CoordinateSequence transformInternal( PackedCoordinateSequence sequence, MathTransform transform ) 
     throws TransformException{
         
-        position.setSequence(sequence);
+        start.setSequence(sequence);        
+        dest.setSequence(sequence);
         for(int i=0; i<sequence.size()*sequence.getDimension();i++ ){
-            position.setOffset(i);
+            start.setOffset(i);
+            dest.setOffset(i);
             try {
-                transform.transform(position, position);
+                transform.transform(start, dest);
             } catch (MismatchedDimensionException e) {
                 throw new TransformException( "", e);
             } 
@@ -78,6 +81,15 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
     private class FlyWeightDirectPosition implements DirectPosition{
         PackedCoordinateSequence sequence;
         int offset=0;
+        private int dimension;
+        
+        /**
+         * Construct <code>InPlaceCoordinateSequenceTransformer.FlyWeightDirectPosition</code>.
+         *
+         */
+        public FlyWeightDirectPosition(int dim) {
+            dimension=dim;
+        }
         
         /**
          * @param offset The offset to set.
@@ -97,7 +109,7 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
          * @see org.opengis.spatialschema.geometry.DirectPosition#getDimension()
          */
         public int getDimension() {
-            return 2;
+            return dimension;
         }
 
         /**
@@ -111,8 +123,6 @@ public class InPlaceCoordinateSequenceTransformer implements CoordinateSequenceT
          * @see org.opengis.spatialschema.geometry.DirectPosition#getOrdinate(int)
          */
         public double getOrdinate( int arg0 ) throws IndexOutOfBoundsException {
-            if( arg0>sequence.getDimension())
-                throw new IndexOutOfBoundsException(arg0+" is out of bounds, max is: "+sequence.getDimension());
             return sequence.getOrdinate(offset, arg0);
         }
 
