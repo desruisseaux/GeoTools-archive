@@ -53,7 +53,8 @@ import org.geotools.validation.ValidationResults;
  * @version $Id: NullZeroValidation.java,v 1.6 2004/04/21 00:27:02 dmzwiers Exp $
  */
 public class NullZeroValidation extends DefaultFeatureValidation {
-    private String attributeName;
+	/** XPATH expression for attribtue */
+    private String attribute;
 
     public NullZeroValidation() {
         super();
@@ -79,29 +80,29 @@ public class NullZeroValidation extends DefaultFeatureValidation {
     public boolean validate(Feature feature, FeatureType type,
         ValidationResults results) { // throws Exception {
 
-        Object ft = feature.getAttribute(attributeName);
+        Object obj = feature.getAttribute(attribute);
 
-        if (ft == null) {
-            results.error(feature, attributeName + " is Empty");
+        if (obj == null) {
+            results.error(feature, attribute + " is Empty");
 
             return false;
         }
 
-        if (ft instanceof Number) {
-            Number nb = (Number) ft;
+        if (obj instanceof Number) {
+            Number number = (Number) obj;
 
-            if (nb.intValue() == 0) {
-                results.error(feature, attributeName + " is Zero");
+            if (number.intValue() == 0) {
+                results.error(feature, attribute + " is Zero");
 
                 return false;
             }
         }
 
-		if (ft instanceof String) {
-			String nb = (String) ft;
+		if (obj instanceof String) {
+			String string = (String) obj;
 
-			if ("".equals(nb.trim())) {
-				results.error(feature, attributeName + " is \"\"");
+			if ("".equals(string.trim())) {
+				results.error(feature, attribute + " is \"\"");
 
 				return false;
 			}
@@ -143,16 +144,16 @@ public class NullZeroValidation extends DefaultFeatureValidation {
      *
      * @return the path being stored for validation
      */
-    public String getAttributeName() {
-        return attributeName;
+    public String getAttribute() {
+        return attribute;
     }
 
     /**
-     * set AttributeName to name.
+     * set AttributeName to xpath expression.
      *
      * @param name
      */
-    public void setAttributeName(String name) {
-        attributeName = name;
+    public void setAttribute(String xpath) {
+        attribute = xpath;
     }
 }

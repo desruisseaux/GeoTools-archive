@@ -73,7 +73,7 @@ public class NullZeroValidationBeanInfo extends DefaultFeatureValidationBeanInfo
             pd[i] = pd2[i];
 
         try {
-            pd[i] = createPropertyDescriptor("attributeName",
+            pd[i] = createPropertyDescriptor("attribute",
                     NullZeroValidation.class, resourceBundle);
             pd[i].setExpert(false);
         } catch (IntrospectionException e) {

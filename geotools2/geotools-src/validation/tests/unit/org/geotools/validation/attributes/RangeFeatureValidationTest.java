@@ -9,6 +9,7 @@ import junit.framework.TestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.validation.RoadValidationResults;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -33,6 +34,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @version $Id: RangeFeatureValidationTest.java,v 1.1 2004/04/29 21:57:32 sploreg Exp $
  */
 public class RangeFeatureValidationTest extends TestCase {
+	private GeometryFactory gf;
 	private RoadValidationResults results;
 	private FeatureType type;
 	private Feature feature;
@@ -49,24 +51,30 @@ public class RangeFeatureValidationTest extends TestCase {
 	 * @see TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		GeometryFactory gf = new GeometryFactory();
-		test = new RangeValidation();
-		super.setUp();
+		super.setUp();	
+		gf = new GeometryFactory();
+		
+		test = new RangeValidation();		
+		test.setAttribute("name");
+		test.setTypeRef("road");
+		test.setName( "JUnit" );
+		test.setName( "test used for junit test "+getName() );
 		
 		type = DataUtilities.createType(getName()+".road",
 		"id:0,*geom:LineString,name:String");
-		Coordinate[] coords = new Coordinate[]{ new Coordinate(1, 1), new Coordinate( 2, 2), new Coordinate (4, 2), new Coordinate (5, 1)};
-
-		
-		feature = type.create(new Object[] {
-				new Integer(1),
-				gf.createLineString(coords),
-				"r1",
-			},
-			"road.rd1"
-		);
 		
 		results = new RoadValidationResults();
+	}
+
+	private Feature road( String road, int id, String name ) throws IllegalAttributeException {
+		Coordinate[] coords = new Coordinate[]{ new Coordinate(1, 1), new Coordinate( 2, 2), new Coordinate (4, 2), new Coordinate (5, 1)};		
+		return type.create(new Object[] {
+				new Integer(id),
+				gf.createLineString(coords),
+				name,
+			},
+			type.getTypeName()+"."+road
+		);
 	}
 
 	/*
@@ -75,21 +83,6 @@ public class RangeFeatureValidationTest extends TestCase {
 	protected void tearDown() throws Exception {
 		test = null;
 		super.tearDown();
-	}
-
-	public void testRangeFeatureValidation() throws Exception {
-		test.setPath("id");
-		
-		
-		assertTrue(test.validate(feature, type, results));
-		assertEquals(0,results.failedFeatures.size());
-		test.setMin(5);
-		assertTrue(!test.validate(feature, type, results));
-		assertEquals(1,results.failedFeatures.size());		
-	}
-
-	public void testValidate() {
-		//test.validate(feature, type, results);
 	}
 
 	public void testSetName() {
@@ -127,8 +120,8 @@ public class RangeFeatureValidationTest extends TestCase {
 	}
 
 	public void testGetPath() {
-		test.setPath("path");
-		assertEquals("path", test.getPath());
+		test.setAttribute("path");
+		assertEquals("path", test.getAttribute());
 	}
 
 	public void testSetMax() {
@@ -143,8 +136,16 @@ public class RangeFeatureValidationTest extends TestCase {
 	}
 
 	public void testSetPath() {
-		test.setPath("path2");
-		assertEquals("path2", test.getPath());
+		test.setAttribute("path2");
+		assertEquals("path2", test.getAttribute());
 	}
-
+	public void testRangeFeatureValidation() throws Exception {
+		test.setTypeRef("road");	
+		test.setAttribute("id");	
+		test.setMin( 0 );
+		assertTrue( test.validate(road("rd1", 1,"street"), type, results) );
+		assertTrue( test.validate(road("rd2", 0,"avenue"), type, results) );
+		assertFalse( test.validate(road("rd3", -1,"alley"), type, results) );			
+	}
+		
 }

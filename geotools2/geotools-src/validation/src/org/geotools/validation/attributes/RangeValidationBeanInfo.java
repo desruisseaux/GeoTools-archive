@@ -73,7 +73,7 @@ public class RangeValidationBeanInfo extends DefaultFeatureValidationBeanInfo {
             pd[i] = pd2[i];
 
         try {
-            pd[i] = createPropertyDescriptor("name", RangeValidation.class,
+            pd[i] = createPropertyDescriptor("attribute", RangeValidation.class,
                     resourceBundle);
             pd[i].setExpert(false);
             pd[i + 1] = createPropertyDescriptor("max", RangeValidation.class,

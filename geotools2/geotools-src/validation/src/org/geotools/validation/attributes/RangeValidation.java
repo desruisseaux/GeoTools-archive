@@ -114,17 +114,14 @@ public class RangeValidation extends DefaultFeatureValidation {
 
             if (number.intValue() < min) {
                 results.error(feature, attribute + " is less than " + min);
-
                 return false;
             }
 
             if (number.intValue() > max) {
                 results.error(feature, attribute + " is greater than " + max);
-
                 return false;
             }
         }
-
         return true;
     }
 
