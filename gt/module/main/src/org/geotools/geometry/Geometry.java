@@ -125,4 +125,11 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
             throw new TransformException("Can't transform the geometry", exception);
         }
     }
+
+    /**
+     * Returns a clone of this geometry.
+     */
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
