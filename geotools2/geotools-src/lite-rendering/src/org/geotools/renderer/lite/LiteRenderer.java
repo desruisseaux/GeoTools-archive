@@ -935,6 +935,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
                     }
                 }
             }
+            reader.close();
         }
     }
 
