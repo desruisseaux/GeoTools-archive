@@ -37,6 +37,8 @@ import javax.units.Unit;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.referencing.AuthorityFactory;
+import org.opengis.referencing.ObjectFactory;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.ScopedName;

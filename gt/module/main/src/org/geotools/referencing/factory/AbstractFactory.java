@@ -24,7 +24,9 @@ package org.geotools.referencing.factory;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
+import org.opengis.referencing.ObjectFactory;
 
 
 /**

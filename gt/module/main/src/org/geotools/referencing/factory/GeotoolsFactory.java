@@ -62,6 +62,7 @@ import org.opengis.referencing.cs.SphericalCS;
 import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.cs.UserDefinedCS;
 import org.opengis.referencing.cs.VerticalCS;
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.EngineeringDatum;
@@ -86,65 +87,15 @@ import org.geotools.util.WeakHashSet;
 
 
 /**
- * Builds up complex objects from simpler objects or values. This factory allows
- * applications to make {@linkplain org.geotools.referencing.cs.CoordinateSystem coordinate systems},
- * {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate reference systems} or
- * {@linkplain org.geotools.referencing.datum.Datum} that cannot be created by an {@link AuthorityFactory}.
- * This factory is very flexible, whereas the authority factory is easier to use. So
- * {@link AuthorityFactory} can be used to make "standard" object, and {@link ObjectFactory}
- * can be used to make "special" objects.
- * <br><br>
- * Most methods expect a {@link Map} argument. The map is often (but is not required to be) a
- * {@link java.util.Properties} instance. The map shall contains at least a <code>"name"</code>
- * property. In the common case where the name is the only property, the map may be constructed with
- * <code>Collections.{@linkplain java.util.Collections#singletonMap singletonMap}("name",
- * <var>theName</var>)</code> where <var>theName</var> is an arbitrary name as free text.
- * The properties listed in the following table are also recongnized. Property names are
- * case-insensitive and trailing and leading spaces are ignored.
- *
- * <table border='1'>
- *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
- *     <th nowrap>Property name</th>
- *     <th nowrap>Value type</th>
- *     <th nowrap>Value given to</th>
- *   </tr>
- *   <tr>
- *     <td nowrap>&nbsp;{@link org.geotools.referencing.IdentifiedObject#NAME_PROPERTY "name"}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String} or {@link Identifier}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link IdentifiedObject#getName}</td>
- *   </tr>
- *   <tr>
- *     <td nowrap>&nbsp;{@link org.geotools.referencing.IdentifiedObject#REMARKS_PROPERTY "remarks"}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link IdentifiedObject#getRemarks}</td>
- *   </tr>
- *   <tr>
- *     <td nowrap>&nbsp;{@link org.geotools.referencing.Identifier#AUTHORITY_PROPERTY "authority"}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the {@linkplain IdentifiedObject#getName name}</td>
- *   </tr>
- *   <tr>
- *     <td nowrap>&nbsp;{@link org.geotools.referencing.Identifier#VERSION_PROPERTY "version"}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the {@linkplain IdentifiedObject#getName name}</td>
- *   </tr>
- *   <tr>
- *     <td nowrap>&nbsp;{@link org.geotools.referencing.IdentifiedObject#IDENTIFIERS_PROPERTY "identifiers"}&nbsp;</td>
- *     <td nowrap>&nbsp;{@link Identifier} or <code>{@linkplain Identifier}[]</code>&nbsp;</td>
- *     <td nowrap>&nbsp;{@link IdentifiedObject#getIdentifiers}</td>
- *   </tr>
- * </table>
- *
- * <P>The <code>"name"</code> property is mandatory. All others are optional. Additionally, all
- * localizable attributes like <code>"name"</code> and <code>"remarks"</code> may have a language
- * and country code suffix. For example the <code>"remarks_fr"</code> property stands for remarks
- * in {@linkplain java.util.Locale#FRENCH French} and the <code>"remarks_fr_CA"</code> property
- * stands for remarks in {@linkplain java.util.Locale#CANADA_FRENCH French Canadian}.</P>
+ * Builds Geotools implementations of {@linkplain CoordinateReferenceSystem CRS},
+ * {@linkplain CoordinateSystem CS} and {@linkplain Datum datum} objects. Most factory methods
+ * expect properties given through a {@link Map} argument. The content of this map is described
+ * in the {@link ObjectFactory} interface.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultObjectFactory extends AbstractFactory
+public class GeotoolsFactory extends AbstractFactory
             implements CSFactory, DatumFactory, CRSFactory
 {
     /**
@@ -171,7 +122,7 @@ public class DefaultObjectFactory extends AbstractFactory
      * {@linkplain CRSFactory}   factory = FactoryFinder.{@linkplain FactoryFinder#getCRSFactory   getCRSFactory()};
      * </pre></blockquote>
      */
-    public DefaultObjectFactory() {
+    public GeotoolsFactory() {
     }
 
 

@@ -65,8 +65,8 @@ public class OperationMethod extends IdentifiedObject
 
     /**
      * Key for the <code>{@value #FORMULA_PROPERTY}</code> property to be given to the
-     * {@linkplain #OperationMethod(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getFormula}.
+     * {@linkplain #OperationMethod(Map,int,int,ParameterDescriptorGroup) constructor}.
+     * This is used for setting the value to be returned by {@link #getFormula}.
      */
     public static final String FORMULA_PROPERTY = "formula";
 
