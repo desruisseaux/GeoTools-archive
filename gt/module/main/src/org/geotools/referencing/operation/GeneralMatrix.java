@@ -135,20 +135,108 @@ public class GeneralMatrix extends GMatrix implements Matrix {
         super(3,3, new double[] {
             transform.getScaleX(), transform.getShearX(), transform.getTranslateX(),
             transform.getShearY(), transform.getScaleY(), transform.getTranslateY(),
-            0,                     0,                         1
+            0,                     0,                     1
         });
         assert isAffine() : this;
     }
     
     /**
-     * Construct an affine transform mapping a source region to a destination
-     * region. The regions must have the same number of dimensions, but their
-     * axis order and axis direction may be different.
+     * Constructs a transform that maps a source region to a destination region.
+     * Axis order and direction are left unchanged.
+     *
+     * <P>If the source dimension is equals to the destination dimension,
+     * then the transform is affine. However, the following special cases
+     * are also handled:</P>
+     *
+     * <UL>
+     *   <LI>If the target dimension is smaller than the source dimension,
+     *       then extra dimensions are dropped.</LI>
+     *   <LI>If the target dimension is greater than the source dimension,
+     *       then the coordinates in the new dimensions are set to 0.</LI>
+     * </UL>
+     *
+     * @param srcRegion The source region.
+     * @param dstRegion The destination region.
+     */
+    public GeneralMatrix(final Envelope srcRegion,
+                         final Envelope dstRegion)
+    {
+        super(dstRegion.getDimension()+1, srcRegion.getDimension()+1);
+        // Next lines should be first if only Sun could fix RFE #4093999 (sigh...)
+        final int srcDim = srcRegion.getDimension();
+        final int dstDim = dstRegion.getDimension();
+        for (int i=Math.min(srcDim, dstDim); --i>=0;) {
+            double scale     = dstRegion.getLength (i) / srcRegion.getLength (i);
+            double translate = dstRegion.getMinimum(i) - srcRegion.getMinimum(i)*scale;
+            setElement(i, i,         scale);
+            setElement(i, srcDim, translate);
+        }
+        setElement(dstDim, srcDim, 1);
+        assert (srcDim != dstDim) || isAffine() : this;
+    }
+    
+    /**
+     * Constructs a transform changing axis order and/or direction.
+     * For example, the transform may converts (NORTH,WEST) coordinates
+     * into (EAST,NORTH). Axis direction can be inversed only. For example,
+     * it is illegal to transform (NORTH,WEST) coordinates into (NORTH,DOWN).
+     *
+     * <P>If the source dimension is equals to the destination dimension,
+     * then the transform is affine. However, the following special cases
+     * are also handled:</P>
+     * <BR>
+     * <UL>
+     *   <LI>If the target dimension is smaller than the source dimension,
+     *       extra axis are dropped. An exception is thrown if the target
+     *       contains some axis not found in the source.</LI>
+     * </UL>
+     *
+     * @param  srcAxis The set of axis direction for source coordinate system.
+     * @param  dstAxis The set of axis direction for destination coordinate system.
+     * @throws IllegalArgumentException If <code>dstAxis</code> contains some axis
+     *         not found in <code>srcAxis</code>, or if some colinear axis were found.
+     */
+    public GeneralMatrix(final AxisDirection[] srcAxis,
+                         final AxisDirection[] dstAxis)
+    {
+        this(null, srcAxis, null, dstAxis, false);
+    }
+    
+    /**
+     * Constructs a transform mapping a source region to a destination region.
+     * Axis order and/or direction can be changed during the process.
+     * For example, the transform may convert (NORTH,WEST) coordinates
+     * into (EAST,NORTH). Axis direction can be inversed only. For example,
+     * it is illegal to transform (NORTH,WEST) coordinates into (NORTH,DOWN).
+     *
+     * <P>If the source dimension is equals to the destination dimension,
+     * then the transform is affine. However, the following special cases
+     * are also handled:</P>
+     * <BR>
+     * <UL>
+     *   <LI>If the target dimension is smaller than the source dimension,
+     *       extra axis are dropped. An exception is thrown if the target
+     *       contains some axis not found in the source.</LI>
+     * </UL>
      *
      * @param srcRegion The source region.
      * @param srcAxis   Axis direction for each dimension of the source region.
      * @param dstRegion The destination region.
      * @param dstAxis   Axis direction for each dimension of the destination region.
+     * @throws MismatchedDimensionException if the envelope dimension doesn't
+     *         matches the axis direction array length.
+     * @throws IllegalArgumentException If <code>dstAxis</code> contains some axis
+     *         not found in <code>srcAxis</code>, or if some colinear axis were found.
+     */
+    public GeneralMatrix(final Envelope srcRegion, final AxisDirection[] srcAxis,
+                         final Envelope dstRegion, final AxisDirection[] dstAxis)
+    {
+        this(srcRegion, srcAxis, dstRegion, dstAxis, true);
+    }
+    
+    /**
+     * Implementation of constructors expecting envelope and/or axis directions.
+     *
      * @param validRegions   <code>true</code> if source and destination regions must
      *        be taken in account. If <code>false</code>, then source and destination
      *        regions will be ignored and may be null.
@@ -157,21 +245,10 @@ public class GeneralMatrix extends GMatrix implements Matrix {
                           final Envelope dstRegion, final AxisDirection[] dstAxis,
                           final boolean validRegions)
     {
-        this(srcAxis.length+1);
-        /*
-         * Arguments check. NOTE: those exceptions are catched
-         * by 'CoordinateOperationFactory'.  If exception type
-         * change, update the factory class.
-         */
-        final int dimension = srcAxis.length;
-        if (dstAxis.length != dimension) {
-            throw new MismatchedDimensionException(
-                        Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-                        new Integer(dimension), new Integer(dstAxis.length)));
-        }
+        super(dstAxis.length+1, srcAxis.length+1);
         if (validRegions) {
-            ensureDimensionMatch("srcRegion", srcRegion, dimension);
-            ensureDimensionMatch("dstRegion", dstRegion, dimension);
+            ensureDimensionMatch("srcRegion", srcRegion, srcAxis.length);
+            ensureDimensionMatch("dstRegion", dstRegion, dstAxis.length);
         }
         /*
          * Map source axis to destination axis.  If no axis is moved (for example if the user
@@ -181,13 +258,13 @@ public class GeneralMatrix extends GMatrix implements Matrix {
          * have to be moved at index <code>dstIndex</code>.
          */
         setZero();
-        for (int srcIndex=0; srcIndex<dimension; srcIndex++) {
+        for (int dstIndex=0; dstIndex<dstAxis.length; dstIndex++) {
             boolean hasFound = false;
-            final AxisDirection srcAxe = srcAxis[srcIndex];
-            final AxisDirection search = srcAxe.absolute();
-            for (int dstIndex=0; dstIndex<dimension; dstIndex++) {
-                final AxisDirection dstAxe = dstAxis[dstIndex];
-                if (search.equals(dstAxe.absolute())) {
+            final AxisDirection dstAxe = dstAxis[dstIndex];
+            final AxisDirection search = dstAxe.absolute();
+            for (int srcIndex=0; srcIndex<srcAxis.length; srcIndex++) {
+                final AxisDirection srcAxe = srcAxis[srcIndex];
+                if (search.equals(srcAxe.absolute())) {
                     if (hasFound) {
                         // TODO: Use the localized version of 'getName' in GeoAPI 1.1
                         throw new IllegalArgumentException(
@@ -201,91 +278,27 @@ public class GeneralMatrix extends GMatrix implements Matrix {
                      * value.
                      */
                     final boolean normal = srcAxe.equals(dstAxe);
-                    double scale     = (normal) ? +1 : -1;
+                    double scale = (normal) ? +1 : -1;
                     double translate = 0;
                     if (validRegions) {
-                        translate  = (normal) ? dstRegion.getMinimum(dstIndex) : dstRegion.getMaximum(dstIndex);
-                        scale     *= dstRegion.getLength(dstIndex) / srcRegion.getLength(srcIndex);
-                        translate -= srcRegion.getMinimum(srcIndex)*scale;
+                        translate  = (normal) ? dstRegion.getMinimum(dstIndex)
+                                              : dstRegion.getMaximum(dstIndex);
+                        scale     *= dstRegion.getLength(dstIndex) /
+                                     srcRegion.getLength(srcIndex);
+                        translate -= srcRegion.getMinimum(srcIndex) * scale;
                     }
-                    setElement(dstIndex, srcIndex,  scale);
-                    setElement(dstIndex, dimension, translate);
+                    setElement(dstIndex, srcIndex,       scale);
+                    setElement(dstIndex, srcAxis.length, translate);
                 }
             }
             if (!hasFound) {
                 // TODO: Use the localized version of 'getName' in GeoAPI 1.1
                 throw new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_NO_DESTINATION_AXIS_$1, srcAxis[srcIndex].name()));
+                            ResourceKeys.ERROR_NO_SOURCE_AXIS_$1, dstAxis[dstIndex].name()));
             }
         }
-        setElement(dimension, dimension, 1);
-        assert isAffine();
-    }
-    
-    /**
-     * Construct an affine transform changing axis order and/or direction.
-     * For example, the affine transform may convert (NORTH,WEST) coordinates
-     * into (EAST,NORTH). Axis direction can be inversed only. For example,
-     * it is illegal to transform (NORTH,WEST) coordinates into (NORTH,DOWN).
-     *
-     * @param  srcAxis The set of axis direction for source coordinate system.
-     * @param  dstAxis The set of axis direction for destination coordinate system.
-     * @throws MismatchedDimensionException if <code>srcAxis</code>
-     *         and <code>dstAxis</code> don't have the same length.
-     * @throws IllegalArgumentException if the affine transform can't
-     *         be created for some other raison.
-     */
-    public static GeneralMatrix createAffineTransform(final AxisDirection[] srcAxis,
-                                                      final AxisDirection[] dstAxis)
-    {
-        return new GeneralMatrix(null, srcAxis, null, dstAxis, false);
-    }
-    
-    /**
-     * Construct an affine transform that maps
-     * a source region to a destination region.
-     * Axis order and direction are left unchanged.
-     *
-     * @param  srcRegion The source region.
-     * @param  dstRegion The destination region.
-     * @throws MismatchedDimensionException if regions don't have the same dimension.
-     */
-    public static GeneralMatrix createAffineTransform(final Envelope srcRegion,
-                                                      final Envelope dstRegion)
-    {
-        final int dimension = srcRegion.getDimension();
-        ensureDimensionMatch("dstRegion", dstRegion, dimension);
-        final GeneralMatrix matrix = new GeneralMatrix(dimension+1);
-        for (int i=0; i<dimension; i++) {
-            final double scale     = dstRegion.getLength (i) / srcRegion.getLength (i);
-            final double translate = dstRegion.getMinimum(i) - srcRegion.getMinimum(i)*scale;
-            matrix.setElement(i, i,         scale);
-            matrix.setElement(i, dimension, translate);
-        }
-        matrix.setElement(dimension, dimension, 1);
-        assert matrix.isAffine() : matrix;
-        return matrix;
-    }
-    
-    /**
-     * Construct an affine transform mapping a source region to a destination
-     * region. Axis order and/or direction can be changed during the process.
-     * For example, the affine transform may convert (NORTH,WEST) coordinates
-     * into (EAST,NORTH). Axis direction can be inversed only. For example,
-     * it is illegal to transform (NORTH,WEST) coordinates into (NORTH,DOWN).
-     *
-     * @param  srcRegion The source region.
-     * @param  srcAxis   Axis direction for each dimension of the source region.
-     * @param  dstRegion The destination region.
-     * @param  dstAxis   Axis direction for each dimension of the destination region.
-     * @throws MismatchedDimensionException if all arguments don't have the same dimension.
-     * @throws IllegalArgumentException if the affine transform can't be created
-     *         for some other raison.
-     */
-    public static GeneralMatrix createAffineTransform(Envelope srcRegion, AxisDirection[] srcAxis,
-                                                      Envelope dstRegion, AxisDirection[] dstAxis)
-    {
-        return new GeneralMatrix(srcRegion, srcAxis, dstRegion, dstAxis, true);
+        setElement(dstAxis.length, srcAxis.length, 1);
+        assert (srcAxis.length != dstAxis.length) || isAffine() : this;
     }
     
     /**

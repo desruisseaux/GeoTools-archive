@@ -341,9 +341,13 @@ public class Parameter extends AbstractParameter
     public double doubleValue() throws InvalidParameterTypeException {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**
@@ -359,9 +363,13 @@ public class Parameter extends AbstractParameter
     public int intValue() throws InvalidParameterTypeException {
         if (value instanceof Number) {
             return ((Number) value).intValue();
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**
@@ -376,9 +384,13 @@ public class Parameter extends AbstractParameter
     public boolean booleanValue() throws InvalidParameterTypeException {
         if (value instanceof Boolean) {
             return ((Boolean) value).booleanValue();
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**
@@ -394,9 +406,13 @@ public class Parameter extends AbstractParameter
     public String stringValue() throws InvalidParameterTypeException {
         if (value instanceof CharSequence) {
             return value.toString();
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**
@@ -445,9 +461,13 @@ public class Parameter extends AbstractParameter
     public double[] doubleValueList() throws InvalidParameterTypeException {
         if (value instanceof double[]) {
             return (double[]) value;
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**
@@ -463,9 +483,13 @@ public class Parameter extends AbstractParameter
     public int[] intValueList() throws InvalidParameterTypeException {
         if (value instanceof int[]) {
             return (int[]) value;
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**
@@ -483,9 +507,13 @@ public class Parameter extends AbstractParameter
     public URL valueFile() throws InvalidParameterTypeException {
         if (value instanceof URL) {
             return (URL) value;
-        } else {
-            throw new InvalidParameterTypeException(getClassTypeError(), getName(descriptor));
         }
+        final String name = getName(descriptor);
+        if (value == null) {
+            throw new IllegalStateException(Resources.format(
+                      ResourceKeys.ERROR_MISSING_PARAMETER_$1, name));
+        }
+        throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 
     /**

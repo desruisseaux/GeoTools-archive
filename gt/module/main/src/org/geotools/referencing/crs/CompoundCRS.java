@@ -24,12 +24,15 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.referencing.datum.Datum;  // For javadoc
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.SingleCRS;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -147,6 +150,63 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
      */
     public CoordinateReferenceSystem[] getCoordinateReferenceSystems() {
         return (CoordinateReferenceSystem[]) crs.clone();
+    }
+
+    /**
+     * Returns the ordered list of single coordinate reference systems.
+     * If this compound CRS contains other compound CRS, all of
+     * them are expanded in an array of <code>SingleCRS</code> objects.
+     *
+     * @return The single coordinate reference systems.
+     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
+     *         {@linkplain org.opengis.referencing.crs.CompoundCRS}.
+     */
+    public SingleCRS[] getSingleCRS() {
+        final List singles = new ArrayList(crs.length);
+        getSingleCRS(crs, singles);
+        return (SingleCRS[]) singles.toArray(new SingleCRS[singles.size()]);
+    }
+
+    /**
+     * Returns the ordered list of single coordinate reference systems
+     * for the specified CRS. The specified CRS doesn't need to be a
+     * Geotools implementation.
+     *
+     * @param  crs The coordinate reference system.
+     * @return The single coordinate reference systems.
+     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
+     *         {@linkplain org.opengis.referencing.crs.CompoundCRS}.
+     */
+    public static SingleCRS[] getSingleCRS(final CoordinateReferenceSystem crs) {
+        if (crs instanceof CompoundCRS) {
+            return ((CompoundCRS) crs).getSingleCRS();
+        }
+        if (crs instanceof org.opengis.referencing.crs.CompoundCRS) {
+            final CoordinateReferenceSystem[] elements =
+                ((org.opengis.referencing.crs.CompoundCRS) crs).getCoordinateReferenceSystems();
+            final List singles = new ArrayList(elements.length);
+            getSingleCRS(elements, singles);
+            return (SingleCRS[]) singles.toArray(new SingleCRS[singles.size()]);
+        }
+        return new SingleCRS[] {(SingleCRS) crs};
+    }
+
+    /**
+     * Recursively add all {@link SingleCRS} in the specified list.
+     *
+     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
+     *         {@linkplain org.opengis.referencing.crs.CompoundCRS}.
+     */
+    private static void getSingleCRS(final CoordinateReferenceSystem[] crs, final List singles) {
+        for (int i=0; i<crs.length; i++) {
+            final CoordinateReferenceSystem candidate = crs[i];
+            if (candidate instanceof org.opengis.referencing.crs.CompoundCRS) {
+                getSingleCRS(((org.opengis.referencing.crs.CompoundCRS) candidate)
+                             .getCoordinateReferenceSystems(), singles);
+            } else {
+                singles.add((SingleCRS) candidate);
+            }
+        }
     }
 
     /**

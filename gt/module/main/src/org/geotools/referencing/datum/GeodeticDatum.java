@@ -23,9 +23,12 @@
 package org.geotools.referencing.datum;
 
 // J2SE dependencies
+import java.util.Set;
 import java.util.Map;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Collections;
+import javax.vecmath.GMatrix;
 
 // OpenGIS dependencies
 import org.opengis.referencing.datum.Datum;
@@ -65,7 +68,7 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
                                               org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
 
     /**
-     * The property for {@linkplain #getTransformTo datum shifts}.
+     * The property for {@linkplain #getAffineTransform datum shifts}.
      */
     public static final String TRANSFORMATIONS_PROPERTY = "transformations";
 
@@ -156,14 +159,114 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
      * Returns a matrix that can be used to define a transformation to the specified datum.
      * If no transformation path is found, then this method returns <code>null</code>.
      *
+     * @param  source The source datum.
+     * @param  target The target datum.
+     * @return An affine transform from <code>source</code> to <code>target</code>,
+     *         or <code>null</code> if none.
+     *
      * @see BursaWolfParameters#getAffineTransform
      */
-    public Matrix getTransformTo(final Datum datum) {
-        if (transformations != null) {
-            for (int i=0; i<transformations.length; i++) {
-                final BursaWolfParameters transformation = transformations[i];
-                if (equals(datum, transformation.targetDatum, false)) {
-                    return transformation.getAffineTransform();
+    public static Matrix getAffineTransform(
+                final org.opengis.referencing.datum.GeodeticDatum source,
+                final org.opengis.referencing.datum.GeodeticDatum target)
+    {
+        return getAffineTransform(source, target, null);
+    }
+
+    /**
+     * Returns a matrix that can be used to define a transformation to the specified datum.
+     * If no transformation path is found, then this method returns <code>null</code>.
+     *
+     * @param  source The source datum.
+     * @param  target The target datum.
+     * @param  exclusion The set of datum to exclude from the search, or <code>null</code>.
+     *         This is used in order to avoid recursivity.
+     * @return An affine transform from <code>source</code> to <code>target</code>,
+     *         or <code>null</code> if none.
+     *
+     * @see BursaWolfParameters#getAffineTransform
+     */
+    private static Matrix getAffineTransform(
+                final org.opengis.referencing.datum.GeodeticDatum source,
+                final org.opengis.referencing.datum.GeodeticDatum target,
+                Set exclusion)
+    {
+        ensureNonNull("source", source);
+        ensureNonNull("target", target);
+        if (source instanceof GeodeticDatum) {
+            final BursaWolfParameters[] transformations = ((GeodeticDatum) source).transformations;
+            if (transformations != null) {
+                for (int i=0; i<transformations.length; i++) {
+                    final BursaWolfParameters transformation = transformations[i];
+                    if (equals(target, transformation.targetDatum, false)) {
+                        return transformation.getAffineTransform();
+                    }
+                }
+            }
+        }
+        /*
+         * No transformation found to the specified target datum.
+         * Search if a transform exists in the opposite direction.
+         */
+        if (target instanceof GeodeticDatum) {
+            final BursaWolfParameters[] transformations = ((GeodeticDatum) target).transformations;
+            if (transformations != null) {
+                for (int i=0; i<transformations.length; i++) {
+                    final BursaWolfParameters transformation = transformations[i];
+                    if (equals(source, transformation.targetDatum, false)) {
+                        final Matrix matrix = transformation.getAffineTransform();
+                        if (matrix instanceof GMatrix) {
+                            ((GMatrix) matrix).invert();
+                            return matrix;
+                        }
+                    }
+                }
+            }
+        }
+        /*
+         * No direct tranformation found. Search for a path through some intermediate datum.
+         * First, search if there is some BursaWolfParameters for the same target in both
+         * 'source' and 'target' datum. If such an intermediate is found, ask for a path
+         * as below:
+         *
+         *    source   -->   [common datum]   -->   target
+         */
+        if (source instanceof GeodeticDatum && target instanceof GeodeticDatum) {
+            final BursaWolfParameters[] sourceParam = ((GeodeticDatum) source).transformations;
+            final BursaWolfParameters[] targetParam = ((GeodeticDatum) target).transformations;
+            org.opengis.referencing.datum.GeodeticDatum sourceStep;
+            org.opengis.referencing.datum.GeodeticDatum targetStep;
+            for (int i=0; i<sourceParam.length; i++) {
+                sourceStep = sourceParam[i].targetDatum;
+                for (int j=0; j<targetParam.length; j++) {
+                    targetStep = targetParam[j].targetDatum;
+                    if (equals(sourceStep, targetStep, false)) {
+                        final Matrix step1, step2;
+                        if (exclusion == null) {
+                            exclusion = new HashSet();
+                        }
+                        if (exclusion.add(source)) {
+                            if (exclusion.add(target)) {
+                                step1 = getAffineTransform(source, sourceStep, exclusion);
+                                if (step1 instanceof GMatrix) {
+                                    step2 = getAffineTransform(targetStep, target, exclusion);
+                                    if (step2 instanceof GMatrix) {
+                                        /*
+                                         * Note: GMatrix.mul(GMatrix) is equivalents to
+                                         *       AffineTransform.concatenate(...): First
+                                         *       transform by the supplied transform and
+                                         *       then transform the result by the original
+                                         *       transform.
+                                         */
+                                        ((GMatrix) step2).mul((GMatrix) step1);
+                                        return step2;
+                                    }
+                                }
+                                exclusion.remove(target);
+                            }
+                            exclusion.remove(source);
+                        }
+                    }
                 }
             }
         }

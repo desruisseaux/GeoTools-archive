@@ -167,6 +167,31 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     }
 
     /**
+     * Creates a matrix that keep only a subset of the ordinate values.
+     * The dimension of source coordinates is <code>sourceDim</code> and
+     * the dimension of target coordinates is <code>toKeep.length</code>.
+     *
+     * @param  sourceDim the dimension of source coordinates.
+     * @param  toKeep the indices of ordinate values to keep.
+     * @return The matrix to give to the {@link #create(Matrix)}
+     *         method in order to create the transform.
+     * @throws IndexOutOfBoundsException if a value of <code>toKeep</code>
+     *         is lower than 0 or not smaller than <code>sourceDim</code>.
+     */
+    public static Matrix createSelectMatrix(final int sourceDim, final int[] toKeep)
+            throws IndexOutOfBoundsException
+    {
+        final int targetDim = toKeep.length;
+        final GeneralMatrix matrix = new GeneralMatrix(targetDim+1, sourceDim+1);
+        matrix.setZero();
+        for (int j=0; j<targetDim; j++) {
+            matrix.setElement(j, toKeep[j], 1);
+        }
+        matrix.setElement(targetDim, sourceDim, 1);
+        return matrix;
+    }
+
+    /**
      * Returns the parameter descriptors for this math transform.
      */
     public ParameterDescriptorGroup getParameterDescriptors() {

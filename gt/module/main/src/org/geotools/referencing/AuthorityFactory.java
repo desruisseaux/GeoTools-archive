@@ -36,7 +36,9 @@ package org.geotools.referencing;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class AuthorityFactory implements org.opengis.referencing.AuthorityFactory {
+public abstract class AuthorityFactory extends Factory
+        implements org.opengis.referencing.AuthorityFactory
+{
     /**
      * Construct a default instance.
      */

@@ -541,6 +541,21 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
             return true;
         }
         if (super.equals(object, compareMetadata)) {
+            if (!compareMetadata) {
+                /*
+                 * Tests for name, since parameters with different name have
+                 * completly different meaning. For example there is no difference
+                 * between "semi_major" and "semi_minor" parameters except the name.
+                 * We don't perform this comparaison if the user asked for metadata
+                 * comparaison, because in such case the names have already been
+                 * compared by the subclass.
+                 */
+                if (!nameMatches(object. getName().getCode()) &&
+                    !nameMatches(object, getName().getCode()))
+                {
+                    return false;
+                }
+            }
             final ParameterDescriptor that = (ParameterDescriptor) object;
             return Utilities.equals(this.primitiveClass, that.primitiveClass)   &&
                    Utilities.equals(this.validValues,    that.validValues)  &&

@@ -246,7 +246,14 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             if (!compareMetadata) {
-                return true;
+                /*
+                 * Tests for name, since datum with different name have completly
+                 * different meaning. We don't perform this comparaison if the user
+                 * asked for metadata comparaison, because in such case the names
+                 * have already been compared by the subclass.
+                 */
+                return nameMatches(object. getName().getCode()) ||
+                       nameMatches(object, getName().getCode());
             }
             final Datum that = (Datum) object;
             return this.realizationEpoch == that.realizationEpoch &&

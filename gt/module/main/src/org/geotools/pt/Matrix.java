@@ -176,8 +176,7 @@ public class Matrix extends org.geotools.referencing.operation.GeneralMatrix {
                 }
             }
             if (!hasFound) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_NO_DESTINATION_AXIS_$1,
-                srcAxis[srcIndex].getName(null)));
+                throw new IllegalArgumentException();
             }
         }
         setElement(dimension, dimension, 1);

@@ -22,15 +22,21 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
+import java.util.Arrays;
 import java.util.Collections;
+import javax.units.Unit;
+import javax.units.Converter;
+import javax.units.ConversionException;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
+import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -144,6 +150,107 @@ public class CoordinateSystem extends IdentifiedObject
      */
     public CoordinateSystemAxis getAxis(final int dimension) throws IndexOutOfBoundsException {
         return axis[dimension];
+    }
+    
+    /**
+     * Returns the axis direction for the specified coordinate system.
+     *
+     * @param  cs The coordinate system.
+     * @return The axis directions for the specified coordinate system.
+     */
+    private static AxisDirection[] getAxisDirections(
+                                   final org.opengis.referencing.cs.CoordinateSystem cs)
+    {
+        final AxisDirection[] axis = new AxisDirection[cs.getDimension()];
+        for (int i=0; i<axis.length; i++) {
+            axis[i] = cs.getAxis(i).getDirection();
+        }
+        return axis;
+    }
+
+    /**
+     * Returns an affine transform between two coordinate systems. Only units and
+     * axis order (e.g. transforming from
+     * ({@linkplain AxisDirection#NORTH NORTH},{@linkplain AxisDirection#WEST WEST}) to
+     * ({@linkplain AxisDirection#EAST EAST},{@linkplain AxisDirection#NORTH NORTH}
+     * are taken in account.
+     *
+     * <P><STRONG>Example:</STRONG> If coordinates in <code>sourceCS</code> are
+     * (<var>x</var>,<var>y</var>) pairs in metres and coordinates in <code>targetCS</code>
+     * are (-<var>y</var>,<var>x</var>) pairs in centimetres, then the transformation
+     * can be performed as below:</P>
+     *
+     * <pre><blockquote>
+     *          [-y(cm)]   [ 0  -100    0 ] [x(m)]
+     *          [ x(cm)] = [ 100   0    0 ] [y(m)]
+     *          [ 1    ]   [ 0     0    1 ] [1   ]
+     * </blockquote></pre>
+     *
+     * @param  sourceCS The source coordinate system.
+     * @param  targetCS The target coordinate system.
+     * @return The conversion from <code>sourceCS</code> to <code>targetCS</code> as
+     *         an affine transform. Only axis orientation and units are taken in account.
+     * @throws IllegalArgumentException if axis doesn't matches.
+     * @throws ConversionException if the unit conversion is non-linear.
+     */
+    public static Matrix swapAndScaleAxis(final org.opengis.referencing.cs.CoordinateSystem sourceCS,
+                                          final org.opengis.referencing.cs.CoordinateSystem targetCS)
+            throws IllegalArgumentException, ConversionException
+    {
+        // Note: while this method signature declares Matrix as the return type,
+        //       CoordinateOperationFactory.createTransformationStep(GeocentricCRS,GeocentricCRS)
+        //       really expects a GeneralMatrix. Other transformation steps are generic enough.
+
+        final AxisDirection[] sourceAxis = getAxisDirections(sourceCS);
+        final AxisDirection[] targetAxis = getAxisDirections(targetCS);
+        final GeneralMatrix matrix = new GeneralMatrix(sourceAxis, targetAxis);
+        assert Arrays.equals(sourceAxis, targetAxis) == matrix.isIdentity() : matrix;
+        /*
+         * The previous code computed a matrix for swapping axis. Usually, this
+         * matrix contains only 0 and 1 values with only one "1" value by row.
+         * For example, the matrix operation for swapping x and y axis is:
+         *
+         *          [y]   [ 0  1  0 ] [x]
+         *          [x] = [ 1  0  0 ] [y]
+         *          [1]   [ 0  0  1 ] [1]
+         *
+         * Now, take in account units conversions. Each matrix's element (j,i)
+         * is multiplied by the conversion factor from sourceCS.getUnit(i) to
+         * targetCS.getUnit(j). This is an element-by-element multiplication,
+         * not a matrix multiplication. The last column is processed in a special
+         * way, since it contains the offset values.
+         */
+        final int sourceDim = matrix.getNumCol()-1;
+        final int targetDim = matrix.getNumRow()-1;
+        assert sourceDim == sourceCS.getDimension() : sourceCS;
+        assert targetDim == targetCS.getDimension() : targetCS;
+        for (int j=0; j<targetDim; j++) {
+            final Unit targetUnit = targetCS.getAxis(j).getUnit();
+            for (int i=0; i<sourceDim; i++) {
+                final double element = matrix.getElement(j,i);
+                if (element == 0) {
+                    // There is no dependency between source[i] and target[j]
+                    // (i.e. axis are orthogonal).
+                    continue;
+                }
+                final Unit sourceUnit = sourceCS.getAxis(i).getUnit();
+                if (Utilities.equals(sourceUnit, targetUnit)) {
+                    // There is no units conversion to apply
+                    // between source[i] and target[j].
+                    continue;
+                }
+                final Converter converter = sourceUnit.getConverterTo(targetUnit);
+                if (!converter.isLinear()) {
+                    // TODO: localize
+                    throw new ConversionException("Unit conversion is non-linear");
+                }
+                final double offset = converter.convert(0);
+                final double scale  = converter.derivative(0);
+                matrix.setElement(j,i, element*scale);
+                matrix.setElement(j,sourceDim, matrix.getElement(j,sourceDim) + element*offset);
+            }
+        }
+        return matrix;
     }
     
     /**

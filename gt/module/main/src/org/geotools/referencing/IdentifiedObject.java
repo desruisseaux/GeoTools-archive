@@ -56,7 +56,7 @@ import org.geotools.util.GrowableInternationalString;
  * When {@link AuthorityFactory} is used to create an object, the
  * {@linkplain Identifier#getAuthority authority} and {@linkplain Identifier#getCode
  * authority code} values are set to the authority name of the factory object, and the
- * authority code supplied by the client, respectively. When {@link Factory} creates an
+ * authority code supplied by the client, respectively. When {@link ObjectFactory} creates an
  * object, the {@linkplain #getName name} is set to the value supplied by the client and
  * all of the other metadata items are left empty.
  *
@@ -624,6 +624,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * <code>sourceCS.equals(targetCS, false)</code> returns <code>true</code> only if
      * the transformation from <code>sourceCS</code> to <code>targetCS</code> is
      * the identity transform, no matter what {@link #getName} saids.
+     *
+     * <P>Some subclasses (especially {@link org.geotools.referencing.datum.Datum}
+     * and {@link org.geotools.parameter.AbstractParameterDescriptor}) will test for
+     * the {@linkplain #getName name}, since objects with different name have
+     * completly different meaning. For example nothing differentiate the
+     * <code>"semi_major"</code> and <code>"semi_minor"</code> parameters
+     * except the name. The name comparaison may be loose however, i.e. we may
+     * accept a name matching an alias.</P>
      *
      * @param  object The object to compare to <code>this</code>.
      * @param  compareMetadata <code>true</code> for performing a strict comparaison, or

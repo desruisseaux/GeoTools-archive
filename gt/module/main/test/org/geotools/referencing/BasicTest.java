@@ -35,13 +35,14 @@ import org.geotools.referencing.*;
 import org.geotools.referencing.cs.*;
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.datum.*;
+import org.geotools.referencing.operation.*;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.citation.Citation;
 
 
 /**
- * Test the creation of {@link IdentifiedObject} and its subclasses. Some basic features and
+ * Tests the creation of {@link IdentifiedObject} and its subclasses. Some basic features and
  * simple <cite>Well Know Text</cite> (WKT) formatting are also tested.
  *
  * @version $Id$

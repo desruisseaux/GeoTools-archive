@@ -382,6 +382,9 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *         or if the math transform creation failed from some other reason.
      */
     public synchronized MathTransform createFromWKT(final String text) throws FactoryException {
+        // Note: while this factory is thread safe, the WKT parser is not.
+        //       Since we share a single instance of this parser, we must
+        //       synchronize.
         if (parser == null) {
             parser = new MathTransformParser(Symbols.DEFAULT, this);
         }

@@ -137,7 +137,7 @@ public interface ResourceKeys
     public static final int ERROR_NOT_TWO_DIMENSIONAL_$1                =   108;
     public static final int ERROR_NO_CONVERGENCE                        =   109;
     public static final int ERROR_NO_CONVERGENCE_$2                     =   110;
-    public static final int ERROR_NO_DESTINATION_AXIS_$1                =   111;
+    public static final int ERROR_NO_SOURCE_AXIS_$1                     =   111;
     public static final int ERROR_NO_SUCH_AUTHORITY_CODE_$2             =   112;
     public static final int ERROR_NO_TRANSFORMATION_PATH_$2             =   113;
     public static final int ERROR_NO_TRANSFORM_FOR_CLASSIFICATION_$1    =   114;
