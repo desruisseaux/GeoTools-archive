@@ -2825,8 +2825,15 @@ public class GMLComplexTypes {
             Feature f = getFeature(element,value,attrs,hints);
             if(hints==null || hints.get(STREAM_HINT)==null)
                 return f;
-            stream(f,(FCBuffer)hints.get(STREAM_HINT));
-            return null;
+            if(element.getType().getParent()!=null && 
+                    element.getType().getParent().getInstanceType().
+                    equals(AbstractFeatureCollectionType.getInstance().
+                            getInstanceType())){
+                stream(f,(FCBuffer)hints.get(STREAM_HINT));
+                return null;
+            }else{
+                return f;
+            }
         	}
         
        public Feature getFeature(Element element, ElementValue[] value,
@@ -3161,7 +3168,7 @@ public class GMLComplexTypes {
          * @see org.geotools.xml.xsi.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Object[].class;
+            return FeatureCollection.class;
         }
 
         /**
