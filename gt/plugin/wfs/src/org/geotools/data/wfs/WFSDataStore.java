@@ -18,6 +18,8 @@ package org.geotools.data.wfs;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+
+import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
@@ -26,9 +28,12 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.crs.CRSService;
+import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
@@ -43,6 +48,8 @@ import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -286,6 +293,28 @@ public class WFSDataStore extends AbstractDataStore {
                 throw new IOException(e.toString());
             }
         }
+        
+        //set crs?
+        List l = capabilities.getFeatureTypes();
+        Iterator i = l.iterator();
+        String crsName = null;
+
+        while (i.hasNext() && crsName==null) {
+            	FeatureSetDescription fsd = (FeatureSetDescription) i.next();
+            	if (typeName.equals(fsd.getName())) {
+            	    crsName = fsd.getSRS();
+            	}
+        }
+        
+        CoordinateReferenceSystem crs;
+        try {
+            crs = getCRSService().createCRS(crsName);
+            t = CRSService.transform(t,crs);
+        } catch (FactoryException e) {
+            logger.warning(e.getMessage());
+        } catch (SchemaException e) {
+            logger.warning(e.getMessage());
+        }
 
         if (t != null) {
             featureTypeCache.put(typeName, t);
@@ -388,13 +417,13 @@ public class WFSDataStore extends AbstractDataStore {
         if(uri!=null)
             hints.put(DocumentWriter.SCHEMA_ORDER, new String[]{WFSSchema.NAMESPACE.toString(), uri.toString()});
 
-        try {
-            DocumentWriter.writeDocument(new String[] { typeName },
-                WFSSchema.getInstance(), new OutputStreamWriter(System.out), hints);
-        } catch (OperationNotSupportedException e) {
-            logger.warning(e.toString());
-            throw new SAXException(e);
-        }
+//        try {
+//            DocumentWriter.writeDocument(new String[] { typeName },
+//                WFSSchema.getInstance(), new OutputStreamWriter(System.out), hints);
+//        } catch (OperationNotSupportedException e) {
+//            logger.warning(e.toString());
+//            throw new SAXException(e);
+//        }
         
         try {
             DocumentWriter.writeDocument(new String[] { typeName },
@@ -435,6 +464,12 @@ public class WFSDataStore extends AbstractDataStore {
         is.close();
 
         return ft;
+    }
+    private CRSService crs;
+    private CRSService getCRSService(){
+        if(crs == null)
+            crs = new CRSService();
+        return crs;
     }
     
     private WFSFeatureReader getFeatureReaderGet(Query request,
@@ -694,7 +729,14 @@ public class WFSDataStore extends AbstractDataStore {
 
             if (t.getFeatureType() != null) {
             	if (!filters[1].equals( Filter.NONE ) ) {
-            		return new FilteringFeatureReader(t, filters[1]);
+            		try {
+                        return new ReprojectFeatureReader(new FilteringFeatureReader(t, filters[1]),query.getCoordinateSystemReproject());
+                    } catch (CannotCreateTransformException e) {
+                        logger.warning(e.getMessage());
+                    } catch (SchemaException e) {
+                        logger.warning(e.getMessage());
+                    }
+                    return new FilteringFeatureReader(t, filters[1]);
                 }
             	return t;
             }

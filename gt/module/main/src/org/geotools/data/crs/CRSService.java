@@ -358,7 +358,7 @@ public class CRSService {
     }
 
 	
-	static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
+	public static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs ) throws SchemaException {
         FeatureTypeFactory factory = FeatureTypeFactory.newInstance( schema.getTypeName() );
         
         try {
@@ -409,7 +409,7 @@ public class CRSService {
 	 * @throws MismatchedDimensionException
 	 * @throws IllegalAttributeException
 	 */
-	static Feature transform( Feature feature, FeatureType schema, MathTransform transform ) throws MismatchedDimensionException, TransformException, IllegalAttributeException{
+	public static Feature transform( Feature feature, FeatureType schema, MathTransform transform ) throws MismatchedDimensionException, TransformException, IllegalAttributeException{
 	    feature = schema.create( feature.getAttributes( null ), feature.getID() );
 	    
 	    GeometryAttributeType geomType = schema.getDefaultGeometry();
