@@ -76,8 +76,6 @@ public class ElementHandlerFactory {
         throws SAXException {
         logger.finest("Target == '" + targ + "'");
         logger.finest("URI == '" + uri + "'");
-System.out.println("Target == '" + targ + "'");
-System.out.println("URI == '" + uri + "'");
 
         Schema s = SchemaFactory.getInstance(targ, uri, logger.getLevel());
 
@@ -100,11 +98,12 @@ System.out.println("URI == '" + uri + "'");
         logger.finest("Target == '" + targ + "'");
 
         Schema s = SchemaFactory.getInstance(targ);
-
+        if(s == null)
+            return;
+        
         if ((prefix == null) || "".equalsIgnoreCase(prefix)) {
             defaultNS = s.getTargetNamespace();
         }
-System.out.println("Schema is null ?"+(s==null)+"   "+targ);
         targSchemas.put(s.getTargetNamespace(), s);
         prefixSchemas.put(prefix, s); // TODO use the prefix somewhere
     }

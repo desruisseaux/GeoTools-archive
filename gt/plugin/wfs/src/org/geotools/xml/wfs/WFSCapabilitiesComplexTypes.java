@@ -911,7 +911,7 @@ public class WFSCapabilitiesComplexTypes {
         private static final Element[] elements = {
                 new WFSElement("Get", GetType.getInstance(), 0,
                     Integer.MAX_VALUE, false, null),
-                new WFSElement("Post", GetType.getInstance(), 0,
+                new WFSElement("Post", PostType.getInstance(), 0,
                     Integer.MAX_VALUE, false, null)
             };
 
@@ -1698,7 +1698,7 @@ public class WFSCapabilitiesComplexTypes {
             };
 
         // static choice
-        private static final DefaultChoice seq = new DefaultChoice(elements);
+        private static final DefaultSequence seq = new DefaultSequence(elements);
 
         public static WFSComplexType getInstance() {
             return instance;
@@ -1736,24 +1736,25 @@ public class WFSCapabilitiesComplexTypes {
             Service service = new Service("", "", null);
 
             for (int i = 0; i < value.length; i++) {
-                if (elements[0].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+//System.out.println(value[i].getElement().getName());
+                if (elements[0].getName().equals(value[i].getElement().getName())) {
                     service.setName((String) value[i].getValue());
                 }
 
-                if (elements[1].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+                if (elements[1].getName().equals(value[i].getElement().getName())) {
                     service.setTitle((String) value[i].getValue());
                 }
 
-                if (elements[2].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+                if (elements[2].getName().equals(value[i].getElement().getName())) {
+                    service.set_abstract((String) value[i].getValue());
+                }
+
+                if (elements[3].getName().equals(value[i].getElement().getName())) {
                     service.setKeywordList(Arrays.asList(((String) value[i]
                             .getValue()).split(" ")));
                 }
 
-                if (elements[3].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+                if (elements[4].getName().equals(value[i].getElement().getName())) {
                     try {
                         service.setOnlineResource(((URI) value[i].getValue())
                             .toURL());
@@ -1762,13 +1763,11 @@ public class WFSCapabilitiesComplexTypes {
                     }
                 }
 
-                if (elements[4].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+                if (elements[5].getName().equals(value[i].getElement().getName())) {
                     service.setFees((String) value[i].getValue());
                 }
 
-                if (elements[5].getName().equals(value[i].getElement().getType()
-                                                             .getName())) {
+                if (elements[6].getName().equals(value[i].getElement().getName())) {
                     service.setAccessConstraints((String) value[i].getValue());
                 }
             }
@@ -1992,13 +1991,14 @@ public class WFSCapabilitiesComplexTypes {
             if (name == null) {
                 return null;
             }
+System.out.println("Looking for : "+name);
+//
+//            for (int i = 0; i < elements.length; i++)
+//                if (name.equals(elements[i].getName())) {
+//                    return elements[i];
+//                }
 
-            for (int i = 0; i < elements.length; i++)
-                if (name.equals(elements[i].getName())) {
-                    return elements[i];
-                }
-
-            return null;
+            return seq.findChildElement(name);
         }
 
         /**
@@ -2113,7 +2113,7 @@ public class WFSCapabilitiesComplexTypes {
         private static final Element[] elements = {
                 new WFSElement("Service", ServiceType.getInstance(), 1, 1,
                     false, null),
-                new WFSElement("Capability", GetCapabilitiesType.getInstance(),
+                new WFSElement("Capability", CapabilityType.getInstance(),
                     1, 1, false, null),
                 new WFSElement("FeatureTypeList",
                     FeatureTypeListType.getInstance(), 1, 1, false, null),
@@ -2298,7 +2298,7 @@ public class WFSCapabilitiesComplexTypes {
 
         // static element list
         private static final Element[] elements = {
-                new WFSElement("DCPType", ServiceType.getInstance(), 1,
+                new WFSElement("DCPType", DCPTypeType.getInstance(), 1,
                     Integer.MAX_VALUE, false, null)
             };
 
@@ -2347,18 +2347,40 @@ public class WFSCapabilitiesComplexTypes {
                 throw new SAXException(
                     "Invalid inputs for parsing a GetCapabilitiesType");
             }
+//
+//            if (value.length < 1) {
+//                throw new SAXException(
+//                    "Invalid number of inputs for parsing a GetCapabilitiesType");
+//            }
+//
+//            // TODO merge one with only post, and one with only get?
+//            Capability[] c = new Capability[value.length];
+//
+//            for (int i = 0; i < value.length; i++) {
+//                c[i] = (Capability) value[i];
+//                c[i].setType(Capability.GET_CAPABILITIES);
+//            }
+//
+//            return c;
 
-            if (value.length < 1) {
+            if (value.length < 2) {
                 throw new SAXException(
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
             // TODO merge one with only post, and one with only get?
-            Capability[] c = new Capability[value.length];
+            Capability[] c = new Capability[value.length - 1];
+            List sdl = null;
 
             for (int i = 0; i < value.length; i++) {
-                c[i] = (Capability) value[i];
-                c[i].setType(Capability.GET_CAPABILITIES);
+                if ((sdl == null) && (value[i].getElement() != null)
+                        && "SchemaDescriptionLanguage".equals(
+                            value[i].getElement().getName())) {
+                    sdl = (List) value[i].getValue();
+                } else {
+                    c[i] = (Capability) value[i];
+                    c[i].setType(Capability.DESCRIBE_FEATURE_TYPE);
+                }
             }
 
             return c;

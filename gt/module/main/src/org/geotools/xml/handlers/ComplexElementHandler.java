@@ -83,11 +83,12 @@ public class ComplexElementHandler extends XMLElementHandler {
             throw new SAXException(e);
         }
 
-        if ((type.getChild() == null) && (type.getParent() == null)) {
-            logger.warning("ComplexType's Child provided was null");
-            throw new SAXException(new NullPointerException(
-                    "ComplexType's Child provided was null"));
-        }
+        // TODO check if this is needed
+//        if ((type.getChild() == null) && (type.getParent() == null)) {
+//            logger.warning("ComplexType's Child provided was null");
+//            throw new SAXException(new NullPointerException(
+//                    "ComplexType's Child provided was null"));
+//        }
     }
 
     /**
@@ -176,6 +177,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      */
     private void validateElementOrder() throws SAXException {
         if ((elements == null) || (elements.size() == 0)) {
+            // TODO ensure we have enough elements
             return;
         }
 
@@ -187,7 +189,7 @@ public class ComplexElementHandler extends XMLElementHandler {
                 && (i < type.getChild().getMaxOccurs());) {
             int t = i;
             i = valid(type.getChild(), i);
-            changed = t != i;
+            changed = (t != i);
         }
 
         if (i < type.getChild().getMinOccurs()) {
@@ -449,7 +451,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         }
 
         throw new SAXException("Could not find element handler for "
-            + namespaceURI + " : " + localName);
+            + namespaceURI + " : " + localName + " as a child of "+type.getName()+".");
     }
 
     /**

@@ -169,9 +169,10 @@ public class XMLSAXHandler extends DefaultHandler {
             ((XMLElementHandler) handlers.pop()).endElement(namespaceURI,
                 localName, hints);
         } catch (Exception e) {
-            logger.warning(e.toString());
+            logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
+e.printStackTrace();
             throw new SAXException(e);
         }
     }
@@ -263,6 +264,7 @@ public class XMLSAXHandler extends DefaultHandler {
             logger.warning(e.toString());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
+e.printStackTrace();
             throw new SAXException(e);
         }
     }
