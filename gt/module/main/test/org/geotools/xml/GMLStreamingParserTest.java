@@ -12,7 +12,6 @@ import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.resources.TestData;
 import org.geotools.xml.gml.FCBuffer;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -58,7 +57,7 @@ public class GMLStreamingParserTest extends TestCase {
 //        }
 //    }
 
-    public void testGTRoadsFeatures() throws SAXException, IOException {
+    public void testGTRoadsFeatures() throws IOException {
         FeatureReader fr = null;
         try {
 
@@ -87,12 +86,12 @@ public class GMLStreamingParserTest extends TestCase {
             fail(e.toString());
         } finally {
             if(fr!=null){
-                ((FCBuffer)fr).stop();
+                ((FCBuffer)fr).close();
             }
         }
     }
     
-    public void testFMERoadsFeatures() throws SAXException, IOException {
+    public void testFMERoadsFeatures() throws IOException {
         FeatureReader fr = null;
         try {
             String path = "fme/roads/roads.xml";
@@ -117,12 +116,12 @@ public class GMLStreamingParserTest extends TestCase {
             fail(e.toString());
         } finally {
             if(fr!=null){
-                ((FCBuffer)fr).stop();
+                ((FCBuffer)fr).close();
             }
         }
     }
     
-    public void testFMELakesFeatures() throws SAXException, IOException {
+    public void testFMELakesFeatures() throws IOException {
         FeatureReader fr = null;
         try {
             String path = "fme/lakes/lakes.xml";
@@ -147,12 +146,12 @@ public class GMLStreamingParserTest extends TestCase {
             fail(e.toString());
         } finally {
             if(fr!=null){
-                ((FCBuffer)fr).stop();
+                ((FCBuffer)fr).close();
             }
         }
     }
     
-    public void testFME2StreamsFeatures() throws SAXException, IOException {
+    public void testFME2StreamsFeatures() throws IOException {
         FeatureReader fr1 = null;
         FeatureReader fr2 = null;
         try {
@@ -198,10 +197,10 @@ public class GMLStreamingParserTest extends TestCase {
             fail(e.toString());
         } finally {
             if(fr1!=null){
-                ((FCBuffer)fr1).stop();
+                ((FCBuffer)fr1).close();
             }
             if(fr2!=null){
-                ((FCBuffer)fr2).stop();
+                ((FCBuffer)fr2).close();
             }
         }
     }
