@@ -36,11 +36,11 @@
       <groupId>gt2</groupId>
       <version>2.1.x</version>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <artifactId>view</artifactId>
       <groupId>gt2</groupId>
       <version>2.1.x</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <id>JTS</id>
       <version>1.4</version>
