@@ -1696,10 +1696,17 @@ public class LiteRenderer implements Renderer, Renderer2D {
                 .doubleValue();
             double opacity = ((Number) graphic.getOpacity().getValue(feature))
                 .doubleValue();
+            Displacement offset = graphic.getDisplacement();
+            int x=0,y=0;
+            if(offset != null){
+                x = ((Number)offset.getDisplacementX().getValue(feature)).intValue();
+                y = ((Number)offset.getDisplacementY().getValue(feature)).intValue();
+             
+            }
             if (geom instanceof Point) {
-                renderImage((Point) geom, img, size, rotation, opacity);
+                renderImage((Point) geom, img, size, rotation, opacity, x, y);
             } else {
-                renderImage(geom.getCentroid(), img, size, rotation, opacity);
+                renderImage(geom.getCentroid(), img, size, rotation, opacity, x, y);
             }
 
             return true;
@@ -1807,7 +1814,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
         if(offset != null){
             x = ((Number)offset.getDisplacementX().getValue(feature)).intValue();
             y = ((Number)offset.getDisplacementY().getValue(feature)).intValue();
-            y = -y;
+           
         }
         rotation = (((Number) graphic.getRotation().getValue(feature))
             .doubleValue() * Math.PI) / 180d;
@@ -1854,7 +1861,18 @@ public class LiteRenderer implements Renderer, Renderer2D {
         double rotation, double opacity) {
         renderImage(point.getX(), point.getY(), img, size, rotation, opacity);
     }
-
+    /**
+     * Renders an image on the device
+     *
+     * @param point the image location on the screen
+     * @param img the image
+     * @param size the image size
+     * @param rotation the image rotatation
+     */
+    private void renderImage(Point point, BufferedImage img, int size,
+        double rotation, double opacity, int xOffset, int yOffset) {
+        renderImage(point.getX(), point.getY(), img, size, rotation, opacity, xOffset, yOffset);
+    }
     /**
      * Renders an image on the device
      *
@@ -1866,6 +1884,22 @@ public class LiteRenderer implements Renderer, Renderer2D {
      */
     private void renderImage(double tx, double ty, BufferedImage img, int size,
         double rotation, double opacity) {
+        renderImage(tx, ty, img, size, rotation, opacity,0,0);   
+            
+    }
+    
+    
+    /**
+     * Renders an image on the device
+     *
+     * @param tx the image location on the screen, x coordinate
+     * @param ty the image location on the screen, y coordinate
+     * @param img the image
+     * @param size the image size
+     * @param rotation the image rotatation
+     */
+    private void renderImage(double tx, double ty, BufferedImage img, int size,
+        double rotation, double opacity, int xOffset, int yOffset) {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("drawing Image @" + tx + "," + ty);
         }
@@ -1875,7 +1909,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
         // we moved the origin to the centre of the image.
         graphics.setComposite(AlphaComposite.getInstance(
                 AlphaComposite.SRC_OVER,  (float)opacity));
-        graphics.drawImage(img, -img.getWidth() / 2, -img.getHeight() / 2, obs);
+        graphics.drawImage(img, (-img.getWidth() / 2)+xOffset, (-img.getHeight() / 2)-yOffset, obs);
 
         graphics.setTransform(old);
 
@@ -1967,7 +2001,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
         Point2D graphicCentre = new java.awt.geom.Point2D.Double();
         temp.transform(mapCentre, graphicCentre);
         markAT.translate(graphicCentre.getX(), graphicCentre.getY());
-        markAT.translate(xOffset / temp.getScaleX(), xOffset / temp.getScaleX());//displacment
+       
         double shearY = temp.getShearY();
         double scaleY = temp.getScaleY();
 
@@ -1983,9 +2017,10 @@ public class LiteRenderer implements Renderer, Renderer2D {
 
         // getbounds is broken, but getBounds2D is not :-)
         double unitSize = Math.max(bounds.getWidth(), bounds.getHeight());
+        
         double drawSize = (double) size / unitSize;
         markAT.scale(drawSize, -drawSize);
-
+        markAT.translate(xOffset / unitSize , yOffset / unitSize);//displacment
         graphic.setTransform(markAT);
 
         if (mark.getFill() != null) {
