@@ -29,8 +29,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 
 
@@ -43,7 +42,7 @@ public class PrjFileReader {
     CharBuffer charBuffer;
     CharsetDecoder decoder;
     
-    CoordinateSystem cs;
+    org.opengis.referencing.crs.CoordinateReferenceSystem cs;
     //private int[] content;
     
     /** Load the index file from the given channel.
@@ -63,12 +62,10 @@ public class PrjFileReader {
         
         String wkt = charBuffer.toString();
         wkt = rewrite(wkt);
-        CoordinateSystemFactory csFactory = CoordinateSystemFactory.getDefault();
-        cs = csFactory.createFromWKT(wkt);
-        System.out.println("cs = " + cs);
+        cs = FactoryFinder.decode(wkt);
     }
     
-    public CoordinateSystem getCoodinateSystem(){
+    public org.opengis.referencing.crs.CoordinateReferenceSystem getCoodinateSystem(){
         return cs;
     }
     

@@ -39,7 +39,6 @@ import java.util.logging.Level;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
@@ -745,8 +744,6 @@ System.out.println(url);
                 crs = FactoryFinder.decode(fsd.getSRS());
                 maxbbox = FactoryFinder.toGeographic(maxbbox,crs);
             } catch (FactoryException e) {
-                e.printStackTrace();maxbbox = null;
-            } catch (CannotCreateTransformException e) {
                 e.printStackTrace();maxbbox = null;
             } catch (MismatchedDimensionException e) {
                 e.printStackTrace();maxbbox = null;

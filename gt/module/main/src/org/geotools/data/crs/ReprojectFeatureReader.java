@@ -25,10 +25,12 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -76,7 +78,7 @@ public class ReprojectFeatureReader implements FeatureReader {
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;
-        transformer.setMathTransform(transform);
+        transformer.setMathTransform((MathTransform2D)transform);
     }
 
     public ReprojectFeatureReader(FeatureReader reader,
@@ -97,7 +99,7 @@ public class ReprojectFeatureReader implements FeatureReader {
         
         this.schema = FeatureTypes.transform(type, cs);
         this.reader = reader;
-        transformer.setMathTransform(FactoryFinder.getCoordinateOperationFactory().createOperation(original,cs).getMathTransform());
+        transformer.setMathTransform((MathTransform2D)FactoryFinder.getCoordinateOperationFactory().createOperation(original,cs).getMathTransform());
     }
 
     /**

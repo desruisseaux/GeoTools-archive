@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.AbstractAttributeIO;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
@@ -79,6 +78,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.FactoryException;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -589,11 +589,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected AttributeType[] readAttributes() throws IOException {
         ShapefileReader shp = openShapeReader();
         DbaseFileReader dbf = openDbfReader();
-        CoordinateSystem cs = null;
+        CoordinateReferenceSystem cs = null;
         try{
             PrjFileReader prj = openPrjReader();
             if(prj!=null){
-                cs = prj.getCoodinateSystem();
+                cs = (CoordinateReferenceSystem) prj.getCoodinateSystem();
             }
         }
         catch(FactoryException fe){

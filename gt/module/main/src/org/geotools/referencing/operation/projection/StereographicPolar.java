@@ -49,7 +49,6 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
-import org.geotools.ct.proj.PolarStereographic;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.opengis.parameter.ParameterNotFoundException;
