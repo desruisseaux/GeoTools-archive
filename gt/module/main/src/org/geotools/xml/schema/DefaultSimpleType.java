@@ -49,6 +49,7 @@ public class DefaultSimpleType implements SimpleType {
     private Facet[] constraints;
 
     private DefaultSimpleType() {
+        // should not be called
     }
 
     /**
@@ -126,11 +127,13 @@ public class DefaultSimpleType implements SimpleType {
      * <p>
      * This method ignores the attributes from the xml node
      * </p>
+     * @throws SAXException
+     * @throws OperationNotSupportedException
      *
      * @see schema.Type#getValue(java.lang.Object, org.xml.sax.Attributes)
      */
     public Object getValue(Element element, ElementValue[] value,
-        Attributes attrs, Map hints) throws SAXException {
+        Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
         if ((value == null) || (value.length != 1)) {
             throw new SAXException(
                 "can only have one text value ... and one is required");
@@ -151,7 +154,7 @@ public class DefaultSimpleType implements SimpleType {
      * Helper for getValue(Element,ElementValue[])
      */
     private Object getUnionValue(Element element, ElementValue value,
-        Attributes attrs, Map hints) throws SAXException {
+        Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
         if (parents == null) {
             return null;
         }
@@ -174,7 +177,7 @@ public class DefaultSimpleType implements SimpleType {
      * Helper for getValue(Element,ElementValue[])
      */
     private Object getListValue(Element element, ElementValue value,
-        Attributes attrs, Map hints) throws SAXException {
+        Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
         if ((parents == null) || (parents[0] == null)) {
             return null;
         }
@@ -197,7 +200,7 @@ public class DefaultSimpleType implements SimpleType {
      * Helper for getValue(Element,ElementValue[])
      */
     private Object getRestValue(Element element, ElementValue value,
-        Attributes attrs, Map hints) throws SAXException {
+        Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
         if ((parents == null) || (parents[0] == null)) {
             return null;
         }
@@ -429,11 +432,12 @@ public class DefaultSimpleType implements SimpleType {
     }
 
     /**
+     * @throws OperationNotSupportedException
      * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute,
      *      java.lang.Object, java.util.Map)
      */
     public AttributeValue toAttribute(Attribute attribute, Object value,
-        Map hints) {
+        Map hints) throws OperationNotSupportedException {
         if (value == null) {
             return null;
         }

@@ -34,7 +34,6 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
@@ -2027,10 +2026,12 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws SAXException
+         * @throws OperationNotSupportedException
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
             if (value.length > 1) {
                 throw new SAXException("Cannot have more than one coord per "
                     + getName());
@@ -2207,10 +2208,12 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws SAXException
+         * @throws OperationNotSupportedException
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
             Element e = value[0].getElement();
 
             if (e == null) {
@@ -2401,10 +2404,12 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws SAXException
+         * @throws OperationNotSupportedException
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
             Element e = value[0].getElement();
 
             if (e == null) {
@@ -2590,10 +2595,12 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws SAXException
+         * @throws OperationNotSupportedException
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
             Element e = value[0].getElement();
 
             if (e == null) {
@@ -2815,10 +2822,12 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws SAXException
+         * @throws OperationNotSupportedException
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
             Element e = value[0].getElement();
 
             if (e == null) {

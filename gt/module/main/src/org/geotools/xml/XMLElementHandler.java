@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.OperationNotSupportedException;
+
 
 /**
  * XSIElementHandler purpose.
@@ -83,11 +85,12 @@ public abstract class XMLElementHandler implements Serializable {
      * @param hints DOCUMENT ME!
      *
      * @throws SAXException
+     * @throws OperationNotSupportedException
      *
      * @see SchemaContentHandler#endElement
      */
     public abstract void endElement(URI namespaceURI, String localName,
-        Map hints) throws SAXException;
+        Map hints) throws SAXException, OperationNotSupportedException;
 
     /**
      * handles SAX start Element events. This matches the start of the element

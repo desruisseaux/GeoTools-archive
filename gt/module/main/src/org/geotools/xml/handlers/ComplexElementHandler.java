@@ -35,6 +35,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.OperationNotSupportedException;
+
 
 /**
  * <p>
@@ -117,11 +119,13 @@ public class ComplexElementHandler extends XMLElementHandler {
     }
 
     /**
+     * @throws SAXException
+     * @throws OperationNotSupportedException
      * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
     public void endElement(URI namespaceURI, String localName, Map hints)
-        throws SAXException {
+        throws OperationNotSupportedException, SAXException {
         text = (text == null) ? null : text.trim();
         
         if(hints == null){

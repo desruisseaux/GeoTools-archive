@@ -1080,11 +1080,13 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         /**
+         * @throws SAXException
+         * @throws OperationNotSupportedException
          * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element,
          *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws OperationNotSupportedException, SAXException {
             Object[] values = null;
 
             logger.finest("Getting value for " + name);

@@ -70,6 +70,8 @@ public interface ElementGrouping {
      * operand,  increasing performance.
      */
     public static final int ALL = 32;
+    
+    public static final int UNBOUNDED = -1;
 
     /**
      * <p>
