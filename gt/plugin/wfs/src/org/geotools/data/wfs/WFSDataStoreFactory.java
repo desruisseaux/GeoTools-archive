@@ -67,10 +67,10 @@ public class WFSDataStoreFactory implements DataStoreFactorySpi{
     public DataStore createNewDataStore(Map params) throws IOException {
         URL host = null;
         if(params.containsKey(SERVER_URL)){
-            host = (URL)params.get(SERVER_URL);
+            host = (URL)params.get(SERVER_URL.key);
             host = WFSDataStore.createGetCapabilitiesRequest(host);
         }else{
-            host = ((URL)params.get(GET_CAPABILITIES_URL));
+            host = ((URL)params.get(GET_CAPABILITIES_URL.key));
         }
         
         Boolean get,post;get = post = null;

@@ -30,26 +30,31 @@ public class WFSFeatureReader extends FCBuffer {
         this.is = is;
     }
     
-    public static FeatureReader getFeatureReader(URI document, int capacity) {
+    public static FeatureReader getFeatureReader(URI document, int capacity) throws SAXException {
         HttpURLConnection hc;
         try {
             hc = (HttpURLConnection)document.toURL().openConnection();
             WFSFeatureReader fc = new WFSFeatureReader(hc.getInputStream(), capacity);
         	fc.start(); // calls run
 
+            if(fc.exception != null)
+                throw fc.exception;
+            
         	return fc;
         } catch (MalformedURLException e) {
             logger.warning(e.toString());
+            throw new SAXException(e);
         } catch (IOException e) {
             logger.warning(e.toString());
+            throw new SAXException(e);
         }
-        return null;
     }
     
-    public static FeatureReader getFeatureReader(InputStream is, int capacity) {
+    public static FeatureReader getFeatureReader(InputStream is, int capacity) throws SAXException {
         WFSFeatureReader fc = new WFSFeatureReader(is, capacity);
         fc.start(); // calls run
-
+        if(fc.exception != null)
+            throw fc.exception;
         return fc;
     }
 
@@ -68,9 +73,11 @@ public class WFSFeatureReader extends FCBuffer {
         } catch (StopException e) {
             exception = e;
             state = STOP;
+            yield();
         } catch (SAXException e) {
             exception = e;
             state = STOP;
+            yield();
         }
     }
 }

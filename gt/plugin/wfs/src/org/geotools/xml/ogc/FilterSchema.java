@@ -293,14 +293,18 @@ public class FilterSchema implements Schema {
      * @see org.geotools.xml.schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-        if (uri.toString().toLowerCase().endsWith("filter.xsd")
-                || uri.toString().toLowerCase().endsWith("filterCapabilities.xsd")
-                || uri.toString().toLowerCase().endsWith("OGC-exception.xsd")
-                || uri.toString().toLowerCase().endsWith("expr.xsd")) {
-            return true;
-        }
-
-        return false;
+//        if (uri.toString().toLowerCase().endsWith("filter.xsd")
+//                || uri.toString().toLowerCase().endsWith("filterCapabilities.xsd")
+//                || uri.toString().toLowerCase().endsWith("OGC-exception.xsd")
+//                || uri.toString().toLowerCase().endsWith("expr.xsd")) {
+//            return true;
+//        }
+//
+//        return false;
+        
+        // this is a spec ... we never want the def modified.
+        // TODO see if this affects printing
+        return true;
     }
 
     /**

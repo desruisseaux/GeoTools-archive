@@ -401,12 +401,16 @@ public class GMLSchema implements Schema {
      * @see schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-        if (uri.toString().toLowerCase().endsWith("geometry.xsd")
-                || uri.toString().toLowerCase().endsWith("feature.xsd")) {
-            return true;
-        }
+//        if (uri.toString().toLowerCase().endsWith("geometry.xsd")
+//                || uri.toString().toLowerCase().endsWith("feature.xsd")) {
+//            return true;
+//        }
+//
+//        return false;
 
-        return false;
+        // this is a spec ... we never want the def modified.
+        // TODO see if this affects printing
+        return true;
     }
 
     /**

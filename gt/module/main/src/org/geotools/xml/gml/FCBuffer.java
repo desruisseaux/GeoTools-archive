@@ -135,11 +135,15 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @param capacity
      *
      * @return
+     * @throws SAXException
      */
-    public static FeatureReader getFeatureReader(URI document, int capacity) {
+    public static FeatureReader getFeatureReader(URI document, int capacity) throws SAXException {
         FCBuffer fc = new FCBuffer(document, capacity);
         fc.start(); // calls run
 
+        if(fc.exception != null)
+            throw fc.exception;
+        
         return fc;
     }
 
@@ -147,11 +151,11 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
-        while ((featureType == null) && (state != FINISH))
+        while ((featureType == null) && (state != FINISH && state != STOP))
             yield(); // let the parser run ... this is being called from 
 
         // the original thread
-        if (state == FINISH) {
+        if (state == FINISH || state == STOP) {
             return null;
         } else {
             return featureType;
@@ -240,9 +244,11 @@ public class FCBuffer extends Thread implements FeatureReader {
         } catch (StopException e) {
             exception = e;
             state = STOP;
+            yield();
         } catch (SAXException e) {
             exception = e;
             state = STOP;
+            yield();
         }
     }
 

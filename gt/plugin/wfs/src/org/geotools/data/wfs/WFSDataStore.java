@@ -211,6 +211,9 @@ public class WFSDataStore extends AbstractDataStore{
     
     private FeatureType getSchemaGet(String typeName) throws SAXException, IOException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
+System.out.println("GetCaps -- get "+getUrl);
+		if(getUrl == null)
+		    return null;
         
         String query = getUrl.getQuery().toUpperCase();
         String url = getUrl.toString();
@@ -250,6 +253,9 @@ public class WFSDataStore extends AbstractDataStore{
     
     private FeatureType getSchemaPost(String typeName) throws IOException, SAXException {
         URL postUrl = capabilities.getDescribeFeatureType().getPost();
+System.out.println("GetCaps -- post "+postUrl);
+		if(postUrl == null)
+		    return null;
         
         HttpURLConnection hc = (HttpURLConnection)postUrl.openConnection();
         hc.setRequestMethod("POST");
@@ -324,7 +330,10 @@ public class WFSDataStore extends AbstractDataStore{
     
     private FeatureReader getFeatureReaderGet(String typeName) throws SAXException, IOException{
         URL getUrl = capabilities.getGetFeature().getGet();
-        
+
+		if(getUrl == null)
+		    return null;
+		
         String query = getUrl.getQuery().toUpperCase();
         String url = getUrl.toString();
         if(query == null){
@@ -356,7 +365,10 @@ public class WFSDataStore extends AbstractDataStore{
     
     private FeatureReader getFeatureReaderPost(String typeName) throws SAXException, IOException{
         URL postUrl = capabilities.getGetFeature().getPost();
-        
+
+		if(postUrl == null)
+		    return null;
+		
         HttpURLConnection hc = (HttpURLConnection)postUrl.openConnection();
         hc.setRequestMethod("POST");
         OutputStream os = getOutputStream(hc,auth);
