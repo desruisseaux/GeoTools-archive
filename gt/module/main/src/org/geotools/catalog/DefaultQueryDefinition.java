@@ -16,11 +16,8 @@
  */
 package org.geotools.catalog;
 
-import org.geotools.metadata.Metadata;
-import org.geotools.metadata.Query;
 import java.io.IOException;
 import java.util.Iterator;
-
 
 /**
  * Wraps a query and applies it to the metadata contained by catalogentries.
@@ -45,7 +42,7 @@ public class DefaultQueryDefinition implements QueryDefinition {
      */
     public boolean accept(CatalogEntry entry) {
         for (Iterator iter = entry.iterator(); iter.hasNext();) {
-            Metadata element = (Metadata) iter.next();
+            MetadataEntity element = (MetadataEntity) iter.next();
 
             try {
                 if (query.accepts(element)) {

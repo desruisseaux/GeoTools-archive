@@ -19,11 +19,11 @@ package org.geotools.expr;
 import java.io.IOException;
 import java.util.Set;
 
+import org.geotools.catalog.MetadataEntity;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
-import org.geotools.metadata.Metadata;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -104,7 +104,7 @@ public interface Expr {
 	 * @param metadata
 	 * @return Expr with all meta( xpath ) Exprs resolved
 	 */
-	public Expr resolve( Metadata metadata );
+	public Expr resolve( MetadataEntity metadata );
 	
 	/**
 	 * 

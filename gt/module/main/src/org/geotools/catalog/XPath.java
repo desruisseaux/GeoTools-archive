@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.catalog;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,9 +22,9 @@ import java.util.List;
 
 
 /**
- * Used to resolve an XPath expression used on a metadata element
+ * Used to resolve an XPath expression used on a MetadataEntity element
  *
- * Either the Metadata.Element object is returned (if getElement is called)
+ * Either the MetadataEntity.Element object is returned (if getElement is called)
  * or the dereference value of the element is returned( when getValue is called)
  *
  * The following XPath options are permitted:
@@ -43,7 +43,7 @@ public class XPath {
     /**
      * Creates a new XPath object.
      *
-     * @param xpath An xpath string that conforms to the specification @linkplain org.geotools.metadata.XPath
+     * @param xpath An xpath string that conforms to the specification @linkplain org.geotools.MetadataEntity.XPath
      */
     public XPath(String xpath) {
         terms = xpath.split("/");
@@ -72,7 +72,7 @@ public class XPath {
         terms[index] = newTerm;
     }
 
-    private List match(Metadata metadata, Metadata.Entity entity, int index) {
+    private List match(MetadataEntity metadata, MetadataEntity.EntityType entity, int index) {
         List elements = entity.getElements();
         List result = new ArrayList();
 
@@ -88,7 +88,7 @@ public class XPath {
         }
 
         for (Iterator iter = matches.iterator(); iter.hasNext();) {
-            Metadata.Element element = (Metadata.Element) iter.next();
+            MetadataEntity.Element element = (MetadataEntity.Element) iter.next();
 
             /*
              * if there are more terms and element is an entity then recurse 1
@@ -99,10 +99,10 @@ public class XPath {
             if (index < (terms.length - 1)) {
                 if (element.isMetadataEntity()) {
                     if (metadata != null) {
-                        metadata = (Metadata) metadata.getElement(element);
+                        metadata = (MetadataEntity) metadata.getElement(element);
                     }
 
-                    result.addAll(match(metadata, element.getEntity(), index
+                    result.addAll(match(metadata, element.getEntityType(), index
                             + 1));
                 } else {
                     continue;
@@ -123,7 +123,7 @@ public class XPath {
         List result = new ArrayList();
 
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
-            Metadata.Element element = (Metadata.Element) iter.next();
+            MetadataEntity.Element element = (MetadataEntity.Element) iter.next();
             String n = element.getName();
 
             if (n.matches(term)) {
@@ -135,29 +135,29 @@ public class XPath {
     }
 
     /**
-     * Returns a List of the Metadata.Elements that satisfy the XPath expression
+     * Returns a List of the MetadataEntity.Elements that satisfy the XPath expression
      * represented by this object
      *
-     * @param entity the Metadata.Entity that used as the root of the XPath evaluation
-     * @return List of the Metadata.Elements that satisfy the XPath expression
+     * @param entity the MetadataEntityEntity.EntityType that used as the root of the XPath evaluation
+     * @return List of the MetadataEntity.Elements that satisfy the XPath expression
      * represented by this object
      */
-    public List getElement(Metadata.Entity entity) {
+    public List getElement(MetadataEntity.EntityType entity) {
         return match(null, entity, 0);
     }
 
     /**
-    * Returns a List of Objects which are the values of the Metadata.Element indicated by
+    * Returns a List of Objects which are the values of the MetadataEntity.Element indicated by
     * the XPath expression which this object represents
     *
-    * @param metadata The Metadata class that is the root of the evaluation.
-    * @return List of Objects which are the values of the Metadata.Element indicated by
+    * @param MetadataEntity The MetadataEntity class that is the root of the evaluation.
+    * @return List of Objects which are the values of the MetadataEntity.Element indicated by
     * the XPath expression which this object represents
     * 			Minimal ordering guarantees.  Values from a object are grouped but not the
     * 			order of the elements in a group or the order of the groups
     */
-    public List getValue(Metadata metadata) {
-        return match(metadata, metadata.getEntity(), 0);
+    public List getValue(MetadataEntity metadata) {
+        return match(metadata, metadata.getEntityType(), 0);
     }
 
     /**
@@ -165,16 +165,16 @@ public class XPath {
      * Element <bold>values</bold> matched.
      *
      * @param xpath XPath Expression
-     * @param metadata The metadata hat will be used as the root
+     * @param MetadataEntity The MetadataEntity hat will be used as the root
      *
      * @return A List of all the Values that the xpath matched
      * 			Minimal ordering guarantees.  Values from a object are grouped but not the
      * 			order of the elements in a group or the order of the groups
      */
-    public static List getValue(String xpath, Metadata metadata) {
+    public static List getValue(String xpath, MetadataEntity MetadataEntity) {
         XPath path = new XPath(xpath);
 
-        return path.getValue(metadata);
+        return path.getValue(MetadataEntity);
     }
 
     /**
@@ -188,7 +188,7 @@ public class XPath {
      * 			Minimal ordering guarantees.  Values from a object are grouped but not the
      * 			order of the elements in a group or the order of the groups
      */
-    public static List getElement(String xpath, Metadata.Entity entity) {
+    public static List getElement(String xpath, MetadataEntity.EntityType entity) {
         XPath path = new XPath(xpath);
 
         return path.getElement(entity);
@@ -199,15 +199,15 @@ public class XPath {
      * Elements matched.
      *
      * @param xpath XPath Expression
-     * @param metadata The metadata hat will be used as the root
+     * @param MetadataEntity The MetadataEntity hat will be used as the root
      *
      * @return List of matched Elements
      * 			Minimal ordering guarantees.  Values from a object are grouped but not the
      * 			order of the elements in a group or the order of the groups
      */
-    public static List getElement(String xpath, Metadata metadata) {
+    public static List getElement(String xpath, MetadataEntity MetadataEntity) {
         XPath path = new XPath(xpath);
 
-        return path.getElement(metadata.getEntity());
+        return path.getElement(MetadataEntity.getEntityType());
     }
 }

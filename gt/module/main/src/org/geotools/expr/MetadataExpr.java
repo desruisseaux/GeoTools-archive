@@ -1,9 +1,9 @@
 package org.geotools.expr;
 
+import org.geotools.catalog.MetadataEntity;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
-import org.geotools.metadata.Metadata;
 
 /**
  * Retrive attribute from Feature.
@@ -20,7 +20,7 @@ public class MetadataExpr extends AbstractExpr {
 	/* (non-Javadoc)
 	 * @see org.geotools.expr.AbstractExpr#resolve(org.geotools.metadata.Metadata)
 	 */
-	public Expr resolve(Metadata metadata) {
+	public Expr resolve(MetadataEntity metadata) {
 		if( metadata == null ) return null;
 		Object value = metadata.getElement( xpath );
 		return Exprs.literal( value );		
@@ -36,9 +36,9 @@ public class MetadataExpr extends AbstractExpr {
 			return this;
 		}
 		String newPath = xpath.substring( bind.length()+2 );
-		Metadata meta;
-		if( feature instanceof Metadata ){
-			meta =(Metadata) feature;				
+		MetadataEntity meta;
+		if( feature instanceof MetadataEntity ){
+			meta =(MetadataEntity) feature;				
 		}
 		else {
 			// aquire metadata from feature?

@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.catalog;
 
 import java.util.List;
 
@@ -26,19 +26,19 @@ import java.util.List;
  * </p>
  * <p>
  * Conceptually a Metadata is comprised of a series of elements. These elements
- * are described by an associated Metadata.Entity & Metadata.Element schema
+ * are described by an associated EntityType & Element schema
  * information.
  * </p>
  * </p>
- * In the best of all possible worlds the Metadata.Entity is a member of a
+ * In the best of all possible worlds the EntityType is a member of a
  * well known specification such as ISO19115 (Metadata for spatial data), or
  * ISO19119 (Metadata for Services). GeoAPI kindly provides these abstractions
  * as a series of interfaces, which we are in the process of implementing.
  * </p>
  * <p>
  * The Metadata interface is similar in use to that of the Feature, it has
- * the same relationship with Metadata.Entity that Feature has with FeatureType.
- * By extention Metadata.Element is similar to AttributeType.
+ * the same relationship with EntityType that Feature has with FeatureType.
+ * By extention Element is similar to AttributeType.
  * </p>
  * <p>
  * Aside: Many classes that implement Metadata follow Java Bean property
@@ -82,11 +82,11 @@ import java.util.List;
  * @see ISO 19115 
  * @author jeichar
  */
-public interface Metadata {
+public interface MetadataEntity {
     /**
      * Access to the values associated with metadata elements.
      * <p>
-     * The list is returned in the same order as described by the Metadata.Entity
+     * The list is returned in the same order as described by the EntityType
      * schema information.
      * </p>
      * @return List of Elements
@@ -111,7 +111,7 @@ public interface Metadata {
      * matches a single element that happens to be a List. Similarly there
      * is no way to tell if a element had the value null, or if the element
      * did not exist at all. Both these questions may answered by working
-     * through the Metadata.Entity schema information.
+     * through the EntityType schema information.
      * </p>
      * @param xPath XPath representation of element location.
      *
@@ -121,38 +121,38 @@ public interface Metadata {
     Object getElement(String xPath);
 
     /**
-     * Gets the value of the provided Metadata.Element.
+     * Gets the value of the provided Element.
      * 
-     * @param Metadata.Element that indicates the value the caller wishes to obtain
+     * @param Element that indicates the value the caller wishes to obtain
      * @return The value of the element the parameter represents
      * 		null if the current Metadata does not contain the Element
      */
     public Object getElement(Element element);
 
     /**
-     * Metadata.Entity describes schema of this Metadata.
+     * EntityType describes schema of this Metadata.
      *
-     * @return the Metadata.Entity that describes the current Metadata object
+     * @return the EntityType that describes the current Metadata object
      */
-    public Entity getEntity();
+    public EntityType getEntityType();
 
     /**
      * Metadata schema description - the "type" of Metadata.
      * <p>
      * Allow for progamatic introspection of the Metadata -
-     * provides the list of Metadata.Elements.
+     * provides the list of Elements.
      *
      * @author jeichar
      */
-    public static interface Entity {
+    public static interface EntityType {
         /**
-         * The cPath is used to identify Metadata.Elements in the Metadata data hierarchy
+         * The cPath is used to identify Elements in the Metadata data hierarchy
          * If the xpath has wild cards a List of Metadata Elements will be returned.
          * 
-         * @param xpath an XPath statement that indicates 0 or more Metadata.Elements.
+         * @param xpath an XPath statement that indicates 0 or more Elements.
          * @return Null if no elements are found to match the xpath 
-         * 		A Metadata.Element if exactly one is found to match the xpath
-         * 		A List is many Metadata.Elements are found to match the xpath.
+         * 		A Element if exactly one is found to match the xpath
+         * 		A List is many Elements are found to match the xpath.
          */
         public Object getElement(String xpath);
 
@@ -216,9 +216,9 @@ public interface Metadata {
          * current element is returned.
          *
          * @return Null, if not a metadata entity (isMetadataEntity returns false)
-         * 		The Metadata.Entity object describing the current element if current element is
+         * 		The EntityType object describing the current element if current element is
          * 		an entity 
          */
-        public Entity getEntity();
+        public EntityType getEntityType();
     }
 }

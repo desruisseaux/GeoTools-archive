@@ -19,7 +19,7 @@ import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
-import org.geotools.metadata.Query;
+import org.geotools.catalog.Query;
 import org.geotools.resources.TestData;
 
 

@@ -13,8 +13,6 @@ package org.geotools.catalog;
 // J2SE direct dependencies
 import java.util.Iterator;
 
-import org.geotools.metadata.Metadata;
-
 
 /**
  * The Catalog Entry contains all the MetaDataEntity Entities used to describe one resource. More
@@ -103,7 +101,7 @@ public interface CatalogEntry{
      *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
      *      Catalog Services </A> Specification 
      */
-    public Metadata getMetadata(int index);
+    public MetadataEntity getMetadata(int index);
 
     /**
      * Obtain the Metadata refered to by the name.
@@ -115,7 +113,7 @@ public interface CatalogEntry{
      *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
      *      Catalog Services </A> Specification 
      */
-    public Metadata getMetadata(String name);
+    public MetadataEntity getMetadata(String name);
 
     /**
      * Returns an iterator that can be used to iterate through the associated Metadata.

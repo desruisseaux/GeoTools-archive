@@ -13,8 +13,8 @@ import junit.framework.TestCase;
 import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.data.coverage.grid.file.FileMetadata;
 import org.geotools.data.coverage.grid.file.FileMetadataImpl;
-import org.geotools.metadata.Metadata;
-import org.geotools.metadata.Metadata.Entity;
+import org.geotools.catalog.MetadataEntity;
+import org.geotools.catalog.MetadataEntity.EntityType;
 import org.geotools.resources.TestData;
 
 /**
@@ -97,36 +97,16 @@ public class FileMetadataImplTest extends TestCase {
     	init();
 
         // test begins
-        List ret=metadata.getElements(null);
+        List ret=metadata.elements();
         
         assertNotNull(ret);
         assertEquals(ret.size(),FileMetadata.class.getDeclaredMethods().length);
    }
 
-    /*
-     * calls getElements(new ArrayList())
-     */
-    public void testGetElementsPassedObjectArray() {
-    	init();
-
-
-        // test begins
-        ArrayList param=new ArrayList();
-        List ret=metadata.getElements(param);
-        
-        assertEquals(param,ret);
-        
-        // ensure that it can withstand a second call
-        param=new ArrayList();
-        ret=metadata.getElements(param);
-        
-        assertEquals(param,ret);
-   }
-
     public void testGetEntity() {
     	init();
         // test begins
-        assertNotNull(metadata.getEntity());
+        assertNotNull(metadata.getEntityType());
     }
 
     /*
@@ -136,12 +116,12 @@ public class FileMetadataImplTest extends TestCase {
     	init();
 
         // test begins
-        Entity entity=metadata.getEntity();
+    	EntityType entity=metadata.getEntityType();
         List elements=entity.getElements();
-        List values=metadata.getElements(null);
+        List values=metadata.elements();
         int i=0;
         for (Iterator iter = elements.iterator(); iter.hasNext();i++) {
-            Metadata.Element element = (Metadata.Element) iter.next();
+            MetadataEntity.Element element = (MetadataEntity.Element) iter.next();
             assertEquals(metadata.getElement(element), values.get(i));
         }
     }

@@ -16,8 +16,8 @@
  */
 package org.geotools.data.coverage.grid.file;
 
+import org.geotools.catalog.MetadataEntity;
 import org.geotools.data.coverage.grid.Format;
-import org.geotools.metadata.Metadata;
 
 
 /**
@@ -26,7 +26,7 @@ import org.geotools.metadata.Metadata;
  * @author jeichar
  *
  */
-public interface FileMetadata extends Metadata {
+public interface FileMetadata extends MetadataEntity {
     /**
      * Returns the File name
      * @return Returns the File name

@@ -17,9 +17,9 @@
 package org.geotools.data.coverage.grid.file;
 
 import org.geotools.catalog.CatalogEntry;
+import org.geotools.catalog.MetadataEntity;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.UnkownFormat;
-import org.geotools.metadata.Metadata;
 import java.io.File;
 import java.util.Iterator;
 
@@ -75,7 +75,7 @@ public class FSCatalogEntry implements CatalogEntry {
     /**
      * @see org.geotools.catalog.CatalogEntry#getMetadata(java.lang.String)
      */
-    public Metadata getMetadata(String name) {
+    public MetadataEntity getMetadata(String name) {
         return metadata;
     }
 
@@ -103,7 +103,7 @@ public class FSCatalogEntry implements CatalogEntry {
     /* (non-Javadoc)
      * @see org.geotools.catalog.CatalogEntry#getMetadata(int)
      */
-    public Metadata getMetadata(int index) {
+    public MetadataEntity getMetadata(int index) {
         if (index < 0) {
             return null;
         }

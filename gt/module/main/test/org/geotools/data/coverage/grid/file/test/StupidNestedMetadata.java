@@ -16,7 +16,7 @@
  */
 package org.geotools.data.coverage.grid.file.test;
 
-import org.geotools.metadata.Metadata;
+import org.geotools.catalog.MetadataEntity;
 
 /**
  * TODO type description
@@ -24,7 +24,7 @@ import org.geotools.metadata.Metadata;
  * @author jeichar
  *
  */
-public interface StupidNestedMetadata extends Metadata {
+public interface StupidNestedMetadata extends MetadataEntity {
     StupidFileData getFileData();
     String getData();
 }

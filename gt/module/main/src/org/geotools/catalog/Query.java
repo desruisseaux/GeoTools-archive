@@ -1,4 +1,4 @@
-package org.geotools.metadata;
+package org.geotools.catalog;
 
 import java.io.IOException;
 
@@ -47,7 +47,7 @@ public class Query {
 		this.expr = expr;
 	}
 	public boolean accepts( Feature feature ) throws IOException{
-		Metadata meta = null;
+		MetadataEntity meta = null;
 		
 		// Get metdata for feature
 		// meta = geature.getMetadata();
@@ -62,7 +62,7 @@ public class Query {
 		
 		return filter.contains( feature );
 	}
-	public boolean accepts( Metadata meta ) throws IOException{
+	public boolean accepts( MetadataEntity meta ) throws IOException{
 		Expr query = expr.resolve( meta );
 		Filter filter = query.filter( fakeFeatureType );
 		return filter.contains( fakeFeature );

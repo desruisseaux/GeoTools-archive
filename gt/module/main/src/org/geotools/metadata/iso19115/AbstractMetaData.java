@@ -30,8 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.geotools.metadata.Metadata;
-import org.geotools.metadata.XPath;
+import org.geotools.catalog.MetadataEntity;
+import org.geotools.catalog.XPath;
 import org.opengis.metadata.MetaData;
 
 /**
@@ -55,14 +55,14 @@ import org.opengis.metadata.MetaData;
  * @author jgarnett
  * @since 2.1
  */
-public abstract class AbstractMetaData implements Metadata, MetaData {
+public abstract class AbstractMetaData implements MetadataEntity, MetaData {
     ISO19115Entity entity;
     
     /**
      * @see org.geotools.metadata.Metadata#elements()
      */
     public final List elements() {
-    	ISO19115Entity entity = getType();
+    	ISO19115Entity entity = (ISO19115Entity) getEntityType();
     	List elements = new ArrayList( entity.getElements().size() );            
         
         for (Iterator iter = entity.propertyMap().values().iterator(); iter.hasNext();) {        	
@@ -106,7 +106,7 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
         if (element instanceof ISO19115Element) {
             elemImpl = (ISO19115Element) element;
         } else {
-            elemImpl = (ISO19115Element) getType().getElement(element.getName());
+            elemImpl = (ISO19115Element) getEntityType().getElement(element.getName());
         }        
         PropertyDescriptor descriptor = elemImpl.getProperty();
         Method read = descriptor.getReadMethod();
@@ -122,11 +122,7 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
     /**
      * @see org.geotools.metadata.Metadata#getEntity()
      */
-    public Entity getEntity() {
-        return getType();
-    }
-
-    protected ISO19115Entity getType() {
+    public EntityType getEntityType() {
         if (entity == null) {
             entity = ISO19115Entity.getEntity(getClass());
         }
@@ -141,7 +137,7 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
      * @author $author$
      * @version $Revision: 1.9 $
      */
-    private static class ISO19115Entity implements Metadata.Entity {
+    private static class ISO19115Entity implements EntityType {
         static HashMap entityMap = new HashMap();
                 
         /** Map of PropertyDescriptor by name */
@@ -293,9 +289,9 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
      * @author $author$
      * @version $Revision: 1.9 $
      */
-    private static class ISO19115Element implements Metadata.Element {
+    private static class ISO19115Element implements Element {
         private PropertyDescriptor property;        
-        private Entity entity;
+        private EntityType entity;
 
         /**
          * @param elementClass
@@ -349,7 +345,7 @@ public abstract class AbstractMetaData implements Metadata, MetaData {
         /**
          * @see org.geotools.metadata.Metadata.Element#isMetadataEntity()
          */
-        public Entity getEntity() {
+        public EntityType getEntityType() {
             return entity;
         }
         public String toString(){

@@ -16,7 +16,7 @@
  */
 package org.geotools.data.coverage.grid.file.test;
 
-import org.geotools.metadata.AbstractMetadata;
+import org.geotools.catalog.DefaultMetadataEntity;
 
 /**
  * TODO type description
@@ -24,7 +24,7 @@ import org.geotools.metadata.AbstractMetadata;
  * @author jeichar
  *
  */
-public class StupidNestedMetadataImpl extends AbstractMetadata implements
+public class StupidNestedMetadataImpl extends DefaultMetadataEntity implements
         StupidNestedMetadata {
 
     /** 

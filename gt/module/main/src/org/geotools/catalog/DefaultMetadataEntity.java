@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.metadata;
+package org.geotools.catalog;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -40,17 +40,17 @@ import java.util.List;
  * @author jeichar
  * @since 2.1
  */
-public class DefaultMetadata implements Metadata {
+public class DefaultMetadataEntity implements MetadataEntity {
     EntityImpl entity;
 
     /**
      * @see org.geotools.metadata.Metadata#elements()
      */
     public final List elements() {
-    	Entity type = getType();
+    	EntityImpl type = (EntityImpl) getEntityType();
     	
         List elements = new ArrayList( type.getElements().size() );        
-        List methods = getType().getGetMethods();
+        List methods = type.getGetMethods();
 
         for (Iterator iter = methods.iterator(); iter.hasNext();) {
             Method method = (Method) iter.next();
@@ -92,7 +92,7 @@ public class DefaultMetadata implements Metadata {
         if (element instanceof ElementImpl) {
             elemImpl = (ElementImpl) element;
         } else {
-            elemImpl = (ElementImpl) getType().getElement(element.getName());
+            elemImpl = (ElementImpl) getEntityType().getElement(element.getName());
         }
 
         return invoke(elemImpl.getGetMethod());
@@ -110,17 +110,13 @@ public class DefaultMetadata implements Metadata {
     /**
      * @see org.geotools.metadata.Metadata#getEntity()
      */
-    public Entity getEntity() {
-        return getType();
-    }
-
-    private EntityImpl getType() {
-        if (entity == null) {
+    public EntityType getEntityType() {
+    	if (entity == null) {
             entity = EntityImpl.getEntity(getClass());
         }
-
         return entity;
     }
+    
 
     /**
      * The EntityImpl class uses reflection to examine the structure of a metadata   
@@ -130,7 +126,7 @@ public class DefaultMetadata implements Metadata {
      * @author $author$
      * @version $Revision: 1.9 $
      */
-    private static class EntityImpl implements Entity {
+    private static class EntityImpl implements EntityType {
         static HashMap entityMap = new HashMap();
         ArrayList elemList = new ArrayList();
         HashMap elemMap = new HashMap();
@@ -209,11 +205,11 @@ public class DefaultMetadata implements Metadata {
                 return;
             }
 
-            if (class1 == Metadata.class) {
+            if (class1 == MetadataEntity.class) {
                 return;
             }
 
-            if (!Metadata.class.isAssignableFrom(class1)) {
+            if (!MetadataEntity.class.isAssignableFrom(class1)) {
                 return;
             }
 
@@ -265,7 +261,7 @@ public class DefaultMetadata implements Metadata {
         private Class type;
         private String name;
         private boolean nillable;
-        private Entity entity;
+        private EntityType entity;
 
         /**
          * @param elementClass
@@ -276,7 +272,7 @@ public class DefaultMetadata implements Metadata {
             name = method.getName().substring(3);
             name = name.substring(0,1).toLowerCase() + name.substring(1);
 
-            if (Metadata.class.isAssignableFrom(elementClass)) {
+            if (MetadataEntity.class.isAssignableFrom(elementClass)) {
                 entity = EntityImpl.getEntity(elementClass);
             }
         }
@@ -319,7 +315,7 @@ public class DefaultMetadata implements Metadata {
         /**
          * @see org.geotools.metadata.Metadata.Element#isMetadataEntity()
          */
-        public Entity getEntity() {
+        public EntityType getEntityType() {
             return entity;
         }
     }

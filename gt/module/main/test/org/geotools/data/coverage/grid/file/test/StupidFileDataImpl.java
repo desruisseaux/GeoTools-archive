@@ -6,7 +6,7 @@
  */
 package org.geotools.data.coverage.grid.file.test;
 
-import org.geotools.metadata.AbstractMetadata;
+import org.geotools.catalog.DefaultMetadataEntity;
 
 /**
  * @author jeichar
@@ -14,7 +14,7 @@ import org.geotools.metadata.AbstractMetadata;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class StupidFileDataImpl extends AbstractMetadata implements
+public class StupidFileDataImpl extends DefaultMetadataEntity implements
         StupidFileData {
 
     /* (non-Javadoc)
