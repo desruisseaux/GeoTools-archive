@@ -49,10 +49,10 @@ import org.geotools.styling.StyleBuilder;
  * @author Andrea Aime
  * @version $Id$
  */
-public class MapViewerOld {
+public class MapViewerTool {
     /** The class used for identifying for logging. */
     private static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.demo.gui.MapViewerOld");
+            "org.geotools.demo.gui.MapViewerTool");
 
     /** Translates between coordinate systems */
     private Adapters adapters = Adapters.getDefault();
@@ -66,7 +66,7 @@ public class MapViewerOld {
      * @param fc DOCUMENT ME!
      * @param style DOCUMENT ME!
      */
-    public MapViewerOld(FeatureCollection fc, Style style) {
+    public MapViewerTool(FeatureCollection fc, Style style) {
         initComponents(createMapPane(fc, style));
     }
 
@@ -146,8 +146,7 @@ public class MapViewerOld {
     public static void mapPane() throws Exception {
         // load data from file (USE SOMETHING ON YOUR LOCAL DISK)
         ShapefileDataStore sds = new ShapefileDataStore(new File(
-                    "/home/rschulz/GIS/spatial_data/shapefiles/bc.shp").toURL());
-        //"f:/work/pnnl/data.frame.zone.shp"
+                    "f:/work/pnnl/data.frame.zone.shp").toURL());
         FeatureCollection fc = sds.getFeatureSource(sds.getTypeNames()[0]).getFeatures().collection();
 
         // create the style
@@ -156,6 +155,6 @@ public class MapViewerOld {
                     Color.LIGHT_GRAY, Color.BLACK, 1));
 
         // show the map
-        new MapViewerOld(fc, simple); //.show();
+        new MapViewerTool(fc, simple); //.show();
     }
 }
