@@ -17,11 +17,9 @@
 package org.geotools.xml.wfs;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.wfs.Capability;
-import org.geotools.data.wfs.FeatureSetDescription;
-import org.geotools.data.wfs.WFSCapabilities;
-import org.geotools.data.wms.capabilities.MetadataURL;
-import org.geotools.data.wms.capabilities.Service;
+import org.geotools.data.ows.FeatureSetDescription;
+import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.ows.Service;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;

@@ -1,5 +1,5 @@
 
-package org.geotools.data.wfs;
+package org.geotools.data.ows;
 
 import java.util.HashMap;
 import java.util.Map;

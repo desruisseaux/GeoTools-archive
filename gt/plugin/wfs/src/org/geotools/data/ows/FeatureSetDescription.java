@@ -1,9 +1,7 @@
 
-package org.geotools.data.wfs;
+package org.geotools.data.ows;
 
 import java.util.List;
-
-import org.geotools.data.wms.capabilities.MetadataURL;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -30,7 +28,7 @@ public class FeatureSetDescription {
     private List keywords;
     private Envelope[] latLongBoundingBox;
     private int operations;
-    private MetadataURL[] metadataURL;
+//    private MetadataURL[] metadataURL;
     /**
      * @return Returns the abstracT.
      */
@@ -70,15 +68,15 @@ public class FeatureSetDescription {
     /**
      * @return Returns the metadataURL.
      */
-    public MetadataURL[] getMetadataURL() {
-        return metadataURL;
-    }
+//    public MetadataURL[] getMetadataURL() {
+//        return metadataURL;
+//    }
     /**
      * @param metadataURL The metadataURL to set.
      */
-    public void setMetadataURL(MetadataURL[] metadataURL) {
-        this.metadataURL = metadataURL;
-    }
+//    public void setMetadataURL(MetadataURL[] metadataURL) {
+//        this.metadataURL = metadataURL;
+//    }
     /**
      * @return Returns the name.
      */

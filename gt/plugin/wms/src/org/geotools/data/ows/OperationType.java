@@ -17,8 +17,6 @@
 package org.geotools.data.ows;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class OperationType {
 	private String[] formats;
