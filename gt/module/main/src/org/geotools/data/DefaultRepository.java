@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Jody Garnett
  */
-public class DefaultDataRepository implements Repository {	    
+public class DefaultRepository implements Repository {	    
 	
 	/** Map of DataStore by dataStoreId */
     protected SortedMap datastores = new TreeMap();
