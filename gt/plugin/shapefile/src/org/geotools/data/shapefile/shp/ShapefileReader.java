@@ -24,7 +24,7 @@ import java.nio.*;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.FileChannel;
 import java.util.*;
-import org.geotools.io.NIOBufferUtils;
+import org.geotools.resources.NIOUtilities;
 
 /**
  * The general use of this class is: <CODE><PRE>
@@ -219,8 +219,8 @@ public class ShapefileReader {
     if (channel.isOpen()) {
       channel.close();
     }
-    if(buffer instanceof MappedByteBuffer) {
-        NIOBufferUtils.clean(buffer);
+    if (buffer instanceof MappedByteBuffer) {
+      NIOUtilities.clean(buffer);
     }
     channel = null;
     header = null;

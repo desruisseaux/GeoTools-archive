@@ -32,6 +32,8 @@ import org.geotools.resources.cts.ResourceKeys;
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.spatialschema.geometry.geometry.Position;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
@@ -41,7 +43,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DirectPosition2D extends Point2D.Double implements DirectPosition {
+public class DirectPosition2D extends Point2D.Double implements DirectPosition, Position {
     /**
      * The coordinate reference system for this position;
      */
@@ -171,6 +173,26 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition {
         setCoordinateReferenceSystem(position.getCoordinateReferenceSystem());
         x = position.getOrdinate(0);
         y = position.getOrdinate(1);
+    }
+
+    /**
+     * Returns the direct position, which is always <code>this</code>.
+     * This method is implemented in order to meet the {@link Position} contract.
+     *
+     * @return Always <code>this</code>.
+     */
+    public org.opengis.spatialschema.geometry.DirectPosition getDirect() {
+        return this;
+    }
+    
+    /**
+     * Returns the point, which is <code>null</code>.
+     * This method is implemented in order to meet the {@link Position} contract.
+     *
+     * @return Always <code>null</code>.
+     */
+    public Point getIndirect() {
+        return null;
     }
     
     /**

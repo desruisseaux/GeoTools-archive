@@ -10,7 +10,7 @@ import com.vividsolutions.jts.geom.*;
 import java.io.*;
 import java.util.*;
 import org.geotools.feature.*;
-import org.geotools.io.NIOBufferUtils;
+import org.geotools.resources.NIOUtilities;
 
 /**
  * PickledFeatureProtocol encapsulates the ability to read and write a
@@ -454,8 +454,8 @@ public abstract class PickledFeatureProtocol {
     }
     
     public void close() throws IOException {
-      NIOBufferUtils.clean(featureBuffer);
-      NIOBufferUtils.clean(schemaBuffer);
+      NIOUtilities.clean(featureBuffer);
+      NIOUtilities.clean(schemaBuffer);
       super.close();
     }
   }

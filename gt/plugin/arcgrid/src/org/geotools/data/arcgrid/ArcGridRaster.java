@@ -35,7 +35,7 @@ import java.nio.charset.CharsetDecoder;
 
 import javax.media.jai.RasterFactory;
 
-import org.geotools.io.NIOBufferUtils;
+import org.geotools.resources.NIOUtilities;
 
 
 /**
@@ -468,7 +468,7 @@ public class ArcGridRaster {
         public void close() throws IOException {
             if(channel != null)
                 channel.close();
-            NIOBufferUtils.clean(map);
+            NIOUtilities.clean(map);
             channel = null;
             map = null;
         }

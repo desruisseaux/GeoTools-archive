@@ -32,6 +32,8 @@ import org.geotools.resources.cts.ResourceKeys;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.spatialschema.geometry.geometry.Position;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
@@ -50,7 +52,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *
  * @see java.awt.geom.Point2D
  */
-public class DirectPosition implements org.opengis.spatialschema.geometry.DirectPosition, Serializable {
+public class DirectPosition implements org.opengis.spatialschema.geometry.DirectPosition,
+                                       Position, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -248,6 +252,26 @@ public class DirectPosition implements org.opengis.spatialschema.geometry.Direct
         }
         ordinates[0] = point.getX();
         ordinates[1] = point.getY();
+    }
+
+    /**
+     * Returns the direct position, which is always <code>this</code>.
+     * This method is implemented in order to meet the {@link Position} contract.
+     *
+     * @return Always <code>this</code>.
+     */
+    public org.opengis.spatialschema.geometry.DirectPosition getDirect() {
+        return this;
+    }
+    
+    /**
+     * Returns the point, which is <code>null</code>.
+     * This method is implemented in order to meet the {@link Position} contract.
+     *
+     * @return Always <code>null</code>.
+     */
+    public Point getIndirect() {
+        return null;
     }
     
     /**

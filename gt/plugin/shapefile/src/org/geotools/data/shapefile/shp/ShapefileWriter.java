@@ -26,7 +26,7 @@ import java.nio.channels.FileChannel;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
-import org.geotools.io.NIOBufferUtils;
+import org.geotools.resources.NIOUtilities;
 
 /**
  * ShapefileWriter allows for the storage of geometries in esris shp format.
@@ -217,11 +217,11 @@ public class ShapefileWriter {
     shxChannel = null;
     handler = null;
     if(indexBuffer instanceof MappedByteBuffer) {
-        NIOBufferUtils.clean(indexBuffer);
+        NIOUtilities.clean(indexBuffer);
     }
-	if(indexBuffer instanceof MappedByteBuffer) {
-        NIOBufferUtils.clean(shapeBuffer);
-	}
+    if(indexBuffer instanceof MappedByteBuffer) {
+        NIOUtilities.clean(shapeBuffer);
+    }
     indexBuffer = null;
     shapeBuffer = null;
   }
