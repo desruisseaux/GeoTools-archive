@@ -238,7 +238,9 @@ public class TransverseMercator extends MapProjection {
      * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    public TransverseMercator(final ParameterValueGroup parameters, final Collection expected) {
+    TransverseMercator(final ParameterValueGroup parameters, final Collection expected) 
+            throws ParameterNotFoundException
+    {
         //Fetch parameters 
         super(parameters, expected);
         
@@ -351,12 +353,12 @@ public class TransverseMercator extends MapProjection {
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    private static final class Spherical extends Mercator {
+    private static final class Spherical extends TransverseMercator {
         /**
          * Construct a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
-         * @param  The expected parameter descriptors.
+         * @param  expected The expected parameter descriptors.
          * @throws ParameterNotFoundException if a mandatory parameter is missing.
          */
         protected Spherical(final ParameterValueGroup parameters, final Collection expected)
