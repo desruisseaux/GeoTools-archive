@@ -194,7 +194,7 @@ public class ArcGridReader implements GridCoverageReader {
             GRASS = false;
         }
         else {
-            compress = parameters.getValue( "Compress" ).booleanValue();
+            compress = parameters.getValue( "Compressed" ).booleanValue();
             GRASS = parameters.getValue( "GRASS" ).booleanValue();
         }              
         if ( compress )
