@@ -57,8 +57,17 @@ import org.geotools.xml.schema.Type;
  */
 public class FilterSchema implements Schema {
     
-    public static final String NAMESPACE = "http://www.opengis.net/ogc";
-    
+    public static final URI NAMESPACE = makeURI("http://www.opengis.net/ogc");
+
+    // convinience method to deal with the URISyntaxException
+    private static URI makeURI(String s) {
+        try {
+            return new URI(s);
+        } catch (URISyntaxException e) {
+            // do nothing
+            return null;
+        }
+    }
     private static final FilterSchema instance = new FilterSchema();
 
     public static FilterSchema getInstance(){return instance;}
@@ -249,11 +258,7 @@ public class FilterSchema implements Schema {
      * @see org.geotools.xml.schema.Schema#getURI()
      */
     public URI getURI() {
-        try {
-            return new URI(NAMESPACE);
-        } catch (URISyntaxException e) {
-            return null;
-        }
+            return NAMESPACE;
     }
 
     /**
@@ -273,7 +278,7 @@ public class FilterSchema implements Schema {
     /**
      * @see org.geotools.xml.schema.Schema#getTargetNamespace()
      */
-    public String getTargetNamespace() {
+    public URI getTargetNamespace() {
         return NAMESPACE;
     }
 
@@ -446,7 +451,7 @@ public class FilterSchema implements Schema {
         /**
          * @see org.geotools.xml.schema.Element#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return NAMESPACE;
         }
 
@@ -551,7 +556,7 @@ public class FilterSchema implements Schema {
         /**
          * @see org.geotools.xml.schema.Type#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return FilterSchema.NAMESPACE;
         }
         /**

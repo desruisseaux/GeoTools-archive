@@ -466,7 +466,7 @@ public class FilterOpsComplexTypes {
             AttributesImpl att = new AttributesImpl();
             att.addAttribute(null,null,null,null,null);
             for(int i=0;i<fids.length;i++){
-            	att.setAttribute(0,element.getNamespace(),attrs[0].getName(),null,"anyUri",fids[0]);
+            	att.setAttribute(0,element.getNamespace().toString(),attrs[0].getName(),null,"anyUri",fids[0]);
             	output.element(element.getNamespace(),element.getName(),att);
             }
         }
@@ -647,9 +647,9 @@ public class FilterOpsComplexTypes {
             LikeFilter lf = (LikeFilter)value;
             
             AttributesImpl at = new AttributesImpl();
-            at.addAttribute(FilterSchema.NAMESPACE,"wildCard",null,"string",lf.getWildcardMulti());
-            at.addAttribute(FilterSchema.NAMESPACE,"singleChar",null,"string",lf.getWildcardSingle());
-            at.addAttribute(FilterSchema.NAMESPACE,"escape",null,"string",lf.getEscape());
+            at.addAttribute(FilterSchema.NAMESPACE.toString(),"wildCard",null,"string",lf.getWildcardMulti());
+            at.addAttribute(FilterSchema.NAMESPACE.toString(),"singleChar",null,"string",lf.getWildcardSingle());
+            at.addAttribute(FilterSchema.NAMESPACE.toString(),"escape",null,"string",lf.getEscape());
             
             output.startElement(element.getNamespace(),element.getName(),at);
             elems[0].getType().encode(elems[0],lf.getPattern(),output,hints); // PropertyName
@@ -1274,9 +1274,9 @@ public class FilterOpsComplexTypes {
             
             AttributesImpl ai = new AttributesImpl();
             if(lf.getLeftGeometry().getType() == org.geotools.filter.ExpressionType.LITERAL_GEOMETRY)
-                ai.addAttribute(getNamespace(),attrs[0].getName(),null,"string", ((Geometry)lf.getLeftGeometry()).getUserData().toString());
+                ai.addAttribute(getNamespace().toString(),attrs[0].getName(),null,"string", ((Geometry)lf.getLeftGeometry()).getUserData().toString());
             else
-                ai.addAttribute(getNamespace(),attrs[0].getName(),null,"string", ((Geometry)lf.getRightGeometry()).getUserData().toString());
+                ai.addAttribute(getNamespace().toString(),attrs[0].getName(),null,"string", ((Geometry)lf.getRightGeometry()).getUserData().toString());
             output.startElement(element.getNamespace(),element.getName(),null);
             output.characters(""+lf.getDistance());
             output.endElement(element.getNamespace(),element.getName());

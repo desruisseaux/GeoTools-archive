@@ -39,6 +39,7 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
@@ -162,12 +163,12 @@ public class WFSBasicComplexTypes {
             Map hints) throws IOException, OperationNotSupportedException {
             if(canEncode(element,value,hints)){
                 AttributesImpl attributes = new AttributesImpl();
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",attrs[0].getFixed());
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",attrs[1].getFixed());
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[2].getName(),null,"string",attrs[2].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string",attrs[0].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",attrs[1].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[2].getName(),null,"string",attrs[2].getFixed());
                 Query query = (Query)value;
                 if(query.getMaxFeatures()!=Query.DEFAULT_MAX)
-                    attributes.addAttribute(WFSSchema.NAMESPACE,elems[3].getName(),null,"integer",""+query.getMaxFeatures());
+                    attributes.addAttribute(WFSSchema.NAMESPACE.toString(),elems[3].getName(),null,"integer",""+query.getMaxFeatures());
                 
                 output.startElement(element.getNamespace(),element.getName(),attributes);
                 elems[0].getType().encode(elems[0],value,output,hints);
@@ -286,9 +287,9 @@ public class WFSBasicComplexTypes {
             Map hints) throws IOException, OperationNotSupportedException {
             if(canEncode(element,value,hints)){
                 AttributesImpl attributes = new AttributesImpl();
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",attrs[0].getFixed());
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",attrs[1].getFixed());
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[2].getName(),null,"string",attrs[2].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string",attrs[0].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",attrs[1].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[2].getName(),null,"string",attrs[2].getFixed());
                 
                 output.startElement(element.getNamespace(),element.getName(),attributes);
                 String[] strs = (String[])value;
@@ -395,8 +396,8 @@ public class WFSBasicComplexTypes {
             Map hints) throws IOException, OperationNotSupportedException {
 
                 AttributesImpl attributes = new AttributesImpl();
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",attrs[0].getFixed());
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",attrs[1].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string",attrs[0].getFixed());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",attrs[1].getFixed());
                 
                 output.element(element.getNamespace(),element.getName(),attributes);
         }
@@ -413,13 +414,13 @@ public class WFSBasicComplexTypes {
         private static Element[] elems = new Element[]{
                 // PropertyName -- used to limit attributes
                 new WFSElement(FilterSchema.getInstance().getElements()[34],0,Integer.MAX_VALUE){
-                    public String getNamespace(){
+                    public URI getNamespace(){
                         return FilterSchema.NAMESPACE;
                     }
                 },
                 // Filter -- used to limit features
                 new WFSElement(FilterSchema.getInstance().getElements()[2],0,Integer.MAX_VALUE){
-                    public String getNamespace(){
+                    public URI getNamespace(){
                         return FilterSchema.NAMESPACE;
                     }
                 }
@@ -504,13 +505,13 @@ public class WFSBasicComplexTypes {
                 AttributesImpl attributes = new AttributesImpl();
                 
                 if(query.getHandle()!=null && !"".equals(query.getHandle()))
-                    attributes.addAttribute(WFSSchema.NAMESPACE,attrs[0].getName(),null,"string",query.getHandle());
+                    attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string",query.getHandle());
                 
                 // TODO this is a QName I think ... check it out
-                attributes.addAttribute(WFSSchema.NAMESPACE,attrs[1].getName(),null,"string",query.getTypeName());
+                attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",query.getTypeName());
                 
                 if(query.getVersion()!=null && !"".equals(query.getVersion()))
-                    attributes.addAttribute(WFSSchema.NAMESPACE,attrs[2].getName(),null,"string",query.getVersion());
+                    attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[2].getName(),null,"string",query.getVersion());
                 
                 
                 output.startElement(element.getNamespace(),element.getName(),attributes);
@@ -576,7 +577,7 @@ public class WFSBasicComplexTypes {
             String lock = null;
             lock = attrs.getValue("","lockID");
             if(lock == null || "".equals(lock))
-                lock = attrs.getValue(WFSSchema.NAMESPACE,"lockID");
+                lock = attrs.getValue(WFSSchema.NAMESPACE.toString(),"lockID");
             
             if(hints!=null && lock!=null && (!"".equals(lock)))
                 hints.put(LOCK_KEY,lock);

@@ -748,7 +748,7 @@ public class WFSCapabilitiesComplexTypes {
             t = attrs.getValue("", "minx");
 
             if ((t == null) || "".equals(t)) {
-                t = attrs.getValue(WFSSchema.NAMESPACE, "minx");
+                t = attrs.getValue(WFSSchema.NAMESPACE.toString(), "minx");
             }
 
             minx = Double.parseDouble(t);
@@ -756,7 +756,7 @@ public class WFSCapabilitiesComplexTypes {
             t = attrs.getValue("", "maxx");
 
             if ((t == null) || "".equals(t)) {
-                t = attrs.getValue(WFSSchema.NAMESPACE, "maxx");
+                t = attrs.getValue(WFSSchema.NAMESPACE.toString(), "maxx");
             }
 
             maxx = Double.parseDouble(t);
@@ -764,7 +764,7 @@ public class WFSCapabilitiesComplexTypes {
             t = attrs.getValue("", "miny");
 
             if ((t == null) || "".equals(t)) {
-                t = attrs.getValue(WFSSchema.NAMESPACE, "miny");
+                t = attrs.getValue(WFSSchema.NAMESPACE.toString(), "miny");
             }
 
             miny = Double.parseDouble(t);
@@ -772,7 +772,7 @@ public class WFSCapabilitiesComplexTypes {
             t = attrs.getValue("", "maxy");
 
             if ((t == null) || "".equals(t)) {
-                t = attrs.getValue(WFSSchema.NAMESPACE, "maxy");
+                t = attrs.getValue(WFSSchema.NAMESPACE.toString(), "maxy");
             }
 
             maxy = Double.parseDouble(t);
@@ -873,7 +873,7 @@ public class WFSCapabilitiesComplexTypes {
             String s = attrs.getValue("", "onlineResource");
 
             if ((s == null) || "".equals(s)) {
-                s = attrs.getValue(WFSSchema.NAMESPACE, "onlineResource");
+                s = attrs.getValue(WFSSchema.NAMESPACE.toString(), "onlineResource");
             }
 
             try {
@@ -1101,7 +1101,7 @@ public class WFSCapabilitiesComplexTypes {
             String s = attrs.getValue("", "onlineResource");
 
             if ((s == null) || "".equals(s)) {
-                s = attrs.getValue(WFSSchema.NAMESPACE, "onlineResource");
+                s = attrs.getValue(WFSSchema.NAMESPACE.toString(), "onlineResource");
             }
 
             try {
@@ -2298,7 +2298,7 @@ public class WFSCapabilitiesComplexTypes {
                     /**
                      * @see schema.Element#getNamespace()
                      */
-                    public String getNamespace() {
+                    public URI getNamespace() {
                         return FilterSchema.NAMESPACE;
                     }
                 }

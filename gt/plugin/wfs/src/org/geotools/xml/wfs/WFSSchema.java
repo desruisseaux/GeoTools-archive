@@ -90,7 +90,17 @@ public class WFSSchema implements Schema {
     private static Schema instance = new WFSSchema();
 
     /** WFS target namespace */
-    public static String NAMESPACE = "http://www.opengis.net/wfs";
+    public static URI NAMESPACE = makeURI("http://www.opengis.net/wfs");
+
+    // convinience method to deal with the URISyntaxException
+    private static URI makeURI(String s) {
+        try {
+            return new URI(s);
+        } catch (URISyntaxException e) {
+            // do nothing
+            return null;
+        }
+    }
     static final Element[] elements = new Element[] {
             new WFSElement("GetCapabilities", GetCapabilitiesType.getInstance()),
             new WFSElement("DescribeFeatureType",
@@ -273,7 +283,7 @@ public class WFSSchema implements Schema {
     /**
      * @see org.geotools.xml.schema.Schema#getTargetNamespace()
      */
-    public String getTargetNamespace() {
+    public URI getTargetNamespace() {
         return NAMESPACE;
     }
 
@@ -371,7 +381,7 @@ public class WFSSchema implements Schema {
         /**
          * @see schema.ComplexType#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return WFSSchema.NAMESPACE;
         }
 
@@ -625,7 +635,7 @@ public class WFSSchema implements Schema {
         /**
          * @see schema.Element#getNamespace()
          */
-        public String getNamespace() {
+        public URI getNamespace() {
             return WFSSchema.NAMESPACE;
         }
     }
