@@ -22,6 +22,7 @@ public class WFSCapabilities {
     private OperationType getFeature;
     private OperationType getFeatureWithLock;
     private OperationType transaction;
+    private OperationType lockFeature;
     
     private String vendorSpecificCapabilities;
 //    private FilterCapabilities filterCapabilities;
@@ -78,61 +79,73 @@ public void setFilterCapabilities(Object filterCapabilities) {
     /**
      * @return Returns the describeFeatureType.
      */
-    OperationType getDescribeFeatureType() {
+    public OperationType getDescribeFeatureType() {
         return describeFeatureType;
     }
     /**
      * @param describeFeatureType The describeFeatureType to set.
      */
-    void setDescribeFeatureType(OperationType describeFeatureType) {
+    public void setDescribeFeatureType(OperationType describeFeatureType) {
         this.describeFeatureType = describeFeatureType;
     }
     /**
      * @return Returns the getCapabilities.
      */
-    OperationType getGetCapabilities() {
+    public OperationType getGetCapabilities() {
         return getCapabilities;
     }
     /**
      * @param getCapabilities The getCapabilities to set.
      */
-    void setGetCapabilities(OperationType getCapabilities) {
+    public void setGetCapabilities(OperationType getCapabilities) {
         this.getCapabilities = getCapabilities;
     }
     /**
      * @return Returns the getFeature.
      */
-    OperationType getGetFeature() {
+    public OperationType getGetFeature() {
         return getFeature;
     }
     /**
      * @param getFeature The getFeature to set.
      */
-    void setGetFeature(OperationType getFeature) {
+    public void setGetFeature(OperationType getFeature) {
         this.getFeature = getFeature;
     }
     /**
      * @return Returns the getFeatureWithLock.
      */
-    OperationType getGetFeatureWithLock() {
+    public OperationType getGetFeatureWithLock() {
         return getFeatureWithLock;
     }
     /**
      * @param getFeatureWithLock The getFeatureWithLock to set.
      */
-    void setGetFeatureWithLock(OperationType getFeatureWithLock) {
+    public void setGetFeatureWithLock(OperationType getFeatureWithLock) {
         this.getFeatureWithLock = getFeatureWithLock;
     }
     /**
      * @return Returns the transaction.
      */
-    OperationType getTransaction() {
+    public OperationType getTransaction() {
         return transaction;
     }
     /**
      * @param transaction The transaction to set.
      */
-    void setTransaction(OperationType transaction) {
+    public void setTransaction(OperationType transaction) {
         this.transaction = transaction;
+    }
+    /**
+     * @return Returns the lockFeature.
+     */
+    public OperationType getLockFeature() {
+        return lockFeature;
+    }
+    /**
+     * @param lockFeature The lockFeature to set.
+     */
+    public void setLockFeature(OperationType lockFeature) {
+        this.lockFeature = lockFeature;
     }
 }

@@ -17,7 +17,6 @@
 package org.geotools.data.ows;
 
 import java.net.URL;
-import java.util.List;
 
 /**
  * @author rgould

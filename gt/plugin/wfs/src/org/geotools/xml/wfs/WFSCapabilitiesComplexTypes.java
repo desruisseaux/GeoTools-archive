@@ -18,6 +18,7 @@ package org.geotools.xml.wfs;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.ows.FeatureSetDescription;
+import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.data.ows.Service;
 import org.geotools.xml.PrintHandler;
@@ -578,39 +579,40 @@ public class WFSCapabilitiesComplexTypes {
                     "Should only have one child value -- the String value of inline text");
             }
 
-            MetadataURL mdurl = new MetadataURL();
+//            MetadataURL mdurl = new MetadataURL();
 
-            String t = "";
+//            String t = "";
+//
+//            t = attrs.getValue("", "type");
+//
+//            if ((t == null) || "".equals(t)) {
+//                t = attrs.getValue(WFSSchema.NAMESPACE, "type");
+//            }
+//
+//            mdurl.setType(MetadataURL.parseType(t));
 
-            t = attrs.getValue("", "type");
+//            t = attrs.getValue("", "format");
+//
+//            if ((t == null) || "".equals(t)) {
+//                t = attrs.getValue(WFSSchema.NAMESPACE, "format");
+//            }
+//
+//            mdurl.setFormat(t);
+//
+//            t = (String) value[0].getValue();
+//
+//            URL url = null;
+//
+//            try {
+//                url = new URL(t);
+//            } catch (MalformedURLException e) {
+//                throw new SAXException(e);
+//            }
+//
+//            mdurl.setOnlineResource(url);
 
-            if ((t == null) || "".equals(t)) {
-                t = attrs.getValue(WFSSchema.NAMESPACE, "type");
-            }
-
-            mdurl.setType(MetadataURL.parseType(t));
-
-            t = attrs.getValue("", "format");
-
-            if ((t == null) || "".equals(t)) {
-                t = attrs.getValue(WFSSchema.NAMESPACE, "format");
-            }
-
-            mdurl.setFormat(t);
-
-            t = (String) value[0].getValue();
-
-            URL url = null;
-
-            try {
-                url = new URL(t);
-            } catch (MalformedURLException e) {
-                throw new SAXException(e);
-            }
-
-            mdurl.setOnlineResource(url);
-
-            return mdurl;
+//            return mdurl;
+            return null;
         }
 
         /**
@@ -624,7 +626,8 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return MetadataURL.class;
+//            return MetadataURL.class;
+            return null;
         }
 
         /**
@@ -973,7 +976,7 @@ public class WFSCapabilitiesComplexTypes {
                     "Must have atleast one http type defined.");
             }
 
-            Capability c = new Capability();
+            OperationType c = new OperationType();
 
             for (int i = 0; i < value.length; i++) {
                 if ((value[i].getElement() != null)
@@ -998,7 +1001,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability.class;
+            return OperationType.class;
         }
 
         /**
@@ -1209,7 +1212,7 @@ public class WFSCapabilitiesComplexTypes {
 
             FeatureSetDescription fsd = new FeatureSetDescription();
             List llbb = new LinkedList();
-            List mdurl = new LinkedList();
+//            List mdurl = new LinkedList();
 
             for (int i = 0; i < value.length; i++) {
                 if (value[i].getElement() == null) {
@@ -1260,8 +1263,8 @@ public class WFSCapabilitiesComplexTypes {
                                             if (elements[7].getName().equals(value[i].getElement()
                                                                                          .getName())) {
                                                 // MetadataURL
-                                                mdurl.add((MetadataURL) value[i]
-                                                    .getValue());
+//                                                mdurl.add((MetadataURL) value[i]
+//                                                    .getValue());
                                             } else {
                                                 // error
                                                 throw new SAXException(
@@ -1286,10 +1289,10 @@ public class WFSCapabilitiesComplexTypes {
                         new Envelope[llbb.size()]));
             }
 
-            if (mdurl.size() > 0) {
-                fsd.setMetadataURL((MetadataURL[]) mdurl.toArray(
-                        new MetadataURL[mdurl.size()]));
-            }
+//            if (mdurl.size() > 0) {
+//                fsd.setMetadataURL((MetadataURL[]) mdurl.toArray(
+//                        new MetadataURL[mdurl.size()]));
+//            }
 
             if ((fsd.getName() == null) || (fsd.getSRS() == null)
                     || (llbb.size() < 1)) {
@@ -1379,7 +1382,7 @@ public class WFSCapabilitiesComplexTypes {
                 throw new SAXException("Wrong number of elements for DCPType");
             }
 
-            return (Capability) value[0].getValue();
+            return (OperationType) value[0].getValue();
         }
 
         /**
@@ -1407,7 +1410,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability.class;
+            return OperationType.class;
         }
 
         /**
@@ -1492,11 +1495,11 @@ public class WFSCapabilitiesComplexTypes {
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-            Capability[] c = new Capability[value.length];
+            OperationType[] c = new OperationType[value.length];
 
             for (int i = 0; i < value.length; i++) {
-                c[i] = (Capability) value[i];
-                c[i].setType(Capability.LOCK_FEATURE);
+                c[i] = (OperationType) value[i];
+//                c[i].setType(OperationType.LOCK_FEATURE);
             }
 
             return c;
@@ -1513,7 +1516,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability[].class;
+            return OperationType[].class;
         }
 
         /**
@@ -1619,12 +1622,170 @@ public class WFSCapabilitiesComplexTypes {
                     "We need atleast one value to parse a wfs:RequestType");
             }
 
-            //            Capability[] result = new Capability[value.length];
-            List result = new LinkedList();
+            OperationType[] result = new OperationType[6];
 
             for (int i = 0; i < value.length; i++) {
-                result.add(Arrays.asList((Capability[]) value[i].getValue()));
-            }
+                OperationType[] t = (OperationType[])value[i].getValue();
+
+                if(t!=null){
+                if(elements[0].getName().equals(value[i].getElement().getName())){
+                    if(result[0] == null){
+                        result[0] = new OperationType();
+                    }
+                    // merge them
+                    for(int j=0;j<t.length;j++){
+                        if(result[0].getGet() == null && t[j].getGet()!=null)
+                            result[0].setGet(t[j].getGet());
+                        if(result[0].getPost() == null && t[j].getPost()!=null)
+                            result[0].setPost(t[j].getGet());
+                        if(t[j].getFormats()!=null){
+                            if(result[0].getFormats() == null){
+                                result[0].setFormats(t[j].getFormats());
+                        }else{
+                                String[] st = result[0].getFormats();
+                                String[] nstr = new String[st.length+t[j].getFormats().length];
+                                for(int k=0;k<st.length;k++)
+                                    nstr[k] = st[k];
+                                for(int k=0;k<t[j].getFormats().length;k++)
+                                    nstr[st.length+k] = t[j].getFormats()[k];
+                            }
+                        }
+                    }
+                }else{
+                    if(elements[1].getName().equals(value[i].getElement().getName())){
+
+                        if(result[1] == null){
+                            result[1] = new OperationType();
+                        }
+                        // merge them
+                        for(int j=0;j<t.length;j++){
+                            if(result[1].getGet() == null && t[j].getGet()!=null)
+                                result[1].setGet(t[j].getGet());
+                            if(result[1].getPost() == null && t[j].getPost()!=null)
+                                result[1].setPost(t[j].getGet());
+                            if(t[j].getFormats()!=null){
+                                if(result[1].getFormats() == null){
+                                    result[1].setFormats(t[j].getFormats());
+                            }else{
+                                    String[] st = result[1].getFormats();
+                                    String[] nstr = new String[st.length+t[j].getFormats().length];
+                                    for(int k=0;k<st.length;k++)
+                                        nstr[k] = st[k];
+                                    for(int k=0;k<t[j].getFormats().length;k++)
+                                        nstr[st.length+k] = t[j].getFormats()[k];
+                                }
+                            }
+                        }
+                    }else{
+                        if(elements[2].getName().equals(value[i].getElement().getName())){
+
+                            if(result[2] == null){
+                                result[2] = new OperationType();
+                            }
+                            // merge them
+                            for(int j=0;j<t.length;j++){
+                                if(result[2].getGet() == null && t[j].getGet()!=null)
+                                    result[2].setGet(t[j].getGet());
+                                if(result[2].getPost() == null && t[j].getPost()!=null)
+                                    result[2].setPost(t[j].getGet());
+                                if(t[j].getFormats()!=null){
+                                    if(result[2].getFormats() == null){
+                                        result[2].setFormats(t[j].getFormats());
+                                }else{
+                                        String[] st = result[2].getFormats();
+                                        String[] nstr = new String[st.length+t[j].getFormats().length];
+                                        for(int k=0;k<st.length;k++)
+                                            nstr[k] = st[k];
+                                        for(int k=0;k<t[j].getFormats().length;k++)
+                                            nstr[st.length+k] = t[j].getFormats()[k];
+                                    }
+                                }
+                            }
+                        }else{
+                            if(elements[3].getName().equals(value[i].getElement().getName())){
+
+                                if(result[3] == null){
+                                    result[3] = new OperationType();
+                                }
+                                // merge them
+                                for(int j=0;j<t.length;j++){
+                                    if(result[3].getGet() == null && t[j].getGet()!=null)
+                                        result[3].setGet(t[j].getGet());
+                                    if(result[3].getPost() == null && t[j].getPost()!=null)
+                                        result[3].setPost(t[j].getGet());
+                                    if(t[j].getFormats()!=null){
+                                        if(result[3].getFormats() == null){
+                                            result[3].setFormats(t[j].getFormats());
+                                    }else{
+                                            String[] st = result[3].getFormats();
+                                            String[] nstr = new String[st.length+t[j].getFormats().length];
+                                            for(int k=0;k<st.length;k++)
+                                                nstr[k] = st[k];
+                                            for(int k=0;k<t[j].getFormats().length;k++)
+                                                nstr[st.length+k] = t[j].getFormats()[k];
+                                        }
+                                    }
+                                }
+                            }else{
+                                if(elements[4].getName().equals(value[i].getElement().getName())){
+
+                                    if(result[4] == null){
+                                        result[4] = new OperationType();
+                                    }
+                                    // merge them
+                                    for(int j=0;j<t.length;j++){
+                                        if(result[4].getGet() == null && t[j].getGet()!=null)
+                                            result[4].setGet(t[j].getGet());
+                                        if(result[4].getPost() == null && t[j].getPost()!=null)
+                                            result[4].setPost(t[j].getGet());
+                                        if(t[j].getFormats()!=null){
+                                            if(result[4].getFormats() == null){
+                                                result[4].setFormats(t[j].getFormats());
+                                        }else{
+                                                String[] st = result[4].getFormats();
+                                                String[] nstr = new String[st.length+t[j].getFormats().length];
+                                                for(int k=0;k<st.length;k++)
+                                                    nstr[k] = st[k];
+                                                for(int k=0;k<t[j].getFormats().length;k++)
+                                                    nstr[st.length+k] = t[j].getFormats()[k];
+                                            }
+                                        }
+                                    }
+                                }else{
+                                    if(elements[5].getName().equals(value[i].getElement().getName())){
+
+                                        if(result[5] == null){
+                                            result[5] = new OperationType();
+                                        }
+                                        // merge them
+                                        for(int j=0;j<t.length;j++){
+                                            if(result[5].getGet() == null && t[j].getGet()!=null)
+                                                result[5].setGet(t[j].getGet());
+                                            if(result[5].getPost() == null && t[j].getPost()!=null)
+                                                result[5].setPost(t[j].getGet());
+                                            if(t[j].getFormats()!=null){
+                                                if(result[5].getFormats() == null){
+                                                    result[5].setFormats(t[j].getFormats());
+                                            }else{
+                                                    String[] st = result[5].getFormats();
+                                                    String[] nstr = new String[st.length+t[j].getFormats().length];
+                                                    for(int k=0;k<st.length;k++)
+                                                        nstr[k] = st[k];
+                                                    for(int k=0;k<t[j].getFormats().length;k++)
+                                                        nstr[st.length+k] = t[j].getFormats()[k];
+                                                }
+                                            }
+                                        }
+                                    }else{
+                                        // error
+                                        throw new SAXException("Unknown child element "+value[i].getElement().getName()+" found in RequestType");
+                                    }   
+                                }   
+                            }   
+                        }   
+                    }    
+                }
+            }}
 
             return result;
         }
@@ -1640,7 +1801,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability[].class;
+            return OperationType[].class;
         }
 
         /**
@@ -1731,7 +1892,7 @@ public class WFSCapabilitiesComplexTypes {
                     "Internal error, ElementValues require an associated Element.");
             }
 
-            Service service = new Service("", "", null);
+            Service service = new Service();
 
             for (int i = 0; i < value.length; i++) {
 //System.out.println(value[i].getElement().getName());
@@ -1748,8 +1909,8 @@ public class WFSCapabilitiesComplexTypes {
                 }
 
                 if (elements[3].getName().equals(value[i].getElement().getName())) {
-                    service.setKeywordList(Arrays.asList(((String) value[i]
-                            .getValue()).split(" ")));
+                    service.setKeywordList(((String) value[i]
+                            .getValue()).split(" "));
                 }
 
                 if (elements[4].getName().equals(value[i].getElement().getName())) {
@@ -1761,13 +1922,13 @@ public class WFSCapabilitiesComplexTypes {
                     }
                 }
 
-                if (elements[5].getName().equals(value[i].getElement().getName())) {
-                    service.setFees((String) value[i].getValue());
-                }
+//                if (elements[5].getName().equals(value[i].getElement().getName())) {
+//                    service.setFees((String) value[i].getValue());
+//                }
 
-                if (elements[6].getName().equals(value[i].getElement().getName())) {
-                    service.setAccessConstraints((String) value[i].getValue());
-                }
+//                if (elements[6].getName().equals(value[i].getElement().getName())) {
+//                    service.setAccessConstraints((String) value[i].getValue());
+//                }
             }
 
             // check the required elements 
@@ -1909,17 +2070,17 @@ public class WFSCapabilitiesComplexTypes {
                 }
             }
 
-            FeatureSetDescription[] fsd = new FeatureSetDescription[fts.size()];
+//            FeatureSetDescription[] fsd = new FeatureSetDescription[fts.size()];
+//
+//            for (int i = 0; i < fsd.length; i++) {
+//                fsd[i] = (FeatureSetDescription) fts.get(i);
+//
+//                if (fsd[i].getOperations() == FeatureSetDescription.NO_OPERATION) {
+//                    fsd[i].setOperations(operations);
+//                }
+//            }
 
-            for (int i = 0; i < fsd.length; i++) {
-                fsd[i] = (FeatureSetDescription) fts.get(i);
-
-                if (fsd[i].getOperations() == FeatureSetDescription.NO_OPERATION) {
-                    fsd[i].setOperations(operations);
-                }
-            }
-
-            return fsd;
+            return fts;
         }
 
         /**
@@ -2040,7 +2201,7 @@ System.out.println("Looking for : "+name);
             for (int i = 0; i < value.length; i++) {
                 if (elements[0].getName().equals(value[i].getElement().getType()
                                                              .getName())) {
-                    capab[1] = (Capability[]) value[i].getValue();
+                    capab[1] = (OperationType[]) value[i].getValue();
                 }
 
                 if (elements[1].getName().equals(value[i].getElement().getType()
@@ -2252,12 +2413,20 @@ System.out.println("Looking for : "+name);
                         }
 
                         result.setVendorSpecificCapabilities((String) temp[0]);
-                        result.setCapabilities((Capability[]) temp[1]);
+                        OperationType[] tmp = (OperationType[])temp[1];
+                        if(tmp!=null){
+                            result.setGetCapabilities(tmp[0]);
+                            result.setDescribeFeatureType(tmp[1]);
+                            result.setTransaction(tmp[2]);
+                            result.setGetFeature(tmp[3]);
+                            result.setGetFeatureWithLock(tmp[4]);
+                            result.setLockFeature(tmp[5]);
+                        }
                     } else {
                         if (elements[2].getName().equals(value[i].getElement()
                                                                      .getName())) {
                             // FeatureTypeList
-                            result.setFeatureTypes((FeatureSetDescription[]) value[i]
+                            result.setFeatureTypes((List) value[i]
                                 .getValue());
                         } else {
                             if (elements[3].getName().equals(value[i].getElement()
@@ -2345,21 +2514,6 @@ System.out.println("Looking for : "+name);
                 throw new SAXException(
                     "Invalid inputs for parsing a GetCapabilitiesType");
             }
-//
-//            if (value.length < 1) {
-//                throw new SAXException(
-//                    "Invalid number of inputs for parsing a GetCapabilitiesType");
-//            }
-//
-//            // TODO merge one with only post, and one with only get?
-//            Capability[] c = new Capability[value.length];
-//
-//            for (int i = 0; i < value.length; i++) {
-//                c[i] = (Capability) value[i];
-//                c[i].setType(Capability.GET_CAPABILITIES);
-//            }
-//
-//            return c;
 
             if (value.length < 2) {
                 throw new SAXException(
@@ -2367,7 +2521,7 @@ System.out.println("Looking for : "+name);
             }
 
             // TODO merge one with only post, and one with only get?
-            Capability[] c = new Capability[value.length - 1];
+            OperationType[] c = new OperationType[value.length - 1];
             List sdl = null;
 
             for (int i = 0; i < value.length; i++) {
@@ -2376,8 +2530,8 @@ System.out.println("Looking for : "+name);
                             value[i].getElement().getName())) {
                     sdl = (List) value[i].getValue();
                 } else {
-                    c[i] = (Capability) value[i];
-                    c[i].setType(Capability.DESCRIBE_FEATURE_TYPE);
+                    c[i] = (OperationType) value[i];
+//                    c[i].setType(OperationType.DESCRIBE_FEATURE_TYPE);
                 }
             }
 
@@ -2395,7 +2549,7 @@ System.out.println("Looking for : "+name);
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability[].class;
+            return OperationType[].class;
         }
 
         /**
@@ -2488,7 +2642,7 @@ System.out.println("Looking for : "+name);
             }
 
             // TODO merge one with only post, and one with only get?
-            Capability[] c = new Capability[value.length - 1];
+            OperationType[] c = new OperationType[value.length - 1];
             List sdl = null;
 
             for (int i = 0; i < value.length; i++) {
@@ -2497,8 +2651,8 @@ System.out.println("Looking for : "+name);
                             value[i].getElement().getName())) {
                     sdl = (List) value[i].getValue();
                 } else {
-                    c[i] = (Capability) value[i];
-                    c[i].setType(Capability.DESCRIBE_FEATURE_TYPE);
+                    c[i] = (OperationType) value[i];
+//                    c[i].setType(OperationType.DESCRIBE_FEATURE_TYPE);
                 }
             }
 
@@ -2516,7 +2670,7 @@ System.out.println("Looking for : "+name);
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability[].class;
+            return OperationType[].class;
         }
 
         /**
@@ -2605,11 +2759,11 @@ System.out.println("Looking for : "+name);
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-            Capability[] c = new Capability[value.length];
+            OperationType[] c = new OperationType[value.length];
 
             for (int i = 0; i < value.length; i++) {
-                c[i] = (Capability) value[i];
-                c[i].setType(Capability.TRANSACTION);
+                c[i] = (OperationType) value[i];
+//                c[i].setType(OperationType.TRANSACTION);
             }
 
             return c;
@@ -2626,7 +2780,7 @@ System.out.println("Looking for : "+name);
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability[].class;
+            return OperationType[].class;
         }
 
         /**
@@ -2717,18 +2871,18 @@ System.out.println("Looking for : "+name);
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-            int t = Capability.GET_FEATURE;
+//            int t = OperationType.GET_FEATURE;
 
             if (element.getName().equals("GetFeatureWithLock")) {
-                t = Capability.GET_FEATURE_WITH_LOCK;
+//                t = OperationType.GET_FEATURE_WITH_LOCK;
             }
 
             // TODO merge one with only post, and one with only get?
-            Capability[] c = new Capability[value.length];
+            OperationType[] c = new OperationType[value.length];
 
             for (int i = 0; i < value.length; i++) {
-                c[i] = (Capability) value[i];
-                c[i].setType(t);
+                c[i] = (OperationType) value[i];
+//                c[i].setType(t);
             }
 
             return c;
@@ -2745,7 +2899,7 @@ System.out.println("Looking for : "+name);
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Capability[].class;
+            return OperationType[].class;
         }
 
         /**
