@@ -387,7 +387,8 @@ ${required}"/>
             </j:forEach>
             <echo message="plugin reactor list = ${todo}"/>
             <attainGoal name="moveBuildFiles"/>
-            <maven:reactor basedir="${basedir}/plugin" includes="${todo}" goals="movePluginBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
+           
+            <maven:reactor basedir="${basedir}/plugin" includes="${todo}" goals="movePluginBin,movePluginSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
 
 
             <!-- add optional extensions seperatly -->
@@ -398,7 +399,7 @@ ${required}"/>
                 <j:set var="todo" value="${item}/project.xml,${todo}"/>
             </j:forEach>
             <echo message="extension reactor list = ${todo}"/>
-            <maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="moveExtBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
+            <maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="moveExtBin,moveExtSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
 
             <!-- add optional demos seperatly -->
             <loadfile property="release.optional" srcFile="demo/release.txt"/>
@@ -592,6 +593,36 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
             <j:if test="${stable == true}">
              <echo message="${pom.id} is stable"/> -->
              <ant:copy todir="../../target/srcRelease/module/${pom.artifactId}/">
+               <ant:fileset dir=".">
+                 <ant:include name="src/**"/>
+                 <ant:include name="test/**"/>
+                 <ant:include name="project.xml"/>
+                 <ant:include name="build.properties"/>
+                 <ant:include name="run-maven.xml"/>
+               </ant:fileset>
+             </ant:copy>
+            <!-- </j:if> -->
+    </goal>
+    <goal name="moveExtSrc">
+           <!-- <j:set var="stable" value="${maven.module.stable}"/>
+            <j:if test="${stable == true}">
+             <echo message="${pom.id} is stable"/> -->
+             <ant:copy todir="../../target/srcRelease/ext/${pom.artifactId}/">
+               <ant:fileset dir=".">
+                 <ant:include name="src/**"/>
+                 <ant:include name="test/**"/>
+                 <ant:include name="project.xml"/>
+                 <ant:include name="build.properties"/>
+                 <ant:include name="run-maven.xml"/>
+               </ant:fileset>
+             </ant:copy>
+            <!-- </j:if> -->
+    </goal>
+    <goal name="movePluginSrc">
+           <!-- <j:set var="stable" value="${maven.module.stable}"/>
+            <j:if test="${stable == true}">
+             <echo message="${pom.id} is stable"/> -->
+             <ant:copy todir="../../target/srcRelease/plugin/${pom.artifactId}/">
                <ant:fileset dir=".">
                  <ant:include name="src/**"/>
                  <ant:include name="test/**"/>
