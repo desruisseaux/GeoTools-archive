@@ -113,7 +113,7 @@ public class TestImageDataSource extends TestCase {
         FeatureCollection ft = ds.getFeatures(filter);
         MapContext mapContext = new DefaultMapContext();
         StyleFactory sFac = StyleFactory.createStyleFactory();
-        Envelope ex = ds.getBounds();
+        Envelope ex = ds.getBbox( false );
         //The following is complex, and should be built from
         //an SLD document and not by hand
         RasterSymbolizer rs = sFac.getDefaultRasterSymbolizer();

@@ -21,9 +21,7 @@ import javax.media.jai.JAI;
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
 import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.AbstractDataSource;
 import org.geotools.data.Query;
-import org.geotools.data.DataSourceMetaData;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -44,8 +42,7 @@ import org.geotools.gc.GridCoverage;
  * @todo : fix the typeName! -IanS
  * @author  iant
  */
-public class ImageDataSource extends AbstractDataSource 
-    implements org.geotools.data.DataSource{
+public class ImageDataSource {
     org.geotools.io.coverage.ExoreferencedGridCoverageReader reader;
     org.geotools.io.coverage.PropertyParser parser;
     java.io.File file;
@@ -251,21 +248,6 @@ public class ImageDataSource extends AbstractDataSource
      */
     public FeatureType getSchema(){
 	return null;
-    }
-
-    /**
-     * Creates the a metaData object.  This method should be overridden in any
-     * subclass implementing any functions beyond getFeatures, so that clients
-     * recieve the proper information about the datasource's capabilities.  <p>
-     * 
-     * @return the metadata for this datasource.
-     *
-     * @see #MetaDataSupport
-     */
-    protected DataSourceMetaData createMetaData() {
-	MetaDataSupport imgMeta = new MetaDataSupport();
-	imgMeta.setSupportsGetBbox(true);
-	return imgMeta;
     }
 
 }
