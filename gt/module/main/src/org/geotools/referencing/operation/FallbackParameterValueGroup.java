@@ -30,6 +30,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
 import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.IdentifiedObject;
 
 
 /**
@@ -62,7 +63,8 @@ final class FallbackParameterValueGroup extends ParameterGroup {
     public FallbackParameterValueGroup(final ParameterDescriptorGroup fallback,
                                        final GeneralParameterValue[] values)
     {
-        super(Collections.singletonMap("name", fallback.getName().toString()), values);
+        super(Collections.singletonMap(IdentifiedObject.NAME_PROPERTY,
+                                       fallback.getName()), values);
         this.fallback = fallback;
     }
 
@@ -73,14 +75,15 @@ final class FallbackParameterValueGroup extends ParameterGroup {
      * @return The parameter value for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public ParameterValue getValue(final String name) throws ParameterNotFoundException {
+    public ParameterValue parameter(final String name) throws ParameterNotFoundException {
         try {
             return super.parameter(name);
         } catch (ParameterNotFoundException exception) {
             try {
-                // Remove cast if covariance is allowed.
+                // Note: Remove cast if covariance is allowed (with J2SE 1.5).
                 return (ParameterValue) fallback.descriptor(name).createValue();
             } catch (ParameterNotFoundException ignore) {
+                // Rethrows the original exception (not the one from the fallback).
                 throw exception;
             }
         }

@@ -41,8 +41,9 @@ import org.geotools.resources.Utilities;
  * A textual description and/or a set of parameters identifying a particular reference level
  * surface used as a zero-height surface. The description includes its position with respect
  * to the Earth for any of the height types recognized by this standard. There are several
- * types of Vertical Datums, and each may place constraints on the
- * {@linkplain Coordinate Axis} with which it is combined to create a {@linkplain Vertical CRS}.
+ * types of vertical datums, and each may place constraints on the
+ * {@linkplain CoordinateSystemAxis coordinate system axis} with which it is combined to
+ * create a {@linkplain VerticalCRS vertical CRS}.
  *
  * @version $Id$
  * @author Martin Desruisseaux

@@ -21,6 +21,10 @@ package org.geotools.geometry;
 
 // J2SE dependencies
 import java.awt.geom.Point2D;
+import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -33,10 +37,13 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * 
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Make this implementation serializable.
  */
-public class DirectPosition2D extends Point2D.Double implements DirectPosition {
+public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = 835130287438466996L;
+
     /**
      * The coordinate reference system for this position;
      */
@@ -201,5 +208,25 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition {
             code ^= crs.hashCode();
         }
         return code;
+    }
+
+    /**
+     * Write this object to the specified stream. This method is necessary
+     * because the super-class is not serializable.
+     */
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeDouble(x);
+        out.writeDouble(y);
+    }
+
+    /**
+     * Read this object from the specified stream. This method is necessary
+     * because the super-class is not serializable.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        x = in.readDouble();
+        y = in.readDouble();
     }
 }

@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.Date;
 import java.util.Collections;
 
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
+
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 
@@ -83,6 +86,26 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
      */
     public Date getOrigin() {
         return new Date(origin);
+    }
+
+    /**
+     * Description of the point or points used to anchor the datum to the Earth.
+     *
+     * @deprecated This attribute is defined in the {@link Datum} parent class,
+     *             but is not used by a temporal datum.
+     */
+    public InternationalString getAnchorPoint() {
+        return super.getAnchorPoint();
+    }
+
+    /**
+     * The time after which this datum definition is valid.
+     *
+     * @deprecated This attribute is defined in the {@link Datum} parent class,
+     *             but is not used by a temporal datum.
+     */
+    public Date getRealizationEpoch() {
+        return super.getRealizationEpoch();
     }
     
     /**

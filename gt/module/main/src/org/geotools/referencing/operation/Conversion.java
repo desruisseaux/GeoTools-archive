@@ -72,4 +72,14 @@ public class Conversion extends Operation implements org.opengis.referencing.ope
     {
         super(properties, sourceCRS, targetCRS, transform, method, values);
     }
+
+    /**
+     * Version of the coordinate transformation.
+     *
+     * @deprecated This attribute is declared in {@link CoordinateOperation}
+     *             but is not used in a conversion.
+     */
+    public String getOperationVersion() {
+        return super.getOperationVersion();
+    }
 }

@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 
 // OpenGIS dependencies
+import org.opengis.util.Cloneable; // For javadoc
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -127,7 +128,16 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
     }
 
     /**
-     * Returns a clone of this geometry.
+     * Returns a clone of this geometry with <em>deep</em> copy semantic. Any change on this object
+     * will have no impact on the returned clone, and conversely. For big geometries, implementations
+     * are encouraged to share as much internal data as possible (as opposed to performing a real
+     * copy of the data), while preserving the deep copy semantic.
+     *
+     * <P>The default implementation throws {@link CloneNotSupportedException}. If subclasses
+     * implements {@link Cloneable}, then they should overrides this method.</P>
+     *
+     * @throws CloneNotSupportedException if this object do not support clone. This exception is
+     *         never throws if this object implements {@link Cloneable}.
      */
     public Object clone() throws CloneNotSupportedException {
         return super.clone();

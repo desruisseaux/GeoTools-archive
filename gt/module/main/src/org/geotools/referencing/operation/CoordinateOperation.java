@@ -33,6 +33,7 @@ import java.util.HashMap;
 import org.opengis.util.InternationalString;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.PositionalAccuracy;
+import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -150,7 +151,7 @@ public class CoordinateOperation extends IdentifiedObject
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;<code>"scope"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
      * </table>
@@ -180,10 +181,10 @@ public class CoordinateOperation extends IdentifiedObject
                                 final MathTransform             transform)
     {
         super(properties, subProperties, LOCALIZABLES);
-        validArea        = (Extent) subProperties.get("validArea"       );
-        scope            = (InternationalString)    subProperties.get("scope"           );
-        operationVersion = (String) subProperties.get("operationVersion");
         PositionalAccuracy[] positionalAccuracy;
+        validArea          = (Extent)               subProperties.get("validArea"         );
+        scope              = (InternationalString)  subProperties.get("scope"             );
+        operationVersion   = (String)               subProperties.get("operationVersion"  );
         positionalAccuracy = (PositionalAccuracy[]) subProperties.get("positionalAccuracy");
         if (positionalAccuracy==null || positionalAccuracy.length==0) {
             positionalAccuracy = null;
@@ -217,8 +218,8 @@ public class CoordinateOperation extends IdentifiedObject
             final int actual = crs.getCoordinateSystem().getDimension();
             if (actual != expected) {
                 throw new IllegalArgumentException(Resources.format(
-                                                   ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
-                                                   name, new Integer(actual), new Integer(expected)));
+                          ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+                          name, new Integer(actual), new Integer(expected)));
             }
         }
     }
@@ -226,8 +227,7 @@ public class CoordinateOperation extends IdentifiedObject
     /**
      * Returns the source CRS. The source CRS is mandatory for {@linkplain Transformation
      * transformations}. {@linkplain Conversion Conversions} may have a source CRS that
-     * is not specified here, but through
-     * {@link org.opengis.referencing.crs.GeneralDerivedCRS#getBaseCRS} instead.
+     * is not specified here, but through {@link GeneralDerivedCRS#getBaseCRS} instead.
      *
      * @return The source CRS, or <code>null</code> if not available.
      */
@@ -238,8 +238,7 @@ public class CoordinateOperation extends IdentifiedObject
     /**
      * Returns the target CRS. The target CRS is mandatory for {@linkplain Transformation
      * transformations} only. {@linkplain Conversion Conversions} may have a target CRS
-     * that is not specified here, but through
-     * {@link org.opengis.referencing.crs.GeneralDerivedCRS} instead.
+     * that is not specified here, but through {@link GeneralDerivedCRS} instead.
      *
      * @return The target CRS, or <code>null</code> if not available.
      */
@@ -288,9 +287,8 @@ public class CoordinateOperation extends IdentifiedObject
     
     /**
      * Gets the math transform. The math transform will transform positions in the
-     * {@linkplain #getSourceCRS source coordinate reference system}
-     * into positions in the
-     * {@linkplain #getTargetCRS target coordinate reference system}.
+     * {@linkplain #getSourceCRS source coordinate reference system} into positions
+     * in the {@linkplain #getTargetCRS target coordinate reference system}.
      */
     public MathTransform getMathTransform() {
         return transform;

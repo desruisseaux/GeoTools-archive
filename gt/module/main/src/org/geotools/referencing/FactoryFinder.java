@@ -98,13 +98,13 @@ public final class FactoryFinder {
     private static Iterator getProviders(final Class category) {
         assert Thread.holdsLock(FactoryFinder.class);
         if (registry == null) {
-            throw new RuntimeException();
-//            registry = new ServiceRegistry(Arrays.asList(new Class[] {
-//                                           DatumFactory.class,
-//                                           CSFactory.class,
-//                                           CRSFactory.class,
-//                                           MathTransformFactory.class,
-//                                           CoordinateOperationFactory.class}).iterator());
+            // TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
+            registry = new ServiceRegistry((Iterator) Arrays.asList(new Class[] {
+                                           DatumFactory.class,
+                                           CSFactory.class,
+                                           CRSFactory.class,
+                                           MathTransformFactory.class,
+                                           CoordinateOperationFactory.class}).iterator());
         }
         Iterator iterator = registry.getServiceProviders(category, false);
         if (!iterator.hasNext()) {

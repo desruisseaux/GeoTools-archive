@@ -27,9 +27,9 @@ import org.geotools.referencing.wkt.Formatter;
  * Interface for object that can be formatted as 
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
  * Known Text</cite> (WKT), but can't extends {@link org.geotools.referencing.wkt.Formattable}.
- * This interface is especially for <ocde>AffineTransform2D</code> implementation. This interface
- * is not public because the <code>formatWKT(Formatter)</code> method usually has a protected
- * access.
+ * This interface is especially used for <ocde>AffineTransform2D</code> implementation. This
+ * interface is not public because the <code>formatWKT(Formatter)</code> method usually has a
+ * protected access.
  *
  * @version $Id$
  * @author Martin Desruisseaux

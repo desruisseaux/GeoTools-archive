@@ -125,12 +125,10 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *
      * @param categories The providers categories, as implementations
      *                   of {@link MathTransformProvider}.
-     *
-     * @todo revisit
      */
     private MathTransformFactory(final Class[] categories) {
-        throw new RuntimeException();
-//        registry = new ServiceRegistry(Arrays.asList(categories).iterator());
+        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
+        registry = new ServiceRegistry((Iterator) Arrays.asList(categories).iterator());
     }
 
     /**
@@ -178,13 +176,10 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * Returns the math transform provider for the specified operation method.
      * This provider can be used in order to query parameter for an identifier
      * code (e.g. <code>getProvider("Transverse_Mercator").getParameters()</code>),
-     * or the transform name in a given locale (e.g.
-     * <code>getProvider("Transverse_Mercator").getName({@link Locale#FRENCH})</code>).
+     * or any of the alias in a given locale.
      *
-     * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code} of the
-     *         operation method to search for (e.g. "Transverse_Mercator"). If this string contains
-     *         the <code>':'</code> character, then the part before <code>':'</code> is the
-     *         {@linkplain Identifier#getCodeSpace code space}.
+     * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code}
+     *         of the operation method to search for (e.g. "Transverse_Mercator").
      * @return The math transform provider.
      * @throws NoSuchIdentifierException if there is no provider registered for the specified
      *         operation method identifier.
@@ -212,23 +207,22 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * parameter values and give them to
      * <code>{@linkplain #createParameterizedTransform createParameterizedTransform}(identifier, parameters)</code>.
      *
-     * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code} of the
-     *         operation method to search for (e.g. "Transverse_Mercator"). If this string contains
-     *         the <code>':'</code> character, then the part before <code>':'</code> is the
-     *         {@linkplain Identifier#getCodeSpace code space}.
+     * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code}
+     *         of the operation method to search for (e.g. "Transverse_Mercator").
      * @return The default parameter values.
      * @throws NoSuchIdentifierException if there is no transform registered for the specified
      *         operation method identifier.
      *
      * @see #getAvailableTransforms
+     *
+     * @todo Returns a <code>ParameterValueGroup</code> instead.
      */
     public GeneralParameterValue[] getDefaultParameters(final String identifier)
             throws NoSuchIdentifierException
     {
         ParameterDescriptorGroup type = getProvider(identifier).getParameters();
         ParameterValueGroup group = (ParameterValueGroup) type.createValue();
-        
-        return Parameters.array( group );         
+        return Parameters.array(group);
     }
 
     /**
@@ -237,9 +231,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * and <code>"semi_minor"</code> parameters for cartographic projection transforms.
      *
      * @param  identifier The case insensitive {@linkplain Identifier#getCode identifier code} of the
-     *         operation method to search for (e.g. "Transverse_Mercator"). If this string contains
-     *         the <code>':'</code> character, then the part before <code>':'</code> is the
-     *         {@linkplain Identifier#getCodeSpace code space}.
+     *         operation method to search for (e.g. "Transverse_Mercator").
      * @param  parameters The parameter values. A default set can be obtained with
      *         <code>{@linkplain #getDefaultParameters getDefaultParameters}(identifier)}</code>
      *         and modified before to be given to this method.
@@ -251,6 +243,8 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *
      * @see #getDefaultParameters
      * @see #getAvailableTransforms
+     *
+     * @todo Expect a single <code>ParameterValueGroup</code> argument instead.
      */
     public MathTransform createParameterizedTransform(final String identifier,
                                                       final GeneralParameterValue[] parameters)

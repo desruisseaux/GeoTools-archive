@@ -80,9 +80,9 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
     }
 
     /**
-     * Construct a concatenated operation from a set of properties. The properties given in argument
-     * follow the same rules than for the {@link org.geotools.referencing.operation.CoordinateOperation}
-     * constructor.
+     * Construct a concatenated operation from a set of properties.
+     * The properties given in argument follow the same rules than for the
+     * {@link org.geotools.referencing.operation.CoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param operations The sequence of operations.
@@ -103,7 +103,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
     {
         this(properties,
              expand(operations, list, true),
-             (SingleOperation[]) list.toArray(new SingleOperation[operations.length]));
+             (SingleOperation[]) list.toArray(new SingleOperation[list.size()]));
     }
 
     /**
@@ -118,7 +118,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
               operations[0].getSourceCRS(),
               operations[operations.length-1].getTargetCRS(),
               transform);
-        this.operations = operations;
+        this.operations = operations; // No need to clone.
     }
 
     /**
@@ -190,8 +190,6 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
 
     /**
      * Returns the sequence of operations.
-     *
-     * @return The sequence of operations.
      */
     public SingleOperation[] getOperations() {
         return (SingleOperation[]) operations.clone();

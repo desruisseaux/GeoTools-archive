@@ -236,7 +236,7 @@ public class Formatter {
                                     ? (IdentifiedObject) formattable : null;
         if (info != null) {
             buffer.append(QUOTE);
-            buffer.append(info.getName().getCode());
+            buffer.append(getName(info));
             buffer.append(QUOTE);
         }
         String keyword = formattable.formatWKT(this);

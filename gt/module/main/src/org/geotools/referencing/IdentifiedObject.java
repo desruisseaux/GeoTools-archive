@@ -73,7 +73,7 @@ public class IdentifiedObject extends Formattable
     /**
      * Key for the <code>"name"</code> property to be given to the
      * {@linkplain #IdentifiedObject(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getName()}.
+     * for setting the value to be returned by {@link #getName}.
      */
     public static final String NAME_PROPERTY = "name";
 
@@ -411,7 +411,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     /**
      * The primary name by which this object is identified.
      */
-    public Identifier getName(){
+    public Identifier getName() {
         return name;
     }
 

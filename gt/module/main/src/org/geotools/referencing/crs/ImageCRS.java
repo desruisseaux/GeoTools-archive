@@ -28,6 +28,7 @@ import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AffineCS;
+import org.opengis.referencing.cs.CartesianCS;   // For javadoc
 import org.opengis.referencing.datum.ImageDatum;
 
 

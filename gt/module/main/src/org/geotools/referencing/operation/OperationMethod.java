@@ -36,6 +36,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.parameter.Parameters;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
@@ -89,54 +90,12 @@ public class OperationMethod extends IdentifiedObject
     private final ParameterDescriptorGroup parameters;
 
     /**
-     * Construct an operation method from a set of properties. The properties given in argument
-     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
-     * super-class constructor}. Additionally, the following properties are understood by this
-     * construtor:
-     * <br><br>
-     * <table border='1'>
-     *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
-     *     <th nowrap>Property name</th>
-     *     <th nowrap>Value type</th>
-     *     <th nowrap>Value given to</th>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"formula"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getFormula}</td>
-     *   </tr>
-     * </table>
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
-     * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
-     */
-    public OperationMethod(final Map properties,
-                           final int sourceDimensions,
-                           final int targetDimensions,
-                           final ParameterDescriptorGroup parameters)
-    {
-        this(properties, new HashMap(), sourceDimensions, targetDimensions, parameters);
-    }
-    /**
-     * Construct an operation method from a set of properties. The properties given in argument
-     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
-     * super-class constructor}. Additionally, the following properties are understood by this
-     * construtor:
-     * <br><br>
-     * <table border='1'>
-     *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
-     *     <th nowrap>Property name</th>
-     *     <th nowrap>Value type</th>
-     *     <th nowrap>Value given to</th>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"formula"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getFormula}</td>
-     *   </tr>
-     * </table>
+     * Construct an operation method from a set of properties and an array of parameter
+     * descriptors. The properties given in argument follow the same rules than for the
+     * {@linkplain #OperationMethod(Map, int, int, ParameterDescriptorGroup) constructor
+     * expecting a parameter group}. This convenience constructor build automatically a
+     * parameter group using the same properties than the one specified for this operation
+     * method.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
@@ -148,13 +107,27 @@ public class OperationMethod extends IdentifiedObject
                            final int targetDimensions,
                            final GeneralParameterDescriptor[] parameters)
     {
-        this(properties, new HashMap(), sourceDimensions, targetDimensions, parameters);
+        this(properties, sourceDimensions, targetDimensions, toGroup(properties, parameters));
     }
+
     /**
-     * Construct an operation method from a set of properties. The properties given in argument
-     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
-     * super-class constructor}. Additionally, the following properties are understood by this
-     * construtor:
+     * Utility method used to kludge <code>GeneralParameterDescriptor[]</code>
+     * into a <code>ParameterDescriptorGroup</code>.
+     * This is a work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static ParameterDescriptorGroup toGroup(final Map properties,
+                                                    final GeneralParameterDescriptor[] parameters)
+    {
+        return (parameters==null || parameters.length==0) ? null :
+               new org.geotools.parameter.ParameterDescriptorGroup(properties, parameters);
+    }
+
+    /**
+     * Construct an operation method from a set of properties and a descriptor group.
+     * The properties given in argument follow the same rules than for the
+     * {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
+     * Additionally, the following properties are understood by this construtor:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -164,7 +137,7 @@ public class OperationMethod extends IdentifiedObject
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;<code>"formula"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getFormula}</td>
      *   </tr>
      * </table>
@@ -172,25 +145,19 @@ public class OperationMethod extends IdentifiedObject
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters Parameter set, or <code>null</code>if none.
-     */    
+     * @param parameters The set of parameters, or <code>null</code> if none.
+     */
     public OperationMethod(final Map properties,
-				           final Map subProperties,
-				           final int sourceDimensions,
-				           final int targetDimensions,
-				           GeneralParameterDescriptor[] parameters)
-	{
-        this(properties, subProperties, sourceDimensions, targetDimensions, group( properties, parameters ));
-	}
-    /** Utility method used to kludge GeneralParameterDescriptor[] into a ParameterDescriptorGroup */
-    private static ParameterDescriptorGroup group( Map properties, GeneralParameterDescriptor[] parameters ){
-        return parameters == null ? org.geotools.parameter.Parameters.EMPTY_GROUP
-                : new org.geotools.parameter.ParameterDescriptorGroup( properties, parameters );
+                           final int sourceDimensions,
+                           final int targetDimensions,
+                           final ParameterDescriptorGroup parameters)
+    {
+        this(properties, new HashMap(), sourceDimensions, targetDimensions, parameters);
     }
+
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
-     * @param parameters Parameter group, or <code>null</code>if none.
      */
     private OperationMethod(final Map properties,
                             final Map subProperties,
@@ -200,13 +167,30 @@ public class OperationMethod extends IdentifiedObject
     {
         super(properties, subProperties, LOCALIZABLES);
         formula = (InternationalString) subProperties.get("formula");
-        if (parameters==null ) {
-            this.parameters = org.geotools.parameter.Parameters.EMPTY_GROUP;
-        } else {
-            this.parameters = parameters; // can I not clone this?            
-        }                
+        // 'parameters' may be null, which is okay. A null value will
+        // make serialization smaller and faster than an empty object.
+        this.parameters       = parameters;
         this.sourceDimensions = sourceDimensions;
         this.targetDimensions = targetDimensions;
+        ensurePositive("sourceDimensions", sourceDimensions);
+        ensurePositive("targetDimensions", targetDimensions);
+    }
+
+    /**
+     * Ensure that the specified value is positive.
+     * An {@link IllegalArgumentException} is throws if it is not.
+     *
+     * @param name  The parameter name.
+     * @param value The parameter value.
+     * @throws IllegalArgumentException if the specified value is not positive.
+     */
+    private static void ensurePositive(final String name, final int value)
+            throws IllegalArgumentException
+    {
+        if (value < 0) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Integer(value)));
+        }
     }
 
     /**
@@ -229,20 +213,16 @@ public class OperationMethod extends IdentifiedObject
 
     /**
      * Number of dimensions in the target CRS of this operation method.
-     *
-     * @return The dimension of target CRS.
      */
     public int getTargetDimensions() {
         return targetDimensions;
     }
 
     /**
-     * The set of parameters.
-     *
-     * @return The parameters, or an empty array if none.
+     * Returns the set of parameters.
      */
     public ParameterDescriptorGroup getParameters() {
-        return parameters;                
+        return (parameters!=null) ? parameters : Parameters.EMPTY_GROUP;
     }
 
     /**
@@ -276,7 +256,9 @@ public class OperationMethod extends IdentifiedObject
      */
     public int hashCode() {
         int code = (int)serialVersionUID + sourceDimensions + 37*targetDimensions;
-        code = code * 37 + parameters.hashCode();
+        if (parameters != null) {
+            code = code * 37 + parameters.hashCode();
+        }
         return code;
     }
     
