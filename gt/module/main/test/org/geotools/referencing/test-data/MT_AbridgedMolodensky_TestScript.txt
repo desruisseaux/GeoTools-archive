@@ -1,0 +1,260 @@
+//AbridgedMolodenskyTransformation tests
+//Note that z values (third dimention) are not yet tested here.
+//the following test points are outside of the valid regions for these datums
+//Calculations were done with ArcGIS 8.3
+//May 29, 2004
+
+//nad 27 to nad 83
+set _MT_AMol1_=PARAM_MT["Abridged_Molodenski", PARAMETER["dim", 2], PARAMETER["dx", -3.0], PARAMETER["dy", 142.0], PARAMETER["dz", 183.0], PARAMETER["src_semi_major", 6378206.4], PARAMETER["src_semi_minor", 6356583.8], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31414036]]
+
+math_transform=_MT_AMol1_
+test_tolerance=(1e-12, 1e-12)
+
+pt_source=(-123.1, 49.2166666666)
+pt_target=(-123.101098871539, 49.2164240958503)
+
+pt_source=(2.33656753, 43.96499314)
+pt_target=(2.33833692871919, 43.9640212895491)
+
+pt_source=(151.283333333, -33.9166666666)
+pt_target=(151.28200226145, -33.9129546039006)
+
+pt_source=(-47.95, -15.75)
+pt_target=(-47.9491333141652, -15.7475483647123)
+
+pt_source=(139.733333333, 35.6833333333)
+pt_target=(139.73215781909, 35.6821465395989)
+
+pt_source=(18.45, -33.9166666666)
+pt_target=(18.4514668586457, -33.913099310479)
+
+pt_source=(0, 0)
+pt_target=(1.27559382381506E-03, 1.65510190152601E-03)
+
+pt_source=(180, 0)
+pt_target=(179.998724406176, 1.65510190152601E-03)
+
+pt_source=(-180, 0)
+pt_target=(179.998724406176, 1.65510190152601E-03)
+
+pt_source=(90, 0)
+pt_target=(90.0000269491653, 1.65510190152601E-03)
+
+pt_source=(-90, 0)
+pt_target=(-90.0000269491653, 1.65510190152601E-03)
+
+pt_source=(-76, -55)
+pt_target=(-75.9995086909825, -54.9980680476351)
+
+pt_source=(12, -15)
+pt_target=(12.0012972403072, -14.9972650232531)
+
+pt_source=(80, 6)
+pt_target=(80.0002494013643, 6.00106682317578)
+
+pt_source=(-45, 71)
+pt_target=(-44.9972962660685, 71.0000900468279)
+
+pt_source=(175, 66.67)
+pt_target=(174.996806357814, 66.6689717498428)
+
+pt_source=(60, -70)
+pt_target=(60.0019272456987, -69.9970450717445)
+
+pt_source=(0, 90)
+pt_target=(0, 90)
+
+pt_source=(0, -90)
+pt_target=(0, -90)
+
+
+//_EPSG:4229_=GEOGCS["Egypt 1907" to wgs84
+set _MT_AMol2_=PARAM_MT["Abridged_Molodenski", PARAMETER["dim", 2], PARAMETER["dx", -130.0], PARAMETER["dy", 110.0], PARAMETER["dz", -13.0], PARAMETER["src_semi_major", 6378200.0], PARAMETER["src_semi_minor", 6356818.16962789], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31424518]]
+
+math_transform=_MT_AMol2_
+test_tolerance=(1e-12, 1e-12)
+
+pt_source=(-123.1, 49.2166666666)
+pt_target=(-123.102319341576, 49.2167597456633)
+
+pt_source=(2.33656753, 43.96499314)
+pt_target=(2.33800307736759, 43.9657181399642)
+
+pt_source=(151.283333333, -33.9166666666)
+pt_target=(151.282965577487, -33.9159483678706)
+
+pt_source=(-47.95, -15.75)
+pt_target=(-47.9502132848259, -15.7505404995689)
+
+pt_source=(139.733333333, 35.6833333333)
+pt_target=(139.733334328123, 35.6823672886897)
+
+pt_source=(18.45, -33.9166666666)
+pt_target=(18.451573255093, -33.9172329862662)
+
+pt_source=(0, 0)
+pt_target=(9.88137052215211E-04, -1.17566757319198E-04)
+
+pt_source=(180, 0)
+pt_target=(179.999011862948, -1.17566757319198E-04)
+
+pt_source=(-180, 0)
+pt_target=(179.999011862948, -1.17566757319198E-04)
+
+pt_source=(90, 0)
+pt_target=(90.0011677983344, -1.17566757319198E-04)
+
+pt_source=(-90, 0)
+pt_target=(-90.0011677983344, -1.17566757319198E-04)
+
+pt_source=(-76, -55)
+pt_target=(-76.0015552377393, -55.0011078597881)
+
+pt_source=(12, -15)
+pt_target=(12.0012517230937, -15.0003703275085)
+
+pt_source=(80, 6)
+pt_target=(80.0013288764471, 5.99980740241019)
+
+pt_source=(-45, 71)
+pt_target=(-45.0003890400181, 71.001415951074)
+
+pt_source=(175, 66.67)
+pt_target=(174.997777666775, 66.6688271712627)
+
+pt_source=(60, -70)
+pt_target=(60.0043885021513, -69.9998014035091)
+
+pt_source=(0, 90)
+pt_target=(0, 90)
+
+pt_source=(0, -90)
+pt_target=(0, -90)
+
+
+//_EPSG:4301_=GEOGCS["Tokyo" to wgs84
+set _MT_AMol3_=PARAM_MT["Abridged_Molodenski", PARAMETER["dim", 2], PARAMETER["dx", -148.0], PARAMETER["dy", 507.0], PARAMETER["dz", 685.0], PARAMETER["src_semi_major", 6377397.155], PARAMETER["src_semi_minor", 6356078.96281819], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31424518]]
+
+math_transform=_MT_AMol3_
+test_tolerance=(1e-12, 1e-12)
+
+pt_source=(-123.1, 49.2166666666)
+pt_target=(-123.105502862596, 49.2236234676274)
+
+pt_source=(2.33656753, 43.96499314)
+pt_target=(2.34295572919651, 43.9708238746992)
+
+pt_source=(151.283333333, -33.9166666666)
+pt_target=(151.27929357828, -33.9102179051796)
+
+pt_source=(-47.95, -15.75)
+pt_target=(-47.9478565520382, -15.7455222280582)
+
+pt_source=(139.733333333, 35.6833333333)
+pt_target=(139.730116030518, 35.6865996900801)
+
+pt_source=(18.45, -33.9166666666)
+pt_target=(18.455707946146, -33.9119955590817)
+
+pt_source=(0, 0)
+pt_target=(4.55498685546937E-03, 6.19552480081531E-03)
+
+pt_source=(180, 0)
+pt_target=(179.995445013145, 6.19552480081531E-03)
+
+pt_source=(-180, 0)
+pt_target=(179.995445013145, 6.19552480081531E-03)
+
+pt_source=(90, 0)
+pt_target=(90.0013296608572, 6.19552480081531E-03)
+
+pt_source=(-90, 0)
+pt_target=(-90.0013296608572, 6.19552480081531E-03)
+
+pt_source=(-76, -55)
+pt_target=(-76.0003274040646, -55.0009152727464)
+
+pt_source=(12, -15)
+pt_target=(12.0048977296619, -14.99441212662)
+
+pt_source=(80, 6)
+pt_target=(80.002111918208, 6.00583822572031)
+
+pt_source=(-45, 71)
+pt_target=(-44.9930157927295, 71.0062913621464)
+
+pt_source=(175, 66.67)
+pt_target=(174.988866127878, 66.6712885291871)
+
+pt_source=(60, -70)
+pt_target=(60.0099961771064, -69.9952074104025)
+
+pt_source=(0, 90)
+pt_target=(0, 90)
+
+pt_source=(0, -90)
+pt_target=(0, -90)
+
+
+//_EPSG:4222_=GEOGCS["Cape" to wgs84
+set _MT_AMol4_=PARAM_MT["Abridged_Molodenski", PARAMETER["dim", 2], PARAMETER["dx", -136.0], PARAMETER["dy", -108.0], PARAMETER["dz", -292.0], PARAMETER["src_semi_major", 6378249.145], PARAMETER["src_semi_minor", 6356514.96639875], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31424518]]
+
+math_transform=_MT_AMol4_
+test_tolerance=(1e-12, 1e-12)
+
+pt_source=(-123.1, 49.2166666666)
+pt_target=(-123.100754222622, 49.2107214182021)
+
+pt_source=(2.33656753, 43.96499314)
+pt_target=(2.33529205586424, 43.9608346515959)
+
+pt_source=(151.283333333, -33.9166666666)
+pt_target=(151.285064140442, -33.9155942437165)
+
+pt_source=(-47.95, -15.75)
+pt_target=(-47.9516173028181, -15.7509162550702)
+
+pt_source=(139.733333333, 35.6833333333)
+pt_target=(139.735214690541, 35.6780320622642)
+
+pt_source=(18.45, -33.9166666666)
+pt_target=(18.4493575997808, -33.9167541734956)
+
+pt_source=(0, 0)
+pt_target=(-9.70163448736352E-04, -2.64100252005967E-03)
+
+pt_source=(180, 0)
+pt_target=(-179.999029836551, -2.64100252005967E-03)
+
+pt_source=(-180, 0)
+pt_target=(-179.999029836551, -2.64100252005967E-03)
+
+pt_source=(90, 0)
+pt_target=(90.0012216873058, -2.64100252005967E-03)
+
+pt_source=(-90, 0)
+pt_target=(-90.0012216873058, -2.64100252005967E-03)
+
+pt_source=(-76, -55)
+pt_target=(-76.0024702139543, -54.9980253713775)
+
+pt_source=(12, -15)
+pt_target=(11.9992806884582, -15.0013335420132)
+
+pt_source=(80, 6)
+pt_target=(80.0010403205433, 5.99683947770815)
+
+pt_source=(-45, 71)
+pt_target=(-45.0047460167377, 70.9973873699846)
+
+pt_source=(175, 66.67)
+pt_target=(175.002701504277, 66.6656458018855)
+
+pt_source=(60, -70)
+pt_target=(60.0016700973926, -70.0002420543934)
+
+pt_source=(0, 90)
+pt_target=(0, 90)
+
+pt_source=(0, -90)
+pt_target=(0, -90)
