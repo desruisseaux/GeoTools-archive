@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.mysql;
+package org.geotools.data.geometryless;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
