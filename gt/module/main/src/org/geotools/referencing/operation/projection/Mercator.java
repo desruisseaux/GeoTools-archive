@@ -239,7 +239,7 @@ public class Mercator extends MapProjection {
      * Construct a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  The expected parameter descriptors.
+     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     Mercator(final ParameterValueGroup parameters, final Collection expected)
@@ -340,7 +340,7 @@ public class Mercator extends MapProjection {
          * Construct a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
-         * @param  The expected parameter descriptors.
+         * @param  expected The expected parameter descriptors.
          * @throws ParameterNotFoundException if a mandatory parameter is missing.
          */
         protected Spherical(final ParameterValueGroup parameters, final Collection expected)
