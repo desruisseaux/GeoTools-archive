@@ -74,6 +74,30 @@ public final class ImageUtilities {
     private static final int MIN_TILE_SIZE = 128;
 
     /**
+     * List of valid names. Note: the "Optimal" type is not
+     * implemented because currently not provided by JAI.
+     */
+    private static final String[] INTERPOLATION_NAMES = {
+        "Nearest",          // JAI name
+        "NearestNeighbor",  // OpenGIS name
+        "Bilinear",
+        "Bicubic",
+        "Bicubic2"          // Not in OpenGIS specification.
+    };
+
+    /**
+     * Interpolation types (provided by Java Advanced
+     * Imaging) for {@link #INTERPOLATION_NAMES}.
+     */
+    private static final int[] INTERPOLATION_TYPES= {
+        Interpolation.INTERP_NEAREST,
+        Interpolation.INTERP_NEAREST,
+        Interpolation.INTERP_BILINEAR,
+        Interpolation.INTERP_BICUBIC,
+        Interpolation.INTERP_BICUBIC_2
+    };
+
+    /**
      * Do not allow creation of instances of this class.
      */
     private ImageUtilities() {
@@ -268,6 +292,29 @@ public final class ImageUtilities {
     }
 
     /**
+     * Cast the specified object to an {@link Interpolation object}.
+     *
+     * @param  type The interpolation type as an {@link Interpolation}
+     *         or a {@link CharSequence} object.
+     * @return The interpolation object for the specified type.
+     * @throws IllegalArgumentException if the specified interpolation type is not a know one.
+     */
+    public static Interpolation toInterpolation(final Object type) throws IllegalArgumentException {
+        if (type instanceof Interpolation) {
+            return (Interpolation) type;
+        } else if (type instanceof CharSequence) {
+            final String name = type.toString();
+            for (int i=0; i<INTERPOLATION_NAMES.length; i++) {
+                if (INTERPOLATION_NAMES[i].equalsIgnoreCase(name)) {
+                    return Interpolation.getInstance(INTERPOLATION_TYPES[i]);
+                }
+            }
+        }
+        throw new IllegalArgumentException(Resources.format(
+                ResourceKeys.ERROR_UNKNOW_INTERPOLATION_$1, type));
+    }
+
+    /**
      * Returns the interpolation name for the specified interpolation object.
      * This method tries to infer the name from the object's class name.
      *
@@ -343,8 +390,8 @@ public final class ImageUtilities {
                                                    operation, new Integer(allowed ? 1 : 0));
                 record.setSourceClassName("ImageUtilities");
                 record.setSourceMethodName("allowNativeAcceleration");
-                Logger.getLogger("org.geotools.gp").log(record);
-                // We used the "org.geotools.gp" logger since this method is usually
+                Logger.getLogger("org.geotools.coverage").log(record);
+                // We used the "org.geotools.coverage" logger since this method is usually
                 // invoked from the GridCoverageProcessor or one of its operations.
             }
         }

@@ -1066,7 +1066,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 final Locale locale = getLocale();
                 throw new RasterFormatException(Resources.getResources(locale).getString(
                           ResourceKeys.ERROR_COVERAGE_ALREADY_BOUND_$2,
-                          "createGeophysics", inverse.inverse.getName().toString(locale)));
+                          "geophysics", inverse.inverse.getName().toString(locale)));
             }
             return inverse;
         }
@@ -1108,7 +1108,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *       (as of JAI's "extrema" operation). If would suffice to add a check making
      *       sure that the range of transformed values doesn't contains 0.
      */
-    protected GridCoverage2D createGeophysics(final boolean geo) {
+    GridCoverage2D createGeophysics(final boolean geo) {
         /*
          * STEP 1 - Gets the source image and prepare the target sample dimensions.
          *          As a slight optimisation, we skip the "Null" operations since

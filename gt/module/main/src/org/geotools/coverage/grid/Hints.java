@@ -27,6 +27,7 @@ import javax.media.jai.JAI; // For Javadoc
 
 // OpenGIS dependencies
 import org.opengis.coverage.SampleDimensionType;                      // For Javadoc
+import org.opengis.coverage.processing.GridCoverageProcessor;         // For Javadoc
 import org.opengis.referencing.operation.CoordinateOperationFactory;  // For Javadoc
 
 // Geotools Dependencies
@@ -43,7 +44,7 @@ import org.geotools.resources.Utilities;
  * <blockquote><pre>
  * CoordinateOperationFactory myFactory = <FONT FACE="Arial">...</FONT>
  * RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_OPERATION_FACTORY}, myFactory);
- * GridCoverageProcessor processor = new GridCoverageProcessor(hints);
+ * GridCoverageProcessor processor = new GridCoverageProcessorGT(hints);
  * </pre></blockquote>
  *
  * @version $Id$
@@ -51,12 +52,10 @@ import org.geotools.resources.Utilities;
  */
 public final class Hints extends RenderingHints.Key {
     /**
-     * Key for setting the {@link GridCoverageProcessor} instance. The value for this
-     * key is set automatically by the {@code GridCoverageProcessor} constructor
-     * and is used by {@link Operation#getGridCoverageProcessor} only.
+     * Key for setting the {@link GridCoverageProcessor} instance.
      */
-    static final RenderingHints.Key PROCESSOR_INSTANCE =
-            new Hints(0, "org.geotools.coverage.grid.GridCoverageProcessor");
+    public static final RenderingHints.Key GRID_COVERAGE_PROCESSOR =
+            new Hints(0, "org.opengis.coverage.grid.GridCoverageProcessor");
 
     /**
      * Key for setting a {@link JAI} instance other than the default one when

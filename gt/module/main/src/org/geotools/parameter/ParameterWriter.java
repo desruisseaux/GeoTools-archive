@@ -198,7 +198,7 @@ public class ParameterWriter extends FilterWriter {
      * @param  name The group name, usually <code>descriptor.getCode().getName()</code>.
      * @param  descriptor The parameter descriptor. Should be equals to
      *         <code>values.getDescriptor()</code> if <code>values</code> is non null.
-     * @param  values The parameter values, or <code>null</code> if none.
+     * @param  values The parameter values, or {@code null} if none.
      * @throws IOException if an error occured will writing to the stream.
      */
     private void format(final String                   name,
@@ -375,7 +375,7 @@ public class ParameterWriter extends FilterWriter {
      * The summary contains the identifier name and alias aligned in a table.
      *
      * @param  parameters The collection of parameters to format.
-     * @param  scopes     The set of scopes to include in the table, of <code>null</code> for all
+     * @param  scopes     The set of scopes to include in the table, of {@code null} for all
      *                    of them. A restricted a set will produce a table with less columns.
      * @throws IOException if an error occured will writing to the stream.
      */
@@ -529,32 +529,8 @@ trim:   for (int column=hide.length; --column>=1;) {
      *
      * @param  value the value to format.
      * @return The value formatted as a string.
-     *
-     * @todo Some code were commented out. This commented code should appears in
-     *       a subclass of <code>ParameterWriter</code> to be provided in the
-     *       grid coverage package.
      */
     protected String formatValue(final Object value) {
-//        if (KernelJAI.GRADIENT_MASK_SOBEL_HORIZONTAL.equals(value)) {
-//            return "GRADIENT_MASK_SOBEL_HORIZONTAL";
-//        }
-//        if (KernelJAI.GRADIENT_MASK_SOBEL_VERTICAL.equals(value)) {
-//            return "GRADIENT_MASK_SOBEL_VERTICAL";
-//        }
-//        if (value instanceof GridCoverage) {
-//            return ((GridCoverage) value).getName(null);
-//        }
-//        if (value instanceof Interpolation) {
-//            return getInterpolationName((Interpolation) value);
-//        }
-//        if (value instanceof EnumeratedParameter) {
-//            return ((EnumeratedParameter) value).getName();
-//        }
-//        if (value instanceof Color) {
-//            final Color c = (Color) value;
-//            return "RGB["+c.getRed()+','+c.getGreen()+','+c.getBlue()+']';
-//        }
-
         if (value instanceof Number) {
             if (numberFormat == null) {
                 numberFormat = NumberFormat.getNumberInstance(locale);

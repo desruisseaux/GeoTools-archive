@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.coverage.processing;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.awt.Rectangle;
@@ -62,7 +62,7 @@ import org.geotools.resources.image.ImageUtilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class Interpolator extends GridCoverage2D {
+public final class Interpolator2D extends GridCoverage2D {
     /**
      * The greatest value smaller than 1 representable as a {@code float} number.
      * This value can be obtained with {@code org.geotools.resources.XMath.previous(1f)}.
@@ -85,7 +85,7 @@ public final class Interpolator extends GridCoverage2D {
      * is no fallback. By convention, {@code this} means that interpolation should fallback
      * on {@code super.evaluate(...)} (i.e. nearest neighbor).
      */
-    private final Interpolator fallback;
+    private final Interpolator2D fallback;
 
     /**
      * Image bounds. Bounds have been reduced by {@link Interpolation}'s padding.
@@ -132,7 +132,7 @@ public final class Interpolator extends GridCoverage2D {
     {
         return create(coverage, new Interpolation[] {interpolation});
     }
-    
+
     /**
      * Constructs a new interpolator for an interpolation and its fallbacks. The fallbacks
      * are used if the primary interpolation failed because of {@linkplain Float#NaN NaN}
@@ -142,15 +142,15 @@ public final class Interpolator extends GridCoverage2D {
      * @param  interpolations The interpolation to use and its fallback (if any).
      */
     public static GridCoverage2D create(GridCoverage2D coverage, final Interpolation[] interpolations) {
-        while (coverage instanceof Interpolator) {
-            coverage = ((Interpolator)coverage).getSource();
+        while (coverage instanceof Interpolator2D) {
+            coverage = ((Interpolator2D)coverage).getSource();
         }
         if (interpolations.length==0 || (interpolations[0] instanceof InterpolationNearest)) {
             return coverage;
         }
-        return new Interpolator(coverage, interpolations, 0);
+        return new Interpolator2D(coverage, interpolations, 0);
     }
-    
+
     /**
      * Constructs a new interpolator for the specified interpolation.
      *
@@ -159,9 +159,9 @@ public final class Interpolator extends GridCoverage2D {
      *         (if any). This array must have at least 1 element.
      * @param  index The index of interpolation to use in the {@code interpolations} array.
      */
-    private Interpolator(final GridCoverage2D  coverage,
-                         final Interpolation[] interpolations,
-                         final int             index)
+    private Interpolator2D(final GridCoverage2D  coverage,
+                           final Interpolation[] interpolations,
+                           final int             index)
     {
         super(coverage);
         this.interpolation = interpolations[index];
@@ -171,7 +171,7 @@ public final class Interpolator extends GridCoverage2D {
                 // (i.e. "NearestNeighbor").
                 this.fallback = this;
             } else {
-                this.fallback = new Interpolator(coverage, interpolations, index+1);
+                this.fallback = new Interpolator2D(coverage, interpolations, index+1);
             }
         } else {
             this.fallback = null;
@@ -251,17 +251,17 @@ public final class Interpolator extends GridCoverage2D {
      *         geophysics values, or {@code false} to get the packed version.
      * @return The newly created grid coverage.
      */
-    protected GridCoverage2D createGeophysics(final boolean geo) {
+    GridCoverage2D createGeophysics(final boolean geo) {
         return create(getSource().geophysics(geo), getInterpolations());
     }
-    
+
     /**
      * Returns interpolations. The first array's element is the interpolation for
      * this grid coverage. Other elements (if any) are fallbacks.
      */
     public Interpolation[] getInterpolations() {
         final List interp = new ArrayList();
-        Interpolator scan = this;
+        Interpolator2D scan = this;
         do {
             interp.add(interpolation);
             if (scan.fallback == scan) {
@@ -275,7 +275,7 @@ public final class Interpolator extends GridCoverage2D {
     }
 
     /**
-     * Returns the name of the interpolation used by this {@link Interpolator}.
+     * Returns the name of the primary interpolation used by this {@code Interpolator2D}.
      */
     public String getInterpolationName() {
         return ImageUtilities.getInterpolationName(interpolation);
@@ -634,7 +634,7 @@ public final class Interpolator extends GridCoverage2D {
 //
 //        /**
 //         * Apply an interpolation to a grid coverage. This method is invoked
-//         * by {@link GridCoverageProcessor} for the "Interpolate" operation.
+//         * by {@link GridCoverageProcessorGT} for the "Interpolate" operation.
 //         */
 //        protected GridCoverage doOperation(final ParameterList  parameters,
 //                                           final RenderingHints hints)

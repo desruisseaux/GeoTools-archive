@@ -81,27 +81,27 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * A immutable, finite set of valid values (usually from a {linkplain org.opengis.util.CodeList
-     * code list}) or <code>null</code> if it doesn't apply. This set is immutable.
+     * code list}) or {@code null} if it doesn't apply. This set is immutable.
      */
     private final Set validValues;
 
     /**
-     * The default value for the parameter, or <code>null</code>.
+     * The default value for the parameter, or {@code null}.
      */
     private final Object defaultValue;
 
     /**
-     * The minimum parameter value, or <code>null</code>.
+     * The minimum parameter value, or {@code null}.
      */
     private final Comparable minimum;
 
     /**
-     * The maximum parameter value, or <code>null</code>.
+     * The maximum parameter value, or {@code null}.
      */
     private final Comparable maximum;
 
     /**
-     * The unit for default, minimum and maximum values, or <code>null</code>.
+     * The unit for default, minimum and maximum values, or {@code null}.
      */
     private final Unit unit;
 
@@ -129,8 +129,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * @param defaultValue The default value for the parameter.
      * @param minimum The minimum parameter value, or {@link Integer#MIN_VALUE} if none.
      * @param maximum The maximum parameter value, or {@link Integer#MAX_VALUE} if none.
-     * @param required <code>true</code> if this parameter is required,
-     *                 <code>false</code> otherwise.
+     * @param required {@code true} if this parameter is required, {@code false} otherwise.
      */
     public ParameterDescriptor(final Map properties,
                                final int defaultValue,
@@ -170,8 +169,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * @param minimum The minimum parameter value, or {@link Double#NEGATIVE_INFINITY} if none.
      * @param maximum The maximum parameter value, or {@link Double#POSITIVE_INFINITY} if none.
      * @param unit    The unit for default, minimum and maximum values.
-     * @param required <code>true</code> if this parameter is required,
-     *                 <code>false</code> otherwise.
+     * @param required {@code true} if this parameter is required, {@code false} otherwise.
      */
     public ParameterDescriptor(final Map     properties,
                                final double  defaultValue,
@@ -191,10 +189,10 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      *
      * @param name The parameter name.
      * @param valueClass The class that describe the type of the parameter.
-     * @param defaultValue The default value for the parameter, or <code>null</code>.
-     * @param minimum The minimum parameter value, or <code>null</code>.
-     * @param maximum The maximum parameter value, or <code>null</code>.
-     * @param unit    The unit for default, minimum and maximum values, or <code>null</code>.
+     * @param defaultValue The default value for the parameter, or {@code null}.
+     * @param minimum The minimum parameter value, or {@code null}.
+     * @param maximum The maximum parameter value, or {@code null}.
+     * @param unit    The unit for default, minimum and maximum values, or {@code null}.
      *
      * @deprecated This constructor add little benefit compared to the full constructor.
      *             In other words, this "convenience" constructor doesn't save much typing.
@@ -212,15 +210,14 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Construct a parameter for a name and a default value. The parameter type will
+     * Constructs a parameter for a name and a default value. The parameter type will
      * be assumed the same than the default value class.
      * 
      * @param name         The parameter name.
      * @param remarks      An optional description as a {@link String} or an
-     *                     {@link InternationalString}, or <code>null</code> if none.
+     *                     {@link InternationalString}, or {@code null} if none.
      * @param defaultValue The default value.
-     * @param required     <code>true</code> if this parameter is required,
-     *                     <code>false</code> otherwise.
+     * @param required     {@code true} if this parameter is required, {@code false} otherwise.
      */
     public ParameterDescriptor(final String       name,
                                final CharSequence remarks,
@@ -252,7 +249,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Construct a parameter for a {@linkplain CodeList code list} (or enumeration).
+     * Constructs a parameter for a {@linkplain CodeList code list} (or enumeration).
      *
      * @param name         The parameter name.
      * @param defaultValue The default value.
@@ -264,13 +261,13 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Construct a parameter for a {@linkplain CodeList code list} (or enumeration).
+     * Constructs a parameter for a {@linkplain CodeList code list} (or enumeration).
      * This constructor is used by the {@link Parameter(String,CodeList)} constructor.
      *
      * @param name         The parameter name.
      * @param valueClass   The class that describe the type of the parameter.
      *                     Must be a subclass of {@link CodeList}.
-     * @param defaultValue The default value, or <code>null</code>.
+     * @param defaultValue The default value, or {@code null}.
      */
     ParameterDescriptor(final String   name,
                         final Class    valueClass,
@@ -281,7 +278,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Returns the enumeration found in the specified <code>CodeList</code> class.
-     * Returns <code>null</code> if no values were found.
+     * Returns {@code null} if no values were found.
      */
     private static CodeList[] getCodeLists(final Class type) {
         try {
@@ -295,14 +292,14 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Construct a mandatory parameter for a set of predefined values.
+     * Constructs a mandatory parameter for a set of predefined values.
      *
      * @param name The parameter name.
      * @param valueClass The class that describe the type of the parameter.
      * @param validValues A finite set of valid values (usually from a
-     *        {linkplain org.opengis.util.CodeList code list}) or <code>null</code>
+     *        {linkplain org.opengis.util.CodeList code list}) or {@code null}
      *        if it doesn't apply.
-     * @param defaultValue The default value for the parameter, or <code>null</code>.
+     * @param defaultValue The default value for the parameter, or {@code null}.
      */
     public ParameterDescriptor(final String   name,
                                final Class    valueClass,
@@ -314,21 +311,21 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Construct a parameter from a set of properties. The properties map is
+     * Constructs a parameter from a set of properties. The properties map is
      * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param valueClass The class that describe the type of the parameter.
      * @param validValues A finite set of valid values (usually from a
-     *        {linkplain org.opengis.util.CodeList code list}) or <code>null</code>
+     *        {linkplain org.opengis.util.CodeList code list}) or {@code null}
      *        if it doesn't apply.
-     * @param defaultValue The default value for the parameter, or <code>null</code>.
-     * @param minimum The minimum parameter value, or <code>null</code>.
-     * @param maximum The maximum parameter value, or <code>null</code>.
-     * @param unit    The unit for default, minimum and maximum values.
-     * @param required <code>true</code> if this parameter is required, or <code>false</code>
-     *        if it is optional.
+     * @param defaultValue The default value for the parameter, or {@code null}.
+     * @param minimum  The minimum parameter value, or {@code null}.
+     * @param maximum  The maximum parameter value, or {@code null}.
+     * @param unit     The unit for default, minimum and maximum values.
+     * @param required {@code true} if this parameter is required,
+     *                 or {@code false} if it is optional.
      */
     public ParameterDescriptor(final Map        properties,
                                final Class      valueClass,
@@ -348,20 +345,20 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Construct a parameter from a set of properties. The properties map is
+     * Constructs a parameter from a set of properties. The properties map is
      * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param required <code>true</code> if this parameter is required, or <code>false</code>
+     * @param required {@code true} if this parameter is required, or {@code false}
      *        if it is optional.
      * @param valueClass The class that describe the type of the parameter.
      * @param validValues A finite set of valid values (usually from a
-     *        {linkplain org.opengis.util.CodeList code list}) or <code>null</code>
+     *        {linkplain org.opengis.util.CodeList code list}) or {@code null}
      *        if it doesn't apply.
-     * @param defaultValue The default value for the parameter, or <code>null</code>.
-     * @param minimum The minimum parameter value, or <code>null</code>.
-     * @param maximum The maximum parameter value, or <code>null</code>.
+     * @param defaultValue The default value for the parameter, or {@code null}.
+     * @param minimum The minimum parameter value, or {@code null}.
+     * @param maximum The maximum parameter value, or {@code null}.
      * @param unit    The unit for default, minimum and maximum values.
      *
      * @deprecated Use the constructor with <code>required</code> as the last argument
@@ -464,12 +461,12 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     /**
      * If this parameter allows only a finite set of values, returns this set.
      * This set is usually a {linkplain org.opengis.util.CodeList code list} or
-     * enumerations. This method returns <code>null</code> if this parameter
+     * enumerations. This method returns {@code null} if this parameter
      * doesn't limits values to a finite set.
      *
      * @return A finite set of valid values (usually from a
      *         {linkplain org.opengis.util.CodeList code list}),
-     *         or <code>null</code> if it doesn't apply.
+     *         or {@code null} if it doesn't apply.
      */
     public Set getValidValues() {
         return validValues;
@@ -478,9 +475,9 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     /**
      * Returns the default value for the parameter. The return type can be any type
      * including a {@link Number} or a {@link String}. If there is no default value,
-     * then this method returns <code>null</code>.
+     * then this method returns {@code null}.
      *
-     * @return The default value, or <code>null</code> in none.
+     * @return The default value, or {@code null} in none.
      */
     public Object getDefaultValue() {
         return defaultValue;
@@ -489,10 +486,9 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     /**
      * Returns the minimum parameter value. If there is no minimum value, or if minimum
      * value is inappropriate for the {@linkplain #getValueClass parameter type}, then
-     * this method returns <code>null</code>.
+     * this method returns {@code null}.
      *
-     * @return The minimum parameter value (often an instance of {@link Double}),
-     *         or <code>null</code>.
+     * @return The minimum parameter value (often an instance of {@link Double}), or {@code null}.
      */
     public Comparable getMinimumValue() {
         return minimum;
@@ -501,10 +497,9 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
     /**
      * Returns the maximum parameter value. If there is no maximum value, or if maximum
      * value is inappropriate for the {@linkplain #getValueClass parameter type}, then
-     * this method returns <code>null</code>.
+     * this method returns {@code null}.
      *
-     * @return The minimum parameter value (often an instance of {@link Double}),
-     *         or <code>null</code>.
+     * @return The minimum parameter value (often an instance of {@link Double}), or {@code null}.
      */
     public Comparable getMaximumValue() {
         return maximum;
@@ -518,7 +513,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * This attribute apply only if the values is of numeric type (usually an instance
      * of {@link Double}).
      *
-     * @return The unit for numeric value, or <code>null</code> if it
+     * @return The unit for numeric value, or {@code null} if it
      *         doesn't apply to the value type.
      */
     public Unit getUnit() {
@@ -529,9 +524,9 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * Compares the specified object with this parameter for equality.
      *
      * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {

@@ -91,8 +91,7 @@ import org.geotools.referencing.datum.GeodeticDatum;
  * // should be AffineTransform.getScaleInstance(0.25, 0.25).
  * //</FONT>
  * GridCoverage coverage;
- * coverage = new GridCoverage("The grid coverage", theRaster, gridCRS,
- *                             MathTransform2D.IDENTITY, ...);
+ * coverage = new GridCoverage("The grid coverage", theRaster, gridCRS, MathTransform2D.IDENTITY, ...);
  * FrameFactory.show(coverage);
  * <FONT color='#008000'>//
  * // Project the coverage from its current 'gridCS' to the 'realCS'. If the grid of
@@ -110,6 +109,8 @@ import org.geotools.referencing.datum.GeodeticDatum;
  * @author Martin Desruisseaux
  *
  * @see DerivedCRS
+ *
+ * @todo The example code is slightly out-dated.
  */
 public class LocalizationGrid {
     /**

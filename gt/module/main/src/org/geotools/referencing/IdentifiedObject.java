@@ -315,7 +315,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 case 92902992: {
                     if (key.equals(ALIAS_PROPERTY)) {
                         if (value instanceof String) {
-                            alias = NameFactory.create((String) value);
+                            alias = new GenericName[] {NameFactory.create((String) value)};
                         } else if (value instanceof String[]) {
                             final String[] values = (String[]) value;
                             final GenericName[] names = new GenericName[values.length];
