@@ -96,6 +96,12 @@ public interface StyleVisitor {
     void visit(TextSymbolizer text);
 
     /**
+     * Called when accept is called on a rastersymbolizer
+     * @param rasyer the raster symbolizer to visit
+     */    
+    void visit(RasterSymbolizer raster);
+
+    /**
      * Called when accept is called on a graphic
      * @param gr the graphic to visit
      */    
