@@ -11,7 +11,13 @@ import org.geotools.data.DataStoreFactorySpi;
 public class PropertyDataStoreFactory implements DataStoreFactorySpi {
     
     public DataStore createDataStore(Map params) throws IOException {
-        File dir = (File) params.get("directory");
+        Object dirParam = params.get("directory");
+	File dir = null;
+	if(dir instanceof File){
+	        dir = (File) dirParam;
+	}else{
+		dir = new File(String.valueOf(dirParam));
+	}
         if( dir.exists() && dir.isDirectory() ){
             return new PropertyDataStore( dir );
         }
