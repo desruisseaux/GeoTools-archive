@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.cs.LocalCoordinateSystem;
-import org.geotools.ct.MathTransform2D;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
@@ -72,7 +70,7 @@ public class DefaultMapContext implements MapContext {
     /** The logger for the map module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.map");
     List layerList = new ArrayList();
-    CoordinateReferenceSystem crs = LocalCoordinateSystem.PROMISCUOUS;
+    CoordinateReferenceSystem crs = C.PROMISCUOUS;
     Envelope areaOfInterest = null;
 
     /** Utility field used by event firing mechanism. */

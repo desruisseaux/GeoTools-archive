@@ -23,9 +23,9 @@ import java.awt.image.RenderedImage;
 
 import javax.media.jai.ImageMIPMap;
 
-import org.geotools.ct.MathTransform2D;
 import org.geotools.gc.GridCoverage;
 import org.geotools.resources.geometry.XAffineTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 
 
 /**
