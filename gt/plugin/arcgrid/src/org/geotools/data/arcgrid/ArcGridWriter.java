@@ -20,6 +20,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.gc.GridCoverage;
+import org.geotools.parameter.Parameter;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.geotools.data.coverage.grid.Format;
 import org.opengis.parameter.InvalidParameterNameException;
