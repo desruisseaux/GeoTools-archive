@@ -61,8 +61,7 @@ public class WMSReaderTest extends TestCase {
 	public void testRead() {
 		try {
 			WMSParameterValue[] params = new WMSParameterValue[16];
-
-			
+		
 			GeneralOperationParameter[] newParams = format.getReadParameters();
 			for (int i = 0; i < newParams.length; i++) {
 				WMSOperationParameter parameter = (WMSOperationParameter) newParams[i];
