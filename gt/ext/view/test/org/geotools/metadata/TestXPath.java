@@ -18,6 +18,7 @@ package org.geotools.metadata;
 
 import java.util.List;
 
+
 import junit.framework.TestCase;
 
 /**

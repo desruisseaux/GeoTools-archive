@@ -31,7 +31,7 @@ public class StupidNestedMetadataImpl extends AbstractMetadata implements
         StupidNestedMetadata {
 
     /** 
-     * @see org.geotools.metadata.StupidNestedMetadata#getFileData()
+     * @see org.geotools.data.arcgrid.test.StupidNestedMetadata#getFileData()
      */
     public FileMetadata getFileData() {
         URL resource = TestFileMetadataImpl.class.getResource("testdata/ArcGrid.asc");

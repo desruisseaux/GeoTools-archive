@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
-import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 
 import junit.framework.TestCase;
 

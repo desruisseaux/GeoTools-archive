@@ -16,6 +16,7 @@
  */
 package org.geotools.metadata;
 
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
