@@ -42,7 +42,7 @@
 <!--
 <project default="build"
 -->
-<project xmlns:reactor="reactor" xmlns:j="jelly:core" xmlns:u="jelly:util" xmlns:ant="jelly:ant" xmlns:maven="jelly:maven" xmlns:m="maven" xmlns:deploy="deploy" xmlns:texen="texen" xmlns:velocity="jelly:org.apache.commons.jelly.tags.velocity.VelocityTagLibrary" default="info">
+<project  xmlns:j="jelly:core" xmlns:u="jelly:util" xmlns:ant="jelly:ant" xmlns:maven="jelly:maven"  xmlns:deploy="deploy"  default="info">
 	<!-- ================================================================== -->
 	<!-- B U I L D                                                          -->
 	<!-- ================================================================== -->
@@ -241,14 +241,15 @@ Module ${module} : ${status}
 		<echo>
       reactor list = ${reactorProjects}
     </echo>
+    <!-- 
 		<velocity:merge name="xdocs/navigation.xml" basedir="${basedir}" template="navigation.vm"/>
-		<attainGoal name="xdoc"/>
+		<attainGoal name="xdoc"/> -->
 	</goal>
 	<!-- ================================================================== -->
 	<!-- F R O N T  E N D  W E B S I T E                                    -->
 	<!-- ================================================================== -->
 	<goal name="deploy-site-front-end">
-		<m:user-check user="${maven.username}"/>
+		<maven:user-check user="${maven.username}"/>
 		<attainGoal name="site-front-end"/>
 		<!-- This needs to taken from the project properties -->
 		<property name="maven.homepage" value="/seis/raid1/Apache/htdocs/software/geotools/"/>
@@ -275,7 +276,7 @@ Module ${module} : ${status}
 		<delete file="${maven.final.name}-site.tar.gz"/>
 	</goal>
 	<goal name="deploy-srcdist">
-		<m:user-check user="${maven.username}"/>
+		<maven:user-check user="${maven.username}"/>
 		<!-- This needs to taken from the project properties -->
 		<property name="maven.homepage" value="/seis/raid1/Apache/htdocs/software/geotools/"/>
 		<property name="maven.dist.dir" value="target"/>
