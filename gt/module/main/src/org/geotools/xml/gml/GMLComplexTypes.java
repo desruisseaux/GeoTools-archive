@@ -341,7 +341,7 @@ public class GMLComplexTypes {
                 // deprecated version
                 ai.addAttribute("", "srsName", "", "anyURI", "" + g.getSRID());
             } else {
-            	throw new IOException("srsName required for MultiPoint "+e.getName());
+            	throw new IOException("srsName required for MultiPoint "+(e==null?"":e.getName()));
             }
         }
 
@@ -3184,10 +3184,11 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws OperationNotSupportedException 
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException {
             Element e = value[0].getElement();
 
             if (e == null) {
@@ -3206,7 +3207,13 @@ public class GMLComplexTypes {
                 geoms[i] = (Point) value[i].getValue();
             }
 
-            return gf.createMultiPoint(geoms);
+            MultiPoint mp = gf.createMultiPoint(geoms);
+
+            ElementValue[] ev = new ElementValue[1];
+            ev[0] = new DefaultElementValue(element, mp);
+
+            return AbstractGeometryType.getInstance().getValue(element, ev,
+                attrs, hints);
         }
 
         /**
@@ -3346,10 +3353,11 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws OperationNotSupportedException 
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException {
             Element e = value[0].getElement();
 
             if (e == null) {
@@ -3368,7 +3376,13 @@ public class GMLComplexTypes {
                 geoms[i] = (LineString) value[i].getValue();
             }
 
-            return gf.createMultiLineString(geoms);
+            MultiLineString mp = gf.createMultiLineString(geoms);
+
+            ElementValue[] ev = new ElementValue[1];
+            ev[0] = new DefaultElementValue(element, mp);
+
+            return AbstractGeometryType.getInstance().getValue(element, ev,
+                attrs, hints);
         }
 
         /**
@@ -3508,10 +3522,11 @@ public class GMLComplexTypes {
         }
 
         /**
+         * @throws OperationNotSupportedException 
          * @see schema.Type#getValue(java.util.List)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints) throws SAXException {
+            Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException {
             Element e = value[0].getElement();
 
             if (e == null) {
@@ -3530,7 +3545,13 @@ public class GMLComplexTypes {
                 geoms[i] = (Polygon) value[i].getValue();
             }
 
-            return gf.createMultiPolygon(geoms);
+            MultiPolygon mp = gf.createMultiPolygon(geoms);
+
+            ElementValue[] ev = new ElementValue[1];
+            ev[0] = new DefaultElementValue(element, mp);
+
+            return AbstractGeometryType.getInstance().getValue(element, ev,
+                attrs, hints);
         }
 
         /**
