@@ -20,7 +20,7 @@
  *
  * Created on 12 February 2002, 21:27
  */
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.arcgrid;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

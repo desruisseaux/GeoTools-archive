@@ -1,7 +1,7 @@
 /*
  * Created on Apr 23, 2004
  */
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.arcgrid;
 
 import java.net.URL;
 

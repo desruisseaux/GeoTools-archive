@@ -4,7 +4,7 @@
  * Created on April 30, 2003, 12:16 PM
  */
 
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.arcgrid;
 
 import java.io.InputStream;
 import java.net.URL;

@@ -1,4 +1,4 @@
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.arcgrid;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

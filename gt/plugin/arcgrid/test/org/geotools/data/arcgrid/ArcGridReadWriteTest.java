@@ -4,7 +4,7 @@
  * Created on September 2, 2004, 9:26 PM
  */
 
-package org.geotools.data.arcgrid.test;
+package org.geotools.data.arcgrid;
 
 import java.io.File;
 import java.awt.image.Raster;
