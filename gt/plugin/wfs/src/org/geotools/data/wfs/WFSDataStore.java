@@ -28,6 +28,7 @@ import javax.naming.OperationNotSupportedException;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
@@ -378,7 +379,7 @@ public class WFSDataStore extends AbstractDataStore{
 //        return null;
 //    }
     
-    private WFSFeatureReader getFeatureReaderGet(Query request) throws SAXException, IOException{
+    private WFSFeatureReader getFeatureReaderGet(Query request,Transaction transaction) throws SAXException, IOException{
         URL getUrl = capabilities.getGetFeature().getGet();
 
 		if(getUrl == null)
@@ -432,8 +433,16 @@ System.out.println(url); // url to request
         hc.setRequestMethod("GET");
 
  	    InputStream is = getInputStream(hc,auth);
-        
- 	   WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize,timeout);
+
+ 	    WFSTransactionState ts = null;
+ 	    if(!(transaction == Transaction.AUTO_COMMIT)){
+ 	    	ts = (WFSTransactionState)transaction.getState(this);
+ 	    	if(ts == null){
+ 	    		ts = new WFSTransactionState();
+ 	    		transaction.putState(this,ts);
+ 	    	}
+ 	    }
+ 	    WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize,timeout,ts);
         return ft;
     }
     
@@ -476,7 +485,7 @@ System.out.println(url); // url to request
     	return e.getMinX()+","+e.getMinY()+","+e.getMaxX()+","+e.getMaxY();
     }
     
-    private WFSFeatureReader getFeatureReaderPost(Query query) throws SAXException, IOException{
+    private WFSFeatureReader getFeatureReaderPost(Query query,Transaction transaction) throws SAXException, IOException{
         URL postUrl = capabilities.getGetFeature().getPost();
 
 		if(postUrl == null)
@@ -517,8 +526,15 @@ System.out.println("FILTER WAS "+query.getFilter());
  	    InputStream is = getInputStream(hc,auth);
 // 	    System.out.println("ready?"+is.available());
 
- 	    WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize,timeout);
- 	    
+ 	    WFSTransactionState ts = null;
+ 	    if(!(transaction == Transaction.AUTO_COMMIT)){
+ 	    	ts = (WFSTransactionState)transaction.getState(this);
+ 	    	if(ts == null){
+ 	    		ts = new WFSTransactionState();
+ 	    		transaction.putState(this,ts);
+ 	    	}
+ 	    }
+ 	    WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is,bufferSize,timeout,ts);
         return ft;
     }
     
@@ -539,7 +555,7 @@ System.out.println("FILTER WAS "+query.getFilter());
         WFSFeatureReader t = null;
         if((protos & POST_FIRST) == POST_FIRST && t == null){
             try {
-                t = getFeatureReaderPost(query);
+                t = getFeatureReaderPost(query,transaction);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -548,7 +564,7 @@ System.out.println("FILTER WAS "+query.getFilter());
 
         if((protos & GET_FIRST) == GET_FIRST && t == null)
             try {
-                t = getFeatureReaderGet(query);
+                t = getFeatureReaderGet(query,transaction);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -556,7 +572,7 @@ System.out.println("FILTER WAS "+query.getFilter());
         
         if((protos & POST_OK) == POST_OK && t == null)
             try {
-                t = getFeatureReaderPost(query);
+                t = getFeatureReaderPost(query,transaction);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -564,7 +580,7 @@ System.out.println("FILTER WAS "+query.getFilter());
 
         if((protos & GET_OK) == GET_OK && t == null)
             try {
-                t = getFeatureReaderGet(query);
+                t = getFeatureReaderGet(query,transaction);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -639,6 +655,19 @@ System.out.println("FILTER WAS "+query.getFilter());
         return f==null?Filter.NONE:f;
     }
     
+	/* (non-Javadoc)
+	 * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
+	 */
+	public FeatureSource getFeatureSource(String typeName) throws IOException {
+		if(capabilities.getTransaction()!=null){
+			if(capabilities.getLockFeature()!=null){
+				return new WFSFeatureLocking(this,getSchema(typeName));
+			}
+			return new WFSFeatureStore(this,getSchema(typeName));
+		}
+		return new WFSFeatureSource(this,getSchema(typeName));
+	}
+	
     private static class WFSFilterVisitor implements FilterVisitor{
     	private Stack stack = new Stack();
     	

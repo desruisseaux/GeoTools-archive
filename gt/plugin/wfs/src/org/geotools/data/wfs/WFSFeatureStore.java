@@ -42,8 +42,8 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore{
 		return trans;
 	}
 	
-	public WFSFeatureStore(WFSDataStore ds, FeatureType ft, Transaction t){
-		super(ds,ft);trans=t;
+	public WFSFeatureStore(WFSDataStore ds, FeatureType ft){
+		super(ds,ft);
 	}
 
 	/**
@@ -160,5 +160,4 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore{
 	public void setTransaction(Transaction transaction) {
 		trans = transaction;
 	}
-
 }

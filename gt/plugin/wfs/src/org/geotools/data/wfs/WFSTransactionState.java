@@ -8,6 +8,7 @@ package org.geotools.data.wfs;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.geotools.data.Transaction;
@@ -62,5 +63,9 @@ public class WFSTransactionState implements State {
 	private LinkedList actions = new LinkedList();
 	public void addAction(Action a){
 		actions.add(a);
+	}
+	
+	public List getActions(){
+		return new LinkedList(actions);
 	}
 }

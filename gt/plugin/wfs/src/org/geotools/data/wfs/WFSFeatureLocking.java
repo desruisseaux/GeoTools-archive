@@ -8,10 +8,10 @@ package org.geotools.data.wfs;
 
 import java.io.IOException;
 
+import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.Query;
-import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 
@@ -24,10 +24,10 @@ import org.geotools.filter.Filter;
 public class WFSFeatureLocking extends WFSFeatureStore implements
 		FeatureLocking {
 
-	protected FeatureLock fl;
+	protected FeatureLock fl = null;
 
-	public WFSFeatureLocking(WFSDataStore ds, FeatureType ft, Transaction t,FeatureLock fl){
-		super(ds,ft,t);this.fl = fl;
+	public WFSFeatureLocking(WFSDataStore ds, FeatureType ft){
+		super(ds,ft);
 	}
 	
 	/* (non-Javadoc)
@@ -49,32 +49,28 @@ public class WFSFeatureLocking extends WFSFeatureStore implements
 	 * @see org.geotools.data.FeatureLocking#lockFeatures(org.geotools.filter.Filter)
 	 */
 	public int lockFeatures(Filter filter) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return lockFeatures(new DefaultQuery(ft.getTypeName(),filter));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.geotools.data.FeatureLocking#lockFeatures()
 	 */
 	public int lockFeatures() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		return lockFeatures(new DefaultQuery(ft.getTypeName()));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.geotools.data.FeatureLocking#unLockFeatures()
 	 */
 	public void unLockFeatures() throws IOException {
-		// TODO Auto-generated method stub
-
+		unLockFeatures(new DefaultQuery(ft.getTypeName()));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.geotools.data.FeatureLocking#unLockFeatures(org.geotools.filter.Filter)
 	 */
 	public void unLockFeatures(Filter filter) throws IOException {
-		// TODO Auto-generated method stub
-
+		unLockFeatures(new DefaultQuery(ft.getTypeName(),filter));
 	}
 
 	/* (non-Javadoc)
