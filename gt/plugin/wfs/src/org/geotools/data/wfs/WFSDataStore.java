@@ -386,7 +386,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         url += ("&TYPENAME=" + typeName);
-System.out.println("SCHMEMA GET "+url);
+//System.out.println("SCHMEMA GET "+url);
         getUrl = new URL(url);
 
         HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
