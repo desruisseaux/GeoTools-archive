@@ -35,6 +35,10 @@ import java.lang.reflect.InvocationTargetException;
 // OpenGIS dependencies
 import org.opengis.metadata.MetaData;
 import org.opengis.util.CodeList;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.util.SimpleInternationalString;
 
 
 /**
@@ -75,7 +79,7 @@ public class MetadataSource {
      * The first question mark is the table name to search into; the second
      * one is the primary key of the record to search.
      */
-    private final String query = "SELECT * FROM metadata.\"?\" WHERE identifier=?";
+    private final String query = "SELECT * FROM metadata.\"?\" WHERE id=?";
 
     /**
      * The SQL query to use for fetching a code list element.
@@ -173,11 +177,21 @@ public class MetadataSource {
         final Class valueType = method.getReturnType();
         if (valueType.isInterface() && valueType.getName().startsWith(metadataPackage)) {
             return getEntry(valueType, result.getInt(identifier, columnName));
-        } else if (CodeList.class.isAssignableFrom(valueType)) {
-            return getCodeList(valueType, result.getInt(identifier, columnName));
-        } else {
-            return result.getObject(identifier, columnName);
         }
+        if (CodeList.class.isAssignableFrom(valueType)) {
+            return getCodeList(valueType, result.getInt(identifier, columnName));
+        }
+        /*
+         * Not a foreigner key. Get the value and transform it to the
+         * espected type, if needed.
+         */
+        final Object value = result.getObject(identifier, columnName);
+        if (value != null) {
+            if (InternationalString.class.isAssignableFrom(valueType)) {
+               return new SimpleInternationalString(value.toString());
+            }
+        }
+        return value;
     }
 
     /**

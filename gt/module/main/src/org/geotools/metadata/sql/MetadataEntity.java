@@ -102,10 +102,12 @@ final class MetadataEntity implements InvocationHandler {
              * The method invoked is a method inherit from a parent class,
              * like Object.toString() or Object.hashCode(). This information
              * is not expected to exists in the database. Forward the call
-             * to the proxy object.
+             * to this object object, since they is only one instance by proxy.
+             * Note: do not forward to the proxy in order to avoid never-ending
+             * loop.
              */
             try {
-                return method.invoke(proxy, args);
+                return method.invoke(this, args);
             } catch (IllegalAccessException e) {
                 throw new MetadataException(e);
             } catch (InvocationTargetException e) {
