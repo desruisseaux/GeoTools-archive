@@ -9,6 +9,7 @@ import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.FeatureType;
 import org.geotools.xml.gml.FCBuffer;
+import org.xml.sax.SAXException;
 
 /**
  * <p> 
@@ -48,7 +49,11 @@ public class GMLDataStore extends AbstractFileDataStore {
      */
     public String[] getTypeNames() {
         if(fcBuffer == null)
-            fcBuffer = (FCBuffer)FCBuffer.getFeatureReader(uri,100);
+            try {
+                fcBuffer = (FCBuffer)FCBuffer.getFeatureReader(uri,100);
+            } catch (SAXException e) {
+                return null;
+            }
         FeatureType ft = fcBuffer.getFeatureType();
         return new String[] {ft.getTypeName(),};
     }
@@ -65,7 +70,11 @@ public class GMLDataStore extends AbstractFileDataStore {
   */
  public FeatureType getSchema() throws IOException {
      if(fcBuffer == null)
-         fcBuffer = (FCBuffer)FCBuffer.getFeatureReader(uri,100);
+         try {
+             fcBuffer = (FCBuffer)FCBuffer.getFeatureReader(uri,100);
+         } catch (SAXException e) {
+             throw new IOException(e.toString());
+         }
      FeatureType ft = fcBuffer.getFeatureType();
      return ft;
  }
@@ -81,7 +90,11 @@ public class GMLDataStore extends AbstractFileDataStore {
   */
  protected FeatureReader getFeatureReader() throws IOException {
      if(fcBuffer == null)
-         return FCBuffer.getFeatureReader(uri,100);
+        try {
+            return FCBuffer.getFeatureReader(uri,100);
+        } catch (SAXException e) {
+            throw new IOException(e.toString());
+        }
      FCBuffer r = fcBuffer;
      fcBuffer = null;
      return r;
