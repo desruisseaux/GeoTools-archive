@@ -6477,35 +6477,37 @@ public class GMLComplexTypes {
     private static AttributeType getAttribute(Element eg){
     	if(eg.getNamespace() == GMLSchema.NAMESPACE && (AbstractFeatureType.getInstance().getChildElements()[0] == eg || AbstractFeatureType.getInstance().getChildElements()[1] == eg || AbstractFeatureType.getInstance().getChildElements()[2] == eg))
     		return null;
-        
+
         Class type = Object.class;
-        if(eg.getType() instanceof SimpleType){
-            type = eg.getType().getInstanceType();
-        }else{
-            if(Object.class.equals(eg.getType().getInstanceType()) || Object[].class.equals(eg.getType().getInstanceType())){
-                // some work now
-                ElementGrouping child = ((ComplexType)eg.getType()).getChild();
-                if(child != null){
-                    List l = getAttributes(eg.getName(),child);
-                    if(l.isEmpty()){
-                        // who knows ... this really shouldn't happen
-                        type = eg.getType().getInstanceType();
-                    }else{
-                        if(l.size() == 1){
-                            return (AttributeType)l.iterator().next();
-                        }
-                        // Do some magic to find the type
-                        type = getCommonType(l);
-                    }
-                }else{
-                    // who knows ... this really shouldn't happen
-                    type = eg.getType().getInstanceType();
-                }
-            }else{
-                // we have a real type
-                type = eg.getType().getInstanceType();
-            }
-        }
+    	if(eg.getType() != null){
+	        if(eg.getType() instanceof SimpleType){
+	            type = eg.getType().getInstanceType();
+	        }else{
+	            if(Object.class.equals(eg.getType().getInstanceType()) || Object[].class.equals(eg.getType().getInstanceType())){
+	                // some work now
+	                ElementGrouping child = ((ComplexType)eg.getType()).getChild();
+	                if(child != null){
+	                    List l = getAttributes(eg.getName(),child);
+	                    if(l.isEmpty()){
+	                        // who knows ... this really shouldn't happen
+	                        type = eg.getType().getInstanceType();
+	                    }else{
+	                        if(l.size() == 1){
+	                            return (AttributeType)l.iterator().next();
+	                        }
+	                        // Do some magic to find the type
+	                        type = getCommonType(l);
+	                    }
+	                }else{
+	                    // who knows ... this really shouldn't happen
+	                    type = eg.getType().getInstanceType();
+	                }
+	            }else{
+	                // we have a real type
+	                type = eg.getType().getInstanceType();
+	            }
+	        }
+    	}
         if(type == null)
             type = Object.class;
         
