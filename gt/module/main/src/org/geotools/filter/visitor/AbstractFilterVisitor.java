@@ -52,7 +52,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor 
 
   
     /** Standard java logger */
-    private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
+    private static Logger LOGGER = Logger.getLogger("org.geotools.filter.visitor");
 
     /**
      * Empty constructor
@@ -64,7 +64,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor 
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
      */
     public void visit(Filter filter) {
-       // unknown filter type
+       // unknown filter type (not good, should not happen)
     }
 
     /**
@@ -81,9 +81,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor 
         
         if (filter.getRightValue() != null) {
             filter.getRightValue().accept(this);
-        }
-
-       
+        } 
     }
 
     /**
@@ -152,7 +150,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor 
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
      */
     public void visit(AttributeExpression expression) {
-       
+       //nothing to do
     }
 
     /**
@@ -194,6 +192,4 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor 
             }
         }
     }
-    
-
 }
