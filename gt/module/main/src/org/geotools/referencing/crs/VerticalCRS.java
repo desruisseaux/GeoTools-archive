@@ -32,7 +32,6 @@ import org.opengis.referencing.datum.VerticalDatum;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.ReferenceSystem;  // For javadoc
 
 
 /**
@@ -46,7 +45,7 @@ import org.geotools.referencing.ReferenceSystem;  // For javadoc
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.cs.VerticalCS Vertical}
+ *   {@link VerticalCS Vertical}
  * </TD></TR></TABLE>
  *
  * @version $Id$
@@ -87,7 +86,8 @@ public class VerticalCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * Constructs a vertical CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
+     * to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
+     * constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

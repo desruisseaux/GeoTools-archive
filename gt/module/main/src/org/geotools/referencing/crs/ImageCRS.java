@@ -29,7 +29,6 @@ import java.util.Collections;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AffineCS;
 import org.opengis.referencing.datum.ImageDatum;
-import org.geotools.referencing.ReferenceSystem;  // For javadoc
 
 
 /**
@@ -40,8 +39,8 @@ import org.geotools.referencing.ReferenceSystem;  // For javadoc
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.cs.CartesianCS Cartesian},
- *   {@link org.geotools.referencing.cs.AffineCS    Affine}
+ *   {@link CartesianCS Cartesian},
+ *   {@link AffineCS    Affine}
  * </TD></TR></TABLE>
  *
  * @version $Id$
@@ -70,8 +69,9 @@ public class ImageCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
-     * Constructs an image CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
+     * Constructs an image CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
+     * constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

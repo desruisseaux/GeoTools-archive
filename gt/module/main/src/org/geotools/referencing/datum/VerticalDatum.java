@@ -28,6 +28,8 @@ import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.cs.CoordinateSystemAxis; // For javadoc
+import org.opengis.referencing.crs.VerticalCRS;         // For javadoc
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -40,8 +42,7 @@ import org.geotools.resources.Utilities;
  * surface used as a zero-height surface. The description includes its position with respect
  * to the Earth for any of the height types recognized by this standard. There are several
  * types of Vertical Datums, and each may place constraints on the
- * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis Coordinate Axis} with which
- * it is combined to create a {@linkplain org.geotools.referencing.crs.VerticalCRS Vertical CRS}.
+ * {@linkplain Coordinate Axis} with which it is combined to create a {@linkplain Vertical CRS}.
  *
  * @version $Id$
  * @author Martin Desruisseaux

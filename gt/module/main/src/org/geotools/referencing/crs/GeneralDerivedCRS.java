@@ -42,7 +42,6 @@ import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -98,8 +97,8 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * Constructs a derived CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}. The following
-     * optional properties are also understood:
+     * the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
+     * constructor}. The following optional properties are also understood:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">

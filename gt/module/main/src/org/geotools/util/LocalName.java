@@ -146,12 +146,12 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
 
     /**
      * Returns the scope (name space) of this generic name. This method returns the same
-     * value than the one returned by the {@linkplain org.geotools.util.ScopedName scoped}
+     * value than the one returned by the {@linkplain ScopedName scoped}
      * version of this name. In other words, the following relation shall be respected:
      * <blockquote><table border='0'><tr>
-     *   <td nowrap>{@link org.geotools.util.ScopedName#asLocalName}</td>
+     *   <td nowrap>{@link ScopedName#asLocalName}</td>
      *   <td nowrap><code>.getScope() ==</code></td>
-     *   <td nowrap align="right">{@link org.geotools.util.ScopedName}</td>
+     *   <td nowrap align="right">{@link ScopedName}</td>
      *   <td nowrap><code>.getScope()</code></td>
      * </tr><tr>
      *   <td align="center"><font size=2>(a locale name)</font></td>

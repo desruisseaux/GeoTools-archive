@@ -36,10 +36,8 @@ import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.CartesianCS;
-import org.geotools.referencing.cs.CoordinateSystemAxis; // For Javadoc
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.Utilities;
@@ -119,8 +117,8 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * A two-dimensional cartesian coordinate reference system with
-     * {@linkplain CoordinateSystemAxis#X x},
-     * {@linkplain CoordinateSystemAxis#Y y}
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y}
      * axis in {@linkplain SI#METER metres}. By default, this CRS has no transformation
      * path to any other CRS (i.e. a map using this CS can't be reprojected to a
      * {@linkplain GeographicCRS geographic coordinate reference system} for example).
@@ -130,9 +128,9 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * A three-dimensional cartesian coordinate reference system with
-     * {@linkplain CoordinateSystemAxis#X x},
-     * {@linkplain CoordinateSystemAxis#Y y},
-     * {@linkplain CoordinateSystemAxis#Z z}
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y},
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Z z}
      * axis in {@linkplain SI#METER metres}. By default, this CRS has no transformation
      * path to any other CRS (i.e. a map using this CS can't be reprojected to a
      * {@linkplain GeographicCRS geographic coordinate reference system} for example).
@@ -142,8 +140,8 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * A two-dimensional wildcard coordinate system with
-     * {@linkplain CoordinateSystemAxis#X x},
-     * {@linkplain CoordinateSystemAxis#Y y}
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y}
      * axis in {@linkplain SI#METER metres}. At the difference of {@link #CARTESIAN_2D},
      * this coordinate system is treated specially by the default {@linkplain
      * org.geotools.referencing.operation.CoordinateOperationFactory coordinate operation factory}
@@ -157,9 +155,9 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * A three-dimensional wildcard coordinate system with
-     * {@linkplain CoordinateSystemAxis#X x},
-     * {@linkplain CoordinateSystemAxis#Y y},
-     * {@linkplain CoordinateSystemAxis#Z z}
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y},
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Z z}
      * axis in {@linkplain SI#METER metres}. At the difference of {@link #CARTESIAN_3D},
      * this coordinate system is treated specially by the default {@linkplain
      * org.geotools.referencing.operation.CoordinateOperationFactory coordinate operation factory}
@@ -187,7 +185,8 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * Constructs an engineering CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
+     * to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
+     * constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

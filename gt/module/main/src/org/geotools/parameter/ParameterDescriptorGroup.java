@@ -35,10 +35,10 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.metadata.Identifier;  // For javadoc
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.Identifier;  // For javadoc
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -131,8 +131,8 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      * Creates a new instance of
      * {@linkplain org.geotools.parameter.ParameterGroup parameter value group}
      * initialized with the
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getDefaultValue default values}. The
-     * {@linkplain org.geotools.parameter.ParameterGroup#getDescriptor parameter value descriptor}
+     * {@linkplain ParameterDescriptor#getDefaultValue default values}. The
+     * {@linkplain ParameterValueGroup#getDescriptor parameter value descriptor}
      * for the created group will be <code>this</code> object.
      */
     public GeneralParameterValue createValue() {
@@ -164,16 +164,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
 
     /**
      * Returns the first parameter in this group for the specified {@linkplain Identifier#getCode
-     * identifier code}. If no {@linkplain org.geotools.parameter.ParameterDescriptor parameter
-     * descriptor} is found for the given code, then this method search recursively in subgroups
-     * (if any). This convenience method provides a way to get parameter information by name.
-     * For example the following idiom fetches the default value for the
-     * <code>"false_easting"</code> parameter:
-     * <br><br>
-     * <blockquote><code>
-     * Object defaultValue = getParameter("false_easting").{@linkplain
-     * org.geotools.parameter.ParameterDescriptor#getDefaultValue() getDefaultValue()};
-     * </code></blockquote>
+     * identifier code}.
      *
      * @param  name The case insensitive {@linkplain Identifier#getCode identifier code} of the
      *              parameter to search for.

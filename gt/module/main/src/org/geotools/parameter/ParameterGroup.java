@@ -45,10 +45,10 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.metadata.Identifier;  // For javadoc
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.Identifier;  // For javadoc
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -58,9 +58,9 @@ import org.geotools.io.TableWriter;
 
 /**
  * A group of related parameter values. The same group can be repeated more than once in an
- * {@linkplain org.geotools.referencing.operation.Operation operation} or higher level
- * <code>ParameterValueGroup</code>, if those instances contain different values of one
- * or more {@link org.geotools.parameter.Parameter}s which suitably distinquish among
+ * {@linkplain org.opengis.referencing.operation.Operation operation} or higher level
+ * {@link org.opengis.parameter.ParameterValueGroup}, if those instances contain different
+ * values of one or more {@link ParameterValue}s which suitably distinquish among
  * those groups.
  *  
  * @version $Id$
@@ -254,27 +254,27 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
 
     /**
      * Returns the value in this group for the specified
-     * {@linkplain org.geotools.referencing.Identifier#getCode identifier code}.
-     * If no {@linkplain org.geotools.parameter.ParameterValue parameter value} is found but
-     * a {@linkplain org.geotools.parameter.ParameterDescriptor parameter descriptor} is found
+     * {@linkplain Identifier#getCode identifier code}.
+     * If no {@linkplain ParameterValue parameter value} is found but
+     * a {@linkplain ParameterDescriptor parameter descriptor} is found
      * (which may occurs if the parameter is optional, i.e.
-     * <code>{@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumOccurs minimumOccurs}
-     * == 0</code>), then a {@linkplain org.geotools.parameter.ParameterValue parameter value} is
-     * automatically created and initialized to its {@linkplain ParameterDescriptor#getDefaultValue
-     * default value} (if any).
+     * <code>{@linkplain ParameterDescriptor#getMinimumOccurs minimumOccurs} == 0</code>),
+     * then a {@linkplain ParameterValue parameter value} is
+     * automatically created and initialized to its
+     * {@linkplain ParameterDescriptor#getDefaultValue default value} (if any).
      *
      * <P>This convenience method provides a way to get and set parameter values by name. For
      * example the following idiom fetches a floating point value for the
      * <code>"false_easting"</code> parameter:</P>
      *
      * <blockquote><code>
-     * double value = parameter("false_easting").{@linkplain
-     * org.geotools.parameter.ParameterValue#doubleValue() doubleValue()};
+     * double value =
+     * parameter("false_easting").{@linkplain ParameterValue#doubleValue() doubleValue()};
      * </code></blockquote>
      *
      * <P>This method do not search recursively in subgroups. This is because more than one
-     * subgroup may exist for the same {@linkplain org.geotools.parameter.ParameterDescriptorGroup
-     * descriptor}. The user must {@linkplain #groups query all subgroups} and select explicitly
+     * subgroup may exist for the same {@linkplain ParameterDescriptorGroup descriptor}. The
+     * user must {@linkplain #groups query all subgroups} and select explicitly
      * the appropriate one to use.</P>
      *
      * @param  name The case insensitive {@linkplain Identifier#getCode identifier code} of the
@@ -324,11 +324,11 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     /**
      * Returns all subgroups with the specified name. This method do not create new groups.
      * If the requested group is optional (i.e.
-     * <code>{@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumOccurs minimumOccurs}
-     * == 0</code>) and no value were set, then this method returns an empty set.
+     * <code>{@linkplain ParameterDescriptor#getMinimumOccurs minimumOccurs} == 0</code>)
+     * and no value were set, then this method returns an empty set.
      *
-     * @param  name The case insensitive {@linkplain org.geotools.referencing.Identifier#getCode
-     *              identifier code} of the parameter group to search for.
+     * @param  name The case insensitive {@linkplain Identifier#getCode identifier code}
+     *         of the parameter group to search for.
      * @return The set of all parameter group for the given identifier code.
      * @throws ParameterNotFoundException if no {@linkplain ParameterDescriptorGroup descriptor}
      *         was found for the given name.

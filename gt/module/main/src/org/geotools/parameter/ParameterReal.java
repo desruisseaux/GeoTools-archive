@@ -71,7 +71,7 @@ public class ParameterReal extends AbstractParameter
 
     /**
      * Construct a parameter from the specified descriptor. The descriptor
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValueClass() value class}
+     * {@linkplain ParameterDescriptor#getValueClass() value class}
      * must be <code>{@linkplain Double}.class</code>.
      *
      * @param  descriptor The abstract definition of this parameter.
@@ -105,7 +105,7 @@ public class ParameterReal extends AbstractParameter
 
     /**
      * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}. The default
-     * implementation always delegates to {@link org.geotools.parameter.ParameterDescriptor#getUnit}.
+     * implementation always delegates to {@link ParameterDescriptor#getUnit}.
      *
      * @return The unit of measure, or <code>null</code> if none.
      */

@@ -24,7 +24,6 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies
 import java.util.Map;
-//import javax.units.Unit;
 
 // OpenGIS direct dependencies
 import org.opengis.referencing.datum.Datum;
@@ -34,14 +33,13 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.ReferenceSystem;
 
 
 /**
  * Abstract coordinate reference system, consisting of a single
- * {@linkplain org.geotools.referencing.cs.CoordinateSystem Coordinate System} and a single
- * {@linkplain org.geotools.referencing.datum.Datum Datum} (as opposed to
- * {@linkplain org.geotools.referencing.crs.CompoundCRS Compound CRS}).
+ * {@linkplain CoordinateSystem Coordinate System} and a single
+ * {@linkplain Datum Datum} (as opposed to
+ * {@linkplain CompoundCRS Compound CRS}).
  *
  * A coordinate reference system consists of an ordered sequence of coordinate system
  * axes that are related to the earth through a datum. A coordinate reference system
@@ -76,7 +74,8 @@ public class SingleCRS extends CoordinateReferenceSystem
 
     /**
      * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
+     * unchanged to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map)
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
@@ -103,7 +102,7 @@ public class SingleCRS extends CoordinateReferenceSystem
     /**
      * Returns the dimension of the underlying {@linkplain CoordinateSystem coordinate system}.
      * This is equivalent to <code>{@linkplain #coordinateSystem}.{@linkplain
-     * org.geotools.referencing.cs.CoordinateSystem#getDimension getDimension}()</code>.
+     * CoordinateSystem#getDimension getDimension}()</code>.
      *
      * @return The dimension of this coordinate reference system.
      */
@@ -115,7 +114,7 @@ public class SingleCRS extends CoordinateReferenceSystem
      * Returns the axis for the underlying {@linkplain CoordinateSystem coordinate system} at
      * the specified dimension. This is equivalent to
      * <code>{@linkplain #coordinateSystem}.{@linkplain
-     * org.geotools.referencing.cs.CoordinateSystem#getAxis getAxis}(dimension)</code>.
+     * CoordinateSystem#getAxis getAxis}(dimension)</code>.
      *
      * @param  dimension The zero based index of axis.
      * @return The axis at the specified dimension.

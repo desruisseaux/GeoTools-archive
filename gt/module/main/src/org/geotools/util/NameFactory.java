@@ -29,7 +29,7 @@ import org.opengis.util.InternationalString;
 
 
 /**
- * A factory for {@link org.geotools.util.GenericName} objects.
+ * A factory for {@link GenericName} objects.
  *
  * @version $Id$
  * @author  Martin Desruisseaux

@@ -37,9 +37,9 @@ import org.geotools.resources.Utilities;
 
 /**
  * Fully qualified identifier for an object.
- * A <code>ScopedName</code> contains a {@link org.geotools.util.LocalName} as
- * {@linkplain #asLocalName head} and a {@linkplain org.geotools.util.GenericName},
- * which may be a {@link org.geotools.util.LocalName} or an other <code>ScopedName</code>,
+ * A <code>ScopedName</code> contains a {@link LocalName} as
+ * {@linkplain #asLocalName head} and a {@linkplain GenericName},
+ * which may be a {@link LocalName} or an other {@link org.opengis.util.ScopedName},
  * as {@linkplain #getScope tail}.
  *
  * <P>Instances of this objects are usually not created directly.

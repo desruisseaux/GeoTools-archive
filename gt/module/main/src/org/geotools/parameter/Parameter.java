@@ -112,7 +112,7 @@ public class Parameter extends AbstractParameter
      * Construct a parameter from the specified name and value. This convenience constructor
      * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code>
-     * is to invokes {@link org.geotools.parameter.ParameterDescriptor#createValue}.
+     * is to invokes {@link ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
      * @param value The parameter value.
@@ -127,7 +127,7 @@ public class Parameter extends AbstractParameter
      * Construct a parameter from the specified name and value. This convenience constructor
      * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code> is
-     * to invokes {@link org.geotools.parameter.ParameterDescriptor#createValue}.
+     * to invokes {@link ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
      * @param value The parameter value.
@@ -144,7 +144,7 @@ public class Parameter extends AbstractParameter
      * Construct a parameter from the specified enumeration. This convenience constructor
      * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if
      * such an object was available, then the preferred way to get a <code>ParameterValue</code>
-     * is to invokes {@link org.geotools.parameter.ParameterDescriptor#createValue}.
+     * is to invokes {@link ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
      * @param value The parameter value.
@@ -207,10 +207,10 @@ public class Parameter extends AbstractParameter
     /**
      * Ensures that the given value is valid according the specified parameter descriptor.
      * This convenience method ensures that <code>value</code> is assignable to the
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValueClass expected class}, is between the
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMinimumValue minimum} and
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getMaximumValue maximum} values and is one of the
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getValidValues set of valid values}.
+     * {@linkplain ParameterDescriptor#getValueClass expected class}, is between the
+     * {@linkplain ParameterDescriptor#getMinimumValue minimum} and
+     * {@linkplain ParameterDescriptor#getMaximumValue maximum} values and is one of the
+     * {@linkplain ParameterDescriptor#getValidValues set of valid values}.
      * If the value fails any of those tests, then an exception is thrown.
      *
      * @param  descriptor The parameter descriptor to check against.

@@ -51,7 +51,7 @@ import org.geotools.referencing.wkt.Formatter;
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.cs.CartesianCS Cartesian}
+ *   {@link CartesianCS Cartesian}
  * </TD></TR></TABLE>
  *
  * @version $Id$

@@ -27,12 +27,12 @@ import java.util.Map;
 import java.util.Collections;
 
 // OpenGIS dependencies
+import org.opengis.referencing.datum.Datum;  // For javadoc
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.cs.CompoundCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
@@ -42,10 +42,10 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * A coordinate reference system describing the position of points through two or more
  * independent coordinate reference systems. Thus it is associated with two or more
- * {@linkplain org.geotools.referencing.cs.CoordinateSystem coordinate systems} and
- * {@linkplain org.geotools.referencing.datum.Datum datums} by defining the compound CRS
+ * {@linkplain CoordinateSystem coordinate systems} and
+ * {@linkplain Datum datums} by defining the compound CRS
  * as an ordered set of two or more instances of
- * {@link org.geotools.referencing.crs.CoordinateReferenceSystem}.
+ * {@link CoordinateReferenceSystem}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -105,7 +105,8 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
 
     /**
      * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
+     * unchanged to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map)
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param crs The array of coordinate reference system making this compound CRS.

@@ -45,7 +45,7 @@ import org.geotools.util.SimpleInternationalString;
 
 /**
  * The definition of a parameter used by an operation method.
- * For {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem Coordinate
+ * For {@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem Coordinate
  * Reference Systems} most parameter values are numeric, but other types
  * of parameter values are possible.
  *
@@ -363,13 +363,13 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      * initialized with the {@linkplain #getDefaultValue default value}.
      * The {@linkplain org.geotools.parameter.Parameter#getDescriptor parameter value
      * descriptor} for the created parameter value will be <code>this</code> object.
-     * <br><br>
-     * If the {@linkplain #getValueClass value class} specified at construction time was
+     *
+     * <P>If the {@linkplain #getValueClass value class} specified at construction time was
      * a primitive type (e.g. <code>Double.{@linkplain Double#TYPE TYPE}</code> instead
      * of <code>{@linkplain Double}.class</code>), then this method may returns a specialized
      * parameter value implementation for this primitive type. Specialized implementations may
      * use less storage space and be more flexible during conversions, but this flexibility is
-     * not always wanted.
+     * not always wanted.</P>
      */
     public org.opengis.parameter.GeneralParameterValue createValue() {
         if (Double.TYPE.equals(primitiveClass)) {

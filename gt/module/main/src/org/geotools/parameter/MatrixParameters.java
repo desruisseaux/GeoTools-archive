@@ -44,7 +44,7 @@ import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
- * A parameter group for {@linkplain GeneralMatrix matrix} elements.  The amount of
+ * A parameter group for {@linkplain Matrix matrix} elements.  The amount of
  * {@linkplain ParameterValue parameter values} is extensible, i.e. it can grown or
  * shrink according the value of  <code>"num_row"</code> and <code>"num_col"</code>
  * parameters. The parameters format may vary according the information provided to
@@ -244,7 +244,7 @@ public class MatrixParameters extends ParameterDescriptorGroup {
     /**
      * Returns the parameter in this group for a matrix element at the specified
      * index. row and column indices are 0 based. Indices must be lower that the
-     * {@link org.geotools.parameter.ParameterDescriptor#getMaximumValue maximum values}
+     * {@linkplain ParameterDescriptor#getMaximumValue maximum values}
      * given to the {@link #numRow} and {@link #numCol} parameters.
      *
      * @param  row    The row indice.
@@ -301,7 +301,7 @@ public class MatrixParameters extends ParameterDescriptorGroup {
 
     /**
      * Returns the parameters in this group. The number or elements is inferred from the
-     * {@link org.geotools.parameter.ParameterDescriptor#getDefaultValue default values}
+     * {@linkplain ParameterDescriptor#getDefaultValue default values}
      * given to the {@link #numRow} and {@link #numCol} parameters.
      *
      * @return The matrix parameters, including all elements.

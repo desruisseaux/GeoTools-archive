@@ -34,7 +34,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 /**
  * A three-dimensional coordinate system consisting of a
- * {@linkplain org.geotools.referencing.cs.PolarCS polar coordinate system} extended by a straight
+ * {@linkplain PolarCS polar coordinate system} extended by a straight
  * coordinate axis perpendicular to the plane spanned by the polar coordinate system.
  * A <code>CylindricalCS</code> shall have three {@linkplain #getAxis axis}.
  *
