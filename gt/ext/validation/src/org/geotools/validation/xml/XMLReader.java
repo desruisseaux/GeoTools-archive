@@ -207,6 +207,11 @@ public class XMLReader {
                             "An error occured loading a test in "
                             + dto.getName() + " test suite.", e);
                     }
+                    catch (Throwable t) {
+                        throw new ValidationException(
+                            "Could not load test suite "
+                            + dto.getName() + ":"+ t.getMessage(), t);
+                    }                    
                 }
             }
         } catch (IOException e) {
@@ -258,7 +263,7 @@ public class XMLReader {
 
             if (dto.getPlugIn() == null) {
                 throw new NullPointerException(
-                    "Error - should have a plugin here");
+                    "Error - should have a plugin at "+elem);
             }
         } catch (SAXException e) {
             throw new ValidationException("Error reading the plugin for the "
