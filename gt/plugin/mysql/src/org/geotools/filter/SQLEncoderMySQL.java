@@ -23,16 +23,13 @@ import java.util.logging.Logger;
 
 
 /**
- * Encodes a filter into a SQL WHERE statement for postgis.  This class adds
+ * Encodes a filter into a SQL WHERE statement for MySQL.  This class adds
  * the ability to turn geometry filters into sql statements if they are
  * bboxes.
  *
  * @author Chris Holmes, TOPP
- *
- * @task TODO: integrated with SQLEncoderPostgisGeos.java, as there no  real
- *       reason to have two different classes.  We just need to do testing to
- *       make sure both handle everything.  At the very least have the geos
- *       one extend more intelligently.
+ * @author Debasish Sahu, debasish.sahu@rmsi.com
+ * 
  */
 public class SQLEncoderMySQL extends SQLEncoder
     implements org.geotools.filter.FilterVisitor {
@@ -134,6 +131,7 @@ public class SQLEncoderMySQL extends SQLEncoder
      */
     public void visit(GeometryFilter filter) throws RuntimeException {
         LOGGER.finer("exporting GeometryFilter");
+		System.out.println("exporting GeometryFilter");
 
         if (filter.getFilterType() == AbstractFilter.GEOMETRY_BBOX) {
             DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
@@ -173,7 +171,7 @@ public class SQLEncoderMySQL extends SQLEncoder
         throws IOException {
         Geometry bbox = (Geometry) expression.getLiteral();
         String geomText = wkt.write(bbox);
-        out.write("MBRContains(GeometryFromText('" + geomText + "', " + srid
+        out.write("MBRIntersects(GeometryFromText('" + geomText + "', " + srid
             + "),geom);");//TODO instead of hardcoding 'geom,' we need the name
                           //     of the column (it could be 'the_geom' or anything
                           //     else)
