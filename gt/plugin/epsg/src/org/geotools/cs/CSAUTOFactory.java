@@ -36,7 +36,8 @@ import org.geotools.pt.CoordinatePoint;
 
 /**
  * Generate Automatic Projections (dynamic projections) based on code and location.
- * Automatic Projections are defined in Annex E of OGC-01-068r3.
+ * Automatic Projections are defined in Annex E of OGC-01-068r3 
+ * (Web Map Service Implementation Specification).
  *
  * <ul>
  *   <li>AUTO projection codes are in the range 42000-42499</li>
@@ -269,7 +270,7 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
      *   ],
      *   PROJECTON["Transverse_Mercator"],
      *   PARAMETER["Central_Meridian", $centralMeridian ],
-     *   PARAMETER["Latitude_of_Origion", 0 ],
+     *   PARAMETER["Latitude_of_Origin", 0 ],
      *   PARAMETER["False_Easting", 500000 ],
      *   PARAMETER["False_Northing", $falseNorthing ],
      *   PARAMETER["Scale_Factor", 0.9996 ],
@@ -310,6 +311,9 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
             final ParameterList parameters = factory.createProjectionParameterList(classification);
             parameters.setParameter("central_meridian", centralMeridian);
             parameters.setParameter("false_northing",   falseNorthing);
+            parameters.setParameter("Latitude_of_Origin", 0.0);
+            parameters.setParameter("False_Easting", 500000.0);
+            parameters.setParameter("Scale_Factor", 0.9996);
             final Projection projection = factory.createProjection("Auto UTM", classification, parameters);
             return factory.createProjectedCoordinateSystem("WGS 84 / Auto UTM",
                                                            GeographicCoordinateSystem.WGS84,
@@ -333,7 +337,8 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
      *   PARAMETER["Central_Meridian", centralMeridian}],
      *   PARAMETER["Latitude_of_Origin", 0],
      *   PARAMETER["False_Easting", 500000],
-     *   PARAMETER["False_Northing", falseNorthing}],PARAMETER["Scale_Factor", 0.9996],
+     *   PARAMETER["False_Northing", falseNorthing}],
+     *   PARAMETER["Scale_Factor", 0.9996],
      *   UNIT["Meter", 1]
      * ]
      * </code></pre>
@@ -368,6 +373,9 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
             final ParameterList parameters = factory.createProjectionParameterList(classification);
             parameters.setParameter("central_meridian", centralMeridian);
             parameters.setParameter("false_northing",   falseNorthing);
+            parameters.setParameter("Latitude_of_Origin", 0.0);
+            parameters.setParameter("False_Easting", 500000.0);
+            parameters.setParameter("Scale_Factor", 0.9996);
             final Projection projection = factory.createProjection("Auto Tr. Mercator", classification, parameters);
             return factory.createProjectedCoordinateSystem("WGS 84 / Auto Tr. Mercator",
                                                            GeographicCoordinateSystem.WGS84,
@@ -426,6 +434,9 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
             final ParameterList parameters  = factory.createProjectionParameterList(classification);
             parameters.setParameter("central_meridian", centralMeridian);
             parameters.setParameter("latitude_of_origin", latitudeOfOrigin );
+            parameters.setParameter("False_Easting", 0.0);
+            parameters.setParameter("false_northing", 0.0);
+            parameters.setParameter("Scale_Factor", 1.0);
             final Projection projection = factory.createProjection("Auto Orthographic", classification, parameters);
             return factory.createProjectedCoordinateSystem("WGS 84 / Auto Orthographic",
                                                            GeographicCoordinateSystem.WGS84,
@@ -483,7 +494,7 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory implements C
             final ParameterList parameters   = factory.createProjectionParameterList(classification);
             parameters.setParameter("central_meridian", centralMeridian);
             parameters.setParameter("latitude_of_origin", 0.0 );
-            // parameters.setParameter("standard_parallel1", standardParallel1);
+            // parameters.setParameter("standard_parallel_1", standardParallel1);
             final Projection projection = factory.createProjection("Auto Equirectangular", classification, parameters);
             return factory.createProjectedCoordinateSystem("WGS 84 / Auto Equirectangular",
                                                            GeographicCoordinateSystem.WGS84,
