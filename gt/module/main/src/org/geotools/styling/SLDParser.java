@@ -1,7 +1,6 @@
 package org.geotools.styling;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
