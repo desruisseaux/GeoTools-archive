@@ -62,7 +62,6 @@ public class ReferencingSuite extends TestCase {
         suite.addTest(org.geotools.util                           .WeakHashSetTest       .suite());
         suite.addTest(org.geotools.util                           .WeakValueHashMapTest  .suite());
         suite.addTest(org.geotools.measure                        .FormatTest            .suite());
-//      suite.addTest(org.geotools.referencing                    .CodeListTest          .suite());
         suite.addTest(org.geotools.referencing                    .BasicTest             .suite());
         suite.addTest(org.geotools.referencing                    .ParameterTest         .suite());
         suite.addTest(org.geotools.referencing.operation          .MatrixTest            .suite());
