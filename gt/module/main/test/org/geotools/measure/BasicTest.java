@@ -67,15 +67,31 @@ public class BasicTest extends TestCase {
      * Test {@link AngleFormat}.
      */
     public void testAngleFormat() throws ParseException {
-        AngleFormat f = new AngleFormat("DD.ddd", Locale.CANADA);
-        assertEquals("20.000", new Angle(20), f);
+        AngleFormat f = new AngleFormat("DD.ddd\u00B0", Locale.CANADA);
+        assertFormat( "20.000\u00B0",  new Angle   ( 20.000), f);
+        assertFormat( "20.749\u00B0",  new Angle   ( 20.749), f);
+        assertFormat("-12.247\u00B0",  new Angle   (-12.247), f);
+        assertFormat( "13.214\u00B0N", new Latitude( 13.214), f);
+        assertFormat( "12.782\u00B0S", new Latitude(-12.782), f);
+
+        f = new AngleFormat("DD.ddd\u00B0", Locale.FRANCE);
+        assertFormat("19,457\u00B0E", new Longitude( 19.457), f);
+        assertFormat("78,124\u00B0S", new Latitude (-78.124), f);
+
+        f = new AngleFormat("DDddd", Locale.CANADA);
+        assertFormat("19457E", new Longitude( 19.457), f);
+        assertFormat("78124S", new Latitude (-78.124), f);
+
+        f = new AngleFormat("DD\u00B0MM.m", Locale.CANADA);
+        assertFormat( "12\u00B030.0", new Angle( 12.50), f);
+        assertFormat("-10\u00B015.0", new Angle(-10.25), f);
     }
 
     /**
      * Format an object and parse the result. The format
      * output is compared with the expected output.
      */
-    private static void assertEquals(final String expected,
+    private static void assertFormat(final String expected,
                                      final Object value,
                                      final Format format) throws ParseException
     {
