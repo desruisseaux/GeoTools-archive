@@ -47,6 +47,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterValue;
@@ -470,26 +471,33 @@ public class Parser extends MathTransformParser {
         } catch (NoSuchIdentifierException exception) {
             throw element.parseFailed(exception, null);
         }
-        if (ellipsoid != null) {
-            final Unit axisUnit = ellipsoid.getAxisUnit();
-            parameters.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), axisUnit);
-            parameters.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), axisUnit);
-        }
-        Element param;
-        while ((param=parent.pullOptionalElement("PARAMETER")) != null) {
-            final String         paramName  = param.pullString("name");
-            final double         paramValue = param.pullDouble("value");
-            final ParameterValue parameter  = parameters.parameter(paramName);
-            final Unit expected = ((ParameterDescriptor)parameter.getDescriptor()).getUnit();
-            if (linearUnit!=null && SI.METER.isCompatible(expected)) {
-                parameter.setValue(paramValue, linearUnit);
-                continue;
+        Element param = parent;
+        try {
+            if (ellipsoid != null) {
+                final Unit axisUnit = ellipsoid.getAxisUnit();
+                parameters.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), axisUnit);
+                parameters.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), axisUnit);
             }
-            if (angularUnit!=null && SI.RADIAN.isCompatible(expected)) {
-                parameter.setValue(paramValue, angularUnit);
-                continue;
+            while ((param=parent.pullOptionalElement("PARAMETER")) != null) {
+                final String         paramName  = param.pullString("name");
+                final double         paramValue = param.pullDouble("value");
+                final ParameterValue parameter  = parameters.parameter(paramName);
+                final Unit expected = ((ParameterDescriptor)parameter.getDescriptor()).getUnit();
+                if (expected!=null && !Unit.ONE.equals(expected)) {
+                    if (linearUnit!=null && SI.METER.isCompatible(expected)) {
+                        parameter.setValue(paramValue, linearUnit);
+                        continue;
+                    }
+                    if (angularUnit!=null && SI.RADIAN.isCompatible(expected)) {
+                        parameter.setValue(paramValue, angularUnit);
+                        continue;
+                    }
+                }
+                parameter.setValue(paramValue);
             }
-            parameter.setValue(paramValue);
+        } catch (ParameterNotFoundException exception) {
+            throw param.parseFailed(exception, Resources.format(
+                  ResourceKeys.ERROR_UNEXPECTED_PARAMETER_$1, exception.getParameterName()));
         }
         return parameters;
     }

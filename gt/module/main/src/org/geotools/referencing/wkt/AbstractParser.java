@@ -227,41 +227,52 @@ public abstract class AbstractParser extends Format {
         } catch (ParseException exception) {
             err.println(exception.getLocalizedMessage());
             if (line != null) {
-                line = line.replace('\r', ' ').replace('\n', ' ');
-                final int WINDOW_WIDTH    = 80; // Arbitrary value.
-                int           stop        = line.length();
-                int           errorOffset = exception.getErrorOffset();
-                int           base        = errorOffset-WINDOW_WIDTH/2;
-                final int     baseMax     = stop-WINDOW_WIDTH;
-                final boolean hasTrailing = (Math.max(base,0) < baseMax);
-                if (!hasTrailing) {
-                    base = baseMax;
-                }
-                if (base < 0) {
-                    base = 0;
-                }
-                stop = Math.min(stop, base+WINDOW_WIDTH);
-                if (hasTrailing) {
-                    stop -= 3;
-                }
-                if (base != 0) {
-                    err.print("...");
-                    errorOffset += 3;
-                    base += 3;
-                }
-                err.print(line.substring(base, stop));
-                if (hasTrailing) {
-                    err.println("...");
-                } else {
-                    err.println();
-                }
-                err.print(Utilities.spaces(errorOffset-base));
-                err.println('^');
+                reportError(err, line, exception.getErrorOffset());
             }
         } catch (InvalidParameterValueException exception) {
             err.print(Resources.format(ResourceKeys.ERROR_IN_$1, exception.getParameterName()));
             err.print(' ');
             err.println(exception.getLocalizedMessage());
         }
+    }
+
+    /**
+     * Report a failure while parsing the specified line.
+     *
+     * @param err  The stream where to report the failure.
+     * @param line The line that failed.
+     * @param errorOffset The error offset in the specified line. This is usually the
+     *        value provided by {@link ParseException#getErrorOffset}.
+     */
+    static void reportError(final PrintWriter err, String line, int errorOffset) {
+        line = line.replace('\r', ' ').replace('\n', ' ');
+        final int WINDOW_WIDTH    = 80; // Arbitrary value.
+        int           stop        = line.length();
+        int           base        = errorOffset-WINDOW_WIDTH/2;
+        final int     baseMax     = stop-WINDOW_WIDTH;
+        final boolean hasTrailing = (Math.max(base,0) < baseMax);
+        if (!hasTrailing) {
+            base = baseMax;
+        }
+        if (base < 0) {
+            base = 0;
+        }
+        stop = Math.min(stop, base+WINDOW_WIDTH);
+        if (hasTrailing) {
+            stop -= 3;
+        }
+        if (base != 0) {
+            err.print("...");
+            errorOffset += 3;
+            base += 3;
+        }
+        err.print(line.substring(base, stop));
+        if (hasTrailing) {
+            err.println("...");
+        } else {
+            err.println();
+        }
+        err.print(Utilities.spaces(errorOffset-base));
+        err.println('^');
     }
 }

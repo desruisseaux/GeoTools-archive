@@ -118,6 +118,7 @@ public interface ResourceKeys
     public static final int ERROR_ILLEGAL_OCCURS_FOR_PARAMETER_$4       =    89;
     public static final int ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1  =    90;
     public static final int ERROR_INCOMPATIBLE_ELLIPSOID_$2             =    91;
+    public static final int ERROR_INCOMPATIBLE_UNIT_$1                  =   134;
     public static final int ERROR_INDEX_OUT_OF_BOUNDS_$1                =    92;
     public static final int ERROR_INSEPARABLE_TRANSFORM                 =    93;
     public static final int ERROR_IN_$1                                 =    94;

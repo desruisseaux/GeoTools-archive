@@ -801,7 +801,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @throws IllegalArgumentException if <code>unit</code> is not an angular unit.
      */
     protected static void ensureAngularUnit(final Unit unit) throws IllegalArgumentException {
-        if (!SI.RADIAN.isCompatible(unit)) {
+        if (!SI.RADIAN.isCompatible(unit) && !Unit.ONE.equals(unit)) {
             throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1, unit));
         }

@@ -16,26 +16,25 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.text.ParseException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.Format;
 import java.io.Writer;
-import java.io.IOException;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.io.LineNumberReader;
+import java.io.IOException;
 
 // OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -46,63 +45,76 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Parser;
+import org.geotools.referencing.wkt.AbstractConsole;
 import org.geotools.geometry.GeneralDirectPosition;
 
 
 /**
  * A console for executing CRS operations from the command line.
+ * Instructions are read from the {@linkplain System#in standard input stream}
+ * and results are sent to the  {@linkplain System#out standard output stream}.
+ * Instructions include:
+ *
+ * <table>
+ *   <tr><td nowrap valign="top"><P><code>SET</code> <var>name</var> <code>=</code> <var>wkt</var></P></td><td>
+ *   <P align="justify">Set the specified <var>name</var> as a shortcut for the specified Well Know
+ *   Text (<var>wkt</var>). This WKT can contains other shortcuts defined previously.</P></td></tr>
+ *
+ *   <tr><td nowrap valign="top"><P><code>transform = </code> <var>wkt</var></P></td><td>
+ *   <P align="justify">Set explicitly a {@linkplain MathTransform math transform} to use for
+ *   coordinate transformations. This instruction is a more direct alternative to the usage of
+ *   <code>source crs</code> and <code>target crs</code> instruction.</P></td></tr>
+ *
+ *   <tr><td nowrap valign="top"><P><code>source crs = </code> <var>wkt</var></P></td><td>
+ *   <P align="justify">Set the source {@linkplain CoordinateReferenceSystem coordinate reference
+ *   system} to the specified object. This object can be specified as a Well Know Text
+ *   (<var>wkt</var>) or as a shortcut previously set.</P></td></tr>
+ *
+ *   <tr><td nowrap valign="top"><P><code>target crs = </code> <var>wkt</var></P></td><td>
+ *   <P align="justify">Set the target {@linkplain CoordinateReferenceSystem coordinate reference
+ *   system} to the specified object. This object can be specified as a Well Know Text
+ *   (<var>wkt</var>) or as a shortcut previously set. Once both source and target
+ *   CRS are specified a {@linkplain MathTransform math transform} from source to
+ *   target CRS is automatically infered.</P></td></tr>
+ *
+ *   <tr><td nowrap valign="top"><P><code>source pt = </code> <var>coord</var></P></td><td>
+ *   <P align="justify">Transforms the specified coordinates from source CRS to target CRS
+ *   and prints the result.</P>
+ *
+ *   <tr><td nowrap valign="top"><P><code>target pt = </code> <var>coord</var></P></td><td>
+ *   <P align="justify">Inverse transforms the specified coordinates from target CRS to source CRS
+ *   and prints the result.</P>
+ *
+ *   <tr><td nowrap valign="top"><P><code>status</code></P></td><td>
+ *   <P align="justify">Print the current status (source and target
+ *   {@linkplain CoordinateReferenceSystem coordinate reference system},
+ *   {@linkplain MathTransform math transform} and its inverse).</P></td></tr>
+ * </table>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Console implements Runnable {
-    /**
-     * The standard input stream.
-     */
-    private final LineNumberReader in;
-
-    /**
-     * The standard output stream.
-     */
-    private final Writer out;
-
-    /**
-     * The error output stream.
-     */
-    private final Writer err;
-
-    /**
-     * The line separator.
-     */
-    private final String lineSeparator = System.getProperty("line.separator", "\n");
-
-
+public class Console extends AbstractConsole {
     /**
      * The number format to use for reading coordinate points.
      */
-    private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+    private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
 
     /**
-     * The WKT parser using default factories.
+     * The number separator in vectors. Usually <code>,</code>, but could
+     * also be <code>;</code> if the coma is already used as the decimal
+     * separator.
      */
-    private final Parser parser = new Parser();
+    private final String numberSeparator;
 
     /**
      * The coordinate operation factory to use.
      */
     private final CoordinateOperationFactory factory =
                   FactoryFinder.getCoordinateOperationFactory();
-    
-    /**
-     * The set of object defined during the execution of this console. Keys are
-     * {@link String} objects, while values are {@link CoordinateReferenceSystem}
-     * or {@link MathTransform} objects.
-     */
-    private final Map definitions = new HashMap();
 
     /**
      * The source and target CRS, or <code>null</code> if not yet determined.
@@ -120,116 +132,328 @@ public class Console implements Runnable {
     private MathTransform transform;
     
     /**
-     * Creates a new instance of console.
-     *
-     * @param in  The standard input stream.
-     * @param out The standard output stream.
-     * @param err The error output stream.
+     * Creates a new console instance using {@linkplain System#in standard input stream},
+     * {@linkplain System#out standard output stream}, {@linkplain System#err error output stream}
+     * and the system default line separator.
      */
-    public Console(final LineNumberReader in, final Writer out, final Writer err) {
-        this.in  = in;
-        this.out = out;
-        this.err = err;
+    public Console() {
+        super(new Parser());
+        numberSeparator = getNumberSeparator(numberFormat);
+    }
+    
+    /**
+     * Creates a new console instance using the specified input stream.
+     *
+     * @param in The input stream.
+     */
+    public Console(final LineNumberReader in) {
+        super(new Parser(), in);
+        numberSeparator = getNumberSeparator(numberFormat);
     }
 
     /**
-     * Returns a coordinate reference system for the specified name. The object
-     * must has been previously defined with a call to {@link #setDefinition}.
-     *
-     * @param  name The identifier name.
-     * @throws NoSuchIdentifierException if no CRS is registered under that name.
+     * Returns the character to use as a number separator.
+     * As a side effect, this method also adjust the minimum and maximum digits.
      */
-    private CoordinateReferenceSystem getCoordinateReferenceSystem(final String name)
-            throws NoSuchIdentifierException
-    {
-        final Object crs = definitions.get(name);
-        if (crs instanceof CoordinateReferenceSystem) {
-            return (CoordinateReferenceSystem) crs;
+    private static String getNumberSeparator(final NumberFormat numberFormat) {
+        numberFormat.setMinimumFractionDigits(6);
+        numberFormat.setMaximumFractionDigits(6);
+        if (numberFormat instanceof DecimalFormat) {
+            final char decimalSeparator = ((DecimalFormat) numberFormat)
+                        .getDecimalFormatSymbols().getDecimalSeparator();
+            if (decimalSeparator == ',') {
+                return ";";
+            }
         }
-        throw new NoSuchIdentifierException(
-                  Resources.format(ResourceKeys.ERROR_NO_SUCH_AUTHORITY_CODE_$2,
-                  Utilities.getShortName(CoordinateReferenceSystem.class), name), name);
+        return ",";
     }
 
     /**
-     * Returns a math transform for the specified name. The object
-     * must has been previously defined with a call to {@link #setDefinition}.
+     * Run the console from the command line. Before to process all instructions
+     * from the {@linkplain System#in standard input stream}, this method first
+     * process the following optional command-line arguments:
      *
-     * @param  name The identifier name.
-     * @throws NoSuchIdentifierException if no math transform is registered under that name.
-     */
-    private MathTransform getMathTransform(final String name)
-            throws NoSuchIdentifierException
-    {
-        final Object crs = definitions.get(name);
-        if (crs instanceof CoordinateReferenceSystem) {
-            return (MathTransform) crs;
-        }
-        throw new NoSuchIdentifierException(
-                  Resources.format(ResourceKeys.ERROR_NO_SUCH_AUTHORITY_CODE_$2,
-                  Utilities.getShortName(MathTransform.class), name), name);
-    }
-
-    /**
-     * If the specified string start with <code>"set"</code>, then add its
-     * value to the {@link #definitions} map and returns <code>true</code>.
-     * Otherwise, returns <code>false</code>.
+     * <TABLE CELLPADDING='0' CELLSPACING='0'>
+     *   <TR><TD NOWRAP><CODE>-load</CODE> <VAR>&lt;filename&gt;</VAR></TD>
+     *       <TD>&nbsp;Load a definition file before to run instructions from
+     *           the standard input stream.</TD></TR>
+     *   <TR><TD NOWRAP><CODE>-quiet</CODE></TD>
+     *       <TD>&nbsp;Do not print a confirmation for each command executed.</TD></TR>
+     *   <TR><TD NOWRAP><CODE>-encoding</CODE> <VAR>&lt;code&gt;</VAR></TD>
+     *       <TD>&nbsp;Set the character encoding.</TD></TR>
+     *   <TR><TD NOWRAP><CODE>-locale</CODE> <VAR>&lt;language&gt;</VAR></TD>
+     *       <TD>&nbsp;Set the language for the output (e.g. "fr" for French).</TD></TR>
+     * </TABLE>
      *
-     * @param  text The string to parse.
-     * @return <code>true</code> if it was a definition string,
-     *         or <code>false</code> otherwise.
-     * @throws ParseException if the string can't be parsed.
+     * @param args the command line arguments
      */
-    private boolean setDefinition(String text) throws ParseException, IOException {
+    public static void main(String[] args) {
+        final Arguments arguments = new Arguments(args);
+        final boolean quiet = arguments.getFlag          ("-quiet");
+        final String   load = arguments.getOptionalString("-load" );
+        final String   file = arguments.getOptionalString("-file" );
+        args = arguments.getRemainingArguments(0);
+        Locale.setDefault(arguments.locale);
+        final LineNumberReader input;
+        final Console console;
         /*
-         * If the string is in the form "set name = value",
-         * then separate the name and the value parts.
+         * The usual way to execute instructions from a file is to redirect the standard input
+         * stream using the standard DOS/Unix syntax (e.g. "< thefile.txt").  However, we also
+         * accept a "-file" argument for the same purpose. It is easier to debug. On DOS system,
+         * it also use the system default encoding instead of the command-line one.
          */
-        final String SET = "set";
-        if (!text.regionMatches(true, 0, SET, 0, SET.length())) {
-            return false;
+        if (file == null) {
+            input   = null;
+            console = new Console();
+        } else try {
+            input   = new LineNumberReader(new FileReader(file));
+            console = new Console(input);
+        } catch (IOException exception) {
+            System.err.println(exception.getLocalizedMessage());
+            return;
         }
-        text = text.substring(SET.length());
-        int lower,upper,index;
-        int length = text.length();
-        index=0;     while (index<length && Character.isSpaceChar         (text.charAt(index))) index++;
-        lower=index; while (index<length && Character.isJavaIdentifierPart(text.charAt(index))) index++;
-        upper=index; while (index<length && Character.isSpaceChar         (text.charAt(index))) index++;
-        if (lower==upper || index==length || text.charAt(index)!='=') {
-            // TODO: localize
-            throw new ParseException("SET must be in the form \"name = value\".", 0);
+        /*
+         * Load predefined shorcuts. The file must be in the form "name = WKT". An example
+         * of such file is the property file used by the property-based authority factory.
+         */
+        if (load != null) try {
+            final LineNumberReader in = new LineNumberReader(new FileReader(load));
+            try {
+                console.loadDefinitions(in);
+            } catch (ParseException exception) {
+                console.reportError(exception);
+                in.close();
+                return;
+            }
+            in.close();
+        } catch (IOException exception) {
+            console.reportError(exception);
+            return;
         }
-        String name  = text.substring(lower,upper);
-        String value = text.substring(index+1).trim();
-        final Object object = parser.parseObject(value);
-        final boolean updated = (definitions.put(name, object) != null);
-        // TODO: localize
-        out.write((updated ? "Updated" : "Added")+" definition for \""+name+"\".");
-        out.write(lineSeparator);
-        out.flush();
-        return true;
+        /*
+         * Run all instructions and close the stream if it was a file one.
+         */
+        console.setQuiet(quiet);
+        console.run();
+        if (input != null) try {
+            input.close();
+        } catch (IOException exception) {
+            console.reportError(exception);
+        }
     }
 
     /**
-     * Parse a vector of values. Vectors are used for coordinate points.
-     * Example:
-     * <pre>
-     * (46.69439222, 13.91405611, 41.21)
-     * </pre>
+     * Execute the specified instruction.
      *
-     * @param  text The vector to parse.
-     * @return The vector as floating point numbers.
-     * @throws ParseException if a number can't be parsed.
+     * @param  instruction The instruction to execute.
+     * @throws IOException if an I/O operation failed while writting to the
+     *         {@linkplain #out output stream}.
+     * @throws ParseException if a line can't be parsed.
+     * @throws FactoryException If a transform can't be created.
+     * @throws TransformException if a transform failed.
      */
-    private static double[] parseVector(String text) throws ParseException {
-        text = removeDelimitors(text, '(', ')');
-        final StringTokenizer st = new StringTokenizer(text, ",");
-        final double[]    values = new double[st.countTokens()];
-        for (int i=0; i<values.length; i++) {
-            values[i] = Double.parseDouble(st.nextToken());
+    protected void execute(String instruction)
+            throws IOException, ParseException, FactoryException, TransformException
+    {
+        String value = null;
+        int i = instruction.indexOf('=');
+        if (i >= 0) {
+            value       = instruction.substring(i+1).trim();
+            instruction = instruction.substring(0,i).trim();
         }
-        return values;
+        final StringTokenizer keywords = new StringTokenizer(instruction);
+        if (keywords.hasMoreTokens()) {
+            /*
+             * 1-keyword instructions
+             * Example: status, transform
+             */
+            final String key0 = keywords.nextToken();
+            if (!keywords.hasMoreTokens()) {
+                if (key0.equalsIgnoreCase("status")) {
+                    if (value != null) {
+                        throw unexpectedArgument("status");
+                    }
+                    executeStatus();
+                    return;
+                }
+                if (key0.equalsIgnoreCase("transform")) {
+                    final MathTransform old = transform;
+                    transform = (MathTransform) fromDefinition(value, MathTransform.class);
+                    sourceCRS = null;
+                    targetCRS = null;
+                    firePropertyChange("transform", old, transform);
+                    return;
+                }
+            } else {
+                /*
+                 * 2-keywords instructions
+                 * Example: source crs, target crs, set <name>
+                 */
+                final String key1 = keywords.nextToken();
+                if (!keywords.hasMoreTokens()) {
+                    if (key0.equalsIgnoreCase("set")) {
+                        addDefinition(key1, value);
+                        return;
+                    }
+                    if (key1.equalsIgnoreCase("crs")) {
+                        if (key0.equalsIgnoreCase("source")) {
+                            final CoordinateReferenceSystem old = sourceCRS;
+                            sourceCRS = (CoordinateReferenceSystem)
+                                        fromDefinition(value, CoordinateReferenceSystem.class);
+                            transform = null;
+                            firePropertyChange("source CRS", old, sourceCRS);
+                            return;
+                        }
+                        if (key0.equalsIgnoreCase("target")) {
+                            final CoordinateReferenceSystem old = targetCRS;
+                            targetCRS = (CoordinateReferenceSystem)
+                                        fromDefinition(value, CoordinateReferenceSystem.class);
+                            transform = null;
+                            firePropertyChange("target CRS", old, targetCRS);
+                            return;
+                        }
+                    }
+                    if (key1.equalsIgnoreCase("pt")) {
+                        if (key0.equalsIgnoreCase("source")) {
+                            executeSourcePt(value);
+                            return;
+                        }
+                        if (key0.equalsIgnoreCase("target")) {
+                            executeTargetPt(value);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        // TODO: localize
+        throw new ParseException("Illegal instruction \""+instruction+"\".", 0);
     }
+
+    /**
+     * Execute the "<code>status</code>" instruction.
+     * This instruction print the current console state.
+     *
+     * @todo Localize
+     */
+    private final void executeStatus() throws FactoryException, IOException {
+        /*
+         * Format the list of pre-defined objects first.
+         */
+        if (true) {
+            String separator = "Predefined objects: ";
+            for (final Iterator it=getDefinitionNames().iterator(); it.hasNext();) {
+                out.write(separator);
+                out.write(String.valueOf(it.next()));
+                separator = ", ";
+            }
+            out.write(lineSeparator);
+        }
+        /*
+         * Format source and target CRS, if any.
+         */
+        final TableWriter table = new TableWriter(out, " \u2502 ");
+        table.setMultiLinesCells(true);
+        char separator = '\u2500';
+        if (sourceCRS!=null || targetCRS!=null) {
+            table.writeHorizontalSeparator();
+            table.write("Source CRS");
+            table.nextColumn();
+            table.write("Target CRS");
+            table.nextLine();
+            table.writeHorizontalSeparator();
+            if (sourceCRS != null) {
+                table.write(parser.format(sourceCRS));
+            }
+            table.nextColumn();
+            if (targetCRS != null) {
+                table.write(parser.format(targetCRS));
+            }
+            table.nextLine();
+            separator = '\u2550';
+        }
+        /*
+         * Format the math transform and its inverse, if any.
+         */
+        update();
+        if (transform != null) {
+            table.nextLine(separator);
+            table.write("Math transform");
+            table.nextColumn();
+            table.write("Inverse transform");
+            table.nextLine();
+            table.writeHorizontalSeparator();
+            table.write(parser.format(transform));
+            table.nextColumn();
+            try {
+                table.write(parser.format(transform.inverse()));
+            } catch (NoninvertibleTransformException exception) {
+                table.write(exception.getLocalizedMessage());
+            }
+            table.nextLine();
+        }
+        table.writeHorizontalSeparator();
+        table.flush();
+    }
+    
+    /**
+     * Execute the "source pt" instruction.
+     *
+     * @param  value The value on the right side of <code>=</code>.
+     * @throws ParseException if the point can't be parsed.
+     * @throws TransformException if the transformation can't be performed.
+     */
+    private void executeSourcePt(final String value)
+            throws ParseException, FactoryException, TransformException, IOException
+    {
+        final double[] vector = parseVector(value);
+        final DirectPosition old = sourcePosition;
+        sourcePosition = new GeneralDirectPosition(vector);
+        update();
+        if (transform != null) {
+            targetPosition = transform.transform(sourcePosition, null);
+            printVector(vector);
+            out.write(" --> ");
+            printVector(targetPosition.getCoordinates());
+            out.write(lineSeparator);
+        } else {
+            firePropertyChange("source pt", old, sourcePosition);
+        }
+    }
+    
+    /**
+     * Execute the "target pt" instruction.
+     *
+     * @param  value The value on the right side of <code>=</code>.
+     * @throws ParseException if the point can't be parsed.
+     * @throws TransformException if the transformation can't be performed.
+     */
+    private void executeTargetPt(final String value)
+            throws ParseException, FactoryException, TransformException, IOException
+    {
+        final double[] vector = parseVector(value);
+        final DirectPosition old = targetPosition;
+        targetPosition = new GeneralDirectPosition(vector);
+        update();
+        if (transform != null) {
+            sourcePosition = transform.inverse().transform(targetPosition, null);
+            printVector(sourcePosition.getCoordinates());
+            out.write(" <-- ");
+            printVector(vector);
+            out.write(lineSeparator);
+        } else {
+            firePropertyChange("target pt", old, targetPosition);
+        }
+    }
+
+
+
+
+    ///////////////////////////////////////////////////////////
+    ////////                                           ////////
+    ////////        H E L P E R   M E T H O D S        ////////
+    ////////                                           ////////
+    ///////////////////////////////////////////////////////////
 
     /**
      * Check if the specified string start and end with the specified delimitors,
@@ -251,222 +475,63 @@ public class Console implements Runnable {
     }
 
     /**
-     * Update the internal state after a change, before to apply transformation.
+     * Parse a vector of values. Vectors are used for coordinate points.
+     * Example:
+     * <pre>
+     * (46.69439222, 13.91405611, 41.21)
+     * </pre>
+     *
+     * @param  text The vector to parse.
+     * @return The vector as floating point numbers.
+     * @throws ParseException if a number can't be parsed.
      */
-    private final void update() throws FactoryException {
+    private double[] parseVector(String text) throws ParseException {
+        text = removeDelimitors(text, '(', ')');
+        final StringTokenizer st = new StringTokenizer(text, numberSeparator);
+        final double[]    values = new double[st.countTokens()];
+        for (int i=0; i<values.length; i++) {
+            values[i] = numberFormat.parse(st.nextToken().trim()).doubleValue();
+        }
+        return values;
+    }
+
+    /**
+     * Print the specified vector to the output stream.
+     *
+     * @param  values The vector to print.
+     * @throws IOException if an error occured while writting to the output stream.
+     */
+    private void printVector(final double[] values) throws IOException {
+        out.write('(');
+        for (int i=0; i<values.length; i++) {
+            if (i != 0) {
+                out.write(numberSeparator);
+                out.write(' ');
+            }
+            out.write(numberFormat.format(values[i]));
+        }
+        out.write(')');
+    }
+
+    /**
+     * Update the internal state after a change, before to apply transformation.
+     * The most important change is to update the math transform, if needed.
+     */
+    private void update() throws FactoryException {
         if (transform==null && sourceCRS!=null && targetCRS!=null) {
             transform = factory.createOperation(sourceCRS, targetCRS).getMathTransform();
         }
     }
 
     /**
-     * Print the current console state.
-     */
-    private final void printStatus() throws FactoryException, IOException {
-        boolean hasOutput = false;
-        final TableWriter table = new TableWriter(out, " \u2502 ");
-        char separator = '\u2500';
-        if (sourceCRS!=null || targetCRS!=null) {
-            table.setMultiLinesCells(true);
-            table.writeHorizontalSeparator();
-            table.write("Source CRS");
-            table.nextColumn();
-            table.write("Target CRS");
-            table.nextLine();
-            table.writeHorizontalSeparator();
-            if (sourceCRS != null) {
-                table.write(parser.format(sourceCRS));
-            }
-            table.nextColumn();
-            if (targetCRS != null) {
-                table.write(parser.format(targetCRS));
-            }
-            table.nextLine();
-            separator = '\u2550';
-            hasOutput = true;
-        }
-        update();
-        if (transform != null) {
-            table.nextLine(separator);
-            table.write("Math transform");
-            table.nextColumn();
-            table.write("Inverse transform");
-            table.nextLine();
-            table.writeHorizontalSeparator();
-            table.write(parser.format(transform));
-            table.nextColumn();
-            try {
-                table.write(parser.format(transform.inverse()));
-            } catch (NoninvertibleTransformException exception) {
-                table.write(exception.getLocalizedMessage());
-            }
-            table.nextLine();
-            hasOutput = true;
-        }
-        table.writeHorizontalSeparator();
-        table.flush();
-        if (!hasOutput) {
-            out.write("No CRS or transform specified.");
-            out.write(lineSeparator);
-            out.flush();
-        }
-    }
-    
-    /**
-     * Run an instruction. Instruction may be any of the following lines
-     * (values listed here are just examples):
-     * <pre>
-     *   source crs     = _Wgs84NE_
-     *   target crs     = _Wgs84SW_
-     *   test_tolerance = 1e-6
-     *   source pt      = (1, 2)
-     *   target pt      = (-1, -2)
-     * </pre>
+     * Constructs an exception saying that an argument was unexpected.
      *
-     * or
-     * 
-     * <pre>
-     *   transform      = _mt_merc1_
-     *   test_tolerance = 1e-6
-     *   source pt      = (1, 2)
-     *   target pt      = (-1, -2)
-     * </pre>
-     *
-     * The "<code>pt_target</code>" instruction triggers the computation.
-     *
-     * @param  text The instruction to parse.
-     * @throws ParseException if the instruction can't be parsed.
-     * @throws NoSuchIdentifierException if the instruction uses an undefined variable.
-     * @throws TransformException if the transformation can't be run.
+     * @param  instruction The instruction name.
+     * @return The exception to throws.
+     * @todo Localize.
      */
-    private void runInstruction(final String text)
-            throws ParseException, FactoryException, TransformException, IOException
-    {
-        final StringTokenizer st = new StringTokenizer(text, "=");
-        switch (st.countTokens()) {
-            case 1: {
-                final String name  = st.nextToken().trim();
-                if (name.equalsIgnoreCase("status")) {
-                    printStatus();
-                    return;
-                }
-                break;
-            }
-            case 2: {
-                final String name  = st.nextToken().trim();
-                final String value = st.nextToken().trim();
-                if (name.equalsIgnoreCase("source crs")) {
-                    sourceCRS = getCoordinateReferenceSystem(value);
-                    transform = null;
-                    return;
-                }
-                if (name.equalsIgnoreCase("target crs")) {
-                    targetCRS = getCoordinateReferenceSystem(value);
-                    transform = null;
-                    return;
-                }
-                if (name.equalsIgnoreCase("transform")) {
-                    transform = getMathTransform(value);
-                    sourceCRS = null;
-                    targetCRS = null;
-                    return;
-                }
-                if (name.equalsIgnoreCase("source pt")) {
-                    sourcePosition = new GeneralDirectPosition(parseVector(value));
-                    out.write("source pt = ");
-                    out.write(String.valueOf(sourcePosition));
-                    out.write(lineSeparator);
-                    update();
-                    if (transform != null) {
-                        targetPosition = transform.transform(sourcePosition, null);
-                        out.write("target pt = ");
-                        out.write(String.valueOf(targetPosition));
-                        out.write(lineSeparator);
-                    }
-                    out.flush();
-                    return;
-                }
-                break;
-            }
-        }
-        throw new ParseException("Illegal instruction: "+text, 0);
-    }
-
-    /**
-     * Process instructions from the input stream specified at construction time.
-     * All lines are read until the end of file. This method may be invoked instead
-     * of {@link #run} if the processing must stop at the first error.
-     *
-     * @throws IOException if an I/O operation failed while reading from the input
-     *         stream or writting to the output stream.
-     * @throws ParseException if a line can't be parsed.
-     * @throws If a transform can't be created.
-     * @throws TransformException if a transform failed.
-     */
-    public void process() throws IOException, ParseException,
-                                 FactoryException, TransformException
-    {
-        String line;
-        while ((line=in.readLine()) != null) {
-            line = line.trim();
-            if (line.length() == 0) {
-                // Ignore empty lines.
-                continue;
-            }
-            if (line.startsWith("//")) {
-                // Ignore comment lines.
-                continue;
-            }
-            if (setDefinition(line)) {
-                // Definition line are processed by 'setDefinition'.
-                continue;
-            }
-            runInstruction(line);
-            out.flush();
-        }
-    }
-
-    /**
-     * Process instructions from the input stream specified at construction time.
-     * All lines are read until the end of file. Errors are catched and printed
-     * to the error output stream.
-     */
-    public void run() {
-        while (true) {
-            try {
-                process();
-                break;
-            } catch (Exception exception) {
-                try {
-                    out.flush();
-                    err.write(Utilities.getShortClassName(exception));
-                    final String message = exception.getLocalizedMessage();
-                    if (message != null) {
-                        err.write(": ");
-                        err.write(message);
-                    }
-                    err.write(lineSeparator);
-                    err.flush();
-                } catch (IOException ignore) {
-                    System.err.println(ignore.getLocalizedMessage());
-                }
-                continue;
-            }
-        }
-    }
-
-    /**
-     * Run the console.
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        final Arguments arguments = new Arguments(args);
-        args = arguments.getRemainingArguments(0);
-        final Console console = new Console(
-              new LineNumberReader(Arguments.getReader(System.in)),
-                                   Arguments.getWriter(System.out),
-                                   Arguments.getWriter(System.err));
-        console.run();
+    private static ParseException unexpectedArgument(final String instruction) {
+        return new ParseException("Unexpected argument for instruction \"" +
+                                  instruction + "\".", 0);
     }
 }

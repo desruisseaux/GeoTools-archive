@@ -94,7 +94,6 @@ public class StereographicPolar extends Stereographic {
      *         it overrides the latitude of origin parameter.
      * @param stereoType The type of stereographic projection (used for 
      *        creating wkt).
-     * @return The created math transform.
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
     protected StereographicPolar(final ParameterValueGroup parameters, final Collection expected, 

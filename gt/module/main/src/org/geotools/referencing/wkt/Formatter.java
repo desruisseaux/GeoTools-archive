@@ -375,7 +375,7 @@ public class Formatter {
             // Covariance: Remove cast if covariance is allowed.
             final ParameterDescriptor descriptor = (ParameterDescriptor) param.getDescriptor();
             Unit unit = descriptor.getUnit();
-            if (unit != null) {
+            if (unit!=null && !Unit.ONE.equals(unit)) {
                 if (linearUnit!=null && unit.isCompatible(linearUnit)) {
                     unit = linearUnit;
                 } else if (angularUnit!=null && unit.isCompatible(angularUnit)) {
@@ -467,10 +467,12 @@ public class Formatter {
             Unit base = null;
             if (SI.METER.isCompatible(unit)) {
                 base = SI.METER;
-            } else if (SI.RADIAN.isCompatible(unit)) {
-                base = SI.RADIAN;
             } else if (SI.SECOND.isCompatible(unit)) {
                 base = SI.SECOND;
+            } else if (SI.RADIAN.isCompatible(unit)) {
+                if (!Unit.ONE.equals(unit)) {
+                    base = SI.RADIAN;
+                }
             }
             if (base != null) {
                 append(unit.getConverterTo(base).convert(1));
@@ -656,7 +658,7 @@ public class Formatter {
      * @param unit The new unit, or <code>null</code>.
      */
     public void setAngularUnit(final Unit unit) {
-        if (unit!=null && !SI.RADIAN.isCompatible(unit)) {
+        if (unit!=null && (!SI.RADIAN.isCompatible(unit) || Unit.ONE.equals(unit))) {
             throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1, unit));
         }

@@ -294,10 +294,12 @@ public class Parameter extends AbstractParameter
      * checking unit with a better error message formatting if needed.
      */
     static int getUnitMessageID(final Unit unit) {
+        // Note: ONE must be tested before RADIAN.
+        if (Unit.ONE .equals      (unit)) return ResourceKeys.ERROR_INCOMPATIBLE_UNIT_$1;
         if (SI.METER .isCompatible(unit)) return ResourceKeys.ERROR_NON_LINEAR_UNIT_$1;
         if (SI.SECOND.isCompatible(unit)) return ResourceKeys.ERROR_NON_TEMPORAL_UNIT_$1;
         if (SI.RADIAN.isCompatible(unit)) return ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1;
-        return -1;
+        return ResourceKeys.ERROR_INCOMPATIBLE_UNIT_$1;
     }
 
     /**

@@ -65,11 +65,11 @@ import org.geotools.resources.cts.Resources;
  * @author Rueben Schulz
  */
 public abstract class Orthographic extends MapProjection {
-    
     /**
-     * The {@link MathTransformProvider} for a {@link Orthographic} projection.
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for a {@link Orthographic} projection.
      *
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.MathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
