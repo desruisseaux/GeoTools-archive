@@ -21,7 +21,7 @@
 package org.geotools.data.vpf.file;
 
 import java.io.IOException;
-import java.util.AbstractMap;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -44,7 +44,7 @@ public class VPFFileStore extends AbstractDataStore {
      * A collection of files which are available
      * Don't ask me how/when to close them!
      */
-    private AbstractMap files;
+    private Map files;
 
     /**
      * Default constructor. Nothing special
@@ -100,5 +100,24 @@ public class VPFFileStore extends AbstractDataStore {
     protected FeatureReader getFeatureReader(String pathName)
         throws IOException {
         return new VPFFileFeatureReader((VPFFile) getSchema(pathName));
+    }
+    /**
+     * Closes all of the opoen files and removes them from the collection of
+     * open files.
+     *
+     */
+    public void reset(){
+        Iterator iter = files.values().iterator();
+        VPFFile file = null;
+        while(iter.hasNext()){
+            try {
+                file = (VPFFile)iter.next();
+                file.close();
+            } catch (Exception exc) {
+                // No idea why this might happen
+                exc.printStackTrace();
+            }
+        }
+        files.clear();
     }
 }

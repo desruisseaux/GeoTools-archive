@@ -98,7 +98,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     private int headerLength = -0;
 
     /** The associated stream */
-    private RandomAccessFile input = null;
+    private RandomAccessFile inputStream = null;
 
     /**
      * Variable <code>narrativeTable</code> keeps value of  an optional
@@ -124,7 +124,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     public VPFFile(String cPathName) throws IOException, SchemaException {
         pathName = cPathName;
-        input = new RandomAccessFile(cPathName, ACCESS_MODE);
+        inputStream = new RandomAccessFile(cPathName, ACCESS_MODE);
         readHeader();
 
         GeometryAttributeType gat = null;
@@ -454,12 +454,12 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             int recordSize = getRecordSize();
 
             if (recordSize > 0) {
-                result = input.length() >= (input.getFilePointer() + recordSize);
+                result = inputStream.length() >= (inputStream.getFilePointer() + recordSize);
             } else {
-                result = input.length() >= (input.getFilePointer() + 1);
+                result = inputStream.length() >= (inputStream.getFilePointer() + 1);
             }
         } catch (IOException exc) {
-            // TODO Auto-generated catch block
+            // No idea what to do if this happens
             exc.printStackTrace();
         }
 
@@ -533,7 +533,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      * @exception IOException if an error occurs
      */
     protected char readChar() throws IOException {
-        return (char) input.read();
+        return (char) inputStream.read();
     }
 
     /**
@@ -710,7 +710,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
 
             byte[] dataBytes = new byte[instancesCount * DataUtils
                 .getDataTypeSize(dataType)];
-            input.read(dataBytes);
+            inputStream.read(dataBytes);
             result = DataUtils.decodeData(dataBytes, dataType);
 
             break;
@@ -791,7 +791,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     protected void readHeader() throws VPFHeaderFormatException, IOException {
         byte[] fourBytes = new byte[4];
-        input.read(fourBytes);
+        inputStream.read(fourBytes);
 
         byteOrder = readChar();
 
@@ -859,7 +859,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     protected byte[] readNumber(int cnt) throws IOException {
         byte[] dataBytes = new byte[cnt];
-        int res = input.read(dataBytes);
+        int res = inputStream.read(dataBytes);
 
         if (res == cnt) {
             if (byteOrder == LITTLE_ENDIAN_ORDER) {
@@ -930,13 +930,13 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      */
     protected TripletId readTripletId() throws IOException {
 // TODO: does this take into account byte order properly?
-        byte tripletDef = (byte) input.read();
+        byte tripletDef = (byte) inputStream.read();
         int dataSize = TripletId.calculateDataSize(tripletDef);
         byte[] tripletData = new byte[dataSize + 1];
         tripletData[0] = tripletDef;
 
         if (dataSize > 0) {
-            input.read(tripletData, 1, dataSize);
+            inputStream.read(tripletData, 1, dataSize);
         }
 
         return new TripletId(tripletData);
@@ -971,7 +971,13 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             // This just means there is nothing in the table
         }
     }
-
+    /**
+     * Close the input stream pointed to by the object
+     *  @throws IOException in some unlikely situation
+     */
+    public void close() throws IOException{
+        inputStream.close();
+    }
     /**
      * Sets the position in the stream
      *
@@ -982,9 +988,9 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     protected void setPosition(long pos) throws IOException {
         if (getRecordSize() < 0) {
             VariableIndexRow varRow = (VariableIndexRow) variableIndex.readRow((int) pos);
-            input.seek(varRow.getOffset());
+            inputStream.seek(varRow.getOffset());
         } else {
-            input.seek(getAdjustedHeaderLength()
+            inputStream.seek(getAdjustedHeaderLength()
                 + ((pos - 1) * getRecordSize()));
         }
     }
@@ -1004,7 +1010,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
      * @exception IOException if an error occurs
      */
     protected void unread(long bytes) throws IOException {
-        input.seek(input.getFilePointer() - bytes);
+        inputStream.seek(inputStream.getFilePointer() - bytes);
     }
 
     /**
