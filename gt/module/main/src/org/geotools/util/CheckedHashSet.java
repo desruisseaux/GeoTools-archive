@@ -20,6 +20,9 @@ import java.util.Iterator;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -31,8 +34,12 @@ import org.geotools.resources.cts.ResourceKeys;
  * 
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
+ *
+ * @todo Provides synchronization facility on arbitrary lock, for use with the metadata package.
+ *       The lock would be the metadata that owns this collection. Be carefull to update the lock
+ *       after a clone (this work my be done in <code>MetadataEntity.unmodifiable(Object)</code>).
  */
-public class CheckedHashSet extends LinkedHashSet {
+public class CheckedHashSet extends LinkedHashSet implements Cloneable {
     /**
      * Serial version UID for compatibility with different versions.
      */

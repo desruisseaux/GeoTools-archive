@@ -27,12 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
 import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Series;
+import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.PresentationForm;
 import org.opengis.util.InternationalString;
@@ -40,6 +40,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.util.CheckedHashSet;
+import org.geotools.util.CheckedHashMap;
 import org.geotools.util.CheckedArrayList;
 import org.geotools.resources.Utilities;
 
@@ -51,9 +52,7 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class Citation extends MetadataEntity
-                   implements org.opengis.metadata.citation.Citation, Serializable
-{
+public class Citation extends MetadataEntity implements org.opengis.metadata.citation.Citation {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -63,16 +62,25 @@ public class Citation extends MetadataEntity
      * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
      */
     public static final Citation OPEN_GIS = new Citation("OpenGIS consortium");
+    static {
+        OPEN_GIS.freeze();
+    }
 
     /**
      * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
      */
     public static final Citation EPSG = new Citation("European Petroleum Survey Group");
+    static {
+        EPSG.freeze();
+    }
 
     /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.
      */
     public static final Citation GEOTOOLS = new Citation("Geotools");
+    static {
+        GEOTOOLS.freeze();
+    }
 
     /**
      * Name by which the cited resource is known.
@@ -175,7 +183,8 @@ public class Citation extends MetadataEntity
     /**
      * Set the name by which the cited resource is known.
      */
-    public void setTitle(final InternationalString title) {
+    public synchronized void setTitle(final InternationalString title) {
+        checkWritePermission();
         this.title = title;
     }
 
@@ -184,13 +193,15 @@ public class Citation extends MetadataEntity
      * Example: "DCW" as an alternative title for "Digital Chart of the World.
      */
     public List getAlternateTitles() {
+        final List alternateTitles = this.alternateTitles; // Avoid synchronization
         return (alternateTitles!=null) ? alternateTitles : Collections.EMPTY_LIST;
     }
 
     /**
      * Set the short name or other language name by which the cited information is known.
      */
-    public void setAlternateTitles(final List alternateTitles) {
+    public synchronized void setAlternateTitles(final List alternateTitles) {
+        checkWritePermission();
         if (this.alternateTitles == null) {
             this.alternateTitles = new CheckedArrayList(InternationalString.class);
         } else {
@@ -203,6 +214,7 @@ public class Citation extends MetadataEntity
      * Returns the reference date for the cited resource.
      */
     public Map getDates() {
+        final Map dates = this.dates; // Avoid synchronization
         return (dates!=null) ? dates : Collections.EMPTY_MAP;
     }
 
@@ -212,9 +224,10 @@ public class Citation extends MetadataEntity
      * @todo Defines a {@link HashMap} subclass which transform all {@link Date} object
      *       into unmidifiable dates.
      */
-    public void setDates(final Map dates) {
+    public synchronized void setDates(final Map dates) {
+        checkWritePermission();
         if (this.dates == null) {
-            this.dates = new HashMap();
+            this.dates = new CheckedHashMap(DateType.class, Date.class);
         } else {
             this.dates.clear();
         }
@@ -231,7 +244,8 @@ public class Citation extends MetadataEntity
     /**
      * Set the version of the cited resource.
      */
-    public void setEdition(final InternationalString edition) {
+    public synchronized void setEdition(final InternationalString edition) {
+        checkWritePermission();
         this.edition = edition;
     }
 
@@ -247,7 +261,8 @@ public class Citation extends MetadataEntity
      *
      * @todo Use an unmodifiable {@link Date} here.
      */
-    public void setEditionDate(Date editionDate) {
+    public synchronized void setEditionDate(Date editionDate) {
+        checkWritePermission();
         if (editionDate != null) {
             editionDate = new Date(editionDate.getTime());
         }
@@ -259,6 +274,7 @@ public class Citation extends MetadataEntity
      * National Stock Number (NSN).
      */
     public Set getIdentifiers() {
+        final Set identifiers = this.identifiers; // Avoid synchronization
         return (identifiers!=null) ? identifiers : Collections.EMPTY_SET;
     }
 
@@ -266,7 +282,8 @@ public class Citation extends MetadataEntity
      * Set the unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public void setIdentifiers(final Set identifiers) {
+    public synchronized void setIdentifiers(final Set identifiers) {
+        checkWritePermission();
         if (this.identifiers == null) {
             this.identifiers = new CheckedHashSet(String.class);
         } else {
@@ -280,6 +297,7 @@ public class Citation extends MetadataEntity
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
      */
     public Set getIdentifierTypes() {
+        final Set identifierTypes = this.identifierTypes; // Avoid synchronization
         return (identifierTypes!=null) ? identifierTypes : Collections.EMPTY_SET;
     }
 
@@ -287,7 +305,8 @@ public class Citation extends MetadataEntity
      * Set the reference form of the unique identifier (ID).
      * Example: Universal Product Code (UPC), National Stock Number (NSN).
      */
-    public void setIdentifierTypes(final Set identifierTypes) {
+    public synchronized void setIdentifierTypes(final Set identifierTypes) {
+        checkWritePermission();
         if (this.identifierTypes == null) {
             this.identifierTypes = new CheckedHashSet(String.class);
         } else {
@@ -301,6 +320,7 @@ public class Citation extends MetadataEntity
      * responsible for the resource. Returns an empty string if there is none.
      */
     public Set getCitedResponsibleParties() {
+        final Set citedResponsibleParties = this.citedResponsibleParties; // Avoid synchronization
         return (citedResponsibleParties!=null) ? citedResponsibleParties : Collections.EMPTY_SET;
     }
 
@@ -308,7 +328,8 @@ public class Citation extends MetadataEntity
      * Set the name and position information for an individual or organization that is responsible
      * for the resource. Returns an empty string if there is none.
      */
-    public void setCitedResponsibleParties(final Set citedResponsibleParties) {
+    public synchronized void setCitedResponsibleParties(final Set citedResponsibleParties) {
+        checkWritePermission();
         if (this.citedResponsibleParties == null) {
             this.citedResponsibleParties = new CheckedHashSet(ResponsibleParty.class);
         } else {
@@ -321,13 +342,15 @@ public class Citation extends MetadataEntity
      * Returns the mode in which the resource is represented, or an empty string if none.
      */
     public Set getPresentationForm() {
+        final Set presentationForm = this.presentationForm; // Avoid synchronization
         return (presentationForm!=null) ? presentationForm : Collections.EMPTY_SET;
     }
 
     /**
      * Set the mode in which the resource is represented, or an empty string if none.
      */
-    public void setPresentationForm(final Set presentationForm) {
+    public synchronized void setPresentationForm(final Set presentationForm) {
+        checkWritePermission();
         if (this.presentationForm == null) {
             this.presentationForm = new CheckedHashSet(PresentationForm.class);
         } else {
@@ -348,7 +371,8 @@ public class Citation extends MetadataEntity
      * Set the information about the series, or aggregate dataset, of which the dataset is
      * a part. Set to <code>null</code> if none.
      */
-    public void setSeries(final Series series) {
+    public synchronized void setSeries(final Series series) {
+        checkWritePermission();
         this.series = series;
     }
 
@@ -364,7 +388,8 @@ public class Citation extends MetadataEntity
      * Set other information required to complete the citation that is not recorded elsewhere.
      * Set to <code>null</code> if none.
      */
-    public void setOtherCitationDetails(final InternationalString otherCitationDetails) {
+    public synchronized void setOtherCitationDetails(final InternationalString otherCitationDetails) {
+        checkWritePermission();
         this.otherCitationDetails = otherCitationDetails;
     }
 
@@ -382,7 +407,8 @@ public class Citation extends MetadataEntity
      * collectively, combined with information about what volumes are available at the
      * source cited. Set to <code>null</code> if there is no title.
      */
-    public void setCollectiveTitle(final InternationalString collectiveTitle) {
+    public synchronized void setCollectiveTitle(final InternationalString collectiveTitle) {
+        checkWritePermission();
         this.collectiveTitle = collectiveTitle;
     }
 
@@ -396,7 +422,8 @@ public class Citation extends MetadataEntity
     /**
      * Set the International Standard Book Number, or <code>null</code> if none.
      */
-    public void setISBN(final String ISBN) {
+    public synchronized void setISBN(final String ISBN) {
+        checkWritePermission();
         this.ISBN = ISBN;
     }
 
@@ -410,14 +437,35 @@ public class Citation extends MetadataEntity
     /**
      * Set the International Standard Serial Number, or <code>null</code> if none.
      */
-    public void setISSN(final String ISSN) {
+    public synchronized void setISSN(final String ISSN) {
+        checkWritePermission();
         this.ISSN = ISSN;
+    }
+
+    /**
+     * Declare this metadata and all its attributes as unmodifiable.
+     */
+    protected void freeze() {
+        super.freeze();
+        title                   = (InternationalString) unmodifiable(title);
+        alternateTitles         = (List)                unmodifiable(alternateTitles);
+        dates                   = (Map)                 unmodifiable(dates);
+        edition                 = (InternationalString) unmodifiable(edition);
+        editionDate             = (Date)                unmodifiable(editionDate);
+        identifiers             = (Set)                 unmodifiable(identifiers);
+        identifierTypes         = (Set)                 unmodifiable(identifierTypes);
+        citedResponsibleParties = (Set)                 unmodifiable(citedResponsibleParties);
+        presentationForm        = (Set)                 unmodifiable(presentationForm);
+        otherCitationDetails    = (InternationalString) unmodifiable(otherCitationDetails);
+        collectiveTitle         = (InternationalString) unmodifiable(collectiveTitle);
+        ISBN                    = (String)              unmodifiable(ISBN);
+        ISSN                    = (String)              unmodifiable(ISSN);
     }
 
     /**
      * Compare this citation with the specified object for equality.
      */
-    public boolean equals(final Object object) {
+    public synchronized boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final Citation that = (Citation) object;
             return Utilities.equals(this.title,                   that.title                  ) &&
@@ -442,7 +490,7 @@ public class Citation extends MetadataEntity
      * not uses all attributes for computing the hash code. Instead, it uses the attributes
      * that are the most likely to be unique.
      */
-    public int hashCode() {
+    public synchronized int hashCode() {
         int code = (int)serialVersionUID;
         if (title       != null) code ^= title      .hashCode();
         if (identifiers != null) code ^= identifiers.hashCode();

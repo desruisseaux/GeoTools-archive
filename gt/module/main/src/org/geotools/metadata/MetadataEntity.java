@@ -17,15 +17,20 @@
 package org.geotools.metadata;
 
 // J2SE dependencies
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Arrays;
+import java.util.RandomAccess;
 import java.util.Locale;
+import java.util.logging.Logger;
+import java.io.Serializable;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -33,6 +38,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
 
 // Geotools dependencies
 import org.geotools.catalog.XPath;
@@ -42,38 +50,60 @@ import org.geotools.resources.rsc.ResourceKeys;
 
 
 /**
- * A superclass for implementing ISO 19115 MetaData interfaces and allowing
+ * A superclass for implementing ISO 19115 metadata interfaces and allowing
  * Expr based query via
  * {@link org.opengis.catalog.MetadataEntity.EntityType} and
  * {@link org.opengis.catalog.MetadataEntity.Element}.
  * 
- * A subclass implements *MUST* implement minimum one of the ISO MetaData interface
- * provided by GeoAPI.
+ * A subclass <strong>must</strong> implement minimum one of the ISO MetaData interface
+ * provided by <A HREF="http://geoapi.sourceforge.net">GeoAPI</A>.
  *
  * <code>MetadataEntity</code> uses BeanInfo style reflection to identify all the attributes
- * implemented by the subclass as part of a GeoAPI MetaData interface.
- * 
- * The BeanInfo attributes are used to construct all the
+ * implemented by the subclass as part of a <A HREF="http://geoapi.sourceforge.net">GeoAPI</A>
+ * metadata interface. The BeanInfo attributes are used to construct all the
  * {@link org.opengis.catalog.MetadataEntity.EntityType} and
  * {@link org.opengis.catalog.MetadataEntity.Element} objects.
  * 
  * The type of each attribue is used to determine whether the element is a simple
  * {@link org.opengis.catalog.MetadataEntity.Element} or
  * {@link org.opengis.catalog.MetadataEntity.EntityType}.
- * Attributes that subclass GeoAPI ISO 19115 MetaData
- * are turned into Metadata Entities. 
  *
- * @todo The last sentence in this javadoc is not exactly true.
+ * <H2>Contract of the {@link #clone() clone()} method</H2>
+ * <P>While {@linkplain java.lang.Cloneable cloneable}, this class do not provides the
+ * {@link #clone() clone()} operation as part of the public API. The clone operation is
+ * required for the internal working of the {@link #unmodifiable()} method, which expect
+ * from {@link #clone() clone()} a <strong>shalow</strong> copy of this metadata entity.
+ * The default implementation of {@link #clone() clone()} is suffisient for must uses.
+ * However, subclasses are required to overrides the {@link #freeze} method.</P>
  *
  * @author Jody Garnett
  * @author Martin Desruisseaux
  * @since 2.1
  */
-public class MetadataEntity implements org.opengis.catalog.MetadataEntity {
+public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
+                                       java.lang.Cloneable, Serializable
+{
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = 5730550742604669102L;
+
+    /**
+     * The logger for metadata implementation.
+     */
+    protected final Logger LOGGER = Logger.getLogger("org.geotools.metadata");
+    
     /**
      * The entity type for this metadata. Will be constructed only when first needed.
      */
     private transient BeanEntity entity;
+
+    /**
+     * An unmodifiable copy of this metadata. Will be created only when first needed.
+     * If <code>null</code>, then no unmodifiable entity is available.
+     * If <code>this</code>, then this entity is itself unmodifiable.
+     */
+    private transient MetadataEntity unmodifiable;
 
     /**
      * Construct a default metadata entity.
@@ -427,5 +457,154 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity {
         public String toString(){
             return getName();
         }
+    }
+
+    /**
+     * Returns an unmodifiable copy of this metadata. Any attempt to modify an attribute of the
+     * returned object will throw an {@link UnsupportedOperationException}. If this metadata is
+     * already unmodifiable, then this method returns <code>this</code>.
+     *
+     * @return An unmodifiable copy of this metadata.
+     */
+    public synchronized MetadataEntity unmodifiable() {
+        if (unmodifiable == null) {
+            try {
+                /*
+                 * Need a SHALOW copy of this metadata, because some attributes
+                 * may already be unmodifiable and we don't want to clone them.
+                 */
+                unmodifiable = (MetadataEntity) clone();
+            } catch (CloneNotSupportedException exception) {
+                /*
+                 * The metadata is not cloneable for some reason left to the user
+                 * (for example it may be backed by some external database).
+                 * Assumes that the metadata is unmodifiable.
+                 */
+                // TODO: localize the warning.
+                LOGGER.warning("Cant't clone the medata. Assumes it is immutable.");
+                return this;
+            }
+            unmodifiable.freeze();
+        }
+        return unmodifiable;
+    }
+
+    /**
+     * Returns an unmodifiable copy of the the specified object. This method is used for
+     * implementation of {@link #freeze} method by subclasses. This method performs the
+     * following heuristic tests:<br>
+     *
+     * <ul>
+     *   <li>If the specified object is an instance of <code>MetadataEntity</code>, then
+     *       {@link #unmodifiable()} is invoked on this object.</li>
+     *   <li>Otherwise, if the object is a {@linkplain Cloneable cloneable}
+     *       {@linkplain Collection collection}, then the collection is cloned and all its
+     *       elements are replaced by their unmodifiable variant. If the collection is not
+     *       cloneable, then it is assumed immutable and returned unchanged.</li>
+     *   <li>Otherwise, the object is assumed immutable and returned unchanged.</li>
+     * </ul>
+     *
+     * @param  object The object to convert in an immutable one.
+     * @return A presumed immutable view of the specified object.
+     */
+    protected static Object unmodifiable(final Object object) {
+        /*
+         * CASE 1 - The object is an implementation of MetadataEntity. It may have
+         *          its own algorithm for creating an unmodifiable view of metadata.
+         */
+        if (object instanceof MetadataEntity) {
+            return ((MetadataEntity) object).unmodifiable();
+        }
+        /*
+         * CASE 2 - The object is a collection. If the collection is not cloneable, it is assumed
+         *          immutable and returned unchanged. Otherwise, the collection is cloned and all
+         *          elements are replaced by their unmodifiable variant.
+         */
+        if (object instanceof Collection) {
+            Collection collection = (Collection) object;
+            if (collection instanceof Cloneable) {
+                collection = (Collection) ((Cloneable) collection).clone();
+                final List buffer;
+                if (collection instanceof List) {
+                    // If the collection is an array list, we will update the element in place...
+                    buffer = (List) collection;
+                } else {
+                    // ...otherwise, we will copy them in a temporary buffer.
+                    buffer = new ArrayList(collection.size());
+                }
+                int index = 0;
+                boolean refill = false;
+                for (final Iterator it=collection.iterator(); it.hasNext(); index++) {
+                    final Object  original = it.next();
+                    final Object  copy     = unmodifiable(original);
+                    final boolean changed  = (original != copy);
+                    if (buffer == collection) {
+                        if (changed) {
+                            buffer.set(index, copy);
+                        }
+                    } else {
+                        buffer.add(copy);
+                        refill |= changed;
+                    }
+                }
+                if (refill) {
+                    collection.clear();
+                    collection.addAll(buffer);
+                }
+                if (collection instanceof List) {
+                    return Collections.unmodifiableList((List) collection);
+                }
+                if (collection instanceof Set) {
+                    return Collections.unmodifiableSet((Set) collection);
+                }
+                return Collections.unmodifiableCollection(collection);
+            }
+            return collection;
+        }
+        /*
+         * CASE 3 - The object is a map. If the map is cloneable, then copy all
+         *          entries in a new map.
+         */
+        if (object instanceof Map) {
+            final Map map = (Map) object;
+            if (map instanceof Cloneable) {
+                final Map copy = (Map) ((Cloneable) map).clone();
+                copy.clear(); // The clone was for constructing an instance of the same class.
+                for (final Iterator it=map.entrySet().iterator(); it.hasNext();) {
+                    final Map.Entry entry = (Map.Entry) it.next();
+                    copy.put(unmodifiable(entry.getKey()), unmodifiable(entry.getValue()));
+                }
+                return Collections.unmodifiableMap(copy);
+            }
+            return map;
+        }
+        /*
+         * CASE 4 - Any other case. The object is assumed immutable and returned unchanged.
+         */
+        return object;
+    }
+
+    /**
+     * Declare this metadata and all its attributes as unmodifiable. This method is invoked
+     * automatically by the {@link #unmodifiable()} method. Subclasses should overrides
+     * this method and invokes {@link #unmodifiable(Object)} for all attributes.
+     */
+    protected void freeze() {
+        unmodifiable = this;
+    }
+
+    /**
+     * Check if changes in the metadata are allowed. All <code>setFoo(...)</code> methods in
+     * sub-classes should invoke this method before to apply any change.
+     *
+     * @throws UnsupportedOperationException if this metadata is unmodifiable.
+     */
+    protected void checkWritePermission() throws UnsupportedOperationException {
+        assert Thread.holdsLock(this);
+        if (unmodifiable == this) {
+            // TODO: Localize the error message.
+            throw new UnsupportedOperationException("Unmodifiable metadata");
+        }
+        unmodifiable = null;
     }
 }
