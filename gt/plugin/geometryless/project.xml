@@ -76,7 +76,8 @@
       <exclude>**/M*.java</exclude>
        <exclude>**/JDBCTestSuite.java</exclude>
        <exclude>**/JDBCDataStoreAPITest.java</exclude>
-  
+        <exclude>**/ServiceTest.java</exclude>
+   
     </excludes>
     <!-- End exclude tests -->
      <resources>

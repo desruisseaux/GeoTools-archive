@@ -56,7 +56,7 @@ public class LocationsXYDataStoreFactory
 
     /** Param, package visibiity for JUnit tests */
     static final Param DBTYPE = new Param("dbtype", String.class,
-            "must be 'jdbc'", true, "jdbc");
+            "must be 'locationsxy'", true, "locationsxy");
 
     /** Param, package visibiity for JUnit tests */
     static final Param XCOLUMN = new Param("xcolumn", String.class,
@@ -156,7 +156,7 @@ public class LocationsXYDataStoreFactory
      *
      * @param params Set of parameters needed for a jdbc data store.
      *
-     * @return <code>true</code> if dbtype equals jdbc, and contains keys
+     * @return <code>true</code> if dbtype equals locationsXy, and contains keys
      *         for host, user, passwd, and database.
      */
     public boolean canProcess(Map params) {
@@ -178,7 +178,7 @@ public class LocationsXYDataStoreFactory
         }
 
   
-        if (!(((String) params.get("dbtype")).equalsIgnoreCase("jdbc"))) {
+        if (!(((String) params.get("dbtype")).equalsIgnoreCase("locationsxy"))) {
             return (false);
         } else {
             return (true);
@@ -189,7 +189,7 @@ public class LocationsXYDataStoreFactory
      * Construct a postgis data store using the params.
      *
      * @param params The full set of information needed to construct a live
-     *        data source.  Should have  dbtype equal to postgis, as well as
+     *        data source.  Should have  dbtype equal to locationsxy, as well as
      *        host, user, passwd, database, and table.
      *
      * @return The created DataSource, this may be null if the required
