@@ -134,6 +134,10 @@ public interface Graphic {
     Expression getSize();
 
     void setSize(Expression size);
+    
+    Displacement getDisplacement();
+    
+    void setDisplacement(Displacement offset);
 
     /**
      * This parameter defines the rotation of a graphic in the clockwise

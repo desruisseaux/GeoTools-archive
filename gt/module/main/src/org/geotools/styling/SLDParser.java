@@ -783,6 +783,10 @@ public class SLDParser {
             if (childName.equalsIgnoreCase("size")) {
                 graphic.setSize(parseCssParameter(child));
             }
+                        
+            if (childName.equalsIgnoreCase("displacement")) {
+                graphic.setDisplacement(parseDisplacement(child));
+            }
             
             if (childName.equalsIgnoreCase("rotation")) {
                 graphic.setRotation(parseCssParameter(child));

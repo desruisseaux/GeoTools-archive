@@ -59,6 +59,27 @@ public class XMLEncoderTest extends TestCase {
         
     
     }
+    public void testMarkDisplacment() throws Exception{
+
+        StyleFactory factory = StyleFactory.createStyleFactory();
+        
+        java.net.URL surl = org.geotools.resources.TestData.getResource(this, "markDisplacmentTest.sld");
+        LOGGER.info("reading "+surl);
+        SLDStyle stylereader = new SLDStyle(factory,surl);
+        Style[] style = stylereader.readXML();
+        StringWriter output = new StringWriter();
+//        Writer output = new PrintWriter(System.out); 
+                XMLEncoder encode = new XMLEncoder(output, style[0]);
+                LOGGER.info("Resulting SLD is \n" +
+                    output.getBuffer().toString());
+                String result = output.getBuffer().toString();
+        
+                result.replaceAll("\n","");
+                result.replaceAll("\t","");
+        assertTrue(result.indexOf("<FeatureTypeName>testPoint</FeatureTypeName>")>0);
+        
+    
+    }
     public void testComplexEncoder() throws Exception{
         
         StyleFactory factory = StyleFactory.createStyleFactory();

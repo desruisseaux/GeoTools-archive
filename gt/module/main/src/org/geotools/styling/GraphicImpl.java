@@ -62,6 +62,7 @@ public class GraphicImpl implements Graphic, Cloneable {
     private java.util.List symbols = new java.util.ArrayList();
     private Expression rotation = null;
     private Expression size = null;
+    private Displacement displacement = null;
     private Expression opacity = null;
 
     /**
@@ -271,6 +272,15 @@ public class GraphicImpl implements Graphic, Cloneable {
      */
     public Expression getSize() {
         return size;
+    }
+    
+      
+    public Displacement getDisplacement(){
+        return displacement;
+    }
+    
+    public void setDisplacement(Displacement offset){
+        this.displacement = offset;
     }
 
     /**

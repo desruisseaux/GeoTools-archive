@@ -288,6 +288,7 @@ A styling layer used for the unit tests of sldstyler
         </rule>
     </FeatureTypeStyle>
 </UserStyle>
+
 <UserStyle>
     <!-- again they have names, titles and abstracts -->
   <Name>MyStyle2</Name>
