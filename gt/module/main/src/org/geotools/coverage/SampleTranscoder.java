@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+// JAI dependencies
 import javax.media.jai.CRIFImpl;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -46,6 +47,7 @@ import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.registry.RenderedRegistryMode;
 
+// Geotools dependencies
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.DualRectIter;
@@ -69,13 +71,13 @@ final class SampleTranscoder extends PointOpImage {
     public static final String OPERATION_NAME = "org.geotools.SampleTranscode";
 
     /**
-     * Ensemble des catégories qui donnent une signification aux pixels de l'image. La
-     * longueur de ce tableau doit correspondre au nombre de bandes de l'image source.
+     * Category lists for each bands.
+     * The array length must matches the number of bands in source image.
      */
     private final CategoryList[] categories;
     
     /**
-     * Construct a new <code>SampleTranscoder</code>.
+     * Constructs a new <code>SampleTranscoder</code>.
      *
      * @param image      The source image.
      * @param categories The category lists, one for each image's band.
@@ -95,17 +97,18 @@ final class SampleTranscoder extends PointOpImage {
     }
     
     /**
-     * Compute one of the destination image tile.
+     * Computes one of the destination image tile.
      *
-     * @task TODO: There is two optimisations we could do here:
-     *
-     *             1) If source and destination are the same raster, then a single
-     *                {@link WritableRectIter} object would be more efficient (the
-     *                hard work is to detect if source and destination are the same).
-     *             2) If the destination image is a single-banded, non-interleaved
-     *                sample model, we could apply the transform directly in the
-     *                {@link java.awt.image.DataBuffer}. We can even avoid to copy
-     *                sample value if source and destination raster are the same.
+     * @todo There is two optimisations we could do here:
+     *       <ul>
+     *         <li>If source and destination are the same raster, then a single
+     *             {@link WritableRectIter} object would be more efficient (the
+     *             hard work is to detect if source and destination are the same).</li>
+     *         <li>If the destination image is a single-banded, non-interleaved
+     *             sample model, we could apply the transform directly in the
+     *             {@link java.awt.image.DataBuffer}. We can even avoid to copy
+     *             sample value if source and destination raster are the same.</li>
+     *       </ul>
      *
      * @param sources  An array of length 1 with source image.
      * @param dest     The destination tile.
@@ -252,8 +255,8 @@ final class SampleTranscoder extends PointOpImage {
 
     /**
      * Register the "SampleTranscode" image operation to the operation registry of
-     * the specified JAI instance.  This method is invoked by the static initializer of
-     * {@link SampleDimension}.
+     * the specified JAI instance. This method is invoked by the static initializer
+     * of {@link SampleDimension}.
      */
     public static void register(final JAI jai) {
         final OperationRegistry registry = jai.getOperationRegistry();

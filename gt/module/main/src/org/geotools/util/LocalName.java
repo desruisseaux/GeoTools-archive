@@ -104,7 +104,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
     LocalName(final ScopedName asScopedName, final CharSequence name) {
         this.asScopedName = asScopedName;
         this.name         = validate(name);
-        org.geotools.util.InternationalString.ensureNonNull("name", name);
+        AbstractInternationalString.ensureNonNull("name", name);
     }
 
     /**

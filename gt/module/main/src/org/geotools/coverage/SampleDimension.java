@@ -23,7 +23,7 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.Color;
 import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
@@ -36,11 +36,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
-import javax.media.jai.JAI;
-import javax.media.jai.util.Range;
 import javax.units.Unit;
 
+// JAI dependencies
+import javax.media.jai.JAI;
+import javax.media.jai.util.Range;
+
+// OpenGIS dependencies
+import org.opengis.coverage.ColorInterpretation;
+import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.PaletteInterpretation;
+import org.opengis.coverage.SampleDimensionType;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
@@ -51,13 +62,6 @@ import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.SimpleInternationalString;
-import org.opengis.coverage.ColorInterpretation;
-import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.coverage.PaletteInterpretation;
-import org.opengis.coverage.SampleDimensionType;
-import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -192,21 +196,23 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     
     /**
      * Constructs a sample dimension with a set of qualitative categories only.
-     * This sample dimension will have no unit and a default set of colors.
+     * This constructor expects only a sequence of category names for the values
+     * contained in a sample dimension. This allows for names to be assigned to
+     * numerical values. The first entry in the sequence relates to a cell value
+     * of zero. For example: [0]="Background", [1]="Water", [2]="Forest", [3]="Urban".
+     * The created sample dimension will have no unit and a default set of colors.
      *
-     * @param names  Sequence of category names for the values contained in a sample dimension.
-     *               This allows for names to be assigned to numerical values. The first entry
-     *               in the sequence relates to a cell value of zero. For example:
-     *               [0]="Background", [1]="Water", [2]="Forest", [3]="Urban".
+     * @param names Sequence of category names for the values contained in a sample dimension,
+     *              as {@link String} or {@link InternationalString} objects.
      */
-    public SampleDimension(final String[] names) {
+    public SampleDimension(final CharSequence[] names) {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(names));
     }
     
     /** Constructs a list of categories. Used by constructors only. */
-    private static CategoryList list(final String[] names) {
+    private static CategoryList list(final CharSequence[] names) {
         final Color[] colors = new Color[names.length];
         final double scale = 255.0/colors.length;
         for (int i=0; i<colors.length; i++) {
@@ -217,91 +223,96 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     }
     
     /**
-     * Constructs a sample dimension with a set of qualitative categories only.
-     * This sample dimension will have no unit.
+     * Constructs a sample dimension with a set of qualitative categories and colors.
+     * This constructor expects a sequence of category names for the values
+     * contained in a sample dimension. This allows for names to be assigned to
+     * numerical values. The first entry in the sequence relates to a cell value
+     * of zero. For example: [0]="Background", [1]="Water", [2]="Forest", [3]="Urban".
+     * The created sample dimension will have no unit and a default set of colors.
      *
-     * @param names  Sequence of category names for the values contained in a sample dimension.
-     *               This allows for names to be assigned to numerical values. The first entry
-     *               in the sequence relates to a cell value of zero. For example:
-     *               [0]="Background", [1]="Water", [2]="Forest", [3]="Urban".
+     * @param names  Sequence of category names for the values contained in a sample dimension,
+     *               as {@link String} or {@link InternationalString} objects.
      * @param colors Color to assign to each category. This array must have the same
      *               length than <code>names</code>.
      */
-    public SampleDimension(final String[] names, final Color[] colors) {
+    public SampleDimension(final CharSequence[] names, final Color[] colors) {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(names, colors));
     }
     
     /** Constructs a list of categories. Used by constructors only. */
-    private static CategoryList list(final String[] names, final Color[] colors) {
+    private static CategoryList list(final CharSequence[] names, final Color[] colors) {
         if (names.length != colors.length) {
             throw new IllegalArgumentException(
                     Resources.format(ResourceKeys.ERROR_MISMATCHED_ARRAY_LENGTH));
         }
         final Category[] categories = new Category[names.length];
         for (int i=0; i<categories.length; i++) {
-            categories[i] = new Category(new SimpleInternationalString(names[i]), colors[i], i);
+            categories[i] = new Category(SimpleInternationalString.wrap(names[i]), colors[i], i);
         }
         return list(categories, null);
     }
 
     /**
      * Constructs a sample dimension with the specified properties. For convenience, any argument
-     * which is not a <code>double</code> primitive can be <code>null</code>. This constructor
-     * allows the construction of a <code>SampleDimension</code> without explicit construction of
-     * {@link Category} objects. An heuristic approach is used for dispatching the informations
-     * into a set of {@link Category} objects. However, this constructor still less general and
-     * provides less fine-grain control than the constructor expecting an array of {@link Category}.
+     * which is not a {@code double} primitive can be {@code null}, and any {@linkplain CharSequence
+     * char sequence} can be either a {@link String} or {@link InternationalString} object.
+     * 
+     * This constructor allows the construction of a {@code SampleDimension} without explicit
+     * construction of {@link Category} objects. An heuristic approach is used for dispatching
+     * the informations into a set of {@link Category} objects. However, this constructor still
+     * less general and provides less fine-grain control than the constructor expecting an array
+     * of {@link Category} objects.
      *
-     * @param  description The sample dimension title or description, or <code>null</code> if none.
+     * @param  description The sample dimension title or description, or {@code null} if none.
      *         This is the value to be returned by {@link #getDescription}.
      * @param  type The grid value data type (which indicate the number of bits for the data type),
-     *         or <code>null</code> for computing it automatically from the range
-     *         <code>[minimum..maximum]</code>. This is the value to be returned by
+     *         or {@code null} for computing it automatically from the range
+     *         {@code [minimum..maximum]}. This is the value to be returned by
      *         {@link #getSampleDimensionType}.
-     * @param  color The color interpretation, or <code>null</code> for a default value (usually
+     * @param  color The color interpretation, or {@code null} for a default value (usually
      *         {@link ColorInterpretation#PALETTE_INDEX PALETTE_INDEX}). This is the value to be
      *         returned by {@link #getColorInterpretation}.
-     * @param  palette The color palette associated with the sample dimension, or <code>null</code>
-     *         for a default color palette (usually grayscale). If <code>categories</code> is
+     * @param  palette The color palette associated with the sample dimension, or {@code null}
+     *         for a default color palette (usually grayscale). If {@code categories} is
      *         non-null, then both arrays usually have the same length. However, this constructor
      *         is tolerant on this array length. This is the value to be returned (indirectly) by
      *         {@link #getColorModel}.
      * @param  categories A sequence of category names for the values contained in the sample
-     *         dimension, or <code>null</code> if none. This is the values to be returned by
+     *         dimension, or {@code null} if none. This is the values to be returned by
      *         {@link #getCategoryNames}.
-     * @param  nodata the values to indicate "no data", or <code>null</code> if none. This is the
+     * @param  nodata the values to indicate "no data", or {@code null} if none. This is the
      *         values to be returned by {@link #getNoDataValues}.
-     * @param  minimum The lower value, inclusive. The <code>[minimum..maximum]</code> range may or
-     *         may not includes the <code>nodata</code> values; the range will be adjusted as
-     *         needed. If <code>categories</code> was non-null, then <code>minimum</code> is
+     * @param  minimum The lower value, inclusive. The {@code [minimum..maximum]} range may or
+     *         may not includes the {@code nodata} values; the range will be adjusted as
+     *         needed. If {@code categories} was non-null, then {@code minimum} is
      *         usually 0. This is the value to be returned by {@link #getMinimumValue}.
      * @param  maximum The upper value, <strong>inclusive</strong> as well. The
-     *         <code>[minimum..maximum]</code> range may or may not includes the <code>nodata</code>
-     *         values; the range will be adjusted as needed. If <code>categories</code> was non-null,
-     *         then <code>maximum</code> is usually equals to <code>categories.length-1</code>. This
+     *         {@code [minimum..maximum]} range may or may not includes the {@code nodata}
+     *         values; the range will be adjusted as needed. If {@code categories} was non-null,
+     *         then {@code maximum} is usually equals to {@code categories.length-1}. This
      *         is the value to be returned by {@link #getMaximumValue}.
      * @param  scale The value which is multiplied to grid values, or 1 if none. This is the value
      *         to be returned by {@link #getScale}.
      * @param  offset The value to add to grid values, or 0 if none. This is the value to be
      *         returned by {@link #getOffset}.
-     * @param  unit The unit information for this sample dimension, or <code>null</code> if none.
+     * @param  unit The unit information for this sample dimension, or {@code null} if none.
      *         This is the value to be returned by {@link #getUnits}.
      *
-     * @throws IllegalArgumentException if the range <code>[minimum..maximum]</code> is not valid.
+     * @throws IllegalArgumentException if the range {@code [minimum..maximum]} is not valid.
      */
-    public SampleDimension(final InternationalString description,
-                           SampleDimensionType type,
-                           ColorInterpretation color,
-                           final Color [] palette,
-                           final InternationalString[] categories,
-                           final double[] nodata,
-                                 double   minimum,
-                                 double   maximum,
-                           final double   scale,
-                           final double   offset,
-                           final Unit     unit)
+    public SampleDimension(final CharSequence  description,
+                           final SampleDimensionType  type,
+                           final ColorInterpretation color,
+                           final Color[]           palette,
+                           final CharSequence[] categories,
+                           final double[]           nodata,
+                           final double            minimum,
+                           final double            maximum,
+                           final double              scale,
+                           final double             offset,
+                           final Unit                 unit)
     {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").        
@@ -310,17 +321,17 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
     }
 
     /** Constructs a list of categories. Used by constructors only. */
-    private static CategoryList list(final InternationalString description,
-                                     SampleDimensionType type,
-                                     ColorInterpretation color,
-                                     final Color [] palette,
-                                     final InternationalString[] categories,
-                                     final double[] nodata,
-                                           double   minimum,
-                                           double   maximum,
-                                     final double   scale,
-                                     final double   offset,
-                                     final Unit     unit)
+    private static CategoryList list(final CharSequence  description,
+                                           SampleDimensionType  type,
+                                           ColorInterpretation color,
+                                     final Color[]           palette,
+                                     final CharSequence[] categories,
+                                     final double[]           nodata,
+                                           double            minimum,
+                                           double            maximum,
+                                     final double              scale,
+                                     final double             offset,
+                                     final Unit                 unit)
     {
         if (Double.isInfinite(minimum) || Double.isInfinite(maximum) || !(minimum < maximum)) {
             throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_RANGE_$2,
@@ -349,7 +360,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
          *          COLOR: Fetched from 'palette' if available, otherwise use Category default.
          */
         for (int i=0; i<nodataCount; i++) {
-            String name = null;
+            InternationalString name = null;
             final double padValue = nodata[i];
             final int    intValue = (int) Math.floor(padValue);
             if (intValue>=0 && intValue<nameCount) {
@@ -357,16 +368,15 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                     // This category will be added in step 2 below.
                     continue;
                 }
-                name = categories[intValue].toString();
+                name = SimpleInternationalString.wrap(categories[intValue]);
             }
             final Number value = wrapSample(padValue, type, false);
             if (name == null) {
-                name = value.toString();
+                name = new SimpleInternationalString(value.toString());
             }
             final NumberRange range = new NumberRange(value.getClass(), value, value);
             final Color[] colors = ColorUtilities.subarray(palette, intValue, intValue+1);
-            categoryList.add(new Category(new SimpleInternationalString(name),
-                                          colors, range, (MathTransform1D)null));
+            categoryList.add(new Category(name, colors, range, (MathTransform1D)null));
         }
         /*
          * STEP 2 - Add a qualitative category for each category name.
@@ -376,13 +386,16 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         if (nameCount != 0) {
             int lower = 0;
             for (int upper=1; upper<=categories.length; upper++) {
-                final String name = categories[lower].toString().trim();
-                if (upper!=categories.length && name.equalsIgnoreCase(categories[upper].toString().trim())) {
+                if (upper!=categories.length &&
+                        categories[lower].toString().trim().equalsIgnoreCase(
+                        categories[upper].toString().trim()))
+                {
                     // If there is a suite of categories with identical name,  create only one
                     // category with range [lower..upper] instead of one new category for each
                     // sample value.
                     continue;
                 }
+                final InternationalString name = SimpleInternationalString.wrap(categories[lower]);
                 Number min = wrapSample(lower,   type, false);
                 Number max = wrapSample(upper-1, type, false);
                 final Class classe;
@@ -396,8 +409,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                 }
                 final NumberRange range = new NumberRange(classe, min, max);
                 final Color[] colors = ColorUtilities.subarray(palette, lower, upper);
-                categoryList.add(new Category(new SimpleInternationalString(name),
-                                              colors, range, (MathTransform1D)null));
+                categoryList.add(new Category(name, colors, range, (MathTransform1D)null));
                 lower = upper;
             }
         }
@@ -485,8 +497,9 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                                                      (int)Math.ceil (minimum),
                                                      (int)Math.floor(maximum));
                 categoryList.add(new Category(
-                    description!=null ? description : new SimpleInternationalString("(automatic)"),
-                    colors, range, scale, offset));
+                    (description!=null) ? SimpleInternationalString.wrap(description)
+                                        : new SimpleInternationalString("(automatic)"),
+                                        colors, range, scale, offset));
                 needQuantitative = false;
             }
         }
@@ -594,7 +607,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
 
     /**
      * Wrap the specified OpenGIS's sample dimension into a Geotools's implementation
-     * of <code>SampleDimension</code>.
+     * of {@code SampleDimension}.
      *
      * @param sd The sample dimension to wrap into a Geotools implementation.
      */
@@ -816,36 +829,20 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         }
         throw new IllegalArgumentException(String.valueOf(value));
     }
-    
+
     /**
      * Get the sample dimension title or description.
-     * This string may be <code>null</code> if no description is present.
-     *
-     * @todo CategoryList.getName() should returns directly an international string.
+     * This string may be {@code null} if no description is present.
      */
     public InternationalString getDescription() {
-        return (categories!=null) ? new SimpleInternationalString(categories.getName(null)) : null;
+        return (categories!=null) ? categories.getName() : null;
     }
     
     /**
      * @deprecated Use {@link #getDescription()} instead.
      */
-    public String getDescription(Locale locale) {
-        return (categories!=null) ? categories.getName(locale) : null;
-    }
-
-    /**
-     * Returns a sequence of category names for the values contained in this sample dimension.
-     *
-     * @todo Not yet fully implemented.
-     */
-    public InternationalString[] getCategoryNames() {
-        final String[] names = getCategoryNames(Locale.getDefault());
-        final InternationalString[] n = new InternationalString[names.length];
-        for (int i=0; i<names.length; i++) {
-            n[i] = new SimpleInternationalString(names[i]);
-        }
-        return n;
+    public String getDescription(final Locale locale) {
+        return (categories!=null) ? categories.getName().toString(locale) : null;
     }
 
     /**
@@ -860,25 +857,22 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *    [3] Urban
      *  </pre></blockquote>
      *
-     * @param  locale The locale for category names, or <code>null</code> for a default locale.
      * @return The sequence of category names for the values contained in this sample dimension,
-     *         or <code>null</code> if there is no category in this sample dimension.
+     *         or {@code null} if there is no category in this sample dimension.
      * @throws IllegalStateException if a sequence can't be mapped because some category use
      *         negative or non-integer sample values.
      *
      * @see #getCategories
      * @see #getCategory
-     *
-     * @todo Returns InternationalString instead.
      */
-    public String[] getCategoryNames(final Locale locale) throws IllegalStateException {
+    public InternationalString[] getCategoryNames() throws IllegalStateException {
         if (categories == null) {
             return null;
         }
         if (categories.isEmpty()) {
-            return new String[0];
+            return new InternationalString[0];
         }
-        String[] names = null;
+        InternationalString[] names = null;
         for (int i=categories.size(); --i>=0;) {
             final Category category = (Category) categories.get(i);
             final int lower = (int) category.minimum;
@@ -886,14 +880,27 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
             if (lower!=category.minimum || lower<0 ||
                 upper!=category.maximum || upper<0)
             {
-                final Resources resources = Resources.getResources(locale);
-                throw new IllegalStateException(resources.getString(
+                throw new IllegalStateException(Resources.format(
                         ResourceKeys.ERROR_NON_INTEGER_CATEGORY));
             }
             if (names == null) {
-                names = new String[upper+1];
+                names = new InternationalString[upper+1];
             }
-            Arrays.fill(names, lower, upper+1, category.getName().toString(locale));
+            Arrays.fill(names, lower, upper+1, category.getName());
+        }
+        return names;
+    }
+
+    /**
+     * Returns a sequence of category names for the values contained in this sample dimension.
+     *
+     * @deprecated Use {@link #getCategoryNames()} instead.
+     */
+    public final String[] getCategoryNames(final Locale locale) throws IllegalStateException {
+        final InternationalString[] inter = getCategoryNames();
+        final String[] names = new String[inter.length];
+        for (int i=0; i<names.length; i++) {
+            names[i] = inter[i].toString(locale);
         }
         return names;
     }
@@ -1082,8 +1089,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * @see #getMinimumValue
      * @see #getMaximumValue
      *
-     * @task TODO: We should do a better job in CategoryList.getRange() when selecting
-     *       the appropriate data type. getSampleDimensionType(Range) may be of
+     * @todo We should do a better job in {@code CategoryList.getRange()} when selecting
+     *       the appropriate data type. {@code getSampleDimensionType(Range)} may be of
      *       some help.
      */
     public NumberRange getRange() {
@@ -1116,7 +1123,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *
      * <ul>
      *   <li>If <code>value</code> maps a qualitative category, then the
-     *       category name is returned as of {@link Category#getName(Locale)}.</li>
+     *       category name is returned as of {@link Category#getName}.</li>
      *
      *   <li>Otherwise, if <code>value</code> maps a quantitative category, then the value is
      *       transformed into a geophysics value as with the {@link #getSampleToGeophysics()
@@ -1437,9 +1444,9 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      * The returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
      * <code>SampleDimension</code> instance is "geophysics", or an integer data type otherwise.
      * <br><br>
-     * Note that {@link org.geotools.gc.GridCoverage#getSampleDimensions} returns special
-     * implementations of <code>SampleDimension</code>. In this particular case, the color model
-     * created by this <code>getColorModel()</code> method will have the same number of bands
+     * Note that {@link org.geotools.coverage.grid.GridCoverage2D#getSampleDimension} returns
+     * special implementations of {@code SampleDimension}. In this particular case, the color model
+     * created by this {@code getColorModel()} method will have the same number of bands
      * than the grid coverage's {@link RenderedImage}.
      *
      * @return The requested color model, suitable for {@link RenderedImage} objects with values

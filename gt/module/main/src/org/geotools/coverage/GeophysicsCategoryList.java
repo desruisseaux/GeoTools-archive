@@ -23,14 +23,14 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.AbstractList;
 import java.util.Locale;
-
 import javax.units.Unit;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
 

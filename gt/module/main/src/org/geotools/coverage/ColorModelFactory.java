@@ -33,9 +33,11 @@ import java.awt.image.RenderedImage;
 import java.util.Arrays;
 import java.util.Map;
 
+// JAI dependencies
 import javax.media.jai.FloatDoubleColorModel;
 import javax.media.jai.RasterFactory;
 
+// Geotools dependencies
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ColorUtilities;

@@ -131,7 +131,7 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private static final class International extends org.geotools.util.InternationalString
+    private static final class International extends AbstractInternationalString
                                           implements Serializable
     {
         /**

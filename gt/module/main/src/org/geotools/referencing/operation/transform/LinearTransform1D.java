@@ -44,7 +44,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  *
  * This class is the same as a 2&times;2 affine transform. However, this specialized
  * <code>LinearTransform1D</code> class is faster. It is defined there because extensively
- * used by {@link org.geotools.coverage.Coverage}.
+ * used by {@link org.geotools.coverage.grid.GridCoverage2D}.
  *
  * @version $Id$
  * @author Martin Desruisseaux

@@ -62,6 +62,7 @@ import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
 
 // OpenGIS dependencies
+import org.opengis.coverage.Coverage;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -69,11 +70,14 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.PointOutsideCoverageException;
+import org.opengis.util.InternationalString;
 
-// Geotools dependencies (CRS)
+// Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.util.SimpleInternationalString;
 
 // Resources
 import org.geotools.resources.XArray;
@@ -107,8 +111,8 @@ import org.geotools.resources.geometry.XAffineTransform;
  *        functions valid over a set of polynomials.</LI>
  * </ul>
  *
- * {@linkplain org.geotools.gc.GridCoverage Grid coverages} are typically 2D while other
- * coverages may be 3D or 4D. The dimension of grid coverage may be queried in many ways:
+ * {@linkplain org.geotools.coverage.grid.GridCoverage2D Grid coverages} are typically 2D while
+ * other coverages may be 3D or 4D. The dimension of grid coverage may be queried in many ways:
  *
  * <ul>
  *   <li><code>{@link #getCoordinateReferenceSystem}.getCoordinateSystem().getDimension();</code></li>
@@ -116,17 +120,14 @@ import org.geotools.resources.geometry.XAffineTransform;
  *   <li><code>{@link #getDimension};</code></li>
  * </ul>
  *
- * All those methods should returns the same number.   Note that the dimension
- * of grid coverage <strong>is not the same</strong> than the number of sample
- * dimensions (<code>{@link #getSampleDimensions()}.length</code>).  The later
- * may be better understood as the number of bands for 2D grid coverage.
- * A coverage has a corresponding {@link SampleDimension} for each sample
- * dimension in the coverage.
+ * All those methods should returns the same number. Note that the dimension
+ * of grid coverage <strong>is not the same</strong> than the number of sample dimensions.
+ * The later may be better understood as the number of bands for 2D grid coverage.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class Coverage extends PropertySourceImpl implements org.opengis.coverage.Coverage {
+public abstract class AbstractCoverage extends PropertySourceImpl implements Coverage {
     /**
      * The set of default axis name.
      */
@@ -145,47 +146,45 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
     /**
      * The coverage name.
      */
-    private final String name;
+    private final InternationalString name;
     
     /**
-     * The coordinate system, or <code>null</code> if there is none.
+     * The coordinate reference system, or {@code null} if there is none.
      */
     protected final CoordinateReferenceSystem crs;
     
     /**
-     * Construct a coverage using the specified coordinate reference system. If the
-     * coordinate reference system is <code>null</code>, then the subclasses must
+     * Constructs a coverage using the specified coordinate reference system. If the
+     * coordinate reference system is {@code null}, then the subclasses must
      * override {@link #getDimension()}.
      *
      * @param name The coverage name.
      * @param crs The coordinate reference system. This specifies the coordinate
      *        system used when accessing a coverage or grid coverage with the
-     *        <code>evaluate(...)</code> methods.
-     * @param source The source for this coverage, or <code>null</code> if none.
+     *        {@code evaluate(...)} methods.
+     * @param source The source for this coverage, or {@code null} if none.
      *        Source may be (but is not limited to) a {@link PlanarImage} or an
-     *        other <code>Coverage</code> object.
-     * @param properties The set of properties for this coverage, or <code>null</code> if
+     *        other {@code AbstractCoverage} object.
+     * @param properties The set of properties for this coverage, or {@code null} if
      *        there is none. "Properties" in <cite>Java Advanced Imaging</cite> is what
-     *        OpenGIS calls "Metadata".  There is no <code>getMetadataValue(...)</code>
-     *        method in this implementation. Use {@link #getProperty} instead. Keys may
-     *        be {@link String} or {@link CaselessStringKey} objects,  while values may
-     *        be any {@link Object}.
+     *        OpenGIS calls "Metadata". Keys may be {@link String} or
+     *        {@link CaselessStringKey} objects, while values may be any {@link Object}.
      */
-    protected Coverage(final String                   name,
-                       final CoordinateReferenceSystem crs,
-                       final PropertySource         source,
-                       final Map                properties)
+    protected AbstractCoverage(final CharSequence             name,
+                               final CoordinateReferenceSystem crs,
+                               final PropertySource         source,
+                               final Map                properties)
     {
         super(properties, source);
-        this.name = name;
+        this.name = SimpleInternationalString.wrap(name);
         this.crs  = crs;
     }
     
     /**
-     * Construct a new coverage with the same
+     * Constructs a new coverage with the same
      * parameters than the specified coverage.
      */
-    protected Coverage(final Coverage coverage) {
+    protected AbstractCoverage(final AbstractCoverage coverage) {
         // NOTE: This constructor keep a strong reference to the
         //       source coverage (through 'PropertySourceImpl').
         //       In many cases, it is not a problem since GridCoverage
@@ -196,47 +195,39 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
     }
     
     /**
-     * Returns the coverage name, localized for the supplied locale.
-     * If the specified locale is not available, returns a name in an
-     * arbitrary locale. The default implementation returns the name
+     * Returns the coverage name. The default implementation returns the name
      * specified at construction time.
-     *
-     * @param  locale The desired locale, or <code>null</code> for a default locale.
-     * @return The coverage name in the specified locale, or in an arbitrary locale
-     *         if the specified localization is not available.
      */
-    public String getName(final Locale locale) {
+    public InternationalString getName() {
         return name;
     }
     
     /**
-     * Returns the coordinate system. This specifies the coordinate system used when
-     * accessing a coverage or grid coverage with the <code>evaluate(...)</code> methods.
-     * It is also the coordinate system of the coordinates used with the math transform
-     * {@link org.geotools.gc.GridGeometry#getGridToCoordinateSystem}. This coordinate
-     * system is usually different than the grid coordinate system of the grid. A grid
-     * coverage can be accessed (re-projected) with new coordinate system with the
-     * {@link org.geotools.gp.GridCoverageProcessor} component.
+     * Returns the coordinate reference system. This specifies the CRS used when
+     * accessing a coverage or grid coverage with the {@code evaluate(...)} methods.
+     * It is also the coordinate reference system of the coordinates used with the math transform
+     * {@link org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem}. A grid coverage
+     * can be accessed (re-projected) with new coordinate reference system with the
+     * {@link org.geotools.coverage.processing.GridCoverageProcessor} component.
      * In this case, a new instance of a grid coverage is created.
      * <br><br>
-     * Note: If a coverage does not have an associated coordinate system,
-     * the returned value will be <code>null</code>.
-     * The {@link org.geotools.gc.GridGeometry#getGridToCoordinateSystem
-     * GridGeometry.gridToCoordinateSystem}) attribute should also be
-     * <code>null</code> if the coordinate system is <code>null</code>.
+     * Note: If a coverage does not have an associated coordinate reference system,
+     * the returned value will be {@code null}.
+     * The {@link org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem}) attribute
+     * should also be {@code null} if the coordinate reference system is {@code null}.
      *
-     * @return The coordinate system, or <code>null</code> if this coverage
-     *         does not have an associated coordinate system.
+     * @return The coordinate reference system, or {@code null} if this coverage
+     *         does not have an associated CRS.
      *
-     * @see org.geotools.gc.GridGeometry#getGridToCoordinateSystem
+     * @see org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
     }
     
     /**
-     * Returns The bounding box for the coverage domain in coordinate system coordinates.
-     * May be null if this coverage has no associated coordinate system.
+     * Returns the bounding box for the coverage domain in coordinate reference system coordinates.
+     * May be null if this coverage has no associated coordinate reference system.
      * For grid coverages, the grid cells are centered on each grid coordinate.
      * The envelope for a 2-D grid coverage includes the following corner positions.
      *
@@ -245,7 +236,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * (Maximum row - 0.5, Maximum column - 0.5) for the maximum coordinates
      * </pre></blockquote>
      *
-     * The default implementation returns the coordinate system envelope if there is one.
+     * The default implementation returns the domain of validity of the CRS, if there is one.
      *
      * @return The bounding box for the coverage domain in coordinate system coordinates.
      */
@@ -255,7 +246,8 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
     
     /**
      * Returns the dimension of the grid coverage. The default implementation
-     * returns the dimension of the underlying {@link CoordinateReferenceSystem}.
+     * returns the dimension of the underlying {@linkplain CoordinateReferenceSystem
+     * coordinate reference system}.
      *
      * @return The number of dimensions of this coverage.
      */
@@ -272,27 +264,41 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * The {@linkplain #getDimension number of dimensions} of the coverage is the
      * number of entries in the list of dimension names.
      *
-     * The default implementation ask for {@link CoordinateReferenceSystem}
-     * axis names, or returns "x", "y"... if this coverage has no coordinate system.
+     * The default implementation ask for {@linkplain CoordinateSystem coordinate system} axis
+     * names, or returns "x", "y"... if this coverage has no CRS.
      *
-     * @param  locale The desired locale, or <code>null</code> for the default locale.
      * @return The names of each dimension. The array's length is equals to {@link #getDimension}.
      */
-    public String[] getDimensionNames(final Locale locale) {
+    public InternationalString[] getDimensionNames() {
         if (crs != null) {
             final CoordinateSystem cs = crs.getCoordinateSystem();
-            final String[] names = new String[cs.getDimension()];
+            final InternationalString[] names = new InternationalString[cs.getDimension()];
             for (int i=0; i<names.length; i++) {
-                names[i] = cs.getAxis(i).getName().getCode();
+                names[i] = new SimpleInternationalString(cs.getAxis(i).getName().getCode());
             }
             return names;
         } else {
-            final String[] names = (String[]) XArray.resize(DIMENSION_NAMES, getDimension());
+            final InternationalString[] names = (InternationalString[])
+                    XArray.resize(DIMENSION_NAMES, getDimension());
             for (int i=DIMENSION_NAMES.length; i<names.length; i++) {
-                names[i] = "dim"+(i+1);
+                names[i] = new SimpleInternationalString("dim"+(i+1));
             }
             return names;
         }
+    }
+
+    /**
+     * Returns the names of each dimension in this coverage.
+     *
+     * @deprecated Replaced by {@link #getDimensionNames()}.
+     */
+    public final String[] getDimensionNames(final Locale locale) {
+        final InternationalString[] inter = getDimensionNames();
+        final String[] names = new String[inter.length];
+        for (int i=0; i<names.length; i++) {
+            names[i] = inter[i].toString(locale);
+        }
+        return names;
     }
 
     /**
@@ -314,14 +320,12 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * Returns a sequence of boolean values for a given point in the coverage.
      * A value for each sample dimension is included in the sequence. The default interpolation
      * type used when accessing grid values for points which fall between grid cells is
-     * nearest neighbor. The coordinate system of the point is the same as the grid
+     * nearest neighbor. The CRS of the point is the same as the grid
      * coverage {@linkplain #getCoordinateReferenceSystem coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to
-     *               create a new array. If non-null, this array must be at least
-     *               <code>{@link #getSampleDimensions()}.length</code> long.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @param  dest An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
@@ -350,15 +354,13 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * Returns a sequence of byte values for a given point in the coverage.
      * A value for each sample dimension is included in the sequence. The default
      * interpolation type used when accessing grid values for points which fall
-     * between grid cells is nearest neighbor. The coordinate system of the
+     * between grid cells is nearest neighbor. The CRS of the
      * point is the same as the coverage {@linkplain #getCoordinateReferenceSystem
      * coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to
-     *               create a new array. If non-null, this array must be at least
-     *               <code>{@link #getSampleDimensions()}.length</code> long.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @param  dest An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
@@ -387,15 +389,13 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * Returns a sequence of integer values for a given point in the coverage.
      * A value for each sample dimension is included in the sequence. The default
      * interpolation type used when accessing grid values for points which fall
-     * between grid cells is nearest neighbor. The coordinate system of the
+     * between grid cells is nearest neighbor. The CRS of the
      * point is the same as the coverage {@linkplain #getCoordinateReferenceSystem
      * coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to
-     *               create a new array. If non-null, this array must be at least
-     *               <code>{@link #getSampleDimensions()}.length</code> long.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @param  dest An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
@@ -424,14 +424,12 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * Returns a sequence of float values for a given point in the coverage.
      * A value for each sample dimension is included in the sequence. The default interpolation
      * type used when accessing grid values for points which fall between grid cells is
-     * nearest neighbor. The coordinate system of the point is the same as the coverage
+     * nearest neighbor. The CRS of the point is the same as the coverage
      * {@linkplain #getCoordinateReferenceSystem coordinate reference system}.
      *
      * @param  coord The coordinate point where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to
-     *               create a new array. If non-null, this array must be at least
-     *               <code>{@link #getSampleDimensions()}.length</code> long.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @param  dest An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
@@ -460,14 +458,12 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * Returns a sequence of double values for a given point in the coverage.
      * A value for each sample dimension is included in the sequence. The default interpolation
      * type used when accessing grid values for points which fall between grid cells is
-     * nearest neighbor. The coordinate system of the point is the same as the grid coverage
+     * nearest neighbor. The CRS of the point is the same as the grid coverage
      * coordinate system.
      *
      * @param  coord The coordinate point where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to
-     *               create a new array. If non-null, this array must be at least
-     *               <code>{@link #getSampleDimensions()}.length</code> long.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
+     * @param  dest An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
@@ -516,16 +512,15 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
     /**
      * Base class for renderable image view of a coverage. Renderable images allow interoperability
      * with <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>  for a two-dimensional
-     * view of a coverage (which may or may not be a {@linkplain org.geotools.gc.GridCoverage grid
-     * coverage}).
+     * view of a coverage (which may or may not be a
+     * {@linkplain org.geotools.coverage.grid.GridCoverage2D grid coverage}).
      *
      * @version $Id$
      * @author Martin Desruisseaux
      *
-     * @see Coverage#getRenderableImage
+     * @see AbstractCoverage#getRenderableImage
      */
-    protected class Renderable extends PropertySourceImpl implements RenderableImage, ImageFunction
-    {
+    protected class Renderable extends PropertySourceImpl implements RenderableImage, ImageFunction {
         /**
          * The two dimensional view of the coverage's envelope.
          */
@@ -543,7 +538,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
 
         /**
          * A coordinate point where to evaluate the function. The point dimension is equals to
-         * the {@linkplain Coverage#getDimension coverage's dimension}. The {@linkplain #xAxis
+         * the {@linkplain AbstractCoverage#getDimension coverage's dimension}. The {@linkplain #xAxis
          * x} and {@link #yAxis y} ordinates will be ignored, since they will vary for each pixel
          * to be evaluated. Other ordinates, if any, should be set to a fixed value. For example
          * a coverage may be three-dimensional, where the third dimension is the time axis. In
@@ -560,7 +555,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          * @param  yAxis Dimension to use for <var>y</var> axis.
          */
         public Renderable(final int xAxis, final int yAxis) {
-            super(null, Coverage.this);
+            super(null, AbstractCoverage.this);
             this.xAxis = xAxis;
             this.yAxis = yAxis;
             final Envelope envelope = getEnvelope();
@@ -571,7 +566,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         }
 
         /**
-         * Returns <code>null</code> to indicate that no source information is available.
+         * Returns {@code null} to indicate that no source information is available.
          */
         public Vector getSources() {
             return null;
@@ -581,7 +576,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          * Returns <code>true</code> if successive renderings with the same arguments may
          * produce different results. The default implementation returns <code>false</code>.
          *
-         * @see org.geotools.gc.GridCoverage#isDataEditable
+         * @see org.geotools.coverage.grid.GridCoverage2D#isDataEditable
          */
         public boolean isDynamic() {
             return false;
@@ -597,8 +592,8 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         /**
          * Gets the width in coverage coordinate space.
          *
-         * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateReferenceSystem
+         * @see AbstractCoverage#getEnvelope
+         * @see AbstractCoverage#getCoordinateReferenceSystem
          */
         public float getWidth() {
             return (float)bounds.getWidth();
@@ -607,8 +602,8 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         /**
          * Gets the height in coverage coordinate space.
          *
-         * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateReferenceSystem
+         * @see AbstractCoverage#getEnvelope
+         * @see AbstractCoverage#getCoordinateReferenceSystem
          */
         public float getHeight() {
             return (float)bounds.getHeight();
@@ -616,11 +611,11 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         
         /**
          * Gets the minimum <var>X</var> coordinate of the rendering-independent image data.
-         * This is the {@linkplain Coverage#getEnvelope coverage's envelope} minimal value
+         * This is the {@linkplain AbstractCoverage#getEnvelope coverage's envelope} minimal value
          * for the {@linkplain #xAxis x axis}.
          *
-         * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateReferenceSystem
+         * @see AbstractCoverage#getEnvelope
+         * @see AbstractCoverage#getCoordinateReferenceSystem
          */
         public float getMinX() {
             return (float)bounds.getX();
@@ -628,11 +623,11 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         
         /**
          * Gets the minimum <var>Y</var> coordinate of the rendering-independent image data.
-         * This is the {@linkplain Coverage#getEnvelope coverage's envelope} minimal value
+         * This is the {@linkplain AbstractCoverage#getEnvelope coverage's envelope} minimal value
          * for the {@linkplain #yAxis y axis}.
          *
-         * @see Coverage#getEnvelope
-         * @see Coverage#getCoordinateReferenceSystem
+         * @see AbstractCoverage#getEnvelope
+         * @see AbstractCoverage#getCoordinateReferenceSystem
          */
         public float getMinY() {
             return (float)bounds.getY();
@@ -658,7 +653,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          *
          * @param  width  The width of rendered image in pixels, or 0.
          * @param  height The height of rendered image in pixels, or 0.
-         * @param  hints  Rendering hints, or <code>null</code>.
+         * @param  hints  Rendering hints, or {@code null}.
          * @return A rendered image containing the rendered data
          */
         public RenderedImage createScaledRendering(int width, int height,
@@ -681,7 +676,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
         /**
          * Creates a rendered image using a given render context. This method will uses
          * an "{@link ImageFunctionDescriptor ImageFunction}" operation if possible
-         * (i.e. if the area of interect is rectangular  and the affine transform contains
+         * (i.e. if the area of interect is rectangular and the affine transform contains
          * only translation and scale coefficients).
          *
          * @param  context The render context to use to produce the rendering.
@@ -797,8 +792,8 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             } catch (NoninvertibleTransformException exception) {
                 // Can't add the property. Too bad, the image has been created anyway.
                 // Maybe the user know what he is doing...
-                Utilities.unexpectedException("org.geotools.cv", "Coverage.Renderable",
-                                              "createRendering", exception);
+                Utilities.unexpectedException("org.geotools.coverage",
+                        "AbstractCoverage.Renderable", "createRendering", exception);
             }
             return image;
         }
@@ -810,12 +805,12 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          * order), so that the image appears properly oriented when rendered.
          *
          * @param  gridBounds The two-dimensional destination rectangle.
-         * @param  hints The rendering hints, or <code>null</code> if none.
+         * @param  hints The rendering hints, or {@code null} if none.
          * @return A render context initialized with an affine transform from the coverage
          *         to the grid coordinate system. This transform is the inverse of
-         *         {@link org.geotools.gc.GridGeometry#getGridToCoordinateSystem2D}.
+         *         {@link org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem2D}.
          *
-         * @see org.geotools.gc.GridGeometry#getGridToCoordinateSystem
+         * @see org.geotools.coverage.grid.GridGeometry#getGridToCoordinateSystem
          */
         protected RenderContext createRenderContext(final Rectangle2D gridBounds,
                                                     final RenderingHints hints)
@@ -862,7 +857,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          * image tile, providing that the rendered image is created using the
          * "{@link ImageFunctionDescriptor ImageFunction}" operator and the image
          * type is not <code>double</code>. The default implementation invokes
-         * {@link Coverage#evaluate(DirectPosition,float[])} recursively.
+         * {@link AbstractCoverage#evaluate(DirectPosition,float[])} recursively.
          */
         public void getElements(final float startX, final float startY,
                                 final float deltaX, final float deltaY,
@@ -891,7 +886,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
          * image tile, providing that the rendered image is created using the
          * "{@link ImageFunctionDescriptor ImageFunction}" operator and the image type
          * is <code>double</code>. The default implementation invokes
-         * {@link Coverage#evaluate(DirectPosition,double[])} recursively.
+         * {@link AbstractCoverage#evaluate(DirectPosition,double[])} recursively.
          */
         public void getElements(final double startX, final double startY,
                                 final double deltaX, final double deltaY,
@@ -968,10 +963,9 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
      * for debugging purpose only and may change in future version.
      */
     public String toString() {
-        final Locale locale = null;
         final StringBuffer buffer=new StringBuffer(Utilities.getShortClassName(this));
         buffer.append("[\"");
-        buffer.append(getName(locale));
+        buffer.append(getName());
         buffer.append('"');
         final Envelope envelope = getEnvelope();
         if (envelope != null) {

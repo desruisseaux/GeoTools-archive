@@ -427,11 +427,11 @@ public class CoordinateSystemAxis extends IdentifiedObject
     }
 
     /**
-     * Constructs an axis with a name as an {@linkplain org.geotools.util.InternationalString
-     * international string} and an abbreviation. The {@linkplain #getName name of this identified
-     * object} is set to the unlocalized version of the <code>name</code> argument, as given by
+     * Constructs an axis with a name as an {@linkplain InternationalString international string}
+     * and an abbreviation. The {@linkplain #getName name of this identified object} is set to the
+     * unlocalized version of the {@code name} argument, as given by
      * <code>name.{@linkplain InternationalString#toString(Locale) toString}(null)</code>. The
-     * same <code>name</code> argument is also stored as an {@linkplain #getAlias alias}, which
+     * same {@code name} argument is also stored as an {@linkplain #getAlias alias}, which
      * allows fetching localized versions of the name.
      *
      * @param name         The name of this axis. Also stored as an alias for localization purpose.

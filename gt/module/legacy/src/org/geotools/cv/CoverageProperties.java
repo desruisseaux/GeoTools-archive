@@ -55,6 +55,8 @@ import org.opengis.cv.CV_Coverage;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated No replacement.
  */
 final class CoverageProperties implements PropertySource, Serializable {
     /**

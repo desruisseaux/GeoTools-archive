@@ -26,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Locale;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -51,6 +52,18 @@ public class SimpleInternationalString extends InternationalString implements Se
     public SimpleInternationalString(final String message) {
         defaultValue = message;
         ensureNonNull("message", message);
+    }
+
+    /**
+     * If the specified string is null or an instance of
+     * {@link org.opengis.util.InternationalString}, returns it unchanged.
+     * Otherwise, wraps the string value in a {@code SimpleInternationalString}.
+     */
+    public static org.opengis.util.InternationalString wrap(final CharSequence string) {
+        if (string==null || string instanceof org.opengis.util.InternationalString) {
+            return (org.opengis.util.InternationalString) string;
+        }
+        return new SimpleInternationalString(string.toString());
     }
 
     /**

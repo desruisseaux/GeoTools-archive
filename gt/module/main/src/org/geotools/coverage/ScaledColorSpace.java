@@ -26,6 +26,7 @@ package org.geotools.coverage;
 // J2SE dependencies
 import java.awt.color.ColorSpace;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 

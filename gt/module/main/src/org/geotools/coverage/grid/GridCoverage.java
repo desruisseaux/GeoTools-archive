@@ -32,7 +32,7 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.PropertySource;
 import javax.media.jai.util.CaselessStringKey;
 
-import org.geotools.coverage.Coverage;
+import org.geotools.coverage.AbstractCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
@@ -43,7 +43,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class GridCoverage extends Coverage
+public abstract class GridCoverage extends AbstractCoverage
                                 implements org.opengis.coverage.grid.GridCoverage
 {
     /**
@@ -57,7 +57,7 @@ public abstract class GridCoverage extends Coverage
      *        <code>evaluate(...)</code> methods.
      * @param source The source for this coverage, or <code>null</code> if none.
      *        Source may be (but is not limited to) a {@link PlanarImage} or an
-     *        other <code>Coverage</code> object.
+     *        other <code>AbstractCoverage</code> object.
      * @param properties The set of properties for this coverage, or <code>null</code> if
      *        there is none. "Properties" in <cite>Java Advanced Imaging</cite> is what
      *        OpenGIS calls "Metadata".  There is no <code>getMetadataValue(...)</code>

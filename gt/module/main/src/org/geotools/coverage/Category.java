@@ -29,8 +29,17 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Arrays;
 
+// JAI dependencies
 import javax.media.jai.operator.PiecewiseDescriptor;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
@@ -38,11 +47,6 @@ import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -152,7 +156,7 @@ public class Category implements Serializable {
      * The minimal sample value (inclusive). This category is made of all values
      * in the range <code>minimum</code> to <code>maximum</code> inclusive.
      *
-     * If this category is an instance of <code>GeophysicsCategory</code>,
+     * If this category is an instance of {@code GeophysicsCategory},
      * then this field is the minimal geophysics value in this category.
      * For qualitative categories, the geophysics value is one of <code>NaN</code> values.
      */
@@ -162,7 +166,7 @@ public class Category implements Serializable {
      * The maximal sample value (inclusive). This category is made of all values
      * in the range <code>minimum</code> to <code>maximum</code> inclusive.
      *
-     * If this category is an instance of <code>GeophysicsCategory</code>,
+     * If this category is an instance of {@code GeophysicsCategory},
      * then this field is the maximal geophysics value in this category.
      * For qualitative categories, the geophysics value is one of <code>NaN</code> values.
      */
@@ -178,7 +182,7 @@ public class Category implements Serializable {
     /**
      * The math transform from sample to geophysics values (never <code>null</code>).
      *
-     * If this category is an instance of <code>GeophysicsCategory</code>, then this transform
+     * If this category is an instance of {@code GeophysicsCategory}, then this transform
      * is the inverse (as computed by {@link MathTransform#inverse()}), except for qualitative
      * categories. Since {@link #getSampleToGeophysics} returns <code>null</code> for
      * qualitative categories, this difference is not visible to the user.
@@ -189,8 +193,8 @@ public class Category implements Serializable {
     final MathTransform1D transform;
 
     /**
-     * A reference to the <code>GeophysicsCategory</code>. If this category is already an
-     * instance of <code>GeophysicsCategory</code>, then <code>inverse</code> is a reference
+     * A reference to the {@code GeophysicsCategory}. If this category is already an
+     * instance of {@code GeophysicsCategory}, then {@code inverse} is a reference
      * to the {@link Category} object that own it.
      */
     final Category inverse;
@@ -211,8 +215,8 @@ public class Category implements Serializable {
      * A set of default category colors.
      */
     private static final Color[] CYCLE = {
-        Color.blue,    Color.red,   Color.orange, Color.yellow,    Color.pink,
-        Color.magenta, Color.green, Color.cyan,   Color.lightGray, Color.gray
+        Color.BLUE,    Color.RED,   Color.ORANGE, Color.YELLOW,     Color.PINK,
+        Color.MAGENTA, Color.GREEN, Color.CYAN,   Color.LIGHT_GRAY, Color.GRAY
     };
     
     /**
@@ -319,9 +323,9 @@ public class Category implements Serializable {
     public Category(final InternationalString name,
                     final Color[]           colors,
                     final int                lower,
-                    final int     upper,
-                    final double  scale,
-                    final double  offset) throws IllegalArgumentException
+                    final int                upper,
+                    final double             scale,
+                    final double            offset) throws IllegalArgumentException
     {
         this(name, colors,
              new NumberRange(Integer.class, new Integer(lower), true,
@@ -456,7 +460,8 @@ public class Category implements Serializable {
                      final NumberRange            range,
                      MathTransform1D sampleToGeophysics) throws IllegalArgumentException
     {
-        this.name      = name; // TODO: ensure non null
+        ensureNonNull("name", name);
+        this.name      = name;
         this.ARGB      = ARGB;
         this.range     = range;
         Class type     = range.getElementClass();
@@ -521,11 +526,11 @@ public class Category implements Serializable {
      * @param  isQuantitative <code>true</code> if the originating category is quantitative.
      * @throws TransformException if a transformation failed.
      *
-     * @task TODO: The algorithm for finding minimum and maximum values is very simple for
-     *             now and will not work if the transformation has local extremas. We would
-     *             need some more sophesticated algorithm for the most general cases. Such
-     *             a general algorithm would be usefull in {@link GeophysicsCategory#getRange}
-     *             as well.
+     * @todo The algorithm for finding minimum and maximum values is very simple for
+     *       now and will not work if the transformation has local extremas. We would
+     *       need some more sophesticated algorithm for the most general cases. Such
+     *       a general algorithm would be usefull in {@link GeophysicsCategory#getRange}
+     *       as well.
      */
     Category(final Category inverse, final boolean isQuantitative) throws TransformException {
         assert  (this    instanceof GeophysicsCategory);
@@ -832,7 +837,7 @@ public class Category implements Serializable {
      * @return The category. Never <code>null</code>, but may be <code>this</code>.
      *
      * @see SampleDimension#geophysics
-     * @see org.geotools.gc.GridCoverage#geophysics
+     * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
      */
     public Category geophysics(final boolean geo) {
         return geo ? inverse : this;
@@ -906,6 +911,23 @@ public class Category implements Serializable {
         buffer.append("])");
         return buffer.toString();
     }
+    
+    /**
+     * Makes sure that an argument is non-null.
+     *
+     * @param  name   Argument name.
+     * @param  object User argument.
+     * @throws IllegalArgumentException if {@code object} is null.
+     */
+    static void ensureNonNull(final String name, final Object object)
+        throws IllegalArgumentException
+    {
+        if (object == null) {
+            throw new IllegalArgumentException(
+                    org.geotools.resources.cts.Resources.format(
+                    org.geotools.resources.cts.ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+        }
+    }
 
     /**
      * Returns the object to use after deserialization. This is usually <code>this</code>.
@@ -917,9 +939,9 @@ public class Category implements Serializable {
      * <ul>
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class
      *       should be exceptional, it is better to play safe.</li>
-     *   <li>{@link GeophysicsCategory} should not inherit it. {@link GeophysicsCategory} is never
+     *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
      *       serialized alone; it is always encapsulated in a <code>Category</code>. Concequently,
-     *       if <code>Category</code> has been canonicalized, then {@link GeophysicsCategory} has
+     *       if <code>Category</code> has been canonicalized, then {@code GeophysicsCategory} has
      *       been canonicalized too.</li>
      * </ul>
      *
@@ -940,9 +962,9 @@ public class Category implements Serializable {
      * <ul>
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class
      *       should be exceptional, it is better to play safe.</li>
-     *   <li>{@link GeophysicsCategory} should not inherit it. {@link GeophysicsCategory} is never
+     *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
      *       serialized alone; it is always encapsulated in a <code>Category</code>. Concequently,
-     *       if <code>Category</code> has been canonicalized, then {@link GeophysicsCategory} has
+     *       if <code>Category</code> has been canonicalized, then {@code GeophysicsCategory} has
      *       been canonicalized too.</li>
      * </ul>
      *

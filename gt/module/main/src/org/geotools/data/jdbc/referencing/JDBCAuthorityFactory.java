@@ -133,6 +133,8 @@ public class JDBCAuthorityFactory implements CRSAuthorityFactory {
 
     /**
      * @see org.opengis.referencing.AuthorityFactory#getObjectFactory()
+     *
+     * @deprecated This method will be removed from GeoAPI interfaces.
      */
     public ObjectFactory getObjectFactory() {
         return factory;

@@ -23,7 +23,7 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RasterFormatException;
@@ -36,23 +36,29 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
-
-import javax.media.jai.iterator.WritableRectIter;
 import javax.units.Unit;
 
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.wkt.UnformattableObjectException;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.util.NumberRange;
+// JAI dependencies
+import javax.media.jai.iterator.WritableRectIter;
+
+// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.wkt.UnformattableObjectException;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.util.AbstractInternationalString;
+import org.geotools.util.NumberRange;
 
 
 /**
@@ -144,6 +150,13 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * category and [0 .. 1000] for the second one.
      */
     private final boolean hasGaps;
+
+    /**
+     * The name for this category list. Will be constructed only when first needed.
+     *
+     * @see #getName
+     */
+    private transient InternationalString name;
 
     /**
      * Construct a category list using the specified array of categories.
@@ -447,24 +460,36 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * Returns the name of this object. The default implementation returns the name
      * of what seems to be the "main" category (i.e. the quantitative category with
      * the widest range of sample values) followed by the geophysics value range.
-     *
-     * @param  locale The locale, or <code>null</code> for the default one.
-     * @return The localized description. If no description was available
-     *         in the specified locale, a default locale is used.
-     *
-     * @todo Returns InternationalString instead.
      */
-    public final String getName(final Locale locale) {
-        final StringBuffer buffer = new StringBuffer(30);
-        if (main != null) {
-            buffer.append(main.getName());
-        } else {
-            buffer.append('(');
-            buffer.append(Resources.getResources(locale).getString(ResourceKeys.UNTITLED));
-            buffer.append(')');
+    public final InternationalString getName() {
+        if (name == null) {
+            name = new Name();
         }
-        buffer.append(' ');
-        return String.valueOf(geophysics(true).formatRange(buffer, locale));
+        return name;
+    }
+
+    /**
+     * The name for this category list. Will be created only when first needed.
+     */
+    private final class Name extends AbstractInternationalString {
+        /** Returns the name in the specified locale. */
+        public String toString(final Locale locale) {
+            final StringBuffer buffer = new StringBuffer(30);
+            if (main != null) {
+                buffer.append(main.getName().toString(locale));
+            } else {
+                buffer.append('(');
+                buffer.append(Resources.getResources(locale).getString(ResourceKeys.UNTITLED));
+                buffer.append(')');
+            }
+            buffer.append(' ');
+            return String.valueOf(geophysics(true).formatRange(buffer, locale));
+        }
+
+        /** Returns the name in the default locale. */
+        public String toString() {
+            return toString(Locale.getDefault());
+        }
     }
     
     /**
@@ -971,11 +996,11 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * same. Locale variables still <code>double</code> because this is the type used in
      * {@link Category} objects.
      *
-     * @task TODO: We could add an optimisation after the loops checking for category change:
-     *             if we were allowed to search for nearest category (overflowFallback!=null),
-     *             then make sure that the category really changed. There is already a slight
-     *             optimization for the most common cases, but maybe we could go a little bit
-     *             further.
+     * @todo We could add an optimisation after the loops checking for category change:
+     *       if we were allowed to search for nearest category (overflowFallback!=null),
+     *       then make sure that the category really changed. There is already a slight
+     *       optimization for the most common cases, but maybe we could go a little bit
+     *       further.
      */
     private void transform(final double[] srcPts, final float[] srcFloat, int srcOff,
                            final double[] dstPts, final float[] dstFloat, int dstOff,

@@ -180,7 +180,7 @@ public final class CRSUtilities {
      * @param  crs   The coordinate system to decompose.
      * @param  lower The first dimension to keep, inclusive.
      * @param  upper The last  dimension to keep, exclusive.
-     * @return The sub-coordinate system, or <code>null</code> if <code>crs</code> can't
+     * @return The sub-coordinate system, or {@code null} if {@code crs} can't
      *         be decomposed for dimensions in the range <code>[lower..upper]</code>.
      */
     public static CoordinateReferenceSystem getSubCRS(CoordinateReferenceSystem crs,
@@ -215,15 +215,15 @@ public final class CRSUtilities {
     
     /**
      * Returns a two-dimensional coordinate reference system representing the two first dimensions
-     * of the specified coordinate reference system. If <code>crs</code> is already a
+     * of the specified coordinate reference system. If {@code crs} is already a
      * two-dimensional CRS, then it is returned unchanged. Otherwise, if it is a
      * {@link CompoundCRS}, then the head coordinate system is examined.
      *
-     * @param  crs The coordinate system, or <code>null</code>.
+     * @param  crs The coordinate system, or {@code null}.
      * @return A two-dimensional coordinate reference system that represents the two first
-     *         dimensions of <code>crs</code>, or <code>null</code> if <code>crs</code> was
-     *         <code>null</code>.
-     * @throws TransformException if <code>crs</code> can't be reduced to a two-coordinate system.
+     *         dimensions of {@code crs}, or {@code null} if {@code crs} was
+     *         {@code null}.
+     * @throws TransformException if {@code crs} can't be reduced to a two-coordinate system.
      *         We use this exception class since this method is usually invoked in the context of
      *         a transformation process.
      */
@@ -249,7 +249,7 @@ public final class CRSUtilities {
     
     /**
      * Returns the first horizontal coordinate reference system found in the given CRS,
-     * or <code>null</code> if there is none.
+     * or {@code null} if there is none.
      */
     public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof GeographicCRS || crs instanceof ProjectedCRS) {
@@ -271,7 +271,7 @@ public final class CRSUtilities {
     
     /**
      * Returns the first projected coordinate reference system found in a the given CRS,
-     * or <code>null</code> if there is none.
+     * or {@code null} if there is none.
      */
     public static ProjectedCRS getProjectedCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof ProjectedCRS) {
@@ -291,7 +291,7 @@ public final class CRSUtilities {
     
     /**
      * Returns the first vertical coordinate reference system found in a the given CRS,
-     * or <code>null</code> if there is none.
+     * or {@code null} if there is none.
      */
     public static VerticalCRS getVerticalCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof VerticalCRS) {
@@ -311,7 +311,7 @@ public final class CRSUtilities {
     
     /**
      * Returns the first temporal coordinate reference system found in the given CRS,
-     * or <code>null</code> if there is none.
+     * or {@code null} if there is none.
      */
     public static TemporalCRS getTemporalCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof TemporalCRS) {
@@ -330,7 +330,7 @@ public final class CRSUtilities {
     }
 
     /**
-     * Returns the datum of the specified CRS, or <code>null</code> if none.
+     * Returns the datum of the specified CRS, or {@code null} if none.
      */
     public static Datum getDatum(final CoordinateReferenceSystem crs) {
         return (crs instanceof SingleCRS) ? ((SingleCRS) crs).getDatum() : null;
@@ -338,7 +338,7 @@ public final class CRSUtilities {
 
     /**
      * Returns the first ellipsoid found in a coordinate reference system,
-     * or <code>null</code> if there is none.
+     * or {@code null} if there is none.
      */
     public static Ellipsoid getEllipsoid(final CoordinateReferenceSystem crs) {
         final Datum datum = getDatum(crs);
@@ -360,7 +360,7 @@ public final class CRSUtilities {
     /**
      * Returns the ellipsoid used by the specified coordinate reference system, providing that
      * the two first dimensions use an instance of {@link GeographicCRS}. Otherwise (i.e. if the
-     * two first dimensions are not geographic), returns <code>null</code>.
+     * two first dimensions are not geographic), returns {@code null}.
      */
     public static Ellipsoid getHeadGeoEllipsoid(CoordinateReferenceSystem crs) {
         while (!(crs instanceof GeographicCRS)) {
@@ -378,29 +378,26 @@ public final class CRSUtilities {
     }
 
     /**
-     * Returns the bounding box of the specified coordinate reference system, or <code>null</code>
+     * Returns the bounding box of the specified coordinate reference system, or {@code null}
      * if none. This method search in the metadata informations.
      *
-     * @param  crs The coordinate reference system, or <code>null</code>.
-     * @return The envelope, or <code>null</code> if none.
+     * @param  crs The coordinate reference system, or {@code null}.
+     * @return The envelope, or {@code null} if none.
      */
     public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
         if (crs != null) {
-            final Datum datum = getDatum(crs);
-            if (datum != null) {
-                Extent validArea = datum.getValidArea();
-                if (validArea != null) {
-                    GeographicExtent geo = validArea.getGeographicElement();
-                    if (geo instanceof GeographicBoundingBox) {
-                        final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
-                        return new GeneralEnvelope(new double[] {bounds.getEastBoundLongitude(),
-                                                                 bounds.getWestBoundLongitude()},
-                                                   new double[] {bounds.getSouthBoundLatitude(),
-                                                                 bounds.getNorthBoundLatitude()});
-                    }
-                    if (geo instanceof BoundingPolygon) {
-                        return ((BoundingPolygon) geo).getPolygon().getEnvelope();
-                    }
+            final Extent validArea = crs.getValidArea();
+            if (validArea != null) {
+                final GeographicExtent geo = validArea.getGeographicElement();
+                if (geo instanceof GeographicBoundingBox) {
+                    final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
+                    return new GeneralEnvelope(new double[] {bounds.getEastBoundLongitude(),
+                                                             bounds.getWestBoundLongitude()},
+                                               new double[] {bounds.getSouthBoundLatitude(),
+                                                             bounds.getNorthBoundLatitude()});
+                }
+                if (geo instanceof BoundingPolygon) {
+                    return ((BoundingPolygon) geo).getPolygon().getEnvelope();
                 }
             }
         }
@@ -469,11 +466,11 @@ public final class CRSUtilities {
      * <pre>transform(transform, new GeneralEnvelope(source)).toRectangle2D()</pre>
      *
      * @param  transform The transform to use. Source and target dimension must be 2.
-     * @param  source The rectangle to transform (may be <code>null</code>).
-     * @param  dest  The destination rectangle (may be <code>source</code>).
-     *         If <code>null</code>, a new rectangle will be created and returned.
-     * @return <code>dest</code>, or a new rectangle if <code>dest</code> was non-null
-     *         and <code>source</code> was null.
+     * @param  source The rectangle to transform (may be {@code null}).
+     * @param  dest The destination rectangle (may be {@code source}).
+     *         If {@code null}, a new rectangle will be created and returned.
+     * @return {@code dest}, or a new rectangle if {@code dest} was non-null
+     *         and {@code source} was null.
      * @throws TransformException if a transform failed.
      */
     public static Rectangle2D transform(final MathTransform2D transform,
@@ -519,14 +516,14 @@ public final class CRSUtilities {
     }
 
     /**
-     * Transforms the relative distance vector specified by <code>source</code> and stores
-     * the result in <code>dest</code>.  A relative distance vector is transformed without
+     * Transforms the relative distance vector specified by {@code source} and stores
+     * the result in {@code dest}.  A relative distance vector is transformed without
      * applying the translation components.
      *
      * @param transform The transform to apply.
      * @param origin The position where to compute the delta transform in the source CS.
      * @param source The distance vector to be delta transformed
-     * @param dest   The resulting transformed distance vector, or <code>null</code>
+     * @param dest   The resulting transformed distance vector, or {@code null}
      * @return       The result of the transformation.
      * @throws TransformException if the transformation failed.
      *

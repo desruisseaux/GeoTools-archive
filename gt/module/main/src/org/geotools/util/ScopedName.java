@@ -104,8 +104,8 @@ public class ScopedName extends org.geotools.util.GenericName
                       final char    separator,
                       final CharSequence name)
     {
-        org.geotools.util.InternationalString.ensureNonNull("scope", scope);
-        org.geotools.util.InternationalString.ensureNonNull("name",  name);
+        AbstractInternationalString.ensureNonNull("scope", scope);
+        AbstractInternationalString.ensureNonNull("name",  name);
         this.scope     = scope;
         this.separator = separator;
         this.name      = new org.geotools.util.LocalName(this, name);

@@ -26,17 +26,18 @@ package org.geotools.coverage;
 // J2SE dependencies
 import java.awt.Color;
 
-import org.geotools.referencing.FactoryFinder;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.util.NumberRange;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -86,10 +87,10 @@ final class GeophysicsCategory extends Category {
      * @return The range of geophysics values.
      * @throws IllegalStateException if sample values can't be transformed into geophysics values.
      *
-     * @task TODO: The algorithm for finding minimum and maximum values is very simple for
-     *             now and will not work if the transformation has local extremas. We would
-     *             need some more sophesticated algorithm for the most general cases. Such
-     *             a general algorithm would be usefull in the super-class constructor as well.
+     * @todo The algorithm for finding minimum and maximum values is very simple for
+     *       now and will not work if the transformation has local extremas. We would
+     *       need some more sophesticated algorithm for the most general cases. Such
+     *       a general algorithm would be usefull in the super-class constructor as well.
      */
     public NumberRange getRange() throws IllegalStateException {
         if (range == null) try {
@@ -154,14 +155,8 @@ final class GeophysicsCategory extends Category {
         if (sampleToGeophysics.isIdentity()) {
             return this;
         }
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
-        try {
-            sampleToGeophysics = (MathTransform1D)factory.createConcatenatedTransform(
-                                 inverse.getSampleToGeophysics(), sampleToGeophysics);
-        } catch (FactoryException exception) {
-            // TODO: Uses Geotools factory instead (so no exception to catch).
-            throw new UnsupportedOperationException();
-        }
+        sampleToGeophysics = (MathTransform1D) ConcatenatedTransform.create(
+                             inverse.getSampleToGeophysics(), sampleToGeophysics);
         return inverse.rescale(sampleToGeophysics).inverse;
     }
 

@@ -65,7 +65,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     private static final long serialVersionUID = -8740895616121262893L;
     
     /**
-     * The valid coordinate range of a grid coverage, or <code>null</code> if none. The lowest
+     * The valid coordinate range of a grid coverage, or {@code null} if none. The lowest
      * valid grid coordinate is zero for {@link BufferedImage}, but may be non-zero for arbitrary
      * {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0 and maximum
      * of 512, with 511 as the highest valid index.
@@ -78,7 +78,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     private final GridRange gridRange;
     
     /**
-     * The math transform (usually an affine transform), or <code>null</code> if none.
+     * The math transform (usually an affine transform), or {@code null} if none.
      * This math transform maps pixel center to "real world" coordinate using the
      * following line:
      *
@@ -88,7 +88,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     
     /**
      * A math transform mapping only the two first dimensions of
-     * <code>gridToCoordinateSystem</code>, or <code>null</code>
+     * <code>gridToCoordinateSystem</code>, or {@code null}
      * if such a "sub-transform" is not available.
      */
     private final MathTransform2D gridToCoordinateSystem2D;
@@ -101,7 +101,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     /**
      * Construct a new grid geometry from a math transform.
      *
-     * @param gridRange The valid coordinate range of a grid coverage, or <code>null</code> if
+     * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if
      *        none. The lowest valid grid coordinate is zero for {@link BufferedImage}, but may
      *        be non-zero for arbitrary {@link RenderedImage}. A grid with 512 cells can have a
      *        minimum coordinate of 0 and maximum of 512, with 511 as the highest valid index.
@@ -144,7 +144,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      *                  the upper left corner of the first pixel and the rectangle's
      *                  lower right corner must coincide with the lower right corner
      *                  of the last pixel.
-     * @param inverse   Tells whatever or not inverse axis. A <code>null</code> value
+     * @param inverse   Tells whatever or not inverse axis. A {@code null} value
      *                  inverse no axis.
      */
     public GridGeometry(final GridRange gridRange,
@@ -314,7 +314,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      * grid with 512 cells can have a minimum coordinate of 0 and maximum of 512, with 511 as the
      * highest valid index.
      *
-     * @return The grid range (never <code>null</code>).
+     * @return The grid range (never {@code null}).
      * @throws InvalidGridGeometryException if this grid geometry has no grid range.
      *
      * @see RenderedImage#getMinX
@@ -334,14 +334,14 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      * Returns the math transform which allows  for the transformations from grid coordinates to
      * real world earth coordinates. The transform is often an affine transformation. The coordinate
      * reference system of the real world coordinates is given by
-     * {@link org.geotools.cv.Coverage#getCoordinateReferenceSystem}. If no math transform is
-     * available, this method returns <code>null</code>.
+     * {@link org.opengis.coverage.Coverage#getCoordinateReferenceSystem}. If no math transform is
+     * available, this method returns {@code null}.
      * <br><br>
      * <strong>Note:</strong> OpenGIS requires that the transform maps <em>pixel centers</em>
      * to real world coordinates. This is different from some other systems that map pixel's
      * upper left corner.
      *
-     * @return The transform (never <code>null</code>).
+     * @return The transform (never {@code null}).
      * @throws InvalidGridGeometryException if this grid geometry has no transform.
      */
     public MathTransform getGridToCoordinateSystem() throws InvalidGridGeometryException {
@@ -384,7 +384,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
      *
      * @param  transform The transform.
      * @param  mtFactory The factory to use for extracting the sub-transform.
-     * @return The {@link MathTransform2D} part of <code>transform</code>, or <code>null</code>
+     * @return The {@link MathTransform2D} part of <code>transform</code>, or {@code null}
      *         if none.
      */
     private static MathTransform2D getMathTransform2D(MathTransform transform) {
@@ -434,7 +434,7 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     /**
      * Returns the pixel coordinate of a rectangle containing the
      * specified geographic area. If the rectangle can't be computed,
-     * then this method returns <code>null</code>.
+     * then this method returns {@code null}.
      */
     final Rectangle inverseTransform(Rectangle2D bounds) {
         if (bounds!=null && gridFromCoordinateSystem2D!=null) {
@@ -455,10 +455,10 @@ public class GridGeometry implements org.opengis.coverage.grid.GridGeometry, Ser
     
     /**
      * Try to guess which axis are inverted in this grid geometry. If
-     * this method can't make the guess, it returns <code>null</code>.
+     * this method can't make the guess, it returns {@code null}.
      *
      * @return An array with length equals  to the number of dimensions in
-     *         the "real world" coordinate system, or <code>null</code> if
+     *         the "real world" coordinate system, or {@code null} if
      *         if this array can't be deduced.
      */
     final boolean[] areAxisInverted() {
