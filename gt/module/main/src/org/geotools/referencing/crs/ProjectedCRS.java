@@ -92,7 +92,7 @@ public class ProjectedCRS extends GeneralDerivedCRS
      * super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
-     *         the underlying {@link org.geotools.referencing.operation.Projection projection}.
+     *         the underlying {@linkplain org.geotools.referencing.operation.Projection projection}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -113,11 +113,12 @@ public class ProjectedCRS extends GeneralDerivedCRS
 
     /**
      * Constructs a projected coordinate reference system from a projection name.
+     * The properties are given unchanged to the
+     * {@linkplain GeneralDerivedCRS#GeneralDerivedCRS(Map,CoordinateReferenceSystem,MathTransform,CoordinateSystem)
+     * super-class constructor}.
      * 
-     * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
-     *         be created can be specified with the <code>"conversion."</code> prefix added in
-     *         front of property names (example: <code>"conversion.name"</code>).
+     * @param  properties Name and other properties to give to the new derived CRS object and to
+     *         the underlying {@linkplain org.geotools.referencing.operation.Projection projection}.
      * @param  geoCRS Geographic coordinate reference system to base projection on.
      * @param  projectionName The classification name for the projection to be created
      *         (e.g. "Transverse_Mercator", "Mercator_1SP", "Oblique_Stereographic", etc.).
@@ -143,6 +144,8 @@ public class ProjectedCRS extends GeneralDerivedCRS
      * Wraps the specified arguments in a {@link Projection} object. This method is invoked
      * by {@link GeneralDerivedCRS} constructor in order to construct a {@link Conversion}
      * object of the right kind.
+     *
+     * @todo Check the Projection subclasses (PlanarProjection, ConicProjection, etc.)
      */
     Conversion createConversion(final Map                       properties,
                                 final CoordinateReferenceSystem sourceCRS,
@@ -151,7 +154,6 @@ public class ProjectedCRS extends GeneralDerivedCRS
                                 final OperationMethod           method,
                                 final GeneralParameterValue[]   values)
     {
-        // TODO: check the Projection subclass.
         return new org.geotools.referencing.operation.Projection(properties,
                     sourceCRS, targetCRS, transform, method, values);
     }

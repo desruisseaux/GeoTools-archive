@@ -98,9 +98,9 @@ public class OperationParameter extends GeneralOperationParameter implements org
                               final int minimum,
                               final int maximum)
     {
-        this(name, Integer.class, new Integer(defaultValue),
-             minimum == Integer.MIN_VALUE ? null : new Integer(minimum),
-             maximum == Integer.MAX_VALUE ? null : new Integer(maximum), null);
+        this(name, Integer.class, ParameterValue.wrap(defaultValue),
+             minimum == Integer.MIN_VALUE ? null : ParameterValue.wrap(minimum),
+             maximum == Integer.MAX_VALUE ? null : ParameterValue.wrap(maximum), null);
     }
 
     /**
@@ -121,9 +121,9 @@ public class OperationParameter extends GeneralOperationParameter implements org
                               final Unit   unit)
     {
         this(name, Double.class,
-             Double.isNaN(defaultValue)          ? null : new Double(defaultValue),
-             minimum == Double.NEGATIVE_INFINITY ? null : new Double(minimum),
-             maximum == Double.POSITIVE_INFINITY ? null : new Double(maximum), unit);
+             Double.isNaN(defaultValue)          ? null : ParameterValue.wrap(defaultValue),
+             minimum == Double.NEGATIVE_INFINITY ? null : ParameterValue.wrap(minimum),
+             maximum == Double.POSITIVE_INFINITY ? null : ParameterValue.wrap(maximum), unit);
     }
 
     /**
@@ -212,7 +212,8 @@ public class OperationParameter extends GeneralOperationParameter implements org
     }
 
     /**
-     * Construct a parameter from a set of properties.
+     * Construct a parameter from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}

@@ -262,6 +262,6 @@ public class LinearTransform1D extends AbstractMathTransform
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        return MatrixTransform.formatWKT(formatter, getMatrix());
+        return ProjectiveTransform.formatWKT(formatter, getMatrix());
     }
 }

@@ -25,6 +25,7 @@ package org.geotools.parameter;
 // J2SE dependencies
 import java.net.URL;
 import java.util.Set;
+import java.util.Arrays;
 import java.util.Locale;
 import javax.units.Unit;
 import javax.units.SI;
@@ -63,6 +64,24 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     private static final long serialVersionUID = -5837826787089486776L;
 
     /**
+     * Frequently used values. <strong>Must</strong> be in increasing order.
+     */
+    private static final int[] CACHED_VALUES = {
+        -360, -180, -90, -45, -30, -4, -3, -2, -1, 0, +1, +2, +3, +4, +30, +45, +90, +180, +360
+    };
+
+    /** Frequently used values as integers. */ private static final Integer[] CACHED_INTEGERS;
+    /** Frequently used values as doubles.  */ private static final Double [] CACHED_DOUBLES;
+    static {
+        CACHED_INTEGERS = new Integer[CACHED_VALUES.length];
+        CACHED_DOUBLES  = new Double [CACHED_VALUES.length];
+        for (int i=0; i<CACHED_VALUES.length; i++) {
+            CACHED_INTEGERS[i] = new Integer(CACHED_VALUES[i]);
+            CACHED_DOUBLES [i] = new Double (CACHED_VALUES[i]);
+        }
+    }
+
+    /**
      * The value.
      */
     private Object value;
@@ -84,7 +103,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     public ParameterValue(final String name, final int value) {
         this(new org.geotools.parameter.OperationParameter(name,
                  0, Integer.MIN_VALUE, Integer.MAX_VALUE));
-        this.value = new Integer(value);
+        this.value = wrap(value);
     }
 
     /**
@@ -100,7 +119,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
     public ParameterValue(final String name, final double value, final Unit unit) {
         this(new org.geotools.parameter.OperationParameter(name,
                  Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, normalize(unit)));
-        this.value = new Double(value);
+        this.value = wrap(value);
         this.unit  = unit;
     }
 
@@ -128,6 +147,32 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         super(descriptor);
         value = descriptor.getDefaultValue();
         unit  = descriptor.getUnit();
+    }
+
+    /**
+     * Wrap the specified value in an {@link Integer} object.
+     * This method try to avoid object creation if the value
+     * is one of {@link #CACHED_VALUES frequently used values}.
+     */
+    static Integer wrap(final int value) {
+        final int i = Arrays.binarySearch(CACHED_VALUES, value);
+        return (i>=0) ? CACHED_INTEGERS[i] : new Integer(value);
+    }
+
+    /**
+     * Wrap the specified value in an {@link Double} object.
+     * This method try to avoid object creation if the value
+     * is one of {@link #CACHED_VALUES frequently used values}.
+     */
+    static Double wrap(final double value) {
+        final int integer = (int)value;
+        if (integer == value) {
+            final int i = Arrays.binarySearch(CACHED_VALUES, integer);
+            if (i >= 0) {
+                return CACHED_DOUBLES[i];
+            }
+        }
+        return new Double(value);
     }
 
     /**
@@ -443,9 +488,9 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
         if (getUnitMessageID(unit) != expectedID) {
             throw new IllegalArgumentException(Resources.format(expectedID, unit));
         }
-        final Double converted = new Double(unit.getConverterTo(targetUnit).convert(value));
+        final Double converted = wrap(unit.getConverterTo(targetUnit).convert(value));
         ensureValidValue(converted);
-        this.value = new Double(value);
+        this.value = wrap(value);
         this.unit  = unit;
     }
 
@@ -462,7 +507,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      * @see #doubleValue()
      */
     public void setValue(final double value) throws InvalidParameterValueException {
-        final Double check = new Double(value);
+        final Double check = wrap(value);
         ensureValidValue(check);
         this.value = check;
     }
@@ -477,7 +522,7 @@ public class ParameterValue extends GeneralParameterValue implements org.opengis
      * @see #intValue
      */
     public void setValue(final int value) throws InvalidParameterValueException {
-        final Integer check = new Integer(value);
+        final Integer check = wrap(value);
         ensureValidValue(check);
         this.value = check;
     }

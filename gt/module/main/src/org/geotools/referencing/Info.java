@@ -237,9 +237,9 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      *
      * @param  locale The desired locale for the name to be returned,
      *         or <code>null</code> for a non-localized string.
-     * @return The remarks, or <code>null</code> if not available.
+     * @return The name, or <code>null</code> if not available.
      */
-    public String getName(Locale locale) {
+    public String getName(final Locale locale) {
         return getLocalized(name, locale);
     }
 

@@ -27,28 +27,40 @@ import org.geotools.util.DerivedMap;
 
 
 /**
- * A map without the <code>"conversion."</code> prefix in front of property keys.
+ * A map without the <code>"conversion."</code> prefix in front of property keys. This
+ * implementation performs a special processing for the <code>{@linkplain #prefix}.name</code>
+ * key: if it doesn't exists, then the plain <code>name</code> key is used. In other words,
+ * this map inherits the <code>"name"</code> property from the {@linkplain #base} map.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class UnprefixedMap extends DerivedMap {
     /**
+     * The property key to process in a special way.
+     */
+    private static final String NAME = "name";
+
+    /**
      * The prefix to remove for this map.
      */
     private final String prefix;
 
     /**
+     * <code>true</code> if the <code>{@linkplain #prefix}.name</code> property exists
+     */
+    private final boolean hasName;
+
+    /**
      * Creates a new unprefixed map from the specified base map and prefix to remove.
      *
-     * @param base The base map.
+     * @param base   The base map.
      * @param prefix The prefix to remove from the keys in the base map.
-     *               <strong>Must</strong> be lower case.
      */
     public UnprefixedMap(final Map base, final String prefix) {
         super(base);
-        this.prefix = prefix;
-        assert prefix.equals(prefix.toLowerCase()) : prefix;
+        this.prefix  = prefix.trim();
+        this.hasName = base.containsKey(this.prefix + NAME);
     }
 
     /**
@@ -60,9 +72,13 @@ final class UnprefixedMap extends DerivedMap {
      *         or <code>null</code>.
      */
     protected Object baseToDerived(final Object key) {
-        final String baseKey = key.toString().trim();
-        if (baseKey.toLowerCase().startsWith(prefix)) {
-            return baseKey.substring(prefix.length());
+        final int length = prefix.length();
+        final String textualKey = key.toString().trim();
+        if (prefix.regionMatches(true, 0, textualKey, 0, length)) {
+            return textualKey.substring(length).trim();
+        }
+        if (!hasName && isName(textualKey)) {
+            return textualKey;
         }
         return null;
     }
@@ -73,7 +89,21 @@ final class UnprefixedMap extends DerivedMap {
      * @param  key A key in this map.
      * @return The key stored in the {@linkplain #base} map.
      */
-    protected Object derivedToBase(Object key) {
-        return prefix + key;
+    protected Object derivedToBase(final Object key) {
+        final String textualKey = key.toString().trim();
+        if (!hasName && isName(textualKey)) {
+            return textualKey;
+        }
+        return prefix + textualKey;
+    }
+
+    /**
+     * Returns <code>true</code> if the specified key is <code>"name"</code>
+     * or starts with <code>"name_"</code>
+     */
+    private static boolean isName(final String key) {
+        final int length = NAME.length();
+        return NAME.regionMatches(true, 0, key, 0, length) &&
+               (key.length()==length || key.charAt(length)=='_');
     }
 }

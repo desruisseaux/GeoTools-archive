@@ -76,7 +76,8 @@ public class OperationParameterGroup extends org.geotools.parameter.GeneralOpera
 
     /**
      * Construct a parameter group from a set of properties.
-     * This parameter group will be required exactly once.
+     * This parameter group will be required exactly once. The properties map is
+     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param parameters The {@linkplain #getParameters operation parameters} for this group.
@@ -88,7 +89,8 @@ public class OperationParameterGroup extends org.geotools.parameter.GeneralOpera
     }
 
     /**
-     * Construct a parameter group from a set of properties.
+     * Construct a parameter group from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}

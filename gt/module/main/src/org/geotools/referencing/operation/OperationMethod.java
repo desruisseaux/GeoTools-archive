@@ -28,12 +28,16 @@ import java.util.Map;
 import java.util.Locale;
 import java.util.HashMap;
 
-// OpenGIS direct dependencies
+// OpenGIS dependencies
 import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.referencing.Info;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -233,5 +237,33 @@ public class OperationMethod extends Info
      */
     protected String formatWKT(final Formatter formatter) {
         return "PROJECTION";
+    }
+
+    /**
+     * Check if an operation method and a math transform have a compatible number of source
+     * and target dimensions. This convenience method is provided for argument checking.
+     *
+     * @param  method    The operation method to compare to the math transform, or <code>null</code>.
+     * @param  transform The math transform to compare to the operation method, or <code>null</code>.
+     * @throws MismatchedDimensionException if the number of dimensions are incompatibles.
+     */
+    public static void checkDimensions(final org.opengis.referencing.operation.OperationMethod method,
+                                       final MathTransform transform)
+            throws MismatchedDimensionException
+    {
+        if (method!=null && transform!=null) {
+            final String name;
+            int actual, expected;
+            if ((actual=transform.getDimSource()) != (expected=method.getSourceDimensions())) {
+                name = "sourceDimensions";
+            } else if ((actual=transform.getDimTarget()) != (expected=method.getTargetDimensions())) {
+                name = "targetDimensions";
+            } else {
+                return;
+            }
+            throw new IllegalArgumentException(Resources.format(
+                                               ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+                                               name, new Integer(actual), new Integer(expected)));
+        }
     }
 }

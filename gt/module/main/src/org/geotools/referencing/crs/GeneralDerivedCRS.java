@@ -36,6 +36,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
@@ -82,7 +83,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
      *         of axes must match the target dimension of the transform
      *         <code>baseToDerived</code>.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
+     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
      *         and <code>derivedCS</code> respectively.
      */
     public GeneralDerivedCRS(final String                    name,
@@ -95,11 +96,37 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
     }
 
     /**
-     * Constructs a geographic CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}. In addition,
-     * properties for the {@link org.geotools.referencing.operation.Conversion} object to be
-     * created can be specified with the <code>"conversion."</code> prefix added in front of
-     * property names (example: <code>"conversion.name"</code>).
+     * Constructs a derived CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}. The following
+     * optional properties are also understood:
+     * <br><br>
+     * <table border='1'>
+     *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+     *     <th nowrap>Property name</th>
+     *     <th nowrap>Value type</th>
+     *     <th nowrap>Value given to</th>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;<code>"parameters"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;<code>{@linkplain GeneralParameterValue}[]</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link Conversion#getParameterValues}</td>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;<code>"method.name"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;<code>{@linkplain Conversion#getMethod}.getName()</code></td>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;<code>"conversion.name"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;<code>{@linkplain #getConversionFromBase}.getName()</code></td>
+     *   </tr>
+     * </table>
+     *
+     * <P>Additional properties for the {@link org.geotools.referencing.operation.Conversion} object
+     * to be created can be specified with the <code>"conversion."</code> prefix added in front of
+     * property names (example: <code>"conversion.remarks"</code>). The same applies for operation
+     * method, using the <code>"method."</code> prefix.</P>
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
      *         the underlying {@link org.geotools.referencing.operation.Conversion conversion}.
@@ -109,7 +136,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
      *         of axes must match the target dimension of the transform
      *         <code>baseToDerived</code>.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
+     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
      *         and <code>derivedCS</code> respectively.
      */
     public GeneralDerivedCRS(final Map                 properties,
@@ -121,29 +148,60 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
         super(properties, getDatum(base), derivedCS);
         ensureNonNull("baseToDerived", baseToDerived);
         this.baseCRS = base;
+        final int dimSource = baseToDerived.getDimSource();
+        final int dimTarget = baseToDerived.getDimTarget();
         int dim1, dim2;
-        if ((dim1=baseToDerived.getDimSource()) != (dim2=base.getCoordinateSystem().getDimension()) ||
-            (dim1=baseToDerived.getDimTarget()) != (dim2=derivedCS.getDimension()))
+        if ((dim1=dimSource) != (dim2=base.getCoordinateSystem().getDimension()) ||
+            (dim1=dimTarget) != (dim2=derivedCS.getDimension()))
         {
             throw new MismatchedDimensionException(Resources.format(
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
                         new Integer(dim1), new Integer(dim2)));
         }
         /*
+         * Gets the parameters, which may be null. If no OperationMethod was explicitly specified,
+         * a new one will be inferred from the parameters. The operation method will inherit the
+         * name from this GeneralDerivedCRS, unless a "method.name" property were explicitly
+         * specified.
          */
+        final GeneralParameterValue[] parameters;
+        parameters = (GeneralParameterValue[]) properties.get("parameters");
         OperationMethod method = (OperationMethod) properties.get("method");
         if (method == null) {
-            
+            final GeneralOperationParameter[] descriptors;
+            if (parameters != null) {
+                descriptors = new GeneralOperationParameter[parameters.length];
+                for (int i=0; i<descriptors.length; i++) {
+                    descriptors[i] = parameters[i].getDescriptor();
+                }
+            } else {
+                descriptors = null;
+            }
+            method = new org.geotools.referencing.operation.OperationMethod(
+                         /* properties       */ new UnprefixedMap(properties, "method."),
+                         /* sourceDimensions */ dimSource,
+                         /* targetDimensions */ dimTarget,
+                         /* parameters       */ descriptors);
+        } else {
+            /*
+             * A method was explicitly specified. Make sure that the source and target dimensions
+             * match. We do not check parameters in current version of this implementation (we may
+             * add this check in a future version), since the provided parameter descriptors may be
+             * more accurate than the one inferred from the parameter values.
+             */
+            org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
         }
         /*
+         * Constructs the conversion from all the information above. The ProjectedCRS subclass
+         * will overrides the createConversion method in order to create a projection instead.
          */
         this.conversionFromBase = createConversion(
                                   /* properties */ new UnprefixedMap(properties, "conversion."),
                                   /* sourceCRS  */ base,
                                   /* targetCRS  */ this,
                                   /* transform  */ baseToDerived,
-                                  /* method     */ null,
-                                  /* parameters */ null);
+                                  /* method     */ method,
+                                  /* parameters */ parameters);
     }
 
     /**

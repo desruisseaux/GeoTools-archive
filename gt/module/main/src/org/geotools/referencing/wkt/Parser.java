@@ -56,7 +56,7 @@ public abstract class Parser extends AbstractParser {
     /**
      * Construct a parser for the specified locale.
      *
-     * @param local      The locale for parsing and formatting numbers.
+     * @param locale     The locale for parsing and formatting numbers.
      * @param crsFactory The factory for constructing reference coordinate systems.
      */
     public Parser(final Locale locale, final CRSFactory crsFactory) {

@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gc;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.awt.Point;
@@ -27,17 +27,22 @@ import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform2D;
+
 // Geotools dependencies
-import org.geotools.ct.MathTransform2D;
-import org.geotools.cs.FittedCoordinateSystem; // For javadoc
-import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
+import org.geotools.referencing.cs.CartesianCS;      // For javadoc
+import org.geotools.referencing.datum.GeodeticDatum; // For javadoc
+import org.geotools.referencing.crs.DerivedCRS;      // For javadoc
+import org.geotools.referencing.crs.GeographicCRS;   // For javadoc
+import org.geotools.coverage.grid.GridGeometry;      // For javadoc
 
 
 /**
  * A factory for {@link MathTransform2D} backed by a <cite>grid of localization</cite>.
- * A grid of localization is a two-dimensional array (or a matrix) of coordinate points.
- * The grid size is <code>width</code>&nbsp;&times;&nbsp;<code>height</code>. Input coordinates
- * are (<var>i</var>,<var>j</var>) index in the grid, where <var>i</var> must be in the range
+ * A grid of localization is a two-dimensional array of coordinate points. The grid size
+ * is <code>width</code>&nbsp;&times;&nbsp;<code>height</code>. Input coordinates are
+ * (<var>i</var>,<var>j</var>) index in the grid, where <var>i</var> must be in the range
  * <code>[0..width-1]</code> and <var>j</var> in the range <code>[0..height-1]</code> inclusive.
  * Output coordinates are the values stored in the grid of localization at the specified index.
  * <br><br>
@@ -54,9 +59,9 @@ import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
  * transform, then an instance of {@link AffineTransform} is returned. Otherwise, a transform
  * backed by the localization grid is returned.
  * <br><br>
- * The example below goes through the steps of constructing a coordinate system for a grid coverage
- * from its grid of localization. This example assumes that the "real world" coordinates are
- * longitudes and latitudes on the {@linkplain GeographicCoordinateSystem#WGS84 WGS84} ellipsoid.
+ * The example below goes through the steps of constructing a coordinate reference system for a grid
+ * coverage from its grid of localization. This example assumes that the "real world" coordinates
+ * are longitudes and latitudes on the {@linkplain GeodeticDatum#WGS84 WGS84} ellipsoid.
  *
  * <blockquote><pre>
  * <FONT color='#008000'>//
@@ -67,17 +72,16 @@ import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
  *     for (int i=0; i<10; i++) {
  *         double x = ...; <FONT color='#008000'>// Set longitude here</FONT>
  *         double y = ...; <FONT color='#008000'>// Set latitude here</FONT>
- *         grid.{@link #setLocalizationPoint(int,int,double,double) setLocalizationPoint}(i,j,x,y);
+ *         grid.{@linkplain #setLocalizationPoint(int,int,double,double) setLocalizationPoint}(i,j,x,y);
  *     }
  * }
  * <FONT color='#008000'>//
- * // Constructs the grid coordinate system.
+ * // Constructs the grid coordinate reference system.
  * //</FONT>
- * CoordinateSystem realCS = GeographicCoordinateSystem.WGS84;
- * CoordinateSystem gridCS = new {@link FittedCoordinateSystem}("The grid CS", realCS, grid.{@link #getMathTransform()},
- *                               new AxisInfo[] {
- *                                   AxisInfo.X,
- *                                   AxisInfo.Y});
+ * CoordinateReferenceSystem realCRS = GeographicCRS.WGS84;
+ * CoordinateReferenceSystem gridCRS = new {@linkplain DerivedCRS}("The grid CRS",
+ *                                                    grid.{@linkplain #getMathTransform()}.inverse(),
+ *                                                    {@linkplain CartesianCS#GENERIC_2D});
  * <FONT color='#008000'>//
  * // Constructs the grid coverage using the grid coordinate system (not the "real world"
  * // one). It is usefull to display the coverage in its native CS before we resample it.
@@ -88,7 +92,7 @@ import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
  * // should be AffineTransform.getScaleInstance(0.25, 0.25).
  * //</FONT>
  * GridCoverage coverage;
- * coverage = new GridCoverage("The grid coverage", theRaster, gridCS,
+ * coverage = new GridCoverage("The grid coverage", theRaster, gridCRS,
  *                             MathTransform2D.IDENTITY, ...);
  * FrameFactory.show(coverage);
  * <FONT color='#008000'>//
@@ -97,8 +101,8 @@ import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
  * // coverage will tpypically have a curved aspect.
  * //</FONT>
  * GridCoverageProcessor processor = GridCoverageProcessor.getDefault();
- * coverage = processor.doOperation("Resample",         coverage,
- *                                  "CoordinateSystem", realCS);
+ * coverage = processor.doOperation("Resample", coverage,
+ *                                  "CRS",      realCRS);
  * FrameFactory.show(coverage);
  * </pre></blockquote>
  *
@@ -106,9 +110,7 @@ import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
  * @author Remi Eve
  * @author Martin Desruisseaux
  *
- * @see FittedCoordinateSystem
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.LocalizationGrid}.
+ * @see DerivedCRS
  */
 public class LocalizationGrid {
     /**
@@ -364,8 +366,7 @@ public class LocalizationGrid {
      * @return       0 if the array is unordered. Otherwise, returns <code>flags</code> with maybe
      *               one of {@link #INCREASING} or {@link #DECREASING} flags cleared.
      */
-    private static int testOrder(final double[] grid, int offset, int num, final int step, int flags)
-    {
+    private static int testOrder(final double[] grid, int offset, int num, final int step, int flags) {
         // We will check (num-1) combinaisons of coordinates.
         for (--num; --num>=0; offset += step) {
             final double v1 = grid[offset];
@@ -489,8 +490,7 @@ public class LocalizationGrid {
      * @param num    The number of element.
      * @param step   The amount to increment <code>offset</code> in order to reach the next element.
      */
-    private static void replaceSingularity(final double[] grid, int offset, int num, final int step)
-    {
+    private static void replaceSingularity(final double[] grid, int offset, int num, final int step) {
         final double increment = (grid[offset+(num-1)*step] - grid[offset])/((double)(num-1));
         final double value = grid[offset];
         offset+= step;

@@ -62,7 +62,8 @@ public class GeneralOperationParameter extends Info
     private final int maximumOccurs;
 
     /**
-     * Construct a parameter from a set of properties.
+     * Construct a parameter from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}

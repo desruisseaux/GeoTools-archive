@@ -17,8 +17,8 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gc;
-///CLOVER:USECLASS
+package org.geotools.referencing.operation.transform;
+
 // J2SE dependencies
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -31,13 +31,13 @@ import java.io.IOException;
 import java.util.Arrays;
 
 // OpenGIS dependencies
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.AbstractMathTransform;
+import org.geotools.referencing.operation.GeneralMatrix;
 
 // Resources
 import org.geotools.resources.Utilities;
@@ -63,11 +63,9 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.LocalizationGridTransform2D}.
  */
-final class LocalizationGridTransform2D extends AbstractMathTransform implements MathTransform2D,
-                                                                                 Serializable
+final class LocalizationGridTransform2D extends AbstractMathTransform
+                                     implements MathTransform2D, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
@@ -92,8 +90,17 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
      * This is a temporary flag until we find why the inverse transform fails to
      * converge in some case.
      */
-    private static final boolean MASK_NON_CONVERGENCE =
-        System.getProperty("org.geotools.gcs.patch", "false").equalsIgnoreCase("true");
+    private static final boolean MASK_NON_CONVERGENCE;
+    static {
+        String property;
+        try {
+            property = System.getProperty("org.geotools.referencing.forceConvergence", "false");
+        } catch (SecurityException exception) {
+            // We are running in an applet.
+            property = "false";
+        }
+        MASK_NON_CONVERGENCE = property.equalsIgnoreCase("true");
+    }
 
     /**
      * <var>x</var> (usually longitude) offset relative to an entry.
@@ -151,22 +158,12 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
      * @param global A global affine transform for the whole grid.
      */
     protected LocalizationGridTransform2D(final int width, final int height, final double[] grid,
-                                          final AffineTransform global) {
+                                          final AffineTransform global)
+    {
         this.width  = width;
         this.height = height;
         this.grid   = grid;
         this.global = global;
-    }
-    
-    /**
-     * Calcule l'indice d'un enregistrement dans la grille.
-     *
-     * @param  col  Coordonnee <var>x</var> du point.
-     * @param  row  Coordonnee <var>y</var> du point.
-     * @return l'indice de l'enregistrement ou du point dans la matrice.
-     */
-    private int computeOffset(final int col, final int row) {
-        return (col + row * width) * CP_LENGTH;
     }
 
     /**
@@ -196,7 +193,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
     public Matrix derivative(final Point2D point) {
         final AffineTransform tr = new AffineTransform();
         getAffineTransform(point.getX(), point.getY(), tr);
-        final Matrix matrix = new Matrix(2,2);
+        final GeneralMatrix matrix = new GeneralMatrix(2,2);
         matrix.setElement(0,0, tr.getScaleX());
         matrix.setElement(1,1, tr.getScaleY());
         matrix.setElement(0,1, tr.getShearX());
@@ -269,7 +266,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
             }
             final int col = Math.max(Math.min((int)xi, maxCol), minCol);
             final int row = Math.max(Math.min((int)yi, maxRow), minRow);
-            final int offset00 = computeOffset(col, row);
+            final int offset00 = (col + row*width)*CP_LENGTH;
             final int offset01 = offset00 + CP_LENGTH*width; // Une ligne plus bas
             final int offset10 = offset00 + CP_LENGTH;  // Une colonne à droite
             final int offset11 = offset01 + CP_LENGTH;  // Une colonne à droite, une ligne plus bas
@@ -359,7 +356,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
          * Nous les obtenons en utilisant 3 points,   chaque         |        |
          * points ayant 2 coordonnées. Voir exemple ci-contre:      P01----(ignoré)
          */
-        final int offset00 = computeOffset(col, row);
+        final int offset00 = (col + row*width)*CP_LENGTH;
         final int offset01 = offset00 + sgnRow*CP_LENGTH*width;
         final int offset10 = offset00 + sgnCol*CP_LENGTH;
         x = grid[offset00 + X_OFFSET];
@@ -554,8 +551,8 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
      * @param  target The target coordinate point (should not be <code>null</code>).
      * @throws NoninvertibleTransformException if the transform is non-invertible.
      *
-     * @task REVISIT: Current implementation project an inside point on the nearest border.
-     *                Could we do something better?
+     * @todo Current implementation project an inside point on the nearest border.
+     *       Could we do something better?
      */
     private void inverseTransform(final Point2D source, final Point2D.Double target)
             throws NoninvertibleTransformException
@@ -736,4 +733,3 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
         return false;
     }
 }
-

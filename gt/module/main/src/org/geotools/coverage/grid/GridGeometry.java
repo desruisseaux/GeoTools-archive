@@ -53,7 +53,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.transform.MatrixTransform;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 
 // Resources
 import org.geotools.resources.Utilities;
@@ -210,11 +210,11 @@ public class GridGeometry implements Serializable {
                 case 1: scaleY=scale; transY=trans; break;
             }
         }
-        gridToCoordinateSystem = MatrixTransform.create(matrix);
+        gridToCoordinateSystem = ProjectiveTransform.create(matrix);
         if (gridToCoordinateSystem instanceof MathTransform2D) {
             gridToCoordinateSystem2D = (MathTransform2D) gridToCoordinateSystem;
         } else {
-            gridToCoordinateSystem2D = (MathTransform2D) MatrixTransform.create(
+            gridToCoordinateSystem2D = (MathTransform2D) ProjectiveTransform.create(
                     new AffineTransform(scaleX, 0, 0, scaleY, transX, transY));
         }
         this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
@@ -246,7 +246,7 @@ public class GridGeometry implements Serializable {
         final AffineTransform tr = new AffineTransform(scaleX, 0, 0, -scaleY, transX, transY);
         tr.translate(0.5, 0.5); // Map to pixel center
         this.gridRange                  = new org.geotools.coverage.grid.GridRange(gridRange);
-        this.gridToCoordinateSystem2D   = (MathTransform2D) MatrixTransform.create(tr);
+        this.gridToCoordinateSystem2D   = (MathTransform2D) ProjectiveTransform.create(tr);
         this.gridToCoordinateSystem     = gridToCoordinateSystem2D;
         this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
     }

@@ -186,6 +186,6 @@ final class IdentityTransform extends AbstractMathTransform implements LinearTra
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        return MatrixTransform.formatWKT(formatter, getMatrix());
+        return ProjectiveTransform.formatWKT(formatter, getMatrix());
     }
 }

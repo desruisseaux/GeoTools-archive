@@ -160,6 +160,6 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        return MatrixTransform.formatWKT(formatter, getMatrix());
+        return ProjectiveTransform.formatWKT(formatter, getMatrix());
     }
 }

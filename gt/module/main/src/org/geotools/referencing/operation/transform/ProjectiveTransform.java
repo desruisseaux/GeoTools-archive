@@ -24,6 +24,7 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
+import java.util.Locale;
 import java.util.Arrays;
 import java.io.Serializable;
 import java.awt.geom.Point2D;
@@ -36,23 +37,54 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies and resources
 import org.geotools.parameter.ParameterValue;
-import org.geotools.referencing.wkt.Formatter;
+import org.geotools.parameter.OperationParameter;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.OperationProvider;
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * Transforms multi-dimensional coordinate points using a {@linkplain GeneralMatrix matrix}.
+ * A usually affine, or otherwise a projective transform. A projective transform is capable of
+ * mapping an arbitrary quadrilateral into another arbitrary quadrilateral, while preserving the
+ * straightness of lines. In the special case where the transform is affine, the parallelism of
+ * lines in the source is preserved in the output.
+ * <br><br>
+ * Such a coordinate transformation can be represented by a square {@linkplain GeneralMatrix matrix}
+ * of an arbitrary size. Point coordinates must have a dimension equals to
+ * <code>{@linkplain Matrix#getNumCol}-1</code>. For example, for square matrix of size 4&times;4,
+ * coordinate points are three-dimensional. The transformed points <code>(x',y',z')</code> are
+ * computed as below (note that this computation is similar to
+ * {@link javax.media.jai.PerspectiveTransform} in <cite>Java Advanced Imaging</cite>):
+ *
+ * <blockquote><pre>
+ * [ u ]     [ m<sub>00</sub>  m<sub>01</sub>  m<sub>02</sub>  m<sub>03</sub> ] [ x ]
+ * [ v ]  =  [ m<sub>10</sub>  m<sub>11</sub>  m<sub>12</sub>  m<sub>13</sub> ] [ y ]
+ * [ w ]     [ m<sub>20</sub>  m<sub>21</sub>  m<sub>22</sub>  m<sub>23</sub> ] [ z ]
+ * [ t ]     [ m<sub>30</sub>  m<sub>31</sub>  m<sub>32</sub>  m<sub>33</sub> ] [ 1 ]
+ *
+ *   x' = u/t
+ *   y' = v/t
+ *   y' = w/t
+ * </pre></blockquote>
+ *
+ * In the special case of an affine transform, the last row contains only zero
+ * values except in the last column, which contains 1.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see javax.media.jai.PerspectiveTransform
+ * @see java.awt.geom.AffineTransform
+ * @see <A HREF="http://mathworld.wolfram.com/AffineTransformation.html">Affine transformation on MathWorld</A>
  */
-public class MatrixTransform extends AbstractMathTransform implements LinearTransform, Serializable {
+public class ProjectiveTransform extends AbstractMathTransform implements LinearTransform, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -79,7 +111,7 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      *
      * @param matrix The matrix.
      */
-    protected MatrixTransform(final Matrix matrix) {
+    protected ProjectiveTransform(final Matrix matrix) {
         numRow = matrix.getNumRow();
         numCol = matrix.getNumCol();
         elt = new double[numRow*numCol];
@@ -98,9 +130,6 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
     public static LinearTransform create(final Matrix matrix) {
         final int dimension = matrix.getNumRow();
         if (dimension == matrix.getNumCol()) {
-            if (matrix.isIdentity()) {
-                return IdentityTransform.create(dimension);
-            }
             final GeneralMatrix m = wrap(matrix);
             if (m.isAffine()) {
                 switch (dimension) {
@@ -108,8 +137,13 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
                     case 3: return create(m.toAffineTransform2D());
                 }
             }
+            if (matrix.isIdentity()) {
+                // The 1D and 2D cases have their own optimized identity transform,
+                // which is why this test must come after the 'isAffine()' test.
+                return IdentityTransform.create(dimension);
+            }
         }
-        return new MatrixTransform(matrix);
+        return new ProjectiveTransform(matrix);
     }
 
     /**
@@ -129,20 +163,6 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      * <code>[x<sub>0</sub>, y<sub>0</sub>, z<sub>0</sub>,
      *        x<sub>1</sub>, y<sub>1</sub>, z<sub>1</sub>...,
      *        x<sub>n</sub>, y<sub>n</sub>, z<sub>n</sub>]</code>.
-     *
-     * The transformed points <code>(x',y',z')</code> are computed as below (note that
-     * this computation is similar to {@link javax.media.jai.PerspectiveTransform}):
-     *
-     * <blockquote><pre>
-     * [ u ]     [ m<sub>00</sub>  m<sub>01</sub>  m<sub>02</sub>  m<sub>03</sub> ] [ x ]
-     * [ v ]  =  [ m<sub>10</sub>  m<sub>11</sub>  m<sub>12</sub>  m<sub>13</sub> ] [ y ]
-     * [ w ]     [ m<sub>20</sub>  m<sub>21</sub>  m<sub>22</sub>  m<sub>23</sub> ] [ z ]
-     * [ t ]     [ m<sub>30</sub>  m<sub>31</sub>  m<sub>32</sub>  m<sub>33</sub> ] [ 1 ]
-     *
-     *   x' = u/t
-     *   y' = v/t
-     *   y' = w/t
-     * </pre></blockquote>
      *
      * @param srcPts The array containing the source point coordinates.
      * @param srcOff The offset to the first point to be transformed in the source array.
@@ -200,20 +220,6 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      * <code>[x<sub>0</sub>, y<sub>0</sub>, z<sub>0</sub>,
      *        x<sub>1</sub>, y<sub>1</sub>, z<sub>1</sub>...,
      *        x<sub>n</sub>, y<sub>n</sub>, z<sub>n</sub>]</code>.
-     *
-     * The transformed points <code>(x',y',z')</code> are computed as below (note that
-     * this computation is similar to {@link javax.media.jai.PerspectiveTransform}):
-     *
-     * <blockquote><pre>
-     * [ u ]     [ m<sub>00</sub>  m<sub>01</sub>  m<sub>02</sub>  m<sub>03</sub> ] [ x ]
-     * [ v ]  =  [ m<sub>10</sub>  m<sub>11</sub>  m<sub>12</sub>  m<sub>13</sub> ] [ y ]
-     * [ w ]     [ m<sub>20</sub>  m<sub>21</sub>  m<sub>22</sub>  m<sub>23</sub> ] [ z ]
-     * [ t ]     [ m<sub>30</sub>  m<sub>31</sub>  m<sub>32</sub>  m<sub>33</sub> ] [ 1 ]
-     *
-     *   x' = u/t
-     *   y' = v/t
-     *   y' = w/t
-     * </pre></blockquote>
      *
      * @param srcPts The array containing the source point coordinates.
      * @param srcOff The offset to the first point to be transformed in the source array.
@@ -345,7 +351,7 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
             e.initCause(exception);
             throw e;
         }
-        return new MatrixTransform(matrix);
+        return new ProjectiveTransform(matrix);
     }
     
     /**
@@ -371,7 +377,7 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
             return true;
         }
         if (super.equals(object)) {
-            final MatrixTransform that = (MatrixTransform) object;
+            final ProjectiveTransform that = (ProjectiveTransform) object;
             return this.numRow == that.numRow &&
                    this.numCol == that.numCol &&
                    Arrays.equals(this.elt, that.elt);
@@ -416,61 +422,58 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
         return "PARAM_MT";
     }
     
-// TODO
-//    
-//    /**
-//     * The provider for {@link MatrixTransform}.
-//     *
-//     * @version $Id$
-//     * @author Martin Desruisseaux
-//     */
-//    static final class Provider extends MathTransformProvider {
-//        /**
-//         * Create a provider for affine transform.
-//         * The default matrix size is 4&times;4.
-//         */
-//        public Provider() {
-//            super("Affine", ResourceKeys.AFFINE_TRANSFORM, null);
-//            final int defaultSize = MatrixParameters.DEFAULT_SIZE.intValue();
-//            putInt("num_row", defaultSize, MatrixParameters.POSITIVE_RANGE);
-//            putInt("num_col", defaultSize, MatrixParameters.POSITIVE_RANGE);
-//        }
-//    
-//        /**
-//         * Returns a newly created parameter list. This custom parameter list
-//         * is different from the default one in that it is "extensible", i.e.
-//         * new parameters may be added if the matrix's size growth.
-//         */
-//        public ParameterList getParameterList() {
-//            return new MatrixParameters();
-//        }
-//        
-//        /**
-//         * Returns a transform for the specified parameters.
-//         *
-//         * @param  parameters The parameter values in standard units.
-//         * @return A {@link MathTransform} object of this classification.
-//         *
-//         * @task REVISIT: Should we invoke {@link MathTransformFactory#createAffineTransform}
-//         *       instead? It would force us to keep a reference to {@link MathTransformFactory}
-//         *       (and not forget to change the reference if this provider is copied into an
-//         *       other factory)...
-//         */
-//        public MathTransform create(final ParameterList parameters) {
-//            final Matrix matrix = MatrixParameters.getMatrix(parameters);
-//            if (matrix.isAffine()) {
-//                switch (matrix.getNumRow()) {
-//                    case 3: return new AffineTransform2D(matrix.toAffineTransform2D());
-//                    case 2: return LinearTransform1D.create(matrix.getElement(0,0),
-//                                                            matrix.getElement(0,1));
-//                }
-//            }
-//            if (matrix.isIdentity()) {
-//                // The 1D and 2D cases have their own optimized identity transform,
-//                // which is why this test must come after the 'isAffine()' test.
-//                return new IdentityTransform(matrix.getNumRow()-1);
-//            }
-//            return new MatrixTransform(matrix);
-//        }
-//    }
+    /**
+     * The provider for {@link ProjectiveTransform}. This transform is registered
+     * under the name "Affine", which is a special case of projective transform.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    public static final class Provider extends OperationProvider {
+        /**
+         * Create a provider for affine transform with a default matrix size of 3&times;3.
+         */
+        public Provider() {
+            this(3);
+        }
+
+        /**
+         * Create a provider for affine transform.
+         *
+         * @param defaultSize The default matrix size.
+         */
+        public Provider(final int defaultSize) {
+            super("Affine", defaultSize-1, defaultSize-1, new OperationParameter[] {
+                new OperationParameter("num_row", defaultSize, 0, Integer.MAX_VALUE),
+                new OperationParameter("num_col", defaultSize, 0, Integer.MAX_VALUE),
+            });
+        }
+
+        /**
+         * Returns the name by which this object is identified. If <code>locale</code> is
+         * <code>null</code>, then this method returns <code>"Affine"</code>. Otherwise,
+         * it try to returns a localized string.
+         *
+         * @param  locale The desired locale for the name to be returned,
+         *         or <code>null</code> for a non-localized string.
+         * @return The name, or <code>null</code> if not available.
+         */
+        public String getName(final Locale locale) {
+            if (locale == null) {
+                return super.getName(locale);
+            }
+            return Resources.format(ResourceKeys.AFFINE_TRANSFORM);
+        }
+
+        /**
+         * Returns a transform for the specified parameters.
+         *
+         * @param  parameters The parameter values in standard units.
+         * @return A {@link MathTransform} object of this classification.
+         */
+        public MathTransform createMathTransform(final GeneralParameterValue[] parameters) {
+            final Matrix matrix = null;//MatrixParameters.getMatrix(parameters);
+            return create(matrix);
+        }
+    }
 }

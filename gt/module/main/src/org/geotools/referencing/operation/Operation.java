@@ -92,6 +92,7 @@ public class Operation extends SingleOperation
     {
         super(properties, sourceCRS, targetCRS, transform);
         ensureNonNull("method", method);
+        org.geotools.referencing.operation.OperationMethod.checkDimensions(method, transform);
         if (values==null || values.length==0) {
             values = null;
         } else {

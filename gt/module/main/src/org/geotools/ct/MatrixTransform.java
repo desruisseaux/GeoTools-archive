@@ -49,7 +49,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.MatrixTransform}
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.ProjectiveTransform}
  *             in the <code>org.geotools.referencing.operation</code> package.
  */
 final class MatrixTransform extends AbstractMathTransform implements LinearTransform, Serializable {
