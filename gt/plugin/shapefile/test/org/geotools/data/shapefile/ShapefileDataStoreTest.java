@@ -335,6 +335,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 testName += "3d";
                 runWriteReadTest(geom,true);
             } catch (Throwable e) {
+            	e.printStackTrace();
                 throw new Exception("Error in " + testName,e);
             }
             
