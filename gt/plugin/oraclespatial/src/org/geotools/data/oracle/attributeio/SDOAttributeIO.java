@@ -1,6 +1,7 @@
 package org.geotools.data.oracle.attributeio;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -143,20 +144,22 @@ public class SDOAttributeIO implements AttributeIO {
 			LOGGER.log(Level.SEVERE, msg, sqlException);
 			throw new DataSourceException(msg, sqlException);
 		}
-//		catch (InvalidGeometryException e) {
-//			String msg = "Problem with the geometry";
-//			LOGGER.log(Level.SEVERE, msg, e);
-//			throw new DataSourceException(msg, e);
-//		} catch (GeometryInputTypeNotSupportedException e) {
-//			String msg = "Geometry Conversion type error";
-//			LOGGER.log(Level.SEVERE, msg, e);
-//			throw new DataSourceException(msg, e);
-//		} catch (GeometryOutputTypeNotSupportedException e) {
-//			String msg = "Geometry Conversion type error";
-//			LOGGER.log(Level.SEVERE, msg, e);
-//			throw new DataSourceException(msg, e);
-//		}
-
 	}
+
+    /**
+     * @see org.geotools.data.jdbc.attributeio.AttributeIO#write(java.sql.PreparedStatement, int, java.lang.Object)
+     */
+    public void write(PreparedStatement ps, int position, Object value) throws IOException {
+        try {
+            Geometry geom = (Geometry) value;
+            STRUCT struct = converter.toSDO( geom ); 
+            ps.setObject(position, struct);          
+        } catch (SQLException sqlException) {
+            String msg = "SQL Exception writing geometry column";
+            LOGGER.log(Level.SEVERE, msg, sqlException);
+            throw new DataSourceException(msg, sqlException);
+        }
+        
+    }
 
 }
