@@ -30,9 +30,9 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
     
     /** ArcGrid files (and associated parameters) to test*/
     final TestParams params[] = new TestParams[] {
-        //new TestParams("spearfish_dem.asc.gz", true, true),
-        new TestParams("ArcGrid.asc", false, false)//,
-        //new TestParams("vandem.asc.gz", true, false)
+        new TestParams("spearfish_dem.asc.gz", true, true),
+        new TestParams("ArcGrid.asc", false, false),
+        new TestParams("vandem.asc.gz", true, false)
     };
     
     /** Creates a new instance of ArcGridReadWriteTest */
