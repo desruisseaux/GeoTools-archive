@@ -23,8 +23,10 @@ import java.util.Map;
 
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.parameter.ParameterDescriptorGroup;
-import org.opengis.coverage.grid.GridCoverageReader;
+import org.geotools.parameter.ParameterGroup;
+import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -39,24 +41,9 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  *
  * @author Richard Gould, Refractions Researach
  */
-public class WMSFormat extends AbstractGridFormat {
+public class WMSFormat implements Format {
     /** Parsed Capabilities Document */
     private WMSCapabilities capabilities;
-
-    /**
-     * TODO: What does this mean? How can I have a WMSFormat without knowing
-     * the capabilities of my Web Map Server?
-     * 
-     * <p>
-     * It looks like a WMSFormat would need to be provided with capabilities
-     * during the call to accepts( Object ) and getReader( Object ). This
-     * still does not make sense to me as differnent Capabilties documents
-     * (for different specifications) should dictate the required parameters
-     * described by getReadParameters().
-     * </p>
-     */
-    public WMSFormat() {
-    }
 
     /**
      * WMSFormat creation.
@@ -66,36 +53,6 @@ public class WMSFormat extends AbstractGridFormat {
     public WMSFormat(WMSCapabilities capabilities) {
         this.capabilities = capabilities;
     }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.Format#getReader(java.lang.Object)
-     */
-    public GridCoverageReader getReader(Object source) {
-        WMSReader reader = new WMSReader(source);
-        reader.setFormat(this);
-
-        return reader;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.Format#getWriter(java.lang.Object)
-     */
-
-    /**
-     * Web Map Servers are not capable of writing, as of version 1.1.1 Returns
-     * null.
-     *
-     * @param destination DOCUMENT ME!
-     *
-     * @return null
-     */
-    public GridCoverageWriter getWriter(Object destination) {
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.Format#accepts(java.lang.Object)
-     */
 
     /**
      * Determines if the input can be processed or not.
@@ -146,7 +103,7 @@ public class WMSFormat extends AbstractGridFormat {
      *
      * @return DOCUMENT ME!
      */
-    public org.opengis.parameter.ParameterDescriptorGroup getReadParameters() {
+    public ParameterValueGroup getReadParameters() {
         GeneralParameterDescriptor[] params = new GeneralParameterDescriptor[16];
 
         WMSParameterMaker maker = new WMSParameterMaker(capabilities);
@@ -170,8 +127,48 @@ public class WMSFormat extends AbstractGridFormat {
         Map properties = new HashMap();
         properties.put("name", capabilities.getService().getName());
         properties.put("remarks", capabilities.getService().get_abstract());
-        readParameters = new ParameterDescriptorGroup(properties, params);
-
-        return readParameters;
+        return new ParameterGroup(new ParameterDescriptorGroup(properties, params));
     }
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getName()
+	 */
+	public String getName() {
+		return "Web Map Server";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getDescription()
+	 */
+	public String getDescription() {
+		return "Web Map Server";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getVendor()
+	 */
+	public String getVendor() {
+		return "Open GIS Consortium";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getDocURL()
+	 */
+	public String getDocURL() {
+		return "http://www.opengis.org";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getVersion()
+	 */
+	public String getVersion() {
+		return capabilities.getVersion();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
+	 */
+	public ParameterValueGroup getWriteParameters() {
+		return null;
+	}
 }

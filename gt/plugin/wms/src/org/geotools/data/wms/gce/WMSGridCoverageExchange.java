@@ -22,13 +22,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.InvalidParameterException;
 
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageExchange;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageExchange;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
 import org.xml.sax.SAXException;
+
 
 
 /**
@@ -94,13 +95,8 @@ public class WMSGridCoverageExchange implements GridCoverageExchange {
                 }
             }
 
-            for (int i = 0; i < formats.length; i++) {
-                Format format = formats[i];
-
-                if (format.accepts(source)) {
-                    return format.getReader(wms);
-                }
-            }
+            return new WMSReader(wms);
+            
         }
 
         throw new InvalidParameterException("Source is not of a support type");

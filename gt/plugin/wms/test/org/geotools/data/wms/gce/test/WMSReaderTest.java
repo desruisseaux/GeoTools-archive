@@ -39,6 +39,7 @@ import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.IdentifiedObject;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
@@ -73,7 +74,7 @@ public class WMSReaderTest extends TestCase {
     }
 
     public void testGetFormat() {
-        assertEquals(new WMSFormat().getClass(), reader.getFormat().getClass());
+        assertEquals(new WMSFormat(null).getClass(), reader.getFormat().getClass());
     }
 
     public void testHasMoreGridCoverages() {
@@ -176,12 +177,10 @@ public class WMSReaderTest extends TestCase {
                 continue;
             }
         }
+//
+//        Map properties = new HashMap();
+//        properties.put(IdentifiedObject.NAME_PROPERTY, "WMS");
 
-        Map properties = new HashMap();
-        properties.put(IdentifiedObject.NAME_PROPERTY, "WMS");
-
-        ParameterValueGroup parameters = new ParameterGroup(properties,
-                generalParameterValues);
-        org.geotools.gc.GridCoverage coverage = reader.read(parameters);
+        GridCoverage coverage = reader.read(generalParameterValues);
     }
 }

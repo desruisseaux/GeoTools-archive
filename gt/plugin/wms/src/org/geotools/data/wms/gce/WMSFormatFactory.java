@@ -16,9 +16,10 @@
  */
 package org.geotools.data.wms.gce;
 
-import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.geotools.data.ows.WMSCapabilities;
+import org.opengis.coverage.grid.Format;
+
 
 
 /**
