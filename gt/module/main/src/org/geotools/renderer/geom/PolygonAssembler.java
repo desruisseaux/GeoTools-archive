@@ -55,9 +55,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.IllegalPathStateException;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.cs.Ellipsoid;
-import org.geotools.ct.TransformException;
 import org.geotools.math.Line;
 import org.geotools.units.Unit;
 import org.geotools.util.ProgressListener;
@@ -94,7 +96,7 @@ import org.geotools.resources.geometry.ShapeUtilities;
  *   <li>The loop is reexecuted from step 1 until no more polylines have been merged.</li>
  * </ol>
  *
- * @version $Id: PolygonAssembler.java,v 1.13 2004/01/31 13:24:21 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @task TODO: L'implémentation actuelle de cette méthode ne prend pas en compte les

@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.geom;
 
@@ -40,11 +27,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.GeometryCollection;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.math.Statistics;
 import org.geotools.resources.Utilities;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.TransformException;
 import org.geotools.renderer.style.Style;  // needed for javadoc?
 import org.geotools.renderer.array.JTSArray;
 
@@ -53,7 +42,7 @@ import org.geotools.renderer.array.JTSArray;
  * A geometry collection backed by one or many JTS
  * {@link com.vividsolutions.jts.geom.Geometry} objects.
  *
- * @version $Id: JTSGeometries.java,v 1.11 2004/03/08 11:32:45 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class JTSGeometries extends org.geotools.renderer.geom.GeometryCollection {

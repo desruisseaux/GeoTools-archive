@@ -54,6 +54,9 @@ import java.util.Map;
 import java.util.Locale;
 import java.io.Serializable;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.units.Unit; // For Javadoc
 import org.geotools.measure.Latitude;
@@ -65,7 +68,6 @@ import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.TransformException;
 import org.geotools.feature.Feature; // For Javadoc
 import org.geotools.renderer.style.Style;
 import org.geotools.resources.Utilities;
@@ -91,7 +93,7 @@ import org.geotools.util.Cloneable;
  * <code>Geometry</code>s can {@linkplain #compress compress} and share their internal data in
  * order to reduce memory footprint.
  *
- * @version $Id: Geometry.java,v 1.15 2004/05/10 22:21:57 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class Geometry implements Shape, Cloneable, Serializable {

@@ -34,11 +34,15 @@ import org.geotools.renderer.style.Style2D;
 import org.geotools.renderer.style.TextStyle2D;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.XMath;
+import org.geotools.renderer.style.GraphicStyle2D;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
+// J2SE dependencies
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
-
-// J2SE dependencies
 import java.awt.Shape;
 import java.awt.TexturePaint;
 import java.awt.font.GlyphVector;
@@ -50,7 +54,6 @@ import java.awt.image.BufferedImage;
 import java.lang.Math;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.geotools.renderer.style.GraphicStyle2D;
 
 
 /**

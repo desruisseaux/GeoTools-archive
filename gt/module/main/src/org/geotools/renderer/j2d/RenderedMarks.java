@@ -51,10 +51,12 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Map;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.TransformException;
 import org.geotools.units.Unit;
 import org.geotools.resources.XMath;
 import org.geotools.resources.XArray;
@@ -66,7 +68,7 @@ import org.geotools.resources.XArray;
  * Subclasses must override the {@link #getMarkIterator} method in order to returns informations
  * about marks.
  *
- * @version $Id: RenderedMarks.java,v 1.19 2004/03/08 11:32:29 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class RenderedMarks extends RenderedLayer {

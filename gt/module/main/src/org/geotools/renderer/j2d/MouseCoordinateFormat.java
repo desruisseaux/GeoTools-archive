@@ -36,11 +36,13 @@ package org.geotools.renderer.j2d;
 // J2SE dependencies
 import java.util.Locale;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.CoordinateFormat;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.TransformException;
 import org.geotools.cs.GeographicCoordinateSystem;
 
 
@@ -54,7 +56,7 @@ import org.geotools.cs.GeographicCoordinateSystem;
  * {@linkplain Renderer#getCoordinateSystem renderer's coordinate system}), but
  * is usually two-dimensional.
  *
- * @version $Id: MouseCoordinateFormat.java,v 1.7 2003/05/13 11:00:47 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class MouseCoordinateFormat extends CoordinateFormat {

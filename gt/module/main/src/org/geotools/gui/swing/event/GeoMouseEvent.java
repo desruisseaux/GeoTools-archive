@@ -1,8 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,28 +15,17 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing.event;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
 
 //import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.event.MouseEvent;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.MathTransform;
-import org.geotools.ct.TransformException;
 import org.geotools.pt.CoordinatePoint;
 
 
@@ -58,7 +45,6 @@ import org.geotools.pt.CoordinatePoint;
  * </pre></blockquote>
  *
  * @version $Id: GeoMouseEvent.java,v 1.5 2003/05/13 11:01:39 desruisseaux Exp $
- * @author Martin Desruisseaux
  * @author Cameron Shorter
  */
 public final class GeoMouseEvent extends MouseEvent {

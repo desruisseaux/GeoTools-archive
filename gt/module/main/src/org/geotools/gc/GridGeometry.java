@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -57,6 +45,9 @@ import org.opengis.gc.GC_GridRange;
 import org.opengis.gc.GC_GridGeometry;
 import org.opengis.ct.CT_MathTransform;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.pt.Envelope;
@@ -64,7 +55,6 @@ import org.geotools.pt.Dimensioned;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;
-import org.geotools.ct.TransformException;
 import org.geotools.pt.MismatchedDimensionException;
 import org.geotools.cv.CannotEvaluateException;
 import org.geotools.ct.NoninvertibleTransformException;
@@ -82,7 +72,7 @@ import org.geotools.resources.image.JAIUtilities;
  * Describes the valid range of grid coordinates and the math
  * transform to transform grid coordinates to real world coordinates.
  *
- * @version $Id: GridGeometry.java,v 1.13 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  *

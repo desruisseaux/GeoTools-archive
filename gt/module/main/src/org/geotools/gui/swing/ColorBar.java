@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gui.swing;
 
@@ -63,6 +50,9 @@ import java.util.logging.Logger;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Axis
 import org.geotools.axis.Graduation;
 import org.geotools.axis.TickIterator;
@@ -72,7 +62,6 @@ import org.geotools.axis.LogarithmicNumberGraduation;
 
 // Geotools dependencies
 import org.geotools.ct.MathTransform1D;
-import org.geotools.ct.TransformException;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
 import org.geotools.gc.GridCoverage;

@@ -1,24 +1,47 @@
 /*
- * StyledRenderedMark.java
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2003, Geotools Project Management Committee (PMC)
  *
- * Created on October 17, 2003, 2:17 PM
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package org.geotools.renderer.j2d;
 
-import com.vividsolutions.jts.geom.Geometry;
+// J2SE dependencies
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D; 
+
+// JTS dependencies
+import com.vividsolutions.jts.geom.Geometry;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
 import org.geotools.feature.Feature;
 import org.geotools.renderer.style.Java2DMark;
+import org.geotools.renderer.j2d.RenderedMarks;
+import org.geotools.renderer.j2d.MarkIterator;
+
 
 /**
  *
  * @author  jamesm
  */
-public class StyledMark extends org.geotools.renderer.j2d.RenderedMarks {
+public class StyledMark extends RenderedMarks {
     Feature f;
     /** Creates a new instance of StyledRenderedMark */
     public StyledMark(Feature f) {
@@ -31,7 +54,7 @@ public class StyledMark extends org.geotools.renderer.j2d.RenderedMarks {
     
     
     
-    class SingleMark extends org.geotools.renderer.j2d.MarkIterator{
+    class SingleMark extends MarkIterator {
         Feature feature;
         int pos = 0;
         public SingleMark(Feature f){
@@ -48,7 +71,7 @@ public class StyledMark extends org.geotools.renderer.j2d.RenderedMarks {
            
         }
         
-        public java.awt.geom.Point2D position() throws org.geotools.ct.TransformException {
+        public java.awt.geom.Point2D position() throws TransformException {
           Geometry g = feature.getDefaultGeometry();
           return new Point2D.Double(g.getCoordinate().x, g.getCoordinate().y);
         }

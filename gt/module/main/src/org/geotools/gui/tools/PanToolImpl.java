@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 
 package org.geotools.gui.tools;
@@ -23,8 +22,9 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.logging.Logger;
 
+import org.opengis.referencing.operation.TransformException;
+
 import org.geotools.ct.Adapters;
-import org.geotools.ct.TransformException;
 import org.geotools.gui.swing.event.GeoMouseEvent;
 import org.geotools.map.MapContext;
 import org.geotools.pt.CoordinatePoint;

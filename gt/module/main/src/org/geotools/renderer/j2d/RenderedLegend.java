@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.j2d;
 
@@ -44,8 +31,8 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import javax.swing.SwingConstants;
 
-// Geotools dependencies
-import org.geotools.ct.TransformException;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -56,7 +43,7 @@ import org.geotools.ct.TransformException;
  * and a {@linkplain #getMargin margin} in dots (or pixels) to keep between the legend and
  * widget's borders.
  *
- * @version $Id: RenderedLegend.java,v 1.4 2003/08/12 17:05:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class RenderedLegend extends RenderedLayer {

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -59,6 +47,9 @@ import javax.media.jai.ParameterListDescriptorImpl;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.IntegerSequence;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools (GCS) dependencies
 import org.geotools.gc.GridRange;
 import org.geotools.gc.GridCoverage;
@@ -73,7 +64,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.FactoryException;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.MathTransformFactory;
 import org.geotools.ct.CoordinateTransformationFactory;
 
@@ -109,7 +99,7 @@ import org.geotools.resources.image.ImageUtilities;
  * grid geometry which as the same geoferencing and a region. Grid range in the grid geometry
  * defines the region to subset in the grid coverage.<br>
  *
- * @version $Id: Resampler.java,v 1.22 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class Resampler extends GridCoverage {
@@ -723,7 +713,7 @@ final class Resampler extends GridCoverage {
     /**
      * The "Resample" operation. See package description for more details.
      *
-     * @version $Id: Resampler.java,v 1.22 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Operation extends org.geotools.gp.Operation {

@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.io.coverage;
 
@@ -71,6 +58,9 @@ import java.util.logging.LogRecord;
 
 // Miscellaneous
 import java.util.Locale;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;  // For javadoc
 
 // Geotools dependencies (CTS and GCS)
 import org.geotools.pt.*;
@@ -139,7 +129,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * For example, the {@link #getCoordinateSystem} method constructs a
  * {@link org.geotools.cs.CoordinateSystem} object using available informations.
  *
- * @version $Id: PropertyParser.java,v 1.17 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class PropertyParser {
@@ -1731,7 +1721,7 @@ public class PropertyParser {
      * 1984 datum.
      *
      * @throws PropertyException if the operation failed. This exception
-     *         may contains a {@link org.geotools.ct.TransformException} as its cause.
+     *         may contains a {@link TransformException} as its cause.
      *
      * @see #getEnvelope
      * @see #getGridRange
@@ -2082,7 +2072,7 @@ loop:       for (int i=str.length(); --i>=0;) {
      * <code>'_'</code> character. For example, the key <code>"false&nbsp;&nbsp;easting"</code>
      * is considered equals to <code>"false_easting"</code>.
      *
-     * @version $Id: PropertyParser.java,v 1.17 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Key implements Serializable {
@@ -2154,7 +2144,7 @@ loop:       for (int i=str.length(); --i>=0;) {
     /**
      * A key for properties derived from {@link Envelope} and/or {@link GridRange}.
      *
-     * @version $Id: PropertyParser.java,v 1.17 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class EnvelopeKey extends Key {
@@ -2264,7 +2254,7 @@ loop:       for (int i=str.length(); --i>=0;) {
      * A key for properties derived from {@link Projection}.
      * The key name must be the projection parameter name.
      *
-     * @version $Id: PropertyParser.java,v 1.17 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class ProjectionKey extends Key {
@@ -2301,7 +2291,7 @@ loop:       for (int i=str.length(); --i>=0;) {
      * <code>AliasKey</code> with ordinary <code>Key</code>s. This kind of key is
      * for internal use only.
      *
-     * @version $Id: PropertyParser.java,v 1.17 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class AliasKey extends Key {

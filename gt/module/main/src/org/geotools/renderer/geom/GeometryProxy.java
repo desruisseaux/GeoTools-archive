@@ -46,9 +46,11 @@ import java.util.Locale;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.TransformException;
 import org.geotools.renderer.style.Style;  // for javadoc
 import org.geotools.math.Statistics;
 
@@ -59,7 +61,7 @@ import org.geotools.math.Statistics;
  * to the wrapped geometry. Consequently, <strong>changes in this geometry will impact
  * on the wrapped geometry</strong>, and conversely.
  *
- * @version $Id: GeometryProxy.java,v 1.7 2004/05/10 22:21:57 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class GeometryProxy extends Geometry {

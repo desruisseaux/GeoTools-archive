@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.j2d;
 
@@ -54,6 +41,9 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.pt.Envelope;
@@ -62,7 +52,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CompoundCoordinateSystem;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.MathTransformFactory;
 import org.geotools.cv.SampleDimension;
 import org.geotools.gc.GridCoverage;
@@ -85,7 +74,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  *       Arrows sizes and direction depends of the sample values.</li>
  * </ul>
  *
- * @version $Id: RenderedGridMarks.java,v 1.13 2003/05/21 08:21:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class RenderedGridMarks extends RenderedMarks {
@@ -789,7 +778,7 @@ public class RenderedGridMarks extends RenderedMarks {
     /**
      * Iterates through all marks in a {@link RenderedGridMarks}.
      *
-     * @version $Id: RenderedGridMarks.java,v 1.13 2003/05/21 08:21:53 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     protected class Iterator extends MarkIterator {

@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.j2d;
 
@@ -58,12 +45,14 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.math.Statistics;
 import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.TransformException;
 import org.geotools.units.UnitException;
 import org.geotools.renderer.geom.Clipper;
 import org.geotools.renderer.geom.Polyline;
@@ -86,7 +75,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * used for isobaths. Each isobath (e.g. sea-level, 50 meters, 100 meters...) may be rendererd
  * with an instance of <code>RenderedGeometries</code>.
  *
- * @version $Id: RenderedGeometries.java,v 1.13 2003/11/28 23:33:46 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class RenderedGeometries extends RenderedLayer {

@@ -67,6 +67,9 @@ import java.util.Locale;
 import java.text.NumberFormat;
 import java.text.FieldPosition;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.cs.Ellipsoid;
@@ -77,7 +80,6 @@ import org.geotools.cs.ProjectedCoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransform;
 
@@ -112,7 +114,7 @@ import org.geotools.renderer.array.ArrayData;
  *
  * <p align="center"><img src="doc-files/borders.png"></p>
  *
- * @version $Id: Polyline.java,v 1.26 2003/11/28 23:33:12 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Polygon

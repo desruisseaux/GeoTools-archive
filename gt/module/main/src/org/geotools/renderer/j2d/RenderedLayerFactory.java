@@ -16,12 +16,25 @@
  */
 package org.geotools.renderer.j2d;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
+// J2SE dependencies
+import java.awt.Color;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.logging.Logger;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
+// J2SE dependencies
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.TransformException;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
 import org.geotools.data.FeatureEvent;
@@ -52,18 +65,10 @@ import org.geotools.util.NumberRange;
 import org.geotools.util.RangeSet;
 
 // JTS dependencies
-import java.awt.Color;
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.logging.Logger;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -71,7 +76,7 @@ import java.util.logging.Logger;
  *
  * @author Andrea Aime
  * @author Martin Desruisseaux
- * @version $Id: RenderedLayerFactory.java,v 1.24 2004/03/27 23:40:00 jmacgill Exp $
+ * @version $Id$
  */
 public class RenderedLayerFactory {
     /** The logger. */

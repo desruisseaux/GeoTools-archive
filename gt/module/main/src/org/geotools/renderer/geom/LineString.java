@@ -47,6 +47,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.GeneralPath;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Arrays
 import org.geotools.renderer.array.ArrayData;
 import org.geotools.renderer.array.PointArray;
@@ -63,7 +66,6 @@ import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.CoordinateTransformation;
 
 // Miscellaneous
@@ -101,7 +103,7 @@ import org.geotools.resources.geometry.ShapeUtilities;
  * Par convention, toutes les méthodes statiques de cette classe peuvent agir
  * sur une chaîne d'objets {@link LineString} plutôt que sur une seule instance.
  *
- * @version $Id: LineString.java,v 1.2 2003/07/23 14:17:32 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class LineString implements Serializable {
@@ -1442,7 +1444,7 @@ final class LineString implements Serializable {
      * A set of points ({@link Point2D}) from a polyline or a polygon.
      * This set of points is returned by {@link Polyline#getPoints}.
      *
-     * @version $Id: LineString.java,v 1.2 2003/07/23 14:17:32 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Collection extends AbstractCollection {
@@ -1485,7 +1487,7 @@ final class LineString implements Serializable {
     /**
      * Iterateur balayant les coordonnées d'un polyligne ou d'un polygone.
      *
-     * @version $Id: LineString.java,v 1.2 2003/07/23 14:17:32 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Iterator implements java.util.Iterator {

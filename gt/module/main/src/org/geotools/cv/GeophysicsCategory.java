@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -39,9 +27,11 @@ package org.geotools.cv;
 import java.awt.Color;
 import java.util.Locale;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.ct.MathTransform1D;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.MathTransformFactory;
 
 // Resources
@@ -56,7 +46,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * values.   By definition, the {@link #getSampleToGeophysics} method for this class returns
  * the identity transform, or <code>null</code> if this category is a qualitative one.
  *
- * @version $Id: GeophysicsCategory.java,v 1.8 2003/05/13 10:59:50 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class GeophysicsCategory extends Category {
@@ -200,7 +190,7 @@ final class GeophysicsCategory extends Category {
      * values is 0 to 20 exclusive or 0 to 18 inclusive, not 0 to 19.9999... The numbers between
      * 18 and 20 is a "gray area" where we don't know for sure what the user intend to do.
      *
-     * @version $Id: GeophysicsCategory.java,v 1.8 2003/05/13 10:59:50 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      *
      * @see GeophysicsCategory#getRange

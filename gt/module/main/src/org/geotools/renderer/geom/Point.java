@@ -16,21 +16,28 @@
  */
 package org.geotools.renderer.geom;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.TransformException;
-import org.geotools.math.Statistics;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.Utilities;
+// J2SE dependencies
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 import java.awt.Shape;
+
+// JTS dependencies
+import com.vividsolutions.jts.geom.Coordinate;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.ct.CannotCreateTransformException;
+import org.geotools.ct.CoordinateTransformation;
+import org.geotools.ct.MathTransform;
+import org.geotools.math.Statistics;
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.resources.CTSUtilities;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -38,7 +45,7 @@ import java.awt.Shape;
  * Geometry hierarchy.
  *
  * @author Andrea Aime
- * @version $Id: Point.java,v 1.3 2004/05/11 08:35:20 desruisseaux Exp $
+ * @version $Id$
  */
 public class Point extends Geometry {
     /**

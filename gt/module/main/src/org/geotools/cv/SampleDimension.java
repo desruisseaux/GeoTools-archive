@@ -63,9 +63,11 @@ import org.opengis.cv.CV_SampleDimensionType;
 import org.opengis.cv.CV_ColorInterpretation;
 import org.opengis.cv.CV_PaletteInterpretation;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.ct.MathTransform1D;
-import org.geotools.ct.TransformException;
 
 // Resources
 import org.geotools.units.Unit;
@@ -99,7 +101,7 @@ import org.geotools.resources.image.ColorUtilities;
  * is that the {@link Category#getSampleToGeophysics} method returns a non-null transform if and
  * only if the category is quantitative.
  *
- * @version $Id: SampleDimension.java,v 1.34 2004/03/07 20:05:47 aaime Exp $
+ * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  *

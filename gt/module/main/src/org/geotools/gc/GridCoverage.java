@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -94,6 +82,9 @@ import org.opengis.gc.GC_GridPacking;
 import org.opengis.gc.GC_GridGeometry;
 import org.opengis.gc.GC_GridCoverage;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.pt.Envelope;
 import org.geotools.pt.CoordinatePoint;
@@ -103,7 +94,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.AxisOrientation;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform1D;
-import org.geotools.ct.TransformException;
 import org.geotools.cv.Coverage;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
@@ -135,7 +125,7 @@ import org.geotools.resources.image.ImageUtilities;
  * the two usual ones (horizontal extends along <var>x</var> and <var>y</var>),
  * and a third one for start time and end time (time extends along <var>t</var>).
  *
- * @version $Id: GridCoverage.java,v 1.25 2003/11/14 22:21:26 desruisseaux Exp $
+ * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  *
@@ -1357,7 +1347,7 @@ testLinear: for (int i=0; i<numBands; i++) {
      * (<cite>Remote Method Invocation</cite>).  Socket connection are used
      * for sending the rendered image through the network.
      *
-     * @version $Id: GridCoverage.java,v 1.25 2003/11/14 22:21:26 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static interface Remote extends GC_GridCoverage {
@@ -1386,7 +1376,7 @@ testLinear: for (int i=0; i<numBands; i++) {
      * of this class directly. The method {@link Adapters#export(GridCoverage)} should
      * be used instead.
      *
-     * @version $Id: GridCoverage.java,v 1.25 2003/11/14 22:21:26 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     protected class Export extends Coverage.Export implements GC_GridCoverage, Remote {

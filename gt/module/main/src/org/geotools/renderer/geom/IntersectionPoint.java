@@ -37,11 +37,13 @@ package org.geotools.renderer.geom;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.TransformException;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.ct.CoordinateTransformationFactory;
 
@@ -58,7 +60,7 @@ import org.geotools.ct.CoordinateTransformationFactory;
  * points of <code>line</code>. This scalar product can be viewed as a sort of measure of the distance
  * between the start of <code>line</code> and the intersection point.
  *
- * @version $Id: IntersectionPoint.java,v 1.4 2003/05/27 18:22:43 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class IntersectionPoint extends Point2D.Double implements Comparable {

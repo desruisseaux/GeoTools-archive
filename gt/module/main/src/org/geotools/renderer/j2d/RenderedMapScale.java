@@ -17,19 +17,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.j2d;
 
@@ -53,6 +40,9 @@ import java.util.logging.LogRecord;
 import java.util.Arrays;
 import java.util.Locale;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.units.UnitException;
@@ -62,7 +52,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.ProjectedCoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.TransformException;
 import org.geotools.resources.XMath;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.renderer.Resources;
@@ -86,7 +75,7 @@ import org.geotools.resources.renderer.ResourceKeys;
  *       is determined using orthodromic distance computation.</li>
  * </ul>
  *
- * @version $Id: RenderedMapScale.java,v 1.10 2003/10/01 20:13:36 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public class RenderedMapScale extends RenderedLegend {

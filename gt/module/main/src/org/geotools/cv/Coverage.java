@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -144,7 +132,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * OpenGIS's metadata are called "Properties" in <em>Java Advanced Imaging</em>.
  * Use {@link #getProperty} instead.
  *
- * @version $Id: Coverage.java,v 1.22 2003/11/12 14:13:52 desruisseaux Exp $
+ * @version $Id$
  * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  *
@@ -516,7 +504,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * view of a coverage (which may or may not be a {@linkplain org.geotools.gc.GridCoverage grid
      * coverage}).
      *
-     * @version $Id: Coverage.java,v 1.22 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      *
      * @see Coverage#getRenderableImage
@@ -973,7 +961,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
      * class directly. The method {@link Adapters#export(Coverage)} should be used
      * instead.
      *
-     * @version $Id: Coverage.java,v 1.22 2003/11/12 14:13:52 desruisseaux Exp $
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     protected class Export extends UnicastRemoteObject implements CV_Coverage, PropertySource {

@@ -21,7 +21,10 @@ import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
-import org.geotools.ct.TransformException;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
 import org.geotools.gui.swing.event.GeoMouseEvent;
 import org.geotools.map.MapContext;
 import org.geotools.pt.CoordinatePoint;

@@ -1,20 +1,4 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
-/*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
  * (C) 2003, Institut de Recherche pour le Développement
@@ -32,25 +16,25 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.renderer.j2d;
 
+// J2SE dependencies
+import java.awt.Component;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Level;
+
+// JTS dependencies
 import com.vividsolutions.jts.geom.Envelope;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.TransformException;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.map.MapContext;
@@ -61,12 +45,6 @@ import org.geotools.map.event.MapLayerListListener;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.resources.XMath;
 import org.geotools.styling.Style;
-import java.awt.Component;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.logging.Level;
 
 
 /**
@@ -75,7 +53,7 @@ import java.util.logging.Level;
  * RenderedLayer#repaint} automatically on changes.
  *
  * @author Martin Desruisseaux
- * @version $Id: StyledMapRenderer.java,v 1.4 2004/02/27 14:09:51 aaime Exp $
+ * @version $Id$
  */
 public class StyledMapRenderer extends Renderer {
     private MapContext mapContext;
@@ -319,7 +297,7 @@ public class StyledMapRenderer extends Renderer {
      * catching changes in collection and visibility.
      *
      * @author Martin Desruisseaux
-     * @version $Id: StyledMapRenderer.java,v 1.4 2004/02/27 14:09:51 aaime Exp $
+     * @version $Id$
      */
     private final class LayerEntry implements MapLayerListener {
         /** The layer. */

@@ -66,12 +66,14 @@ import java.util.logging.LogRecord;
 // Java Advanced Imaging
 import javax.media.jai.PlanarImage; // For Javadoc
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
 // Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.LocalCoordinateSystem;
 import org.geotools.cs.CompoundCoordinateSystem;
 import org.geotools.ct.CoordinateTransformationFactory;
-import org.geotools.ct.TransformException;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransform;
 import org.geotools.resources.XMath;
@@ -93,7 +95,7 @@ import org.geotools.resources.geometry.XAffineTransform;
  * {@link #setVisible setVisible}(true);
  * </pre></blockquote>
  *
- * @version $Id: RenderedLayer.java,v 1.34 2004/04/03 13:47:18 aaime Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see Renderer
