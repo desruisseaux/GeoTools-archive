@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1999, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -231,13 +231,13 @@ public class DefaultArray extends PointArray implements RandomAccess {
     }
 
     /**
-     * Retourne un tableau enveloppant les mï¿½mes points que le tableau courant,
-     * mais des index <code>lower</code> inclusivement jusqu'ï¿½ <code>upper</code>
-     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-ï¿½-dire si
-     * <code>lower==upper</code>), alors cette mï¿½thode retourne <code>null</code>.
+     * Retourne un tableau enveloppant les mêmes points que le tableau courant,
+     * mais des index <code>lower</code> inclusivement jusqu'à <code>upper</code>
+     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-à-dire si
+     * <code>lower==upper</code>), alors cette méthode retourne <code>null</code>.
      *
-     * @param lower Index du premier point ï¿½ prendre en compte.
-     * @param upper Index suivant celui du dernier point ï¿½ prendre en compte.
+     * @param lower Index du premier point à prendre en compte.
+     * @param upper Index suivant celui du dernier point à prendre en compte.
      */
     public PointArray subarray(int lower, int upper) {
         final int thisLower=lower();
@@ -251,32 +251,32 @@ public class DefaultArray extends PointArray implements RandomAccess {
     }
 
     /**
-     * Insï¿½re les donnï¿½es de <code>this</code> dans le tableau spï¿½cifiï¿½. Cette mï¿½thode est
-     * strictement rï¿½servï¿½e ï¿½ l'implï¿½mentation de {@link #insertAt(int,PointArray,boolean)}.
-     * La classe {@link DefaultArray} remplace l'implï¿½mentation par dï¿½faut par une nouvelle
-     * implï¿½mentation qui ï¿½vite de copier les donnï¿½es avec {@link #toArray()}.
+     * Insère les données de <code>this</code> dans le tableau spécifié. Cette méthode est
+     * strictement réservée à l'implémentation de {@link #insertAt(int,PointArray,boolean)}.
+     * La classe {@link DefaultArray} remplace l'implémentation par défaut par une nouvelle
+     * implémentation qui évite de copier les données avec {@link #toArray()}.
      */
     PointArray insertTo(final PointArray dest, final int index, final boolean reverse) {
         return dest.insertAt(index, array, lower(), upper(), reverse);
     }
 
     /**
-     * Insï¿½re les donnï¿½es (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spï¿½cifiï¿½.
-     * Si le drapeau <code>reverse</code> ï¿½ la valeur <code>true</code>, alors les points de
-     * <code>toMerge</code> seront copiï¿½es en ordre inverse.
+     * Insère les données (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spécifié.
+     * Si le drapeau <code>reverse</code> à la valeur <code>true</code>, alors les points de
+     * <code>toMerge</code> seront copiées en ordre inverse.
      *
-     * @param  index Index ï¿½ partir d'oï¿½ insï¿½rer les points dans ce tableau. Le point ï¿½ cet
-     *         index ainsi que tous ceux qui le suivent seront dï¿½calï¿½s vers des index plus ï¿½levï¿½s.
-     * @param  toMerge Tableau de coordonnï¿½es (<var>x</var>,<var>y</var>) ï¿½ insï¿½rer dans ce
-     *         tableau de points. Ses valeurs seront copiï¿½es.
-     * @param  lower Index de la premiï¿½re coordonnï¿½e de <code>toMerge</code> ï¿½ copier dans ce tableau.
-     * @param  upper Index suivant celui de la derniï¿½re coordonnï¿½e de <code>toMerge</code> ï¿½ copier.
+     * @param  index Index à partir d'où insérer les points dans ce tableau. Le point à cet
+     *         index ainsi que tous ceux qui le suivent seront décalés vers des index plus élevés.
+     * @param  toMerge Tableau de coordonnées (<var>x</var>,<var>y</var>) à insérer dans ce
+     *         tableau de points. Ses valeurs seront copiées.
+     * @param  lower Index de la première coordonnée de <code>toMerge</code> à copier dans ce tableau.
+     * @param  upper Index suivant celui de la dernière coordonnée de <code>toMerge</code> à copier.
      * @param  reverse <code>true</code> s'il faut inverser l'ordre des points de <code>toMerge</code>
      *         lors de la copie. Cette inversion ne change pas l'ordre (<var>x</var>,<var>y</var>) des
-     *         coordonnï¿½es de chaque points.
+     *         coordonnées de chaque points.
      *
-     * @return <code>this</code> si l'insertion ï¿½ pu ï¿½tre faite sur
-     *         place, ou un autre tableau si ï¿½a n'a pas ï¿½tï¿½ possible.
+     * @return <code>this</code> si l'insertion à pu être faite sur
+     *         place, ou un autre tableau si ça n'a pas été possible.
      */
     public PointArray insertAt(final int index, final float toMerge[],
                                final int lower, final int upper, final boolean reverse)
@@ -292,18 +292,18 @@ public class DefaultArray extends PointArray implements RandomAccess {
     /**
      * Renverse l'ordre de tous les points compris dans ce tableau.
      *
-     * @return <code>this</code> si l'inversion a pu ï¿½tre faite sur-place,
-     *         ou un autre tableau si ï¿½a n'a pas ï¿½tï¿½ possible.
+     * @return <code>this</code> si l'inversion a pu être faite sur-place,
+     *         ou un autre tableau si ça n'a pas été possible.
      */
     public PointArray reverse() {
         return new DynamicArray(array, lower(), upper(), 16).reverse();
     }
 
     /**
-     * Retourne un tableau immutable qui contient les mï¿½mes donnï¿½es que celui-ci.
-     * Aprï¿½s l'appel de cette mï¿½thode, toute tentative de modification (avec les
-     * mï¿½thodes {@link #insertAt} ou {@link #reverse}) vont retourner un autre
-     * tableau de faï¿½on ï¿½ ne pas modifier le tableau immutable.
+     * Retourne un tableau immutable qui contient les mêmes données que celui-ci.
+     * Après l'appel de cette méthode, toute tentative de modification (avec les
+     * méthodes {@link #insertAt} ou {@link #reverse}) vont retourner un autre
+     * tableau de façon à ne pas modifier le tableau immutable.
      */
     public PointArray getFinal(final CompressionLevel level) {
         if (CompressionLevel.RELATIVE_AS_BYTES.equals(level) && count() >= 8) {

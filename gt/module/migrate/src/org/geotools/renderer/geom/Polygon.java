@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -60,8 +60,8 @@ public class Polygon extends Polyline {
     private static final Polyline[] EMPTY_ARRAY = new Polyline[0];
 
     /**
-     * Nom de ce polygone.  Il s'agit en gï¿½nï¿½ral d'un nom gï¿½ographique, par exemple
-     * "ï¿½le d'Anticosti" ou "Lac Supï¿½rieur". Ce champs peut ï¿½tre nul si ce polygone
+     * Nom de ce polygone.  Il s'agit en général d'un nom géographique, par exemple
+     * "Île d'Anticosti" ou "Lac Supérieur". Ce champs peut être nul si ce polygone
      * ne porte pas de nom.
      */
     private String name;

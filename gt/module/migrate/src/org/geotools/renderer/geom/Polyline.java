@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -120,9 +120,9 @@ public class Polyline extends Geometry {
                     getIdentityTransform(DEFAULT_COORDINATE_SYSTEM);
 
     /**
-     * Un des maillons de la chaï¿½ne de polylignes, ou
-     * <code>null</code> s'il n'y a aucune donnï¿½e de
-     * mï¿½morisï¿½e.
+     * Un des maillons de la chaîne de polylignes, ou
+     * <code>null</code> s'il n'y a aucune donnée de
+     * mémorisée.
      */
     private LineString data;
 
@@ -371,8 +371,8 @@ public class Polyline extends Geometry {
                 }
             }
             /*
-             * Construit les polylignes qui correspondent ï¿½
-             * la forme gï¿½omï¿½trique qui vient d'ï¿½tre balayï¿½e.
+             * Construit les polylignes qui correspondent à
+             * la forme géométrique qui vient d'être balayée.
              */
             final LineString[] strings = LineString.getInstances(array, 0, index);
             for (int i=0; i<strings.length; i++) {
@@ -1162,7 +1162,7 @@ public class Polyline extends Geometry {
      *         (<var>x</var>,<var>y</var>) and to specify <code>null</code> for this argument.
      * @return <code>true</code> if the point is inside this polyline.
      *
-     * @author Andrï¿½ Gosselin (original C version)
+     * @author André Gosselin (original C version)
      * @author Martin Desruisseaux (Java adaptation)
      */
     private boolean contains(final float x, final float y,
@@ -1518,7 +1518,7 @@ public class Polyline extends Geometry {
     }
 
     /**
-     * Implï¿½mentation of the <code>intersects[Polyline|Edge](Polyline)</code> methods.
+     * Implémentation of the <code>intersects[Polyline|Edge](Polyline)</code> methods.
      *
      * @param  shape polylines to check.
      * @param  checkEdgeOnly <code>true</code> to only check edges, without bothering with

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -52,7 +52,7 @@ import org.geotools.renderer.array.ArrayData;
  */
 final class PolygonPathIterator extends ArrayData implements PathIterator {
     /**
-     * Itï¿½rateur balayant les objets {@link Polyline} ï¿½ tracer.
+     * Itérateur balayant les objets {@link Polyline} à tracer.
      */
     private final Iterator polylines;
 
@@ -62,12 +62,12 @@ final class PolygonPathIterator extends ArrayData implements PathIterator {
     private Polyline polyline;
 
     /**
-     * Transformation a appliquer aux coordonnï¿½es (rotation, translation, ï¿½chelle...).
+     * Transformation a appliquer aux coordonnées (rotation, translation, échelle...).
      */
     private final AffineTransform transform;
 
     /**
-     * Index de la prochaine valeur ï¿½ retourner dans le tableau {@link #array}.
+     * Index de la prochaine valeur à retourner dans le tableau {@link #array}.
      */
     private int index;
 
@@ -77,7 +77,7 @@ final class PolygonPathIterator extends ArrayData implements PathIterator {
     private int curveType = SEG_MOVETO;
 
     /**
-     * Construit un itï¿½rateur qui balayera les points d'un ensemble de polylignes.
+     * Construit un itérateur qui balayera les points d'un ensemble de polylignes.
      *
      * @param first     The first polyline, or <code>null</code> if none.
      * @param polylines Iterator through the next {@link Polylines} objects, or <code>null</code>.
@@ -162,12 +162,12 @@ final class PolygonPathIterator extends ArrayData implements PathIterator {
     }
 
     /**
-     * Retourne la coordonnï¿½e et le type du prochain segment. Cette mï¿½thode retourne
-     * {@link #SEG_MOVETO} au dï¿½but de chaque polyligne. Aprï¿½s le dernier point, elle
-     * retourne {@link #SEG_CLOSE} si la forme gï¿½omï¿½trique est une ï¿½le, un lac ou tout
-     * autre forme fermï¿½e. Entre ces deux extrï¿½mitï¿½s, elle retourne toujours {@link #SEG_LINETO}.
+     * Retourne la coordonnée et le type du prochain segment. Cette méthode retourne
+     * {@link #SEG_MOVETO} au début de chaque polyligne. Après le dernier point, elle
+     * retourne {@link #SEG_CLOSE} si la forme géométrique est une île, un lac ou tout
+     * autre forme fermée. Entre ces deux extrémités, elle retourne toujours {@link #SEG_LINETO}.
      *
-     * @param into Tableau dans lequel mï¿½moriser les coordonnï¿½es du prochain point.
+     * @param into Tableau dans lequel mémoriser les coordonnées du prochain point.
      *             Ce tableau doit avoir une longueur d'au moins 2 (pour 1 point).
      */
     public int currentSegment(final float into[]) {
@@ -187,12 +187,12 @@ final class PolygonPathIterator extends ArrayData implements PathIterator {
     }
 
     /**
-     * Retourne la coordonnï¿½e et le type du prochain segment. Cette mï¿½thode retourne
-     * {@link #SEG_MOVETO} au dï¿½but de chaque polyligne. Aprï¿½s le dernier point, elle
-     * retourne {@link #SEG_CLOSE} si la forme gï¿½omï¿½trique est une ï¿½le, un lac ou tout
-     * autre forme fermï¿½e. Entre ces deux extrï¿½mitï¿½s, elle retourne toujours {@link #SEG_LINETO}.
+     * Retourne la coordonnée et le type du prochain segment. Cette méthode retourne
+     * {@link #SEG_MOVETO} au début de chaque polyligne. Après le dernier point, elle
+     * retourne {@link #SEG_CLOSE} si la forme géométrique est une île, un lac ou tout
+     * autre forme fermée. Entre ces deux extrémités, elle retourne toujours {@link #SEG_LINETO}.
      *
-     * @param into Tableau dans lequel mï¿½moriser les coordonnï¿½es du prochain point.
+     * @param into Tableau dans lequel mémoriser les coordonnées du prochain point.
      *             Ce tableau doit avoir une longueur d'au moins 2 (pour 1 point).
      */
     public int currentSegment(final double into[]) {

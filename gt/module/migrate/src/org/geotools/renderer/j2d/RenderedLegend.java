@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -53,27 +53,27 @@ public class RenderedLegend extends RenderedLayer {
     private String text;
 
     /**
-     * Position oï¿½ placer la lï¿½gende.
+     * Position où placer la légende.
      */
     private LegendPosition position = LegendPosition.NORTH_WEST;
 
     /**
-     * Espace ï¿½ laisser entre le haut de la fenï¿½tre et le haut de la lï¿½gende.
+     * Espace à laisser entre le haut de la fenêtre et le haut de la légende.
      */
     private short top = 15;
 
     /**
-     * Espace ï¿½ laisser entre le bord gauche de la la fenï¿½tre et le bord gauche de la lï¿½gende.
+     * Espace à laisser entre le bord gauche de la la fenêtre et le bord gauche de la légende.
      */
     private short left = 15;
 
     /**
-     * Espace ï¿½ laisser entre le bas de la fenï¿½tre et le bas de la lï¿½gende.
+     * Espace à laisser entre le bas de la fenêtre et le bas de la légende.
      */
     private short bottom = 15;
 
     /**
-     * Espace ï¿½ laisser entre le bord droit de la la fenï¿½tre et le bord droit de la lï¿½gende.
+     * Espace à laisser entre le bord droit de la la fenêtre et le bord droit de la légende.
      */
     private short right = 15;
 

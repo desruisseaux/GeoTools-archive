@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -42,7 +42,7 @@ import java.util.NoSuchElementException;
 
 
 /**
- * Arrow oriented toward positives <var>x</var> values (0ï¿½ arithmetic). This shape doesn't
+ * Arrow oriented toward positives <var>x</var> values (0° arithmetic). This shape doesn't
  * have direct support for rotation. To rotate the arrow toward an other direction, use
  * {@link java.awt.geom.AffineTransform}.
  *
@@ -56,19 +56,19 @@ import java.util.NoSuchElementException;
  */
 public class Arrow2D extends RectangularShape {
     /**
-     * Coordonnï¿½es <var>x</var> et <var>y</var> minimales.
+     * Coordonnées <var>x</var> et <var>y</var> minimales.
      */
     private double minX, minY;
 
     /**
-     * Longueur de la flï¿½che. Cette longueur est mesurï¿½e horizontalement (selon
-     * l'axe des <var>x</var>) de la queue jusqu'ï¿½ la pointe de la flï¿½che.
+     * Longueur de la flèche. Cette longueur est mesurée horizontalement (selon
+     * l'axe des <var>x</var>) de la queue jusqu'à la pointe de la flèche.
      */
     private double length;
 
     /**
-     * Largeur de la flï¿½che. Cette largeur est mesurï¿½e verticalement (selon l'axe
-     * des <var>y</var>) le long de la partie la plus large de cette flï¿½che.
+     * Largeur de la flèche. Cette largeur est mesurée verticalement (selon l'axe
+     * des <var>y</var>) le long de la partie la plus large de cette flèche.
      */
     private double thickness;
 
@@ -90,20 +90,20 @@ public class Arrow2D extends RectangularShape {
     private double sx = 2.0/3;
 
     /**
-     * Construit une flï¿½che donc la surface initiale est nulle.
+     * Construit une flèche donc la surface initiale est nulle.
      */
     public Arrow2D() {
     }
 
     /**
-     * Construit une flï¿½che situï¿½e aux coordonnï¿½es (<var>x</var>,<var>y</var>) avec
+     * Construit une flèche située aux coordonnées (<var>x</var>,<var>y</var>) avec
      * une longueur selon <var>x</var> de <code>width</code> et une hauteur selon
      * <var>y</var> de <code>height</code>.
      *
-     * @param x Coordonnï¿½e <var>x</var> minimale.
-     * @param y Coordonnï¿½e <var>y</var> minimale.
-     * @param width  Longueur selon l'axe des <var>x</var>, de la base ï¿½ la pointe de la flï¿½che.
-     * @param height Largeur maximale de la flï¿½che, mesurï¿½e selon l'axe des <var>y</var>.
+     * @param x Coordonnée <var>x</var> minimale.
+     * @param y Coordonnée <var>y</var> minimale.
+     * @param width  Longueur selon l'axe des <var>x</var>, de la base à la pointe de la flèche.
+     * @param height Largeur maximale de la flèche, mesurée selon l'axe des <var>y</var>.
      */
     public Arrow2D(final double x, final double y, final double width, final double height) {
         this.minX      = x;
@@ -113,16 +113,16 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Modifie la largeur et hauteur de la queue de la flï¿½che, en proportion avec les dimensions
-     * totales de cette flï¿½che. Ces facteurs doivent ï¿½tre compris entre 0 et 1. Les valeurs par
-     * dï¿½faut sont de 1/3 selon <var>y</var> et 2/3 selon <var>x</var>, ce qui signifie que la
-     * queue de la flï¿½che aura le tiers de la largeur totale disponible et les deux tiers de la
-     * longueur disponible. La pointe de la flï¿½che aura le reste. Ces proportions donnent d'assez
-     * bons rï¿½sultats lorsque la flï¿½che est deux fois plus longue que large.
+     * Modifie la largeur et hauteur de la queue de la flèche, en proportion avec les dimensions
+     * totales de cette flèche. Ces facteurs doivent être compris entre 0 et 1. Les valeurs par
+     * défaut sont de 1/3 selon <var>y</var> et 2/3 selon <var>x</var>, ce qui signifie que la
+     * queue de la flèche aura le tiers de la largeur totale disponible et les deux tiers de la
+     * longueur disponible. La pointe de la flèche aura le reste. Ces proportions donnent d'assez
+     * bons résultats lorsque la flèche est deux fois plus longue que large.
      *
-     * @param sx  Proportion de la longueur occupï¿½e par la queue de la flï¿½che, entre 0 et 1.
-     * @param sy1 Proportion de la largeur occupï¿½e par la queue de la flï¿½che prï¿½s de la base, entre 0 et 1.
-     * @param sy0 Proportion de la largeur occupï¿½e par le bout de la queue de la flï¿½che, entre 0 et 1.
+     * @param sx  Proportion de la longueur occupée par la queue de la flèche, entre 0 et 1.
+     * @param sy1 Proportion de la largeur occupée par la queue de la flèche près de la base, entre 0 et 1.
+     * @param sy0 Proportion de la largeur occupée par le bout de la queue de la flèche, entre 0 et 1.
      */
     public void setTailProportion(double sx, double sy1, double sy0) {
         if (sy1<0) sy1=0;
@@ -137,57 +137,57 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Renvoie la longueur de la queue de la flï¿½che,
+     * Renvoie la longueur de la queue de la flèche,
      *
-     * @return La longueur de la queue, compris de 0 ï¿½ <code>getWidth</code>.
+     * @return La longueur de la queue, compris de 0 à <code>getWidth</code>.
      */
     public double getTailLength() {
         return sx*length;
     }
 
     /**
-     * Retourne la coordonnï¿½e <var>x</var>. Il s'agira du <var>x</var>
-     * le plus bas de la superficie couverte par la flï¿½che.
+     * Retourne la coordonnée <var>x</var>. Il s'agira du <var>x</var>
+     * le plus bas de la superficie couverte par la flêche.
      *
-     * @return La coordonnï¿½e <var>x</var> minimale.
+     * @return La coordonnée <var>x</var> minimale.
      */
     public double getX() {
         return minX;
     }
 
     /**
-     * Retourne la coordonnï¿½e <var>y</var>. Il s'agira du <var>y</var>
-     * le plus bas de la superficie couverte par la flï¿½che.
+     * Retourne la coordonnée <var>y</var>. Il s'agira du <var>y</var>
+     * le plus bas de la superficie couverte par la flêche.
      *
-     * @return La coordonnï¿½e <var>y</var> minimale.
+     * @return La coordonnée <var>y</var> minimale.
      */
     public double getY() {
         return minY;
     }
 
     /**
-     * Retourne la longueur de la flï¿½che, de la base jusqu'ï¿½ sa pointe.
-     * Cette longueur est mesurï¿½e selon l'axe des <var>x</var>.
+     * Retourne la longueur de la flèche, de la base jusqu'à sa pointe.
+     * Cette longueur est mesurée selon l'axe des <var>x</var>.
      */
     public double getWidth() {
         return length;
     }
 
     /**
-     * Retourne la largeur de la partie la plus large de la flï¿½che.
-     * Cette largeur est mesurï¿½e selon l'axe des <var>y</var>.
+     * Retourne la largeur de la partie la plus large de la flèche.
+     * Cette largeur est mesurée selon l'axe des <var>y</var>.
      */
     public double getHeight() {
         return thickness;
     }
 
     /**
-     * Renvoie la largeur de la flï¿½che ï¿½ la position <var>x</var>. Si cette position n'est pas
-     * comprise de <code>getMinX()</code> ï¿½ <code>getMaxX()</code>, alors cette mï¿½thode retourne 0.
-     * Sinon elle retourne la largeur de la flï¿½che ï¿½ la position spï¿½cifiï¿½e.
+     * Renvoie la largeur de la flèche à la position <var>x</var>. Si cette position n'est pas
+     * comprise de <code>getMinX()</code> à <code>getMaxX()</code>, alors cette méthode retourne 0.
+     * Sinon elle retourne la largeur de la flèche à la position spécifiée.
      *
-     * @param x Coordonnï¿½e <var>x</var> ï¿½ laquelle on veut la largeur.
-     * @return La largeur de la flï¿½che, comprise entre 0 et <code>getHeight</code>.
+     * @param x Coordonnée <var>x</var> à laquelle on veut la largeur.
+     * @return La largeur de la flèche, comprise entre 0 et <code>getHeight</code>.
      */
     public double getHeight(double x) {
         x = (x-minX)/(sx*length);
@@ -201,21 +201,21 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Dï¿½termine si la superficie de cette flï¿½che est nulle.
+     * Détermine si la superficie de cette flèche est nulle.
      *
-     * @return <code>true</code> si la superficie de cette flï¿½che est nulle.
+     * @return <code>true</code> si la superficie de cette flèche est nulle.
      */
     public boolean isEmpty() {
         return !(length>0 && thickness>0);
     }
 
     /**
-     * Affecte une nouvelle position et une nouvelle largeur ï¿½ la flï¿½che.
+     * Affecte une nouvelle position et une nouvelle largeur à la flèche.
      *
-     * @param x Coordonnï¿½ex <var>x</var> minimale.
-     * @param y Coordonnï¿½ex <var>y</var> minimale.
-     * @param width  Longueur, de la base ï¿½ la pointe de la flï¿½che.
-     * @param height Largeur de la partie la plus large de la flï¿½che.
+     * @param x Coordonnéex <var>x</var> minimale.
+     * @param y Coordonnéex <var>y</var> minimale.
+     * @param width  Longueur, de la base à la pointe de la flèche.
+     * @param height Largeur de la partie la plus large de la flèche.
      */
     public void setFrame(final double x, final double y, final double width, final double height) {
         this.minX      = x;
@@ -225,17 +225,17 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Renvoie les dimensions de cette flï¿½che.
+     * Renvoie les dimensions de cette flèche.
      */
     public Rectangle2D getBounds2D() {
         return new Rectangle2D.Double(minX, minY, length, thickness);
     }
 
     /**
-     * Indique si cette flï¿½che contient le point spï¿½cifiï¿½.
+     * Indique si cette flèche contient le point spécifié.
      *
-     * @param x Coordonnï¿½e <var>x</var> du point ï¿½ vï¿½rifier.
-     * @param y Coordonnï¿½e <var>y</var> du point ï¿½ vï¿½rifier.
+     * @param x Coordonnée <var>x</var> du point à vérifier.
+     * @param y Coordonnée <var>y</var> du point à vérifier.
      */
     public boolean contains(final double x, double y) {
         if (x < minX) {
@@ -244,7 +244,7 @@ public class Arrow2D extends RectangularShape {
         final double base = minX + sx*length;
         if (x <= base) {
             /*
-             * Point dans la queue. Vï¿½rifie s'il se trouve dans le triangle...
+             * Point dans la queue. Vérifie s'il se trouve dans le triangle...
              */
             double yMaxAtX = 0.5*thickness;
             y -= (minY + yMaxAtX);
@@ -252,7 +252,7 @@ public class Arrow2D extends RectangularShape {
             return (Math.abs(y) <= yMaxAtX);
         } else {
             /*
-             * Point dans la pointe. Vï¿½rifie s'il se trouve dans le triangle.
+             * Point dans la pointe. Vérifie s'il se trouve dans le triangle.
              */
             final double maxX = minX + length;
             if (x > maxX) {
@@ -266,14 +266,14 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Indique si la flï¿½che contient entiï¿½rement le rectangle spï¿½cifiï¿½. Ce sera
-     * le cas si la flï¿½che contient chacun des quatre coins du rectangle.
+     * Indique si la flèche contient entièrement le rectangle spécifié. Ce sera
+     * le cas si la flèche contient chacun des quatre coins du rectangle.
      *
-     * @param x Coordonnï¿½e <var>x</var> minimale du rectangle.
-     * @param y Coordonnï¿½e <var>y</var> minimale du rectangle.
+     * @param x Coordonnée <var>x</var> minimale du rectangle.
+     * @param y Coordonnée <var>y</var> minimale du rectangle.
      * @param width Largeur du rectangle.
      * @param height Hauteur du rectangle.
-     * @return <code>true</code> si la flï¿½che contient le rectangle.
+     * @return <code>true</code> si la flèche contient le rectangle.
      */
     public boolean contains(final double x, final double y, final double width, final double height)
     {
@@ -284,13 +284,13 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Indique si la flï¿½che intersepte le rectangle spï¿½cifiï¿½.
+     * Indique si la flèche intersepte le rectangle spécifié.
      *
-     * @param x Coordonnï¿½e <var>x</var> minimale du rectangle.
-     * @param y Coordonnï¿½e <var>y</var> minimale du rectangle.
+     * @param x Coordonnée <var>x</var> minimale du rectangle.
+     * @param y Coordonnée <var>y</var> minimale du rectangle.
      * @param width Largeur du rectangle.
      * @param height Hauteur du rectangle.
-     * @return <code>true</code> si la flï¿½che intersepte le rectangle.
+     * @return <code>true</code> si la flèche intersepte le rectangle.
      */
     public boolean intersects(final double x, final double y, final double width, final double height) {
         final double right = x + width;
@@ -341,20 +341,20 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Retourne un itï¿½rateur permettant de balayer les segments
-     * formant la flï¿½che. Comme cette flï¿½che ne contient pas de
-     * portion arrondie, cette mï¿½thode retourne la mï¿½me chose
-     * que l'autre mï¿½thode <code>getPathIterator</code>.
+     * Retourne un itérateur permettant de balayer les segments
+     * formant la flèche. Comme cette flèche ne contient pas de
+     * portion arrondie, cette méthode retourne la même chose
+     * que l'autre méthode <code>getPathIterator</code>.
      *
      * @param at Une transformation affine facultative.
-     * @param flatness Ignorï¿½.
+     * @param flatness Ignoré.
      */
     public PathIterator getPathIterator(final AffineTransform at, final double flatness) {
         return new Iterator(at);
     }
 
     /**
-     * Retourne un itï¿½rateur permettant de balayer les segments formant la flï¿½che.
+     * Retourne un itérateur permettant de balayer les segments formant la flèche.
      *
      * @param at Une transformation affine facultative.
      */
@@ -363,30 +363,30 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Itï¿½rateur balayant les coordonnï¿½es de la flï¿½che.
+     * Itérateur balayant les coordonnées de la flèche.
      */
     private class Iterator implements PathIterator {
         /**
-         * Transformation affine ï¿½ utiliser pour
-         * transformer les coordonnï¿½es. Peut ï¿½tre nul.
+         * Transformation affine à utiliser pour
+         * transformer les coordonnées. Peut être nul.
          */
         private final AffineTransform at;
 
         /**
-         * Quelques variables calculï¿½es lors de la construction
-         * afin d'ï¿½viter d'avoir ï¿½ les recalculer trop souvent.
+         * Quelques variables calculées lors de la construction
+         * afin d'éviter d'avoir à les recalculer trop souvent.
          */
         private final double halfBottom0, halfBottom1, center, halfTop1, halfTop0, base;
 
         /**
-         * Code indiquant quel sera la prochaine donnï¿½e ï¿½ retourner pour cette flï¿½che.
+         * Code indiquant quel sera la prochaine donnée à retourner pour cette flèche.
          */
         private int code;
 
         /**
-         * Construit un itï¿½rateur balayant les coordonnï¿½es de la flï¿½che.
+         * Construit un itérateur balayant les coordonnées de la flèche.
          *
-         * @param at Transformation affine ï¿½ utiliser pour transformer les coordonnï¿½es. Peut ï¿½tre nul.
+         * @param at Transformation affine à utiliser pour transformer les coordonnées. Peut être nul.
          */
         Iterator(final AffineTransform at) {
             this.at = at;
@@ -400,7 +400,7 @@ public class Arrow2D extends RectangularShape {
         }
 
         /**
-         * Retourne la rï¿½gle utilisï¿½ pour remplir le polygone.
+         * Retourne la règle utilisé pour remplir le polygone.
          *
          * @return Toujours <code>EVEN_ODD</code>.
          */
@@ -416,10 +416,10 @@ public class Arrow2D extends RectangularShape {
         }
 
         /**
-         * Renvoie les coordonnï¿½es du segment actuel.
+         * Renvoie les coordonnées du segment actuel.
          *
-         * @param Tableau dans lequel mï¿½moriser les coordonnï¿½es.
-         * @return Le code des coordonnï¿½es mï¿½morisï¿½es.
+         * @param Tableau dans lequel mémoriser les coordonnées.
+         * @return Le code des coordonnées mémorisées.
          */
         public int currentSegment(final float[] coords) {
             switch (code) {
@@ -441,10 +441,10 @@ public class Arrow2D extends RectangularShape {
         }
 
         /**
-         * Renvoie les coordonnï¿½es du segment actuel.
+         * Renvoie les coordonnées du segment actuel.
          *
-         * @param Tableau dans lequel mï¿½moriser les coordonnï¿½es.
-         * @return Le code des coordonnï¿½es mï¿½morisï¿½es.
+         * @param Tableau dans lequel mémoriser les coordonnées.
+         * @return Le code des coordonnées mémorisées.
          */
         public int currentSegment(final double[] coords)  {
             switch (code) {
@@ -466,9 +466,9 @@ public class Arrow2D extends RectangularShape {
         }
 
         /**
-         * Indique si l'on a terminï¿½ de balayer les points.
+         * Indique si l'on a terminé de balayer les points.
          *
-         * @return <code>true</code> si le balayage est terminï¿½.
+         * @return <code>true</code> si le balayage est terminé.
          */
         public boolean isDone() {
             return code > 8;
@@ -476,7 +476,7 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Indique si cette flï¿½che est identique ï¿½ la flï¿½che spï¿½cifiï¿½e.
+     * Indique si cette flèche est identique à la flèche spécifiée.
      */
     public boolean equals(final Object obj) {
         if (obj == this) {
@@ -497,7 +497,7 @@ public class Arrow2D extends RectangularShape {
     }
 
     /**
-     * Retourne un code "hash value" pour cette flï¿½che.
+     * Retourne un code "hash value" pour cette flèche.
      */
     public int hashCode() {
         final long code=Double.doubleToLongBits(thickness) + 37*

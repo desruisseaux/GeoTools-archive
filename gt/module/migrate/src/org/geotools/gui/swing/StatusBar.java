@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -92,26 +92,26 @@ import org.geotools.resources.gui.Resources;
  */
 public class StatusBar extends JComponent implements MouseMotionListener {
     /**
-     * Chaï¿½ne de caractï¿½res reprï¿½sentant un texte nul. Ce sera en gï¿½nï¿½ral un
-     * espace afin que l'ï¿½tiquette conserve quand mï¿½me une certaine hauteur.
+     * Chaîne de caractères représentant un texte nul. Ce sera en général un
+     * espace afin que l'étiquette conserve quand même une certaine hauteur.
      */
     private static final String NULL = " ";
 
     /**
-     * Texte ï¿½ afficher dans la barre d'ï¿½tat lorsqu'aucune opï¿½ration n'est en cours.
-     * S'il n'y a pas de texte ï¿½ afficher, alors cette chaï¿½ne devrait ï¿½tre la constante
-     * <code>StatusBar.NULL</code> plutï¿½t que <code>null</code>.
+     * Texte à afficher dans la barre d'état lorsqu'aucune opération n'est en cours.
+     * S'il n'y a pas de texte à afficher, alors cette chaîne devrait être la constante
+     * <code>StatusBar.NULL</code> plutôt que <code>null</code>.
      */
     private String text = NULL;
 
     /**
-     * Composante dans lequel ï¿½crire des messages.
+     * Composante dans lequel écrire des messages.
      */
     private final JLabel message = new JLabel(NULL);
 
     /**
-     * Composante dans lequel ï¿½crire les coordonnï¿½es
-     * pointï¿½es par le curseur de la souris.
+     * Composante dans lequel écrire les coordonnées
+     * pointées par le curseur de la souris.
      */
     private final JLabel coordinate = new JLabel(NULL);
 
@@ -128,17 +128,17 @@ public class StatusBar extends JComponent implements MouseMotionListener {
     private transient JPopupMenu coordinateMenu;
 
     /**
-     * Progression d'une opï¿½ration quelconque. Ce sera
+     * Progression d'une opération quelconque. Ce sera
      * souvent la progression de la lecture d'une image.
      */
     private final BoundedRangeModel progress;
 
     /**
-     * Liste de numï¿½ros (<strong>en ordre croissant</code>) identifiant les objets
-     * qui veulent ï¿½crire leur progression dans la barre des progrï¿½s. Chaque objet
-     * {@link ProgressListener} a un numï¿½ro unique.  Le premier numï¿½ro de la liste
-     * est celui de l'objet {@link ProgressListener} qui possï¿½de la barre des progrï¿½s.
-     * On ne retient pas des rï¿½fï¿½rences directes afin de ne pas nuire au travail du
+     * Liste de numéros (<strong>en ordre croissant</code>) identifiant les objets
+     * qui veulent écrire leur progression dans la barre des progrès. Chaque objet
+     * {@link ProgressListener} a un numéro unique.  Le premier numéro de la liste
+     * est celui de l'objet {@link ProgressListener} qui possède la barre des progrès.
+     * On ne retient pas des références directes afin de ne pas nuire au travail du
      * ramasse-miettes.
      */
     private transient int[] progressQueue = new int[0]; // must be transient
@@ -197,7 +197,7 @@ public class StatusBar extends JComponent implements MouseMotionListener {
     }
 
     /**
-     * Configure la zone de texte spï¿½cifiï¿½e.
+     * Configure la zone de texte spécifiée.
      */
     private static void config(final JLabel label)  {
         label.setOpaque(true);
@@ -395,7 +395,7 @@ public class StatusBar extends JComponent implements MouseMotionListener {
 
 
     /**
-     * Classe chargï¿½e de rï¿½agir au progrï¿½s de la lecture.
+     * Classe chargée de réagir au progrès de la lecture.
      *
      * @version $Id: StatusBar.java,v 1.7 2003/11/12 14:14:25 desruisseaux Exp $
      * @author Martin Desruisseaux
@@ -448,7 +448,7 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
 
         /**
-         * Construit un objet chargï¿½ d'informer des progrï¿½s de la lecture d'une image.
+         * Construit un objet chargé d'informer des progrès de la lecture d'une image.
          */
         protected ProgressListener(final String name) {
             this.name = name;
@@ -456,13 +456,13 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
         
         /**
-         * Prï¿½pare une opï¿½ration ï¿½ exï¿½cuter dans le thread de <i>Swing</i>.
-         * Cette opï¿½ration sera dï¿½crite par le champ {@link #operation} et
-         * consistera typiquement ï¿½ initialiser la barre des progrï¿½s ou
+         * Prépare une opération à exécuter dans le thread de <i>Swing</i>.
+         * Cette opération sera décrite par le champ {@link #operation} et
+         * consistera typiquement à initialiser la barre des progrès ou
          * afficher son pourcentage ({@link #percent}).
          *
-         * @param nextOp  Code de l'opï¿½ration ({@link #START}, {@link #PROGRESS} ou {@link #END}).
-         * @param percent Pourcentage des progrï¿½s accomplis.
+         * @param nextOp  Code de l'opération ({@link #START}, {@link #PROGRESS} ou {@link #END}).
+         * @param percent Pourcentage des progrès accomplis.
          */
         private void invokeLater(final byte nextOp, final int percent) {
             synchronized (progress) {
@@ -491,10 +491,10 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
 
         /**
-         * Exï¿½cute une opï¿½ration prï¿½parï¿½e par {@link #invokeLater}. Cette opï¿½ration peut
-         * constiter ï¿½ initialiser la barre des progrï¿½s ({@link #START}), informer des
-         * progrï¿½s accomplis ({@link #PROGRESS}) ou informer que la tï¿½che est terminï¿½e
-         * ({@link #END}). Cette mï¿½thode doit obligatoirement ï¿½tre appelï¿½e dans le thread
+         * Exécute une opération préparée par {@link #invokeLater}. Cette opération peut
+         * constiter à initialiser la barre des progrès ({@link #START}), informer des
+         * progrès accomplis ({@link #PROGRESS}) ou informer que la tâche est terminée
+         * ({@link #END}). Cette méthode doit obligatoirement être appelée dans le thread
          * de <i>Swing</i>.
          */
         public void run() {
@@ -502,10 +502,10 @@ public class StatusBar extends JComponent implements MouseMotionListener {
                 try {
                     switch (operation) {
                         /*
-                         * Si on dï¿½marre la lecture d'une nouvelle image, tente de
-                         * prendre possession de la barre d'ï¿½tat.  Si on n'est pas
-                         * le premier ï¿½ demander la possession de la barre d'ï¿½tat,
-                         * cet objet 'ProgressListener' sera placï¿½ dans une liste
+                         * Si on démarre la lecture d'une nouvelle image, tente de
+                         * prendre possession de la barre d'état.  Si on n'est pas
+                         * le premier à demander la possession de la barre d'état,
+                         * cet objet 'ProgressListener' sera placé dans une liste
                          * d'attente.
                          */
                         case START: {
@@ -517,10 +517,10 @@ public class StatusBar extends JComponent implements MouseMotionListener {
                             break;
                         }
                         /*
-                         * Si la lecture de l'image a avancï¿½, on ï¿½crira les progrï¿½s dans la barre d'ï¿½tat
-                         * ï¿½ la condition que cette barre d'ï¿½tat nous appartient. On ï¿½crira le nom de
-                         * l'opï¿½ration si ce n'ï¿½tait pas dï¿½jï¿½ fait (c'est le cas si on n'avait pas pu
-                         * prendre possession de la barre d'ï¿½tat au moment ou START avait ï¿½tï¿½ exï¿½cutï¿½).
+                         * Si la lecture de l'image a avancé, on écrira les progrès dans la barre d'état
+                         * à la condition que cette barre d'état nous appartient. On écrira le nom de
+                         * l'opération si ce n'était pas déjà fait (c'est le cas si on n'avait pas pu
+                         * prendre possession de la barre d'état au moment ou START avait été exécuté).
                          */
                         case PROGRESS: {
                             if (hasLock()) {
@@ -530,9 +530,9 @@ public class StatusBar extends JComponent implements MouseMotionListener {
                             break;
                         }
                         /*
-                         * A la fin de la lecture, relï¿½che la barre d'ï¿½tat. Elle
-                         * pourra ï¿½tre rï¿½cupï¿½rï¿½e par d'autres 'ProgressListener'
-                         * qui ï¿½taient dans la liste d'attente.
+                         * A la fin de la lecture, relâche la barre d'état. Elle
+                         * pourra être récupérée par d'autres 'ProgressListener'
+                         * qui étaient dans la liste d'attente.
                          */
                         case END: {
                             if (hasLock()) {
@@ -552,15 +552,15 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
 
         /**
-         * Ecrit dans la barre d'ï¿½tat la description de cet objet <code>ProgressListener</code>, si
-         * ce n'ï¿½tait pas dï¿½jï¿½ fait.  Cette mï¿½thode ne doit ï¿½tre appelï¿½e que lorsque les conditions
-         * suivantes ont ï¿½tï¿½ remplises:
+         * Ecrit dans la barre d'état la description de cet objet <code>ProgressListener</code>, si
+         * ce n'était pas déjà fait.  Cette méthode ne doit être appelée que lorsque les conditions
+         * suivantes ont été remplises:
          *
          * <ul>
-         *   <li>Cette mï¿½thode est appelï¿½e dans le thread de Swing.</li>
-         *   <li>Cette mï¿½thode est appelï¿½e dans un bloc synchronisï¿½ sur
+         *   <li>Cette méthode est appelée dans le thread de Swing.</li>
+         *   <li>Cette méthode est appelée dans un bloc synchronisé sur
          *       <code>StatusBar.progress</code>.</li>
-         *   <li>La mï¿½thode {@link #lock} ou {@link #hasLock} a retournï¿½ <code>true</code>.</li>
+         *   <li>La méthode {@link #lock} ou {@link #hasLock} a retourné <code>true</code>.</li>
          * </ul>
          */
         private void flush() {
@@ -573,11 +573,11 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
 
         /**
-         * Vï¿½rifie si cet objet <code>ProgressBar</code> possï¿½de la barre d'ï¿½tat. Cette
-         * mï¿½thode ne doit ï¿½tre appelï¿½e que lorsque les conditions suivantes ont ï¿½tï¿½ remplises:
+         * Vérifie si cet objet <code>ProgressBar</code> possède la barre d'état. Cette
+         * méthode ne doit être appelée que lorsque les conditions suivantes ont été remplises:
          *
          * <ul>
-         *   <li>Cette mï¿½thode est appelï¿½e dans un bloc synchronisï¿½ sur
+         *   <li>Cette méthode est appelée dans un bloc synchronisé sur
          *       <code>StatusBar.progress</code>.</li>
          * </ul>
          */
@@ -588,13 +588,13 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
 
         /**
-         * tente de prendre possession de la barre d'ï¿½tat. Cette mï¿½thode retourne <code>true</code>
-         * si elle a effectivement rï¿½ussie ï¿½ en prendre possession, ou <code>false</code> si elle
-         * s'est placï¿½e dans une liste d'attente. Cette mï¿½thode ne doit ï¿½tre appelï¿½e que lorsque
-         * les conditions suivantes ont ï¿½tï¿½ remplises:
+         * tente de prendre possession de la barre d'état. Cette méthode retourne <code>true</code>
+         * si elle a effectivement réussie à en prendre possession, ou <code>false</code> si elle
+         * s'est placée dans une liste d'attente. Cette méthode ne doit être appelée que lorsque
+         * les conditions suivantes ont été remplises:
          *
          * <ul>
-         *   <li>Cette mï¿½thode est appelï¿½e dans un bloc synchronisï¿½ sur
+         *   <li>Cette méthode est appelée dans un bloc synchronisé sur
          *       <code>StatusBar.progress</code>.</li>
          * </ul>
          */
@@ -620,12 +620,12 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
 
         /**
-         * Dï¿½clare que cet objet <code>ProgressBar</code> n'est plus intï¿½ressï¿½
-         * a possï¿½der la barre d'ï¿½tat. Cette mï¿½thode ne doit ï¿½tre appelï¿½e que
-         * lorsque les conditions suivantes ont ï¿½tï¿½ remplises:
+         * Déclare que cet objet <code>ProgressBar</code> n'est plus intéressé
+         * a posséder la barre d'état. Cette méthode ne doit être appelée que
+         * lorsque les conditions suivantes ont été remplises:
          *
          * <ul>
-         *   <li>Cette mï¿½thode est appelï¿½e dans un bloc synchronisï¿½ sur
+         *   <li>Cette méthode est appelée dans un bloc synchronisé sur
          *       <code>StatusBar.progress</code>.</li>
          * </ul>
          */
@@ -639,8 +639,8 @@ public class StatusBar extends JComponent implements MouseMotionListener {
         }
 
         /**
-         * Dï¿½clare que cet objet <code>ProgressListener</code>
-         * n'est plus intï¿½ressï¿½ a possï¿½der la barre d'ï¿½tat.
+         * Déclare que cet objet <code>ProgressListener</code>
+         * n'est plus intéressé a posséder la barre d'état.
          */
         protected void finalize() throws Throwable {
             synchronized (progress) {

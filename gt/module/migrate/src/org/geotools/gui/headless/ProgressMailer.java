@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1999, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -61,55 +61,55 @@ import org.geotools.util.ProgressListener;
 
 
 /**
- * Informe l'utilisateur des progrï¿½s d'une opï¿½ration en envoyant
- * des courriers ï¿½lectroniques ï¿½ intervalles rï¿½gulier.
+ * Informe l'utilisateur des progrès d'une opération en envoyant
+ * des courriers électroniques à intervalles régulier.
  *
  * @version $Id: ProgressMailer.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
 public class ProgressMailer implements ProgressListener {
     /**
-     * Nom de l'opï¿½ration en cours. Le pourcentage
-     * sera ï¿½cris ï¿½ la droite de ce nom.
+     * Nom de l'opération en cours. Le pourcentage
+     * sera écris à la droite de ce nom.
      */
     private String description;
 
     /**
-     * Langue ï¿½ utiliser pour le formattage.
+     * Langue à utiliser pour le formattage.
      */
     private final Locale locale;
 
     /**
-     * Session ï¿½ utiliser pour
+     * Session à utiliser pour
      * envoyer des courriels.
      */
     private final Session session;
 
     /**
-     * Addresse des personnes ï¿½ qui envoyer
-     * un rapport sur les progrï¿½s.
+     * Addresse des personnes à qui envoyer
+     * un rapport sur les progrès.
      */
     private final Address[] address;
 
     /**
-     * Laps de temps entre deux courriers ï¿½lectroniques
-     * informant des progrï¿½s. On attendra que ce laps de
-     * temps soit ï¿½coulï¿½s avant d'envoyer un nouveau courriel.
+     * Laps de temps entre deux courriers électroniques
+     * informant des progrès. On attendra que ce laps de
+     * temps soit écoulés avant d'envoyer un nouveau courriel.
      */
     private long timeInterval = 3*60*60*1000L;
 
     /**
-     * Date et heure ï¿½ laquelle envoyer le prochain courriel.
+     * Date et heure à laquelle envoyer le prochain courriel.
      */
     private long nextTime;
 
     /**
      * Construit un objet qui informera des
-     * progrï¿½s en envoyant des courriels.
+     * progrès en envoyant des courriels.
      *
-     * @param  host Nom du serveur ï¿½ utiliser pour envoyer des courriels.
-     * @param  address Adresse ï¿½ laquelle envoyer les messages.
-     * @throws AddressException si l'adresse spï¿½cifiï¿½e n'est pas dans un format valide.
+     * @param  host Nom du serveur à utiliser pour envoyer des courriels.
+     * @param  address Adresse à laquelle envoyer les messages.
+     * @throws AddressException si l'adresse spécifiée n'est pas dans un format valide.
      */
     public ProgressMailer(final String host, final String address) throws AddressException {
         this(Session.getDefaultInstance(properties(host)), new InternetAddress[] {
@@ -118,9 +118,9 @@ public class ProgressMailer implements ProgressListener {
 
     /**
      * Construit un objet qui informera des
-     * progrï¿½s en envoyant des courriels.
+     * progrès en envoyant des courriels.
      *
-     * @param session Session ï¿½ utiliser pour envoyer des courriels.
+     * @param session Session à utiliser pour envoyer des courriels.
      */
     public ProgressMailer(final Session session, final Address[] address) {
         this.session = session;
@@ -130,10 +130,10 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Retourne un ensemble de propriï¿½tï¿½s
-     * nï¿½cessaires pour ouvrir une session.
+     * Retourne un ensemble de propriétés
+     * nécessaires pour ouvrir une session.
      *
-     * @param host Nom du serveur ï¿½ utiliser pour envoyer des courriels.
+     * @param host Nom du serveur à utiliser pour envoyer des courriels.
      */
     private static final Properties properties(final String host) {
         final Properties props = new Properties();
@@ -142,8 +142,8 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Retourne le laps de temps minimal entre deux courriers ï¿½lectroniques
-     * informant des progrï¿½s. On attendra que ce laps de temps soit ï¿½coulï¿½s
+     * Retourne le laps de temps minimal entre deux courriers électroniques
+     * informant des progrès. On attendra que ce laps de temps soit écoulés
      * avant d'envoyer un nouveau courriel.
      *
      * @return Intervalle de temps en millisecondes.
@@ -153,10 +153,10 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Spï¿½cifie le laps de temps minimal entre deux courriers ï¿½lectroniques
-     * informant des progrï¿½s. On attendra que ce laps de temps soit ï¿½coulï¿½s
-     * avant d'envoyer un nouveau courriel. Par dï¿½faut, un courriel n'est
-     * envoyï¿½ qu'une fois tous les heures.
+     * Spécifie le laps de temps minimal entre deux courriers électroniques
+     * informant des progrès. On attendra que ce laps de temps soit écoulés
+     * avant d'envoyer un nouveau courriel. Par défaut, un courriel n'est
+     * envoyé qu'une fois tous les heures.
      *
      * @param interval Intervalle de temps en millisecondes.
      */
@@ -165,8 +165,8 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Retourne le message d'ï¿½crivant l'opï¿½ration
-     * en cours. Si aucun message n'a ï¿½tï¿½ dï¿½finie,
+     * Retourne le message d'écrivant l'opération
+     * en cours. Si aucun message n'a été définie,
      * retourne <code>null</code>.
      */
     public String getDescription() {
@@ -174,10 +174,10 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Spï¿½cifie un message qui dï¿½crit l'opï¿½ration en cours.
-     * Ce message est typiquement spï¿½cifiï¿½e avant le dï¿½but
-     * de l'opï¿½ration. Toutefois, cette mï¿½thode peut aussi
-     * ï¿½tre appelï¿½e ï¿½ tout moment pendant l'opï¿½ration sans
+     * Spécifie un message qui décrit l'opération en cours.
+     * Ce message est typiquement spécifiée avant le début
+     * de l'opération. Toutefois, cette méthode peut aussi
+     * être appelée à tout moment pendant l'opération sans
      * que cela affecte le pourcentage accompli. La valeur
      * <code>null</code> signifie qu'on ne souhaite plus
      * afficher de description.
@@ -187,14 +187,14 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Envoie le message spï¿½cifiï¿½ par courrier ï¿½lectronique.
+     * Envoie le message spécifié par courrier électronique.
      *
-     * @param method Nom de la mï¿½thode qui appelle celle-ci.
-     *        Cette information est utilisï¿½e pour produire
-     *        un message d'erreur en cas d'ï¿½chec.
-     * @param subjectKey Clï¿½ du sujet: {@link ResourceKeys#PROGRESS},
+     * @param method Nom de la méthode qui appelle celle-ci.
+     *        Cette information est utilisée pour produire
+     *        un message d'erreur en cas d'échec.
+     * @param subjectKey Clé du sujet: {@link ResourceKeys#PROGRESS},
      *        {@link ResourceKeys#WARNING} ou {@link ResourceKeys#EXCEPTION}.
-     * @param messageText Message ï¿½ envoyer par courriel.
+     * @param messageText Message à envoyer par courriel.
      */
     private void send(final String method, final int subjectKey, final String messageText) {
         try {
@@ -216,12 +216,12 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Envoie par courrier ï¿½lectronique un rapport des progrï¿½s.
+     * Envoie par courrier électronique un rapport des progrès.
      *
-     * @param method Nom de la mï¿½thode qui appelle celle-ci.
-     *        Cette information est utilisï¿½e pour produire
-     *        un message d'erreur en cas d'ï¿½chec.
-     * @param percent Pourcentage effectuï¿½ (entre 0 et 100).
+     * @param method Nom de la méthode qui appelle celle-ci.
+     *        Cette information est utilisée pour produire
+     *        un message d'erreur en cas d'échec.
+     * @param percent Pourcentage effectué (entre 0 et 100).
      */
     private void send(final String method, final float percent) {
         final Runtime      system = Runtime.getRuntime();
@@ -244,18 +244,18 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Envoie un courrier ï¿½lectronique indiquant
-     * que l'opï¿½ration vient de commencer.
+     * Envoie un courrier électronique indiquant
+     * que l'opération vient de commencer.
      */
     public synchronized void started() {
         send("started", 0);
     }
 
     /**
-     * Envoie un courrier ï¿½lectronique informant des progrï¿½s de l'opï¿½ration.
-     * Cette information ne sera pas nï¿½cessairement prise en compte. Cette
-     * mï¿½thode n'envoie des rapport qu'ï¿½ des intervalles de temps assez espacï¿½s
-     * (par dï¿½faut 3 heure) afin de ne pas innonder l'utilisateur de courriels.
+     * Envoie un courrier électronique informant des progrès de l'opération.
+     * Cette information ne sera pas nécessairement prise en compte. Cette
+     * méthode n'envoie des rapport qu'à des intervalles de temps assez espacés
+     * (par défaut 3 heure) afin de ne pas innonder l'utilisateur de courriels.
      */
     public synchronized void progress(float percent) {
         final long time = System.currentTimeMillis();
@@ -268,31 +268,31 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Envoie un courrier ï¿½lectronique indiquant
-     * que l'opï¿½ration vient de se terminer.
+     * Envoie un courrier électronique indiquant
+     * que l'opération vient de se terminer.
      */
     public synchronized void complete() {
         send("complete", 100);
     }
 
     /**
-     * Libï¿½re les ressources utilisï¿½es par cet objet.
-     * L'implï¿½mentation par dï¿½faut ne fait rien.
+     * Libère les ressources utilisées par cet objet.
+     * L'implémentation par défaut ne fait rien.
      */
     public void dispose() {
     }
 
     /**
      * Envoie un message d'avertissement. Ce message
-     * sera envoyï¿½e par courrier ï¿½lectronique.
+     * sera envoyée par courrier électronique.
      *
-     * @param source Chaï¿½ne de caractï¿½re dï¿½crivant la source de l'avertissement.
+     * @param source Chaîne de caractère décrivant la source de l'avertissement.
      *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
-     *        a ï¿½tï¿½ dï¿½tectï¿½e. Peut ï¿½tre nul si la source n'est pas connue.
-     * @param margin Texte ï¿½ placer dans la marge de l'avertissement <code>warning</code>,
-     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numï¿½ro
-     *        de ligne oï¿½ s'est produite l'erreur dans le fichier <code>source</code>.
-     * @param warning Message d'avertissement ï¿½ ï¿½crire.
+     *        a été détectée. Peut être nul si la source n'est pas connue.
+     * @param margin Texte à placer dans la marge de l'avertissement <code>warning</code>,
+     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numéro
+     *        de ligne où s'est produite l'erreur dans le fichier <code>source</code>.
+     * @param warning Message d'avertissement à écrire.
      */
     public synchronized void warningOccurred(final String source,
                                              final String margin,
@@ -316,9 +316,9 @@ public class ProgressMailer implements ProgressListener {
     }
 
     /**
-     * Indique qu'une exception est survenue pendant le traitement de l'opï¿½ration.
-     * L'implï¿½mentation par dï¿½faut envoie la trace de l'exception par courrier
-     * ï¿½lectronique.
+     * Indique qu'une exception est survenue pendant le traitement de l'opération.
+     * L'implémentation par défaut envoie la trace de l'exception par courrier
+     * électronique.
      */
     public synchronized void exceptionOccurred(final Throwable exception) {
         final CharArrayWriter buffer = new CharArrayWriter();

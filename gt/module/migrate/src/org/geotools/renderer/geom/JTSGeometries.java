@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2003, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -43,8 +43,8 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class JTSGeometries extends org.geotools.renderer.geom.GeometryCollection {
     /**
-     * Numï¿½ro de version pour compatibilitï¿½ avec des
-     * bathymï¿½tries enregistrï¿½es sous d'anciennes versions.
+     * Numéro de version pour compatibilité avec des
+     * bathymétries enregistrées sous d'anciennes versions.
      */
     private static final long serialVersionUID = 1390543865440404086L;
 

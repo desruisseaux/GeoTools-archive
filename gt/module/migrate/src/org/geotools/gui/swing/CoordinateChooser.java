@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -85,8 +85,8 @@ import org.geotools.resources.gui.Resources;
  * A pane of controls designed to allow a user to select spatio-temporal coordinates.
  * Current implementation use geographic coordinates (longitudes/latitudes) and dates
  * according some locale calendar. Future version may allow the use of user-specified
- * coordinate system. Latitudes are constrained in the range 90ï¿½S to 90ï¿½N inclusive.
- * Longitudes are constrained in the range 180ï¿½W to 180ï¿½E inclusive. By default, dates
+ * coordinate system. Latitudes are constrained in the range 90°S to 90°N inclusive.
+ * Longitudes are constrained in the range 180°W to 180°E inclusive. By default, dates
  * are constrained in the range January 1st, 1970 up to the date at the time the widget
  * was created.
  *
@@ -150,35 +150,35 @@ public class CoordinateChooser extends JPanel {
     private final JComboBox timezone;
 
     /**
-     * Dates de dï¿½but et de fin de la plage de temps demandï¿½e par l'utilisateur.
-     * Ces dates sont gï¿½rï¿½es par un modï¿½le {@link SpinnerDateModel}.
+     * Dates de début et de fin de la plage de temps demandée par l'utilisateur.
+     * Ces dates sont gérées par un modèle {@link SpinnerDateModel}.
      */
     private final JSpinner tmin, tmax;
 
     /**
-     * Longitudes et latitudes minimales et maximales demandï¿½es par l'utilisateur.
-     * Ces coordonnï¿½es sont gï¿½rï¿½es par un modï¿½le {@link SpinnerNumberModel}.
+     * Longitudes et latitudes minimales et maximales demandées par l'utilisateur.
+     * Ces coordonnées sont gérées par un modèle {@link SpinnerNumberModel}.
      */
     private final JSpinner xmin, xmax, ymin, ymax;
 
     /**
-     * Rï¿½solution (en minutes de longitudes et de latitudes) demandï¿½e par l'utilisateur.
-     * Ces rï¿½solution sont gï¿½rï¿½es par un modï¿½le {@link SpinnerNumberModel}.
+     * Résolution (en minutes de longitudes et de latitudes) demandée par l'utilisateur.
+     * Ces résolution sont gérées par un modèle {@link SpinnerNumberModel}.
      */
     private final JSpinner xres, yres;
 
     /**
-     * Bouton radio pour sï¿½lectioner la meilleure rï¿½solution possible.
+     * Bouton radio pour sélectioner la meilleure résolution possible.
      */
     private final AbstractButton radioBestRes;
 
     /**
-     * Bouton radio pour sï¿½lectioner la rï¿½solution spï¿½cifiï¿½e.
+     * Bouton radio pour sélectioner la résolution spécifiée.
      */
     private final AbstractButton radioPrefRes;
 
     /**
-     * Composante facultative ï¿½ afficher ï¿½ la droite
+     * Composante facultative à afficher à la droite
      * du paneau <code>CoordinateChooser</code>.
      */
     private JComponent accessory;
@@ -263,7 +263,7 @@ public class CoordinateChooser extends JPanel {
         xres = new JSpinner(new SpinnerNumberModel(1, 0, 360*60, 1));
         yres = new JSpinner(new SpinnerNumberModel(1, 0, 180*60, 1));
 
-        final AngleFormat   angleFormat = new AngleFormat("Dï¿½MM.m'", locale);
+        final AngleFormat   angleFormat = new AngleFormat("D°MM.m'", locale);
         final DateFormat     dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
         xmin.setEditor(new SpinnerAngleModel.Editor(xmin, angleFormat));
@@ -334,7 +334,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Retourne un panneau avec une bordure titrï¿½e.
+     * Retourne un panneau avec une bordure titrée.
      */
     private static JPanel getPanel(final String title) {
         final JPanel panel=new JPanel(new GridBagLayout());
@@ -345,8 +345,8 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Dï¿½finit la largeur (en nombre de colonnes) d'un champ.
-     * Eventuellement, cette mï¿½thode peut aussi redï¿½finir le
+     * Définit la largeur (en nombre de colonnes) d'un champ.
+     * Eventuellement, cette méthode peut aussi redéfinir le
      * format.
      */
     private static void setup(final JSpinner spinner, final int width, final Format format) {
@@ -667,12 +667,12 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Prend en compte les valeurs des champs ï¿½ditï¿½s par l'utilisateur.
-     * Si les entrï¿½s ne sont pas valide, affiche un message d'erreur en
-     * utilisant la fenï¿½tre parente <code>owner</code> spï¿½cifiï¿½e.
+     * Prend en compte les valeurs des champs édités par l'utilisateur.
+     * Si les entrés ne sont pas valide, affiche un message d'erreur en
+     * utilisant la fenêtre parente <code>owner</code> spécifiée.
      *
-     * @param  owner Fenï¿½tre dans laquelle faire apparaï¿½tre d'eventuels messages d'erreur.
-     * @return <code>true</code> si la prise en compte des paramï¿½tres ï¿½ rï¿½ussie.
+     * @param  owner Fenêtre dans laquelle faire apparaître d'eventuels messages d'erreur.
+     * @return <code>true</code> si la prise en compte des paramètres à réussie.
      */
     private boolean commitEdit(final Component owner) {
         try {

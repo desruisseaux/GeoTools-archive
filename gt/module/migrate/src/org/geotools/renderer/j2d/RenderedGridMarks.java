@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -92,10 +92,10 @@ public class RenderedGridMarks extends RenderedMarks {
     private static final Shape DEFAULT_SHAPE_1D = MarkIterator.DEFAULT_SHAPE;
 
     /**
-     * Forme gï¿½omï¿½trique reprï¿½sentant une flï¿½che.  Le dï¿½but de cette flï¿½che
-     * est l'origine ï¿½ (0,0) et sa longueur est de 10 points. La flï¿½che est
-     * pointï¿½e dans la direction des <var>x</var> positifs (soit ï¿½ un angle
-     * de 0 radians arithmï¿½tiques).
+     * Forme géométrique représentant une flèche.  Le début de cette flèche
+     * est l'origine à (0,0) et sa longueur est de 10 points. La flèche est
+     * pointée dans la direction des <var>x</var> positifs (soit à un angle
+     * de 0 radians arithmétiques).
      */
     private static final Shape DEFAULT_SHAPE_2D = new Arrow2D(0, -2.5, 10, 5);
 
@@ -132,29 +132,29 @@ public class RenderedGridMarks extends RenderedMarks {
     private int bandX, bandY;
 
     /**
-     * Nombre de points ï¿½ dï¿½cimer selon l'axe des <var>x</var> et des <var>y</var>.
-     * Ce nombre doit ï¿½tre supï¿½rieur ï¿½ 0. La valeur <code>1</code> signifie qu'aucune
-     * dï¿½cimation ne sera faite.
+     * Nombre de points à décimer selon l'axe des <var>x</var> et des <var>y</var>.
+     * Ce nombre doit être supérieur à 0. La valeur <code>1</code> signifie qu'aucune
+     * décimation ne sera faite.
      */
     private int decimateX=1, decimateY=1;
 
     /**
-     * Espace minimal (en points) ï¿½ laisser entre les points de la grille selon les axes
-     * <var>x</var> et <var>y</var>. La valeur 0 dï¿½sactive la dï¿½cimation selon cet axe.
+     * Espace minimal (en points) à laisser entre les points de la grille selon les axes
+     * <var>x</var> et <var>y</var>. La valeur 0 désactive la décimation selon cet axe.
      */
     private int spaceX=0, spaceY=0;
 
     /**
-     * Indique si la dï¿½cimation est active. Ce champ prend la valeur <code>true</code>
-     * si <code>decimateX</code> ou <code>decimateY</code> sont supï¿½rieurs ï¿½ 1.
+     * Indique si la décimation est active. Ce champ prend la valeur <code>true</code>
+     * si <code>decimateX</code> ou <code>decimateY</code> sont supérieurs à 1.
      */
     private boolean decimate = false;
 
     /**
-     * Indique si la dï¿½cimation automatique est active. Ce champ prend la
+     * Indique si la décimation automatique est active. Ce champ prend la
      * valeur <code>true</code> lorsque {@link #setAutoDecimation} est
-     * appellï¿½e et que <code>spaceX</code> ou <code>spaceY</code> sont
-     * supï¿½rieurs ï¿½ 0.
+     * appellée et que <code>spaceX</code> ou <code>spaceY</code> sont
+     * supérieurs à 0.
      */
     private boolean autoDecimate = false;
 
@@ -165,7 +165,7 @@ public class RenderedGridMarks extends RenderedMarks {
     private MathTransform2D gridToCoordinateSystem = MathTransform2D.IDENTITY;
 
     /**
-     * Couleur des flï¿½ches.
+     * Couleur des flèches.
      */
     private Paint markPaint = MarkIterator.DEFAULT_COLOR;
 
@@ -192,12 +192,12 @@ public class RenderedGridMarks extends RenderedMarks {
     private SampleDimension mainSD;
 
     /**
-     * Buffer temporaire pour l'ï¿½criture des "tooltip".
+     * Buffer temporaire pour l'écriture des "tooltip".
      */
     private transient StringBuffer buffer;
 
     /**
-     * Objet ï¿½ utiliser pour l'ï¿½criture des angles.
+     * Objet à utiliser pour l'écriture des angles.
      */
     private transient AngleFormat angleFormat;
 
@@ -478,13 +478,13 @@ public class RenderedGridMarks extends RenderedMarks {
     }
 
     /**
-     * Dï¿½cime automatiquement les points de la grille de faï¿½on ï¿½ conserver un espace
+     * Décime automatiquement les points de la grille de façon à conserver un espace
      * d'au moins <code>spaceX</code> et <code>spaceY</code> entre chaque point.
      *
-     * @param spaceX Espace minimal (en points) selon <var>x</var> ï¿½ laisser entre les
-     *        points de la grille. La valeur 0 dï¿½sactive la dï¿½cimation selon cet axe.
-     * @param spaceY Espace minimal (en points) selon <var>y</var> ï¿½ laisser entre les
-     *        points de la grille. La valeur 0 dï¿½sactive la dï¿½cimation selon cet axe.
+     * @param spaceX Espace minimal (en points) selon <var>x</var> à laisser entre les
+     *        points de la grille. La valeur 0 désactive la décimation selon cet axe.
+     * @param spaceY Espace minimal (en points) selon <var>y</var> à laisser entre les
+     *        points de la grille. La valeur 0 désactive la décimation selon cet axe.
      */
     public void setAutoDecimation(final int spaceX, final int spaceY) {
         if (spaceX < 0) {
@@ -606,8 +606,8 @@ public class RenderedGridMarks extends RenderedMarks {
     }
 
     /**
-     * Retourne le nombre de points de cette grille. Le nombre de point retournï¿½
-     * tiendra compte de la dï¿½cimation spï¿½cifiï¿½e avec {@link #setDecimation}.
+     * Retourne le nombre de points de cette grille. Le nombre de point retourné
+     * tiendra compte de la décimation spécifiée avec {@link #setDecimation}.
      */
     final int getCount() {
         assert Thread.holdsLock(getTreeLock());
@@ -696,7 +696,7 @@ public class RenderedGridMarks extends RenderedMarks {
                 visibleArea = CTSUtilities.transform(mapToCS, visibleArea, visibleArea);
             }
             // Note: on profite du fait que {@link Rectangle#setRect}
-            //       arrondie correctement vers les limites supï¿½rieures.
+            //       arrondie correctement vers les limites supérieures.
             final Rectangle bounds = (Rectangle) CTSUtilities.transform(
                                                  (MathTransform2D) gridToCoordinateSystem.inverse(),
                                                  visibleArea, new Rectangle());
@@ -714,10 +714,10 @@ public class RenderedGridMarks extends RenderedMarks {
     }
 
     /**
-     * Procï¿½de au traï¿½age des marques de cette grille.
+     * Procède au traçage des marques de cette grille.
      *
      * @throws TransformException si une projection
-     *         cartographique ï¿½tait nï¿½cessaire et a ï¿½chouï¿½e.
+     *         cartographique était nécessaire et a échouée.
      */
     protected void paint(final RenderingContext context) throws TransformException {
         if (autoDecimate) {
@@ -839,8 +839,8 @@ public class RenderedGridMarks extends RenderedMarks {
         }
 
         /**
-         * Indique si la marque ï¿½ l'index spï¿½cifiï¿½ est visible dans le clip spï¿½cifiï¿½.
-         * Le rectangle <code>clip</code> doit avoir ï¿½tï¿½ obtenu par {@link #getGridClip}.
+         * Indique si la marque à l'index spécifié est visible dans le clip spécifié.
+         * Le rectangle <code>clip</code> doit avoir été obtenu par {@link #getGridClip}.
          */
         final boolean visible(final Rectangle clip) {
             if (!visible()) {
@@ -855,7 +855,7 @@ public class RenderedGridMarks extends RenderedMarks {
         }
 
         /**
-         * Calcule les composantes <var>x</var> et <var>y</var> du vecteur ï¿½ l'index spï¿½cifiï¿½.
+         * Calcule les composantes <var>x</var> et <var>y</var> du vecteur à l'index spécifié.
          */
         private void compute() {
             assert Thread.holdsLock(getTreeLock());
@@ -891,12 +891,12 @@ public class RenderedGridMarks extends RenderedMarks {
         }
 
         /**
-         * Retourne les coordonnï¿½es (<var>x</var>,<var>y</var>) d'un point de la grille.
-         * Les coordonnï¿½es <var>x</var> et <var>y</var> seront exprimï¿½es selon le systï¿½me
-         * de coordonnï¿½es du {@linkplain #getGridCoverage grid coverage}.
+         * Retourne les coordonnées (<var>x</var>,<var>y</var>) d'un point de la grille.
+         * Les coordonnées <var>x</var> et <var>y</var> seront exprimées selon le système
+         * de coordonnées du {@linkplain #getGridCoverage grid coverage}.
          *
-         * Si une dï¿½cimation a ï¿½tï¿½ spï¿½cifiï¿½e avec la mï¿½thode {@link #setDecimation},
-         * alors la position retournï¿½e sera situï¿½e au milieu des points ï¿½ moyenner.
+         * Si une décimation a été spécifiée avec la méthode {@link #setDecimation},
+         * alors la position retournée sera située au milieu des points à moyenner.
          *
          * @throws TransformException if a transform was required and failed.
          */
@@ -916,10 +916,10 @@ public class RenderedGridMarks extends RenderedMarks {
         }
 
         /**
-         * Retourne l'amplitude ï¿½ la position d'une marque. Si une dï¿½cimation a ï¿½tï¿½ spï¿½cifiï¿½e avec
-         * la mï¿½thode {@link #setDecimation}, alors cette mï¿½thode calcule la moyenne vectorielle
-         * (la moyenne des composantes <var>x</var> et <var>y</var>) aux positions des marques ï¿½
-         * dï¿½cimer, et retourne l'amplitude du vecteur moyen.
+         * Retourne l'amplitude à la position d'une marque. Si une décimation a été spécifiée avec
+         * la méthode {@link #setDecimation}, alors cette méthode calcule la moyenne vectorielle
+         * (la moyenne des composantes <var>x</var> et <var>y</var>) aux positions des marques à
+         * décimer, et retourne l'amplitude du vecteur moyen.
          */
         public double amplitude() {
             assert Thread.holdsLock(getTreeLock());
@@ -935,10 +935,10 @@ public class RenderedGridMarks extends RenderedMarks {
         }
 
         /**
-         * Retourne la direction de la valeur d'une marque. Si une dï¿½cimation a ï¿½tï¿½ spï¿½cifiï¿½e avec
-         * la mï¿½thode {@link #setDecimation}, alors cette mï¿½thode calcule la moyenne vectorielle
-         * (la moyenne des composantes <var>x</var> et <var>y</var>) aux positions des marques ï¿½
-         * dï¿½cimer, et retourne la direction du vecteur moyen.
+         * Retourne la direction de la valeur d'une marque. Si une décimation a été spécifiée avec
+         * la méthode {@link #setDecimation}, alors cette méthode calcule la moyenne vectorielle
+         * (la moyenne des composantes <var>x</var> et <var>y</var>) aux positions des marques à
+         * décimer, et retourne la direction du vecteur moyen.
          */
         public double direction() {
             assert Thread.holdsLock(getTreeLock());
@@ -954,10 +954,10 @@ public class RenderedGridMarks extends RenderedMarks {
         }
 
         /**
-         * Retourne la forme gï¿½omï¿½trique servant de modï¿½le au traï¿½age des marques.
-         * Lorsque deux bandes sont utilisï¿½es, la forme par dï¿½faut sera une flï¿½che
-         * dont l'origine est ï¿½ (0,0) et qui pointe dans la direction des <var>x</var>
-         * positifs (soit ï¿½ un angle de 0 radians arithmï¿½tiques).
+         * Retourne la forme géométrique servant de modèle au traçage des marques.
+         * Lorsque deux bandes sont utilisées, la forme par défaut sera une flèche
+         * dont l'origine est à (0,0) et qui pointe dans la direction des <var>x</var>
+         * positifs (soit à un angle de 0 radians arithmétiques).
          *
          * @see RenderedGridMarks#getMarkShape
          * @see RenderedGridMarks#setMarkShape
@@ -1018,7 +1018,7 @@ public class RenderedGridMarks extends RenderedMarks {
                 buffer.append(label);
             } else {
                 if (angleFormat == null) {
-                    angleFormat = new AngleFormat("D.ddï¿½", locale);
+                    angleFormat = new AngleFormat("D.dd°", locale);
                 }
                 // Will be formatted as a number (because of 'Double' type).
                 buffer = angleFormat.format(new Double(amplitude), buffer, null);
@@ -1028,7 +1028,7 @@ public class RenderedGridMarks extends RenderedMarks {
                 angle = 90-Math.toDegrees(angle);
                 angle -= 360*Math.floor(angle/360);
                 if (angleFormat == null) {
-                    angleFormat = new AngleFormat("D.ddï¿½", locale);
+                    angleFormat = new AngleFormat("D.dd°", locale);
                 }
                 buffer.append("  ");
                 buffer = angleFormat.format(angle, buffer, null);

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -631,7 +631,7 @@ public class RenderedMapScale extends RenderedLegend {
             if ((i&1) != 0) {
                 /*
                  * Dans un rectangle sur deux, on dessinera un
-                 * rectangle noir ï¿½ l'intï¿½rieur du rectangle blanc.
+                 * rectangle noir à l'intérieur du rectangle blanc.
                  */
                 int space   = thickness-thicknessSub;
                 rect.height = thicknessSub;

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2003, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -39,29 +39,29 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**
- * Itï¿½rateur balayant les donnï¿½es d'un tableau {@link JTSArray}.
+ * Itérateur balayant les données d'un tableau {@link JTSArray}.
  *
  * @version $Id: JTSIterator.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
  */
 final class JTSIterator extends PointIterator {
     /**
-     * Tableau de donnï¿½es ï¿½ balayer.
+     * Tableau de données à balayer.
      */
     private final Coordinate[] coords;
 
     /**
-     * Index suivant celui de la derniï¿½re donnï¿½e ï¿½ balayer.
+     * Index suivant celui de la dernière donnée à balayer.
      */
     private final int upper;
 
     /**
-     * Index de la prochaine donnï¿½e ï¿½ retourner.
+     * Index de la prochaine donnée à retourner.
      */
     private int index;
 
     /**
-     * Construit un itï¿½rateur qui balaiera la plage spï¿½cifiï¿½e d'un tableau de donnï¿½es.
+     * Construit un itérateur qui balaiera la plage spécifiée d'un tableau de données.
      */
     public JTSIterator(Coordinate[] coords, int lower, int upper) {
         this.coords = coords;
@@ -70,7 +70,7 @@ final class JTSIterator extends PointIterator {
     }
 
     /**
-     * Indique si les mï¿½thodes {@link #next} peuvent retourner d'autres donnï¿½es.
+     * Indique si les méthodes {@link #next} peuvent retourner d'autres données.
      */
     public boolean hasNext() {
         return index < upper;
@@ -78,8 +78,8 @@ final class JTSIterator extends PointIterator {
 
     /**
      * Retourne la valeur de la longitude courante. Avant d'appeller
-     * une seconde fois cette mï¿½thode, il faudra <g>obligatoirement</g>
-     * avoir appelï¿½ {@link #nextY}.
+     * une seconde fois cette méthode, il faudra <g>obligatoirement</g>
+     * avoir appelé {@link #nextY}.
      */
     public float nextX() {
         return (float)coords[index].x;
@@ -87,8 +87,8 @@ final class JTSIterator extends PointIterator {
 
     /**
      * Retourne la valeur de la latitude courante, puis avance au point
-     * suivant. Chaque appel de cette mï¿½thode doit <g>obligatoirement</g>
-     * avoir ï¿½tï¿½ prï¿½cï¿½dï¿½e d'un appel ï¿½ la mï¿½thode {@link #nextX}.
+     * suivant. Chaque appel de cette méthode doit <g>obligatoirement</g>
+     * avoir été précédée d'un appel à la méthode {@link #nextX}.
      */
     public float nextY() {
         return (float)coords[index++].y;
@@ -96,7 +96,7 @@ final class JTSIterator extends PointIterator {
 
     /**
      * Retourne la valeur du point courant dans un objet {@link Point2D},
-     * puis avance au point suivant. Cette mï¿½thode combine un appel de
+     * puis avance au point suivant. Cette méthode combine un appel de
      * {@link #nextX} suivit de {@link #nextY}.
      */
     public Object next() {

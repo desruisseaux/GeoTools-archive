@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2000, Institut de Recherche pour le Développement
+ * (C) 1999, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -545,9 +545,9 @@ public class ColorBar extends JComponent {
         Rectangle2D labelBounds=null;
         if (labelVisibles && graduation!=null) {
             /*
-             * Prï¿½pare l'ï¿½criture de la graduation. On vï¿½rifie quelle longueur
-             * (en pixels) a la rampe de couleurs et on calcule les coï¿½fficients
-             * qui permettront de convertir les valeurs logiques en coordonnï¿½es
+             * Prépare l'écriture de la graduation. On vérifie quelle longueur
+             * (en pixels) a la rampe de couleurs et on calcule les coéfficients
+             * qui permettront de convertir les valeurs logiques en coordonnées
              * pixels.
              */
             double x = bounds.getCenterX();
@@ -572,7 +572,7 @@ public class ColorBar extends JComponent {
             hints.put(Graduation.VISUAL_AXIS_LENGTH, new Float((float)visualLength));
             graphics.setColor(getForeground());
             /*
-             * Procï¿½de ï¿½ l'ï¿½criture de la graduation.
+             * Procède à l'écriture de la graduation.
              */
             for (final TickIterator ticks = reuse = graduation.getTickIterator(hints, reuse);
                                                     ticks.hasNext(); ticks.nextMajor())
@@ -601,7 +601,7 @@ public class ColorBar extends JComponent {
                 }
             }
             /*
-             * Ecrit les unitï¿½s.
+             * Ecrit les unités.
              */
             if (units != null) {
                 final GlyphVector glyph = font.createGlyphVector(context, units);
@@ -741,8 +741,8 @@ public class ColorBar extends JComponent {
 
     /**
      * Classe ayant la charge de dessiner la rampe de couleurs, ainsi que
-     * de calculer l'espace qu'elle occupe. Cette classe peut aussi rï¿½agir
-     * ï¿½ certains ï¿½vï¿½nements.
+     * de calculer l'espace qu'elle occupe. Cette classe peut aussi réagir
+     * à certains événements.
      *
      * @version $Id: ColorBar.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
      * @author Martin Desruisseaux
@@ -757,7 +757,7 @@ public class ColorBar extends JComponent {
         }
 
         /**
-         * Retourne la dimension prï¿½fï¿½rï¿½e de cette rampe de couleurs.
+         * Retourne la dimension préférée de cette rampe de couleurs.
          */
         public Dimension getPreferredSize(final JComponent c) {
             return (((ColorBar) c).horizontal) ? new Dimension(256,16)
@@ -765,11 +765,11 @@ public class ColorBar extends JComponent {
         }
 
         /**
-         * Dessine la rampe de couleurs vers le graphique spï¿½cifiï¿½.  Cette mï¿½thode a
-         * l'avantage d'ï¿½tre appelï¿½e automatiquement par <i>Swing</i> avec une copie
-         * d'un objet {@link Graphics}, ce qui nous ï¿½vite d'avoir ï¿½ le remettre dans
-         * son ï¿½tat initial lorsqu'on a terminï¿½ le traï¿½age de la rampe de couleurs.
-         * On n'a pas cet avantage lorsque l'on ne fait que redï¿½finir
+         * Dessine la rampe de couleurs vers le graphique spécifié.  Cette méthode a
+         * l'avantage d'être appelée automatiquement par <i>Swing</i> avec une copie
+         * d'un objet {@link Graphics}, ce qui nous évite d'avoir à le remettre dans
+         * son état initial lorsqu'on a terminé le traçage de la rampe de couleurs.
+         * On n'a pas cet avantage lorsque l'on ne fait que redéfinir
          * {@link JComponent#paintComponent}.
          */
         public void paint(final Graphics graphics, final JComponent component) {
@@ -783,8 +783,8 @@ public class ColorBar extends JComponent {
         }
 
         /**
-         * Mï¿½thode appelï¿½e automatiquement chaque
-         * fois qu'une propriï¿½tï¿½ de l'axe a changï¿½e.
+         * Méthode appelée automatiquement chaque
+         * fois qu'une propriété de l'axe a changée.
          */
         public void propertyChange(final PropertyChangeEvent event) {
             repaint();

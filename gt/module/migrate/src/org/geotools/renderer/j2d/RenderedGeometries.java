@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -785,7 +785,7 @@ public class RenderedGeometries extends RenderedLayer {
      * Returns a tool tip text for the specified coordinates.
      * The default implementation delegates to {@link GeometryCollection#getPolygonName}.
      *
-     * @param  event The mouve event with geographic coordinï¿½tes.
+     * @param  event The mouve event with geographic coordinétes.
      * @return The tool tip text, or <code>null</code> if there
      *         in no tool tips for this location.
      */

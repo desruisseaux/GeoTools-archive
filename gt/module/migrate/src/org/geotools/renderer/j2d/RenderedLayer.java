@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1998, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -113,18 +113,18 @@ public abstract class RenderedLayer {
     private transient Shape dirtyArea;
 
     /**
-     * Forme gï¿½omï¿½trique englobant la rï¿½gion dans laquelle la couche a ï¿½tï¿½ dessinï¿½e lors du
-     * dernier appel de la mï¿½thode {@link #paint}.  Les coordonnï¿½es de cette rï¿½gion doivent
-     * ï¿½tre en exprimï¿½es en coordonnï¿½es de Java2D ({@link RenderingContext#textCS}).
-     * La valeur <code>null</code> signifie qu'on peut considï¿½rer que cette couche occupe la
-     * totalitï¿½ de la surface dessinable.
+     * Forme géométrique englobant la région dans laquelle la couche a été dessinée lors du
+     * dernier appel de la méthode {@link #paint}.  Les coordonnées de cette région doivent
+     * être en exprimées en coordonnées de Java2D ({@link RenderingContext#textCS}).
+     * La valeur <code>null</code> signifie qu'on peut considérer que cette couche occupe la
+     * totalité de la surface dessinable.
      */
     private transient Shape paintedArea;
 
     /**
-     * Coordonnï¿½es gï¿½ographiques couvertes par cette couche. Ces coordonnï¿½es doivent
-     * ï¿½tre exprimï¿½ees selon le systï¿½me de coordonnï¿½es <code>coordinateSystem</code>.
-     * Une valeur nulle signifie que cette couche n'a pas de limites bien dï¿½limitï¿½es.
+     * Coordonnées géographiques couvertes par cette couche. Ces coordonnées doivent
+     * être expriméees selon le système de coordonnées <code>coordinateSystem</code>.
+     * Une valeur nulle signifie que cette couche n'a pas de limites bien délimitées.
      *
      * @see #getPreferredArea
      * @see #setPreferredArea
@@ -132,8 +132,8 @@ public abstract class RenderedLayer {
     private Rectangle2D preferredArea;
 
     /**
-     * Dimension prï¿½fï¿½rï¿½e des pixels pour un zoom rapprochï¿½. Une valeur
-     * nulle signifie qu'aucune dimension prï¿½fï¿½rï¿½e n'a ï¿½tï¿½ spï¿½cifiï¿½e.
+     * Dimension préférée des pixels pour un zoom rapproché. Une valeur
+     * nulle signifie qu'aucune dimension préférée n'a été spécifiée.
      *
      * @see #getPreferredPixelSize
      * @see #setPreferredPixelSize
@@ -141,15 +141,15 @@ public abstract class RenderedLayer {
     private Dimension2D preferredPixelSize;
 
     /**
-     * Largeur par dï¿½faut des lignes ï¿½ tracer. La valeur <code>null</code>
-     * signifie que cette largeur doit ï¿½tre recalculï¿½e. Cette largeur sera
-     * dï¿½terminï¿½e ï¿½ partir de la valeur de {@link #preferredPixelSize}.
+     * Largeur par défaut des lignes à tracer. La valeur <code>null</code>
+     * signifie que cette largeur doit être recalculée. Cette largeur sera
+     * déterminée à partir de la valeur de {@link #preferredPixelSize}.
      */
     private transient Stroke stroke;
 
     /**
-     * Indique si cette couche est visible. Les couches sont invisibles par dï¿½faut.
-     * L'appel de {@link Renderer#addLayer(RenderedLayer)} appelera systï¿½matiquement
+     * Indique si cette couche est visible. Les couches sont invisibles par défaut.
+     * L'appel de {@link Renderer#addLayer(RenderedLayer)} appelera systématiquement
      * <code>setVisible(true)</code>.
      *
      * @see #setVisible
@@ -157,13 +157,13 @@ public abstract class RenderedLayer {
     private boolean visible;
 
     /**
-     * Ordre <var>z</var> ï¿½ laquelle cette couche doit ï¿½tre dessinï¿½e. Les couches avec un
-     * <var>z</var> ï¿½levï¿½ seront dessinï¿½es par dessus les couches avec un <var>z</var> bas.
-     * Typiquement, cet ordre <var>z</var> devrait ï¿½tre l'altitude en mï¿½tres de la couche
-     * (par exemple -30 pour l'isobath ï¿½ 30 mï¿½tres de profondeur). La valeur
+     * Ordre <var>z</var> à laquelle cette couche doit être dessinée. Les couches avec un
+     * <var>z</var> élevé seront dessinées par dessus les couches avec un <var>z</var> bas.
+     * Typiquement, cet ordre <var>z</var> devrait être l'altitude en mètres de la couche
+     * (par exemple -30 pour l'isobath à 30 mètres de profondeur). La valeur
      * {@link Float#POSITIVE_INFINITY} fait dessiner une couche par dessus tout le reste,
      * tandis que la valeur {@link Float#NEGATIVE_INFINITY} la fait dessiner en dessous.
-     * La valeur {@link Float#NaN} signifie que l'ordre z n'a pas encore ï¿½tï¿½ dï¿½fini.
+     * La valeur {@link Float#NaN} signifie que l'ordre z n'a pas encore été défini.
      *
      * @see #getZOrder
      * @see #setZOrder
@@ -506,9 +506,9 @@ public abstract class RenderedLayer {
     }
 
     /**
-     * Spï¿½cifie si cette couche doit ï¿½tre visible ou non. Cette mï¿½thode peut ï¿½tre
-     * appelï¿½e pour cacher momentanï¿½ment une couche. Elle est aussi appelï¿½e de
-     * faï¿½on systï¿½matique lorsque cette couche est ajoutï¿½e ou retirï¿½e d'un
+     * Spécifie si cette couche doit être visible ou non. Cette méthode peut être
+     * appelée pour cacher momentanément une couche. Elle est aussi appelée de
+     * façon systématique lorsque cette couche est ajoutée ou retirée d'un
      * {@link Renderer}:
      *
      * <ul>
@@ -574,11 +574,11 @@ public abstract class RenderedLayer {
     }
 
     /**
-     * Indique qu'une partie de cette couche a besoin d'ï¿½tre redï¿½ssinï¿½e.
-     * Cette mï¿½thode peut ï¿½tre appelï¿½e ï¿½ partir de n'importe quel thread
-     * (pas nï¿½cessairement celui de <i>Swing</i>).
+     * Indique qu'une partie de cette couche a besoin d'être redéssinée.
+     * Cette méthode peut être appelée à partir de n'importe quel thread
+     * (pas nécessairement celui de <i>Swing</i>).
      *
-     * @param bounds Coordonnï¿½es (en points) de la partie ï¿½ redessiner.
+     * @param bounds Coordonnées (en points) de la partie à redessiner.
      */
     final void repaintComponent(final Rectangle bounds) {
         /*
@@ -668,7 +668,7 @@ public abstract class RenderedLayer {
      * <blockquote><pre>
      * &nbsp;Shape paint(RenderingContext context) {
      * &nbsp;    Graphics2D graphics = context.getGraphics();
-     * &nbsp;    // <cite>Paint here map features in geographic coordinates (usually m or ï¿½)</cite>
+     * &nbsp;    // <cite>Paint here map features in geographic coordinates (usually m or °)</cite>
      * &nbsp;    context.addPaintedArea(...); // Optional
      * &nbsp;
      * &nbsp;    context.setCoordinateSystem(context.textCS);
@@ -749,7 +749,7 @@ public abstract class RenderedLayer {
      * mouse coordinate (this is {@link MouseCoordinateFormat#format(GeoMouseEvent)} business).
      * Instead, it is invoked for formatting a value at current mouse position. For example a
      * remote sensing image of Sea Surface Temperature (SST) can format the temperature in
-     * geophysical units (e.g. "12ï¿½C"). The default implementation do nothing and returns
+     * geophysical units (e.g. "12°C"). The default implementation do nothing and returns
      * <code>false</code>.
      *
      * @param  event The mouse event.
@@ -765,19 +765,19 @@ public abstract class RenderedLayer {
     }
 
     /**
-     * Retourne le texte ï¿½ afficher dans une bulle lorsque la souris traï¿½ne sur la couche.
-     * L'implï¿½mentation par dï¿½faut retourne toujours <code>null</code>, ce qui signifie que
-     * cette couche n'a aucun texte ï¿½ afficher (les autres couches seront alors interrogï¿½es).
-     * Les classes dï¿½rivï¿½es peuvent redï¿½finir cette mï¿½thode pour retourner un texte aprï¿½s avoir
-     * vï¿½rifiï¿½ que les coordonnï¿½es de <code>event</code> correspondent bien ï¿½ un point de la
+     * Retourne le texte à afficher dans une bulle lorsque la souris traîne sur la couche.
+     * L'implémentation par défaut retourne toujours <code>null</code>, ce qui signifie que
+     * cette couche n'a aucun texte à afficher (les autres couches seront alors interrogées).
+     * Les classes dérivées peuvent redéfinir cette méthode pour retourner un texte après avoir
+     * vérifié que les coordonnées de <code>event</code> correspondent bien à un point de la
      * couche.
      *
      * <strong>Note: This method is not a commited part of the API.
      *         It may moves elsewhere in a future version.</strong>
      *
-     * @param  event Coordonnï¿½es du curseur de la souris.
-     * @return Le texte ï¿½ afficher lorsque la souris traï¿½ne sur la couche.
-     *         Ce texte peut ï¿½tre nul pour signifier qu'il ne faut rien ï¿½crire.
+     * @param  event Coordonnées du curseur de la souris.
+     * @return Le texte à afficher lorsque la souris traîne sur la couche.
+     *         Ce texte peut être nul pour signifier qu'il ne faut rien écrire.
      *
      * @see Renderer#getToolTipText
      */
@@ -962,12 +962,12 @@ public abstract class RenderedLayer {
     }
 
     /**
-     * Efface les donnï¿½es qui avaient ï¿½tï¿½ conservï¿½es dans une cache interne. L'appel
-     * de cette mï¿½thode permettra de libï¿½rer un peu de mï¿½moire ï¿½ d'autres fins. Elle
-     * sera appelï¿½e lorsque qu'on aura dï¿½terminï¿½ que la couche <code>this</code>  ne
-     * sera plus affichï¿½e avant un certain temps.  Cette mï¿½thode ne doit pas changer
-     * le paramï¿½trage de cette couche; son seul impact sera de rendre le prochain
-     * traï¿½age un peu plus lent.
+     * Efface les données qui avaient été conservées dans une cache interne. L'appel
+     * de cette méthode permettra de libérer un peu de mémoire à d'autres fins. Elle
+     * sera appelée lorsque qu'on aura déterminé que la couche <code>this</code>  ne
+     * sera plus affichée avant un certain temps.  Cette méthode ne doit pas changer
+     * le paramétrage de cette couche; son seul impact sera de rendre le prochain
+     * traçage un peu plus lent.
      */
     void clearCache() {
         assert Thread.holdsLock(getTreeLock());

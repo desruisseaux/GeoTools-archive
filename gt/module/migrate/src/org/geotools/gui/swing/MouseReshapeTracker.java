@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -219,7 +219,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * unlike {@link #adjustingSides}, it designates an edge of the shape
      * {@link #logicalShape} and not an edge of the shape in pixels appearing
      * on the screen. It is different, for example, if the affine transform
-     * {@link #transform} contains a 90ï¿½ rotation.
+     * {@link #transform} contains a 90° rotation.
      */
     private transient int adjustingLogicalSides;
 
@@ -358,7 +358,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     private void update() {
         /*
          * Takes into account cases where the affine transform
-         * contains a rotation of 90ï¿½ or any other.
+         * contains a rotation of 90° or any other.
          */
         adjustingLogicalSides = inverseTransform(adjustingSides);
         /*
@@ -1023,7 +1023,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
                         e.consume();
                     }
                 } catch (NoninvertibleTransformException exception) {
-                    // Pas besoin de gï¿½rer cette exception.
+                    // Pas besoin de gérer cette exception.
                     // L'ignorer est correct.
                 }
             }

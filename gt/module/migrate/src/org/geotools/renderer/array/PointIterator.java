@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
- * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
+ * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 1999, Pêches et Océans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,12 +28,12 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * Itï¿½rateur balayant les donnï¿½es d'un tableau {@link PointArray}. Cet itï¿½rateur est obtenu par
- * un appel ï¿½ {@link PointArray#iterator}.  Le balayage se fait gï¿½nï¿½ralement par des appels aux
- * aux mï¿½thodes {@link #nextX} et {@link #nextY}, qui retournent les donnï¿½es sous forme de nombres
- * rï¿½els <code>float</code>. Toutefois, ces mï¿½thodes <g>doivent toujours</g> ï¿½tre appellï¿½es dans
- * cet ordre: {@link #nextX} d'abord, suivit de {@link #nextY}. Tout manquement ï¿½ cette rï¿½gle (par
- * exemple appeller {@link #nextX} deux fois de suite) peut produire des rï¿½sultats erronï¿½es.
+ * Itérateur balayant les données d'un tableau {@link PointArray}. Cet itérateur est obtenu par
+ * un appel à {@link PointArray#iterator}.  Le balayage se fait généralement par des appels aux
+ * aux méthodes {@link #nextX} et {@link #nextY}, qui retournent les données sous forme de nombres
+ * réels <code>float</code>. Toutefois, ces méthodes <g>doivent toujours</g> être appellées dans
+ * cet ordre: {@link #nextX} d'abord, suivit de {@link #nextY}. Tout manquement à cette règle (par
+ * exemple appeller {@link #nextX} deux fois de suite) peut produire des résultats erronées.
  *
  * @version $Id: PointIterator.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
@@ -44,33 +44,33 @@ import org.opengis.util.Cloneable;
  */
 public abstract class PointIterator implements Iterator, Cloneable {
     /**
-     * Constructeur par dï¿½faut.
+     * Constructeur par défaut.
      */
     protected PointIterator() {
     }
 
     /**
-     * Indique si les mï¿½thodes {@link #next} peuvent retourner d'autres donnï¿½es.
+     * Indique si les méthodes {@link #next} peuvent retourner d'autres données.
      */
     public abstract boolean hasNext();
 
     /**
      * Retourne la valeur de la longitude courante. Avant d'appeller
-     * une seconde fois cette mï¿½thode, il faudra <g>obligatoirement</g>
-     * avoir appelï¿½ {@link #nextY}.
+     * une seconde fois cette méthode, il faudra <g>obligatoirement</g>
+     * avoir appelé {@link #nextY}.
      */
     public abstract float nextX();
 
     /**
      * Retourne la valeur de la latitude courante, puis avance au point
-     * suivant. Chaque appel de cette mï¿½thode doit <g>obligatoirement</g>
-     * avoir ï¿½tï¿½ prï¿½cï¿½dï¿½e d'un appel ï¿½ la mï¿½thode {@link #nextX}.
+     * suivant. Chaque appel de cette méthode doit <g>obligatoirement</g>
+     * avoir été précédée d'un appel à la méthode {@link #nextX}.
      */
     public abstract float nextY();
 
     /**
      * Retourne la valeur du point courant dans un objet {@link Point2D},
-     * puis avance au point suivant. Cette mï¿½thode combine un appel de
+     * puis avance au point suivant. Cette méthode combine un appel de
      * {@link #nextX} suivit de {@link #nextY}.
      */
     public Object next() {
@@ -78,17 +78,17 @@ public abstract class PointIterator implements Iterator, Cloneable {
     }
 
     /**
-     * Opï¿½ration non-supportï¿½e.
+     * Opération non-supportée.
      */
     public final void remove() {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Retourne une copie conforme de cet itï¿½rateur. Cette
-     * copie peut ï¿½tre utile pour balayer une seconde fois
-     * les mï¿½mes donnï¿½es ï¿½ partir du point oï¿½ se trouve cet
-     * itï¿½rateur.
+     * Retourne une copie conforme de cet itérateur. Cette
+     * copie peut être utile pour balayer une seconde fois
+     * les mêmes données à partir du point où se trouve cet
+     * itérateur.
      */
     public final Object clone() {
         try {
