@@ -1,4 +1,19 @@
-/* *    Geotools2 - OpenSource mapping toolkit *    http://geotools.org *    (C) 2002, Geotools Project Managment Committee (PMC) * *    This library is free software; you can redistribute it and/or *    modify it under the terms of the GNU Lesser General Public *    License as published by the Free Software Foundation; *    version 2.1 of the License. * *    This library is distributed in the hope that it will be useful, *    but WITHOUT ANY WARRANTY; without even the implied warranty of *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU *    Lesser General Public License for more details. * */
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.data.oracle;
 
 import org.geotools.data.DataSource;
@@ -42,14 +57,20 @@ public class OracleDataSourceFactory implements DataSourceFactorySpi {
             return null;
         }
 
-        /* There are no defaults here. Calling canProcess verifies that         * all these variables exist.         */
+        /* There are no defaults here. Calling canProcess verifies that
+         * all these variables exist.
+         */
         String host = (String) params.get("host");
         String port = (String) params.get("port");
         String instance = (String) params.get("instance");
         String user = (String) params.get("user");
         String passwd = (String) params.get("passwd");
         String tableName = (String) params.get("table");
-        String fidDefault = (String) params.get("fiddefault");        if (fidDefault == null) {            fidDefault = "OBJECTID";        }        
+        String fidDefault = (String) params.get("fiddefault");
+        if (fidDefault == null) {
+            fidDefault = "OBJECTID";
+        }
+        
         try {
             OracleConnectionFactory ocFactory = new OracleConnectionFactory(host, port, instance);
             ocFactory.setLogin(user, passwd);
@@ -111,6 +132,14 @@ public class OracleDataSourceFactory implements DataSourceFactorySpi {
      * @return True if all the required parameters are supplied.
      */
     public boolean canProcess(Map params) {
-        //J-        return (params.containsKey("dbtype")             && params.get("dbtype").equals("oracle")             && params.containsKey("host")             && params.containsKey("port")             && params.containsKey("passwd")             && params.containsKey("instance")             && params.containsKey("table"));        //J+
+        //J-
+        return (params.containsKey("dbtype") 
+            && params.get("dbtype").equals("oracle") 
+            && params.containsKey("host") 
+            && params.containsKey("port") 
+            && params.containsKey("passwd") 
+            && params.containsKey("instance") 
+            && params.containsKey("table"));
+        //J+
     }
 }

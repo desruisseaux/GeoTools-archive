@@ -492,7 +492,9 @@ public class SQLEncoderOracle extends SQLEncoder {
         }
     }
 
-    /* (non-Javadoc)     * @see org.geotools.filter.SQLEncoder#visit(org.geotools.filter.AttributeExpression)     */
+    /* (non-Javadoc)
+     * @see org.geotools.filter.SQLEncoder#visit(org.geotools.filter.AttributeExpression)
+     */
     public void visit(AttributeExpression ae) throws RuntimeException {
         super.visit(ae);
 

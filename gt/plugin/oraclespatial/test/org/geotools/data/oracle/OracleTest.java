@@ -1,7 +1,57 @@
-/* *    Geotools2 - OpenSource mapping toolkit *    http://geotools.org *    (C) 2002, Geotools Project Managment Committee (PMC) * *    This library is free software; you can redistribute it and/or *    modify it under the terms of the GNU Lesser General Public *    License as published by the Free Software Foundation; *    version 2.1 of the License. * *    This library is distributed in the hope that it will be useful, *    but WITHOUT ANY WARRANTY; without even the implied warranty of *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU *    Lesser General Public License for more details. * */
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
 package org.geotools.data.oracle;
 
-import java.io.FileInputStream;import java.math.BigDecimal;import java.sql.ResultSet;import java.sql.Statement;import java.util.Iterator;import java.util.Properties;import java.util.Set;import junit.framework.Test;import junit.framework.TestCase;import junit.framework.TestSuite;import junit.textui.TestRunner;import oracle.jdbc.OracleConnection;import org.geotools.data.DataSource;import org.geotools.data.DataSourceMetaData;import org.geotools.data.DefaultQuery;import org.geotools.data.Query;import org.geotools.data.jdbc.ConnectionPoolManager;import org.geotools.feature.Feature;import org.geotools.feature.FeatureCollection;import org.geotools.feature.FeatureCollections;import org.geotools.feature.FeatureIterator;import org.geotools.feature.FeatureType;import org.geotools.filter.AbstractFilter;import org.geotools.filter.CompareFilter;import org.geotools.filter.Expression;import org.geotools.filter.FilterFactory;import org.geotools.filter.GeometryFilter;import org.geotools.filter.LikeFilter;import com.vividsolutions.jts.geom.Coordinate;import com.vividsolutions.jts.geom.Envelope;import com.vividsolutions.jts.geom.Geometry;import com.vividsolutions.jts.geom.GeometryFactory;import com.vividsolutions.jts.geom.Point;
+import java.io.FileInputStream;
+import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+import oracle.jdbc.OracleConnection;
+
+import org.geotools.data.DataSource;
+import org.geotools.data.DataSourceMetaData;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.Query;
+import org.geotools.data.jdbc.ConnectionPoolManager;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.LikeFilter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 /**
  * Tests the OracleDataSource. The oracle datasource does not have a publically available instance,
  * so the sql script in oraclespatial/tests/unit/testData named testData.sql needs to be run on
@@ -52,7 +102,9 @@ public class OracleTest extends TestCase {
     }
 
     public void tearDown() throws Exception {
-        conn.close();        ConnectionPoolManager manager = ConnectionPoolManager.getInstance();        manager.closeAll();
+        conn.close();
+        ConnectionPoolManager manager = ConnectionPoolManager.getInstance();
+        manager.closeAll();
     }
 
     public void testGetFeatures() throws Exception {
@@ -61,7 +113,8 @@ public class OracleTest extends TestCase {
     }
 
     public void testMaxFeatures() throws Exception {
-        DefaultQuery query = new DefaultQuery();        query.setTypeName("ORA_TEST_POINTS");
+        DefaultQuery query = new DefaultQuery();
+        query.setTypeName("ORA_TEST_POINTS");
         query.setMaxFeatures(3);
         FeatureCollection collection = ds.getFeatures(query);
         assertEquals(3, collection.size());
@@ -283,5 +336,7 @@ public class OracleTest extends TestCase {
         Feature feature = iter.next();
         FeatureType type = feature.getFeatureType();
         assertEquals(2, type.getAttributeCount());
-    }        
+    }
+    
+    
 }
