@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="Core">
-  <title>Core</title>
+<project name="main">
+  <title>geotools-main</title>
   <body>
     <links>
-      <item name="modules.geotools.org/core" href="http://modules.geotools.org/core"></item>
       <item name="modules.geotools.org" href="http://modules.geotools.org"></item>
       <item name="geotools.org" href="http://www.geotools.org"></item>
     </links>
