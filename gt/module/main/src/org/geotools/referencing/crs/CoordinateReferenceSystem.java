@@ -79,8 +79,8 @@ public class CoordinateReferenceSystem extends ReferenceSystem
     protected final Datum datum;
 
     /**
-     * Constructs a coordinate reference system from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs a coordinate reference system from a set of properties. The properties are given
+     * unchanged to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

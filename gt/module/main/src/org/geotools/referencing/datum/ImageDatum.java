@@ -55,7 +55,6 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
 
     /**
      * Construct an image datum from a name.
-     * The properties map is given unchanged to the superclass constructor.
      *
      * @param name The datum name.
      * @param pixelInCell the way the image grid is associated with the image data attributes.
@@ -65,8 +64,8 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
     }
 
     /**
-     * Construct an image datum from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct an image datum from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Datum#Datum(Map) super-class constructor}.
      *
      * @param properties  Set of properties. Should contains at least <code>"name"</code>.
      * @param pixelInCell the way the image grid is associated with the image data attributes.

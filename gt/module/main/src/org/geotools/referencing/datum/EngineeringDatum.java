@@ -60,7 +60,6 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
 
     /**
      * Construct an engineering datum from a name.
-     * The properties map is given unchanged to the superclass constructor.
      *
      * @param name The datum name.
      */
@@ -69,8 +68,8 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
     }
 
     /**
-     * Construct an engineering datum from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct an engineering datum from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Datum#Datum(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      */

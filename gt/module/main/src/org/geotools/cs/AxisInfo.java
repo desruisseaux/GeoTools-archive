@@ -44,7 +44,6 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * and indicate the orientation.
  *
  * @version $Id$
- * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_AxisInfo
@@ -63,7 +62,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * is usually used with projected coordinate
      * systems.
      *
-     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#X}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#X}.
      */
     public static final AxisInfo X = new AxisInfo("x", AxisOrientation.EAST);
     
@@ -73,7 +72,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * is usually used with projected coordinate
      * systems.
      *
-     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#Y}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#Y}.
      */
     public static final AxisInfo Y = new AxisInfo("y", AxisOrientation.NORTH);
     
@@ -83,7 +82,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * This is usually used with geographic
      * coordinate systems.
      *
-     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#LONGITUDE}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#LONGITUDE}.
      */
     public static final AxisInfo LONGITUDE = new AxisInfo.Localized("Longitude", ResourceKeys.LONGITUDE, AxisOrientation.EAST);
     
@@ -93,7 +92,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * This is usually used with geographic
      * coordinate systems.
      *
-     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#LATITUDE}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#LATITUDE}.
      */
     public static final AxisInfo LATITUDE = new AxisInfo.Localized("Latitude", ResourceKeys.LATITUDE, AxisOrientation.NORTH);
     
@@ -101,7 +100,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * The default axis for altitude values.
      * Increasing ordinates values go up.
      *
-     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#ALTITUDE}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#ALTITUDE}.
      */
     public static final AxisInfo ALTITUDE = new AxisInfo.Localized("Altitude", ResourceKeys.ALTITUDE, AxisOrientation.UP);
     
@@ -109,7 +108,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * A default axis for time values.
      * Increasing time go toward future.
      *
-     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#TIME}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#TIME}.
      */
     public static final AxisInfo TIME = new AxisInfo.Localized("Time", ResourceKeys.TIME, AxisOrientation.FUTURE);
     

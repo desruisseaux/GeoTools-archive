@@ -130,8 +130,8 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      *        x<sub>1</sub>, y<sub>1</sub>, z<sub>1</sub>...,
      *        x<sub>n</sub>, y<sub>n</sub>, z<sub>n</sub>]</code>.
      *
-     * The transformed points <code>(x',y',z')</code> are computed as below
-     * (note that this computation is similar to {@link PerspectiveTransform}):
+     * The transformed points <code>(x',y',z')</code> are computed as below (note that
+     * this computation is similar to {@link javax.media.jai.PerspectiveTransform}):
      *
      * <blockquote><pre>
      * [ u ]     [ m<sub>00</sub>  m<sub>01</sub>  m<sub>02</sub>  m<sub>03</sub> ] [ x ]
@@ -201,8 +201,8 @@ public class MatrixTransform extends AbstractMathTransform implements LinearTran
      *        x<sub>1</sub>, y<sub>1</sub>, z<sub>1</sub>...,
      *        x<sub>n</sub>, y<sub>n</sub>, z<sub>n</sub>]</code>.
      *
-     * The transformed points <code>(x',y',z')</code> are computed as below
-     * (note that this computation is similar to {@link PerspectiveTransform}):
+     * The transformed points <code>(x',y',z')</code> are computed as below (note that
+     * this computation is similar to {@link javax.media.jai.PerspectiveTransform}):
      *
      * <blockquote><pre>
      * [ u ]     [ m<sub>00</sub>  m<sub>01</sub>  m<sub>02</sub>  m<sub>03</sub> ] [ x ]

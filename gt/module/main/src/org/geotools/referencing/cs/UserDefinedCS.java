@@ -78,8 +78,9 @@ public class UserDefinedCS extends CoordinateSystem implements org.opengis.refer
     }
 
     /**
-     * Construct a two-dimensional coordinate system from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct a two-dimensional coordinate system from a set of properties. The properties map is
+     * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param axis0 The first axis.
@@ -93,8 +94,9 @@ public class UserDefinedCS extends CoordinateSystem implements org.opengis.refer
     }
 
     /**
-     * Construct a three-dimensional coordinate system from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct a three-dimensional coordinate system from a set of properties. The properties map is
+     * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param axis0 The first axis.

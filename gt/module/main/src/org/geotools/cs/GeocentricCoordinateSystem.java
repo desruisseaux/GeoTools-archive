@@ -197,7 +197,7 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_GeocentricCoordinateSystem#getHorizontalDatum()
      *
-     * @deprecated Replaced by {@link org.opengis.geotools.crs.GeocentricCRS#getDatum}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.GeocentricCRS#getDatum}.
      */
     public HorizontalDatum getHorizontalDatum() {
         return datum;

@@ -341,7 +341,7 @@ public class GeodeticCalculator {
     /**
      * Set the anchor point.
      * The {@linkplain #getAzimuth() azimuth},
-     * the {@linkplain #getDistance() distance} and
+     * the {@linkplain #getOrthodromicDistance() orthodromic distance} and
      * the {@linkplain #getDestinationPoint() destination point} are discarted.
      * They will need to be specified again.
      *
@@ -389,7 +389,7 @@ public class GeodeticCalculator {
     /**
      * Set the destination point. The azimuth and distance values will be updated as a side
      * effect of this call. They will be recomputed the next time {@link #getAzimuth()} or
-     * {@link #getDistance()} are invoked.
+     * {@link #getOrthodromicDistance()} are invoked.
      *
      * @param  longitude The longitude in degrees between -180 and +180°
      * @param  latitude  The latgitude in degrees between  -90 and  +90°
@@ -509,7 +509,8 @@ public class GeodeticCalculator {
 
     /**
      * Compute the destination point from the {@linkplain #getAnchorPoint anchor point},
-     * the {@linkplain #getAzimuth azimuth} and the {@linkplain #getDistance distance}.
+     * the {@linkplain #getAzimuth azimuth} and the {@linkplain #getOrthodromicDistance
+     * orthodromic distance}.
      *
      * @throws IllegalStateException if the azimuth and the distance have not been set.
      *

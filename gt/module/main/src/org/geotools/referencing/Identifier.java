@@ -141,7 +141,7 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
      * argument shall contains at least a <code>"code"</code> property. Other properties listed
      * in the table below are optional.
-     *
+     * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>

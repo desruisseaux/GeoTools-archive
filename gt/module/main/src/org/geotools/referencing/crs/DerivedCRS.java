@@ -73,14 +73,12 @@ public class DerivedCRS extends GeneralDerivedCRS
     }
 
     /**
-     * Constructs a derived CRS from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs a derived CRS from a set of properties. The properties are given unchanged to the
+     * {@linkplain GeneralDerivedCRS#GeneralDerivedCRS(Map,CoordinateReferenceSystem,MathTransform,CoordinateSystem)
+     * super-class constructor}.
      *
-     * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain org.geotools.referencing.Factory listed there}.
-     *         Properties for the {@link Conversion} object to be created can be specified
-     *         with the <code>"conversion."</code> prefix added in front of property names
-     *         (example: <code>"conversion.name"</code>).
+     * @param  properties Name and other properties to give to the new derived CRS object and to
+     *         the underlying {@link org.geotools.referencing.operation.Conversion conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number

@@ -35,6 +35,7 @@ import org.opengis.referencing.datum.EngineeringDatum;
 
 // Geotools dependencies
 import org.geotools.referencing.Info;
+import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.referencing.cs.CoordinateSystemAxis; // For Javadoc
@@ -165,8 +166,8 @@ public class EngineeringCRS extends org.geotools.referencing.crs.CoordinateRefer
     }
 
     /**
-     * Constructs an engineering CRS from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs an engineering CRS from a set of properties. The properties are given unchanged
+     * to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

@@ -52,7 +52,7 @@ import org.opengis.metadata.citation.Citation;
  * <code>Collections.{@linkplain java.util.Collections#singletonMap singletonMap}("name",
  * <var>theName</var>)</code> where <var>theName</var> is an arbitrary name as free text.
  * The properties listed in the following table are also recongnized. Property names are
- * case-insensitive and trailing and leading spaces are ignored.
+ * case-insensitive and trailing and leading spaces are ignored.</P>
  *
  * <table border='1'>
  *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -695,9 +695,9 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * in any other plane.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link Conversion} object to be created can be specified
-     *         with the <code>"conversion."</code> prefix added in front of property names
-     *         (example: <code>"conversion.name"</code>).
+     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
+     *         be created can be specified with the <code>"conversion."</code> prefix added in
+     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -725,9 +725,9 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * Creates a projected coordinate reference system from a transform.
      * 
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link Conversion} object to be created can be specified
-     *         with the <code>"conversion."</code> prefix added in front of property names
-     *         (example: <code>"conversion.name"</code>).
+     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
+     *         be created can be specified with the <code>"conversion."</code> prefix added in
+     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  geoCRS Geographic coordinate reference system to base projection on.
      * @param  toProjected The transform from the geographic to the projected CRS.
      * @param  cs The coordinate system for the projected CRS.
@@ -752,9 +752,9 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * Creates a projected coordinate reference system from a projection name.
      * 
      * @param  properties Name and other properties to give to the new object.
-     *         Properties for the {@link Conversion} object to be created can be specified
-     *         with the <code>"conversion."</code> prefix added in front of property names
-     *         (example: <code>"conversion.name"</code>).
+     *         Properties for the {@link org.geotools.referencing.operation.Conversion} object to
+     *         be created can be specified with the <code>"conversion."</code> prefix added in
+     *         front of property names (example: <code>"conversion.name"</code>).
      * @param  geoCRS Geographic coordinate reference system to base projection on.
      * @param  projectionName The classification name for the projection to be created
      *         (e.g. "Transverse_Mercator", "Mercator_1SP", "Oblique_Stereographic", etc.).

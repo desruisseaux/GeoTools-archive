@@ -78,8 +78,9 @@ public class CylindricalCS extends org.geotools.referencing.cs.CoordinateSystem
     }
 
     /**
-     * Construct a three-dimensional coordinate system from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct a three-dimensional coordinate system from a set of properties. The properties map is
+     * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
+     * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param polarCS    The polar coordinate system.

@@ -31,12 +31,16 @@ import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
 import org.geotools.referencing.Info;
+import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -91,14 +95,14 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
     }
 
     /**
-     * Constructs a geographic CRS from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs a geographic CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}. In addition,
+     * properties for the {@link org.geotools.referencing.operation.Conversion} object to be
+     * created can be specified with the <code>"conversion."</code> prefix added in front of
+     * property names (example: <code>"conversion.name"</code>).
      *
-     * @param  properties Name and other properties to give to the new object.
-     *         Available properties are {@linkplain org.geotools.referencing.Factory listed there}.
-     *         Properties for the {@link Conversion} object to be created can be specified
-     *         with the <code>"conversion."</code> prefix added in front of property names
-     *         (example: <code>"conversion.name"</code>).
+     * @param  properties Name and other properties to give to the new derived CRS object and to
+     *         the underlying {@link org.geotools.referencing.operation.Conversion conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
@@ -117,13 +121,6 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
         super(properties, getDatum(base), derivedCS);
         ensureNonNull("baseToDerived", baseToDerived);
         this.baseCRS = base;
-        this.conversionFromBase = new org.geotools.referencing.operation.Conversion(
-                                      /* properties */ properties,
-                                      /* sourceCRS  */ base,
-                                      /* targetCRS  */ this,
-                                      /* transform  */ baseToDerived,
-                                      /* method     */ null,
-                                      /* parameters */ null);
         int dim1, dim2;
         if ((dim1=baseToDerived.getDimSource()) != (dim2=base.getCoordinateSystem().getDimension()) ||
             (dim1=baseToDerived.getDimTarget()) != (dim2=derivedCS.getDimension()))
@@ -132,6 +129,37 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.CoordinateRe
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
                         new Integer(dim1), new Integer(dim2)));
         }
+        /*
+         */
+        OperationMethod method = (OperationMethod) properties.get("method");
+        if (method == null) {
+            
+        }
+        /*
+         */
+        this.conversionFromBase = createConversion(
+                                  /* properties */ new UnprefixedMap(properties, "conversion."),
+                                  /* sourceCRS  */ base,
+                                  /* targetCRS  */ this,
+                                  /* transform  */ baseToDerived,
+                                  /* method     */ null,
+                                  /* parameters */ null);
+    }
+
+    /**
+     * Wraps the specified arguments in a {@link Conversion} object. Class {@link ProjectedCRS}
+     * will overrides this method in order to wraps the arguments in a  in a {@link Projection}
+     * object instead.
+     */
+    Conversion createConversion(final Map                       properties,
+                                final CoordinateReferenceSystem sourceCRS,
+                                final CoordinateReferenceSystem targetCRS,
+                                final MathTransform             transform,
+                                final OperationMethod           method,
+                                final GeneralParameterValue[]   values)
+    {
+        return new org.geotools.referencing.operation.Conversion(properties,
+                    sourceCRS, targetCRS, transform, method, values);
     }
 
     /**

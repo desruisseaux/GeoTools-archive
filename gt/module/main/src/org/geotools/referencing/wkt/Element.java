@@ -17,45 +17,42 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.resources;
+package org.geotools.referencing.wkt;
 
 // Collections
 import java.util.List;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-// Parsing
+// Parsing and formatting
+import java.io.PrintWriter;
 import java.text.ParsePosition;
 import java.text.ParseException;
 
-// Input/output
-import java.io.PrintWriter;
-
 // Resources
+import org.geotools.resources.XArray;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * An element in a <cite>Well Know Text</cite> (WKT).
- * A <code>WKTElement</code> is made of {@link String}, {@link Number}
- * and other {@link WKTElement}. For example:
+ * An element in a <cite>Well Know Text</cite> (WKT). A <code>Element</code> is
+ * made of {@link String}, {@link Number} and other {@link Element}. For example:
  *
  * <blockquote><pre>
  * PRIMEM["Greenwich", 0.0, AUTHORITY["some authority", "Greenwich"]]
  * </pre></blockquote>
  *
- * Each <code>WKTElement</code> object can contains an arbitrary amount of other elements.
+ * Each <code>Element</code> object can contains an arbitrary amount of other elements.
  * The result is a tree, which can be printed with {@link #print}.
  * Elements can be pull in a <cite>first in, first out</cite> order.
  *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @deprecated Rempaced by {@link org.geotools.referencing.wkt.Element}.
  */
-public final class WKTElement {    
+public final class Element {    
     /**
      * The position where this element starts in the string to be parsed.
      */
@@ -67,7 +64,7 @@ public final class WKTElement {
     public final String keyword;
 
     /**
-     * An ordered list of {@link String}s, {@link Number}s and other {@link WKTElement}s.
+     * An ordered list of {@link String}s, {@link Number}s and other {@link Element}s.
      * May be <code>null</code> if the keyword was not followed by a pair of brackets
      * (e.g. "NORTH").
      */
@@ -78,7 +75,7 @@ public final class WKTElement {
      *
      * @param element The only children for this root.
      */
-    WKTElement(final WKTElement singleton) {
+    Element(final Element singleton) {
         offset  = 0;
         keyword = null;
         list    = new LinkedList();
@@ -86,14 +83,14 @@ public final class WKTElement {
     }
 
     /**
-     * Construct a new <code>WKTElement</code>.
+     * Construct a new <code>Element</code>.
      *
      * @param  text       The text to parse.
      * @param  position   In input, the position where to start parsing from.
      *                    In output, the first character after the separator.
      * @param  separator  The character to search.
      */ 
-    WKTElement(final WKTFormat format, final String text, final ParsePosition position)
+    Element(final AbstractParser format, final String text, final ParsePosition position)
         throws ParseException
     {
         /*
@@ -137,7 +134,7 @@ public final class WKTElement {
          *
          *   - If the first character is a quote, then the element is parsed as a String.
          *   - Otherwise, if the first character is a unicode identifier start, then the
-         *     element is parsed as a chidren WKTElement.
+         *     element is parsed as a chidren Element.
          *   - Otherwise, the element is parsed as a number.
          */
         do {
@@ -177,7 +174,7 @@ public final class WKTElement {
                 continue;
             }
             // Otherwise, add the element as a child element.
-            list.add(new WKTElement(format, text, position));
+            list.add(new Element(format, text, position));
         } while (parseOptionalSeparator(text, position, format.elementSeparator));
         parseSeparator(text, position, format.closingBrackets[bracketIndex]);
     }
@@ -250,7 +247,7 @@ public final class WKTElement {
     /**
      * Returns a {@link ParseException} with the specified cause. A localized string
      * <code>"Error in <{@link #keyword}>"</code> will be prepend to the message.
-     * The error index will be the starting index of this <code>WKTElement</code>.
+     * The error index will be the starting index of this <code>Element</code>.
      *
      * @param  cause   The cause of the failure, or <code>null</code> if none.
      * @param  message The message explaining the cause of the failure, or <code>null</code>
@@ -426,14 +423,14 @@ public final class WKTElement {
     }
 
     /**
-     * Removes the next {@link WKTElement} from the list and returns it.
+     * Removes the next {@link Element} from the list and returns it.
      *
      * @param  key The element name (e.g. <code>"PRIMEM"</code>).
-     * @return The next {@link WKTElement} on the list.
+     * @return The next {@link Element} on the list.
      * @throws ParseException if no more element is available.
      */
-    public WKTElement pullElement(final String key) throws ParseException {
-        final WKTElement element = pullOptionalElement(key);
+    public Element pullElement(final String key) throws ParseException {
+        final Element element = pullOptionalElement(key);
         if (element != null) {
             return element;
         }
@@ -441,19 +438,19 @@ public final class WKTElement {
     }        
 
     /**
-     * Removes the next {@link WKTElement} from the list and returns it.
+     * Removes the next {@link Element} from the list and returns it.
      *
      * @param  key The element name (e.g. <code>"PRIMEM"</code>).
-     * @return The next {@link WKTElement} on the list,
+     * @return The next {@link Element} on the list,
      *         or <code>null</code> if no more element is available.
      */
-    public WKTElement pullOptionalElement(String key) {
+    public Element pullOptionalElement(String key) {
         key = key.toUpperCase();
         final Iterator iterator = list.iterator();
         while (iterator.hasNext()) {
             final Object object = iterator.next();
-            if (object instanceof WKTElement) {
-                final WKTElement element = (WKTElement) object;
+            if (object instanceof Element) {
+                final Element element = (Element) object;
                 if (element.list!=null && element.keyword.equals(key)) {
                     iterator.remove();
                     return element;
@@ -464,19 +461,19 @@ public final class WKTElement {
     }
 
     /**
-     * Removes and returns the next {@link WKTElement} with no bracket.
+     * Removes and returns the next {@link Element} with no bracket.
      * The key is used only for only for formatting an error message.
      *
      * @param  key The parameter name. Used only for formatting an error message.
-     * @return The next {@link WKTElement} in the list, with no bracket.
+     * @return The next {@link Element} in the list, with no bracket.
      * @throws ParseException if no more void element is available.
      */
-    public WKTElement pullVoidElement(final String key) throws ParseException {
+    public Element pullVoidElement(final String key) throws ParseException {
         final Iterator iterator = list.iterator();
         while (iterator.hasNext()) {
             final Object object = iterator.next();
-            if (object instanceof WKTElement) {
-                final WKTElement element = (WKTElement) object;
+            if (object instanceof Element) {
+                final Element element = (Element) object;
                 if (element.list == null) {
                     iterator.remove();
                     return element;
@@ -516,7 +513,7 @@ public final class WKTElement {
     }
 
     /**
-     * Print this <code>WKTElement</code> as a tree.
+     * Print this <code>Element</code> as a tree.
      * This method is used for debugging purpose only.
      *
      * @param  out    The output stream.
@@ -532,8 +529,8 @@ public final class WKTElement {
         final int size = list.size();
         for (int j=0; j<size; j++) {
             final Object object = list.get(j);
-            if (object instanceof WKTElement) {
-                ((WKTElement)object).print(out, level+1);
+            if (object instanceof Element) {
+                ((Element)object).print(out, level+1);
             } else {
                 out.print(Utilities.spaces(tabWidth * (level+1)));
                 out.println(object);

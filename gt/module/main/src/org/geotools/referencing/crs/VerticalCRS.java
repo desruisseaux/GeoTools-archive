@@ -32,6 +32,7 @@ import org.opengis.referencing.datum.VerticalDatum;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.ReferenceSystem;  // For javadoc
 
 
 /**
@@ -85,8 +86,8 @@ public class VerticalCRS extends CoordinateReferenceSystem
     }
 
     /**
-     * Constructs a vertical CRS from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs a vertical CRS from a set of properties. The properties are given unchanged
+     * to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

@@ -88,9 +88,9 @@ public class OperationMethod extends Info
 
     /**
      * Construct an operation method from a set of properties. The properties given in argument
-     * follow the same rules than for the {@link Info} constructor. Additionally, the following
-     * properties are understood by this construtor:
-     *
+     * follow the same rules than for the {@linkplain Info#Info(Map) super-class constructor}.
+     * Additionally, the following properties are understood by this construtor:
+     * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>

@@ -78,7 +78,6 @@ public class GeodeticDatum extends Datum implements org.opengis.referencing.datu
 
     /**
      * Construct a geodetic datum from a name.
-     * The properties map is given unchanged to the superclass constructor.
      *
      * @param name          The datum name.
      * @param ellipsoid     The ellipsoid.
@@ -92,8 +91,8 @@ public class GeodeticDatum extends Datum implements org.opengis.referencing.datu
     }
 
     /**
-     * Construct a geodetic datum from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct a geodetic datum from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Datum#Datum(Map) super-class constructor}.
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
      * @param ellipsoid     The ellipsoid.

@@ -86,7 +86,7 @@ import java.io.Serializable;
  *       All of the other metadata items should be left empty.</li>
  * </ul>
  *
- * @version $Id: Info.java,v 1.14 2003/08/04 17:11:17 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
@@ -131,8 +131,8 @@ public class Info implements org.opengis.referencing.Info, Serializable {
     
     /**
      * Creates an object with the specified name. If <code>name</code>
-     * implements the {@link Map} interface, then its values will be
-     * copied for the following keys:
+     * implements the {@link java.util.Map} interface, then its values
+     * will be copied for the following keys:
      * <ul>
      *   <li>"authority"</li>
      *   <li>"authorityCode"</li>

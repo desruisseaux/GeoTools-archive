@@ -94,8 +94,9 @@ public class VerticalCS extends CoordinateSystem implements org.opengis.referenc
     }
 
     /**
-     * Construct a coordinate system from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct a coordinate system from a set of properties. The properties map is given
+     * unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
+     * super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param axis         The axis.

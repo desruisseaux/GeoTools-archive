@@ -64,7 +64,7 @@ public class PassThroughOperation extends SingleOperation
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceCRS The source CRS.
      * @param targetCRS The target CRS.
-     * @param The operation to apply on the subset of a coordinate tuple.
+     * @param operation The operation to apply on the subset of a coordinate tuple.
      * @param firstAffectedOrdinate Index of the first affected ordinate.
      * @param numTrailingOrdinates Number of trailing ordinates to pass through.
      */

@@ -88,8 +88,8 @@ public class PrimeMeridian extends Info implements org.opengis.referencing.datum
     }
 
     /**
-     * Construct a prime meridian from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct a prime meridian from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties          Set of properties. Should contains at least <code>"name"</code>.
      * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.

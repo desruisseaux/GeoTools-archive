@@ -33,6 +33,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.Info;
+import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.CompoundCS;
 import org.geotools.resources.cts.Resources;
@@ -104,8 +105,8 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
     }
 
     /**
-     * Constructs a coordinate reference system from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs a coordinate reference system from a set of properties. The properties are given
+     * unchanged to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param crs The array of coordinate reference system making this compound CRS.

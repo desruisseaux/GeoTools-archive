@@ -301,7 +301,7 @@ public class Ellipsoid extends Info {
      * @param  y2 Latitude  of second point (in degrees).
      * @return The orthodromic distance (in the units of this ellipsoid's axis).
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#orthodromicDistance(double,double,double,double}.
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#orthodromicDistance(double,double,double,double)}.
      */
     public double orthodromicDistance(double x1, double y1, double x2, double y2) {
         x1 = Math.toRadians(x1);

@@ -93,7 +93,7 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * @param  key A key in this map.
      * @return The key stored in the {@linkplain #base} map.
      */
-    protected abstract Object derivedToBase(final Object element);
+    protected abstract Object derivedToBase(final Object key);
 
     /**
      * Returns the number of key-value mappings in this map.

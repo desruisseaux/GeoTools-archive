@@ -34,6 +34,9 @@ import javax.units.SI;
 import org.opengis.referencing.cs.TemporalCS;
 import org.opengis.referencing.datum.TemporalDatum;
 
+// Geotools dependencies
+import org.geotools.referencing.ReferenceSystem;  // For javadoc
+
 
 /**
  * A 1D coordinate reference system used for the recording of time.
@@ -88,8 +91,8 @@ public class TemporalCRS extends CoordinateReferenceSystem
     }
 
     /**
-     * Constructs a temporal CRS from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs a temporal CRS from a set of properties. The properties are given unchanged
+     * to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param cs The coordinate system.

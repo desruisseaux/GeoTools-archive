@@ -442,8 +442,8 @@ public class CoordinateSystemAxis extends Info implements org.opengis.referencin
     }
 
     /**
-     * Construct an axis from a set of properties. The properties map is given unchanged
-     * to the superclass constructor.
+     * Construct an axis from a set of properties. The properties map is given
+     * unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this

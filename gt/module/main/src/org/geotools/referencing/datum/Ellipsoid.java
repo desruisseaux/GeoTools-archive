@@ -107,7 +107,8 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
     private final Unit unit;
     
     /**
-     * Constructs a new ellipsoid using the specified axis length.
+     * Constructs a new ellipsoid using the specified axis length. The properties map
+     * is given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties        Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis     The equatorial radius.
@@ -151,7 +152,8 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
     }
 
     /**
-     * Constructs a new ellipsoid using the specified axis length.
+     * Constructs a new ellipsoid using the specified axis length. The properties map
+     * is given unchanged to the {@linkplain Info#Info(Map) super-class constructor}.
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis The equatorial radius.
@@ -172,8 +174,7 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
     }
     
     /**
-     * Constructs a new ellipsoid using the specified axis length
-     * and inverse flattening value.
+     * Constructs a new ellipsoid using the specified axis length and inverse flattening value.
      *
      * @param name              The ellipsoid name.
      * @param semiMajorAxis     The equatorial radius.
@@ -191,8 +192,9 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
     }
     
     /**
-     * Constructs a new ellipsoid using the specified axis length
-     * and inverse flattening value.
+     * Constructs a new ellipsoid using the specified axis length and inverse flattening value.
+     * The properties map is given unchanged to the {@linkplain Info#Info(Map) super-class
+     * constructor}.
      *
      * @param properties        Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis     The equatorial radius.

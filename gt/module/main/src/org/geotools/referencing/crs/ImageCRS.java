@@ -29,6 +29,7 @@ import java.util.Collections;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.ObliqueCartesianCS;
 import org.opengis.referencing.datum.ImageDatum;
+import org.geotools.referencing.ReferenceSystem;  // For javadoc
  
 
 /**
@@ -70,8 +71,8 @@ public class ImageCRS extends CoordinateReferenceSystem
     }
 
     /**
-     * Constructs an image CRS from a set of properties.
-     * The properties are given unchanged to the super-class constructor.
+     * Constructs an image CRS from a set of properties. The properties are given unchanged
+     * to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.resources;
+package org.geotools.referencing.wkt;
 
 // Formatting
 import java.util.Locale;
@@ -29,22 +29,17 @@ import java.text.ParseException;
 
 
 /**
- * The base class for <cite>Well Know Text</cite> (WKT) parser and formatter. This base class
- * contains information about the symbols to use (opening and closing bracket, element separator,
- * etc.). This is a relatively light object compared to their subclasses and can be used when
- * parsing are not needed.
+ * The base class for <cite>Well Know Text</cite> (WKT) parser and formatter.
  *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
- *
- * @deprecated Rempaced by {@link org.geotools.referencing.wkt.AbstractFormat}.
  */
-public abstract class WKTFormat extends Format {
+public abstract class AbstractParser extends Format {
     /**
      * The locale for number parsing and formatting.
      */
-    public final Locale locale;
+    final Locale locale;
 
     /**
      * The object to use for parsing and formatting numbers.
@@ -52,19 +47,19 @@ public abstract class WKTFormat extends Format {
      * Consider using this format in a synchronized block if thread safe
      * behavior is wanted.
      */
-    public final NumberFormat number;
+    final NumberFormat number;
 
     /**
      * The character to use as an element separator.
      * This is usually the coma <code>','</code>.
      */
-    public final char elementSeparator;
+    final char elementSeparator;
 
     /**
      * The character to use as text delimitor.
      * This is usually the quote <code>'"'</code>.
      */
-    public final char textDelimitor = '"';
+    final char textDelimitor = '"';
 
     /**
      * List of caracters acceptable as opening bracket. The closing bracket must
@@ -83,21 +78,21 @@ public abstract class WKTFormat extends Format {
      * This is usually <code>'['</code> or <code>'('</code>.
      * This character is used for formatting WKT.
      */
-    public final char openingBracket = '[';
+    final char openingBracket = '[';
 
     /**
      * The character to use for closing element's parameters.
      * This is usually <code>']'</code> or <code>')'</code>.
      * This character is used for formatting WKT.
      */
-    public final char closingBracket = ']';
+    final char closingBracket = ']';
     
     /**
      * Construct a format for the specified locale.
      *
      * @param locale The locale for parsing and formatting numbers.
      */
-    public WKTFormat(final Locale locale) {
+    public AbstractParser(final Locale locale) {
         this.locale = locale;
         this.number = NumberFormat.getNumberInstance(locale);
         char decimalSeparator = '.';
@@ -110,16 +105,16 @@ public abstract class WKTFormat extends Format {
     }
 
     /**
-     * Returns a tree of {@link WKTElement} for the specified text.
+     * Returns a tree of {@link Element} for the specified text.
      *
      * @param  text       The text to parse.
      * @param  position   In input, the position where to start parsing from.
      *                    In output, the first character after the separator.
      */
-    protected final WKTElement getTree(final String text, final ParsePosition position)
+    protected final Element getTree(final String text, final ParsePosition position)
         throws ParseException
     {
-        return new WKTElement(new WKTElement(this, text, position));
+        return new Element(new Element(this, text, position));
     }
 
 
@@ -130,7 +125,7 @@ public abstract class WKTFormat extends Format {
      * @return The object.
      * @throws ParseException if the element can't be parsed.
      */
-    protected abstract Object parse(final WKTElement element) throws ParseException;
+    protected abstract Object parse(final Element element) throws ParseException;
 
     /**
      * Parses a <cite>Well Know Text</cite> (WKT).
@@ -140,7 +135,7 @@ public abstract class WKTFormat extends Format {
      * @throws ParseException if the string can't be parsed.
      */
     public final Object parseObject(final String text) throws ParseException {
-        final WKTElement element = getTree(text, new ParsePosition(0));
+        final Element element = getTree(text, new ParsePosition(0));
         final Object object = parse(element);
         element.close();
         return object;

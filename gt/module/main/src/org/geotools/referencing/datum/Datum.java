@@ -91,10 +91,10 @@ public class Datum extends Info implements org.opengis.referencing.datum.Datum {
     private final Map scope;
 
     /**
-     * Construct a datum from a set of properties. The properties given in argument follow the
-     * same rules than for the {@link org.geotools.referencing.Info} constructor. Additionally,
-     * the following properties are understood by this construtor:
-     *
+     * Construct a datum from a set of properties. The properties given in argument follow
+     * the same rules than for the {@linkplain Info#Info(Map) super-class constructor}.
+     * Additionally, the following properties are understood by this construtor:
+     * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>

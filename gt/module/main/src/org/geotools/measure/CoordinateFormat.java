@@ -54,10 +54,10 @@ import org.geotools.referencing.crs.TemporalCRS;
 
 
 /**
- * Format a {@link org.geotools.geometry.DirectPosition} in an arbitrary
- * {@link org.geotools.referencing.crs.CoordinateReferenceSystem}. The
- * format for each ordinate is infered from the coordinate system units
- * using the following rules:
+ * Format a {@linkplain org.geotools.geometry.GeneralDirectPosition direct position} in an
+ * arbitrary {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate
+ * reference system}. The format for each ordinate is infered from the coordinate system
+ * units using the following rules:
  * <ul>
  *   <li>Ordinate values in {@linkplain NonSI#DEGREE_ANGLE degrees} are formated as angles
  *       using {@link AngleFormat}.</li>

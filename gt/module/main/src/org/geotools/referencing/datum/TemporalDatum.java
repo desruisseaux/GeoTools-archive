@@ -55,7 +55,6 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
 
     /**
      * Construct a temporal datum from a name.
-     * The properties map is given unchanged to the superclass constructor.
      *
      * @param name   The datum name.
      * @param origin The date and time origin of this temporal datum.
@@ -65,8 +64,8 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
     }
 
     /**
-     * Construct a temporal datum from a set of properties.
-     * The properties map is given unchanged to the superclass constructor.
+     * Construct a temporal datum from a set of properties. The properties map is
+     * given unchanged to the {@linkplain Datum#Datum(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param origin The date and time origin of this temporal datum.

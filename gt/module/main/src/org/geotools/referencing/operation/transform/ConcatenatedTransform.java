@@ -233,11 +233,10 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
     
     /**
-     * Gets the derivative of this transform at a point. We must delegate to the
-     * {@link #derivative(DirectPosition)} version  because  the transformation
-     * steps {@link #transform1} and {@link #transform2} may not be instances of
-     * {@link MathTransform2D}. The only class which is allowed to delegate directly
-     * to the {@link Point2D} version is {@link ConcatenatedTransformDirect2D}.
+     * Gets the derivative of this transform at a point. This method delegates to the
+     * {@link #derivative(DirectPosition)} method because the transformation steps
+     * {@link #transform1} and {@link #transform2} may not be instances of
+     * {@link MathTransform2D}.
      *
      * @param  point The coordinate point where to evaluate the derivative.
      * @return The derivative at the specified point as a 2&times;2 matrix.
