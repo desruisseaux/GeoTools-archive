@@ -65,11 +65,11 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
     //object factory
     protected CRSFactory crsFactory;
         
-    protected CRSEPSGPropertyFileFactory() {
+    protected CRSEPSGPropertyFileFactory() throws FactoryException {
         this(FactoryFinder.getCRSFactory());
     }
     
-    protected CRSEPSGPropertyFileFactory(final CRSFactory factory ) {
+    protected CRSEPSGPropertyFileFactory(final CRSFactory factory ) throws FactoryException {
     	this(factory, CRSEPSGPropertyFileFactory.class.getResource("epsg.properties"));
     }
     
@@ -77,7 +77,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      *
      */
     protected CRSEPSGPropertyFileFactory(final CRSFactory factory,
-                       	 URL definition) {
+                       	 URL definition) throws FactoryException {
         this.crsFactory = factory;
         
         try {
@@ -95,7 +95,7 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      * @return The default factory.
      * @throws SQLException if the connection to the database can't be etablished.
      */
-    public synchronized static CRSAuthorityFactory getDefault() {
+    public synchronized static CRSAuthorityFactory getDefault() throws FactoryException {
         if (DEFAULT == null) {        	
             DEFAULT = new CRSEPSGPropertyFileFactory();
         }            
