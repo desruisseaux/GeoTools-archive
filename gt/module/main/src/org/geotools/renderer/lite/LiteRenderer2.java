@@ -19,12 +19,14 @@ package org.geotools.renderer.lite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,16 +35,20 @@ import java.util.logging.Logger;
 
 import javax.media.jai.util.Range;
 
+import org.geotools.ct.CannotCreateTransformException;
+import org.geotools.ct.MathTransform2D;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.crs.CRSService;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Expression;
@@ -69,12 +75,15 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 
 
@@ -104,14 +113,13 @@ import com.vividsolutions.jts.geom.Point;
  * @version $Id$
  */
 public class LiteRenderer2 implements Renderer, Renderer2D {
-    int error=0;
-    
     /** Tolerance used to compare doubles for equality */
     private static final double TOLERANCE = 1e-6;
 
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.rendering");
+    int error = 0;
 
     /** Filter factory for creating bounding box filters */
     private FilterFactory filterFactory = FilterFactory.createFilterFactory();
@@ -141,7 +149,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     private Envelope mapExtent = null;
 
     /** Graphics object to be rendered to. Controlled by set output. */
-
     private Graphics2D outputGraphics;
 
     /** The size of the output area in output units. */
@@ -175,6 +182,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
     /** The painter class we use to depict shapes onto the screen */
     private StyledShapePainter painter = new StyledShapePainter();
+
+    /** The math transform cache */
+    private HashMap transformMap = new HashMap();
 
     /**
      * Creates a new instance of LiteRenderer without a context. Use it only to
@@ -288,7 +298,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     public void paint(Graphics2D graphics, Rectangle paintArea,
         AffineTransform transform) {
-	error=0;
+        error = 0;
+
         if ((graphics == null) || (paintArea == null)) {
             LOGGER.info("renderer passed null arguments");
 
@@ -313,10 +324,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             AffineTransform atg = graphics.getTransform();
             atg.concatenate(at);
             at = atg;
-        } 
-        
-        // graphics.setTransform(at);
+        }
 
+        // graphics.setTransform(at);
         setScaleDenominator(1 / at.getScaleX());
 
         MapLayer[] layers = context.getLayers();
@@ -348,6 +358,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         Envelope envelope = new Envelope(Math.min(x1, x2), Math.max(x1, x2),
                 Math.min(y1, y2), Math.max(y1, y2));
 
+        // get detstination CRS
+        CoordinateReferenceSystem destinationCrs = context
+            .getCoordinateReferenceSystem();
+
         for (int i = 0; i < layers.length; i++) {
             MapLayer currLayer = layers[i];
 
@@ -362,12 +376,14 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
             try {
                 // mapExtent = this.context.getAreaOfInterest();
-                FeatureResults results = queryLayer(currLayer, envelope);
+                FeatureResults results = queryLayer(currLayer, envelope,
+                        destinationCrs);
 
                 // extract the feature type stylers from the style object
                 // and process them
                 processStylers(graphics, results,
-                    currLayer.getStyle().getFeatureTypeStyles(), at);
+                    currLayer.getStyle().getFeatureTypeStyles(), at,
+                    context.getCoordinateReferenceSystem());
             } catch (Exception exception) {
                 LOGGER.warning("Exception " + exception + " rendering layer "
                     + currLayer);
@@ -378,10 +394,12 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio()
             + " , hits " + styleFactory.getHits() + ", requests "
             + styleFactory.getRequests());
-	
-	if( error>0 )
-	    LOGGER.warning("Number of Errors during paint(Graphics2D, AffineTransform) = "+error);
 
+        if (error > 0) {
+            LOGGER.warning(
+                "Number of Errors during paint(Graphics2D, AffineTransform) = "
+                + error);
+        }
     }
 
     /**
@@ -429,6 +447,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @param currLayer the actually processing layer for renderition
      * @param envelope the spatial extent wich is the target area fo the
      *        rendering process
+     * @param destinationCrs DOCUMENT ME!
      *
      * @return the set of features resulting from <code>currLayer</code> after
      *         quering its feature source
@@ -441,7 +460,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      *
      * @see MapLayer#setQuery(org.geotools.data.Query)
      */
-    FeatureResults queryLayer(MapLayer currLayer, Envelope envelope)
+    FeatureResults queryLayer(MapLayer currLayer, Envelope envelope,
+        CoordinateReferenceSystem destinationCrs)
         throws IllegalFilterException, IOException {
         FeatureResults results = null;
         FeatureSource featureSource = currLayer.getFeatureSource();
@@ -452,18 +472,43 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             // see what attributes we really need by exploring the styles
             String[] attributes = findStyleAttributes(currLayer, schema);
 
-            // Then create the geometry filters. We have to create one for each
-            // geometric
-            // attribute used during the rendering as the feature may have more
-            // than one
-            // and the styles could use non default geometric ones
-            BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
-            Filter filter = createBBoxFilters(schema, attributes, rightBBox);
+            try {
+                // Then create the geometry filters. We have to create one for each
+                // geometric
+                // attribute used during the rendering as the feature may have more
+                // than one
+                // and the styles could use non default geometric ones
+                CoordinateReferenceSystem sourceCrs = currLayer.getFeatureSource()
+                                                               .getSchema()
+                                                               .getDefaultGeometry()
+                                                               .getCoordinateSystem();
 
-            // now build the query using only the attributes and the bounding
-            // box needed
-            query = new DefaultQuery(schema.getTypeName(), filter,
-                    Integer.MAX_VALUE, attributes, "");
+                if (!sourceCrs.equals(destinationCrs)) {
+                    // get an unprojected envelope since the feature source is operating on 
+                    // unprojected geometries
+                    MathTransform2D transform = (MathTransform2D) CRSService.reproject(destinationCrs,
+                            sourceCrs, true);
+                    envelope = CRSService.transform(envelope, transform);
+                }
+
+                BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
+                Filter filter = createBBoxFilters(schema, attributes, rightBBox);
+
+                // now build the query using only the attributes and the bounding
+                // box needed
+                DefaultQuery q = new DefaultQuery(schema.getTypeName());
+                q.setFilter(filter);
+                q.setPropertyNames(attributes);
+                query = q;
+            } catch (TransformException e) {
+                LOGGER.severe(
+                    "Got a tranform exception while trying to de-project the current "
+                    + "envelope, falling back on full data loading (no bbox query)");
+
+                DefaultQuery q = new DefaultQuery(schema.getTypeName());
+                q.setPropertyNames(attributes);
+                query = q;
+            }
         }
 
         //now, if a definition query has been established for this layer, be
@@ -614,19 +659,19 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         /* If we are rendering to a component which has already set up some form
          * of transformation then we can concatenate our transformation to it.
          * An example of this is the ZoomPane component of the swinggui module.*/
-//        if (concatTransforms) {
-//            outputGraphics.getTransform().concatenate(at);
-//        } else {
-//            outputGraphics.setTransform(at);
-//        }
-
+        //        if (concatTransforms) {
+        //            outputGraphics.getTransform().concatenate(at);
+        //        } else {
+        //            outputGraphics.setTransform(at);
+        //        }
         scaleDenominator = 1 / outputGraphics.getTransform().getScaleX();
 
         //extract the feature type stylers from the style object and process them
         FeatureTypeStyle[] featureStylers = s.getFeatureTypeStyles();
 
         try {
-            processStylers(outputGraphics, DataUtilities.results(features), featureStylers, at);
+            processStylers(outputGraphics, DataUtilities.results(features),
+                featureStylers, at, null);
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "I/O error while rendering the layer", ioe);
         } catch (IllegalAttributeException iae) {
@@ -735,20 +780,26 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * 
      * <p></p>
      *
+     * @param graphics DOCUMENT ME!
      * @param features An array of features to be rendered
      * @param featureStylers An array of feature stylers to be applied
+     * @param at DOCUMENT ME!
+     * @param destinationCrs - The destination CRS, or null if no reprojection
+     *        is required
      *
      * @throws IOException DOCUMENT ME!
      * @throws IllegalAttributeException DOCUMENT ME!
      */
-    private void processStylers(final Graphics2D graphics, final FeatureResults features,
-        final FeatureTypeStyle[] featureStylers, AffineTransform at)
+    private void processStylers(final Graphics2D graphics,
+        final FeatureResults features, final FeatureTypeStyle[] featureStylers,
+        AffineTransform at, CoordinateReferenceSystem destinationCrs)
         throws IOException, IllegalAttributeException {
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("processing " + featureStylers.length + " stylers");
         }
 
         LiteShape shape = createPath(null, at);
+        transformMap = new HashMap();
 
         for (int i = 0; i < featureStylers.length; i++) {
             FeatureTypeStyle fts = featureStylers[i];
@@ -778,54 +829,61 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             FeatureReader reader = features.reader();
 
             while (true) {
-		try{
-		    if( !reader.hasNext() )
-			break;
-                boolean doElse = true;
-                Feature feature = reader.next();
+                try {
+                    if (!reader.hasNext()) {
+                        break;
+                    }
 
-                if (renderingStopRequested) {
-                    return;
-                }
+                    boolean doElse = true;
+                    Feature feature = reader.next();
 
-                String typeName = feature.getFeatureType().getTypeName();
+                    if (renderingStopRequested) {
+                        return;
+                    }
 
-                if ((typeName != null)
-                        && (feature.getFeatureType().isDescendedFrom(null,
-                            fts.getFeatureTypeName())
-                        || typeName.equalsIgnoreCase(fts.getFeatureTypeName()))) {
-                    // applicable rules
-                    for (Iterator it = ruleList.iterator(); it.hasNext();) {
-                        Rule r = (Rule) it.next();
+                    String typeName = feature.getFeatureType().getTypeName();
 
-                        // if this rule applies
-                        if (isWithInScale(r) && !r.hasElseFilter()) {
-                            Filter filter = r.getFilter();
+                    if ((typeName != null)
+                            && (feature.getFeatureType().isDescendedFrom(null,
+                                fts.getFeatureTypeName())
+                            || typeName.equalsIgnoreCase(
+                                fts.getFeatureTypeName()))) {
+                        // applicable rules
+                        for (Iterator it = ruleList.iterator(); it.hasNext();) {
+                            Rule r = (Rule) it.next();
 
-                            if ((filter == null) || filter.contains(feature)) {
-                                doElse = false;
+                            // if this rule applies
+                            if (isWithInScale(r) && !r.hasElseFilter()) {
+                                Filter filter = r.getFilter();
 
+                                if ((filter == null)
+                                        || filter.contains(feature)) {
+                                    doElse = false;
+
+                                    Symbolizer[] symbolizers = r.getSymbolizers();
+                                    processSymbolizers(graphics, feature,
+                                        symbolizers, scaleRange, shape,
+                                        destinationCrs);
+                                }
+                            }
+                        }
+
+                        if (doElse) {
+                            // rules with an else filter
+                            for (Iterator it = elseRuleList.iterator();
+                                    it.hasNext();) {
+                                Rule r = (Rule) it.next();
                                 Symbolizer[] symbolizers = r.getSymbolizers();
-                                processSymbolizers(graphics, feature, symbolizers,
-                                    scaleRange, shape);
+                                processSymbolizers(graphics, feature,
+                                    symbolizers, scaleRange, shape,
+                                    destinationCrs);
                             }
                         }
                     }
-
-                    if (doElse) {
-                        // rules with an else filter
-                        for (Iterator it = elseRuleList.iterator();
-                                it.hasNext();) {
-                            Rule r = (Rule) it.next();
-                            Symbolizer[] symbolizers = r.getSymbolizers();
-                            processSymbolizers(graphics, feature, symbolizers,
-                                scaleRange, shape);
-                        }
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    error++;
                 }
-	    }catch(Exception e){ 
-		error++; 
-	    }
             }
 
             reader.close();
@@ -839,30 +897,104 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * This is an internal method and should only be called by processStylers.
      * </p>
      *
+     * @param graphics
      * @param feature The feature to be rendered
      * @param symbolizers An array of symbolizers which actually perform the
      *        rendering.
      * @param scaleRange The scale range we are working on... provided in order
      *        to make the style factory happy
-     * @param shape DOCUMENT ME!
+     * @param shape
+     * @param destinationCrs
+     *
+     * @throws TransformException
      */
-    private void processSymbolizers(final Graphics2D graphics, final Feature feature,
-        final Symbolizer[] symbolizers, Range scaleRange, LiteShape shape) {
+    private void processSymbolizers(final Graphics2D graphics,
+        final Feature feature, final Symbolizer[] symbolizers,
+        Range scaleRange, LiteShape shape,
+        CoordinateReferenceSystem destinationCrs) throws TransformException {
         for (int m = 0; m < symbolizers.length; m++) {
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("applying symbolizer " + symbolizers[m]);
             }
 
             if (symbolizers[m] instanceof RasterSymbolizer) {
-                renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m]);
+                renderRaster(graphics, feature,
+                    (RasterSymbolizer) symbolizers[m]);
             } else {
                 Style2D style = styleFactory.createStyle(feature,
                         symbolizers[m], scaleRange);
-                Geometry g = findGeometry(feature, symbolizers[m], style);
-                shape.setGeometry(g);
-                painter.paint(graphics, shape, style, scaleDenominator);
+                Geometry g = findGeometry(feature, symbolizers[m]);
+                CoordinateReferenceSystem crs = findGeometryCS(feature,
+                        symbolizers[m]);
+                MathTransform2D transform = getMathTransform(crs,
+                        destinationCrs, shape.getTransform());
+
+                if (transform != null) {
+                    Shape transformedShape = getTransformedShape(g, transform);
+                    painter.paint(graphics, transformedShape, style,
+                        scaleDenominator);
+                } else {
+                    shape.setGeometry(g);
+                    painter.paint(graphics, shape, style, scaleDenominator);
+                }
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param g
+     * @param transform
+     *
+     * @return
+     *
+     * @throws TransformException
+     */
+    private Shape getTransformedShape(Geometry g, MathTransform2D transform)
+        throws TransformException {
+        LiteShape base = new LiteShape(g, null, false);
+
+        return transform.createTransformedShape(base);
+    }
+
+    /**
+     * Computes the math transform from the source CRS to the destination CRS.
+     * Since this is expensive, we keep a cache of coordinate transformations
+     * during the rendering process
+     *
+     * @param sourceCrs
+     * @param destinationCrs
+     * @param at DOCUMENT ME!
+     *
+     * @return
+     *
+     * @throws CannotCreateTransformException
+     */
+    private MathTransform2D getMathTransform(
+        CoordinateReferenceSystem sourceCrs,
+        CoordinateReferenceSystem destinationCrs, AffineTransform at)
+        throws CannotCreateTransformException {
+        MathTransform2D transform = (MathTransform2D) transformMap.get(sourceCrs);
+
+        if (transform != null) {
+            return transform;
+        }
+
+        if ((sourceCrs == null) || (destinationCrs == null)) { // no transformation possible
+
+            return MathTransform2D.IDENTITY;
+        }
+
+        transform = (MathTransform2D) CRSService.reproject(sourceCrs, destinationCrs, true);
+
+        if (transform != null) {
+            transform = CRSService.concatenate(transform, at);
+        }
+
+        transformMap.put(sourceCrs, transform);
+
+        return transform;
     }
 
     /**
@@ -871,13 +1003,15 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * of the grid coverage on the device, and falls back on the geophysics
      * one if the former fails
      *
+     * @param graphics DOCUMENT ME!
      * @param feature the feature that contains the GridCoverage. The grid
      *        coverage must be contained in the "grid" attribute
      * @param symbolizer The raster symbolizer
      *
      * @task make it follow the symbolizer
      */
-    private void renderRaster(Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer) {
+    private void renderRaster(Graphics2D graphics, Feature feature,
+        RasterSymbolizer symbolizer) {
         GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
         GridCoverageRenderer gcr = new GridCoverageRenderer(grid);
         gcr.paint(graphics);
@@ -889,17 +1023,16 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      *
      * @param f The feature
      * @param s The symbolizer
-     * @param style the resolved style for the specified feature
      *
      * @return The geometry requested in the symbolizer, or the default
      *         geometry if none is specified
      */
     private com.vividsolutions.jts.geom.Geometry findGeometry(Feature f,
-        Symbolizer s, Style2D style) {
+        Symbolizer s) {
         String geomName = getGeometryPropertyName(s);
 
         // get the geometry
-        com.vividsolutions.jts.geom.Geometry geom;
+        Geometry geom;
 
         if (geomName == null) {
             geom = f.getDefaultGeometry();
@@ -910,7 +1043,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         // if the symbolizer is a point or text symbolizer generate a suitable location to place the
         // point in order to avoid recomputing that location at each rendering step
         if ((s instanceof PointSymbolizer || s instanceof TextSymbolizer)
-                && !(geom instanceof Point)) {
+                && !((geom instanceof Point) || (geom instanceof MultiPoint))) {
             if (geom instanceof LineString && !(geom instanceof LinearRing)) {
                 // use the mid point to represent the point/text symbolizer anchor
                 Coordinate[] coordinates = geom.getCoordinates();
@@ -926,6 +1059,29 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         }
 
         return geom;
+    }
+
+    /**
+     * Finds the geometric attribute coordinate reference system
+     *
+     * @param f The feature
+     * @param s The symbolizer
+     *
+     * @return The geometry requested in the symbolizer, or the default
+     *         geometry if none is specified
+     */
+    private org.opengis.referencing.crs.CoordinateReferenceSystem findGeometryCS(
+        Feature f, Symbolizer s) {
+        String geomName = getGeometryPropertyName(s);
+
+        if (geomName != null) {
+            return ((GeometryAttributeType) f.getFeatureType().getAttributeType(geomName))
+            .getCoordinateSystem();
+        } else {
+            return ((GeometryAttributeType) f.getFeatureType()
+                                             .getDefaultGeometry())
+            .getCoordinateSystem();
+        }
     }
 
     private String getGeometryPropertyName(Symbolizer s) {
@@ -949,6 +1105,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * Convenience method.  Converts a Geometry object into a Shape
      *
      * @param geom The Geometry object to convert
+     * @param at DOCUMENT ME!
      *
      * @return A GeneralPath that is equivalent to geom
      */
