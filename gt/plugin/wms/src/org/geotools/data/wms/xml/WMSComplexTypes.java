@@ -5445,6 +5445,90 @@ public class WMSComplexTypes {
             throw new OperationNotSupportedException();
         }
     }
+    
+    protected static class _CW_WKBType extends WMSComplexType {
+        private static final WMSComplexType instance = new _CW_WKBType();
+
+        public static WMSComplexType getInstance() {
+            return instance;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.ComplexType#getChild()
+         */
+        public ElementGrouping getChild() {
+            return null;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.ComplexType#getChildElements()
+         */
+        public Element[] getChildElements() {
+            return null;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
+         *      org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
+         */
+        public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints )
+                throws SAXException, OperationNotSupportedException {
+            return WMS1_0_0.toMIME("CW_WKB");
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.Type#getName()
+         */
+        public String getName() {
+            return "CW_WKB";
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.Type#getInstanceType()
+         */
+        public Class getInstanceType() {
+            return String.class;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
+         */
+        public boolean canEncode( Element element, Object value, Map hints ) {
+            return false;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object,
+         *      org.geotools.xml.PrintHandler, java.util.Map)
+         */
+        public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException,
+                OperationNotSupportedException {
+            throw new OperationNotSupportedException();
+        }
+    }
 
     static class LongitudeType extends WMSSimpleType {
         private static SimpleType instance = new LongitudeType();

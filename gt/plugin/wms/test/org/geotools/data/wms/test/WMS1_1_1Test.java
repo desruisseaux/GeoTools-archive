@@ -26,7 +26,9 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_1_1;
+import org.geotools.data.wms.WMS1_3_0;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.GetStylesRequest;
 import org.xml.sax.SAXException;
 
 /**
@@ -41,6 +43,8 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
 		this.spec = new WMS1_1_1();
 		this.server = new URL(
 		"http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
+		
+		this.getStylesURL = new URL("http://mapserv2.esrin.esa.it/cubestor/cubeserv/cubeserv.cgi?VERSION=1.1.1&REQUEST=GetCapabilities&SERVICE=WMS");
 	}
 
 	public void testGetVersion() {
@@ -128,8 +132,16 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
         assertEquals(layer.getName(), "UrbanArea");
         assertEquals(layer.getTitle(), "USGS Urban Areas Ortho-Imagery");
         
-
 	}
+	
+	//Don't have working server to test against yet.
+//	public void testCreateGetStylesRequest() throws Exception {
+//      WebMapServer wms = new CustomWMS(getStylesURL);
+//      
+//      GetStylesRequest request = wms.createGetStylesRequest();
+//      assertNotNull(request);
+//	}
+	
 	/* (non-Javadoc)
 	 * @see org.geotools.data.wms.test.WMS1_0_0Test#checkProperties(java.util.Properties)
 	 */

@@ -31,12 +31,15 @@ import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.request.GetStylesRequest;
+import org.geotools.data.wms.request.PutStylesRequest;
 import org.geotools.data.wms.request.Request;
 import org.geotools.data.wms.response.AbstractResponse;
 import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.handlers.DocumentHandler;
@@ -375,6 +378,8 @@ public class WebMapServer implements Discovery {
             currentResponse = new DescribeLayerResponse(contentType, inputStream);
         } else if (currentRequest instanceof GetLegendGraphicRequest) {
             currentResponse = new GetLegendGraphicResponse(contentType, inputStream);
+        } else if (currentRequest instanceof PutStylesRequest) {
+            currentResponse = new PutStylesResponse(contentType, inputStream);
         } else {
             throw new RuntimeException("Request is an invalid type. I do not know it.");
         }
@@ -458,6 +463,30 @@ public class WebMapServer implements Discovery {
         return request;        
     }
     
+    public GetStylesRequest createGetStylesRequest() throws IOException, UnsupportedOperationException{
+        if (getCapabilities().getRequest().getGetStyles() == null) {
+            throw new UnsupportedOperationException("Server does not specify a GetStyles operation. Cannot be performed");
+        }
+        
+        URL onlineResource = getCapabilities().getRequest().getGetStyles().getGet();
+        
+        GetStylesRequest request = specification.createGetStylesRequest(onlineResource,
+                getNamedLayers());
+       
+        return request;
+    }
+    
+    public PutStylesRequest createPutStylesRequest() throws IOException, UnsupportedOperationException {
+        if (getCapabilities().getRequest().getPutStyles() == null) {
+            throw new UnsupportedOperationException("Server does not specify a PutStyles operation. Cannot be performed");
+        }
+        
+        URL onlineResource = getCapabilities().getRequest().getPutStyles().getGet();
+        
+        PutStylesRequest request = specification.createPutStylesRequest(onlineResource);
+        return request;
+    }
+    
     /**********************************************************
      * UTILITY METHODS
      **********************************************************/
@@ -467,27 +496,32 @@ public class WebMapServer implements Discovery {
      * 
      * @return A list of type Layer, each value has a it's name property set
      */
-    public List getNamedLayers() {
-        List namedLayers = new ArrayList();
+    public Layer[] getNamedLayers() {
+        List namedLayersList = new ArrayList();
 
         Layer[] layers = capabilities.getLayers();
 
         for( int i = 0; i < layers.length; i++ ) {
             if ((layers[i].getName() != null) && (layers[i].getName().length() != 0)) {
-                namedLayers.add(layers[i]);
+                namedLayersList.add(layers[i]);
             }
         }
 
+        Layer[] namedLayers = new Layer[namedLayersList.size()];
+        for (int i = 0; i < namedLayersList.size(); i++) {
+            namedLayers[i] = (Layer) namedLayersList.get(i);
+        }
+        
         return namedLayers;
     }
 
     private Set getQueryableLayers() {
         Set layers = new TreeSet();
 
-        List namedLayers = getNamedLayers();
+        Layer[] namedLayers = getNamedLayers();
 
-        for( int i = 0; i < namedLayers.size(); i++ ) {
-            Layer layer = (Layer) namedLayers.get(i);
+        for( int i = 0; i < namedLayers.length; i++ ) {
+            Layer layer = (Layer) namedLayers[i];
 
             if (layer.isQueryable()) {
                 layers.add(layer);

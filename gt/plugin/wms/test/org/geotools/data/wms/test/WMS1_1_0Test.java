@@ -35,6 +35,7 @@ import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.xml.sax.SAXException;
@@ -46,10 +47,13 @@ import org.xml.sax.SAXException;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class WMS1_1_0Test extends WMS1_0_0Test {
+    protected URL getStylesURL; 
 
 	public WMS1_1_0Test() throws Exception {
 		server = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
 		spec = new WMS1_1_0();
+		
+
 	}
 	
 	public void testGetVersion() {
@@ -130,6 +134,15 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
         assertEquals(image.getHeight(), 50);
         
     }
+    
+    //Cannot test 1.1.0 versioning.. I don't have a 1.1.0 server that will do GetStyles
+//    public void testCreateGetStylesRequest() throws Exception {
+//        WebMapServer wms = new CustomWMS(getStylesURL);
+//        
+//        GetStylesRequest request = wms.createGetStylesRequest();
+//        assertNotNull(request);
+//        
+//    }
     
 	public void testCreateParser() throws Exception {
 		WMSCapabilities capabilities = createCapabilities("1.1.0Capabilities.xml");

@@ -152,6 +152,7 @@ public class WMSSchema implements Schema {
         new WMSElement("MIME", _MIMEType.getInstance()),
         new WMSElement("INIMAGE", _INIMAGEType.getInstance()),
         new WMSElement("BLANK", _BLANKType.getInstance()),
+        new WMSElement("CW_WKB", _CW_WKBType.getInstance()),
         
         new WMSElement("WMS_DescribeLayerResponse", WMS_DescribeLayerResponse.getInstance()),
         new WMSElement("LayerDescription", _LayerDescription.getInstance()),

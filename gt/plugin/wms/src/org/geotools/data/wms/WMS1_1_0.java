@@ -11,13 +11,18 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.request.AbstractDescribeLayerRequest;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.AbstractGetLegendGraphicRequest;
+import org.geotools.data.wms.request.AbstractGetStylesRequest;
+import org.geotools.data.wms.request.AbstractPutStylesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.request.GetStylesRequest;
+import org.geotools.data.wms.request.PutStylesRequest;
 
 /**
  * @author Kefka
@@ -67,6 +72,17 @@ public class WMS1_1_0 extends WMS1_0_0 {
     
     public GetLegendGraphicRequest createGetLegendGraphicRequest( URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions) {
         return new InternalGetLegendGraphicRequest(onlineResource, layers, formats, exceptions);
+    }
+    
+    public GetStylesRequest createGetStylesRequest( URL onlineResource, Layer[] layers ) throws UnsupportedOperationException {
+        return new InternalGetStylesRequest(onlineResource, layers);
+    }
+    
+    /**
+     * @see org.geotools.data.wms.WMS1_0_0#createPutStylesRequest(java.net.URL)
+     */
+    public PutStylesRequest createPutStylesRequest( URL onlineResource) throws UnsupportedOperationException {
+        return new InternalPutStylesRequest(onlineResource);
     }
     
 	public static class GetCapsRequest extends WMS1_0_0.GetCapsRequest {
@@ -161,4 +177,36 @@ public class WMS1_1_0 extends WMS1_0_0 {
         }
 	    
 	}
+	
+	public static class InternalGetStylesRequest extends AbstractGetStylesRequest {
+
+        /**
+         * @param onlineResource
+         * @param layers
+         */
+        public InternalGetStylesRequest( URL onlineResource, Layer[] layers ) {
+            super(onlineResource, layers);
+        }
+
+        /* (non-Javadoc)
+         * @see org.geotools.data.wms.request.AbstractGetStylesRequest#initVersion()
+         */
+        protected void initVersion() {
+            setProperty(VERSION, "1.1.0");
+        }
+	    
+	}
+	
+	public static class InternalPutStylesRequest extends AbstractPutStylesRequest {
+
+        public InternalPutStylesRequest( URL onlineResource ) {
+            super(onlineResource, null);
+        }
+
+        protected void initVersion() {
+            setProperty(VERSION, "1.0.0");            
+        }
+	    
+	}
+
 }

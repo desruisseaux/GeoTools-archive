@@ -20,11 +20,14 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.request.GetStylesRequest;
+import org.geotools.data.wms.request.PutStylesRequest;
 
 
 /**
@@ -134,4 +137,26 @@ public abstract class Specification {
      * @throws UnsupportedOperationException if the version of the specification doesn't support this request
      */
     public abstract GetLegendGraphicRequest createGetLegendGraphicRequest(URL onlineResource, SimpleLayer[] layers, String[] formats, String[] exceptions ) throws UnsupportedOperationException;
+    
+    
+    /**
+     * Creates a GetStylesRequest which can be used to retrieve styles from
+     * the WMS.
+     * 
+     * @param onlineResource The location where the request can be made
+     * @param layers all the named layers in the WMS
+     * @return a configurable request object to be passed to a WMS
+     * @throws UnsupportedOperationException if the version of the specification doesn't support this request
+     */
+    public abstract GetStylesRequest createGetStylesRequest(URL onlineResource, Layer[] layers) throws UnsupportedOperationException;
+    
+    /**
+     * Creates a PutStyles request which can be configured and the passed to 
+     * the WMS to store styles for later use.
+     * 
+     * @param onlineResource the location where the request can be made
+     * @return a configureable request object to be passed to the WMS
+     * @throws UnsupportedOperationException if the version of the specification doesn't support this request
+     */
+    public abstract PutStylesRequest createPutStylesRequest(URL onlineResource) throws UnsupportedOperationException;
 }
