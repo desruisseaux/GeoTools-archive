@@ -135,7 +135,7 @@ public class WFSDataStore extends AbstractDataStore {
         new WFSSchemaFactory();
 
         if ((username != null) && (password != null)) {
-            auth = new WFSAuthenticator(username, password, host);
+            auth = new WFSAuthenticator(username, password);
         }
 
         if (protocol == null) {
@@ -185,20 +185,25 @@ public class WFSDataStore extends AbstractDataStore {
         //
         // should be ok, as we would only be playing with the classloader's allocated space
         InputStream result = null;
-
-        synchronized (Authenticator.class) {
-            Authenticator.setDefault(auth);
-
-            try {
-                result = url.getInputStream();
-            } catch (MalformedURLException e) {
-                WFSDataStoreFactory.logger.warning(e.toString());
-                throw e;
-            }
-
+        
+        if(auth == null){
+            result = url.getInputStream();
             url.connect();
+        }else{
+            synchronized (Authenticator.class) {
+                Authenticator.setDefault(auth);
 
-            Authenticator.setDefault(null);
+                try {
+                    result = url.getInputStream();
+                } catch (MalformedURLException e) {
+                    WFSDataStoreFactory.logger.warning(e.toString());
+                    throw e;
+                }
+
+                url.connect();
+
+                Authenticator.setDefault(null);
+            }
         }
 
         return new BufferedInputStream(result);
@@ -210,16 +215,19 @@ public class WFSDataStore extends AbstractDataStore {
         //
         // should be ok, as we would only be playing with the classloader's allocated space
         OutputStream result = null;
+        url.setDoOutput(true);
 
+        if(auth == null){
+            result = url.getOutputStream();
+        }else{
         synchronized (Authenticator.class) {
             Authenticator.setDefault(auth);
-            url.setDoOutput(true);
 
             // 	      url.connect();
             result = url.getOutputStream();
 
             Authenticator.setDefault(null);
-        }
+        }}
 
         return new BufferedOutputStream(result);
     }
@@ -412,7 +420,6 @@ public class WFSDataStore extends AbstractDataStore {
         url += ("&TYPENAME=" + typeName);
 
         getUrl = new URL(url);
-
         HttpURLConnection hc = (HttpURLConnection) getUrl.openConnection();
         hc.setRequestMethod("GET");
 
@@ -474,6 +481,7 @@ public class WFSDataStore extends AbstractDataStore {
             hints.put(DocumentWriter.SCHEMA_ORDER, new String[]{WFSSchema.NAMESPACE.toString(), uri.toString()});
 
 //        try {
+//            System.out.println(postUrl);
 //            DocumentWriter.writeDocument(new String[] { typeName },
 //                WFSSchema.getInstance(), new OutputStreamWriter(System.out), hints);
 //        } catch (OperationNotSupportedException e) {
@@ -485,11 +493,14 @@ public class WFSDataStore extends AbstractDataStore {
             DocumentWriter.writeDocument(new String[] { typeName },
                 WFSSchema.getInstance(), w, hints);
         } catch (OperationNotSupportedException e) {
-            WFSDataStoreFactory.logger.warning(e.toString());
+            WFSDataStoreFactory.logger.warning(e.getMessage());
             throw new SAXException(e);
         }
+        w.flush();
         os.flush();
-
+        w.close();
+        os.close();
+        
         InputStream is = getInputStream(hc, auth);
         Schema schema = SchemaFactory.getInstance(null, is);
         Element[] elements = schema.getElements();
@@ -683,8 +694,11 @@ public class WFSDataStore extends AbstractDataStore {
             return null;
         }
 
+        
         HttpURLConnection hc = (HttpURLConnection) postUrl.openConnection();
         hc.setRequestMethod("POST");
+        hc.setDoInput(true);
+        hc.setDoOutput(true);
 
         OutputStream os = getOutputStream(hc, auth);
 
@@ -970,7 +984,6 @@ public class WFSDataStore extends AbstractDataStore {
 
     private static class WFSAuthenticator extends Authenticator {
         private PasswordAuthentication pa;
-        private URL host; // this is the getCapabilities url
 
         private WFSAuthenticator() {
         	// not called
@@ -982,32 +995,11 @@ public class WFSDataStore extends AbstractDataStore {
          * @param pass
          * @param host
          */
-        public WFSAuthenticator(String user, String pass, URL host) {
+        public WFSAuthenticator(String user, String pass) {
             pa = new PasswordAuthentication(user, pass.toCharArray());
-            this.host = host;
         }
 
         protected PasswordAuthentication getPasswordAuthentication() {
-            // check protocol
-            if ((host.getProtocol() != null)
-                    && (!host.getProtocol().equals(getRequestingProtocol()))) {
-                return null;
-            }
-
-            // check host
-            if ((host.getHost() != null)
-                    && (!host.getHost().equals(getRequestingHost()))) {
-                return null;
-            }
-
-            // check port
-            // TODO probably should add more ports here ://
-            if ((host.getPort() != 0)
-                    && (host.getPort() != getRequestingPort())) {
-                return null;
-            }
-
-            // TODO add more checks by someone who knows more
             return pa;
         }
     }
