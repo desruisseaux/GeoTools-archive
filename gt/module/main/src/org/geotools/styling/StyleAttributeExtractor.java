@@ -161,7 +161,11 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor implements
     public void visit(RasterSymbolizer rs) {
         if (rs.getGeometryPropertyName() != null) {
             attributeNames.add(rs.getGeometryPropertyName());
-            attributeNames.add("grid");
+            // FIXME
+            // LiteRenderer2 trhwos an Exception:
+            //  Do not know how to deep copy org.geotools.coverage.grid.GridCoverage2D
+            
+            // attributeNames.add("grid");
         }
         
         if (rs.getImageOutline() != null) {
