@@ -60,8 +60,6 @@ public class JTS {
         private CoordinateReferenceSystem crs = null;
         public ReferencedEnvelope(Envelope env, CoordinateReferenceSystem crs){
             super(env);
-            if(crs == null)
-                throw new NullPointerException("CoordinateRefrenceSystem may not be null");
             this.crs = crs;
         }
         
