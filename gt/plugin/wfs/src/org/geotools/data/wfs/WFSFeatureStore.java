@@ -54,7 +54,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore{
 	public Set addFeatures(FeatureReader reader) throws IOException {
 		WFSTransactionState ts = null;
 		if(trans == Transaction.AUTO_COMMIT){
-			ts = new WFSTransactionState();
+			ts = new WFSTransactionState(ds);
 		}else{
 			ts = (WFSTransactionState)trans.getState(ds);
 		}
@@ -84,7 +84,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore{
 	public void removeFeatures(Filter filter) throws IOException {
 		WFSTransactionState ts = null;
 		if(trans == Transaction.AUTO_COMMIT){
-			ts = new WFSTransactionState();
+			ts = new WFSTransactionState(ds);
 		}else{
 			ts = (WFSTransactionState)trans.getState(ds);
 		}
@@ -103,7 +103,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore{
 			Filter filter) throws IOException {
 		WFSTransactionState ts = null;
 		if(trans == Transaction.AUTO_COMMIT){
-			ts = new WFSTransactionState();
+			ts = new WFSTransactionState(ds);
 		}else{
 			ts = (WFSTransactionState)trans.getState(ds);
 		}
@@ -133,7 +133,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore{
 	public void setFeatures(FeatureReader reader) throws IOException {
 		WFSTransactionState ts = null;
 		if(trans == Transaction.AUTO_COMMIT){
-			ts = new WFSTransactionState();
+			ts = new WFSTransactionState(ds);
 		}else{
 			ts = (WFSTransactionState)trans.getState(ds);
 		}

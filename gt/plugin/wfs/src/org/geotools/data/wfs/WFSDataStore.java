@@ -69,14 +69,14 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 public class WFSDataStore extends AbstractDataStore{
-    private WFSCapabilities capabilities = null;
+	protected WFSCapabilities capabilities = null;
     protected static final Logger logger = Logger.getLogger("org.geotools.data.wfs"); 
  	
-    private int protos = 0;
- 	private static final int POST_FIRST = 1;
- 	private static final int GET_FIRST = 2;
- 	private static final int POST_OK = 4;
- 	private static final int GET_OK = 8;
+    protected int protos = 0;
+    protected static final int POST_FIRST = 1;
+    protected static final int GET_FIRST = 2;
+    protected static final int POST_OK = 4;
+    protected static final int GET_OK = 8;
  	
  	private Authenticator auth = null;
  	
@@ -438,7 +438,7 @@ System.out.println(url); // url to request
  	    if(!(transaction == Transaction.AUTO_COMMIT)){
  	    	ts = (WFSTransactionState)transaction.getState(this);
  	    	if(ts == null){
- 	    		ts = new WFSTransactionState();
+ 	    		ts = new WFSTransactionState(this);
  	    		transaction.putState(this,ts);
  	    	}
  	    }
@@ -530,7 +530,7 @@ System.out.println("FILTER WAS "+query.getFilter());
  	    if(!(transaction == Transaction.AUTO_COMMIT)){
  	    	ts = (WFSTransactionState)transaction.getState(this);
  	    	if(ts == null){
- 	    		ts = new WFSTransactionState();
+ 	    		ts = new WFSTransactionState(this);
  	    		transaction.putState(this,ts);
  	    	}
  	    }
@@ -660,9 +660,9 @@ System.out.println("FILTER WAS "+query.getFilter());
 	 */
 	public FeatureSource getFeatureSource(String typeName) throws IOException {
 		if(capabilities.getTransaction()!=null){
-			if(capabilities.getLockFeature()!=null){
-				return new WFSFeatureLocking(this,getSchema(typeName));
-			}
+//			if(capabilities.getLockFeature()!=null){
+//				return new WFSFeatureLocking(this,getSchema(typeName));
+//			}
 			return new WFSFeatureStore(this,getSchema(typeName));
 		}
 		return new WFSFeatureSource(this,getSchema(typeName));
