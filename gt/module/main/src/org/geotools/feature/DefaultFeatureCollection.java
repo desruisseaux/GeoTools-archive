@@ -151,10 +151,20 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
      */
     public boolean add(Object o) {
         Feature feature = (Feature) o;
-
+        if(feature.getParent() == null){
+            feature.setParent(this);
+        }
+        else{
+            try{
+            feature = feature.getFeatureType().duplicate(feature);//expensive clone
+            }
+            catch(org.geotools.feature.IllegalAttributeException iae){
+                //should be uterly impossible.
+            }
+        }
         // This cast is neccessary to keep with the contract of Set!
         boolean changed = features.add(feature);
-
+        
         if (changed) {
             fireChange(feature, CollectionEvent.FEATURES_ADDED);
         }

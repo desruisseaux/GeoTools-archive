@@ -233,7 +233,7 @@ public class DefaultFeatureResults implements FeatureResults {
             FeatureCollection collection = FeatureCollections.newCollection();
             Feature feature;
             FeatureReader reader = reader();
-
+            FeatureType type = reader.getFeatureType();
             while (reader.hasNext()) {
                 collection.add(reader.next());
             }
