@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -47,7 +48,12 @@ public class FCBuffer extends Thread implements FeatureReader {
     public static final int STOP = -2;
 
     /** DOCUMENT ME!  */
-    protected static Logger logger = Logger.getLogger("org.geotools.xml.gml");
+    protected static Logger logger = getLogger();
+    private static final Logger getLogger(){
+    	Logger l = Logger.getLogger("org.geotools.xml.gml");
+    	l.setLevel(Level.WARNING);
+    	return l;
+    }
 
     // positive number is the number of feature to parse before yield
 

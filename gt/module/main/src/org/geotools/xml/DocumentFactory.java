@@ -141,7 +141,6 @@ public class DocumentFactory {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
         spf.setValidating(false);
-
         try {
             return spf.newSAXParser();
         } catch (ParserConfigurationException e) {

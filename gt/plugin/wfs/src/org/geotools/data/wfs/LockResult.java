@@ -15,7 +15,32 @@ import org.geotools.filter.FidFilter;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class LockResult {
-	private String lockId;
-	private FidFilter supported;
-	private FidFilter notSupported;
+	protected String lockId;
+	protected FidFilter supported;
+	protected FidFilter notSupported;
+	
+	private LockResult(){}
+	public LockResult(String lockId, FidFilter supported, FidFilter notSupported){
+		this.lockId = lockId;
+		this.supported = supported;
+		this.notSupported = notSupported;
+	}
+	/**
+	 * @return Returns the lockId.
+	 */
+	public String getLockId() {
+		return lockId;
+	}
+	/**
+	 * @return Returns the notSupported.
+	 */
+	public FidFilter getNotSupported() {
+		return notSupported;
+	}
+	/**
+	 * @return Returns the supported.
+	 */
+	public FidFilter getSupported() {
+		return supported;
+	}
 }

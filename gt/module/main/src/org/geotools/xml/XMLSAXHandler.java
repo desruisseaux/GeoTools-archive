@@ -61,6 +61,7 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     protected final static Logger logger = Logger.getLogger(
             "net.refractions.xml.sax");
+    protected static Level level = Level.WARNING;
 
     // the stack of handlers
     private Stack handlers = new Stack();
@@ -96,6 +97,7 @@ public class XMLSAXHandler extends DefaultHandler {
     public XMLSAXHandler(URI intendedDocument, Map hints) {
         instanceDocument = intendedDocument;
         this.hints = hints;
+        logger.setLevel(level);
     }
     /**
      * <p>
@@ -109,6 +111,7 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     public XMLSAXHandler(Map hints) {
         this.hints = hints;
+        logger.setLevel(level);
     }
 
     /**
@@ -296,6 +299,7 @@ e.printStackTrace();
      * @param l
      */
     public static void setLogLevel(Level l) {
+    	level = l;
         logger.setLevel(l);
         XMLElementHandler.setLogLevel(l);
     }

@@ -40,6 +40,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+
 import javax.naming.OperationNotSupportedException;
 
 
@@ -54,6 +56,11 @@ import javax.naming.OperationNotSupportedException;
  * @author dzwiers www.refractions.net
  */
 public class GMLSchema implements Schema {
+	
+	public static void setLogLevel(Level l){
+		GMLComplexTypes.logger.setLevel(l);
+		FCBuffer.logger.setLevel(l);
+	}
     
     /** GML target namespace */
     public static final URI NAMESPACE = makeURI("http://www.opengis.net/gml");

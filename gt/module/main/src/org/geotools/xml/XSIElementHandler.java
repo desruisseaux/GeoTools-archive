@@ -47,6 +47,7 @@ public abstract class XSIElementHandler implements Serializable {
      */
     protected final static Logger logger = Logger.getLogger(
             "net.refractions.xsi.element");
+    private static Level level = Level.WARNING;
 
     /** Type constants */
     public static final int DEFAULT = 0; // for those cases where type is not
@@ -74,6 +75,7 @@ public abstract class XSIElementHandler implements Serializable {
      * the sub-packages
      */
     protected XSIElementHandler() {
+    	logger.setLevel(level);
     }
 
     /**
@@ -186,6 +188,7 @@ public abstract class XSIElementHandler implements Serializable {
      * @param l
      */
     public static void setLogLevel(Level l) {
+    	level = l;
         logger.setLevel(l);
     }
 }

@@ -69,6 +69,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 
@@ -85,8 +86,13 @@ import javax.naming.OperationNotSupportedException;
  */
 public class GMLComplexTypes {
     // used for debugging
-    private static Logger logger = Logger.getLogger(
-            "net.refractions.gml.static");
+    protected static Logger logger = getLogger();
+    private static final Logger getLogger(){
+    	Logger l = Logger.getLogger("net.refractions.gml.static");
+    	l.setLevel(Level.WARNING);
+    	return l;
+    }
+    	
 
     /** DOCUMENT ME!  */
     public static final String STREAM_HINT = "org.geotools.xml.gml.STREAM_HINT";

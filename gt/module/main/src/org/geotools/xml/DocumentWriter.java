@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 
@@ -63,6 +64,12 @@ public class DocumentWriter {
     /** DOCUMENT ME!  */
     public static final Logger logger = Logger.getLogger(
             "net.refractions.xml.write");
+    private static Level level = Level.WARNING;
+    
+    public static void setLevel(Level l){
+    	level = l;
+    	logger.setLevel(l);
+    }
 
     /** Writer ... include the key to represent true when writing to files, include a Writer to write to otherwise. */
     public static final String WRITE_SCHEMA = "DocumentWriter_WRITE_SCHEMA";
@@ -228,6 +235,7 @@ public class DocumentWriter {
     Map hints = wch.hints;
 
     Element e = null;
+    logger.setLevel(level);
     if(hints!=null && hints.containsKey(BASE_ELEMENT)){
         e = (Element)hints.get(BASE_ELEMENT);
         if(e!=null && e.getType()!=null)
