@@ -56,7 +56,7 @@ public class WMS1_1_1 extends Specification {
 
     public WMS1_1_1() {
         parsers = new WMSParser[1];
-        parsers[0] = new Spec111WMSParser();
+        parsers[0] = new Parser();
     }
 
     /** Expected name attribute for root element */
