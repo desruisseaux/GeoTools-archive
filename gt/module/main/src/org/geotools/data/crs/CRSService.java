@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -55,10 +54,8 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.referencing.Factory;
 import org.geotools.units.Unit;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -246,7 +243,7 @@ public class CRSService {
 		    CoordinateSystemAuthorityFactory factory =
 		        (CoordinateSystemAuthorityFactory) i.next();
 		    
-		    if( !factory.getAuthority().equals( authority ) ){
+		    if( !factory.getAuthority().equalsIgnoreCase( authority ) ){
 		        continue;
 		    }
 		    try {
