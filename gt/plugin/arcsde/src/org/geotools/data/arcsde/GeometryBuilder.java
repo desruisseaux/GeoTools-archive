@@ -562,7 +562,7 @@ class MultiPointBuilder extends GeometryBuilder {
             sdePoints[i] = new SDEPoint(currPoint.getX(), currPoint.getY());
         }
 
-        dest.generatePoint(1, sdePoints);
+        dest.generatePoint(nPoints, sdePoints);
     }
 }
 
