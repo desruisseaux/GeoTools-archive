@@ -27,6 +27,7 @@ import org.geotools.data.coverage.grid.GridCoverageWriter ;
 //J2SE Dependencies
 import java.util.HashMap ; 
 import java.io.File ; 
+import java.net.URL;
 
 /**
  *
@@ -54,26 +55,28 @@ public class GeoTiffFormat extends AbstractGridFormat {
     }
     
     public boolean accepts(Object input) {
-        boolean retval = false; 
         
         // If the object is some version of a filename, check the extension
         // for "tif"
-        if ((input instanceof File) || (input instanceof String)) {
-            String fname = null ; 
-            if (input instanceof File) { 
-                fname = ((File)input).getName() ; 
-            } else {
-                fname = (new File((String)input)).getName() ;  
-            }
-            
-            // get the filename extension
-            String []fname_parts = fname.split(".") ; 
-            
-            // accept the input if we have a .tif extension
-            retval = fname_parts[fname_parts.length-1].equalsIgnoreCase("tif");
-        }
+        String pathname = null;
         
-        return retval ; 
+        if (input instanceof String) {
+            pathname = (new File((String)input)).getName() ; 
+        }
+        if (input instanceof File) {
+            pathname = ((File)input).getName();
+        }
+        if (input instanceof URL) {
+            URL url = (URL) input;
+            pathname = url.getFile();
+        }
+
+        if (pathname != null && 
+            ((pathname.endsWith(".tif")) || (pathname.endsWith(".TIF")))) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     public GridCoverageReader getReader(Object source) {
