@@ -2,7 +2,7 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-jdbc</name>
+  <name>geotools-geometryless</name>
   <id>jdbc-geometryless</id>
   <currentVersion>2.1.x</currentVersion>
   <package>org.geotools</package>
