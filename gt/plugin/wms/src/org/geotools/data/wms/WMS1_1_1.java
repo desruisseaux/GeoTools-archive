@@ -78,11 +78,7 @@ public class WMS1_1_1 extends WMS1_1_0 {
     }
 
     static public class GetCapsRequest extends WMS1_1_0.GetCapsRequest {
-        /**
-         * Construct a Request compatable with a 1.0.0 Web Feature Server.
-         *
-         * @param urlGetCapabilities URL of GetCapabilities document.
-         */
+
         public GetCapsRequest(URL urlGetCapabilities) {
             super(urlGetCapabilities);
         }

@@ -16,10 +16,7 @@
  */
 package org.geotools.data.wms;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,10 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.geotools.util.InternationalString;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
 
 
 /**

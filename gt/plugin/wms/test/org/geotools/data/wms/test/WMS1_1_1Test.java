@@ -41,25 +41,11 @@ public class WMS1_1_1Test extends WMS1_1_0Test {
 		"http://www2.demis.nl/mapserver/Request.asp?wmtver=1.0.0&request=getcapabilities");
 	}
 
-	public void testGetName() {
-		assertEquals(spec.getName(), "WMT_MS_Capabilities");
-	}
-
 	public void testGetVersion() {
 		assertEquals(spec.getVersion(), "1.1.1");
 	}
 	public void testCreateParser() throws Exception {
-        File getCaps = TestData.file(this, "1.1.1Capabilities.xml");
-        URL getCapsURL = getCaps.toURL();
-
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(getCapsURL);
-
-        WMSParser parser = spec.createParser(document);
-        assertEquals(parser.getClass(), WMS1_1_1.Parser.class);
-        
-        WMSCapabilities capabilities = parser.constructCapabilities(document,
-                new WMSBuilder());
+        WMSCapabilities capabilities = createCapabilities("1.1.1Capabilities.xml");
         
         assertEquals(capabilities.getVersion(), "1.1.1");
         assertEquals(capabilities.getService().getName(), "OGC:WMS");

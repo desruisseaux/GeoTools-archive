@@ -42,6 +42,10 @@ public class Service {
 
     /** Abstract allows a description providing more information about the Service */
     private String _abstract;
+    
+    private int layerLimit;
+    private int maxWidth;
+    private int maxHeight;
 
     public String get_abstract() {
         return _abstract;
@@ -82,4 +86,22 @@ public class Service {
     public void setTitle(String title) {
         this.title = title;
     }
+	public int getLayerLimit() {
+		return layerLimit;
+	}
+	public void setLayerLimit(int layerLimit) {
+		this.layerLimit = layerLimit;
+	}
+	public int getMaxHeight() {
+		return maxHeight;
+	}
+	public void setMaxHeight(int maxHeight) {
+		this.maxHeight = maxHeight;
+	}
+	public int getMaxWidth() {
+		return maxWidth;
+	}
+	public void setMaxWidth(int maxWidth) {
+		this.maxWidth = maxWidth;
+	}
 }

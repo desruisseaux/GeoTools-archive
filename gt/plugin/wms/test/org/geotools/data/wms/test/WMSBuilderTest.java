@@ -38,7 +38,7 @@ public class WMSBuilderTest extends TestCase {
         WMSBuilder builder = new WMSBuilder();
         builder.buildCapabilities("1.1.1");
         builder.buildService("FakeService", "Test",
-            new URL("http://online.com"), "nothin", null);
+            new URL("http://online.com"), "nothin", null, 4, 2000, 1000);
 
         List formats = new ArrayList();
         formats.add("image/jpeg");
@@ -71,6 +71,11 @@ public class WMSBuilderTest extends TestCase {
         assertEquals(capabilities.getVersion(), "1.1.1");
         assertEquals(capabilities.getService().getName(), "FakeService");
         assertEquals(capabilities.getService().getTitle(), "Test");
+        
+        assertEquals(capabilities.getService().getLayerLimit(), 4);
+        assertEquals(capabilities.getService().getMaxWidth(), 2000);
+        assertEquals(capabilities.getService().getMaxHeight(), 1000);
+        
         assertEquals(capabilities.getRequest().getGetCapabilities().getGet(),
             new URL("http://get.com"));
         assertEquals(capabilities.getRequest().getGetMap().getFormatStrings()[0],

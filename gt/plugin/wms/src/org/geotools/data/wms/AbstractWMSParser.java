@@ -46,6 +46,9 @@ import java.util.TreeSet;
  * @author Jody Garnett, Refractions Research
  */
 public abstract class AbstractWMSParser implements WMSParser {
+	
+	protected Namespace defaultNamespace = Namespace.NO_NAMESPACE;
+	
     /**
      * Version number understood by this parser.
      * <p>
@@ -101,7 +104,7 @@ public abstract class AbstractWMSParser implements WMSParser {
         }
 
         String version = element.getAttributeValue("version"); //$NON-NLS-1$
-
+        
         if ((version == null) || !version.equals(getVersion())) {
             return WMSParser.NO;
         }
@@ -130,12 +133,12 @@ public abstract class AbstractWMSParser implements WMSParser {
             String version = capabilitiesElement.getAttributeValue("version"); //$NON-NLS-1$
 
             builder.buildCapabilities(version);
-            parseService(capabilitiesElement.getChild("Service"), builder); //$NON-NLS-1$
+            parseService(capabilitiesElement.getChild("Service", defaultNamespace), builder); //$NON-NLS-1$
 
             Element capabilityElement = capabilitiesElement.getChild(
-                    "Capability"); //$NON-NLS-1$
-            parseRequest(capabilityElement.getChild("Request"), builder); //$NON-NLS-1$
-            parseLayer(capabilityElement.getChild("Layer"), builder, null); //$NON-NLS-1$
+                    "Capability", defaultNamespace); //$NON-NLS-1$
+            parseRequest(capabilityElement.getChild("Request", defaultNamespace), builder); //$NON-NLS-1$
+            parseLayer(capabilityElement.getChild("Layer", defaultNamespace), builder, null); //$NON-NLS-1$
         } catch (MalformedURLException exception) {
             throw new ParseCapabilitiesException("Unable to parse URL properly",
                 null, exception);
@@ -157,20 +160,25 @@ public abstract class AbstractWMSParser implements WMSParser {
      */
     protected void parseLayer(Element layerElement, WMSBuilder builder,
         String parentTitle) throws MalformedURLException {
-        String title = layerElement.getChildText("Title"); //$NON-NLS-1$
-        String name = layerElement.getChildText("Name"); //$NON-NLS-1$
+        String title = layerElement.getChildText("Title", defaultNamespace); //$NON-NLS-1$
+        String name = layerElement.getChildText("Name", defaultNamespace); //$NON-NLS-1$
         Set srsElements = querySRS(layerElement);
         List styleElements = queryStyles(layerElement);
+        
+        String queryAttribute = layerElement.getAttributeValue(
+                "queryable", defaultNamespace);
 
-        boolean queryable = Integer.parseInt(layerElement.getAttributeValue(
-                    "queryable")) == 1; //$NON-NLS-1$
+        boolean queryable = false; 
+        if (queryAttribute != null && queryAttribute.length() != 0) {
+        	queryable = Integer.parseInt(queryAttribute) == 1; //$NON-NLS-1$
+        }
 
         builder.buildLayer(title, name, queryable, parentTitle, srsElements,
             styleElements);
 
         parseBoundingBoxes(layerElement, builder);
 
-        List children = layerElement.getChildren("Layer"); //$NON-NLS-1$
+        List children = layerElement.getChildren("Layer", defaultNamespace); //$NON-NLS-1$
 
         for (Iterator i = children.iterator(); i.hasNext();) {
             parseLayer((Element) i.next(), builder, title);
@@ -178,7 +186,7 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
     protected void parseBoundingBoxes(Element layerElement, WMSBuilder builder) {
-        List bboxElements = layerElement.getChildren("BoundingBox"); //$NON-NLS-1$
+        List bboxElements = layerElement.getChildren("BoundingBox", defaultNamespace); //$NON-NLS-1$
         Iterator iter = bboxElements.iterator();
 
         while (iter.hasNext()) {
@@ -209,14 +217,14 @@ public abstract class AbstractWMSParser implements WMSParser {
      */
     protected List queryStyles(Element layerElement) {
         // TODO This is buggy. Need to extract Style.Name.value not Style.value
-        List styleElements = layerElement.getChildren("Style"); //$NON-NLS-1$
+        List styleElements = layerElement.getChildren("Style", defaultNamespace); //$NON-NLS-1$
         List styles = new ArrayList();
 
         if (styleElements != null) {
             Iterator iter = styleElements.iterator();
 
             while (iter.hasNext()) {
-                String value = ((Element) iter.next()).getChildText("Name"); //$NON-NLS-1$
+                String value = ((Element) iter.next()).getChildText("Name", defaultNamespace); //$NON-NLS-1$
                 styles.add(value);
             }
         }
@@ -233,7 +241,7 @@ public abstract class AbstractWMSParser implements WMSParser {
      */
     protected List extractStrings(Element element, String childName) {
         //TODO: Remove srs-nessof this.
-        List srsElements = element.getChildren(childName);
+        List srsElements = element.getChildren(childName, defaultNamespace);
         List srs = new ArrayList();
 
         if (srsElements != null) {
@@ -258,16 +266,16 @@ public abstract class AbstractWMSParser implements WMSParser {
      */
     protected void parseRequest(Element requestElement, WMSBuilder builder)
     	throws MalformedURLException {
-        Element getCapabilities = requestElement.getChild(getRequestGetCapName());
+        Element getCapabilities = requestElement.getChild(getRequestGetCapName(), defaultNamespace);
 
         builder.buildGetCapabilitiesOperation(queryFormats(getCapabilities),
             queryGet(getCapabilities), queryPost(getCapabilities));
 
-        Element getMap = requestElement.getChild(getRequestGetMapName());
+        Element getMap = requestElement.getChild(getRequestGetMapName(), defaultNamespace);
         builder.buildGetMapOperation(queryFormats(getMap), queryGet(getMap),
             queryPost(getMap));
 
-        Element getFeatureInfo = requestElement.getChild(getRequestGetFeatureInfoName());
+        Element getFeatureInfo = requestElement.getChild(getRequestGetFeatureInfoName(), defaultNamespace);
 
         if (getFeatureInfo != null) {
             builder.buildGetFeatureInfoOperation(queryFormats(getFeatureInfo),
@@ -293,22 +301,38 @@ public abstract class AbstractWMSParser implements WMSParser {
      */
     protected void parseService(Element serviceElement, WMSBuilder builder)
         throws MalformedURLException {
-        String name = serviceElement.getChildText("Name"); //$NON-NLS-1$
-        String title = serviceElement.getChildText("Title"); //$NON-NLS-1$
+        String name = serviceElement.getChildText("Name", defaultNamespace); //$NON-NLS-1$
+        String title = serviceElement.getChildText("Title", defaultNamespace); //$NON-NLS-1$
 
         URL onlineResource = queryServiceOnlineResource(serviceElement);
 
-        String description = serviceElement.getChildText("Abstract"); //$NON-NLS-1$
+        String description = serviceElement.getChildText("Abstract", defaultNamespace); //$NON-NLS-1$
 
         String[] keywords = queryKeywords(serviceElement);
+        
+        int layerLimit = queryLayerLimit(serviceElement);
+        int maxWidth = queryMaxWidth(serviceElement);
+        int maxHeight = queryMaxHeight(serviceElement);
 
-        builder.buildService(name, title, onlineResource, description, keywords);
+        builder.buildService(name, title, onlineResource, description, keywords, layerLimit, maxWidth, maxHeight);
     }
 
-    protected Set querySRS(Element layerElement) {
+	protected int queryMaxHeight(Element serviceElement) {
+		return 0;
+	}
+
+	protected int queryMaxWidth(Element serviceElement) {
+		return 0;
+	}
+
+	protected int queryLayerLimit(Element serviceElement) {
+		return 0;
+	}
+
+	protected Set querySRS(Element layerElement) {
 		Set srss = new TreeSet();
 		
-		List srsElements = layerElement.getChildren("SRS");
+		List srsElements = layerElement.getChildren(getCRSElementName(), defaultNamespace);
 		Iterator iter = srsElements.iterator();
 		while (iter.hasNext()) {
 			Element srsElement = (Element) iter.next();
@@ -321,22 +345,26 @@ public abstract class AbstractWMSParser implements WMSParser {
 	    return srss;
 	}
 
+	protected String getCRSElementName() {
+		return "SRS";
+	}
+
 	protected URL queryServiceOnlineResource(Element serviceElement) throws MalformedURLException {
-	    return new URL(serviceElement.getChildText("OnlineResource")); //$NON-NLS-1$
+	    return new URL(serviceElement.getChildText("OnlineResource", defaultNamespace)); //$NON-NLS-1$
 	}
 
 	protected URL queryDCPType(Element element, String httpType) throws MalformedURLException {
-	    List dcpTypeElements = element.getChildren("DCPType"); //$NON-NLS-1$
+	    List dcpTypeElements = element.getChildren("DCPType", defaultNamespace); //$NON-NLS-1$
 	
 	    for (Iterator i = dcpTypeElements.iterator(); i.hasNext();) {
 	        Element dcpTypeElement = (Element) i.next();
-	        Element httpElement = dcpTypeElement.getChild("HTTP"); //$NON-NLS-1$
+	        Element httpElement = dcpTypeElement.getChild("HTTP", defaultNamespace); //$NON-NLS-1$
 	
-	        Element httpTypeElement = httpElement.getChild(httpType);
+	        Element httpTypeElement = httpElement.getChild(httpType, defaultNamespace);
 	
 	        if (httpTypeElement != null) {
 	            return new URL((httpTypeElement.getAttributeValue(
-	                    "onlineResource"))); //$NON-NLS-1$
+	                    "onlineResource", defaultNamespace))); //$NON-NLS-1$
 	        }
 	    }
 	
@@ -356,7 +384,7 @@ public abstract class AbstractWMSParser implements WMSParser {
 	}
 
 	protected String[] queryKeywords(Element serviceElement) {
-	    String keywords = serviceElement.getChildTextTrim("Keywords"); //$NON-NLS-1$
+	    String keywords = serviceElement.getChildTextTrim("Keywords", defaultNamespace); //$NON-NLS-1$
 	
 	    return keywords.split(" "); //$NON-NLS-1$
 	}
@@ -388,7 +416,7 @@ public abstract class AbstractWMSParser implements WMSParser {
 	 */
 	protected List queryFormats(Element op) {
 	    // Example: <Format><PNG /><JPEG /><GML.1 /></Format>
-	    Element formatElement = op.getChild("Format"); //$NON-NLS-1$
+	    Element formatElement = op.getChild("Format", defaultNamespace); //$NON-NLS-1$
 	
 	    Iterator iter;
 	

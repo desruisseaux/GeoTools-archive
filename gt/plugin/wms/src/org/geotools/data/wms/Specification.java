@@ -59,10 +59,6 @@ import java.net.URL;
  * @author Jody Garnett, Refractions Reasearch
  */
 public abstract class Specification {
-    /** Expected name attribute for root element */
-    public String getName() {
-        return "WMT_MS_Capabilities";
-    }
 
     /**
      * Expected version attribute for root element.

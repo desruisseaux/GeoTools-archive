@@ -49,10 +49,6 @@ public class WMS1_0_0Test extends TestCase {
                 "http://www2.demis.nl/mapserver/Request.asp?wmtver=1.0.0&request=getcapabilities");
     }
 
-    public void testGetName() {
-        assertEquals(spec.getName(), "WMT_MS_Capabilities");
-    }
-
     public void testGetVersion() {
         assertEquals(spec.getVersion(), "1.0.0");
     }
@@ -136,7 +132,6 @@ public class WMS1_0_0Test extends TestCase {
         WMSParser parser = spec.createParser(document);
         
         parserCheck(parser);
-        
 
         return parser.constructCapabilities(document, new WMSBuilder());
 	}

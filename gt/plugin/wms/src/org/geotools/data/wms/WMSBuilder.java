@@ -90,15 +90,21 @@ public class WMSBuilder {
      * @param onlineResource the URL of the server that provides the service
      * @param _abstract a description of the service
      * @param keywords searchable metadata keywords about the server
+     * @param maxHeight
+     * @param maxWidth
+     * @param layerLimit
      */
     public void buildService(String name, String title, URL onlineResource,
-        String _abstract, String[] keywords) {
+        String _abstract, String[] keywords, int layerLimit, int maxWidth, int maxHeight) {
         service = new Service();
         service.setName(name);
         service.setTitle(title);
         service.setOnlineResource(onlineResource);
         service.set_abstract(_abstract);
         service.setKeywordList(keywords);
+        service.setLayerLimit(layerLimit);
+        service.setMaxWidth(maxWidth);
+        service.setMaxHeight(maxHeight);
     }
 
     /**

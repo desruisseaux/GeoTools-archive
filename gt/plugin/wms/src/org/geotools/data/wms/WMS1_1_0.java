@@ -6,19 +6,13 @@
  */
 package org.geotools.data.wms;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import org.geotools.data.wms.WMS1_0_0.Parser;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
-import org.geotools.util.InternationalString;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -59,17 +53,17 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		}
 
 		protected URL queryDCPType(Element element, String httpType) throws MalformedURLException {
-		    List dcpTypeElements = element.getChildren("DCPType"); //$NON-NLS-1$
+		    List dcpTypeElements = element.getChildren("DCPType", defaultNamespace); //$NON-NLS-1$
 		
 		    for (Iterator i = dcpTypeElements.iterator(); i.hasNext();) {
 		        Element dcpTypeElement = (Element) i.next();
-		        Element httpElement = dcpTypeElement.getChild("HTTP"); //$NON-NLS-1$
+		        Element httpElement = dcpTypeElement.getChild("HTTP", defaultNamespace); //$NON-NLS-1$
 		
-		        Element httpTypeElement = httpElement.getChild(httpType);
+		        Element httpTypeElement = httpElement.getChild(httpType, defaultNamespace);
 		
 		        if (httpTypeElement != null) {
 		            return parseOnlineResource(httpTypeElement.getChild(
-		                    "OnlineResource")); //$NON-NLS-1$
+		                    "OnlineResource", defaultNamespace)); //$NON-NLS-1$
 		        }
 		    }
 		
@@ -96,7 +90,7 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		 * @return a URL containing the value in the OnlineResource element
 		 */
 		protected URL queryServiceOnlineResource(Element serviceElement) throws MalformedURLException {
-		    return parseOnlineResource(serviceElement.getChild("OnlineResource")); //$NON-NLS-1$
+		    return parseOnlineResource(serviceElement.getChild("OnlineResource", defaultNamespace)); //$NON-NLS-1$
 		}
 
 		protected String getRequestGetFeatureInfoName() {
@@ -120,10 +114,10 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		 * @return A String[], each element containing a keyword
 		 */
 		protected String[] queryKeywordList(Element keywordListElement) {
-		    String[] keywords = new String[keywordListElement.getChildren().size()];
+		    String[] keywords = new String[keywordListElement.getChildren(null, defaultNamespace).size()];
 		
-		    for (int i = 0; i < keywordListElement.getChildren().size(); i++) {
-		        Element keyword = (Element) keywordListElement.getChildren().get(i);
+		    for (int i = 0; i < keywordListElement.getChildren(null, defaultNamespace).size(); i++) {
+		        Element keyword = (Element) keywordListElement.getChildren(null, defaultNamespace).get(i);
 		        keywords[i] = keyword.getText();
 		    }
 		
@@ -138,7 +132,7 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		 */
 		protected String[] queryKeywords(Element serviceElement) {
 		    String[] keywords = null;
-		    Element keywordListElement = serviceElement.getChild("KeywordList"); //$NON-NLS-1$
+		    Element keywordListElement = serviceElement.getChild("KeywordList", defaultNamespace); //$NON-NLS-1$
 		
 		    if (keywordListElement != null) {
 		        keywords = queryKeywordList(keywordListElement);
@@ -193,7 +187,7 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		    Iterator iter;
 		
 		    List formats = new ArrayList();
-		    List formatElements = op.getChildren("Format"); //$NON-NLS-1$
+		    List formatElements = op.getChildren("Format", defaultNamespace); //$NON-NLS-1$
 		    iter = formatElements.iterator();
 		
 		    while (iter.hasNext()) {
