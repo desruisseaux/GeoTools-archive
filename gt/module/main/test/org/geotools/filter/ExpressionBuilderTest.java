@@ -79,6 +79,8 @@ public class ExpressionBuilderTest extends FilterTestSupport {
             assertTrue(filter.contains(testFeature));
             filter = (Filter)ExpressionBuilder.parse("5 > 10");
             assertFalse(filter.contains(testFeature));
+            filter = (Filter)ExpressionBuilder.parse("testInteger < 2000");
+            assertTrue(filter.contains(testFeature));
             
         } catch(ParseException pe){
             fail(pe.getMessage());
