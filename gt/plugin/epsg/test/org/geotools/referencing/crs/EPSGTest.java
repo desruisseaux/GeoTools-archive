@@ -101,11 +101,12 @@ public class EPSGTest extends TestCase {
         
         for( Iterator i=codes.iterator(); i.hasNext(); ){           
             CoordinateReferenceSystem crs;
+            String code = (String) i.next();
             try {
-                crs = (CoordinateReferenceSystem) factory.createObject( (String) i.next() );
+                crs = (CoordinateReferenceSystem) factory.createObject( code );
                 if( crs != null ) count ++;                
             } catch (Throwable e) {
-                System.err.println("WARNING:"+e );
+                System.err.println("WARNING (CRS: "+code+" ):"+e );
             }            
         }
         System.out.println( "success:" + count + "/" + total );                
