@@ -124,7 +124,6 @@ public class ArcGridReader  implements GridCoverageReader {
     pg.parameter("Compressed").setValue(compress);
 
 
-
     //the file can be read
     //GRASS or arcgrid?
     try{
@@ -186,6 +185,7 @@ public class ArcGridReader  implements GridCoverageReader {
 
     }
   }
+
 
   /**
    * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataNames()
@@ -371,13 +371,13 @@ public class ArcGridReader  implements GridCoverageReader {
         this.arcGridRaster.getNCols() * this.arcGridRaster.getCellSize(),
         this.arcGridRaster.getYlCorner() +
         this.arcGridRaster.getNRows() * this.arcGridRaster.getCellSize()});
-        
+
         envelope.setCoordinateReferenceSystem(coordinateSystem);
 
     try {
       //////////////////////////////////////////////////////////////////////////////////////////////////
       //
-      //TODO this is not finished
+      //TODO this is not finished it is just a temporary hack
       //
       //////////////////////////////////////////////////////////////////////////////////////////////////
       ColorModel cm=RasterFactory.createComponentColorModel(
@@ -392,7 +392,7 @@ public class ArcGridReader  implements GridCoverageReader {
             envelope);
       //////////////////////////////////////////////////////////////////////////////////////////////////
       //
-      //TODO this is not finished
+      //TODO this is not finishedit is just a temporary hack
       //
       //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -404,9 +404,15 @@ public class ArcGridReader  implements GridCoverageReader {
     return null;
   }
 
-  /**
+  /** Gets the coordinate system that will be associated to the GridCoverage.
    * Gets the coordinate system that will be associated to the GridCoverage.
-   * The WGS84 coordinate system is used by default
+   * The WGS84 coordinate system is used by default.
+   * It is worth to point out that when reading from a
+   * stream which is not connected to a file, like from an http connection
+   * (e.g. from a WCS) we cannot rely on recevig a prj file too.
+   * In this case the echange of information about referenceing should proceed
+   * the echange of data thus I rely on this ans I ask the user who's invoking the read
+   * operation to provide me a valid crs and envelope thru read parameters.
    *
    * @return the coordinate system for GridCoverage creation
    */
@@ -435,7 +441,19 @@ public class ArcGridReader  implements GridCoverageReader {
               pathname=url.getPath().substring(0,url.getPath().lastIndexOf("/")+1);
 	      name = url.getPath().substring(url.getPath().lastIndexOf("/")+1,url.getPath().length());
 	    }else
-	    	throw new Exception("fake exception");
+            {
+              //let's check if the user provided some crs information otherwise go for the
+              //default WGS84
+              if(format.getReadParameters()!=null &&
+                  format.getReadParameters().parameter("crs")!=null)
+              {
+                //we should always get here cause I provide a default value for
+                //the crs parameter set to WGS84
+                return this.coordinateSystem=(CoordinateReferenceSystem)format.getReadParameters().parameter("crs").getValue();
+              }
+              //go for the default value
+              throw new Exception("fake exception");
+            }
 	    //build up the name
 	    name = pathname +
 	        (name.lastIndexOf(".") > 0 ? name.substring(0, name.indexOf(".")) :
@@ -443,6 +461,7 @@ public class ArcGridReader  implements GridCoverageReader {
 	        ".prj";
 
 	    //read the prj info from the file
+            //if does not exist go for the default value
 	    BufferedReader reader= new BufferedReader(new FileReader(name));
 
 	    //reading infos
