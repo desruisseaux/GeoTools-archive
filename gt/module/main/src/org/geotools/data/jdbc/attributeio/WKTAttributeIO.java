@@ -71,6 +71,9 @@ public class WKTAttributeIO implements AttributeIO {
     public Object read(ResultSet rs, int position) throws IOException {
         try {
             String wkt = rs.getString(position);
+            if (wkt == null || wkt.equals("")) {
+	        return null;
+            }
 
             return getWKTReader().read(wkt);
         } catch (SQLException e) {

@@ -37,7 +37,19 @@ import java.util.logging.Logger;
  * features from the database. Useful when the resultset got from the database
  * is not updatable, for example.
  *
+ * @task TODO: Use prepared statements for inserts.  Jody says that oracle
+ *             at least will perform faster, and I imagine postgis will
+ *             too.  This will require a bit of rearchitecture, since the
+ *             statement should just be made once, right now even if there
+ *             were many features coming in they would all have to make
+ *             a new prepared statement - should be able to do it before
+ *             and then just fill it up for each feature.  And for oracle
+ *             Jody has some convenience methods in his SDO stuff that
+ *             works with prepared statements and STRUCTS directly.
+ *             See http://jira.codehaus.org/browse/GEOT-219 (close when done).
+ *
  * @author Andrea Aime
+ * @version $Id$
  */
 public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
     /** The logger for the jdbc module. */
@@ -117,7 +129,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
         FeatureType fetureType = ftInfo.getSchema();
 
-        String tableName = fetureType.getTypeName();
+        String tableName = encodeName(fetureType.getTypeName());
         AttributeType[] attributeTypes = fetureType.getAttributeTypes();
 
         String attrValue;
@@ -134,7 +146,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         }
 
         for (int i = 0; i < attributeTypes.length; i++) {
-            statementSQL.append(attributeTypes[i].getName()).append(",");
+	    String colName = encodeName(attributeTypes[i].getName());
+            statementSQL.append(colName).append(",");
         }
 
         statementSQL.setCharAt(statementSQL.length() - 1, ')');
@@ -200,6 +213,14 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
     }
 
     /**
+     * Encodes the tableName, default is to do nothing, but postgis will
+     * override and put double quotes around the tablename.
+     */
+    protected String encodeName(String tableName) {
+	return tableName;
+    }
+
+    /**
      * Turns a geometry into the textual version needed for the sql statement
      *
      * @param geom
@@ -226,7 +247,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
             String sql = makeDeleteSql(current);
             LOGGER.info(sql);
-            System.out.println(sql);
+            //System.out.println(sql);
             statement.executeUpdate(sql);
         } catch (SQLException sqle) {
             String msg = "SQL Exception writing geometry column";
@@ -258,7 +279,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
         FeatureType fetureType = ftInfo.getSchema();
 
-        String tableName = fetureType.getTypeName();
+        String tableName = encodeName(fetureType.getTypeName());
 
         StringBuffer statementSQL = new StringBuffer("DELETE FROM " + tableName
                 + " WHERE ");
@@ -330,7 +351,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         FeatureType featureType = ftInfo.getSchema();
         AttributeType[] attributes = featureType.getAttributeTypes();
 
-        String tableName = featureType.getTypeName();
+        String tableName = encodeName(featureType.getTypeName());
 
         StringBuffer statementSQL = new StringBuffer("UPDATE " + tableName
                 + " SET ");
@@ -343,8 +364,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 if (LOGGER.isLoggable(Level.INFO)) {
                     LOGGER.info("modifying att# " + i + " to " + currAtt);
                 }
-
-                statementSQL.append(attributes[i].getName()).append(" = ")
+		String colName = encodeName(attributes[i].getName());
+                statementSQL.append(colName).append(" = ")
                             .append(addQuotes(currAtt)).append(", ");
             }
         }

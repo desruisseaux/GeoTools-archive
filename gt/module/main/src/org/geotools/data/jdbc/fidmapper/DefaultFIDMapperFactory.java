@@ -317,6 +317,14 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
         return autoIncrement;
     }
 
+    /**
+     * Returns true if the dataType for the column can serve as a primary
+     * key.  Note that this now returns true for a DECIMAL type, because
+     * oracle Numbers are returned in jdbc as DECIMAL.  This may cause
+     * errors in very rare cases somewhere down the line, but only if
+     * users do something incredibly silly like defining a primary key
+     * with a double.
+     */
     protected boolean isIntegralType(int dataType) {
         return (dataType == Types.BIGINT) || (dataType == Types.INTEGER)
         || (dataType == Types.NUMERIC) || (dataType == Types.SMALLINT)

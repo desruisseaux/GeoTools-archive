@@ -393,7 +393,7 @@ public class JDBCFeatureSource implements FeatureSource {
             sqlBuilder.sqlFrom(sql, typeName);
             sqlBuilder.sqlWhere(sql, filter);
             
-            LOGGER.finest("SQL: " + sql);
+            LOGGER.finer("SQL: " + sql);
 
             Statement statement = conn.createStatement();
             ResultSet results = statement.executeQuery(sql.toString());

@@ -126,6 +126,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
         sqlBuffer.append("SELECT ");
         sqlColumns(sqlBuffer, mapper, attrTypes);
         sqlFrom(sqlBuffer, typeName);
+        encoder.setFIDMapper(mapper);
         sqlWhere(sqlBuffer, filter);
 
         String sqlStmt = sqlBuffer.toString();

@@ -150,7 +150,7 @@ public abstract class JDBCDataStore implements DataStore {
     private BasicAttributeIO basicAttributeIO;
 
     /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
 
     /**
      * Maps SQL types to Java classes. This might need to be fleshed out more
@@ -995,8 +995,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @return A single use connection.
      *
      * @throws IOException 
-     * @throws DataSourceException If the connection is not an
-     *         OracleConnection.
+     * @throws DataSourceException If the connection can not be obtained.
      */
     protected final Connection getConnection(Transaction transaction) throws IOException {
         if (transaction != Transaction.AUTO_COMMIT) {

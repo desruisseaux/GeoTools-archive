@@ -127,7 +127,16 @@ public class DefaultFeatureResults implements FeatureResults {
      * @throws IOException If results could not be obtained
      */
     public FeatureReader reader() throws IOException {
-        return featureSource.getDataStore().getFeatureReader( query, getTransaction() );
+        FeatureReader reader = featureSource.getDataStore().getFeatureReader(query,
+                getTransaction());
+        int maxFeatures = query.getMaxFeatures();
+
+        if (maxFeatures == Integer.MAX_VALUE) {
+            return reader;
+        } else {
+            return new MaxFeatureReader(reader, maxFeatures);
+        }
+
 
     }
 

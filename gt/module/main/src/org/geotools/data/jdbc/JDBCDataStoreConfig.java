@@ -52,8 +52,12 @@ public class JDBCDataStoreConfig {
     public JDBCDataStoreConfig(String namespace, String databaseSchemaName,
          long typeHandlerCacheTimeout) {
         this.namespace = namespace;
-        this.databaseSchemaName = databaseSchemaName;
-        this.typeHandlerCacheTimout = typeHandlerCacheTimeout;
+	if (databaseSchemaName == null || databaseSchemaName.equals("")) {
+	    this.databaseSchemaName = null;
+	} else {
+	    this.databaseSchemaName = databaseSchemaName;
+        }
+	this.typeHandlerCacheTimout = typeHandlerCacheTimeout;
     }
 
     public static JDBCDataStoreConfig createWithNameSpaceAndSchemaName(
