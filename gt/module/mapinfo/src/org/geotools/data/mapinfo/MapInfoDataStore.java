@@ -27,7 +27,6 @@ import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
-import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
@@ -42,6 +41,7 @@ import org.geotools.feature.FeatureType;
  * @author Jody Garnett
  */
 public class MapInfoDataStore extends AbstractDataStore {
+    
     MapInfoDataSource zombie;
 
     /**
@@ -55,28 +55,20 @@ public class MapInfoDataStore extends AbstractDataStore {
      * @throws MalformedURLException invalid URL was used
      */    
     public MapInfoDataStore( URL url) throws IOException {
+        super( false );
         zombie = new MapInfoDataSource( url );
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.DataStore#getTypeNames()
-     */
     public String[] getTypeNames() {
         return new String[]{ zombie.getSchema().getTypeName(), };
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.data.DataStore#getSchema(java.lang.String)
-     */
     public FeatureType getSchema(String typeName) throws IOException {
         if( typeName != null && typeName.equals( zombie.getSchema().getTypeName() )){
             return zombie.getSchema();
         }
         return null;
     }
-    /* (non-Javadoc)
-     * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String, org.geotools.data.Query)
-     */
     protected FeatureReader getFeatureReader(String typeName, Query query)
             throws IOException {
         FeatureCollection features = FeatureCollections.newCollection();
@@ -84,12 +76,8 @@ public class MapInfoDataStore extends AbstractDataStore {
         return DataUtilities.reader( features );
         
     }
-    /* (non-Javadoc)
-     * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
-     */
     protected FeatureReader getFeatureReader(String typeName)
             throws IOException {
         return getFeatureReader( typeName, Query.ALL );
     }
-
 }
