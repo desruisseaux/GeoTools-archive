@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -59,11 +47,13 @@ import java.rmi.RemoteException;
  * behavior (such as the rate of change of the orientation of the coordinate
  * axes).
  *
- * @version $Id: Datum.java,v 1.9 2003/05/13 10:58:47 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_Datum
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.Datum}.
  */
 public class Datum extends Info {
     /**
@@ -93,6 +83,9 @@ public class Datum extends Info {
      * Gets the type of the datum as an enumerated code.
      *
      * @see org.opengis.cs.CS_Datum#getDatumType()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.VerticalDatum#getVerticalDatumType}
+     *             for the vertical case. No replacement for other cases.
      */
     public DatumType getDatumType() {
         return type;

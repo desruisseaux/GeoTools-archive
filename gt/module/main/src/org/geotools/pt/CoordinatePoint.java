@@ -24,6 +24,10 @@ import java.util.Arrays;
 import java.io.Serializable;
 import java.awt.geom.Point2D;
 
+// OpenGIS dependencies
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 // Geotools dependencies
 import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
@@ -46,7 +50,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @deprecated Replaced by {@link org.geotools.geometry.DirectPosition}
  *             in the <code>org.geotools.geometry</code> package.
  */
-public class CoordinatePoint implements Dimensioned, Cloneable, Serializable {
+public class CoordinatePoint implements DirectPosition, Dimensioned, Cloneable, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -104,6 +108,27 @@ public class CoordinatePoint implements Dimensioned, Cloneable, Serializable {
      */
     public CoordinatePoint(final CoordinatePoint point) {
         ord = (double[]) point.ord.clone();
+    }
+
+    /**
+     * Returns always <code>null</code>.
+     */
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return null;
+    }
+
+    /**
+     * Returns {@link #ord}.
+     */
+    public double[] getCoordinates() {
+        return ord;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setOrdinate(int dimension, double value) throws IndexOutOfBoundsException {
+        ord[dimension] = value;
     }
 
     /**

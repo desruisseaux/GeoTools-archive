@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -56,11 +44,14 @@ import org.geotools.resources.cts.ResourceKeys;
  * for local types. This will allow the OpenGIS Consortium to coordinate the
  * addition of new interoperable codes.
  *
- * @version $Id: DatumType.java,v 1.9 2004/03/08 11:30:55 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_DatumType
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType}.
+ *             for the vertical case. No replacement for other cases.
  */
 public abstract class DatumType extends EnumeratedParameter {
     /**
@@ -76,6 +67,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * a region or a continent.
      *
      * @see org.opengis.cs.CS_DatumType#CS_HD_Classic
+     *
+     * @deprecated No replacement, since this is a horizontal datum type.
      */
     public static final Horizontal CLASSIC = new Horizontal("CLASSIC", CS_DatumType.CS_HD_Classic, ResourceKeys.CLASSIC);
     
@@ -88,6 +81,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * realizations of ITRF, such as ETRF, are also included in this category.
      *
      * @see org.opengis.cs.CS_DatumType#CS_HD_Geocentric
+     *
+     * @deprecated No replacement, since this is a horizontal datum type.
      */
     public static final Horizontal GEOCENTRIC = new Horizontal("GEOCENTRIC", CS_DatumType.CS_HD_Geocentric, ResourceKeys.GEOCENTRIC);
     
@@ -96,6 +91,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * that are measured along the plumb line.
      *
      * @see org.opengis.cs.CS_DatumType#CS_VD_Orthometric
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#ORTHOMETRIC}.
      */
     public static final Vertical ORTHOMETRIC = new Vertical("ORTHOMETRIC", CS_DatumType.CS_VD_Orthometric, ResourceKeys.ORTHOMETRIC);
     
@@ -104,6 +101,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * normal to the ellipsoid used in the definition of horizontal datum.
      *
      * @see org.opengis.cs.CS_DatumType#CS_VD_Ellipsoidal
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#ELLIPSOIDAL}.
      */
     public static final Vertical ELLIPSOIDAL = new Vertical("ELLIPSOIDAL", CS_DatumType.CS_VD_Ellipsoidal, ResourceKeys.ELLIPSOIDAL);
     
@@ -116,6 +115,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * used to measure geopotential height).
      *
      * @see org.opengis.cs.CS_DatumType#CS_VD_AltitudeBarometric
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#BAROMETRIC}.
      */
     public static final Vertical ALTITUDE_BAROMETRIC = new Vertical("ALTITUDE_BAROMETRIC", CS_DatumType.CS_VD_AltitudeBarometric, ResourceKeys.BAROMETRIC_ALTITUDE);
     
@@ -135,6 +136,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * <var>H</var>=<var>h</var>-<var>N</var>.
      *
      * @see org.opengis.cs.CS_DatumType#CS_VD_GeoidModelDerived
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#GEOIDAL}.
      */
     public static final Vertical GEOID_MODEL_DERIVED = new Vertical("GEOID_MODEL_DERIVED", CS_DatumType.CS_VD_GeoidModelDerived, ResourceKeys.GEOID_MODEL_DERIVED);
     
@@ -147,6 +150,8 @@ public abstract class DatumType extends EnumeratedParameter {
      * gravity field, using such procedures as echo-sounding.
      *
      * @see org.opengis.cs.CS_DatumType#CS_VD_Depth
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.datum.VerticalDatumType#DEPTH}.
      */
     public static final Vertical DEPTH = new Vertical("DEPTH", CS_DatumType.CS_VD_Depth, ResourceKeys.DEPTH);
     

@@ -30,7 +30,8 @@ import javax.units.Unit;
 
 // OpenGIS direct dependencies
 import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.SphericalCS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
@@ -40,57 +41,71 @@ import org.geotools.referencing.wkt.Formatter;
 
 
 /**
- * A coordinate reference system based on an ellipsoidal approximation of the geoid; this provides
- * an accurate representation of the geometry of geographic features for a large portion of the
- * earth's surface.
+ * A 3D coordinate reference system with the origin at the approximate centre of mass of the earth.
+ * A geocentric CRS deals with the earth's curvature by taking a 3D spatial view, which obviates
+ * the need to model the earth's curvature.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.cs.EllipsoidalCS Ellipsoidal}
+ *   {@link org.geotools.referencing.cs.CartesianCS Cartesian},
+ *   {@link org.geotools.referencing.cs.SphericalCS Spherical}
  * </TD></TR></TABLE>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeographicCRS extends CoordinateReferenceSystem
-                        implements org.opengis.referencing.crs.GeographicCRS
+public class GeocentricCRS extends CoordinateReferenceSystem implements org.opengis.referencing.crs.GeocentricCRS
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 861224913438092335L;
-
+    private static final long serialVersionUID = 6784642848287659827L;
+    
     /**
-     * A two-dimensional geographic coordinate reference system using WGS84 datum.
-     * This CRS uses (<var>longitude</var>,<var>latitude</var>) ordinates with longitude values
-     * increasing north and latitude values increasing east. Angular units are degrees and
-     * prime meridian is Greenwich.
+     * The default geocentric CRS with a
+     * {@linkplain org.geotools.referencing.cs.CartesianCS#GEOCENTRIC cartesian coordinate system}.
+     * Prime meridian is Greenwich, geodetic datum is WGS84 and linear units are metres.
+     * The <var>X</var> axis points towards the prime meridian.
+     * The <var>Y</var> axis points East.
+     * The <var>Z</var> axis points North.
      */
-    public static final GeographicCRS WGS84 = new GeographicCRS("WGS84",
-                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D,
+    public static final GeocentricCRS CARTESIAN = new GeocentricCRS("Cartesian",
+                        org.geotools.referencing.cs.CartesianCS.GEOCENTRIC,
+                        org.geotools.referencing.datum.GeodeticDatum.WGS84);
+    
+    /**
+     * The default geocentric CRS with a
+     * {@linkplain org.geotools.referencing.cs.SphericalCS#GEOCENTRIC spherical coordinate system}.
+     * Prime meridian is Greenwich, geodetic datum is WGS84 and linear units are metres.
+     */
+    public static final GeocentricCRS SPHERICAL = new GeocentricCRS("Spherical",
+                        org.geotools.referencing.cs.SphericalCS.GEOCENTRIC,
                         org.geotools.referencing.datum.GeodeticDatum.WGS84);
 
     /**
-     * A three-dimensional geographic coordinate reference system using WGS84 datum.
-     * This CRS uses (<var>longitude</var>,<var>latitude</var>,<var>height</var>)
-     * ordinates with longitude values increasing north, latitude values increasing
-     * east and height above the ellipsoid in metre. Angular units are degrees and
-     * prime meridian is Greenwich.
-     */
-    public static final GeographicCRS WGS84_3D = new GeographicCRS("WGS84",
-                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_3D,
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84);
-
-    /**
-     * Constructs a geographic CRS from a name.
+     * Constructs a geocentric CRS from a name.
      *
      * @param name The name.
      * @param coordinateSystem The coordinate system.
      * @param datum The datum.
      */
-    public GeographicCRS(final String        name,
-                         final EllipsoidalCS coordinateSystem,
+    public GeocentricCRS(final String        name,
+                         final CartesianCS   coordinateSystem,
+                         final GeodeticDatum datum)
+    {
+        this(Collections.singletonMap("name", name), coordinateSystem, datum);
+    }
+
+    /**
+     * Constructs a geocentric CRS from a name.
+     *
+     * @param name The name.
+     * @param coordinateSystem The coordinate system.
+     * @param datum The datum.
+     */
+    public GeocentricCRS(final String        name,
+                         final SphericalCS   coordinateSystem,
                          final GeodeticDatum datum)
     {
         this(Collections.singletonMap("name", name), coordinateSystem, datum);
@@ -104,15 +119,30 @@ public class GeographicCRS extends CoordinateReferenceSystem
      * @param coordinateSystem The coordinate system.
      * @param datum The datum.
      */
-    public GeographicCRS(final Map           properties,
-                         final EllipsoidalCS coordinateSystem,
+    public GeocentricCRS(final Map           properties,
+                         final CartesianCS   coordinateSystem,
+                         final GeodeticDatum datum)
+    {
+        super(properties, coordinateSystem, datum);
+    }
+
+    /**
+     * Constructs a geographic CRS from a set of properties.
+     * The properties are given unchanged to the super-class constructor.
+     *
+     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param coordinateSystem The coordinate system.
+     * @param datum The datum.
+     */
+    public GeocentricCRS(final Map           properties,
+                         final SphericalCS   coordinateSystem,
                          final GeodeticDatum datum)
     {
         super(properties, coordinateSystem, datum);
     }
     
     /**
-     * Returns a hash value for this geographic CRS.
+     * Returns a hash value for this geocentric CRS.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
@@ -127,30 +157,16 @@ public class GeographicCRS extends CoordinateReferenceSystem
      * Known Text</cite> (WKT)</A> element.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "GEOGCS"
+     * @return The WKT element name, which is "GEOCCS"
      */
     protected String formatWKT(final Formatter formatter) {
-        Unit unit = NonSI.DEGREE_ANGLE;
-        for (int i=coordinateSystem.getDimension(); --i>=0;) {
-            final CoordinateSystemAxis axis = coordinateSystem.getAxis(i);
-            final Unit candidate = axis.getUnit();
-            if (NonSI.DEGREE_ANGLE.isCompatible(unit)) {
-                unit = candidate;
-                if (AxisDirection.EAST.equals(axis.getDirection().absolute())) {
-                    break; // Found the longitude axis.
-                }
-            }
-        }
-        final Unit oldUnit = formatter.getContextualUnit();
         formatter.append(datum);
-        formatter.setContextualUnit(unit);
         formatter.append(((GeodeticDatum)datum).getPrimeMeridian());
-        formatter.setContextualUnit(oldUnit);
-        formatter.append(unit);
-        super.formatWKT(formatter);
-        if (!unit.equals(getUnit())) {
-            formatter.setInvalidWKT();
+        formatter.append(getUnit());
+        final int dimension = coordinateSystem.getDimension();
+        for (int i=0; i<dimension; i++) {
+            formatter.append(coordinateSystem.getAxis(i));
         }
-        return "GEOGCS";
+        return "GEOCCS";
     }
 }

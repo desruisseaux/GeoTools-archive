@@ -58,4 +58,12 @@ parameters.setParameter("semi_minor", 6356752.314);
     </TABLE>
     <P ALIGN="center"><A HREF="doc-files/Accuracy.html">Notes on transformation accuracy</A></P>
   </BODY>
+
+  <H2>Incompatibles changes since last release</H2>
+  <UL>
+    <LI>All occurences of <code>org.geotools.ct.TransformException</code> need to be replaced by
+        <code>org.opengis.referencing.operation.TransformException</code>.</LI>
+    <LI>All occurences of <code>org.geotools.ct.NoninvertibleTransformException</code> need to be replaced by
+        <code>org.opengis.referencing.operation.NoninvertibleTransformException</code>.</LI>
+  </UL>
 </HTML>

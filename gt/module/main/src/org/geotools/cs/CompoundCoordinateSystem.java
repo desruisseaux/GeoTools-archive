@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -57,11 +45,13 @@ import java.rmi.RemoteException;
  * geographic or a projected coordinate system with a horizontal datum.
  * The other is a one-dimensional coordinate system with a vertical datum.
  *
- * @version $Id: CompoundCoordinateSystem.java,v 1.13 2003/11/20 22:18:25 jive Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_CompoundCoordinateSystem
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.CompoundCRS}.
  */
 public class CompoundCoordinateSystem extends CoordinateSystem {
     /**
@@ -114,6 +104,8 @@ public class CompoundCoordinateSystem extends CoordinateSystem {
      * Returns the first sub-coordinate system.
      *
      * @see org.opengis.cs.CS_CompoundCoordinateSystem#getHeadCS()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.CompoundCRS#getCoordinateReferenceSystems}.
      */
     public CoordinateSystem getHeadCS() {
         return head;
@@ -123,6 +115,8 @@ public class CompoundCoordinateSystem extends CoordinateSystem {
      * Returns the second sub-coordinate system.
      *
      * @see org.opengis.cs.CS_CompoundCoordinateSystem#getTailCS()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.CompoundCRS#getCoordinateReferenceSystems}.
      */
     public CoordinateSystem getTailCS() {
         return tail;

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -60,11 +48,13 @@ import java.rmi.RemoteException;
  * will point East (e.g. a right handed system), but you should
  * check the axes for non-default values.
  *
- * @version $Id: GeocentricCoordinateSystem.java,v 1.13 2003/11/20 22:18:25 jive Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_GeocentricCoordinateSystem
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.GeocentricCRS}.
  */
 public class GeocentricCoordinateSystem extends CoordinateSystem {
     /**
@@ -206,6 +196,8 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
      * center of the Earth, and not the surface.
      *
      * @see org.opengis.cs.CS_GeocentricCoordinateSystem#getHorizontalDatum()
+     *
+     * @deprecated Replaced by {@link org.opengis.geotools.crs.GeocentricCRS#getDatum}.
      */
     public HorizontalDatum getHorizontalDatum() {
         return datum;
@@ -219,6 +211,8 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
      * @param dimension Zero based index of axis.
      *
      * @see org.opengis.cs.CS_GeocentricCoordinateSystem#getUnits(int)
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getUnit}.
      */
     public Unit getUnits(final int dimension) {
         if (dimension>=0 && dimension<getDimension()) {
@@ -244,6 +238,8 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
      * Returns the prime meridian.
      *
      * @see org.opengis.cs.CS_GeocentricCoordinateSystem#getPrimeMeridian()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.GeodeticDatum#getPrimeMeridian}.
      */
     public PrimeMeridian getPrimeMeridian() {
         return meridian;

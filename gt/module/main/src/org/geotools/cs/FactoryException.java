@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -41,10 +29,12 @@ package org.geotools.cs;
  * be a failure to find the authority code ({@link NoSuchAuthorityCodeException}),
  * a failure in the backing store, or a failure to contact the backing store.
  *
- * @version $Id: FactoryException.java,v 1.4 2003/05/13 10:58:47 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.FactoryException}.
  */
-public class FactoryException extends Exception {
+public class FactoryException extends org.opengis.referencing.FactoryException {
     /**
      * Serial number for interoperability with different versions.
      */

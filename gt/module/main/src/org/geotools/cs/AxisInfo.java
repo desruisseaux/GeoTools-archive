@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -55,11 +43,13 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * Details of axis. This is used to label axes,
  * and indicate the orientation.
  *
- * @version $Id: AxisInfo.java,v 1.4 2003/05/13 10:58:47 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_AxisInfo
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis}.
  */
 public class AxisInfo implements CoordinateSystemAxis, Serializable {
     /**
@@ -72,6 +62,8 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * Increasing ordinates values go East. This
      * is usually used with projected coordinate
      * systems.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#X}.
      */
     public static final AxisInfo X = new AxisInfo("x", AxisOrientation.EAST);
     
@@ -80,6 +72,8 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * Increasing ordinates values go North. This
      * is usually used with projected coordinate
      * systems.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#Y}.
      */
     public static final AxisInfo Y = new AxisInfo("y", AxisOrientation.NORTH);
     
@@ -88,6 +82,8 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * Increasing ordinates values go East.
      * This is usually used with geographic
      * coordinate systems.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#LONGITUDE}.
      */
     public static final AxisInfo LONGITUDE = new AxisInfo.Localized("Longitude", ResourceKeys.LONGITUDE, AxisOrientation.EAST);
     
@@ -96,18 +92,24 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * Increasing ordinates values go North.
      * This is usually used with geographic
      * coordinate systems.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#LATITUDE}.
      */
     public static final AxisInfo LATITUDE = new AxisInfo.Localized("Latitude", ResourceKeys.LATITUDE, AxisOrientation.NORTH);
     
     /**
      * The default axis for altitude values.
      * Increasing ordinates values go up.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#ALTITUDE}.
      */
     public static final AxisInfo ALTITUDE = new AxisInfo.Localized("Altitude", ResourceKeys.ALTITUDE, AxisOrientation.UP);
     
     /**
      * A default axis for time values.
      * Increasing time go toward future.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.CoordinateSystemAxis#TIME}.
      */
     public static final AxisInfo TIME = new AxisInfo.Localized("Time", ResourceKeys.TIME, AxisOrientation.FUTURE);
     
@@ -118,6 +120,8 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * short string.
      *
      * @see org.opengis.cs.CS_AxisInfo#name
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getName}.
      */
     public final String name;
     
@@ -125,6 +129,8 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * Enumerated value for orientation.
      *
      * @see org.opengis.cs.CS_AxisInfo#orientation
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getDirection}.
      */
     public final AxisOrientation orientation;
 

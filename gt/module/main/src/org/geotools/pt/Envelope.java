@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.io.Serializable;
 import java.awt.geom.Rectangle2D;
 
+// OpenGIS dependencies
+import org.opengis.spatialschema.geometry.DirectPosition;
+
 // Geotools dependencies
 import org.geotools.util.Cloneable;
 import org.geotools.resources.cts.Resources;
@@ -51,7 +54,9 @@ import org.geotools.resources.geometry.XRectangle2D;
  * @deprecated Replaced by {@link org.geotools.geometry.Envelope}
  *             in the <code>org.geotools.geometry</code> package.
  */
-public class Envelope implements Dimensioned, Cloneable, Serializable {
+public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
+                                 Dimensioned, Cloneable, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -188,6 +193,24 @@ public class Envelope implements Dimensioned, Cloneable, Serializable {
      */
     public int getDimension() {
         return ord.length/2;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DirectPosition getLowerCorner() {
+        final double[] c = new double[ord.length/2];
+        System.arraycopy(ord, 0, c, 0, c.length);
+        return new CoordinatePoint(c);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public DirectPosition getUpperCorner() {
+        final double[] c = new double[ord.length/2];
+        System.arraycopy(ord, c.length, c, 0, c.length);
+        return new CoordinatePoint(c);
     }
     
     /**

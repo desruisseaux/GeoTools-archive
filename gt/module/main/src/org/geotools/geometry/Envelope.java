@@ -232,8 +232,7 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope, Se
     }
     
     /**
-     * Returns the center ordinate
-     * along the specified dimension.
+     * Returns the center ordinate along the specified dimension.
      */
     public final double getCenter(final int dimension) {
         return 0.5*(ordinates[dimension] + ordinates[dimension+ordinates.length/2]);

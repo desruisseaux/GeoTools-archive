@@ -16,35 +16,15 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.pt;
 
-// Geotools dependencies
-import org.geotools.cs.AxisOrientation;
-
-// Matrix and transforms
+// J2SE dependencies
 import javax.vecmath.GMatrix;
-import org.opengis.pt.PT_Matrix;             // For JavaDoc
-//import javax.media.j3d.Transform3D;          // For JavaDoc
-import javax.media.jai.PerspectiveTransform; // For JavaDoc
 import java.awt.geom.AffineTransform;
 
-// Miscellaneous
-import java.text.NumberFormat;
-import java.text.FieldPosition;
+// Geotools dependencies
+import org.geotools.cs.AxisOrientation;
 
 // Resources
 import org.geotools.resources.Utilities;
@@ -53,22 +33,15 @@ import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * A two dimensional array of numbers.
- * Row and column numbering begins with zero.
+ * A two dimensional array of numbers. Row and column numbering begins with zero.
  *
- * @version 1.00
- * @author OpenGIS (www.opengis.org)
+ * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.opengis.pt.PT_Matrix
- * @see javax.vecmath.GMatrix
- * @see java.awt.geom.AffineTransform
- * @see javax.media.jai.PerspectiveTransform
- * @see javax.media.j3d.Transform3D
- * @see <A HREF="http://math.nist.gov/javanumerics/jama/">Jama matrix</A>
- * @see <A HREF="http://jcp.org/jsr/detail/83.jsp">JSR-83 Multiarray package</A>
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.Matrix}
+ *             in the <code>org.geotools.referencing.operation</code> package.
  */
-public class Matrix extends GMatrix {
+public class Matrix extends org.geotools.referencing.operation.Matrix {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -79,7 +52,7 @@ public class Matrix extends GMatrix {
      * <code>size</code>&nbsp;&times;&nbsp;<code>size</code>.
      */
     public Matrix(final int size) {
-        super(size,size);
+        super(size);
     }
     
     /**
@@ -101,9 +74,6 @@ public class Matrix extends GMatrix {
      */
     public Matrix(final int numRow, final int numCol, final double[] matrix) {
         super(numRow, numCol, matrix);
-        if (numRow*numCol != matrix.length) {
-            throw new IllegalArgumentException(String.valueOf(matrix.length));
-        }
     }
     
     /**
@@ -114,15 +84,7 @@ public class Matrix extends GMatrix {
      *         (i.e. if all rows doesn't have the same length).
      */
     public Matrix(final double[][] matrix) throws IllegalArgumentException {
-        super(matrix.length, (matrix.length!=0) ? matrix[0].length : 0);
-        final int numRow = getNumRow();
-        final int numCol = getNumCol();
-        for (int j=0; j<numRow; j++) {
-            if (matrix[j].length!=numCol) {
-                throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_MATRIX_NOT_REGULAR));
-            }
-            setRow(j, matrix[j]);
-        }
+        super(matrix);
     }
     
     /**
@@ -134,16 +96,10 @@ public class Matrix extends GMatrix {
     }
     
     /**
-     * Construct a 3&times;3 matrix from
-     * the specified affine transform.
+     * Construct a 3&times;3 matrix from the specified affine transform.
      */
     public Matrix(final AffineTransform transform) {
-        super(3,3, new double[] {
-            transform.getScaleX(), transform.getShearX(), transform.getTranslateX(),
-            transform.getShearY(), transform.getScaleY(), transform.getTranslateY(),
-            0,                     0,                         1
-        });
-        assert isAffine();
+        super(transform);
     }
     
     /**
@@ -287,109 +243,5 @@ public class Matrix extends GMatrix {
                                                Envelope dstRegion, AxisOrientation[] dstAxis)
     {
         return new Matrix(srcRegion, srcAxis, dstRegion, dstAxis, true);
-    }
-    
-    /**
-     * Retrieves the specifiable values in the transformation matrix into a
-     * 2-dimensional array of double precision values. The values are stored
-     * into the 2-dimensional array using the row index as the first subscript
-     * and the column index as the second. Values are copied; changes to the
-     * returned array will not change this matrix.
-     *
-     * @see org.opengis.pt.PT_Matrix#elt
-     */
-    public final double[][] getElements() {
-        final int numCol = getNumCol();
-        final double[][] matrix = new double[getNumRow()][];
-        for (int j=0; j<matrix.length; j++) {
-            getRow(j, matrix[j]=new double[numCol]);
-        }
-        return matrix;
-    }
-    
-    /**
-     * Returns <code>true</code> if this matrix is an affine transform.
-     * A transform is affine if the matrix is square and last row contains
-     * only zeros, except in the last column which contains 1.
-     */
-    public final boolean isAffine() {
-        int dimension  = getNumRow();
-        if (dimension != getNumCol())
-            return false;
-        
-        dimension--;
-        for (int i=0; i<=dimension; i++) {
-            if (getElement(dimension, i) != (i==dimension ? 1 : 0)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    /**
-     * Returns <code>true</code> if this matrix is an identity matrix.
-     */
-    public final boolean isIdentity() {
-        final int numRow = getNumRow();
-        final int numCol = getNumCol();
-        if (numRow != numCol) return false;
-        
-        for (int j=0; j<numRow; j++) {
-            for (int i=0; i<numCol; i++) {
-                if (getElement(j,i) != (i==j ? 1 : 0)) {
-                    return false;
-                }
-            }
-        }
-        assert isAffine();
-        return true;
-    }
-    
-    /**
-     * Returns an affine transform for this matrix.
-     * This is a convenience method for interoperability with Java2D.
-     *
-     * @throws IllegalStateException if this matrix is not 3x3,
-     *         or if the last row is not [0 0 1].
-     */
-    public final AffineTransform toAffineTransform2D() throws IllegalStateException {
-        int check;
-        if ((check=getNumRow())!=3 || (check=getNumCol())!=3) {
-            throw new IllegalStateException(Resources.format(
-                        ResourceKeys.ERROR_NOT_TWO_DIMENSIONAL_$1, new Integer(check-1)));
-        }
-        if (isAffine()) {
-            return new AffineTransform(getElement(0,0), getElement(1,0),
-            getElement(0,1), getElement(1,1),
-            getElement(0,2), getElement(1,2));
-        }
-        throw new IllegalStateException(Resources.format(
-                    ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM));
-    }
-    
-    /**
-     * Returns a string representation of this matrix.
-     * The returned string is implementation dependent.
-     * It is usually provided for debugging purposes only.
-     */
-    public String toString() {
-        final int    numRow = getNumRow();
-        final int    numCol = getNumCol();
-        StringBuffer buffer = new StringBuffer();
-        final int      columnWidth = 12;
-        final String lineSeparator = System.getProperty("line.separator", "\n");
-        final FieldPosition  dummy = new FieldPosition(0);
-        final NumberFormat  format = NumberFormat.getNumberInstance();
-        format.setMinimumFractionDigits(6);
-        format.setMaximumFractionDigits(6);
-        for (int j=0; j<numRow; j++) {
-            for (int i=0; i<numCol; i++) {
-                final int position = buffer.length();
-                buffer = format.format(getElement(j,i), buffer, dummy);
-                buffer.insert(position, Utilities.spaces(columnWidth-(buffer.length()-position)));
-            }
-            buffer.append(lineSeparator);
-        }
-        return buffer.toString();
     }
 }

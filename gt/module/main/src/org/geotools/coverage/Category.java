@@ -35,15 +35,17 @@ import javax.media.jai.util.Range;
 import javax.media.jai.operator.PiecewiseDescriptor; // For Javadoc
 
 // OpenGIS dependencies
-import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform; // For Javadoc
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransformFactory;
 
-// Resources
-import org.geotools.util.WeakHashSet;
+// Geotools dependencies
 import org.geotools.util.NumberRange;
+import org.geotools.util.WeakHashSet;
+import org.geotools.referencing.operation.Matrix;
+
+// Resources
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.Resources;
@@ -537,11 +539,11 @@ public class Category implements Serializable {
      *               for initializing {@link #transform} for a qualitative category.
      */
     static MathTransform1D createLinearTransform(final double scale, final double offset) {
+        Matrix matrix = new Matrix(2,2);
+        matrix.setElement(0,0, scale);
+        matrix.setElement(0,1, offset);
         // TODO: Required CRS implementation not yet available.
         throw new UnsupportedOperationException();
-//        Matrix matrix = new Matrix(2,2);
-//        matrix.setElement(0,0, scale);
-//        matrix.setElement(0,1, offset);
 //        return (MathTransform1D)MathTransformFactory.getDefault().createAffineTransform(matrix);
     }
 

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -81,11 +69,13 @@ import java.rmi.RemoteException;
  * come from specification 2.0 and appears in the <code>implements</code> clause only as a patch
  * for anticipating a future transition to OGC spec. 2.0.
  *
- * @version $Id: CoordinateSystem.java,v 1.14 2004/03/08 11:30:55 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_CoordinateSystem
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.CoordinateReferenceSystem}.
  */
 public abstract class CoordinateSystem extends Info
                                     implements Dimensioned, CoordinateReferenceSystem
@@ -139,6 +129,8 @@ public abstract class CoordinateSystem extends Info
      * Returns the dimension of the coordinate system.
      *
      * @see org.opengis.cs.CS_CoordinateSystem#getDimension()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystem#getDimension}.
      */
     public abstract int getDimension();
     
@@ -149,6 +141,8 @@ public abstract class CoordinateSystem extends Info
      * @param dimension Zero based index of axis.
      *
      * @see org.opengis.cs.CS_CoordinateSystem#getAxis(int)
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystem#getAxis}.
      */
     public abstract AxisInfo getAxis(int dimension);
     
@@ -159,6 +153,8 @@ public abstract class CoordinateSystem extends Info
      * @param dimension Zero based index of axis.
      *
      * @see org.opengis.cs.CS_CoordinateSystem#getUnits(int)
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getUnit}.
      */
     public abstract Unit getUnits(int dimension);
     

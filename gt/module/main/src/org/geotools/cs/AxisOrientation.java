@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -72,11 +60,13 @@ import org.geotools.resources.cts.ResourceKeys;
  * See {@link java.lang.Comparable}, {@link java.util.SortedMap} or
  * {@link java.util.SortedSet} for more information.
  *
- * @version $Id: AxisOrientation.java,v 1.6 2003/05/13 10:58:47 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_AxisOrientationEnum
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection}.
  */
 public final class AxisOrientation extends EnumeratedParameter implements Comparable {
     /**
@@ -93,6 +83,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * This can be used for local or fitted coordinate systems.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_Other
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#OTHER}.
      */
     public static final AxisOrientation OTHER = new AxisOrientation("OTHER",
         CS_AxisOrientationEnum.CS_AO_Other, ResourceKeys.OTHER, AxisDirection.OTHER);
@@ -102,6 +94,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * This is usually used for Grid Y coordinates and Latitude.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_North
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#NORTH}.
      */
     public static final AxisOrientation NORTH = new AxisOrientation("NORTH",
             CS_AxisOrientationEnum.CS_AO_North, ResourceKeys.NORTH, AxisDirection.NORTH);
@@ -110,6 +104,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * Increasing ordinates values go South.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_South
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#SOUTH}.
      */
     public static final AxisOrientation SOUTH = new AxisOrientation("SOUTH",
             CS_AxisOrientationEnum.CS_AO_South, ResourceKeys.SOUTH, AxisDirection.SOUTH);
@@ -119,6 +115,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * This is usually used for Grid X coordinates and Longitude.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_East
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#EAST}.
      */
     public static final AxisOrientation EAST = new AxisOrientation("EAST",
             CS_AxisOrientationEnum.CS_AO_East, ResourceKeys.EAST, AxisDirection.EAST);
@@ -127,6 +125,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * Increasing ordinates values go West.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_West
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#WEST}.
      */
     public static final AxisOrientation WEST = new AxisOrientation("WEST",
             CS_AxisOrientationEnum.CS_AO_West, ResourceKeys.WEST, AxisDirection.WEST);
@@ -136,6 +136,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * This is used for vertical coordinate systems.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_Up
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#UP}.
      */
     public static final AxisOrientation UP = new AxisOrientation("UP",
             CS_AxisOrientationEnum.CS_AO_Up, ResourceKeys.UP, AxisDirection.UP);
@@ -145,6 +147,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
      * This is used for vertical coordinate systems.
      *
      * @see org.opengis.cs.CS_AxisOrientationEnum#CS_AO_Down
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#DOWN}.
      */
     public static final AxisOrientation DOWN = new AxisOrientation("DOWN",
             CS_AxisOrientationEnum.CS_AO_Down, ResourceKeys.DOWN, AxisDirection.DOWN);
@@ -152,6 +156,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
     /**
      * Increasing time go toward future.
      * This is used for temporal axis.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#FUTURE}.
      */
     public static final AxisOrientation FUTURE = new AxisOrientation("FUTURE",
             7, ResourceKeys.FUTURE, AxisDirection.FUTURE);
@@ -159,6 +165,8 @@ public final class AxisOrientation extends EnumeratedParameter implements Compar
     /**
      * Increasing time go toward past.
      * This is used for temporal axis.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.cs.AxisDirection#PAST}.
      */
     public static final AxisOrientation PAST = new AxisOrientation("PAST",
             8, ResourceKeys.PAST, AxisDirection.PAST);

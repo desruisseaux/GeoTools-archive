@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -55,11 +43,13 @@ import java.rmi.RemoteException;
  * any other math transform to inject itself into the base coordinate
  * system.
  *
- * @version $Id: FittedCoordinateSystem.java,v 1.6 2003/11/20 22:18:25 jive Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_FittedCoordinateSystem
+ *
+ * @deprecated Replaced by {@link org.opengis.referencing.crs.DerivedCRS}.
  */
 public class FittedCoordinateSystem extends CoordinateSystem {
     /**
@@ -139,6 +129,8 @@ public class FittedCoordinateSystem extends CoordinateSystem {
      * <code>{@link #getToBase}.getDimTarget()</code>.
      *
      * @see org.opengis.cs.CS_FittedCoordinateSystem#getBaseCoordinateSystem()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DerivedCRS#getBaseCRS}.
      */
     public CoordinateSystem getBaseCoordinateSystem() {
         return base;
@@ -153,6 +145,9 @@ public class FittedCoordinateSystem extends CoordinateSystem {
      * at least as big as the dimension of this coordinate system.
      *
      * @see org.opengis.cs.CS_FittedCoordinateSystem#getToBase()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DerivedCRS#getConversionFromBase},
+     *             except that the transform needs to be inverted.
      */
     public MathTransform getToBase() {
         return toBase;

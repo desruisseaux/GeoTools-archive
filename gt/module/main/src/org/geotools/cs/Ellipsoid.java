@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  *
@@ -64,11 +52,13 @@ import java.rmi.RemoteException;
  * the measurement of the shape and the size of the Earth to approximate
  * the geoid as close as possible.
  *
- * @version $Id: Ellipsoid.java,v 1.13 2003/08/04 17:11:16 desruisseaux Exp $
+ * @version $Id$
  * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  *
  * @see org.opengis.cs.CS_Ellipsoid
+ *
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid}.
  */
 public class Ellipsoid extends Info {
     /**
@@ -151,6 +141,8 @@ public class Ellipsoid extends Info {
      * @param unit          The units of the semi-major and semi-minor axis values.
      *
      * @see org.geotools.cs.CoordinateSystemFactory#createEllipsoid
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#createEllipsoid}.
      */
     public static Ellipsoid createEllipsoid(final CharSequence name,
                                             final double       semiMajorAxis,
@@ -176,6 +168,8 @@ public class Ellipsoid extends Info {
      *                          values.
      *
      * @see org.geotools.cs.CoordinateSystemFactory#createFlattenedSphere
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#createFlattenedSphere}.
      */
     public static Ellipsoid createFlattenedSphere(final CharSequence name,
                                                   final double       semiMajorAxis,
@@ -214,6 +208,8 @@ public class Ellipsoid extends Info {
      * The returned length is expressed in this object's axis units.
      *
      * @see org.opengis.cs.CS_Ellipsoid#getSemiMajorAxis()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#getSemiMajorAxis}.
      */
     public double getSemiMajorAxis() {
         return semiMajorAxis;
@@ -224,6 +220,8 @@ public class Ellipsoid extends Info {
      * The returned length is expressed in this object's axis units.
      *
      * @see org.opengis.cs.CS_Ellipsoid#getSemiMinorAxis()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#getSemiMinorAxis}.
      */
     public double getSemiMinorAxis() {
         return semiMinorAxis;
@@ -233,6 +231,8 @@ public class Ellipsoid extends Info {
      * The ratio of the distance between the center and a focus of the ellipse
      * to the length of its semimajor axis. The eccentricity can alternately be
      * computed from the equation: <code>e=sqrt(2f-f²)</code>.
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#getEccentricity}.
      */
     public double getEccentricity() {
         final double f=1-getSemiMinorAxis()/getSemiMajorAxis();
@@ -250,6 +250,8 @@ public class Ellipsoid extends Info {
      * (which is the correct value).
      *
      * @see org.opengis.cs.CS_Ellipsoid#getInverseFlattening()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#getInverseFlattening}.
      */
     public double getInverseFlattening() {
         return inverseFlattening;
@@ -263,6 +265,8 @@ public class Ellipsoid extends Info {
      * avoid floating-point rounding errors.
      *
      * @see org.opengis.cs.CS_Ellipsoid#isIvfDefinitive()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#isIvfDefinitive}.
      */
     public boolean isIvfDefinitive() {
         return ivfDefinitive;
@@ -277,6 +281,8 @@ public class Ellipsoid extends Info {
      * @param  P1 Longitude and latitude of first point (in degrees).
      * @param  P2 Longitude and latitude of second point (in degrees).
      * @return The orthodromic distance (in the units of this ellipsoid).
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#orthodromicDistance(Point2D,Point2D)}.
      */
     public double orthodromicDistance(final Point2D P1, final Point2D P2) {
         return orthodromicDistance(P1.getX(), P1.getY(), P2.getX(), P2.getY());
@@ -294,6 +300,8 @@ public class Ellipsoid extends Info {
      * @param  x2 Longitude of second point (in degrees).
      * @param  y2 Latitude  of second point (in degrees).
      * @return The orthodromic distance (in the units of this ellipsoid's axis).
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#orthodromicDistance(double,double,double,double}.
      */
     public double orthodromicDistance(double x1, double y1, double x2, double y2) {
         x1 = Math.toRadians(x1);
@@ -388,6 +396,8 @@ public class Ellipsoid extends Info {
      * Returns the units of the semi-major and semi-minor axis values.
      *
      * @see org.opengis.cs.CS_Ellipsoid#getAxisUnit()
+     *
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid#getAxisUnit}.
      */
     public Unit getAxisUnit() {
         return unit;
