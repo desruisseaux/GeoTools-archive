@@ -2,8 +2,6 @@
  * A first attempt to port script test to ...referencing
  *
  * To do:
- *   Uncomment MathTransform wkt check in addDefinition()
- *      - reqires fix / clarification to AbstractMathTransform formatWKT()
  *   Uncomment MT_Molodensky_TestScript - needs MolodenskyTransform implemented
  *   Uncomment MT_Proj_TestScript - need some projections implemented
  *   Uncomment <projection>_TestScripts in main (to test CRS parsing)
@@ -14,11 +12,12 @@
  *
  * Would be nice to do:
  *   Add tests for CONCAT_MT, INVERSE_MT, PASSTHROUGH_MT
- *   Find a more extensible way to add new tests (don't hardcode them)
  *
  * Done:
  *   Use new interfaces
  *   Get MT_*Tests running - need a wkt parser for math transforms
+ *   Uncomment MathTransform wkt check in addDefinition()
+ *      - reqires fix / clarification to AbstractMathTransform formatWKT()
  */
 
 
@@ -408,15 +407,15 @@ public class ScriptTest extends TestCase {
             crs = mtFactory.createFromWKT(value);
             if (true) {
                 assertEquals("MathTransform.equals(...) failed", crs, crs);
-//                final MathTransform check = mtFactory.createFromWKT(crs.toString());
-//                assertEquals("WKT formating produces a different result.", check, crs);
+                final MathTransform check = mtFactory.createFromWKT(((MathTransform) crs).toWKT());
+                assertEquals("WKT formating produces a different result.", check, crs);
             }
         }
         else {
             crs = crsFactory.createFromWKT(value);
             if (true) {
                 assertEquals("CoordinateReferenceSystem.equals(...) failed", crs, crs);
-                final CoordinateReferenceSystem check = crsFactory.createFromWKT(crs.toString());
+                final CoordinateReferenceSystem check = crsFactory.createFromWKT(((CoordinateReferenceSystem) crs).toWKT());
                 assertEquals("WKT formating produces a different result.", check, crs);
             }
         }
