@@ -17,6 +17,7 @@
 package org.geotools.data.wms;
 
 import org.geotools.data.ows.BoundingBox;
+import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WMSCapabilities;
@@ -62,6 +63,7 @@ public class WMSBuilder {
     private List layers;
     private Layer layer;
     private HashMap bboxes;
+	private LatLonBoundingBox latLonBBox;
 
     /**
      * Constructs a WMSBuilder
@@ -212,13 +214,19 @@ public class WMSBuilder {
         BoundingBox bbox = new BoundingBox(crs, minX, minY, maxX, maxY);
         bboxes.put(crs, bbox);
     }
+    
+    public void buildLatLonBoundingBox(double minX, double minY, double maxX, double maxY) {
+    	latLonBBox = new LatLonBoundingBox(minX, minY, maxX, maxY);
+    }
 
     private void finishLayer() {
         layer.setBoundingBoxes(bboxes);
+        layer.setLatLonBoundingBox(latLonBBox);
 
         layers.add(layer);
 
         bboxes = null;
+        latLonBBox = null;
     }
 
     /**

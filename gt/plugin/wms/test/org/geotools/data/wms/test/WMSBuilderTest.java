@@ -58,6 +58,7 @@ public class WMSBuilderTest extends TestCase {
 
         builder.buildLayer("Layer1", "layer1", true, null, srss, styles);
         builder.buildBoundingBox("bork", 1.0, 1.0, 2.0, 2.0);
+        builder.buildLatLonBoundingBox(10.0, 10.0, 100.0, 100.0);
 
         srss = new TreeSet();
         srss.add("EPSG:3");
@@ -86,6 +87,8 @@ public class WMSBuilderTest extends TestCase {
 
         BoundingBox bbox = (BoundingBox) capabilities.getLayers()[0].getBoundingBoxes()
                                                                     .get("bork");
-        assertEquals(Double.toString(bbox.getMinX()), Double.toString(1.0));
+        assertEquals(bbox.getMinX(), 1.0, 0.0);
+        
+        assertEquals(capabilities.getLayers()[0].getLatLonBoundingBox().getMaxX(), 100.0, 0.0);
     }
 }

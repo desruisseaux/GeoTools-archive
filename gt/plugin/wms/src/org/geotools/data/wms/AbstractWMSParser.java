@@ -177,6 +177,8 @@ public abstract class AbstractWMSParser implements WMSParser {
             styleElements);
 
         parseBoundingBoxes(layerElement, builder);
+        
+        parseLatLonBoundingBox(layerElement, builder);
 
         List children = layerElement.getChildren("Layer", defaultNamespace); //$NON-NLS-1$
 
@@ -185,7 +187,46 @@ public abstract class AbstractWMSParser implements WMSParser {
         }
     }
 
-    protected void parseBoundingBoxes(Element layerElement, WMSBuilder builder) {
+	protected void parseLatLonBoundingBox(Element layerElement, WMSBuilder builder) {
+		Element latLonBboxElement = layerElement.getChild("LatLonBoundingBox"); 
+		
+		if (latLonBboxElement == null) {
+			return;
+		}
+		
+		double[] coords = queryBaseBBoxAttributes(latLonBboxElement);
+		
+		builder.buildLatLonBoundingBox(coords[0], coords[1], coords[2], coords[3]);
+	}
+
+	/**
+	 * Extracts the coordinate attributes from a generic bounding box element and returns
+	 * a array of doubles containing those attributes.
+	 * 
+	 * @param bboxElement an element containing four attributes ('minx', 'miny', 'maxx', 'maxy')
+	 * @return an array of ordered doubles. index 0 = minx, 1 = miny, 2 = maxx, 3 = maxy 
+	 */
+	protected double[] queryBaseBBoxAttributes(Element bboxElement) {
+		double[] coords = new double[4];
+		
+		double minX = Double.parseDouble(bboxElement.getAttributeValue(
+        	"minx")); //$NON-NLS-1$
+		double minY = Double.parseDouble(bboxElement.getAttributeValue(
+        	"miny")); //$NON-NLS-1$
+		double maxX = Double.parseDouble(bboxElement.getAttributeValue(
+        	"maxx")); //$NON-NLS-1$
+		double maxY = Double.parseDouble(bboxElement.getAttributeValue(
+        	"maxy")); //$NON-NLS-1$
+		
+		coords[0] = minX;
+		coords[1] = minY;
+		coords[2] = maxX;
+		coords[3] = maxY;
+		
+		return coords;
+	}
+
+	protected void parseBoundingBoxes(Element layerElement, WMSBuilder builder) {
         List bboxElements = layerElement.getChildren("BoundingBox", defaultNamespace); //$NON-NLS-1$
         Iterator iter = bboxElements.iterator();
 
@@ -193,16 +234,9 @@ public abstract class AbstractWMSParser implements WMSParser {
             Element bboxElement = (Element) iter.next();
 
             String crs = bboxElement.getAttributeValue(getBBoxCRSName());
-            double minX = Double.parseDouble(bboxElement.getAttributeValue(
-                        "minx")); //$NON-NLS-1$
-            double minY = Double.parseDouble(bboxElement.getAttributeValue(
-                        "miny")); //$NON-NLS-1$
-            double maxX = Double.parseDouble(bboxElement.getAttributeValue(
-                        "maxx")); //$NON-NLS-1$
-            double maxY = Double.parseDouble(bboxElement.getAttributeValue(
-                        "maxy")); //$NON-NLS-1$
+            double[] coords = queryBaseBBoxAttributes(bboxElement);
 
-            builder.buildBoundingBox(crs, minX, minY, maxX, maxY);
+            builder.buildBoundingBox(crs, coords[0], coords[1], coords[2], coords[3]);
         }
     }
 

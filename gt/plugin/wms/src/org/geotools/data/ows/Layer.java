@@ -45,6 +45,11 @@ public class Layer implements Comparable {
      * The Value is the BoundingBox object itself.
      */
     private HashMap boundingBoxes;
+    
+    /**
+     * A boundingbox containing the minimum rectangle of the map data in EPSG:4326
+     */
+    private LatLonBoundingBox latLonBoundingBox;
 
     /**
      * A list of type Style
@@ -159,4 +164,11 @@ public class Layer implements Comparable {
     public void setParent(Layer parent) {
         this.parent = parent;
     }
+    
+	public LatLonBoundingBox getLatLonBoundingBox() {
+		return latLonBoundingBox;
+	}
+	public void setLatLonBoundingBox(LatLonBoundingBox latLonBoundingBox) {
+		this.latLonBoundingBox = latLonBoundingBox;
+	}
 }
