@@ -84,6 +84,7 @@
       <!-- This section excludes the tests -->
       <excludes>
         <exclude>**/*Test.java</exclude>
+        <exclude>**/QuickOracleTest.java</exclude>
       </excludes>
       <!--  End exclude tests -->
       <!-- This section includes the tests.
