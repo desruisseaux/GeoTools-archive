@@ -299,7 +299,7 @@ public final class FactoryFinder {
                 }
                 first = false;
                 final Factory provider = (Factory)providers.next();
-                table.write(provider.getVendor().getTitle().toString());
+                table.write(provider.getVendor().getTitle().toString(locale));
             }
             table.nextLine();
         }

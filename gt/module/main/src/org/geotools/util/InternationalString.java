@@ -69,7 +69,7 @@ public class InternationalString implements org.opengis.util.InternationalString
      * The string values in different locales (never <code>null</code>).
      * Keys are {@link Locale} objects and values are {@link String}s.
      */
-    private Map localMap = Collections.EMPTY_MAP;
+    private Map localMap;
 
     /**
      * The string in the {@linkplain Locale#getDefault system default} locale, or <code>null</code>
@@ -83,6 +83,25 @@ public class InternationalString implements org.opengis.util.InternationalString
      * using one of {@link #addLocalizedString addLocalizedString(...)} methods.
      */
     public InternationalString() {
+        localMap = Collections.EMPTY_MAP;
+    }
+
+    /**
+     * Constructs an international string initialized with the specified string.
+     * Additional localized strings can been added using one of
+     * {@link #addLocalizedString addLocalizedString(...)} methods.
+     * The string specified to this constructor is the one that will be returned
+     * if no localized string is found for the {@link Locale} argument in a call
+     * to {@link #toString(Locale)}.
+     *
+     * @param string The string in no specific locale.
+     */
+    public InternationalString(final String string) {
+        if (string != null) {
+            localMap = Collections.singletonMap(null, string);
+        } else {
+            localMap = Collections.EMPTY_MAP;
+        }
     }
 
     /**

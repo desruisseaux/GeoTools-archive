@@ -1853,7 +1853,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
          * discovered a part of the window which was hidden before. However,
          * we still need to adjust the scrollbars.
          */
-        final Object[] listeners=listenerList.getListenerList();
+        final Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length; (i-=2) >= 0;) {
             if (listeners[i] == ZoomChangeListener.class) {
                 if (listeners[i + 1] instanceof Synchronizer) try {

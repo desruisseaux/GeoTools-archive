@@ -32,6 +32,7 @@ import javax.units.UnitFormat;
 
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
+import org.opengis.util.InternationalString;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
@@ -238,14 +239,14 @@ public class Formatter {
         if (identifier != null) {
             final Citation authority = identifier.getAuthority();
             if (authority != null) {
-                final String title = authority.getTitle().toString();
+                final InternationalString title = authority.getTitle();
                 if (title != null) {
                     buffer.append(SEPARATOR);
                     buffer.append(SPACE);
                     buffer.append("AUTHORITY");
                     buffer.append(OPEN);
                     buffer.append(QUOTE);
-                    buffer.append(title);
+                    buffer.append(title.toString(locale));
                     final String code = identifier.getCode();
                     if (code != null) {
                         buffer.append(QUOTE);

@@ -87,7 +87,7 @@ public class IdentifiedObject extends Formattable
     private final Map remarks;
     
     /**
-     * Construct an object from a set of properties. Keys are strings from the table below.
+     * Constructs an object from a set of properties. Keys are strings from the table below.
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
      * argument shall contains at least a <code>"name"</code> property. Other properties listed
      * in the table below are optional.
@@ -148,7 +148,7 @@ public class IdentifiedObject extends Formattable
     }
 
     /**
-     * Construct an object from a set of properties and copy unrecognized properties in the
+     * Constructs an object from a set of properties and copy unrecognized properties in the
      * specified map. The <code>properties</code> argument is treated as in the {@linkplain
      * IdentifiedObject#IdentifiedObject(Map) one argument constructor}. All properties unknow to
      * this <code>IdentifiedObject</code> constructor are copied in the <code>subProperties</code>
