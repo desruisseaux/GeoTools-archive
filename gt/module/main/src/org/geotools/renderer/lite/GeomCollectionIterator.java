@@ -245,12 +245,4 @@ class GeomCollectionIterator extends AbstractLiteIterator {
         }
     }
 
-    /**
-     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
-     */
-    public void setMathTransform( MathTransform transform ) {
-        for(int i=0; i<gc.getNumGeometries(); i++){
-            getIterator(gc.getGeometryN(i)).setMathTransform(transform);
-        }
-    }
 }

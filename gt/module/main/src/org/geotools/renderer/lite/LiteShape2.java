@@ -23,8 +23,14 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import org.geotools.geometry.coordinatesequence.InPlaceCoordinateSequenceTransformer;
+import org.geotools.geometry.jts.CoordinateSequenceTransformer;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -44,7 +50,7 @@ import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
  * @author Andrea Aime
  * @version $Id$
  */
-public class LiteShape implements Shape, Cloneable {
+public class LiteShape2 implements Shape, Cloneable {
     /** The wrapped JTS geometry */
     private Geometry geometry;
 
@@ -60,9 +66,13 @@ public class LiteShape implements Shape, Cloneable {
 	private float xScale;
 
 	private float yScale;
-
-    private GeometryFactory geomFac;
     
+    private GeometryFactory geomFac;
+
+	private MathTransform mathTransform;
+
+	private static final AffineTransform IDENTITY = new AffineTransform();
+
     /**
      * Creates a new LiteShape object.
      *
@@ -71,9 +81,56 @@ public class LiteShape implements Shape, Cloneable {
      * @param generalize - set to true if the geometry need to be generalized
      *        during rendering
      * @param maxDistance - distance used in the generalization process
+     * @throws TransformException 
+     * @throws FactoryException 
      */
-    public LiteShape(Geometry geom, AffineTransform at, boolean generalize,
-        double maxDistance) {
+    public LiteShape2(Geometry geom, AffineTransform at, MathTransform mathTransform, boolean generalize,
+        double maxDistance) throws TransformException, FactoryException {
+        this(geom, at, mathTransform, generalize);
+        this.maxDistance = maxDistance;
+    }
+
+    /**
+     * Creates a new LiteShape object.
+     *
+     * @param geom - the wrapped geometry
+     * @param at - the transformation applied to the geometry in order to get to the shape points
+     * @param generalize - set to true if the geometry need to be generalized
+     *        during rendering
+     * @param maxDistance - distance used in the generalization process
+     * @throws TransformException 
+     * @throws FactoryException 
+     */
+    public LiteShape2(Geometry geom, AffineTransform at, MathTransform mathTransform, boolean generalize) throws TransformException, FactoryException {
+        if( geom!=null)
+            this.geometry =getGeometryFactory().createGeometry(geom);
+        if( at!=null )
+        	this.affineTransform = at;
+        else
+        	this.affineTransform=IDENTITY;
+        	this.mathTransform=mathTransform;
+    		if( geometry!=null)
+    			transformGeometry(geometry);
+        this.generalize = generalize;
+        xScale = (float) Math.sqrt(
+                (affineTransform.getScaleX() * affineTransform.getScaleX())
+                + (affineTransform.getShearX() * affineTransform.getShearX()));
+        yScale = (float) Math.sqrt(
+                (affineTransform.getScaleY() * affineTransform.getScaleY())
+                + (affineTransform.getShearY() * affineTransform.getShearY()));
+    }
+    /**
+     * Creates a new LiteShape object.
+     *
+     * @param geom - the wrapped geometry
+     * @param at - the transformation applied to the geometry in order to get to the shape points
+     * @param generalize - set to true if the geometry need to be generalized
+     *        during rendering
+     * @param maxDistance - distance used in the generalization process
+     * @throws TransformException 
+     */
+    public LiteShape2(Geometry geom, AffineTransform at, boolean generalize,
+        double maxDistance){
         this(geom, at, generalize);
         this.maxDistance = maxDistance;
     }
@@ -86,25 +143,69 @@ public class LiteShape implements Shape, Cloneable {
      * @param generalize - set to true if the geometry need to be generalized
      *        during rendering
      * @param maxDistance - distance used in the generalization process
+     * @throws TransformException 
      */
-    public LiteShape(Geometry geom, AffineTransform at, boolean generalize) {
+    public LiteShape2(Geometry geom, AffineTransform at, boolean generalize){
         if( geom!=null)
             this.geometry =getGeometryFactory().createGeometry(geom);
-        this.affineTransform = at;
+        if( at!=null )
+        	this.affineTransform = at;
+        else
+        	this.affineTransform=new AffineTransform();
         this.generalize = generalize;
-        if (at==null){
-        	yScale=xScale=1;
-        	return;
-        }
+        	try {
+        		if( geometry!=null)
+        			transformGeometry(geometry);
+			} catch (Exception e) {
+				affineTransform=at;
+				geometry=geom;
+			}
         xScale = (float) Math.sqrt(
-                (at.getScaleX() * at.getScaleX())
-                + (at.getShearX() * at.getShearX()));
+                (affineTransform.getScaleX() * affineTransform.getScaleX())
+                + (affineTransform.getShearX() * affineTransform.getShearX()));
         yScale = (float) Math.sqrt(
-                (at.getScaleY() * at.getScaleY())
-                + (at.getShearY() * at.getShearY()));
+                (affineTransform.getScaleY() * affineTransform.getScaleY())
+                + (affineTransform.getShearY() * affineTransform.getShearY()));
     }
+    
+	private void transformGeometry(Geometry geometry) throws TransformException, FactoryException {
+		
+		if( mathTransform==null || mathTransform.isIdentity() ){
+			if( !affineTransform.isIdentity() ){
+				MathTransformFactory factory=FactoryFinder.getMathTransformFactory();
+				mathTransform=factory.createAffineTransform(new GeneralMatrix(affineTransform));
+				affineTransform=IDENTITY;
+			}
+		}else if( !affineTransform.isIdentity() ){
+			MathTransformFactory factory=FactoryFinder.getMathTransformFactory();
+			factory.createConcatenatedTransform(mathTransform, factory.createAffineTransform(new GeneralMatrix(affineTransform)));
+			affineTransform=IDENTITY;
+		}
+		
+		if( mathTransform==null || mathTransform.isIdentity() )
+			return;
+		
+		
+        CoordinateSequenceTransformer transformer=new InPlaceCoordinateSequenceTransformer();
+        if (geometry instanceof GeometryCollection) {
+        	GeometryCollection collection=(GeometryCollection)geometry;
+        	for (int i = 0; i < collection.getNumGeometries(); i++) {
+        		transformGeometry(collection.getGeometryN(i));
+			}
+        }else if (geometry instanceof Point) {
+			transformer.transform(((Point)geometry).getCoordinateSequence(), mathTransform);
+        }else if (geometry instanceof Polygon) {     
+        	Polygon polygon=(Polygon) geometry;
+        	transformGeometry(polygon.getExteriorRing());
+        	for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+				transformGeometry(polygon.getInteriorRingN(i));
+			}
+        } else if (geometry instanceof LineString) {
+        	transformer.transform(((LineString)geometry).getCoordinateSequence(), mathTransform);
+        } 
+	}
 
-    private GeometryFactory getGeometryFactory() {
+	private GeometryFactory getGeometryFactory() {
         if (geomFac == null) {
             geomFac = new GeometryFactory(new PackedCoordinateSequenceFactory());
         }
@@ -117,9 +218,14 @@ public class LiteShape implements Shape, Cloneable {
      * object instead of creating it again and again during rendering
      *
      * @param g
+     * @throws TransformException 
+     * @throws FactoryException 
      */
-    public void setGeometry(Geometry g) {
-        this.geometry = (Geometry) g.clone();
+    public void setGeometry(Geometry g) throws TransformException, FactoryException {
+        if( g!=null){
+            this.geometry =getGeometryFactory().createGeometry(g);
+            transformGeometry(geometry);
+        }
     }
 
     /**
@@ -403,10 +509,7 @@ public class LiteShape implements Shape, Cloneable {
         AbstractLiteIterator pi = null;
 
         AffineTransform combined = null;
-
-        if (affineTransform == null) {
-            combined = at;
-        } else if ((at == null) || at.isIdentity()) {
+        if ((at == null) || at.isIdentity()) {
             combined = affineTransform;
         } else {
             combined = new AffineTransform(affineTransform);
@@ -443,7 +546,6 @@ public class LiteShape implements Shape, Cloneable {
                     combined, generalize, maxDistance);
             pi = collIterator;
         }
-
         return pi;
     }
 
@@ -626,6 +728,10 @@ public class LiteShape implements Shape, Cloneable {
      */
     public AffineTransform getAffineTransform() {
         return affineTransform;
+    }
+
+    public MathTransform getMathTransform() {
+        return mathTransform;
     }
 
 	public Geometry getGeometry() {

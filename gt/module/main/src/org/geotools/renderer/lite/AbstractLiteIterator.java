@@ -47,8 +47,6 @@ public abstract class AbstractLiteIterator implements PathIterator {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     protected double[] dcoords = new double[2];
-    protected static final AffineTransform NO_TRANSFORM = new AffineTransform();
-    protected MathTransform mathTransform=null;
     
     /**
      * @see java.awt.geom.PathIterator#currentSegment(float[])
@@ -60,37 +58,5 @@ public abstract class AbstractLiteIterator implements PathIterator {
 
         return result;
     }
-
-    /**
-     * @return Returns the mathTransform.
-     */
-    public MathTransform getMathTransform() {
-        return mathTransform;
-    }
-    
-    public abstract void setMathTransform(MathTransform transform);
-    
-    /**
-     * Transforms the coordinates and sets the math transform.
-     */
-    protected void transform( CoordinateSequence coordinates, MathTransform transform ) {
-        try {
-            MathTransform tmp=mathTransform;
-            if( tmp!=null)
-                tmp=FactoryFinder.getMathTransformFactory().createConcatenatedTransform(mathTransform.inverse(), transform);
-            else
-                tmp=transform;
-            if( tmp==null )
-                return;
-            CoordinateSequenceTransformer transformer=new InPlaceCoordinateSequenceTransformer();
-
-            coordinates=transformer.transform(coordinates, tmp);
-            
-            mathTransform=transform;
-        } catch (Exception e) {
-            LOGGER.warning("The coordinates were not transformed by the math transform");
-        }
-    }
-
     
 }

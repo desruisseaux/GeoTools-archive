@@ -20,6 +20,7 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import org.geotools.filter.FilterFactory;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 

@@ -17,13 +17,12 @@
 package org.geotools.renderer.lite;
 
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.Canvas;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -31,6 +30,11 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +44,17 @@ import org.geotools.renderer.style.MarkStyle2D;
 import org.geotools.renderer.style.PolygonStyle2D;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.renderer.style.TextStyle2D;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -59,16 +74,25 @@ public class StyledShapePainter {
     private static final Logger LOGGER = Logger.getLogger(StyledShapePainter.class
             .getName());
 
+    LabelCache labelCache;
+    /**
+	 * Construct <code>StyledShapePainter</code>.
+	 */
+	public StyledShapePainter(LabelCache labelCache) {
+		this.labelCache=labelCache;
+	}
+    
+
     /**
      * Invoked automatically when a polyline is about to be draw. This
      * implementation paints the polyline according to the rendered style
      *
      * @param graphics The graphics in which to draw.
-     * @param shape The polyline to draw.
+     * @param shape The polygon to draw.
      * @param style The style to apply, or <code>null</code> if none.
      * @param scale The scale denominator for the current zoom level
      */
-    public void paint(final Graphics2D graphics, final Shape shape,
+    public void paint(final Graphics2D graphics, final LiteShape2 shape,
         final Style2D style, final double scale) {
         if (style == null) {
             // TODO: what's going on? Should not be reached...
@@ -122,66 +146,7 @@ public class StyledShapePainter {
             renderImage(graphics, coords[0], coords[1],
                 (Image) gs2d.getImage(), gs2d.getRotation(), gs2d.getOpacity());
         } else if (style instanceof TextStyle2D) {
-            // get the point onto the shape has to be painted
-            float[] coords = new float[2];
-            PathIterator iter = shape.getPathIterator(IDENTITY_TRANSFORM);
-            iter.currentSegment(coords);
-
-            AffineTransform old = graphics.getTransform();
-            AffineTransform temp = new AffineTransform(old);
-            TextStyle2D ts2d = (TextStyle2D) style;
-            GlyphVector textGv = ts2d.getTextGlyphVector(graphics);
-            Rectangle2D bounds = textGv.getVisualBounds();
-
-            temp.translate(coords[0], coords[1]);
-
-            double x = 0;
-            double y = 0;
-
-            if (ts2d.isAbsoluteLineDisplacement()) {
-                double offset = ts2d.getDisplacementY();
-
-                if (offset > 0.0) { // to the left of the line
-                    y = -offset;
-                } else if (offset < 0) {
-                    y = -offset + bounds.getHeight();
-                } else {
-                    y = bounds.getHeight() / 2;
-                }
-
-                x = -bounds.getWidth() / 2;
-            } else {
-                x = (ts2d.getAnchorX() * (-bounds.getWidth()))
-                    + ts2d.getDisplacementX();
-                y = (ts2d.getAnchorY() * (bounds.getHeight()))
-                    + ts2d.getDisplacementY();
-            }
-
-            temp.rotate(ts2d.getRotation());
-            temp.translate(x, y);
-
-            try {
-                graphics.setTransform(temp);
-                
-                if (ts2d.getHaloFill() != null) {
-                    // float radious = ts2d.getHaloRadius();
-
-                    // graphics.translate(radious, -radious);
-                    graphics.setPaint(ts2d.getHaloFill());
-                    graphics.setComposite(ts2d.getHaloComposite());
-                    graphics.fill(ts2d.getHaloShape(graphics));
-
-                    // graphics.translate(radious, radious);
-                }
-
-                if (ts2d.getFill() != null) {
-                    graphics.setPaint(ts2d.getFill());
-                    graphics.setComposite(ts2d.getComposite());
-                    graphics.drawGlyphVector(textGv, 0, 0);
-                }
-            } finally {
-                graphics.setTransform(old);
-            }
+        	labelCache.put((TextStyle2D) style, shape);
         } else {
             // if the style is a polygon one, process it even if the polyline is not
             // closed (by SLD specification)
@@ -426,4 +391,5 @@ public class StyledShapePainter {
 
         return;
     }
+
 }

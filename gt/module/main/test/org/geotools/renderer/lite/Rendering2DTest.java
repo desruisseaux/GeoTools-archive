@@ -93,11 +93,11 @@ public class Rendering2DTest extends TestCase {
     private static final boolean INTERACTIVE=false;
     private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
     private Object transform;
-    private static final String LINE = "linefeature";
-    private static final String POLYGON = "polygonfeature";
-    private static final String POINT = "pointfeature";
-    private static final String RING = "ringfeature";
-    private static final String COLLECTION = "collfeature";
+    static final String LINE = "linefeature";
+    static final String POLYGON = "polygonfeature";
+    static final String POINT = "pointfeature";
+    static final String RING = "ringfeature";
+    static final String COLLECTION = "collfeature";
 
     public Rendering2DTest( java.lang.String testName ) {
         super(testName);
@@ -143,7 +143,10 @@ public class Rendering2DTest extends TestCase {
         Fill myFill = sFac.getDefaultFill();
         myFill.setColor(filterFactory.createLiteralExpression("#ff0000"));
         polysym.setFill(myFill);
-        polysym.setStroke(sFac.getDefaultStroke());
+        myStroke = sFac.getDefaultStroke();
+        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
+        polysym.setStroke(myStroke);
         Rule rule = sFac.createRule();
         rule.setSymbolizers(new Symbolizer[]{polysym});
         FeatureTypeStyle fts = sFac.createFeatureTypeStyle(new Rule[]{rule});
@@ -622,7 +625,7 @@ public class Rendering2DTest extends TestCase {
     /**
      * bounds may be null
      */
-    private void showRender( String testName, Object renderer, long timeOut, Envelope bounds )
+    static void showRender( String testName, Object renderer, long timeOut, Envelope bounds )
             throws Exception {
 
         int w = 300, h = 300;
@@ -658,7 +661,7 @@ public class Rendering2DTest extends TestCase {
         }
 
         // java.net.URL base = TestData.getResource(this, ".");
-        java.io.File base = TestData.file(this, ".");
+        java.io.File base = TestData.file(new Rendering2DTest(""), ".");
         java.io.File file = new java.io.File(base, testName + "_"
                 + renderer.getClass().getName().replace('.', '_') + ".png");
         java.io.FileOutputStream out = new java.io.FileOutputStream(file);
@@ -684,7 +687,7 @@ public class Rendering2DTest extends TestCase {
                 if( imageExemplar.getRGB(x, y)!=imageTest.getRGB(x, y) )
                 	errors++;
             }
-            assertTrue("Too many errors", errors<50);
+            assertTrue("Too many errors: "+errors, errors<50);
         }
 
     }
@@ -695,7 +698,7 @@ public class Rendering2DTest extends TestCase {
      * @param g
      * @param bounds
      */
-    private void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
+    private static void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
         if (obj instanceof LiteRenderer2) {
             LiteRenderer2 renderer = (LiteRenderer2) obj;
             if (bounds == null)

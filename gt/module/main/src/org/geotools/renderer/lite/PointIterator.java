@@ -89,12 +89,4 @@ public class PointIterator extends AbstractLiteIterator {
         return SEG_MOVETO;
     }
 
-
-    /**
-     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
-     */
-    public void setMathTransform( MathTransform transform ) {
-        transform(point.getCoordinateSequence(), transform);
-    }
-    
 }

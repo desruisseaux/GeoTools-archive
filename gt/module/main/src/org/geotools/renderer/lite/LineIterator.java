@@ -73,6 +73,8 @@ class LineIterator extends AbstractLiteIterator {
 
 	private int coordinateCount;
 
+	private static final AffineTransform NO_TRANSFORM = new AffineTransform();
+
 	/**
 	 * 
 	 */
@@ -355,13 +357,6 @@ class LineIterator extends AbstractLiteIterator {
             return SEG_LINETO;
         }
 	}
-
-    /**
-     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
-     */
-    public void setMathTransform( MathTransform transform ) {
-        transform(coordinates, transform);
-    }
 
 	
 }

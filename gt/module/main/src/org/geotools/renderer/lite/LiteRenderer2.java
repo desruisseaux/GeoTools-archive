@@ -11,6 +11,7 @@ package org.geotools.renderer.lite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
@@ -163,8 +164,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     /** Factory that will resolve symbolizers into rendered styles */
     private SLDStyleFactory styleFactory = new SLDStyleFactory();
 
+    LabelCache labelCache=new LabelCacheDefault();
+    
     /** The painter class we use to depict shapes onto the screen */
-    private StyledShapePainter painter = new StyledShapePainter();
+    private StyledShapePainter painter = new StyledShapePainter(labelCache);
 
     /** The math transform cache */
     private HashMap transformMap = new HashMap();
@@ -278,7 +281,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     public void paint( Graphics2D graphics, Rectangle paintArea, AffineTransform transform ) {
         error = 0;
-
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         if ((graphics == null) || (paintArea == null)) {
             LOGGER.info("renderer passed null arguments");
 
@@ -336,8 +339,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
         // get detstination CRS
         CoordinateReferenceSystem destinationCrs = context.getCoordinateReferenceSystem();
-
+        labelCache.start();
         for( int i = 0; i < layers.length; i++ ) {
+        	
             MapLayer currLayer = layers[i];
 
             if (!currLayer.isVisible()) {
@@ -348,7 +352,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             if (renderingStopRequested) {
                 return;
             }
-
+            labelCache.startLayer();
             try {
                 // mapExtent = this.context.getAreaOfInterest();
                 FeatureResults results = queryLayer(currLayer, envelope, destinationCrs);
@@ -361,7 +365,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 LOGGER.warning("Exception " + exception + " rendering layer " + currLayer);
                 exception.printStackTrace();
             }
+
+            labelCache.endLayer(graphics, screenSize);
         }
+
+        labelCache.end(graphics, paintArea);
 
         LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio() + " , hits "
                 + styleFactory.getHits() + ", requests " + styleFactory.getRequests());
@@ -460,7 +468,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 q.setPropertyNames(attributes);
                 if( envelope.intersects(featureSource.getBounds())){
                     LOGGER.severe("Got a tranform exception while trying to de-project the current "
-                            + "envelope, bboxs intersect therfore using envelope)");
+                            + "envelope, bboxs intersect therefore using envelope)");
                     Filter filter = null;
                     BBoxExpression rightBBox = filterFactory.createBBoxExpression(envelope);
                     filter = createBBoxFilters(schema, attributes, rightBBox);
@@ -748,7 +756,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             LOGGER.finest("processing " + featureStylers.length + " stylers");
         }
 
-        LiteShape shape = createPath(null, at);
+        LiteShape2 shape = createPath(null, at);
         transformMap = new HashMap();
 
         for( int i = 0; i < featureStylers.length; i++ ) {
@@ -808,7 +816,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
                                     Symbolizer[] symbolizers = r.getSymbolizers();
                                     processSymbolizers(graphics, feature, symbolizers, scaleRange,
-                                            shape, destinationCrs);
+                                            at, destinationCrs);
                                 }
                             }
                         }
@@ -819,7 +827,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                                 Rule r = (Rule) it.next();
                                 Symbolizer[] symbolizers = r.getSymbolizers();
                                 processSymbolizers(graphics, feature, symbolizers, scaleRange,
-                                        shape, destinationCrs);
+                                        at, destinationCrs);
                             }
                         }
                     }
@@ -830,6 +838,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             }
 
             reader.close();
+            
         }
     }
 
@@ -847,11 +856,13 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @param shape
      * @param destinationCrs
      * @throws TransformException
+     * @throws FactoryException 
      */
     private void processSymbolizers( final Graphics2D graphics, final Feature feature,
-            final Symbolizer[] symbolizers, Range scaleRange, LiteShape shape,
-            CoordinateReferenceSystem destinationCrs ) throws TransformException {
+            final Symbolizer[] symbolizers, Range scaleRange, AffineTransform at,
+            CoordinateReferenceSystem destinationCrs ) throws TransformException, FactoryException {
 
+    	LiteShape2 shape=createPath(null, at);
         for( int m = 0; m < symbolizers.length; m++ ) {
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("applying symbolizer " + symbolizers[m]);
@@ -879,7 +890,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
                 // if (transform != null && !(transform instanceof AffineTransform) ) {
                 if (transform != null) {
-                    Shape transformedShape = getTransformedShape(g, transform);
+                	LiteShape2 transformedShape = getTransformedShape(g, transform);
                     painter.paint(graphics, transformedShape, style, scaleDenominator);
                 } else {
                     shape.setGeometry(g);
@@ -896,13 +907,12 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @param transform
      * @return
      * @throws TransformException
+     * @throws FactoryException 
      */
-    private Shape getTransformedShape( Geometry g, MathTransform2D transform )
-            throws TransformException {
-        LiteShape shape = new LiteShape(g, null, false);
-        shape.setMathTransform(transform);
+    private LiteShape2 getTransformedShape( Geometry g, MathTransform2D transform )
+            throws TransformException, FactoryException {
+        LiteShape2 shape = new LiteShape2(g, null, transform, false);
         return shape;
-//         return transform.createTransformedShape(shape);
     }
 
     /**
@@ -990,7 +1000,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
         // if the symbolizer is a point or text symbolizer generate a suitable location to place the
         // point in order to avoid recomputing that location at each rendering step
-        if ((s instanceof PointSymbolizer || s instanceof TextSymbolizer)
+        if ((s instanceof PointSymbolizer 
+//        		|| s instanceof TextSymbolizer
+        		)
                 && !((geom instanceof Point) || (geom instanceof MultiPoint))) {
             if (geom instanceof LineString && !(geom instanceof LinearRing)) {
                 // use the mid point to represent the point/text symbolizer anchor
@@ -1054,12 +1066,12 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @param at DOCUMENT ME!
      * @return A GeneralPath that is equivalent to geom
      */
-    private LiteShape createPath( final Geometry geom, final AffineTransform at ) {
-        if (generalizationDistance > 0) {
-            return new LiteShape(geom, at, true, generalizationDistance);
-        } else {
-            return new LiteShape(geom, at, false);
-        }
+    private LiteShape2 createPath( final Geometry geom, final AffineTransform at ) {
+	    	if (generalizationDistance > 0) {
+	            return new LiteShape2(geom, at, true, generalizationDistance);
+	        } else {
+	            return new LiteShape2(geom, at, false);
+	        }
     }
 
     /**

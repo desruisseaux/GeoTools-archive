@@ -253,12 +253,4 @@ class PolygonIterator extends AbstractLiteIterator {
         }
     }
     
-
-    /**
-     * @see org.geotools.renderer.lite.AbstractLiteIterator#setMathTransform(org.opengis.referencing.operation.MathTransform)
-     */
-    public void setMathTransform( MathTransform transform ) {
-        transform(coords, transform);
-    }
-
 }
