@@ -36,10 +36,12 @@ import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.util.NameFactory;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -71,9 +73,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GEODETIC_LONGITUDE
      * @see #SPHERICAL_LONGITUDE
      */
-    public static final CoordinateSystemAxis LONGITUDE =
-                        new Localized("\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE,
-                                      ResourceKeys.LONGITUDE);
+    public static final CoordinateSystemAxis LONGITUDE = new CoordinateSystemAxis(
+            ResourceKeys.LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
     
     /**
      * Default axis info for latitudes.
@@ -86,9 +87,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GEODETIC_LATITUDE
      * @see #SPHERICAL_LATITUDE
      */
-    public static final CoordinateSystemAxis LATITUDE =
-                        new Localized("\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE,
-                                      ResourceKeys.LATITUDE);
+    public static final CoordinateSystemAxis LATITUDE = new CoordinateSystemAxis(
+            ResourceKeys.LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
     
     /**
      * The default axis for altitude values.
@@ -103,9 +103,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
      */
-    public static final CoordinateSystemAxis ALTITUDE =
-                        new Localized("h", AxisDirection.UP, SI.METER,
-                                      ResourceKeys.ALTITUDE);
+    public static final CoordinateSystemAxis ALTITUDE = new CoordinateSystemAxis(
+            ResourceKeys.ALTITUDE, "h", AxisDirection.UP, SI.METER);
     
     /**
      * The default axis for depth.
@@ -118,9 +117,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
      */
-    public static final CoordinateSystemAxis DEPTH =
-                        new Localized("d", AxisDirection.DOWN, SI.METER,
-                                      ResourceKeys.DEPTH);
+    public static final CoordinateSystemAxis DEPTH = new CoordinateSystemAxis(
+            ResourceKeys.DEPTH, "d", AxisDirection.DOWN, SI.METER);
     
     /**
      * Default axis info for geodetic longitudes in a
@@ -134,9 +132,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GEODETIC_LONGITUDE
      * @see #SPHERICAL_LONGITUDE
      */
-    public static final CoordinateSystemAxis GEODETIC_LONGITUDE =
-                        new Localized("\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE,
-                                      ResourceKeys.GEODETIC_LONGITUDE);
+    public static final CoordinateSystemAxis GEODETIC_LONGITUDE = new CoordinateSystemAxis(
+            ResourceKeys.GEODETIC_LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
     
     /**
      * Default axis info for geodetic latitudes in a
@@ -150,9 +147,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GEODETIC_LATITUDE
      * @see #SPHERICAL_LATITUDE
      */
-    public static final CoordinateSystemAxis GEODETIC_LATITUDE =
-                        new Localized("\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE,
-                                      ResourceKeys.GEODETIC_LATITUDE);
+    public static final CoordinateSystemAxis GEODETIC_LATITUDE = new CoordinateSystemAxis(
+            ResourceKeys.GEODETIC_LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
     
     /**
      * The default axis for height values above the ellipsoid in a
@@ -168,9 +164,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
      */
-    public static final CoordinateSystemAxis ELLIPSOIDAL_HEIGHT =
-                        new Localized("h", AxisDirection.UP, SI.METER,
-                                      ResourceKeys.ELLIPSOIDAL_HEIGHT);
+    public static final CoordinateSystemAxis ELLIPSOIDAL_HEIGHT = new CoordinateSystemAxis(
+            ResourceKeys.ELLIPSOIDAL_HEIGHT, "h", AxisDirection.UP, SI.METER);
     
     /**
      * The default axis for height values measured from gravity.
@@ -184,9 +179,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
      */
-    public static final CoordinateSystemAxis GRAVITY_RELATED_HEIGHT =
-                        new Localized("h", AxisDirection.UP, SI.METER,
-                                      ResourceKeys.GRAVITY_RELATED_HEIGHT);
+    public static final CoordinateSystemAxis GRAVITY_RELATED_HEIGHT = new CoordinateSystemAxis(
+            ResourceKeys.GRAVITY_RELATED_HEIGHT, "h", AxisDirection.UP, SI.METER);
     
     /**
      * Default axis info for longitudes in a
@@ -201,9 +195,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GEODETIC_LONGITUDE
      * @see #SPHERICAL_LONGITUDE
      */
-    public static final CoordinateSystemAxis SPHERICAL_LONGITUDE =
-                        new Localized("\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE,
-                                      ResourceKeys.SPHERICAL_LONGITUDE);
+    public static final CoordinateSystemAxis SPHERICAL_LONGITUDE = new CoordinateSystemAxis(
+            ResourceKeys.SPHERICAL_LONGITUDE, "\u03C6", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
     
     /**
      * Default axis info for latitudes in a
@@ -218,9 +211,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GEODETIC_LATITUDE
      * @see #SPHERICAL_LATITUDE
      */
-    public static final CoordinateSystemAxis SPHERICAL_LATITUDE =
-                        new Localized("\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE,
-                                      ResourceKeys.SPHERICAL_LATITUDE);
+    public static final CoordinateSystemAxis SPHERICAL_LATITUDE = new CoordinateSystemAxis(
+            ResourceKeys.SPHERICAL_LATITUDE, "\u03BB", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
     
     /**
      * Default axis info for radius in a
@@ -237,9 +229,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #GRAVITY_RELATED_HEIGHT
      * @see #DEPTH
      */
-    public static final CoordinateSystemAxis GEOCENTRIC_RADIUS =
-                        new Localized("r", AxisDirection.UP, SI.METER,
-                                      ResourceKeys.GEOCENTRIC_RADIUS);
+    public static final CoordinateSystemAxis GEOCENTRIC_RADIUS = new CoordinateSystemAxis(
+            ResourceKeys.GEOCENTRIC_RADIUS, "r", AxisDirection.UP, SI.METER);
     
     /**
      * Default axis info for <var>x</var> values in a {@linkplain CartesianCS cartesian CS}.
@@ -253,8 +244,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #EASTING
      * @see #WESTING
      */
-    public static final CoordinateSystemAxis X =
-                        new CoordinateSystemAxis("x", AxisDirection.EAST, SI.METER);
+    public static final CoordinateSystemAxis X = new CoordinateSystemAxis(
+                        "x", AxisDirection.EAST, SI.METER);
     
     /**
      * Default axis info for <var>y</var> values in a {@linkplain CartesianCS cartesian CS}.
@@ -268,8 +259,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #NORTHING
      * @see #SOUTHING
      */
-    public static final CoordinateSystemAxis Y =
-                        new CoordinateSystemAxis("y", AxisDirection.NORTH, SI.METER);
+    public static final CoordinateSystemAxis Y = new CoordinateSystemAxis(
+                        "y", AxisDirection.NORTH, SI.METER);
     
     /**
      * Default axis info for <var>z</var> values in a {@linkplain CartesianCS cartesian CS}.
@@ -281,8 +272,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #Z
      * @see #GEOCENTRIC_Z
      */
-    public static final CoordinateSystemAxis Z =
-                        new CoordinateSystemAxis("z", AxisDirection.UP, SI.METER);
+    public static final CoordinateSystemAxis Z = new CoordinateSystemAxis(
+                        "z", AxisDirection.UP, SI.METER);
     
     /**
      * Default axis info for <var>x</var> values in a
@@ -298,9 +289,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #EASTING
      * @see #WESTING
      */
-    public static final CoordinateSystemAxis GEOCENTRIC_X =
-                        new Localized("X", AxisDirection.EAST, SI.METER,
-                                      ResourceKeys.GEOCENTRIC_X);
+    public static final CoordinateSystemAxis GEOCENTRIC_X = new CoordinateSystemAxis(
+            ResourceKeys.GEOCENTRIC_X, "X", AxisDirection.EAST, SI.METER);
     
     /**
      * Default axis info for <var>y</var> values in a
@@ -316,9 +306,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #NORTHING
      * @see #SOUTHING
      */
-    public static final CoordinateSystemAxis GEOCENTRIC_Y =
-                        new Localized("Y", AxisDirection.NORTH, SI.METER,
-                                      ResourceKeys.GEOCENTRIC_Y);
+    public static final CoordinateSystemAxis GEOCENTRIC_Y = new CoordinateSystemAxis(
+            ResourceKeys.GEOCENTRIC_Y, "Y", AxisDirection.NORTH, SI.METER);
     
     /**
      * Default axis info for <var>z</var> values in a
@@ -332,9 +321,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #Z
      * @see #GEOCENTRIC_Z
      */
-    public static final CoordinateSystemAxis GEOCENTRIC_Z =
-                        new Localized("Z", AxisDirection.UP, SI.METER,
-                                      ResourceKeys.GEOCENTRIC_Z);
+    public static final CoordinateSystemAxis GEOCENTRIC_Z = new CoordinateSystemAxis(
+            ResourceKeys.GEOCENTRIC_Z, "Z", AxisDirection.UP, SI.METER);
     
     /**
      * Default axis info for Easting values in a
@@ -349,9 +337,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #EASTING
      * @see #WESTING
      */
-    public static final CoordinateSystemAxis EASTING =
-                        new Localized("E", AxisDirection.EAST, SI.METER,
-                                      ResourceKeys.EASTING);
+    public static final CoordinateSystemAxis EASTING = new CoordinateSystemAxis(
+            ResourceKeys.EASTING, "E", AxisDirection.EAST, SI.METER);
     
     /**
      * Default axis info for Westing values in a
@@ -365,9 +352,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #EASTING
      * @see #WESTING
      */
-    public static final CoordinateSystemAxis WESTING =
-                        new Localized("W", AxisDirection.WEST, SI.METER,
-                                      ResourceKeys.WESTING);
+    public static final CoordinateSystemAxis WESTING = new CoordinateSystemAxis(
+            ResourceKeys.WESTING, "W", AxisDirection.WEST, SI.METER);
     
     /**
      * Default axis info for Northing values in a
@@ -382,9 +368,8 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #NORTHING
      * @see #SOUTHING
      */
-    public static final CoordinateSystemAxis NORTHING =
-                        new Localized("N", AxisDirection.NORTH, SI.METER,
-                                      ResourceKeys.NORTHING);
+    public static final CoordinateSystemAxis NORTHING = new CoordinateSystemAxis(
+            ResourceKeys.NORTHING, "N", AxisDirection.NORTH, SI.METER);
     
     /**
      * Default axis info for Southing values in a
@@ -398,18 +383,17 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * @see #NORTHING
      * @see #SOUTHING
      */
-    public static final CoordinateSystemAxis SOUTHING =
-                        new Localized("S", AxisDirection.SOUTH, SI.METER,
-                                      ResourceKeys.SOUTHING);
+    public static final CoordinateSystemAxis SOUTHING = new CoordinateSystemAxis(
+            ResourceKeys.SOUTHING, "S", AxisDirection.SOUTH, SI.METER);
     
     /**
-     * A default axis for time values in a {@linkplain TemporalCS temporal CS}.
+     * A default axis for time values in a {@linkplain TimeCS time CS}.
      * Increasing time go toward {@linkplain AxisDirection#FUTURE future}
      * and units are {@linkplain NonSI#DAY days}.
      * The abbreviation is lower case "t".
      */
-    public static final CoordinateSystemAxis TIME =
-                        new Localized("t", AxisDirection.FUTURE, NonSI.DAY, ResourceKeys.TIME);
+    public static final CoordinateSystemAxis TIME = new CoordinateSystemAxis(
+            ResourceKeys.TIME, "t", AxisDirection.FUTURE, NonSI.DAY);
 
     /**
      * The abbreviation used for this coordinate system axes. This abbreviation is also
@@ -430,44 +414,7 @@ public class CoordinateSystemAxis extends IdentifiedObject
     private final Unit unit;
 
     /**
-     * Construct an axis with the same {@linkplain #getName name} as the abbreviation.
-     *
-     * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
-     *                     coordinate system axes.
-     * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
-     * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
-     *                     system axis.
-     */
-    public CoordinateSystemAxis(final String        abbreviation,
-						        final AxisDirection direction,
-						        final Unit          unit)
-    {
-        this( Collections.singletonMap("name", abbreviation), abbreviation, direction, unit);
-    }
-    /**
-     * Construct an axis with an InternationalString name and a abbreviation.
-     *
-     * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
-     *                     coordinate system axes.
-     * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
-     * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
-     *                     system axis.
-     */    
-    public CoordinateSystemAxis(final InternationalString name,
-                                final String        abbreviation,
-                                final AxisDirection direction,
-                                final Unit          unit)
-    {
-        this( propertites( name, abbreviation), abbreviation, direction, unit);
-    }
-    private static Map propertites( final InternationalString name, final String abbreviation ){
-        Map map = new HashMap();
-        map.put( "name", name );
-        map.put( "abbreviation", abbreviation );
-        return map;
-    }
-    /**
-     * Construct an axis from a set of properties. The properties map is given unchanged
+     * Constructs an axis from a set of properties. The properties map is given unchanged
      * to the {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
@@ -492,6 +439,76 @@ public class CoordinateSystemAxis extends IdentifiedObject
     }
 
     /**
+     * Constructs an axis with the same {@linkplain #getName name} as the abbreviation.
+     *
+     * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
+     *                     coordinate system axes.
+     * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
+     * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
+     *                     system axis.
+     */
+    public CoordinateSystemAxis(final String        abbreviation,
+                                final AxisDirection direction,
+                                final Unit          unit)
+    {
+        this(Collections.singletonMap(NAME_PROPERTY, abbreviation), abbreviation, direction, unit);
+    }
+
+    /**
+     * Constructs an axis with a name as an {@linkplain org.geotools.util.InternationalString
+     * international string} and an abbreviation. The {@linkplain #getName name of this identified
+     * object} is set to the unlocalized version of the <code>name</code> argument, as given by
+     * <code>name.{@linkplain InternationalString#toString(Locale) toString}(null)</code>. The
+     * same <code>name</code> argument is also stored as an {@linkplain #getAlias alias}, which
+     * allows fetching localized versions of the name.
+     *
+     * @param name         The name of this axis. Also stored as an alias for localization purpose.
+     * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
+     *                     coordinate system axis.
+     * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
+     * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
+     *                     system axis.
+     */    
+    public CoordinateSystemAxis(final InternationalString name,
+                                final String        abbreviation,
+                                final AxisDirection direction,
+                                final Unit          unit)
+    {
+        this(toMap(name), abbreviation, direction, unit);
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static Map toMap(final InternationalString name) {
+        final Map properties = new HashMap(4);
+        if (name != null) {
+            properties.put(NAME_PROPERTY,  name.toString(null));
+            properties.put(ALIAS_PROPERTY, NameFactory.create(new InternationalString[] {name}));
+        }
+        return properties;
+    }
+
+    /**
+     * Constructs an axis with a name and an abbreviation as a resource bundle key.
+     *
+     * @param name         The resource bundle key for the name.
+     * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
+     *                     coordinate system axes.
+     * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
+     * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
+     *                     system axis.
+     */    
+    private CoordinateSystemAxis(final int           name,
+                                 final String        abbreviation,
+                                 final AxisDirection direction,
+                                 final Unit          unit)
+    {
+        this(Resources.formatInternational(name), abbreviation, direction, unit);
+    }
+
+    /**
      * The abbreviation used for this coordinate system axes. This abbreviation is also
      * used to identify the ordinates in coordinate tuple. Examples are "<var>X</var>"
      * and "<var>Y</var>".
@@ -509,16 +526,15 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * {@linkplain AxisDirection#NORTH north} or {@linkplain AxisDirection#SOUTH south},
      * {@linkplain AxisDirection#EAST  east}  or {@linkplain AxisDirection#WEST  west},
      * {@linkplain AxisDirection#UP    up}    or {@linkplain AxisDirection#DOWN  down}.
-     * Within any set of coordinate system axes, only one of each pair of terms
+     *
+     * <P>Within any set of coordinate system axes, only one of each pair of terms
      * can be used. For earth-fixed coordinate reference systems, this direction is often
      * approximate and intended to provide a human interpretable meaning to the axis. When a
      * geodetic datum is used, the precise directions of the axes may therefore vary slightly
-     * from this approximate direction.
+     * from this approximate direction.</P>
      *
-     * Note that an {@link org.geotools.referencing.crs.EngineeringCRS} often requires
-     * specific descriptions of the directions of its coordinate system axes.
-     *
-     * @return The coordinate system axis direction.
+     * <P>Note that an {@link org.geotools.referencing.crs.EngineeringCRS} often requires
+     * specific descriptions of the directions of its coordinate system axes.</P>
      */
     public AxisDirection getDirection() {
         return direction;
@@ -529,8 +545,6 @@ public class CoordinateSystemAxis extends IdentifiedObject
      * coordinate in a coordinate tuple shall be recorded using this unit of measure,
      * whenever those coordinates use a coordinate reference system that uses a
      * coordinate system that uses this axis.
-     *
-     * @return  The coordinate system axis unit.
      */
     public Unit getUnit() {
         return unit;
@@ -550,18 +564,27 @@ public class CoordinateSystemAxis extends IdentifiedObject
         }
         if (super.equals(object, compareMetadata)) {
             final CoordinateSystemAxis that = (CoordinateSystemAxis) object;
-            return equals(this.abbreviation, that.abbreviation) &&
-                   equals(this.direction,    that.direction)    &&
-                   equals(this.unit,         that.unit);
+            if (!compareMetadata) {
+                /*
+                 * We compare the code since it is the only way to differentiate axes with the same
+                 * abbreviation, for example LONGITUDE and GEODETIC_LONGITUDE constants. However,
+                 * we don't need to perform this check if 'compareMetadata' is true since in such
+                 * case, the comparaison will already have been done in the super-class.
+                 */
+                if (!Utilities.equals(this.getName().getCode(), that.getName().getCode())) {
+                    return false;
+                }
+            }
+            return Utilities.equals(this.abbreviation, that.abbreviation) &&
+                   Utilities.equals(this.direction,    that.direction)    &&
+                   Utilities.equals(this.unit,         that.unit);
         }
         return false;
     }
     
     /**
-     * Returns a hash value for this axis.
-     *
-     * @return The hash code value. This value doesn't need to be the same
-     *         in past or future versions of this class.
+     * Returns a hash value for this axis. This value doesn't need to be the same
+     * in past or future versions of this class.
      */
     public int hashCode() {
         int code = (int)serialVersionUID;
@@ -583,66 +606,5 @@ public class CoordinateSystemAxis extends IdentifiedObject
     protected String formatWKT(final Formatter formatter) {
         formatter.append(direction);
         return "AXIS";
-    }
-    
-    /**
-     * Localized {@link CoordinateSystemAxis}.
-     * Used for providing localized version of {@link #getName}.
-     *
-     * @author Martin Desruisseaux
-     * @version $Id$
-     */
-    private static final class Localized extends CoordinateSystemAxis {
-        /**
-         * Serial number for interoperability with different versions.
-         */
-        private static final long serialVersionUID = 3447702143250807839L;
-        
-        /**
-         * The key for localization.
-         */
-        private final int key;
-        
-        /**
-         * Constructs a localized axis.
-         */
-        public Localized(final String        abbreviation,
-                         final AxisDirection direction,
-                         final Unit          unit,
-                         final int           key)
-        {
-            super( Resources.international( key ), abbreviation,
-                   direction, unit);
-            this.key = key;
-        }        
-        /**
-         * Returns a localized string. If <code>locale</code> is <code>null</code>, then the
-         * {@linkplain Locale#ENGLISH English} locale is used in order to allows proper WKT
-         * formatting. English resources should always been available for this implementation.
-         */
-        public String getName(Locale locale) {
-            if (locale == null) {
-                locale = Locale.ENGLISH;
-            }
-            return Resources.getResources(locale).getString(key);
-        }
-    
-        /**
-         * Compares the specified object with this axis for equality.
-         *
-         * @param  object The object to compare to <code>this</code>.
-         * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-         *         <code>false</code> for comparing only properties relevant to transformations.
-         * @return <code>true</code> if both objects are equal.
-         */
-        public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
-            if (super.equals(object, compareMetadata)) {
-                // Always compare the key, since we use it for differentiating axis
-                // with the same abbreviation (e.g. LATITUDE and GEODETIC_LATITUDE).
-                final Localized that = (Localized) object;
-                return this.key == that.key;
-            }
-            return false;
-        }
     }
 }

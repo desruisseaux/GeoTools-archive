@@ -78,11 +78,11 @@ public class WeakHashSetTest extends TestCase {
                      */
                     final boolean   weakModified = weakSet  .add(value);
                     final boolean strongModified = strongSet.add(value);
-                    assertEquals("add", strongModified, weakModified);
+                    assertEquals("add:", strongModified, weakModified);
                     if (strongModified) {
-                        assertSame("get", value, weakSet.get(value));
+                        assertSame("get:", value, weakSet.get(value));
                     } else {
-                        assertEquals("get",  value, weakSet.get(value));
+                        assertEquals("get:",  value, weakSet.get(value));
                     }
                 } else {
                     /*
@@ -90,11 +90,11 @@ public class WeakHashSetTest extends TestCase {
                      */
                     final boolean   weakModified = weakSet  .remove(value);
                     final boolean strongModified = strongSet.remove(value);
-                    assertEquals("remove", strongModified, weakModified);
-                    assertNull("get", weakSet.get(value));
+                    assertEquals("remove:", strongModified, weakModified);
+                    assertNull("get:", weakSet.get(value));
                 }
-                assertEquals("contains", strongSet.contains(value), weakSet.contains(value));
-                assertEquals("equals", strongSet, weakSet);
+                assertEquals("contains:", strongSet.contains(value), weakSet.contains(value));
+                assertEquals("equals:", strongSet, weakSet);
             }
         }
     }
@@ -121,7 +121,7 @@ public class WeakHashSetTest extends TestCase {
                         // If the element was not in the WeakHashSet (i.e. if the garbage
                         // collector has cleared it), then it must not been in HashSet neither
                         // (otherwise GC should not have cleared it).
-                        assertTrue("add", strongModified);
+                        assertTrue("add:", strongModified);
                     } else {
                         assertTrue(value != weakSet.get(value));
                         if (strongModified) {
@@ -143,17 +143,17 @@ public class WeakHashSetTest extends TestCase {
                      */
                     final boolean c = weakSet.contains(value);
                     if (strongSet.remove(value)) {
-                        assertTrue("contains", c);
+                        assertTrue("contains:", c);
                     }
                 }
-                assertTrue("containsAll", weakSet.containsAll(strongSet));
+                assertTrue("containsAll:", weakSet.containsAll(strongSet));
             }
             // Do our best to lets GC finish its work.
             for (int i=0; i<4; i++) {
                 Thread.sleep(50);
                 System.gc();
             }
-            assertTrue("equals", strongSet.equals(weakSet));
+            assertTrue("equals:", strongSet.equals(weakSet));
         }
     }
 }

@@ -60,7 +60,7 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
      * @param origin The date and time origin of this temporal datum.
      */
     public TemporalDatum(final String name, final Date origin) {
-        this(Collections.singletonMap("name", name), origin);
+        this(Collections.singletonMap(NAME_PROPERTY, name), origin);
     }
 
     /**

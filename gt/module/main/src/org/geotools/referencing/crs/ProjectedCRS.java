@@ -84,7 +84,7 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
                         final CartesianCS       derivedCS)
             throws MismatchedDimensionException
     {
-        this(Collections.singletonMap("name", name), base, baseToDerived, derivedCS);
+        this(Collections.singletonMap(NAME_PROPERTY, name), base, baseToDerived, derivedCS);
     }
 
     /**

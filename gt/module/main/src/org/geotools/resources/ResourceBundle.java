@@ -148,7 +148,9 @@ public class ResourceBundle extends java.util.ResourceBundle {
         final String lineSeparator = System.getProperty("line.separator", "\n");
         for (int i=0; i<values.length; i++) {
             String value = values[i];
-            if (value==null) continue;
+            if (value == null) {
+                continue;
+            }
             int indexCR=value.indexOf('\r'); if (indexCR<0) indexCR=value.length();
             int indexLF=value.indexOf('\n'); if (indexLF<0) indexLF=value.length();
             final String number = String.valueOf(i);
@@ -384,7 +386,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
      *         found.
      */
     public final String getMenuLabel(final int key) throws MissingResourceException {
-        return getString(key)+"...";
+        return getString(key) + "...";
     }
 
     /**
@@ -397,7 +399,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
      *         found.
      */
     public final String getLabel(final int key) throws MissingResourceException {
-        return getString(key)+": ";
+        return getString(key) + ": ";
     }
 
     /**

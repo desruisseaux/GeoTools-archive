@@ -25,6 +25,8 @@ package org.geotools.parameter;
 // J2SE dependencies
 import java.util.Map;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Collections;
 
@@ -40,6 +42,7 @@ import org.geotools.referencing.Identifier;  // For javadoc
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.UnmodifiableArrayList;
 
 
 /**
@@ -51,8 +54,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see org.geotools.parameter.ParameterGroup
  * @see org.geotools.parameter.ParameterDescriptor
  */
-public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractParameterDescriptor
-                                  implements org.opengis.parameter.ParameterDescriptorGroup
+public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractParameterDescriptor
+                                   implements org.opengis.parameter.ParameterDescriptorGroup
 {
     /**
      * Serial number for interoperability with different versions.
@@ -65,14 +68,20 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
     private final GeneralParameterDescriptor[] parameters;
 
     /**
+     * A view of {@link #parameters} as an immutable list. Will be constructed
+     * only when first needed.
+     */
+    private transient List asList;
+
+    /**
      * Construct a parameter group from a name.
      * This parameter group will be required exactly once.
      *
      * @param name The parameter group name.
      * @param parameters The {@linkplain #getParameters operation parameters} for this group.
      */
-    public ParameterGroupDescriptor(final String name,
-                                   final GeneralParameterDescriptor[] parameters)
+    public ParameterDescriptorGroup(final String name,
+                                    final GeneralParameterDescriptor[] parameters)
     {
         this(Collections.singletonMap("name", name), parameters);
     }
@@ -86,8 +95,8 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param parameters The {@linkplain #getParameters operation parameters} for this group.
      */
-    public ParameterGroupDescriptor(final Map properties,
-                                   final GeneralParameterDescriptor[] parameters)
+    public ParameterDescriptorGroup(final Map properties,
+                                    final GeneralParameterDescriptor[] parameters)
     {
         this(properties, 1, 1, parameters);
     }
@@ -104,10 +113,10 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
      *        that values for this parameter group are required.
      * @param parameters The {@linkplain #getParameters operation parameters} for this group.
      */
-    public ParameterGroupDescriptor(final Map properties,
-                                   final int minimumOccurs,
-                                   final int maximumOccurs,
-                                   final GeneralParameterDescriptor[] parameters)
+    public ParameterDescriptorGroup(final Map properties,
+                                    final int minimumOccurs,
+                                    final int maximumOccurs,
+                                    final GeneralParameterDescriptor[] parameters)
     {
         super(properties, minimumOccurs, maximumOccurs);
         ensureNonNull("parameters", parameters);
@@ -132,8 +141,22 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
 
     /**
      * Returns the parameters in this group.
+     */
+    public List descriptors() {
+        if (asList == null) {
+            if (parameters == null){
+                asList = Collections.EMPTY_LIST;
+            } else {
+                asList = new UnmodifiableArrayList(parameters);
+            }
+        }
+        return asList;
+    }
+
+    /**
+     * Returns the parameters in this group.
      *
-     * @return The parameters.
+     * @deprecated Use {@link #descriptors} instead.
      */
     public GeneralParameterDescriptor[] getParameters() {
         return (GeneralParameterDescriptor[]) parameters.clone();
@@ -141,10 +164,10 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
 
     /**
      * Returns the first parameter in this group for the specified {@linkplain Identifier#getCode
-     * identifier code}. If no {@linkplain org.geotools.parameter.ParameterDescriptor operation
-     * parameter} is found for the given code, then this method search recursively in subgroups
-     * (if any). This convenience method provides a way to get and set parameter information by
-     * name. For example the following idiom fetches the default value for the
+     * identifier code}. If no {@linkplain org.geotools.parameter.ParameterDescriptor parameter
+     * descriptor} is found for the given code, then this method search recursively in subgroups
+     * (if any). This convenience method provides a way to get parameter information by name.
+     * For example the following idiom fetches the default value for the
      * <code>"false_easting"</code> parameter:
      * <br><br>
      * <blockquote><code>
@@ -153,22 +176,20 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
      * </code></blockquote>
      *
      * @param  name The case insensitive {@linkplain Identifier#getCode identifier code} of the
-     *              parameter to search for. If this string contains the <code>':'</code> character,
-     *              then the part before <code>':'</code> is the {@linkplain Identifier#getCodeSpace
-     *              code space}.
+     *              parameter to search for.
      * @return The parameter for the given identifier code.
      * @throws ParameterNotFoundException if there is no parameter for the given identifier code.
      */
-    public ParameterDescriptor getParameter(String name) throws ParameterNotFoundException {
+    public ParameterDescriptor descriptor(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
         List subgroups = null;
-        GeneralParameterDescriptor[] parameters = this.parameters;
+        List/*<GeneralParameterDescriptor>*/ parameters = descriptors();
         while (parameters != null) {
-            for (int i=0; i<parameters.length; i++) {
-                final GeneralParameterDescriptor param = parameters[i];
+            for (final Iterator it=parameters.iterator(); it.hasNext();) {
+                final GeneralParameterDescriptor param = (GeneralParameterDescriptor) it.next();
                 if (param instanceof ParameterDescriptor) {
-                    if (identifierMatches(param, name)) {
+                    if (nameMatches(param, name)) {
                         return (ParameterDescriptor) param;
                     }
                 } else if (param instanceof org.opengis.parameter.ParameterDescriptorGroup) {
@@ -186,10 +207,21 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
             if (subgroups==null || subgroups.isEmpty()) {
                 break;
             }
-            parameters = ((org.opengis.parameter.ParameterDescriptorGroup) subgroups.remove(0)).getParameters();
+            parameters = ((org.opengis.parameter.ParameterDescriptorGroup) subgroups.remove(0))
+                         .descriptors();
         }
         throw new ParameterNotFoundException(Resources.format(
                   ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
+    }
+
+    /**
+     * Returns the first parameter in this group for the specified {@linkplain Identifier#getCode
+     * identifier code}.
+     *
+     * @deprecated Use {@link #descriptor} instead.
+     */
+    public ParameterDescriptor getParameter(String name) throws ParameterNotFoundException {
+        return descriptor(name);
     }
     
     /**
@@ -202,16 +234,8 @@ public class ParameterGroupDescriptor extends org.geotools.parameter.AbstractPar
      */
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
-            final ParameterGroupDescriptor that = (ParameterGroupDescriptor) object;
-            // TODO: We should use Arrays.deepEquals instead in J2SE 1.5.
-            if (this.parameters.length == that.parameters.length) {
-                for (int i=0; i<parameters.length; i++) {
-                    if (!Utilities.equals(this.parameters[i], that.parameters[i])) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+            final ParameterDescriptorGroup that = (ParameterDescriptorGroup) object;
+            return Arrays.equals(this.parameters, that.parameters);
         }
         return false;
     }

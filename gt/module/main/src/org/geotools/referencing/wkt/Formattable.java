@@ -25,6 +25,9 @@ package org.geotools.referencing.wkt;
 // J2SE dependencies
 import java.util.prefs.Preferences;
 
+// GeoAPI dependencies
+import org.opengis.parameter.GeneralParameterValue;
+
 // Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -118,7 +121,14 @@ public class Formattable {
      */
     public String toWKT(final int indentation) throws UnformattableObjectException {
         final Formatter formatter = new Formatter(null, indentation);
-        formatter.append(this);
+        if (this instanceof GeneralParameterValue) {
+            // Special processing for parameter values, which is formatted
+            // directly in 'Formatter'. Note that in GeoAPI, this interface
+            // doesn't share the same parent interface than other interfaces.
+            formatter.append((GeneralParameterValue) this);
+        } else {
+            formatter.append(this);
+        }
         if (formatter.isInvalidWKT()) {
             // TODO localize.
             throw new UnformattableObjectException("Not a valid WKT format.");

@@ -46,9 +46,9 @@ public final class DisjointSetTest extends TestCase {
     /**
      * Returns the test suite.
      */
-     public static Test suite() {
-         return new TestSuite(DisjointSetTest.class);
-     }
+    public static Test suite() {
+        return new TestSuite(DisjointSetTest.class);
+    }
 
     /**
      * Constructs a test case with the given name.

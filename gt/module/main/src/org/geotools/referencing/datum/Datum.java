@@ -25,16 +25,16 @@ package org.geotools.referencing.datum;
 // J2SE dependencies
 import java.util.Map;
 import java.util.Date;
-import java.util.Locale;
 import java.util.HashMap;
 
 // OpenGIS dependencies
-import org.opengis.util.CodeList;
 import org.opengis.metadata.extent.Extent;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -58,19 +58,47 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 6409767361634056227L;
+    private static final long serialVersionUID = -4894180465652474930L;
+
+    /**
+     * Key for the <code>"anchorPoint"</code> property to be given to the
+     * {@linkplain #Datum(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getAnchorPoint()}.
+     */
+    public static final String ANCHOR_POINT_PROPERTY = "anchorPoint";
+
+    /**
+     * Key for the <code>"realizationEpoch"</code> property to be given to the
+     * {@linkplain #Datum(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getRealizationEpoch()}.
+     */
+    public static final String REALIZATION_EPOCH_PROPERTY = "realizationEpoch";
+
+    /**
+     * Key for the <code>"validArea"</code> property to be given to the
+     * {@linkplain #Datum(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getValidArea()}.
+     */
+    public static final String VALID_AREA_PROPERTY = "validArea";
+
+    /**
+     * Key for the <code>"scope"</code> property to be given to the
+     * {@linkplain #Datum(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getScope()}.
+     */
+    public static final String SCOPE_PROPERTY = "scope";
     
     /**
      * List of localizable properties. To be given to
      * {@link org.geotools.referencing.IdentifiedObject} constructor.
      */
-    private static final String[] LOCALIZABLES = {"anchorPoint", "scope"};
+    private static final String[] LOCALIZABLES = {ANCHOR_POINT_PROPERTY, SCOPE_PROPERTY};
 
     /**
      * Description, possibly including coordinates, of the point or points used to anchor the datum
      * to the Earth. Also known as the "origin", especially for Engineering and Image Datums.
      */
-    private final Map anchorPoint;
+    private final InternationalString anchorPoint;
 
     /**
      * The time after which this datum definition is valid. This time may be precise
@@ -88,7 +116,7 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
      * Description of domain of usage, or limitations of usage, for which this
      * datum object is valid.
      */
-    private final Map scope;
+    private final InternationalString scope;
 
     /**
      * Construct a datum from a set of properties. The properties given in argument follow
@@ -102,23 +130,23 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"anchorPoint"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #ANCHOR_POINT_PROPERTY "anchorPoint"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link InternationalString} or {@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getAnchorPoint}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"realizationEpoch"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #REALIZATION_EPOCH_PROPERTY "realizationEpoch"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Date}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getRealizationEpoch}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"validArea"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VALID_AREA_PROPERTY "validArea"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getValidArea}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"scope"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #SCOPE_PROPERTY "scope"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link InternationalString} or {@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
      * </table>
@@ -134,11 +162,10 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
     private Datum(final Map properties, final Map subProperties) {
         super(properties, subProperties, LOCALIZABLES);
         final Date realizationEpoch;
-        anchorPoint      = (Map)    subProperties.get("anchorPoint"     );
-        realizationEpoch = (Date)   subProperties.get("realizationEpoch");
-        validArea        = (Extent) subProperties.get("validArea"       );
-        scope            = (Map)    subProperties.get("scope"           );
-
+        anchorPoint      = (InternationalString) subProperties.get(ANCHOR_POINT_PROPERTY     );
+        realizationEpoch = (Date)                subProperties.get(REALIZATION_EPOCH_PROPERTY);
+        validArea        = (Extent)              subProperties.get(VALID_AREA_PROPERTY       );
+        scope            = (InternationalString) subProperties.get(SCOPE_PROPERTY            );
         this.realizationEpoch = (realizationEpoch != null) ?
                                  realizationEpoch.getTime() : Long.MIN_VALUE;
     }
@@ -163,13 +190,9 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
      *   <li>For a temporal datum, this attribute is not defined. Instead of the anchor point,
      *       a temporal datum carries a separate time origin of type {@link Date}.</li>
      * </ul>
-     *
-     * @param  locale The desired locale for the datum anchor point to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The datum anchor point in the given locale, or <code>null</code> if none.
      */
-    public String getAnchorPoint(final Locale locale) {
-        return getLocalized(anchorPoint, locale);
+    public InternationalString getAnchorPoint() {
+        return anchorPoint;
     }
 
     /**
@@ -180,8 +203,6 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
      * defined. Alternatively, a datum may be superseded by a later datum, in which case the
      * realization epoch for the new datum defines the upper limit for the validity of the
      * superseded datum.
-     *
-     * @return The datum realization epoch, or <code>null</code> if not available.
      */
     public Date getRealizationEpoch() {
         return (realizationEpoch!=Long.MIN_VALUE) ? new Date(realizationEpoch) : null;
@@ -189,8 +210,6 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
 
     /**
      * Area or region in which this datum object is valid.
-     *
-     * @return The datum valid area, or <code>null</code> if not available.
      */
     public Extent getValidArea() {
         return validArea;
@@ -199,13 +218,9 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
     /**
      * Description of domain of usage, or limitations of usage, for which this
      * datum object is valid.
-     *
-     * @param  locale The desired locale for the datum scope to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The datum scope in the given locale, or <code>null</code> if none.
      */
-    public String getScope(Locale locale) {
-        return getLocalized(scope, locale);
+    public InternationalString getScope() {
+        return scope;
     }
     
     /**
@@ -235,9 +250,9 @@ public class Datum extends IdentifiedObject implements org.opengis.referencing.d
             }
             final Datum that = (Datum) object;
             return this.realizationEpoch == that.realizationEpoch &&
-                   equals(this.validArea,   that.validArea      ) &&
-                   equals(this.anchorPoint, that.anchorPoint    ) &&
-                   equals(this.scope,       that.scope);
+                   Utilities.equals(this.validArea,   that.validArea      ) &&
+                   Utilities.equals(this.anchorPoint, that.anchorPoint    ) &&
+                   Utilities.equals(this.scope,       that.scope);
         }
         return false;
     }

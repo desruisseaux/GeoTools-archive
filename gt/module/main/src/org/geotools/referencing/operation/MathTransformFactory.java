@@ -125,9 +125,12 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *
      * @param categories The providers categories, as implementations
      *                   of {@link MathTransformProvider}.
+     *
+     * @todo revisit
      */
     private MathTransformFactory(final Class[] categories) {
-        registry = new ServiceRegistry(Arrays.asList(categories).iterator());
+        throw new RuntimeException();
+//        registry = new ServiceRegistry(Arrays.asList(categories).iterator());
     }
 
     /**
@@ -195,7 +198,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
         final Iterator providers = getProviders(MathTransformProvider.class);        
         while (providers.hasNext()) {
             final MathTransformProvider provider = (MathTransformProvider) providers.next();            
-            if (provider.identifierMatches(identifier)) {
+            if (provider.nameMatches(identifier)) {
                 return provider;
             }
         }

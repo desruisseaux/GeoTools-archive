@@ -25,20 +25,20 @@ package org.geotools.referencing;
 // J2SE dependencies
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.Locale;   // For javadoc
 import java.util.Iterator;
-import java.util.Collections;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.util.logging.Logger;
 import java.io.Serializable;
 import java.io.ObjectStreamException;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
 import org.geotools.util.WeakHashSet;
+import org.geotools.util.GrowableInternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -49,14 +49,40 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @todo Move to the metadata package.
  */
 public class Identifier implements org.opengis.metadata.Identifier, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 3908988678966095825L;
+    private static final long serialVersionUID = 8474731565582774497L;
+
+    /**
+     * Key for the <code>"code"</code> property to be given to the
+     * {@linkplain #Identifier(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getCode()}.
+     */
+    public static final String CODE_PROPERTY = "code";
+
+    /**
+     * Key for the <code>"authority"</code> property to be given to the
+     * {@linkplain #Identifier(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getAuthority()}.
+     */
+    public static final String AUTHORITY_PROPERTY = "authority";
+
+    /**
+     * Key for the <code>"version"</code> property to be given to the
+     * {@linkplain #Identifier(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getVersion()}.
+     */
+    public static final String VERSION_PROPERTY = "version";
+    
+    /**
+     * Key for the <code>"remarks"</code> property to be given to the
+     * {@linkplain #Identifier(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getRemarks()}.
+     */
+    public static final String REMARKS_PROPERTY = "remarks";
 
     /**
      * Set of weak references to existing objects (identifiers, CRS, Datum, whatever).
@@ -66,65 +92,10 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
     static final WeakHashSet POOL = new WeakHashSet();
 
     /**
-     * A locale without language. This is the locale returned by {@link #getLocale} if no
-     * locale were specified after the <code>"name"</code> or <code>"remarks"</code> key.
-     */
-    static final Locale VOID_LOCALE = new Locale("");
-
-    /**
-     * The set of locales created in this virtual machine through the {@link #getLocale}
-     * method. Used in order to canonicalize the {@link Locale} objects.
-     */
-    private static final Map LOCALES = new HashMap();
-
-    /**
-     * Initialize {@link #LOCALES} with the set of locales defined in {@link Locale}.
-     */
-    static {
-        LOCALES.put(VOID_LOCALE, VOID_LOCALE);
-        try {
-            final Field[] fields = Locale.class.getFields();
-            for (int i=0; i<fields.length; i++) {
-                final Field field = fields[i];
-                if (Modifier.isStatic(field.getModifiers())) {
-                    if (Locale.class.isAssignableFrom(field.getType())) {
-                        final Locale locale = (Locale) field.get(null);
-                        LOCALES.put(locale, locale);
-                    }
-                }
-            }
-        } catch (Exception exception) {
-            /*
-             * Not a big deal if this operation fails (this is actually just an
-             * optimization for reducing memory usage). Log a warning and continue.
-             */
-            Utilities.unexpectedException("org.geotools.referencing",
-                                          "Identifier", "<cinit>", exception);
-        }
-    }
-
-    /**
      * Identifier code or name, optionally from a controlled list or pattern
      * defined by a code space.
      */
     private final String code;
-
-    /**
-     * Identifier of a code space within which one or more codes are defined. This code space
-     * is optional but is normally included. This code space is often defined by some authority
-     * organization, where one organization may define multiple code spaces. The range and format
-     * of each Code Space identifier is defined by that code space authority.
-     */
-    private final String codeSpace;
-
-    /**
-     * Identifier of the version of the associated code space or code, as specified
-     * by the code space or code authority. This version is included only when the
-     * {@linkplain #getCode code} or {@linkplain #getCodeSpace codeSpace} uses versions.
-     * When appropriate, the edition is identified by the effective date, coded using
-     * ISO 8601 date format.
-     */
-    private final String version;
 
     /**
      * Organization or party responsible for definition and maintenance of the
@@ -133,10 +104,17 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
     private final Citation authority;
 
     /**
-     * Comments on or information about this identifier, or <code>null</code> if none.
-     * Keys are {@link Locale} objects and values are {@link String}.
+     * Identifier of the version of the associated code space or code, as specified
+     * by the code space or code authority. This version is included only when the
+     * {@linkplain #getCode code} uses versions. When appropriate, the edition is
+     * identified by the effective date, coded using ISO 8601 date format.
      */
-    private final Map remarks;
+    private final String version;
+
+    /**
+     * Comments on or information about this identifier, or <code>null</code> if none.
+     */
+    private final InternationalString remarks;
 
     /**
      * Construct an identifier from a set of properties. Keys are strings from the table below.
@@ -151,28 +129,23 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"authority"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getAuthority}</td>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"code"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #CODE_PROPERTY "code"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getCode}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"codeSpace"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getCodeSpace}</td>
+     *     <td nowrap>&nbsp;{@link #AUTHORITY_PROPERTY "authority"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #getAuthority}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"version"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VERSION_PROPERTY "version"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getVersion}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"remarks"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #REMARKS_PROPERTY "remarks"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getRemarks}</td>
      *   </tr>
      * </table>
@@ -195,51 +168,62 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
      * @param authority The authority (e.g. {@link org.geotools.metadata.citation.Citation#OPEN_GIS}
-     *        or {@link org.geotools.metadata.citation.Citation#EPSG}).
-     * @param codespace The code space, or <code>null</code> if none.
+     *                  or {@link org.geotools.metadata.citation.Citation#EPSG}).
      * @param code      The code. This parameter is mandatory.
      */
-    public Identifier(final Citation authority,
-                      final String   codespace,
-                      final String   code)
-    {
-        this(toMap(authority, codespace, code));
+    public Identifier(final Citation authority, final String code) {
+        this(authority, code, null);
+    }
+
+    /**
+     * Constructs an identifier from an authority and code informations. This is a convenience
+     * constructor for commonly-used parameters. If more control are wanted (for example adding
+     * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
+     *
+     * @param authority The authority (e.g. {@link org.geotools.metadata.citation.Citation#OPEN_GIS}
+     *                  or {@link org.geotools.metadata.citation.Citation#EPSG}).
+     * @param code      The code. This parameter is mandatory.
+     * @param version   The version, or <code>null</code> if none.
+     */
+    public Identifier(final Citation authority, final String code, final String version) {
+        this(toMap(authority, code, version));
     }
 
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static final Map toMap(final Citation authority,
-                                   final String   codespace,
-                                   final String   code)
+    private static Map toMap(final Citation authority,
+                             final String   code,
+                             final String   version)
     {
-        final Map properties = new HashMap(8);
-        properties.put("authority", authority);
-        properties.put("codespace", codespace);
-        properties.put("code",      code     );
+        final Map properties = new HashMap(4);
+        if (authority != null) properties.put(AUTHORITY_PROPERTY, authority);
+        if (code      != null) properties.put(     CODE_PROPERTY, code     );
+        if (version   != null) properties.put(  VERSION_PROPERTY, version  );
         return properties;
     }
 
     /**
      * Implementation of the constructor. The remarks in the <code>properties</code> will be
-     * parsed only if the <code>parseRemarks</code> argument is set to <code>true</code>.
+     * parsed only if the <code>standalone</code> argument is set to <code>true</code>, i.e.
+     * this identifier is being constructed as a standalone object. If <code>false</code>, then
+     * this identifier is assumed to be constructed from inside the {@link IdentifiedObject}
+     * constructor.
      *
      * @param properties The properties to parse, as described in the public constructor.
-     * @param <code>parseRemarks</code> <code>true</code> for parsing "remarks" as well.
+     * @param <code>standalone</code> <code>true</code> for parsing "remarks" as well.
      *
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    Identifier(final Map properties, final boolean parseRemarks)
-            throws IllegalArgumentException
-    {
+    Identifier(final Map properties, final boolean standalone) throws IllegalArgumentException {
         ensureNonNull("properties", properties);
         Object code      = null;
-        Object codeSpace = null;
         Object version   = null;
         Object authority = null;
-        Map    remarks   = null;
+        Object remarks   = null;
+        GrowableInternationalString growable = null;
         /*
          * Iterate through each map entry. This have two purposes:
          *
@@ -260,42 +244,97 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
              *       so it should not change across implementations.
              */
             switch (key.hashCode()) {
-                case     3059181: if (key.equals("code"))      code      = value; continue;
-                case -1108676807: if (key.equals("codespace")) codeSpace = value; continue;
-                case   351608024: if (key.equals("version"))   version   = value; continue;
-                case  1475610435: if (key.equals("authority")) authority = value;
-                                  if (value instanceof String) {
-                                      value = new org.geotools.metadata.citation.Citation(value.toString());
-                                  }
-                                  continue;
-            }
-            if (parseRemarks) {
-                final Locale locale = getLocale(key, "remarks");
-                if (locale != null) {
-                    remarks = addLocalizedString(remarks, locale, value);
+                case 3373707: {
+                    if (!standalone && key.equals("name")) {
+                        code = value;
+                        continue;
+                    }
+                    break;
+                }
+                case 3059181: {
+                    if (key.equals(CODE_PROPERTY)) {
+                        code = value;
+                        continue;
+                    }
+                    break;
+                }
+                case 351608024: {
+                    if (key.equals(VERSION_PROPERTY)) {
+                        version = value;
+                        continue;
+                    }
+                    break;
+                }
+                case 1475610435: {
+                    if (key.equals(AUTHORITY_PROPERTY)) {
+                        if (value instanceof String) {
+                            value = new org.geotools.metadata.citation.Citation(value.toString());
+                        }
+                        authority = value;
+                        continue;
+                    }
+                    break;
+                }
+                case 1091415283: {
+                    if (standalone && key.equals(REMARKS_PROPERTY)) {
+                        if (value instanceof InternationalString) {
+                            remarks = value;
+                            continue;
+                        }
+                    }
+                    break;
                 }
             }
+            /*
+             * Search for additional locales (e.g. "remarks_fr").
+             */
+            if (standalone && value instanceof String) {
+                if (growable == null) {
+                    if (remarks instanceof GrowableInternationalString) {
+                        growable = (GrowableInternationalString) remarks;
+                    } else {
+                        growable = new GrowableInternationalString();
+                    }
+                }
+                growable.add(REMARKS_PROPERTY, key, value.toString());
+            }
         }
+        /*
+         * Get the localized remarks, if it was not yet set. If a user specified remarks
+         * both as InternationalString and as String for some locales (which is a weird
+         * usage...), then current implementation discart the later with a warning.
+         */
+        if (growable!=null && !growable.getLocales().isEmpty()) {
+            if (remarks == null) {
+                remarks = growable;
+            } else {
+                Logger.getLogger("org.geotools.referencing").warning(
+                                 Resources.format(ResourceKeys.WARNING_LOCALES_DISCARTED));
+            }
+        }
+        /*
+         * Stores the definitive reference to the attributes. Note that casts are performed only
+         * there (not before). This is a wanted feature, since we want to catch ClassCastExceptions
+         * are rethrown them as more informative exceptions.
+         */
         try {
-            key="code"     ; this.code      = (String)   (value=code);
-            key="codeSpace"; this.codeSpace = (String)   (value=codeSpace);
-            key="version"  ; this.version   = (String)   (value=version);
-            key="authority"; this.authority = (Citation) (value=authority);
-            key="remarks"  ; this.remarks   =             remarks;
+            key=      CODE_PROPERTY; this.code      = (String)              (value=code);
+            key=   VERSION_PROPERTY; this.version   = (String)              (value=version);
+            key= AUTHORITY_PROPERTY; this.authority = (Citation)            (value=authority);
+            key=   REMARKS_PROPERTY; this.remarks   = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
             InvalidParameterValueException e = new InvalidParameterValueException(Resources.format(
                                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, value), key, value);
             e.initCause(exception);
             throw e;
         }
-        ensureNonNull("code", code);
-        canonicalizeKeys(remarks);
+        ensureNonNull(CODE_PROPERTY, code);
     }
     
     /**
      * Makes sure an argument is non-null. This is method duplicate
-     * {@link IdentifiedObject#ensureNonNull(String, Object)} except for the more accurate stack trace.
-     * It is duplicated there in order to avoid a dependency to {@link IdentifiedObject}.
+     * {@link IdentifiedObject#ensureNonNull(String, Object)} except for the more accurate stack
+     * trace. It is duplicated there in order to avoid a dependency to {@link IdentifiedObject}.
      *
      * @param  name   Argument name.
      * @param  object User argument.
@@ -311,113 +350,7 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
     }
 
     /**
-     * Put the given (locale, value) pair in the specified map. If the map is null, a new
-     * map will be automatically created. This method will favor singleton maps as much as
-     * possible since the maps will often contains only one entry.
-     *
-     * @param  map    The map which contains localized string.
-     * @param  locale The locale for the <code>value</code> string.
-     * @param  value  The localized string. Usually a {@link String} instance. This method will
-     *                check the type and throws an {@link InvalidParameterValueException} if the
-     *                type is invalid.
-     *
-     * @throws InvalidParameterValueException if <code>value</code> is invalid.
-     */
-    static Map addLocalizedString(Map map, Locale locale, final Object value)
-            throws IllegalArgumentException
-    {
-        if (value != null) {
-            if (!(value instanceof CharSequence)) {
-                throw new InvalidParameterValueException(Resources.format(
-                            ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
-                            Utilities.getShortClassName(value),
-                            Utilities.getShortClassName(CharSequence.class)),
-                            locale.getDisplayName(), value);
-            }
-            if (VOID_LOCALE.equals(locale)) {
-                locale = null;
-            }
-            if (map == null) {
-                return Collections.singletonMap(locale, value.toString());
-            }
-            if (map.size() == 1) {
-                map = new HashMap(map);
-            }
-            map.put(locale, value);
-        }
-        return map;
-    }
-
-    /**
-     * Find the locale for the specified key. If the key starts with the given prefix, then the
-     * part after the prefix will be broken into its language, contry and variant component. For
-     * example <code>getLocale("remarks_fr", "remarks")</code> will returns {@link Locale#FRENCH}.
-     * If no locale were specified after the key, then this method returns {@link #VOID_LOCALE}.
-     * If the key is not valid, then this method returns <code>null</code>.
-     *
-     * @param  key The key to examine.
-     * @param  prefix The prefix.
-     * @return The locale, or <code>null</code> if the key is not valid.
-     */
-    static Locale getLocale(final String key, final String prefix) {
-        if (key.startsWith(prefix)) {
-            final int length = key.length();
-            int position = prefix.length();
-            final String[] parts = new String[] {"", "", ""};
-            for (int i=0; /*break condition inside*/; i++) {
-                if (position == length) {
-                    return canonicalize(new Locale(parts[0] /* language */,
-                                                   parts[1] /* country  */,
-                                                   parts[2] /* variant  */));
-                }
-                if (key.charAt(position)!='_' || i==parts.length) {
-                    break;
-                }
-                int next = key.indexOf('_', ++position);
-                if (next < position) {
-                    if (next < 0) {
-                        next = length;
-                    } else {
-                        break;  // Found consecutive '_' character.
-                    }
-                }
-                parts[i] = key.substring(position, position=next);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns a canonical instance of the given locale.
-     */
-    private static synchronized Locale canonicalize(final Locale locale) {
-        final Locale candidate = (Locale) LOCALES.get(locale);
-        if (candidate != null) {
-            return candidate;
-        }
-        LOCALES.put(locale, locale);
-        return locale;
-    }
-
-    /**
-     * Canonicalize all {@link Locale} keys in the given map. This
-     * method is invoked as an optimization after deserialization.
-     */
-    static void canonicalizeKeys(final Map map) {
-        if (map != null  &&  map.size() != 1) {
-            // For now, we do not apply this operation on singleton map since they are immutable.
-            final Map.Entry[] entries = (Map.Entry[]) map.entrySet().toArray(new Map.Entry[map.size()]);
-            map.clear();
-            for (int i=0; i<entries.length; i++) {
-                final Map.Entry entry = entries[i];
-                map.put(canonicalize((Locale)entry.getKey()), entry.getValue());
-            }
-        }
-    }
-
-    /**
-     * Identifier code or name, optionally from a controlled list or pattern
-     * defined by a {@linkplain #getCodeSpace code space}.
+     * Identifier code or name, optionally from a controlled list or pattern.
      *
      * @return The code.
      */
@@ -426,33 +359,8 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
     }
 
     /**
-     * Identifier of a code space within which one or more codes are defined. This code space
-     * is optional but is normally included. This code space is often defined by some authority
-     * organization, where one organization may define multiple code spaces. The range and format
-     * of each code space identifier is defined by that code space authority.
-     *
-     * @return The code space, or <code>null</code> if not available.
-     */
-    public String getCodeSpace() {
-        return codeSpace;
-    }
-
-    /**
-     * Identifier of the version of the associated code space or code, as specified
-     * by the code space or code authority. This version is included only when the
-     * {@linkplain #getCode code} or {@linkplain #getCodeSpace code space} uses versions.
-     * When appropriate, the edition is identified by the effective date, coded using
-     * ISO 8601 date format.
-     *
-     * @return The version, or <code>null</code> if not available.
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
      * Organization or party responsible for definition and maintenance of the
-     * {@linkplain #getCodeSpace code space} or {@linkplain #getCode code}.
+     * {@linkplain #getCode code}.
      *
      * @return The authority, or <code>null</code> if not available.
      */
@@ -461,54 +369,43 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
     }
 
     /**
-     * Comments on or information about this identifier. In the first use of an
-     * <code>Identifier</code> for an {@link IdentifiedObject} object, these remarks are information about this
-     * object, including data source information. Additional uses of a <code>Identifier</code>
-     * for an object, if any, are aliases, and the remarks are then about that alias.
+     * Identifier of the version of the associated code space or code, as specified by the
+     * code authority. This version is included only when the {@linkplain #getCode code}
+     * uses versions. When appropriate, the edition is identified by the effective date,
+     * coded using ISO 8601 date format.
      *
-     * @param  locale The desired locale for the remarks to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The remarks, or <code>null</code> if not available.
+     * @return The version, or <code>null</code> if not available.
      */
-    public String getRemarks(final Locale locale) {
-        return getLocalized(remarks, locale);
+    public String getVersion() {
+        return version;
     }
 
     /**
-     * Returns a localized entry in the given map. The keys must be {@link Locale} objects
-     * and the value must be {@link String}s. If the <code>locale</code> argument is not
-     * found in the map, then this method will try to remove first the
-     * {@linkplain Locale#getVariant variant}, then the {@linkplain Locale#getCountry country}
-     * part of the locale. For example if the <code>"fr_CA"</code> locale was requested but not
-     * found, then this method will looks for the <code>"fr"</code> locale. The <code>null</code>
-     * value (which stand for unlocalized message) is tried last.
-     *
-     * @param map The map to look into.
-     * @param locale The locale to look for, or <code>null</code>.
+     * Comments on or information about this identifier, or <code>null</code> if none.
      */
-    static String getLocalized(final Map map, Locale locale) {
-        if (map != null) {
-            while (locale != null) {
-                final String text = (String) map.get(locale);
-                if (text != null) {
-                    return text;
-                }
-                final String language = locale.getLanguage();
-                final String country  = locale.getCountry ();
-                final String variant  = locale.getVariant ();
-                if (variant.length() != 0) {
-                    locale = new Locale(language, country);
-                    continue;
-                }
-                if (country.length() != 0) {
-                    locale = new Locale(language);
-                    continue;
-                }
-                break;
-            }
-            return (String) map.get(null);
+    public InternationalString getRemarks() {
+        return remarks;
+    }
+
+    /**
+     * Returns a string representation of this identifier. This string is mostly for
+     * debugging purpose and is implementation-dependent.
+     */
+    public String toString() {
+        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
+        buffer.append("[\"");
+        if (authority != null) {
+            buffer.append(authority.getTitle());
+            buffer.append(':');
         }
-        return null;
+        buffer.append(code);
+        buffer.append('"');
+        if (version != null) {
+            buffer.append(", version ");
+            buffer.append(version);
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
     /**
@@ -518,7 +415,6 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
         if (object!=null && object.getClass().equals(getClass())) {
             final Identifier that = (Identifier) object;
             return Utilities.equals(this.code,      that.code     ) &&
-                   Utilities.equals(this.codeSpace, that.codeSpace) &&
                    Utilities.equals(this.version,   that.version  ) &&
                    Utilities.equals(this.authority, that.authority) &&
                    Utilities.equals(this.remarks,   that.remarks  );
@@ -530,9 +426,9 @@ public class Identifier implements org.opengis.metadata.Identifier, Serializable
      * Returns a hash code value for this identifier.
      */
     public int hashCode() {
-        int hash = code.hashCode();
-        if (codeSpace != null) {
-            hash = hash*37 + codeSpace.hashCode();
+        int hash = (int)serialVersionUID;
+        if (code != null) {
+            hash ^= code.hashCode();
         }
         if (version != null) {
             hash = hash*37 + version.hashCode();

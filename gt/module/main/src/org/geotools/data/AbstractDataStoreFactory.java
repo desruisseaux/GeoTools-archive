@@ -23,7 +23,7 @@ import java.util.Map;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterGroupDescriptor;
+import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterReal;
 import org.geotools.parameter.Parameter;
 import org.opengis.parameter.GeneralParameterValue;
@@ -155,7 +155,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         return true;
     }
 
-    public ParameterGroupDescriptor getParameters(){
+    public ParameterDescriptorGroup getParameters(){
         Param params[] = getParametersInfo();
         ParameterDescriptor parameters[] = new ParameterDescriptor[ params.length ];
         for( int i=0; i<params.length; i++ ){
@@ -165,7 +165,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         Map properties = new HashMap();
         properties.put( "name", getDisplayName() );
         properties.put( "remarks", getDescription() );        
-        return new ParameterGroupDescriptor( properties, parameters );        
+        return new ParameterDescriptorGroup( properties, parameters );        
     }
 }
 

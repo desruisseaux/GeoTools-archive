@@ -32,37 +32,36 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.util.SimpleInternationalString;
 
 
 /**
  * The definition of a parameter used by an operation method.
- * <p>
- * For Coordindate Reference Systems most parameter values are numeric, but other types
+ * For {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem Coordinate
+ * Reference Systems} most parameter values are numeric, but other types
  * of parameter values are possible.
- * <ul>
- * <li>
- * For numeric values, the {@linkplain #getValueClass value class} is usually
+ *
+ * <P>For numeric values, the {@linkplain #getValueClass value class} is usually
  * <code>{@linkplain Double}.class</code>, <code>{@linkplain Integer}.class</code> or
- * some other Java wrapper class.
- * </li>
- * <li>For non numeric 
- * </li>
- * </ul>
- * </p>
+ * some other Java wrapper class.</P>
  *  
  * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see org.geotools.parameter.Parameter
- * @see org.geotools.parameter.ParameterGroupDescriptor
+ * @see org.geotools.parameter.ParameterDescriptorGroup
  */
-public class ParameterDescriptor extends AbstractParameterDescriptor implements org.opengis.parameter.ParameterDescriptor {
+public class ParameterDescriptor extends AbstractParameterDescriptor
+             implements org.opengis.parameter.ParameterDescriptor
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -109,36 +108,8 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      */
     private final Unit unit;
 
-    private static final Map properties( String name, String remarks ){
-        if (remarks == null ){
-            return Collections.singletonMap("name", name);
-        }
-        Map properties = new HashMap(2);
-        properties.put("name", name );
-        properties.put("remarks", name );
-        return properties;        
-    }
     /**
-     * Similar to DataStore PARAM constuctor.
-     * 
-     * @param name The parameter name.
-     * @param true1
-     */
-    public ParameterDescriptor(String name, String description, Object defaultValue, boolean required ) {
-        this( properties( name, description ),
-              required ? 1 : 0,
-              1,
-              defaultValue.getClass(),
-              null,
-              defaultValue,
-              null,
-              null,
-              null );              
-              
-    }
-
-    /**
-     * Construct a parameter for a range of integer values.
+     * Constructs a parameter for a range of integer values.
      *
      * @param name The parameter name.
      * @param defaultValue The default value for the parameter.
@@ -146,9 +117,9 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * @param maximum The maximum parameter value, or {@link Integer#MAX_VALUE} if none.
      */
     public ParameterDescriptor(final String name,
-                              final int defaultValue,
-                              final int minimum,
-                              final int maximum)
+                               final int defaultValue,
+                               final int minimum,
+                               final int maximum)
     {
         this(name, Integer.class, Parameter.wrap(defaultValue),
              minimum == Integer.MIN_VALUE ? null : Parameter.wrap(minimum),
@@ -156,7 +127,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
     }
 
     /**
-     * Construct a parameter for a range of floating point values. The parameter is mandatory
+     * Constructs a parameter for a range of floating point values. The parameter is mandatory
      * if no default value is specified (i.e. <code>defaultValue</code> is <code>NaN</code>).
      * Otherwise, the parameter will be optional.
      *
@@ -167,10 +138,10 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * @param unit    The unit for default, minimum and maximum values.
      */
     public ParameterDescriptor(final String name,
-                              final double defaultValue,
-                              final double minimum,
-                              final double maximum,
-                              final Unit   unit)
+                               final double defaultValue,
+                               final double minimum,
+                               final double maximum,
+                               final Unit   unit)
     {
         this(name, Double.class,
              Double.isNaN(defaultValue)          ? null : Parameter.wrap(defaultValue),
@@ -179,7 +150,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
     }
 
     /**
-     * Construct a parameter from a range of comparable objects. The parameter is mandatory
+     * Constructs a parameter from a range of comparable objects. The parameter is mandatory
      * if no default value is specified (i.e. <code>defaultValue</code> is <code>null</code>).
      * Otherwise, the parameter will be optional.
      *
@@ -191,14 +162,14 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * @param unit    The unit for default, minimum and maximum values, or <code>null</code>.
      */
     public ParameterDescriptor(final String     name,
-                              final Class      valueClass,
-                              final Comparable defaultValue,
-                              final Comparable minimum,
-                              final Comparable maximum,
-                              final Unit       unit)
+                               final Class      valueClass,
+                               final Comparable defaultValue,
+                               final Comparable minimum,
+                               final Comparable maximum,
+                               final Unit       unit)
     {
-        this(Collections.singletonMap("name", name),
-             (defaultValue!=null) ? 0 : 1, 1, valueClass, null, defaultValue, minimum, maximum, unit);
+        this(Collections.singletonMap(NAME_PROPERTY, name),
+          (defaultValue!=null) ? 0 : 1, 1, valueClass, null, defaultValue, minimum, maximum, unit);
     }
 
     /**
@@ -208,7 +179,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * @param defaultValue The default value.
      */
     public ParameterDescriptor(final String   name,
-                              final CodeList defaultValue)
+                               final CodeList defaultValue)
     {
         this(name, defaultValue.getClass(), defaultValue);
     }
@@ -221,27 +192,86 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      *                     Must be a subclass of {@link CodeList}.
      * @param defaultValue The default value, or <code>null</code>.
      */
-    private ParameterDescriptor(final String   name,
-                               final Class    valueClass,
-                               final CodeList defaultValue)
+    ParameterDescriptor(final String   name,
+                        final Class    valueClass,
+                        final CodeList defaultValue)
     {
         this(name, valueClass, getCodeLists(valueClass), defaultValue);
     }
 
     /**
      * Returns the enumeration found in the specified <code>CodeList</code> class.
-     * Returns <code>null</code> if no values were found. Note: this code should
-     * be defined in the constructor. Current method is a work around for RFE #4093999
-     * in Sun's bug database ("Relax constraint on placement of this()/super() call in constructors").
+     * Returns <code>null</code> if no values were found.
      */
     private static CodeList[] getCodeLists(final Class type) {
         try {
-            return (CodeList[]) type.getMethod("values", null).invoke(null, null);
+            return (CodeList[]) type.getMethod("values", (Class[])null)
+                                    .invoke(null, (Object[]) null);
         } catch (Exception exception) {
             // No code list defined. Not a problem; we will just
             // not provided any set of code to check against.
             return null;
         }
+    }
+
+    /**
+     * Construct a parameter for a name and a default value. The parameter type will
+     * be assumed the same than the default value class.
+     * 
+     * @param name The parameter name.
+     * @param description An optional description.
+     * @param defaultValue The default value.
+     * @param required <code>true</code> if this parameter is required,
+     *        <code>false</code> otherwise.
+     *
+     * @deprecated Use the constructor with an {@link InternationalString} argument instead.
+     */
+    public ParameterDescriptor(final String   name,
+                               final String   description,
+                               final Object   defaultValue,
+                               final boolean  required )
+    {
+        this(name, new SimpleInternationalString(description), defaultValue, required);
+    }
+
+    /**
+     * Construct a parameter for a name and a default value. The parameter type will
+     * be assumed the same than the default value class.
+     * 
+     * @param name The parameter name.
+     * @param description An optional description.
+     * @param defaultValue The default value.
+     * @param required <code>true</code> if this parameter is required,
+     *        <code>false</code> otherwise.
+     */
+    public ParameterDescriptor(final String              name,
+                               final InternationalString description,
+                               final Object              defaultValue,
+                               final boolean             required )
+    {
+        this(toMap(name, description),
+             required ? 1 : 0,
+             1,
+             defaultValue.getClass(),
+             (defaultValue instanceof CodeList) ? getCodeLists(defaultValue.getClass()) : null,
+             defaultValue,
+             null,
+             null,
+             null);
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static final Map toMap(final String name, final InternationalString remarks) {
+        if (remarks == null ){
+            return Collections.singletonMap(NAME_PROPERTY, name);
+        }
+        final Map properties = new HashMap(4);
+        properties.put(NAME_PROPERTY,   name);
+        properties.put(REMARKS_PROPERTY, remarks);
+        return properties;        
     }
 
     /**
@@ -255,9 +285,9 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * @param defaultValue The default value for the parameter, or <code>null</code>.
      */
     public ParameterDescriptor(final String   name,
-                              final Class    valueClass,
-                              final Object[] validValues,
-                              final Object   defaultValue)
+                               final Class    valueClass,
+                               final Object[] validValues,
+                               final Object   defaultValue)
     {
         this(Collections.singletonMap("name", name),
              (defaultValue!=null) ? 0 : 1, 1, valueClass, validValues, defaultValue, null, null, null);
@@ -283,14 +313,14 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * @param unit    The unit for default, minimum and maximum values.
      */
     public ParameterDescriptor(final Map        properties,
-                              final int        minimumOccurs,
-                              final int        maximumOccurs,
-                                    Class      valueClass,
-                              final Object[]   validValues,
-                              final Object     defaultValue,
-                              final Comparable minimum,
-                              final Comparable maximum,
-                              final Unit       unit)
+                               final int        minimumOccurs,
+                               final int        maximumOccurs,
+                                     Class      valueClass,
+                               final Object[]   validValues,
+                               final Object     defaultValue,
+                               final Comparable minimum,
+                               final Comparable maximum,
+                               final Unit       unit)
     {
         super(properties, minimumOccurs, maximumOccurs);
         this.primitiveClass = valueClass;
@@ -298,7 +328,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
         this.minimum        = minimum;
         this.maximum        = maximum;
         this.unit           = unit;
-        AbstractParameter.ensureNonNull("valueClass",  valueClass);
+        ensureNonNull("valueClass", valueClass);
         if (valueClass.isPrimitive()) {
             valueClass = ClassChanger.toWrapper(valueClass);
         }
@@ -322,6 +352,9 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
             this.validValues = Collections.unmodifiableSet(valids);
         } else {
             this.validValues = null;
+        }
+        if (defaultValue != null) {
+            Parameter.ensureValidValue(this, defaultValue);
         }
     }
 
@@ -386,7 +419,8 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * value is inappropriate for the {@linkplain #getValueClass parameter type}, then
      * this method returns <code>null</code>.
      *
-     * @return The minimum parameter value (often an instance of {@link Double}), or <code>null</code>.
+     * @return The minimum parameter value (often an instance of {@link Double}),
+     *         or <code>null</code>.
      */
     public Comparable getMinimumValue() {
         return minimum;
@@ -397,7 +431,8 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * value is inappropriate for the {@linkplain #getValueClass parameter type}, then
      * this method returns <code>null</code>.
      *
-     * @return The minimum parameter value (often an instance of {@link Double}), or <code>null</code>.
+     * @return The minimum parameter value (often an instance of {@link Double}),
+     *         or <code>null</code>.
      */
     public Comparable getMaximumValue() {
         return maximum;
@@ -427,14 +462,17 @@ public class ParameterDescriptor extends AbstractParameterDescriptor implements 
      * @return <code>true</code> if both objects are equal.
      */
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+        if (object == this) {
+            return true;
+        }
         if (super.equals(object, compareMetadata)) {
             final ParameterDescriptor that = (ParameterDescriptor) object;
-            return equals(this.primitiveClass, that.primitiveClass)   &&
-                   equals(this.validValues,    that.validValues)  &&
-                   equals(this.defaultValue,   that.defaultValue) &&
-                   equals(this.minimum,        that.minimum)      &&
-                   equals(this.maximum,        that.maximum)      &&
-                   equals(this.unit,           that.unit);
+            return Utilities.equals(this.primitiveClass, that.primitiveClass)   &&
+                   Utilities.equals(this.validValues,    that.validValues)  &&
+                   Utilities.equals(this.defaultValue,   that.defaultValue) &&
+                   Utilities.equals(this.minimum,        that.minimum)      &&
+                   Utilities.equals(this.maximum,        that.maximum)      &&
+                   Utilities.equals(this.unit,           that.unit);
         }
         return false;
     }

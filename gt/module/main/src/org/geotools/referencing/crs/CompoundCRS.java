@@ -28,7 +28,6 @@ import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
-//import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
@@ -101,7 +100,7 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
      * @param crs The array of coordinate reference system making this compound CRS.
      */
     public CompoundCRS(final String name, final CoordinateReferenceSystem[] crs) {
-        this(Collections.singletonMap("name", name), crs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), crs);
     }
 
     /**

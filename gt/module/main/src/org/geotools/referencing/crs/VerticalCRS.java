@@ -82,7 +82,7 @@ public class VerticalCRS extends org.geotools.referencing.crs.SingleCRS
                        final VerticalDatum datum,
                        final VerticalCS       cs)
     {
-        this(Collections.singletonMap("name", name), datum, cs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
     }
 
     /**

@@ -25,15 +25,12 @@ package org.geotools.referencing.crs;
 // J2SE dependencies
 import java.util.Map;
 import java.util.Collections;
-//import javax.units.NonSI;
 import javax.units.Unit;
 
 // OpenGIS direct dependencies
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.SphericalCS;
-//import org.opengis.referencing.cs.AxisDirection;
-//import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
@@ -95,7 +92,7 @@ public class GeocentricCRS extends org.geotools.referencing.crs.SingleCRS
                          final GeodeticDatum datum,
                          final CartesianCS      cs)
     {
-        this(Collections.singletonMap("name", name), datum, cs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
     }
 
     /**
@@ -109,7 +106,7 @@ public class GeocentricCRS extends org.geotools.referencing.crs.SingleCRS
                          final GeodeticDatum datum,
                          final SphericalCS      cs)
     {
-        this(Collections.singletonMap("name", name), datum, cs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
     }
 
     /**

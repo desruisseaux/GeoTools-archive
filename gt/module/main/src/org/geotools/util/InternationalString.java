@@ -23,19 +23,9 @@
 package org.geotools.util;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Iterator;
-import java.util.Collections;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.ObjectInputStream;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -48,201 +38,47 @@ import org.geotools.resources.cts.ResourceKeys;
  * {@link CharSequence} methods} is the string in the current {@linkplain
  * Locale#getDefault system default}.
  *
+ * <P>The {@linkplain Comparable natural ordering} is defined by the string in
+ * {@linkplain Locale#getDefault default locale}, as returned by {@link #toString()}.
+ * This string also defines the {@linkplain CharSequence character sequence}.</P>
+ *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class InternationalString implements org.opengis.util.InternationalString,
-                                            CharSequence, Comparable, Serializable
-{
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = 5760033376627376937L;
-
-    /**
-     * The set of locales created in this virtual machine through the {@link #getLocale} method.
-     * Used in order to {@linkplain #canonicalize canonicalize} the {@link Locale} objects.
-     */
-    private static final Map LOCALES = new HashMap();
-
-    /**
-     * The string values in different locales (never <code>null</code>).
-     * Keys are {@link Locale} objects and values are {@link String}s.
-     */
-    private Map localMap;
-
+public abstract class InternationalString implements org.opengis.util.InternationalString {
     /**
      * The string in the {@linkplain Locale#getDefault system default} locale, or <code>null</code>
      * if this string has not yet been determined. This is the default string returned by
      * {@link #toString()} and others methods from the {@link CharSequence} interface.
+     *
+     * <P>This field is not serialized because serialization is often used for data transmission
+     * between a server and a client, and the client may not use the same locale than the server.
+     * We want the locale to be examined again on the client side.</P>
+     *
+     * <P>This field is read and write by {@link SimpleInternationalString}.</P>
      */
-    private transient String defaultValue;
+    transient String defaultValue;
 
     /**
-     * Constructs an initially empty international string. Localized strings can been added
-     * using one of {@link #addLocalizedString addLocalizedString(...)} methods.
+     * Constructs an international string.
      */
     public InternationalString() {
-        localMap = Collections.EMPTY_MAP;
     }
-
+    
     /**
-     * Constructs an international string initialized with the specified string.
-     * Additional localized strings can been added using one of
-     * {@link #addLocalizedString addLocalizedString(...)} methods.
-     * The string specified to this constructor is the one that will be returned
-     * if no localized string is found for the {@link Locale} argument in a call
-     * to {@link #toString(Locale)}.
+     * Makes sure an argument is non-null.
      *
-     * @param string The string in no specific locale.
+     * @param  name   Argument name.
+     * @param  object User argument.
+     * @throws IllegalArgumentException if <code>object</code> is null.
      */
-    public InternationalString(final String string) {
-        if (string != null) {
-            localMap = Collections.singletonMap(null, string);
-        } else {
-            localMap = Collections.EMPTY_MAP;
-        }
-    }
-
-    /**
-     * Add a string for the given locale.
-     *
-     * @param  locale The locale for the <code>string</code> value, or <code>null</code>.
-     * @param  string The localized string.
-     * @throws IllegalArgumentException if a different string value was already set for
-     *         the given locale.
-     */
-    public void addLocalizedString(final Locale locale, final String string)
+    static void ensureNonNull(final String name, final Object object)
             throws IllegalArgumentException
     {
-        if (string != null) {
-            switch (localMap.size()) {
-                case 0: localMap = Collections.singletonMap(locale, string); return;
-                case 1: localMap = new HashMap(localMap); break;
-            }
-            final String old = (String) localMap.put(locale, string);
-            if (old!=null && !string.equals(old)) {
-                // TODO: provide a localized message "String value already set for locale ...".
-                throw new IllegalArgumentException();
-            }
+        if (object == null) {
+            throw new IllegalArgumentException(Resources.format(
+                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
         }
-    }
-
-    /**
-     * Add a string for the given property key. This convenience method for constructing an
-     * <code>InternationalString</code> while iteration through the {@linkplain Map.Entry entries}
-     * in a {@link Map}. It infers the {@link Local} from the property <code>key</code>, using the
-     * following steps:
-     * <ul>
-     *   <li>If the <code>key</code> do not starts with the specified <code>prefix</code>, then
-     *       this method do nothing and returns <code>false</code>.</li>
-     *   <li>Otherwise, the characters after the <code>prefix</code> are parsed as an ISO language
-     *       and country code, and the {@link #addLocalizedString(Locale,String) method is
-     *       invoked.</li>
-     * </ul>
-     *
-     * <P>For example if the prefix is <code>"remarks"</code>, then the <code>"remarks_fr"</code>
-     * property key stands for remarks in {@linkplain Locale#FRENCH French} while the
-     * <code>"remarks_fr_CA"</code> property key stands for remarks in
-     * {@linkplain Locale#CANADA_FRENCH French Canadian}.</P>
-     *
-     * @param  prefix The prefix to skip at the begining of the <code>key</code>.
-     * @param  key The property key.
-     * @param  string The localized string for the specified <code>key</code>.
-     * @return <code>true</code> if the key has been recognized, or <code>false</code> otherwise.
-     * @throws IllegalArgumentException if the locale after the prefix is an illegal code, or a
-     *         different string value was already set for the given locale.
-     */
-    public boolean addLocalizedString(final String prefix, final String key, final String string)
-            throws IllegalArgumentException
-    {
-        if (key.startsWith(prefix)) {
-            addLocalizedString(toLocale(key, prefix.length()), string);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns the locale for the given string. For example  <code>"_fr"</code> stands
-     * for {@linkplain Locale#FRENCH French} while <code>"_fr_CA"</code> stands for
-     * {@linkplain Locale#CANADA_FRENCH French Canadian}.
-     *
-     * @param  locale The locale as a string.
-     * @param  offset The first character to parse in <code>locale</code>.
-     *                Must point over a '_' character.
-     * @return The locale.
-     * @throws IllegalArgumentException if the local is not a valid code.
-     */
-    private static Locale toLocale(final String locale, final int offset)
-            throws IllegalArgumentException
-    {
-        int position = offset;
-        final int length = locale.length();
-        final String[] parts = new String[] {"", "", ""};
-        for (int i=0; /*break condition inside*/; i++) {
-            if (position == length) {
-                return (i==0) ? (Locale)null :
-                       canonicalize(new Locale(parts[0] /* language */,
-                                               parts[1] /* country  */,
-                                               parts[2] /* variant  */));
-            }
-            if (locale.charAt(position)!='_' || i==parts.length) {
-                // Unknow character, or two many characters
-                break;
-            }
-            int next = locale.indexOf('_', ++position);
-            if (next < 0) {
-                next = length;
-            } else if (next == position) {
-                // Found two consecutive '_' characters
-                break;
-            }
-            parts[i] = locale.substring(position, position=next);
-        }
-        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
-                                           "locale", locale.substring(offset)));
-    }
-
-    /**
-     * Returns a canonical instance of the given locale.
-     *
-     * @param  locale The locale to canonicalize.
-     * @return The canonical instance of <code>locale</code>.
-     */
-    private static synchronized Locale canonicalize(final Locale locale) {
-        /**
-         * Initialize the LOCALES map with the set of locales defined in the Locale class.
-         * This operation is done only once.
-         */
-        if (LOCALES.isEmpty()) try {
-            final Field[] fields = Locale.class.getFields();
-            for (int i=0; i<fields.length; i++) {
-                final Field field = fields[i];
-                if (Modifier.isStatic(field.getModifiers())) {
-                    if (Locale.class.isAssignableFrom(field.getType())) {
-                        final Locale toAdd = (Locale) field.get(null);
-                        LOCALES.put(toAdd, toAdd);
-                    }
-                }
-            }
-        } catch (Exception exception) {
-            /*
-             * Not a big deal if this operation fails (this is actually just an
-             * optimization for reducing memory usage). Log a warning and continue.
-             */
-            Utilities.unexpectedException("org.geotools.referencing",
-                                          "Identifier", "<cinit>", exception);
-        }
-        /*
-         * Now canonicalize the locale.
-         */
-        final Locale candidate = (Locale) LOCALES.get(locale);
-        if (candidate != null) {
-            return candidate;
-        }
-        LOCALES.put(locale, locale);
-        return locale;
     }
     
     /**
@@ -299,68 +135,31 @@ public class InternationalString implements org.opengis.util.InternationalString
     }
 
     /**
-     * Returns a string in the specified locale. If there is no string for the specified
-     * <code>locale</code>, then this method search for a locale without the
-     * {@linkplain Locale#getVariant variant} part. If no string are found,
-     * then this method search for a locale without the {@linkplain Locale#getCountry country}
-     * part. For example if the <code>"fr_CA"</code> locale was requested but not found, then
-     * this method looks for the <code>"fr"</code> locale. The <code>null</code> locale
-     * (which stand for unlocalized message) is tried last.
+     * Returns this string in the given locale. If no string is available in the given locale,
+     * then some default locale is used. The default locale is implementation-dependent. It
+     * may or may not be the {@linkplain Locale#getDefault() system default}).
      *
-     * @param  locale The locale to look for, or <code>null</code>.
-     * @return The string in the specified locale, or in a default locale.
+     * @param  locale The desired locale for the string to be returned, or <code>null</code>
+     *         for a string in the implementation default locale.
+     * @return The string in the given locale if available, or in the default locale otherwise.
      */
-    public String toString(Locale locale) {
-        String text;
-        while (locale != null) {
-            text = (String) localMap.get(locale);
-            if (text != null) {
-                return text;
-            }
-            final String language = locale.getLanguage();
-            final String country  = locale.getCountry ();
-            final String variant  = locale.getVariant ();
-            if (variant.length() != 0) {
-                locale = new Locale(language, country);
-                continue;
-            }
-            if (country.length() != 0) {
-                locale = new Locale(language);
-                continue;
-            }
-            break;
-        }
-        
-        // Try an Empty Locale
-        // TODO: Remove this block. The Locale("", "", "") is used temporarily
-        //       by IdentifiedObject, but this is strictly an internal use and
-        //       should never appears outside IdentifiedObject.
-        locale = new Locale( "", "", "" ); // IdentifiedObject does this to us
-        text = (String) localMap.get(locale);
-        if (text != null) {
-            return text;
-        }
-        
-        // Try the string in the 'null' locale.
-        text = (String) localMap.get(null);
-        if (text == null) {
-            // No 'null' locale neither. Returns the first string in whatever locale.
-            final Iterator it = localMap.values().iterator();
-            if (it.hasNext()) {
-                return (String) it.next();
-            }
-        }
-        return text;
-    }
+    public abstract String toString(final Locale locale);
 
     /**
-     * Returns the string in the {@linkplain Locale#getDefault default locale}.
+     * Returns this string in the default locale. Invoking this method is equivalent to invoking
+     * <code>{@linkplain #toString(Locale) toString}({@linkplain Locale#getDefault})</code>. All
+     * methods from {@link CharSequence} operate on this string. This string is also used as the
+     * criterion for {@linkplain Comparable natural ordering}.
+     *
+     * @return The string in the default locale.
      */
     public String toString() {
         if (defaultValue == null) {
             defaultValue = toString(Locale.getDefault());
+            if (defaultValue == null) {
+                return "";
+            }
         }
-        assert defaultValue==null || localMap.containsValue(defaultValue) : defaultValue;
         return defaultValue;
     }
 
@@ -372,46 +171,4 @@ public class InternationalString implements org.opengis.util.InternationalString
     public int compareTo(final Object object) {
         return toString().compareTo(object.toString());
     }
-
-    /**
-     * Compares this international string with the specified object for equality.
-     */
-    public boolean equals(final Object object) {
-        if (object!=null && object.getClass().equals(getClass())) {
-            final InternationalString that = (InternationalString) object;
-            return Utilities.equals(this.localMap, that.localMap);
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash code value for this international text.
-     */
-    public int hashCode() {
-        return (int)serialVersionUID ^ localMap.hashCode();
-    }
-    
-    /**
-     * Canonicalize the locales after deserialization.
-     */
-    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        final int size = localMap.size();
-        if (size == 0) {
-            return;
-        }
-        final Map.Entry[] entries;
-        entries = (Map.Entry[]) localMap.entrySet().toArray(new Map.Entry[size]);
-        if (size == 1) {
-            final Map.Entry entry = entries[0];
-            localMap = Collections.singletonMap(canonicalize((Locale)entry.getKey()),
-                                                                     entry.getValue());
-        } else {
-            localMap.clear();
-            for (int i=0; i<entries.length; i++) {
-                final Map.Entry entry = entries[i];
-                localMap.put(canonicalize((Locale)entry.getKey()), entry.getValue());
-            }
-        }
-    }    
 }

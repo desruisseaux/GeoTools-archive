@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.HashMap;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.referencing.operation.MathTransform;
@@ -40,6 +41,7 @@ import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -76,6 +78,8 @@ public class CoordinateOperation extends IdentifiedObject
 
     /**
      * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
+     *
+     * @todo Declare constants
      */
     private static final String[] LOCALIZABLES = {"scope"};
 
@@ -109,7 +113,7 @@ public class CoordinateOperation extends IdentifiedObject
     /**
      * Description of domain of usage, or limitations of usage, for which this operation is valid.
      */
-    private final Map scope;
+    private final InternationalString scope;
 
     /**
      * Transform from positions in the {@linkplain #getSourceCRS source coordinate reference system}
@@ -177,7 +181,7 @@ public class CoordinateOperation extends IdentifiedObject
     {
         super(properties, subProperties, LOCALIZABLES);
         validArea        = (Extent) subProperties.get("validArea"       );
-        scope            = (Map)    subProperties.get("scope"           );
+        scope            = (InternationalString)    subProperties.get("scope"           );
         operationVersion = (String) subProperties.get("operationVersion");
         PositionalAccuracy[] positionalAccuracy;
         positionalAccuracy = (PositionalAccuracy[]) subProperties.get("positionalAccuracy");
@@ -277,13 +281,9 @@ public class CoordinateOperation extends IdentifiedObject
 
     /**
      * Description of domain of usage, or limitations of usage, for which this operation is valid.
-     *
-     * @param  locale The desired locale for the coordinate operation scope to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The coordinate operation scope in the given locale, or <code>null</code> if none.
      */
-    public String getScope(final Locale locale) {
-        return getLocalized(scope, locale);
+    public InternationalString getScope() {
+        return scope;
     }
     
     /**
@@ -312,16 +312,16 @@ public class CoordinateOperation extends IdentifiedObject
         }
         if (super.equals(object, compareMetadata)) {
             final CoordinateOperation that = (CoordinateOperation) object;
-            if (equals(this.sourceCRS, that.sourceCRS, compareMetadata) &&
-                equals(this.targetCRS, that.targetCRS, compareMetadata) &&
-                equals(this.transform, that.transform))
+            if (          equals(this.sourceCRS, that.sourceCRS, compareMetadata) &&
+                          equals(this.targetCRS, that.targetCRS, compareMetadata) &&
+                Utilities.equals(this.transform, that.transform))
             {
                 if (!compareMetadata) {
                     return true;
                 }
-                return equals(this.validArea,  that.validArea) &&
-                       equals(this.scope,      that.scope    ) &&
-                       Arrays.equals(this.positionalAccuracy, that.positionalAccuracy);
+                return Utilities.equals(this.validArea,          that.validArea) &&
+                       Utilities.equals(this.scope,              that.scope    ) &&
+                       Arrays   .equals(this.positionalAccuracy, that.positionalAccuracy);
                        // TODO: Uses Arrays.deepEquals(...) when J2SE 1.5 will be available.
             }
         }

@@ -67,17 +67,17 @@ public class CoordinateSystem extends IdentifiedObject
     private final CoordinateSystemAxis[] axis;
 
     /**
-     * Construct a coordinate system from a name.
+     * Constructs a coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis  The set of axis.
      */
     public CoordinateSystem(final String name, final CoordinateSystemAxis[] axis) {
-        this(Collections.singletonMap("name", name), axis);
+        this(Collections.singletonMap(NAME_PROPERTY, name), axis);
     }
 
     /**
-     * Construct a coordinate system from a set of properties. The properties map
+     * Constructs a coordinate system from a set of properties. The properties map
      * is given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
      * super-class constructor}.
      *
@@ -130,8 +130,6 @@ public class CoordinateSystem extends IdentifiedObject
     /**
      * Returns the dimension of the coordinate system.
      * This is the number of axis.
-     *
-     * @return The dimension of the coordinate system.
      */
     public int getDimension() {
         return axis.length;

@@ -74,29 +74,29 @@ public class WeakValueHashMapTest extends TestCase {
             for (int i=0; i<500; i++) {
                 final Integer key   = new Integer(random.nextInt(500));
                 final Integer value = new Integer(random.nextInt(500));
-                assertEquals("containsKey",   strongMap.containsKey(key),
-                                                weakMap.containsKey(key));
+                assertEquals("containsKey:",   strongMap.containsKey(key),
+                                                 weakMap.containsKey(key));
                 if (false) {
                     // Can't test this one, since 'WeakValueHashMap.entrySet()' is not implemented.
-                    assertEquals("containsValue", strongMap.containsValue(value),
-                                                    weakMap.containsValue(value));
+                    assertEquals("containsValue:", strongMap.containsValue(value),
+                                                     weakMap.containsValue(value));
                 }
-                assertSame("get",             strongMap.get(key),
-                                                weakMap.get(key));
+                assertSame("get:", strongMap.get(key),
+                                     weakMap.get(key));
                 if (random.nextBoolean()) {
                     /*
                      * Test addition.
                      */
-                    assertSame("put", strongMap.put(key, value),
-                                        weakMap.put(key, value));
+                    assertSame("put:", strongMap.put(key, value),
+                                         weakMap.put(key, value));
                 } else {
                     /*
                      * Test remove
                      */
-                    assertSame("remove", strongMap.remove(key),
-                                           weakMap.remove(key));
+                    assertSame("remove:", strongMap.remove(key),
+                                            weakMap.remove(key));
                 }
-                assertEquals("equals", strongMap, weakMap);
+                assertEquals("equals:", strongMap, weakMap);
             }
         }
     }
@@ -124,14 +124,14 @@ public class WeakValueHashMapTest extends TestCase {
                         // If the element was not in the WeakValueHashMap (i.e. if the garbage
                         // collector has cleared it), then it must not been in HashMap neither
                         // (otherwise GC should not have cleared it).
-                        assertNull("put", strongPrevious);
+                        assertNull("put:", strongPrevious);
                     } else {
                         assertTrue(value != weakPrevious);
                     }
                     if (strongPrevious != null) {
                         // Note: If 'strongPrevious==null', 'weakPrevious' may not
                         //       be null if GC has not collected its entry yet.
-                        assertSame("put", strongPrevious, weakPrevious);
+                        assertSame("put:", strongPrevious, weakPrevious);
                     }
                 } else {
                     /*
@@ -140,12 +140,12 @@ public class WeakValueHashMapTest extends TestCase {
                     final Object   weakPrevious = weakMap.get(key);
                     final Object strongPrevious = strongMap.remove(key);
                     if (strongPrevious != null) {
-                        assertSame("remove", strongPrevious, weakPrevious);
+                        assertSame("remove:", strongPrevious, weakPrevious);
                     }
                 }
                 if (false) {
                     // Can't test this one, since 'WeakValueHashMap.entrySet()' is not implemented.
-                    assertTrue("containsAll", weakMap.entrySet().containsAll(strongMap.entrySet()));
+                    assertTrue("containsAll:", weakMap.entrySet().containsAll(strongMap.entrySet()));
                 }
             }
             // Do our best to lets GC finish its work.
@@ -153,7 +153,7 @@ public class WeakValueHashMapTest extends TestCase {
                 Thread.sleep(50);
                 System.gc();
             }
-            assertTrue("equals", strongMap.equals(weakMap));
+            assertTrue("equals:", strongMap.equals(weakMap));
         }
     }
 }

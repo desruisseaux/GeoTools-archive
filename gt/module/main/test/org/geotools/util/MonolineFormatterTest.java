@@ -41,9 +41,9 @@ public class MonolineFormatterTest extends TestCase {
     /**
      * Returns the test suite.
      */
-     public static Test suite() {
-         return new TestSuite(MonolineFormatterTest.class);
-     }
+    public static Test suite() {
+        return new TestSuite(MonolineFormatterTest.class);
+    }
 
     /**
      * Constructs a test case with the given name.

@@ -24,6 +24,7 @@ import java.util.Map;
 
 // Geotools dependencies
 import org.geotools.util.DerivedMap;
+import org.geotools.referencing.IdentifiedObject;
 
 
 /**
@@ -39,7 +40,7 @@ final class UnprefixedMap extends DerivedMap {
     /**
      * The property key to process in a special way.
      */
-    private static final String NAME = "name";
+    private static final String NAME_PROPERTY = IdentifiedObject.NAME_PROPERTY;
 
     /**
      * The prefix to remove for this map.
@@ -60,7 +61,7 @@ final class UnprefixedMap extends DerivedMap {
     public UnprefixedMap(final Map base, final String prefix) {
         super(base);
         this.prefix  = prefix.trim();
-        this.hasName = base.containsKey(this.prefix + NAME);
+        this.hasName = base.containsKey(this.prefix + NAME_PROPERTY);
     }
 
     /**
@@ -102,8 +103,8 @@ final class UnprefixedMap extends DerivedMap {
      * or starts with <code>"name_"</code>
      */
     private static boolean isName(final String key) {
-        final int length = NAME.length();
-        return NAME.regionMatches(true, 0, key, 0, length) &&
+        final int length = NAME_PROPERTY.length();
+        return NAME_PROPERTY.regionMatches(true, 0, key, 0, length) &&
                (key.length()==length || key.charAt(length)=='_');
     }
 }

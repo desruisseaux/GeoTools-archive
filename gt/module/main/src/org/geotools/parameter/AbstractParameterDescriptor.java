@@ -75,8 +75,8 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      *        that values for this parameter group or parameter are required.
      */
     protected AbstractParameterDescriptor(final Map properties,
-                                        final int minimumOccurs,
-                                        final int maximumOccurs)
+                                          final int minimumOccurs,
+                                          final int maximumOccurs)
     {
         super(properties);
         this.minimumOccurs = minimumOccurs;
@@ -96,13 +96,12 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      * descriptor} for the created parameter value(s) will be <code>this</code> object.
      * <p>
      * Example implementation:
-     * <pre><code>
-     * <b>return</b> new AbstractParameter(this);
-     * </code></pre>
+     * <pre>
+     * <b>return</b> new {@link Parameter}(this);
+     * </pre>
      * </p>
      */
     public abstract org.opengis.parameter.GeneralParameterValue createValue();
-    // 
     
     /**
      * The minimum number of times that values for this parameter group or
@@ -119,7 +118,9 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
 
     /**
      * The maximum number of times that values for this parameter group or
-     * parameter can be included. The default value is one.
+     * parameter can be included. For a {@linkplain ParameterDescriptor single parameter},
+     * the value is always 1. For a {@linkplain ParameterDescriptorGroup parameter group},
+     * it may vary. The default value is one.
      *
      * @return The maximum occurrences.
      *

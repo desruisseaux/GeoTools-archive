@@ -26,6 +26,7 @@ package org.geotools.referencing.datum;
 import java.util.Map;
 import java.util.Locale;
 import java.util.Collections;
+import java.util.HashMap;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -56,7 +57,13 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
      * @see org.geotools.referencing.crs.EngineeringCRS#CARTESIAN_2D
      * @see org.geotools.referencing.crs.EngineeringCRS#CARTESIAN_3D
      */
-    public static final EngineeringDatum UNKNOW = new Localized("Unknow", ResourceKeys.UNKNOW);
+    public static final EngineeringDatum UNKNOW;
+    static {
+        final Map properties = new HashMap(4);
+        properties.put( NAME_PROPERTY, "Unknow");
+        properties.put(ALIAS_PROPERTY, Resources.formatInternational(ResourceKeys.UNKNOW));
+        UNKNOW = new EngineeringDatum(properties);
+    }
 
     /**
      * Construct an engineering datum from a name.
@@ -64,7 +71,7 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
      * @param name The datum name.
      */
     public EngineeringDatum(final String name) {
-        this(Collections.singletonMap("name", name));
+        this(Collections.singletonMap(NAME_PROPERTY, name));
     }
 
     /**
@@ -103,39 +110,5 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
     protected String formatWKT(final Formatter formatter) {
         super.formatWKT(formatter);
         return "LOCAL_DATUM";
-    }
-
-    /**
-     * A localized version of {@link org.geotools.referencing.datum.EngineeringDatum}.
-     */
-    private static final class Localized extends EngineeringDatum {
-        /**
-         * Serial number for interoperability with different versions.
-         */
-        private static final long serialVersionUID = 5208264027125837183L;
-
-        /**
-         * The key for the localized name.
-         */
-        private final int key;
-
-        /**
-         * Construct a localized datum.
-         */
-        public Localized(final String name, final int key) {
-            super(name);
-            this.key = key;
-        }
-
-        /**
-         * Returns the localized name.
-         */
-        public String getName(final Locale locale) {
-            if (locale != null) {
-                return Resources.getResources(locale).getString(key);
-            } else {
-                return super.getName(locale);
-            }
-        }
     }
 }

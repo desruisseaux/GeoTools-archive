@@ -91,7 +91,7 @@ public class MetadataEntity implements org.opengis.catalog.MetadataEntity,
     /**
      * The logger for metadata implementation.
      */
-    protected final Logger LOGGER = Logger.getLogger("org.geotools.metadata");
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.metadata");
     
     /**
      * The entity type for this metadata. Will be constructed only when first needed.

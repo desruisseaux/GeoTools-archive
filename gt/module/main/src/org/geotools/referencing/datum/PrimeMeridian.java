@@ -86,7 +86,7 @@ public class PrimeMeridian extends IdentifiedObject
      * @param angularUnit         The angular unit of the longitude.
      */
     public PrimeMeridian(final String name, final double greenwichLongitude, final Unit angularUnit) {
-        this(Collections.singletonMap("name", name), greenwichLongitude, angularUnit);
+        this(Collections.singletonMap(NAME_PROPERTY, name), greenwichLongitude, angularUnit);
     }
 
     /**

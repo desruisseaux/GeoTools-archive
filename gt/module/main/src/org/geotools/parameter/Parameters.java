@@ -43,11 +43,13 @@ import org.opengis.referencing.IdentifiedObject;
  * Utility class for methods helping implementing, and working with the
  * Parameter API from org.opengis.parameter.
  * 
- * @author Jody Garnett, Refractions Research
+ * @author Jody Garnett (Refractions Research)
  */
 public class Parameters {
     /** Empty ParameterGroup */
-    public static ParameterDescriptorGroup EMPTY_GROUP = new ParameterGroupDescriptor( "empty", new GeneralParameterDescriptor[0] );
+    public static ParameterDescriptorGroup EMPTY_GROUP =
+            new org.geotools.parameter.ParameterDescriptorGroup("empty",
+            new GeneralParameterDescriptor[0]);
     
     /** Locate by GeneralParameterDescriptor by ID (rather than name).
      * <p>
@@ -70,7 +72,7 @@ public class Parameters {
         }
         return null;
     }
-    public static boolean allowed( ParameterGroupDescriptor group, GeneralParameterDescriptor type){
+    public static boolean allowed( ParameterDescriptorGroup group, GeneralParameterDescriptor type){
         GeneralParameterDescriptor types[] = group.getParameters();
         for( int i=0; i < types.length; i++ ){
             if( types[i] == type ){
@@ -94,7 +96,7 @@ public class Parameters {
      */ 
     public static int count( ParameterValueGroup group, GeneralParameterDescriptor type){
         GeneralParameterValue[] params = array( group );
-        ParameterGroupDescriptor groupType = (ParameterGroupDescriptor) group.getDescriptor();        
+        ParameterDescriptorGroup groupType = (ParameterDescriptorGroup) group.getDescriptor();        
         int count = 0;
         for (int i=0; i<params.length; i++) {
             final GeneralParameterValue param = params[i];

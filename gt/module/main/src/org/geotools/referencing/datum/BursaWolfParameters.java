@@ -28,7 +28,9 @@ import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.util.Cloneable;
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -75,18 +77,21 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
     
     /** Bursa Wolf scaling in parts per million. */
     public double ppm;
-    
-    /** Human readable text describing intended region of transformation. */
-    public String domainOfValidity;
+
+    /** The target datum for this parameters. */
+    public final Datum targetDatum;
     
     /**
      * Constructs a transformation info with all parameters set to 0.
+     *
+     * @param target The target datum for this parameters.
      */
-    public BursaWolfParameters() {
+    public BursaWolfParameters(final Datum target) {
+        this.targetDatum = target;
     }
 
     /**
-     * Returns an affine maps that can be used to define this
+     * Returns an affine transform that can be used to define this
      * Bursa Wolf transformation. The formula is as follows:
      *
      * <blockquote><pre>
@@ -159,7 +164,7 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
                    Double.doubleToLongBits(this.ey)  == Double.doubleToLongBits(that.ey)  &&
                    Double.doubleToLongBits(this.ez)  == Double.doubleToLongBits(that.ez)  &&
                    Double.doubleToLongBits(this.ppm) == Double.doubleToLongBits(that.ppm) &&
-                   Utilities.equals(this.domainOfValidity, that.domainOfValidity);
+                   Utilities.equals(this.targetDatum, that.targetDatum);
         }
         return false;
     }
@@ -183,6 +188,9 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
         formatter.append(ey);
         formatter.append(ez);
         formatter.append(ppm);
-        return "TOWGS84[";
+        if (!GeodeticDatum.isWGS84(targetDatum)) {
+            formatter.setInvalidWKT();
+        }
+        return "TOWGS84";
     }
 }

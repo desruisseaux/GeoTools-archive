@@ -30,7 +30,7 @@ import java.util.Collections;
 import org.opengis.referencing.cs.AffineCS;
 import org.opengis.referencing.datum.ImageDatum;
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
- 
+
 
 /**
  * An engineering coordinate reference system applied to locations in images. Image coordinate
@@ -66,7 +66,7 @@ public class ImageCRS extends org.geotools.referencing.crs.SingleCRS
                     final ImageDatum datum,
                     final AffineCS   cs)
     {
-        this(Collections.singletonMap("name", name), datum, cs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
     }
 
     /**

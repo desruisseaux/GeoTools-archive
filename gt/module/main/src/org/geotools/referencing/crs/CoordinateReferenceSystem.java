@@ -28,7 +28,6 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
-//import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -73,8 +72,6 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
 
     /**
      * Returns the coordinate system.
-     *
-     * @return The coordinate system.
      */
     public CoordinateSystem getCoordinateSystem() {
         return coordinateSystem;
@@ -84,8 +81,6 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      * Returns the unit used for all axis. If not all axis uses the same unit,
      * then this method returns <code>null</code>. This method is often used
      * for Well Know Text (WKT) formatting.
-     *
-     * @return unit The unit used for all axis, or <code>null</code>.
      */
     final Unit getUnit() {
         Unit unit = null;
@@ -115,7 +110,7 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final CoordinateReferenceSystem that = (CoordinateReferenceSystem) object;
-            return equals(this.coordinateSystem, that.coordinateSystem);
+            return equals(this.coordinateSystem, that.coordinateSystem, compareMetadata);
         }
         return false;
     }

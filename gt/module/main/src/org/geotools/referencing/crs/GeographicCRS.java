@@ -93,7 +93,7 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
                          final GeodeticDatum datum,
                          final EllipsoidalCS    cs)
     {
-        this(Collections.singletonMap("name", name), datum, cs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
     }
 
     /**

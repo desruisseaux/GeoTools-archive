@@ -22,20 +22,22 @@
  */
 package org.geotools.parameter;
 
-
-import org.opengis.parameter.ParameterDescriptor;
-
-// J2SE dependencies
-import java.lang.reflect.Array;
+// J2SE dependencies and extensions
 import java.net.URL;
-
 import javax.units.Unit;
+import java.io.IOException;
 
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.InvalidParameterTypeException;
+import org.opengis.parameter.InvalidParameterValueException;
+
+// Geotools dependencies
+import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.parameter.InvalidParameterTypeException;
-import org.opengis.parameter.InvalidParameterValueException;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
@@ -331,21 +333,19 @@ public class ParameterReal extends AbstractParameter
         final long code = Double.doubleToLongBits(value);
         return (int)code ^ (int)(code >>> 32) + super.hashCode()*37;
     }
-    public String toString() {
-        String name = descriptor.getName().toString( null );
-        Object value = getValue();
-        
-        StringBuffer buf = new StringBuffer();
-        buf.append( "[<" );
-        buf.append( descriptor.getName().toString( null ) );
-        buf.append( "> " );
-        if( value == null ){
-            buf.append( "null" );
-        }
-        else {
-            buf.append( value );            
-        }        
-        buf.append("]");
-        return buf.toString();
-    }    
+
+    /**
+     * Write the content of this parameter to the specified table.
+     *
+     * @param  table The table where to format the parameter value.
+     * @throws IOException if an error occurs during output operation.
+     */
+    protected void write(final TableWriter table) throws IOException {
+        table.write(descriptor.getName().getCode());
+        table.nextColumn();
+        table.write('=');
+        table.nextColumn();
+        table.write(String.valueOf(value));
+        table.nextLine();
+    }
 }

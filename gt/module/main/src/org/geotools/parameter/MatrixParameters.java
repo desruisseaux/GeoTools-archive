@@ -21,6 +21,7 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.List;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -38,6 +39,7 @@ import org.geotools.referencing.IdentifiedObject;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.referencing.operation.GeneralMatrix;
 
 
@@ -60,13 +62,16 @@ import org.geotools.referencing.operation.GeneralMatrix;
  * elt_<var>&lt;num_row-1&gt;</var>_<var>&lt;num_col-1&gt;</var>
  * </pre></blockquote>
  *
- * @version $Id$
+ * @version $Id: MatrixParameters.java 7846 2004-09-08 21:34:06Z jgarnett $
  * @author Martin Desruisseaux
  *
  * @see MatrixParameterValues
  */
-public class MatrixParameters extends ParameterGroupDescriptor {
-    private static final long serialVersionUID = 1L;
+public class MatrixParameters extends ParameterDescriptorGroup {
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = -7386537348359343836L;
 
     /**
      * The default matrix size for the {@linkplain #MatrixParameters(Map) one-argument constructor}.
@@ -139,10 +144,10 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @param prefix     The prefix to insert in front of parameter name for each matrix elements.
      * @param separator  The separator between the row and the column index in parameter names.
      */
-    public MatrixParameters(final Map            properties,
-            				ParameterDescriptor[] parameters,
-                            final String         prefix,
-                            final char           separator)
+    public MatrixParameters(final Map             properties,
+                            ParameterDescriptor[] parameters,
+                            final String          prefix,
+                            final char            separator)
     {
         super(properties, parameters);
         if (parameters.length < 2) {
@@ -185,16 +190,16 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public final ParameterDescriptor getParameter(final String name)
+    public final ParameterDescriptor descriptor(final String name)
             throws ParameterNotFoundException
     {
-        return getParameter(name,
-                            ((Number) numRow.getMaximumValue()).intValue(),
-                            ((Number) numCol.getMaximumValue()).intValue());
+        return descriptor(name,
+                          ((Number) numRow.getMaximumValue()).intValue(),
+                          ((Number) numCol.getMaximumValue()).intValue());
     }
 
     /**
-     * Implementation of the {@link #getParameter(String)} method.
+     * Implementation of the {@link #descriptor(String)} method.
      *
      * @param  name   The case insensitive name of the parameter to search for.
      * @param  numRow The maximum number of rows.
@@ -202,7 +207,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    final ParameterDescriptor getParameter(String name, final int numRow, final int numCol)
+    final ParameterDescriptor descriptor(String name, final int numRow, final int numCol)
             throws ParameterNotFoundException
     {
         ensureNonNull("name", name);
@@ -213,7 +218,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
             if (split >= 0) try {
                 final int row = Integer.parseInt(name.substring(prefix.length(), split));
                 final int col = Integer.parseInt(name.substring(split+1));
-                return getParameter(row, col, numRow, numCol);
+                return descriptor(row, col, numRow, numCol);
             } catch (NumberFormatException exception) {
                 cause = exception;
             } catch (IndexOutOfBoundsException exception) {
@@ -225,7 +230,7 @@ public class MatrixParameters extends ParameterGroupDescriptor {
          * class for other parameters, especially "num_row" and "num_col".
          */
         try {
-            return super.getParameter(name);
+            return super.descriptor(name);
         } catch (ParameterNotFoundException exception) {
             if (cause!=null) try {
                 exception.initCause(cause);
@@ -247,16 +252,16 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter descriptor for the specified matrix element.
      * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
      */
-    public final ParameterDescriptor getParameter(final int row, final int column)
+    public final ParameterDescriptor descriptor(final int row, final int column)
             throws IndexOutOfBoundsException
     {
-        return getParameter(row, column,
-                            ((Number) numRow.getMaximumValue()).intValue(),
-                            ((Number) numCol.getMaximumValue()).intValue());
+        return descriptor(row, column,
+                          ((Number) numRow.getMaximumValue()).intValue(),
+                          ((Number) numCol.getMaximumValue()).intValue());
     }
 
     /**
-     * Implementation of the {@link #getParameter(int,int)} method.
+     * Implementation of the {@link #descriptor(int,int)} method.
      *
      * @param  row    The row indice.
      * @param  column The column indice
@@ -265,8 +270,8 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      * @return The parameter descriptor for the specified matrix element.
      * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
      */
-    final ParameterDescriptor getParameter(final int row,    final int column,
-                                          final int numRow, final int numCol)
+    final ParameterDescriptor descriptor(final int row,    final int column,
+                                         final int numRow, final int numCol)
             throws IndexOutOfBoundsException
     {
         checkIndice("row",    row,    numRow);
@@ -301,31 +306,50 @@ public class MatrixParameters extends ParameterGroupDescriptor {
      *
      * @return The matrix parameters, including all elements.
      */
-    public final GeneralParameterDescriptor[] getParameters() {
-        return getParameters(((Number) this.numRow.getDefaultValue()).intValue(),
-                             ((Number) this.numCol.getDefaultValue()).intValue());
+    public final List/*<GeneralParameterDescriptor>*/ descriptors() {
+        return descriptors(((Number) this.numRow.getDefaultValue()).intValue(),
+                           ((Number) this.numCol.getDefaultValue()).intValue());
     }
 
     /**
-     * Implementation of the {@link #getParameters()} method.
+     * Implementation of the {@link #descriptors()} method.
      * Returns the parameters in this group for a matrix of the specified size.
      *
      * @param numRow The number of rows.
      * @param numCol The number of columns.
      * @return The matrix parameters, including all elements.
      */
-    final GeneralParameterDescriptor[] getParameters(final int numRow, final int numCol) {
+    final List/*<GeneralParameterDescriptor>*/ descriptors(final int numRow, final int numCol) {
         final ParameterDescriptor[] parameters = new ParameterDescriptor[numRow*numCol + 2];
         int k = 0;
         parameters[k++] = this.numRow;
         parameters[k++] = this.numCol;
         for (int j=0; j<numRow; j++) {
             for (int i=0; i<numCol; i++) {
-                parameters[k++] = getParameter(j,i, numRow, numCol);
+                parameters[k++] = descriptor(j,i, numRow, numCol);
             }
         }
         assert k==parameters.length : k;
-        return parameters;
+        return new UnmodifiableArrayList(parameters);
+    }
+
+    /**
+     * Returns the parameters in this group.
+     *
+     * @deprecated Use {@link #descriptors} instead.
+     */
+    public final GeneralParameterDescriptor[] getParameters() {
+        final List p = descriptors();
+        return (GeneralParameterDescriptor[]) p.toArray(new GeneralParameterDescriptor[p.size()]);
+    }
+
+    /**
+     * Returns the descriptor for the specified name.
+     *
+     * @deprecated Use {@link #descriptor(String)} instead.
+     */
+    public final ParameterDescriptor getParameter(String name) {
+        return descriptor(name);
     }
 
     /**

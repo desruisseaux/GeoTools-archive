@@ -32,6 +32,7 @@ import org.opengis.referencing.datum.VerticalDatumType;
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -49,7 +50,7 @@ public class VerticalDatum extends Datum implements org.opengis.referencing.datu
     /**
      * Serial number for interoperability with different versions.
      */
-//    private static final long serialVersionUID = 3357241732140076884L;
+    private static final long serialVersionUID = 380347456670516572L;
 
     /**
      * A copy of the list of vertical types.
@@ -96,7 +97,7 @@ public class VerticalDatum extends Datum implements org.opengis.referencing.datu
      * @param type   The type of this vertical datum.
      */
     public VerticalDatum(final String name, final VerticalDatumType type) {
-        this(Collections.singletonMap("name", name), type);
+        this(Collections.singletonMap(NAME_PROPERTY, name), type);
     }
 
     /**
@@ -166,7 +167,7 @@ public class VerticalDatum extends Datum implements org.opengis.referencing.datu
         }
         if (super.equals(object, compareMetadata)) {
             final VerticalDatum that = (VerticalDatum) object;
-            return equals(this.type, that.type);
+            return Utilities.equals(this.type, that.type);
         }
         return false;
     }

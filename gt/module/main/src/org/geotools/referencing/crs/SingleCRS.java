@@ -138,7 +138,7 @@ public class SingleCRS extends CoordinateReferenceSystem
     public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final SingleCRS that = (SingleCRS) object;
-            return equals(this.datum, that.datum);
+            return equals(this.datum, that.datum, compareMetadata);
         }
         return false;
     }

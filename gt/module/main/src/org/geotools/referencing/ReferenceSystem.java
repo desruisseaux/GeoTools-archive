@@ -29,6 +29,10 @@ import java.util.Locale;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -37,16 +41,32 @@ import org.opengis.metadata.extent.Extent;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ReferenceSystem extends IdentifiedObject implements org.opengis.referencing.ReferenceSystem {
+public class ReferenceSystem extends IdentifiedObject
+                          implements org.opengis.referencing.ReferenceSystem
+{
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -2017349900886658590L;
+    private static final long serialVersionUID = 3337659819553899435L;
+
+    /**
+     * Key for the <code>"validArea"</code> property to be given to the
+     * {@linkplain #ReferenceSystem(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getValidArea()}.
+     */
+    public static final String VALID_AREA_PROPERTY = "validArea";
+
+    /**
+     * Key for the <code>"scope"</code> property to be given to the
+     * {@linkplain #ReferenceSystem(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getScope()}.
+     */
+    public static final String SCOPE_PROPERTY = "scope";
 
     /**
      * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
      */
-    private static final String[] LOCALIZABLES = {"scope"};
+    private static final String[] LOCALIZABLES = {SCOPE_PROPERTY};
 
     /**
      * Area for which the (coordinate) reference system is valid.
@@ -57,7 +77,7 @@ public class ReferenceSystem extends IdentifiedObject implements org.opengis.ref
      * Description of domain of usage, or limitations of usage, for which this
      * (coordinate) reference system object is valid.
      */
-    private final Map scope;
+    private final InternationalString scope;
 
     /**
      * Construct a reference system from a set of properties. The properties given in argument
@@ -72,13 +92,13 @@ public class ReferenceSystem extends IdentifiedObject implements org.opengis.ref
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"validArea"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VALID_AREA_PROPERTY "validArea"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getValidArea}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"scope"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #SCOPE_PROPERTY "scope"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
      * </table>
@@ -93,14 +113,13 @@ public class ReferenceSystem extends IdentifiedObject implements org.opengis.ref
      */
     private ReferenceSystem(final Map properties, final Map subProperties) {
         super(properties, subProperties, LOCALIZABLES);
-        validArea = (Extent) subProperties.get("validArea");
-        scope     = (Map)    subProperties.get("scope"    );
+        validArea = (Extent)              subProperties.get(VALID_AREA_PROPERTY);
+        scope     = (InternationalString) subProperties.get(SCOPE_PROPERTY);
     }
 
     /**
      * Area for which the (coordinate) reference system is valid.
-     *
-     * @return Coordinate reference system valid area, or <code>null</code> if not available.
+     * Returns <code>null</code> if not available.
      */
     public Extent getValidArea() {
         return validArea;
@@ -109,13 +128,10 @@ public class ReferenceSystem extends IdentifiedObject implements org.opengis.ref
     /**
      * Description of domain of usage, or limitations of usage, for which this
      * (coordinate) reference system object is valid.
-     *
-     * @param  locale The desired locale for the scope to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The remarks, or <code>null</code> if not available.
+     * Returns <code>null</code> if not available.
      */
-    public String getScope(final Locale locale) {
-        return Identifier.getLocalized(scope, locale);
+    public InternationalString getScope() {
+        return scope;
     }
 
     /**
@@ -134,8 +150,8 @@ public class ReferenceSystem extends IdentifiedObject implements org.opengis.ref
                 return true;
             }
             final ReferenceSystem that = (ReferenceSystem) object;
-            return equals(validArea, that.validArea) &&
-                   equals(scope,     that.scope    );
+            return Utilities.equals(validArea, that.validArea) &&
+                   Utilities.equals(scope,     that.scope    );
         }
         return false;
     }

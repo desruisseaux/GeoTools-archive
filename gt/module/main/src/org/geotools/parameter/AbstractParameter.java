@@ -23,30 +23,35 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
+import java.io.IOException;
 import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 // Geotools dependencies
+import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.wkt.Formattable;
 
 
 /**
  * Abstract parameter value or group of parameter values.
  * <p>
  * This maps directly to opengis GeneralParameterValue, the name is changed to protect
- * developers from confusing the two. This class does need to be subclassed before
- * it is considered useable.
+ * developers from confusing the two.
  * </p>
  * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see org.geotools.parameter.AbstractParameterDescriptor
  */
-public abstract class AbstractParameter implements org.opengis.parameter.GeneralParameterValue, Serializable {
+public abstract class AbstractParameter extends Formattable
+           implements org.opengis.parameter.GeneralParameterValue, Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -62,32 +67,16 @@ public abstract class AbstractParameter implements org.opengis.parameter.General
      *
      * @param descriptor The abstract definition of this parameter or group of parameters.
      */
-    protected AbstractParameter(GeneralParameterDescriptor descriptor) {
+    protected AbstractParameter(final GeneralParameterDescriptor descriptor) {
         this.descriptor = descriptor;
         ensureNonNull("descriptor", descriptor);
     }
     
     /**
      * Returns the abstract definition of this parameter or group of parameters.
-     *
-     * @return The abstract definition of this parameter or group of parameters.
      */
     public GeneralParameterDescriptor getDescriptor() {
         return descriptor;
-    }
-
-    /**
-     * Returns a copy of this parameter value or group.
-     *
-     * @return A copy of this parameter value or group.
-     */
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException exception) {
-            // Should not happen, since we are cloneable
-            throw new AssertionError(exception);
-        }
     }
     
     /**
@@ -114,7 +103,7 @@ public abstract class AbstractParameter implements org.opengis.parameter.General
      * a convenience method for subclass constructors.
      *
      * @param  name  Argument name.
-     * @param  array User argument.
+     * @param  array The array to look at.
      * @param  index Index of the element to check.
      * @throws IllegalArgumentException if <code>array[i]</code> is null.
      */
@@ -146,6 +135,18 @@ public abstract class AbstractParameter implements org.opengis.parameter.General
             }
         }
     }
+
+    /**
+     * Returns a copy of this parameter value or group.
+     */
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException exception) {
+            // Should not happen, since we are cloneable
+            throw new AssertionError(exception);
+        }
+    }
     
     /**
      * Compares the specified object with this parameter for equality.
@@ -169,5 +170,61 @@ public abstract class AbstractParameter implements org.opengis.parameter.General
      */
     public int hashCode() {
         return descriptor.hashCode() ^ (int)serialVersionUID;
+    }
+
+    /**
+     * Returns a string representation of this parameter. The default implementation
+     * delegates the work to {@link #write}, which should be overriden by subclasses.
+     */
+    public final String toString() {
+        final TableWriter table = new TableWriter(null, 1);
+        table.setMultiLinesCells(true);
+        try {
+            write(table);
+        } catch (IOException exception) {
+            // Should never happen, since we write to a StringWriter.
+            throw new AssertionError(exception);
+        }
+        return table.toString();
+    }
+
+    /**
+     * Write the content of this parameter to the specified table. This method make it easier
+     * to align values properly than overriding the {@link #toString} method. The table's columns
+     * are defined as below:
+     * <ol>
+     *   <li>The parameter name</li>
+     *   <li>The separator</li>
+     *   <li>The parameter value</li>
+     * </ol>
+     *
+     * <P>Subclasses should override this method with the following idiom:</P>
+     *
+     * <blockquote><pre>
+     * table.{@linkplain TableWriter#write(String) write}("<var>parameter name</var>");
+     * table.{@linkplain TableWriter#nextColumn() nextColumn}()
+     * table.{@linkplain TableWriter#write(String) write}('=');
+     * table.{@linkplain TableWriter#nextColumn() nextColumn}()
+     * table.{@linkplain TableWriter#write(String) write}("<var>parameter value</var>");
+     * table.{@linkplain TableWriter#nextLine() nextLine}()
+     * </pre></blockquote>
+     *
+     * @param  table The table where to format the parameter value.
+     * @throws IOException if an error occurs during output operation.
+     */
+    protected void write(final TableWriter table) throws IOException {
+        table.write(descriptor.getName().getCode());
+        // No know parameter value for this default implementation.
+        table.nextLine();
+    }
+
+    /**
+     * Format the inner part of this parameter as
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A>. This method doesn't need to be overriden, since the formatter
+     * already know how to {@linkplain Formatter#append(GeneralParameterValue) format parameters}.
+     */
+    protected final String formatWKT(final Formatter formatter) {
+        return "PARAMETER";
     }
 }

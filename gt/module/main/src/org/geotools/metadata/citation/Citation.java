@@ -42,7 +42,7 @@ import org.geotools.metadata.MetadataEntity;
 import org.geotools.util.CheckedHashSet;
 import org.geotools.util.CheckedHashMap;
 import org.geotools.util.CheckedArrayList;
-//import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.Utilities;
 
 
@@ -107,9 +107,10 @@ public class Citation extends MetadataEntity
     private InternationalString edition;
 
     /**
-     * Date of the edition, or <code>null</code> if none.
+     * Date of the edition in millisecondes ellapsed sine January 1st, 1970,
+     * or {@link Long#MIN_VALUE} if none.
      */
-    private Date editionDate;
+    private long editionDate = Long.MIN_VALUE;
 
     /**
      * Unique identifier for the resource. Example: Universal Product Code (UPC),
@@ -178,7 +179,7 @@ public class Citation extends MetadataEntity
         if (title instanceof InternationalString) {
             this.title = (InternationalString) title;
         } else {
-            this.title = new org.geotools.util.InternationalString(title.toString());
+            this.title = new SimpleInternationalString(title.toString());
         }
     }
 
@@ -261,8 +262,8 @@ public class Citation extends MetadataEntity
     /**
      * Returns the date of the edition, or <code>null</code> if none.
      */
-    public Date getEditionDate() {
-        return editionDate;
+    public synchronized Date getEditionDate() {
+        return (editionDate!=Long.MIN_VALUE) ? new Date(editionDate) : null;
     }
 
     /**
@@ -270,12 +271,9 @@ public class Citation extends MetadataEntity
      *
      * @todo Use an unmodifiable {@link Date} here.
      */
-    public synchronized void setEditionDate(Date newValue) {
+    public synchronized void setEditionDate(final Date newValue) {
         checkWritePermission();
-        if (newValue != null) {
-            newValue = new Date(newValue.getTime());
-        }
-        editionDate = newValue;
+        editionDate = (newValue!=null) ? newValue.getTime() : Long.MIN_VALUE;
     }
 
     /**
@@ -460,7 +458,6 @@ public class Citation extends MetadataEntity
         alternateTitles         = (List)                unmodifiable(alternateTitles);
         dates                   = (Map)                 unmodifiable(dates);
         edition                 = (InternationalString) unmodifiable(edition);
-        editionDate             = (Date)                unmodifiable(editionDate);
         identifiers             = (Set)                 unmodifiable(identifiers);
         identifierTypes         = (Set)                 unmodifiable(identifierTypes);
         citedResponsibleParties = (Set)                 unmodifiable(citedResponsibleParties);
@@ -484,7 +481,7 @@ public class Citation extends MetadataEntity
                    Utilities.equals(this.alternateTitles,         that.alternateTitles        ) &&
                    Utilities.equals(this.dates,                   that.dates                  ) &&
                    Utilities.equals(this.edition,                 that.edition                ) &&
-                   Utilities.equals(this.editionDate,             that.editionDate            ) &&
+                                   (this.editionDate         ==   that.editionDate            ) &&
                    Utilities.equals(this.identifiers,             that.identifiers            ) &&
                    Utilities.equals(this.identifierTypes,         that.identifierTypes        ) &&
                    Utilities.equals(this.citedResponsibleParties, that.citedResponsibleParties) &&

@@ -293,7 +293,7 @@ public class CoordinateFormat extends Format {
 
     /**
      * Set the pattern for dates fields. If some ordinates are formatted as date (for example in
-     * {@linkplain org.geotools.referencing.cs.TemporalCS temporal coordinate system}), then
+     * {@linkplain org.geotools.referencing.cs.TimeCS time coordinate system}), then
      * those dates will be formatted using this pattern.
      *
      * @param pattern The date pattern as specified in {@link SimpleDateFormat}.
@@ -311,7 +311,7 @@ public class CoordinateFormat extends Format {
 
     /**
      * Set the time zone for dates fields. If some ordinates are formatted as date (for example in
-     * {@linkplain org.geotools.referencing.cs.TemporalCS temporal coordinate system}), then
+     * {@linkplain org.geotools.referencing.cs.TimeCS time coordinate system}), then
      * those dates will be formatted using the specified time zone.
      *
      * @param timezone The time zone for dates.

@@ -33,7 +33,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 /**
  * A one-dimensional coordinate system containing a single time axis, used to describe the
  * temporal position of a point in the specified time units from a specified time origin.
- * A <code>TemporalCS</code> shall have one {@linkplain #getAxis axis}.
+ * A <code>TimeCS</code> shall have one {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -44,7 +44,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TemporalCS extends CoordinateSystem implements org.opengis.referencing.cs.TemporalCS {
+public class TimeCS extends CoordinateSystem implements org.opengis.referencing.cs.TimeCS {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -55,7 +55,7 @@ public class TemporalCS extends CoordinateSystem implements org.opengis.referenc
      * <var>{@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#TIME time}</var>,
      * axis in days.
      */
-    public static TemporalCS DAYS = new TemporalCS("Temporal",
+    public static TimeCS DAYS = new TimeCS("Temporal",
                     org.geotools.referencing.cs.CoordinateSystemAxis.TIME);
 
     /**
@@ -64,7 +64,7 @@ public class TemporalCS extends CoordinateSystem implements org.opengis.referenc
      * @param name  The coordinate system name.
      * @param axis  The axis.
      */
-    public TemporalCS(final String name, final CoordinateSystemAxis axis) {
+    public TimeCS(final String name, final CoordinateSystemAxis axis) {
         super(name, new CoordinateSystemAxis[] {axis});
         ensureTimeUnit(getAxis(0).getUnit());
     }
@@ -77,7 +77,7 @@ public class TemporalCS extends CoordinateSystem implements org.opengis.referenc
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param axis         The axis.
      */
-    public TemporalCS(final Map properties, final CoordinateSystemAxis axis) {
+    public TimeCS(final Map properties, final CoordinateSystemAxis axis) {
         super(properties, new CoordinateSystemAxis[] {axis});
         ensureTimeUnit(getAxis(0).getUnit());
     }

@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.HashMap;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.operation.MathTransform;
@@ -39,15 +40,14 @@ import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.parameter.ParameterGroupDescriptor;
+import org.geotools.resources.Utilities;
+
 
 /**
  * Definition of an algorithm used to perform a coordinate operation. Most operation
  * methods use a number of operation parameters, although some coordinate conversions
  * use none. Each coordinate operation using the method assigns values to these parameters.
  *  
- * <p>
- * FEEDBACK: This really looks like a ParameterDescriptorGroup with formula, sourceDimensions, targetDimensions
  * @version $Id$
  * @author Martin Desruisseaux
  *
@@ -71,7 +71,7 @@ public class OperationMethod extends IdentifiedObject
      * publication. Note that the operation method may not be analytic, in which case this
      * attribute references or contains the procedure, not an analytic formula.
      */
-    private final Map formula;
+    private final InternationalString formula;
 
     /**
      * Number of dimensions in the source CRS of this operation method.
@@ -87,7 +87,6 @@ public class OperationMethod extends IdentifiedObject
      * The set of parameters, or <code>null</code> if none.
      */
     private final ParameterDescriptorGroup parameters;
-    //private final GeneralParameterDescriptor[] parameters;
 
     /**
      * Construct an operation method from a set of properties. The properties given in argument
@@ -186,7 +185,7 @@ public class OperationMethod extends IdentifiedObject
     /** Utility method used to kludge GeneralParameterDescriptor[] into a ParameterDescriptorGroup */
     private static ParameterDescriptorGroup group( Map properties, GeneralParameterDescriptor[] parameters ){
         return parameters == null ? org.geotools.parameter.Parameters.EMPTY_GROUP
-                : new ParameterGroupDescriptor( properties, parameters );
+                : new org.geotools.parameter.ParameterDescriptorGroup( properties, parameters );
     }
     /**
      * Work around for RFE #4093999 in Sun's bug database
@@ -200,7 +199,7 @@ public class OperationMethod extends IdentifiedObject
                             ParameterDescriptorGroup parameters)
     {
         super(properties, subProperties, LOCALIZABLES);
-        formula = (Map)    subProperties.get("formula");
+        formula = (InternationalString) subProperties.get("formula");
         if (parameters==null ) {
             this.parameters = org.geotools.parameter.Parameters.EMPTY_GROUP;
         } else {
@@ -214,15 +213,9 @@ public class OperationMethod extends IdentifiedObject
      * Formula(s) or procedure used by this operation method. This may be a reference to a
      * publication. Note that the operation method may not be analytic, in which case this
      * attribute references or contains the procedure, not an analytic formula.
-     *
-     * @param  locale The desired locale for the formula to be returned, or <code>null</code>
-     *         for a formula in some default locale (may or may not be the
-     *         {@linkplain Locale#getDefault() system default}).
-     * @return The coordinate operation method formula in the given locale. If no formula
-     *         is available in the given locale, then some default locale is used.
      */
-    public String getFormula(final Locale locale) {
-        return getLocalized(formula, locale);
+    public InternationalString getFormula() {
+        return formula;
     }
 
     /**
@@ -270,9 +263,9 @@ public class OperationMethod extends IdentifiedObject
             final OperationMethod that = (OperationMethod) object;
             if (this.sourceDimensions == that.sourceDimensions &&
                 this.targetDimensions == that.targetDimensions &&
-                equals(this.parameters,  that.parameters))
+                equals(this.parameters,  that.parameters, compareMetadata))
             {
-                return !compareMetadata || equals(this.formula, that.formula);
+                return !compareMetadata || Utilities.equals(this.formula, that.formula);
             }
         }
         return false;

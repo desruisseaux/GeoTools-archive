@@ -53,6 +53,7 @@ public class AllTests extends TestCase {
         final TestSuite suite = new TestSuite("org.geotools.util");
         suite.addTest(org.geotools.resources.AllTests.suite());
         suite.addTest(MonolineFormatterTest          .suite());
+        suite.addTest(InternationalStringTest        .suite());
         suite.addTest(RangeSetTest                   .suite());
         suite.addTest(DisjointSetTest                .suite());
         suite.addTest(WeakHashSetTest                .suite());

@@ -23,14 +23,15 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.Collection;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.io.IOException;
+import java.io.Writer;
 import javax.units.Unit;
 import javax.units.SI;
 import javax.units.NonSI;
@@ -44,7 +45,7 @@ import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
-import org.geotools.data.DataSourceException;
+import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -52,24 +53,21 @@ import org.geotools.resources.cts.ResourceKeys;
 
 /**
  * A parameter value used by an operation method.
- * <p>
- * Most CRS parameter values are numeric, but other types of parameter values are possible. The parameter type can be fetch with the
+ * Most CRS parameter values are numeric, but other types of parameter values are possible.
+ * The parameter type can be fetch with the
  * <code>{@linkplain #getValue()}.{@linkplain Object#getClass() getClass()}</code> idiom.
  * The {@link #getValue()} and {@link #setValue(Object)} methods can be invoked at any time.
  * Others getters and setters are parameter-type dependents.
- * </p>
- * <p>
- * This implementation extends the capabilities of the geoapi interface with an additional
- * functionality proivded by parse( text ), and text() methods.
- * </p> 
+ *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Jody Garnett (Refractions Research)
  *
  * @see org.geotools.parameter.ParameterDescriptor
  * @see org.geotools.parameter.ParameterGroup
  */
 public class Parameter extends AbstractParameter
-                         implements org.opengis.parameter.ParameterValue
+                       implements org.opengis.parameter.ParameterValue
 {
     /**
      * Serial number for interoperability with different versions.
@@ -93,6 +91,12 @@ public class Parameter extends AbstractParameter
             CACHED_DOUBLES [i] = new Double (CACHED_VALUES[i]);
         }
     }
+
+    /**
+     * An array with a single {@link String} class.
+     * Used for {@link #parse} default implementation.
+     */
+    private static final Class[] STRING_ARGUMENT = new Class[] {String.class};
 
     /**
      * The value.
@@ -146,7 +150,7 @@ public class Parameter extends AbstractParameter
      * @param value The parameter value.
      */
     public Parameter(final String name, final CodeList value) {
-        this(new org.geotools.parameter.ParameterDescriptor(name, value));
+        this(new org.geotools.parameter.ParameterDescriptor(name, value.getClass(), (CodeList)null));
         this.value = value;
     }
 
@@ -277,7 +281,7 @@ public class Parameter extends AbstractParameter
 
     /**
      * Returns the unit type as one of error message code. Used for
-     * checking unit type are better error message formatting if needed.
+     * checking unit with a better error message formatting if needed.
      */
     static int getUnitMessageID(final Unit unit) {
         if (SI.METER .isCompatible(unit)) return ResourceKeys.ERROR_NON_LINEAR_UNIT_$1;
@@ -544,8 +548,14 @@ public class Parameter extends AbstractParameter
      * @see #intValue
      */
     public void setValue(final int value) throws InvalidParameterValueException {
+        final ParameterDescriptor descriptor = (ParameterDescriptor) this.descriptor;
+        final Class type = descriptor.getValueClass();
+        if (Double.class.equals(type) || Double.TYPE.equals(type)) {
+            setValue((double) value);
+            return;
+        }
         final Integer check = wrap(value);
-        ensureValidValue((ParameterDescriptor) descriptor, check);
+        ensureValidValue(descriptor, check);
         this.value = check;
     }
 
@@ -637,126 +647,53 @@ public class Parameter extends AbstractParameter
         if (unit  != null) code += 37*unit.hashCode();
         return code;
     }
-    
+
     /**
-     * Set the Parameter value of the provided text.
-     * 
-     * @param text parsed using valueOf( text )
+     * Write the content of this parameter to the specified table.
+     *
+     * @param  table The table where to format the parameter value.
+     * @throws IOException if an error occurs during output operation.
      */
-    public void parse( String text ) throws IOException {
-        setValue( valueOf( text ) );
+    protected void write(final TableWriter table) throws IOException {
+        table.write(descriptor.getName().getCode());
+        table.nextColumn();
+        table.write('=');
+        table.nextColumn();
+        append(table, value);
+        table.nextLine();
     }
-    /** Text representation of parameter value.
-     * <p>
-     * Should be suitable for use with parse( text )
-     * @return
-     */
-    public String text(){
-        Object obj = getValue();
-        if( obj == null ){
-            return null;
-        }
-        return obj.toString();
-    }
+
     /**
-     * Parses the text into a value for this Parameter.
-     * <p>
-     * Default implementation uses reflection to look for a constructor
-     * that takes a single String.
-     * </p>
-     * @param text Text to parse
-     * @return value value of type getDescriptor().getValueClass()
-     * 
-     * @throws IOException If text could not be parsed to getDescriptor().getValueClass()
+     * Append the specified value to a stream. If the value is an array, then
+     * the array element are appended recursively (i.e. the array may contains
+     * sub-array).
      */
-    protected Object valueOf( String text ) throws IOException {
-        
-        ParameterDescriptor descriptor =
-            (ParameterDescriptor) this.getDescriptor();
-        
-        Class type = descriptor.getValueClass();
-        
-        if (text == null) {            
-            return null;
-        }
-        if (type == String.class) {
-            return text;
-        }
-        if (text.length() == 0) {
-            return null;
-        }
-
-        Constructor constructor;
-
-        try {
-            constructor = type.getConstructor(new Class[] { String.class });
-        } catch (SecurityException e) {
-            //  type( String ) constructor is not public
-            throw new IOException("Could not create " + type.getName()
-                + " from text");
-        } catch (NoSuchMethodException e) {
-            // No type( String ) constructor
-            throw new IOException("Could not create " + type.getName()
-                + " from text");
-        }
-
-        try {
-            return constructor.newInstance(new Object[] { text, });
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new DataSourceException("Could not create "
-                + type.getName() + ": from '" + text + "'",
-                illegalArgumentException);
-        } catch (InstantiationException instantiaionException) {
-            throw new DataSourceException("Could not create "
-                + type.getName() + ": from '" + text + "'",
-                instantiaionException);
-        } catch (IllegalAccessException illegalAccessException) {
-            throw new DataSourceException("Could not create "
-                + type.getName() + ": from '" + text + "'",
-                illegalAccessException);
-        } catch (InvocationTargetException targetException) {
-            Throwable cause = targetException.getCause();
-            throw new DataSourceException( cause );
-            
-        }
-    }
-               
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        String name = descriptor.getName().toString( null );
-        Object value = getValue();
-        
-        StringBuffer buf = new StringBuffer();
-        buf.append( "[<" );
-        buf.append( descriptor.getName().toString( null ) );
-        buf.append( "> " );
-        if( value == null ){
-            buf.append( "null" );
-        }
-        else if( value.getClass().isArray() ){
-            int length = Array.getLength( value );
-            if( length == 0 ){
-                buf.append( "(,)" );
+    private static void append(final Writer buffer, final Object value) throws IOException {
+        if (value == null) {
+            buffer.write("null");
+        } else if (value.getClass().isArray()) {
+            buffer.write('{');
+            final int length = Array.getLength(value);
+            final int limit = Math.min(5, length);
+            for (int i=0; i<limit; i++) {
+                if (i != 0) {
+                    buffer.write(", ");
+                }
+                append(buffer, Array.get(value, i));
             }
-            else {
-                buf.append( "(");
-                for( int i = 0; i< Math.min(5,length);i++){
-                    buf.append( Array.get( value, 0 ) );
-                    buf.append( "," );
-                }
-                if( length > 5 ){
-                    buf.append( "..." );
-                }
-                buf.append(")");
+            if (length > limit) {
+                buffer.write(", ...");
+            }
+            buffer.write('}');
+        } else {
+            final boolean isNumeric = (value instanceof Number);
+            if (!isNumeric) {
+                buffer.write('"');
+            }
+            buffer.write(value.toString());
+            if (!isNumeric) {
+                buffer.write('"');
             }
         }
-        else {
-            buf.append( value );            
-        }        
-        buf.append("]");
-        return buf.toString();
     }
 }
-

@@ -20,13 +20,17 @@
 package org.geotools.parameter;
 
 // OpenGIS dependencies
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.io.IOException;
 
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -34,8 +38,10 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
+import org.geotools.io.TableWriter;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.wkt.UnformattableObjectException;
 
@@ -45,15 +51,20 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  * is extensible, i.e. the number of <code>"elt_<var>row</var>_<var>col</var>"</code> parameters
  * depends on the <code>"num_row"</code> and <code>"num_col"</code> parameter values. Concequently,
  * this {@linkplain ParameterGroup parameter value group} is also its own mutable
- * {@linkplain ParameterGroupDescriptor operation parameter group}.
+ * {@linkplain ParameterDescriptorGroup operation parameter group}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see MatrixParameters
  */
-public class MatrixParameterValues extends ParameterGroup implements ParameterDescriptorGroup {    
-    private static final long serialVersionUID = 1L;
+public class MatrixParameterValues extends org.geotools.parameter.ParameterGroup
+                                implements ParameterDescriptorGroup
+{
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = -7747712999115044943L;
     
     /**
      * The parameter values. Will be constructed only when first requested.
@@ -78,8 +89,8 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      */
     public MatrixParameterValues(final MatrixParameters descriptor) {
         super(descriptor);        
-        numRow = (ParameterValue) getValue(0);
-        numCol = (ParameterValue) getValue(1);
+        numRow = (ParameterValue) parameter(0);
+        numCol = (ParameterValue) parameter(1);
     }
 
     /**
@@ -95,8 +106,16 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
      * specified at construction time.
      */
-    public InternationalString getName() {
+    public Identifier getName() {
         return descriptor.getName();
+    }
+
+    /**
+     * Forward the call to the {@linkplain MatrixParameters matrix parameters} descriptor
+     * specified at construction time.
+     */
+    public GenericName[] getAlias() {
+        return descriptor.getAlias();
     }
 
     /**
@@ -143,11 +162,18 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      * @return The parameter for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public ParameterDescriptor getParameter(final String name)
-            throws ParameterNotFoundException
-    {
-        return ((MatrixParameters) descriptor).getParameter(name, numRow.intValue(),
-                                                                  numCol.intValue());
+    public ParameterDescriptor descriptor(final String name) throws ParameterNotFoundException {
+        return ((MatrixParameters) descriptor).descriptor(name, numRow.intValue(),
+                                                                numCol.intValue());
+    }
+
+    /**
+     * Returns the parameter for the given name.
+     *
+     * @deprecated Use {@link #descriptor(String)} instead.
+     */
+    public ParameterDescriptor getParameter(final String name) throws ParameterNotFoundException {
+        return descriptor(name);
     }
 
     /**
@@ -162,7 +188,7 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      * @return The parameter value for the given name.
      * @throws ParameterNotFoundException if there is no parameter for the given name.
      */
-    public ParameterValue getValue(String name) throws ParameterNotFoundException {
+    public ParameterValue parameter(String name) throws ParameterNotFoundException {
         ensureNonNull("name", name);
         name = name.trim();
         final MatrixParameters descriptor = ((MatrixParameters) this.descriptor);
@@ -173,7 +199,7 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
             if (split >= 0) try {
                 final int row = Integer.parseInt(name.substring(prefix.length(), split));
                 final int col = Integer.parseInt(name.substring(split+1));
-                return getValue(row, col);
+                return parameter(row, col);
             } catch (NumberFormatException exception) {
                 cause = exception;
             } catch (IndexOutOfBoundsException exception) {
@@ -205,13 +231,14 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      * @return The parameter value for the specified matrix element (never <code>null</code>).
      * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
      */
-    public final ParameterValue getValue(final int row, final int column)
+    public final ParameterValue parameter(final int row, final int column)
             throws IndexOutOfBoundsException
     {
-        return getValue(row, column, numRow.intValue(), numCol.intValue());
-    }   
+        return parameter(row, column, numRow.intValue(), numCol.intValue());
+    }
+
     /**
-     * Implementation of {@link #getValue(int,int)}.
+     * Implementation of {@link #parameter(int,int)}.
      *
      * @param  row    The row indice.
      * @param  column The column indice
@@ -220,8 +247,8 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
      * @return The parameter value for the specified matrix element.
      * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
      */
-    private ParameterValue getValue(final int row,    final int column,
-                                    final int numRow, final int numCol)
+    private ParameterValue parameter(final int row,    final int column,
+                                     final int numRow, final int numCol)
             throws IndexOutOfBoundsException
     {
         MatrixParameters.checkIndice("row",    row,    numRow);
@@ -242,54 +269,58 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
         ParameterValue param = rowValues[column];
         if (param == null) {
             rowValues[column] = param = new ParameterReal(
-                    ((MatrixParameters) descriptor).getParameter(row, column, numRow, numCol));
+                    ((MatrixParameters) descriptor).descriptor(row, column, numRow, numCol));
         }
         return param;
     }
-    public final void delValue(final int row, final int column){
+
+    /** @deprecated This is internal mechanic. */
+    public final void delValue(final int row, final int column) {
         delValue(row, column, numRow.intValue(), numCol.intValue());
-	}     
+    }
+
+    /** @deprecated This is internal mechanic. */
     public void delValue( int row, int column, int numRow, int numCol ){
         if( matrixValues == null ){
             return; // nothing to remove
         }
         final ParameterValue[] rowValues = matrixValues[column];
-        if( rowValues == null ){
+        if (rowValues == null ){
             // nothing there
             return;
         }
-        if ( row < rowValues.length) {
+        if (row < rowValues.length) {
             rowValues[row] = null;
         }
     }
+
     /**
      * Returns the parameters descriptors in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
      */
-    public GeneralParameterDescriptor[] getParameters() {
-        return ((MatrixParameters) descriptor).getParameters(numRow.intValue(),
-                                                             numCol.intValue());
+    public List/*<GeneralParameterDescriptor>*/ descriptors() {
+        return ((MatrixParameters) descriptor).descriptors(numRow.intValue(),
+                                                           numCol.intValue());
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.parameter.ParameterGroup#values()
+    /**
+     * Returns the parameters in this group.
+     *
+     * @deprecated Use {@link #descriptors} instead.
      */
-    public List values() {
-        GeneralParameterValue[] params = getValues();
-        List list = new ArrayList();
-        for( int i=0; i<params.length; i++ ){
-            list.add( params[i] );
-        }        
-        return list;
+    public final GeneralParameterDescriptor[] getParameters() {
+        final List p = descriptors();
+        return (GeneralParameterDescriptor[]) p.toArray(new GeneralParameterDescriptor[p.size()]);
     }
+
     /**
      * Returns the parameters values in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
      * The parameter array will contains only matrix elements which have been requested at
-     * least once by one of <code>getValue(...)</code> methods. Never requested elements
+     * least once by one of <code>parameter(...)</code> methods. Never requested elements
      * are left to their default value and omitted from the returned array.
      */
-    public GeneralParameterValue[] getValues() {
+    public List/*<GeneralParameterValue>*/ values() {
         final int numRow = this.numRow.intValue();
         final int numCol = this.numCol.intValue();
         final ParameterValue[] parameters = new ParameterValue[numRow*numCol + 2];
@@ -311,7 +342,7 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
                 }
             }
         }
-        return (ParameterValue[]) XArray.resize(parameters, k);
+        return new UnmodifiableArrayList((ParameterValue[]) XArray.resize(parameters, k));
     }
     
     /**
@@ -349,7 +380,7 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
 
     /**
      * Set all parameter values to the element value in the specified matrix.
-     * After this method call, {@link #getValues} will returns only the elements
+     * After this method call, {@link #values} will returns only the elements
      * different from the default value.
      *
      * @param matrix The matrix to copy in this group of parameters.
@@ -363,33 +394,31 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
         for (int row=0; row<numRow; row++) {
             for (int col=0; col<numCol; col++) {
                 final double element = matrix.getElement(row,col);
-                ParameterDescriptor descriptor = matrixDescriptor.getParameter( row, col );
+                ParameterDescriptor descriptor = matrixDescriptor.descriptor(row, col);
                 final Object defaultValue = descriptor.getDefaultValue();
-                if( defaultValue instanceof Number ){
-                    double value = ((Number) defaultValue ).doubleValue();
-                    if( element != value ){
-                        // ParameterValue paramValue = getValue( row, col );
-                        if( matrixValues == null ){
-                            matrixValues = new ParameterValue[ numRow ][];
+                if (defaultValue instanceof Number) {
+                    double value = ((Number) defaultValue).doubleValue();
+                    if (element != value) {
+                        if (matrixValues == null) {
+                            matrixValues = new ParameterValue[numRow][];
                         }
-                        if( matrixValues[ row] == null ){
-                            matrixValues[ row ] = new ParameterValue[ numCol ]; 
+                        if (matrixValues[row] == null ){
+                            matrixValues[row] = new ParameterValue[numCol]; 
                         }
-                        ParameterValue realValue = new ParameterReal( descriptor, element );
-                        matrixValues[ row ][ col ] = realValue;                                                        
-                    }
-                    else {
+                        matrixValues[row][col] = new ParameterReal(descriptor, element);
+                    } else {
                         // remove entry to keep things sparse
-                        if( matrixValues != null && matrixValues[row] != null &&
-                            matrixValues[row][col] != null ){
+                        if (matrixValues != null && matrixValues[row] != null &&
+                            matrixValues[row][col] != null)
+                        {
                             matrixValues[row][col] = null;
                         }
                     }
-                }                
-                else {
+                } else {
                     // remove entry
                     if( matrixValues != null && matrixValues[row] != null &&
-                        matrixValues[row][col] != null ){
+                        matrixValues[row][col] != null)
+                    {
                         matrixValues[row][col] = null;
                     }
                 }               
@@ -410,8 +439,8 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
             final int numCol = this.numCol.intValue();
             for (int j=0; j<numRow; j++) {
                 for (int i=0; i<numCol; i++) {
-                    if (!Utilities.equals(this.getValue(j,i, numRow, numCol),
-                                          that.getValue(j,i, numRow, numCol)))
+                    if (!Utilities.equals(this.parameter(j,i, numRow, numCol),
+                                          that.parameter(j,i, numRow, numCol)))
                     {
                         return false;
                     }
@@ -428,8 +457,8 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
     public Object clone() {
         final MatrixParameterValues copy = (MatrixParameterValues) super.clone();
         if (copy.matrixValues != null) {
-            copy.numRow = (ParameterValue)     copy.getValue(0);
-            copy.numCol = (ParameterValue)     copy.getValue(1);
+            copy.numRow       = (ParameterValue)     copy.parameter(0);
+            copy.numCol       = (ParameterValue)     copy.parameter(1);
             copy.matrixValues = (ParameterValue[][]) copy.matrixValues.clone();
             for (int j=0; j<copy.matrixValues.length; j++) {
                 ParameterValue[] array = copy.matrixValues[j];
@@ -447,16 +476,17 @@ public class MatrixParameterValues extends ParameterGroup implements ParameterDe
     }
 
     /**
-     * Returns a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> using a default indentation.
+     * Write the content of this parameter to the specified table.
      *
-     * @return The Well Know Text for this object.
-     * @throws UnformattableObjectException If this object can't be formatted as WKT.
-     *
-     * @todo Not yet implemented.
+     * @param  The table where to format the parameter value.
+     * @throws IOException if an error occurs during output operation.
      */
-    public String toWKT() throws UnformattableObjectException {
-        throw new UnformattableObjectException("Not yet implemented.");
+    protected void write(final TableWriter table) throws IOException {
+        table.write(descriptor.getName().getCode());
+        table.nextColumn();
+        table.write('=');
+        table.nextColumn();
+        table.write(getMatrix().toString());
+        table.nextLine();
     }
 }

@@ -31,7 +31,7 @@ import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
-import org.opengis.referencing.cs.TemporalCS;
+import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.datum.TemporalDatum;
 
 // Geotools dependencies
@@ -44,7 +44,7 @@ import org.geotools.referencing.ReferenceSystem;  // For javadoc
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.cs.TemporalCS Temporal}
+ *   {@link org.geotools.referencing.cs.TimeCS Time}
  * </TD></TR></TABLE>
  *
  * @version $Id$
@@ -85,9 +85,9 @@ public class TemporalCRS extends org.geotools.referencing.crs.SingleCRS
      */
     public TemporalCRS(final String         name,
                        final TemporalDatum datum,
-                       final TemporalCS       cs)
+                       final TimeCS           cs)
     {
-        this(Collections.singletonMap("name", name), datum, cs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
     }
 
     /**
@@ -100,7 +100,7 @@ public class TemporalCRS extends org.geotools.referencing.crs.SingleCRS
      */
     public TemporalCRS(final Map      properties,
                        final TemporalDatum datum,
-                       final TemporalCS       cs)
+                       final TimeCS           cs)
     {
         super(properties, datum, cs);
     }

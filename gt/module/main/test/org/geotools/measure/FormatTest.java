@@ -29,7 +29,7 @@ import java.text.ParseException;
 // Geotools dependencies
 import org.geotools.referencing.*;
 import org.geotools.referencing.crs.*;
-import org.geotools.referencing.cs.TemporalCS;
+import org.geotools.referencing.cs.TimeCS;
 import org.geotools.referencing.datum.TemporalDatum;
 import org.geotools.geometry.GeneralDirectPosition;
 
@@ -116,7 +116,7 @@ public class FormatTest extends TestCase {
         final CoordinateReferenceSystem crs = new CompoundCRS("WGS84 3D + time",
                     GeographicCRS.WGS84,
                     VerticalCRS.ELLIPSOIDAL_HEIGHT,
-                    new TemporalCRS("Time", datum, TemporalCS.DAYS));
+                    new TemporalCRS("Time", datum, TimeCS.DAYS));
         final CoordinateFormat format = new CoordinateFormat(Locale.FRANCE);
         format.setCoordinateReferenceSystem(crs);
         format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));

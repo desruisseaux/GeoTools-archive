@@ -55,7 +55,7 @@ final class Adapter extends Formattable {
         final Class classe = object.getClass();
         final String wkt;
         try {
-            wkt = (String) classe.getMethod("toWKT", null).invoke(object, null);
+            wkt = (String) classe.getMethod("toWKT", (Class[])null).invoke(object, (Object[])null);
         } catch (Exception cause) {
             final UnsupportedImplementationException exception;
             exception = new UnsupportedImplementationException(classe);

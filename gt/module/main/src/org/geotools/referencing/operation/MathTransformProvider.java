@@ -131,23 +131,21 @@ public abstract class MathTransformProvider extends OperationMethod {
     protected static ParameterDescriptorGroup group(final Identifier[] identifiers,
                                                    final GeneralParameterDescriptor[] parameters)
     {
-        return new org.geotools.parameter.ParameterGroupDescriptor(toMap(null, identifiers), parameters);
+        return new org.geotools.parameter.ParameterDescriptorGroup(toMap(null, identifiers), parameters);
     }
 
     /**
      * Returns the name by which this provider is identified.
      *
-     * @param  locale The desired locale for the name to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The name, or <code>null</code> if not available.
+     * @todo revisit
      */
-    public String getName(final Locale locale) {
-        int key;
-        if (locale==null || (key=getLocalizationKey())<0) {
-            return super.getName(locale);
-        }
-        return Resources.getResources(locale).getString(key);
-    }
+//    public String getName() {
+//        int key;
+//        if (locale==null || (key=getLocalizationKey())<0) {
+//            return super.getName();
+//        }
+//        return Resources.getResources(locale).getString(key);
+//    }
 
     /**
      * Ensure that the given set of parameters contains only valid values. This method
@@ -238,7 +236,7 @@ public abstract class MathTransformProvider extends OperationMethod {
             if( values[i] instanceof ParameterValue ){
                 ParameterValue value = (ParameterValue) values[i];                
                 ParameterDescriptor descriptor = (ParameterDescriptor) value.getDescriptor();
-                String name = descriptor.getName().toString( null );                
+                String name = descriptor.getName().getCode();                
                 if( descriptor.getMaximumOccurs() == 1 &&
                     params.parameter( name ) != null ){                    
                     params.parameter( name ).setValue( value.getValue() );
@@ -351,6 +349,8 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Returns the resources key for {@linkplain #getName localized name}.
      * This method is for internal purpose by Geotools implementation only.
+     *
+     * @todo revisit
      */
     protected int getLocalizationKey() {
         return -1;

@@ -26,20 +26,24 @@ package org.geotools.referencing.crs;
 import java.util.Map;
 import java.util.Locale;
 import java.util.Collections;
-//import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS direct dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.EngineeringDatum;
+import org.opengis.util.InternationalString;
+import org.opengis.util.GenericName;
 
 // Geotools dependencies
+import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.ReferenceSystem;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.referencing.cs.CoordinateSystemAxis; // For Javadoc
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.Utilities;
+import org.geotools.util.NameFactory;
  
 
 /**
@@ -76,14 +80,14 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * A cartesian local coordinate system.
-     *
-     * @todo In current implementation, CARTESIAN_xD and GENERIC_xD would be considered
-     *       equals when metadata are ignored...  A possible fix is to attach different
-     *       ResourceKeys to them.
      */
     private static final class Cartesian extends EngineeringCRS {
         /** Serial number for interoperability with different versions. */
         private static final long serialVersionUID = -1773381554353809683L;
+
+        /** The alias to use for all Cartesian CS. */
+        private static GenericName ALIAS = NameFactory.create(new InternationalString[] {
+                       Resources.formatInternational(ResourceKeys.CARTESIAN)});
 
         /** Construct a coordinate system with the given name. */
         public Cartesian(final String name, final CoordinateSystem cs) {
@@ -91,8 +95,25 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
         }
 
         /** Returns the localized name for "Cartesian". */
-        public String getName(final Locale locale) {
-            return Resources.getResources(locale).getString(ResourceKeys.CARTESIAN);
+        public GenericName[] getAlias() {
+            return new GenericName[] {ALIAS};
+        }
+
+        /**
+         * Compares the specified object to this CRS for equality. This method is overriden
+         * because, otherwise, <code>CARTESIAN_xD</code> and <code>GENERIC_xD</code> would
+         * be considered equals when metadata are ignored.
+         */
+        public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+            if (super.equals(object, compareMetadata)) {
+                if (compareMetadata) {
+                    // No need to performs the check below if metadata were already compared.
+                    return true;
+                }
+                final Cartesian that = (Cartesian) object;
+                return Utilities.equals(this.getName().getCode(), that.getName().getCode());
+            }
+            return false;
         }
     }
 
@@ -161,7 +182,7 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
                           final EngineeringDatum datum,
                           final CoordinateSystem    cs)
     {
-        this(Collections.singletonMap("name", name), datum, cs);
+        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
     }
 
     /**

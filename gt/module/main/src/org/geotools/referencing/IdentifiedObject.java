@@ -25,8 +25,10 @@ package org.geotools.referencing;
 // J2SE dependencies
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Locale;
+import java.util.Arrays;
+import java.util.Locale;  // For javadoc
 import java.util.Iterator;
+import java.util.logging.Logger;
 import java.io.Serializable;
 import java.io.ObjectStreamException;
 import javax.units.Unit;
@@ -34,14 +36,19 @@ import javax.units.SI;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation; // For javadoc
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.util.InternationalString;
+import org.opengis.util.GenericName;
 
 // Geotools dependencies
+import org.geotools.util.NameFactory;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Formattable;
-import org.geotools.util.InternationalString;    
+import org.geotools.util.GrowableInternationalString;    
+
 
 /**
  * A base class for metadata applicable to reference system objects.
@@ -50,7 +57,7 @@ import org.geotools.util.InternationalString;
  * authority code} values are set to the authority name of the factory object, and the
  * authority code supplied by the client, respectively. When {@link Factory} creates an
  * object, the {@linkplain #getName name} is set to the value supplied by the client and
- * ll of the other metadata items are left empty.
+ * all of the other metadata items are left empty.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -58,18 +65,44 @@ import org.geotools.util.InternationalString;
 public class IdentifiedObject extends Formattable
                            implements org.opengis.referencing.IdentifiedObject, Serializable
 {
-        
-    /** "name" Key used to provide String for getName() */
-    public static final String NAME_PROPERTY = "name";
-    
-    /** "remarks" Key used to provide String for getRemarks() */
-    public static final String REMARKS_PROPERTY = "remarks";
-    
-        /**
+    /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -5543338998051359448L;
+    private static final long serialVersionUID = -5173281694258483264L;
 
+    /**
+     * Key for the <code>"name"</code> property to be given to the
+     * {@linkplain #IdentifiedObject(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getName()}.
+     */
+    public static final String NAME_PROPERTY = "name";
+
+    /**
+     * Key for the <code>"aliases"</code> property to be given to the
+     * {@linkplain #IdentifiedObject(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getAlias()}.
+     */
+    public static final String ALIAS_PROPERTY = "alias";
+
+    /**
+     * Key for the <code>"identifiers"</code> property to be given to the
+     * {@linkplain #IdentifiedObject(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getIdentifiers()}.
+     */
+    public static final String IDENTIFIERS_PROPERTY = "identifiers";
+    
+    /**
+     * Key for the <code>"remarks"</code> property to be given to the
+     * {@linkplain #IdentifiedObject(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getRemarks()}.
+     */
+    public static final String REMARKS_PROPERTY = "remarks";
+    
+    /**
+     * An empty array of alias.
+     */
+    private static final GenericName[] NO_ALIAS = new GenericName[0];
+    
     /**
      * An empty array of identifiers.
      */
@@ -77,32 +110,25 @@ public class IdentifiedObject extends Formattable
 
     /**
      * The name for this object or code. Should never be <code>null</code>.
-     * Keys are {@link Locale} objects and values are {@link String}.
      */
-    //private final Map name;
-    private final InternationalString name;
+    private final Identifier name;
+
     /**
-     * Set of alternative identifications of this object. The first identifier, if
-     * any, is normally the primary identification code, and any others are aliases.
+     * An alternative name by which this object is identified.
+     */
+    private final GenericName[] alias;
+
+    /**
+     * An identifier which references elsewhere the object's defining information.
+     * Alternatively an identifier by which this object can be referenced.
      */
     private final Identifier[] identifiers;
 
     /**
      * Comments on or information about this object, or <code>null</code> if none.
-     * Keys are {@link Locale} objects and values are {@link String}.
      */
-    // private final Map remarks;
     private final InternationalString remarks;
-    
-    static private final Map defaultMap( String objectName, String objectDescription ){
-        Map map = new HashMap();
-        map.put( NAME_PROPERTY, objectName );
-        map.put( REMARKS_PROPERTY, objectDescription );
-        return map;        
-    }
-    public IdentifiedObject( String objectName, String objectDescription ) throws IllegalArgumentException {
-        this( defaultMap( objectName, objectDescription ));
-    }
+
     /**
      * Constructs an object from a set of properties. Keys are strings from the table below.
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
@@ -116,46 +142,47 @@ public class IdentifiedObject extends Formattable
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"name"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #NAME_PROPERTY "name"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link Identifier}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getName}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"remarks"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #ALIAS_PROPERTY "alias"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String}, <code>{@linkplain String}[]</code>,
+     *     {@link GenericName} or <code>{@linkplain GenericName}[]</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #getAlias}</td>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;{@link org.geotools.referencing.Identifier#AUTHORITY_PROPERTY "authority"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the {@linkplain #getName name}</td>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;{@link org.geotools.referencing.Identifier#VERSION_PROPERTY "version"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getRemarks}</td>
+     *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the {@linkplain #getName name}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"authority"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String} or {@link org.opengis.metadata.citation.Citation}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the first identifier</td>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"code"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getCode} on the first identifier</td>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"codeSpace"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getCodeSpace} on the first identifier</td>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"version"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the first identifier</td>
-     *   </tr>
-     *   <tr>
-     *     <td nowrap>&nbsp;<code>"identifiers"</code>&nbsp;</td>
-     *     <td nowrap>&nbsp;<code>{@linkplain Identifier}</code>[]&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #IDENTIFIERS_PROPERTY "identifiers"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link Identifier} or <code>{@linkplain Identifier}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getIdentifiers}</td>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;{@link #REMARKS_PROPERTY "remarks"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #getRemarks}</td>
      *   </tr>
      * </table>
      *
-     * <P>Additionally, all localizable attributes like <code>"name"</code> and <code>"remarks"</code>
-     * may have a language and country code suffix. For example the <code>"remarks_fr"</code> property
-     * stands for remarks in {@linkplain java.util.Locale#FRENCH French} and the <code>"remarks_fr_CA"</code>
-     * property stands for remarks in {@linkplain java.util.Locale#CANADA_FRENCH French Canadian}.</P>
+     * <P>Additionally, all localizable attributes like <code>"remarks"</code>
+     * may have a language and country code suffix. For example the <code>"remarks_fr"</code>
+     * property stands for remarks in {@linkplain java.util.Locale#FRENCH French} and the
+     * <code>"remarks_fr_CA"</code> property stands for remarks in
+     * {@linkplain java.util.Locale#CANADA_FRENCH French Canadian}.</P>
+     *
+     * <P>Note that the <code>"authority"</code> and <code>"version"</code> properties are
+     * ignored if the <code>"name"</code> property is already a {@link Citation} object
+     * instead of a {@link String}.</P>
      *
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
@@ -172,10 +199,10 @@ public class IdentifiedObject extends Formattable
      * map, after their key has been normalized (usually lower case, leading and trailing space
      * removed).
      *
-     * If <code>localizables</code> is non-null, then all keys listed in this argument are treated
-     * as localizable one (i.e. may have a suffix like "_fr", "_de", etc.). Localizable properties
-     * are stored in the <code>subProperties</code> map as {@link Map} with {@link Locale} keys and
-     * {@link Object} values.
+     * <P>If <code>localizables</code> is non-null, then all keys listed in this argument are
+     * treated as localizable one (i.e. may have a suffix like "_fr", "_de", etc.). Localizable
+     * properties are stored in the <code>subProperties</code> map as {@link InternationalString}
+     * objects.</P>
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
      * @param subProperties The map in which to copy unrecognized properties.
@@ -190,10 +217,12 @@ public class IdentifiedObject extends Formattable
             throws IllegalArgumentException
     {
         ensureNonNull("properties", properties);
-        
-        InternationalString name        = new org.geotools.util.InternationalString();
-        InternationalString remarks     = new org.geotools.util.InternationalString();
-        Identifier[] identifiers        = null;
+        Object name        = null;
+        Object alias       = null;
+        Object identifiers = null;
+        Object remarks     = null;
+        GrowableInternationalString       growable = null;
+        GrowableInternationalString[] subGrowables = null;
         /*
          * Iterate through each map entry. This have two purposes:
          *
@@ -201,9 +230,9 @@ public class IdentifiedObject extends Formattable
          *   2) Find localized remarks.
          *
          * This algorithm is sub-optimal if the map contains a lot of entries of no interest to
-         * this identifier. Hopefully, most users will fill a map only with usefull entries.
+         * this object. Hopefully, most users will fill a map only with usefull entries.
          */
-CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
+NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
             Map.Entry entry = (Map.Entry) it.next();
             String    key   = ((String) entry.getKey()).trim().toLowerCase();
             Object    value = entry.getValue();
@@ -212,86 +241,195 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
              *       so it should not change across implementations.
              */
             switch (key.hashCode()) {
-                case 1368189162: {
-                    if (key.equals("identifiers")) {                                                
-                        if (value != null) {
-                            Identifier origional[] = (Identifier[]) value;
-                            identifiers = (Identifier[]) (origional.clone());                            
-                        }                        
-                        continue CHECK;
-                    }
-                }
                 // Fix case for common keywords.
                 case -1528693765: if (key.equals("anchorpoint"))      key="anchorPoint";      break;
                 case  1127093059: if (key.equals("realizationepoch")) key="realizationEpoch"; break;
                 case -1109785975: if (key.equals("validarea"))        key="validArea";        break;
+                case 3373707: {
+                    if (key.equals(NAME_PROPERTY)) {
+                        if (value instanceof String) {
+                            name = new org.geotools.referencing.Identifier(properties, false);
+                            assert value.equals(((Identifier) name).getCode()) : name;
+                        } else {
+                            name = value;
+                        }
+                        continue NEXT_KEY;
+                    }
+                    break;
+                }
+                case 92902992: {
+                    if (key.equals(ALIAS_PROPERTY)) {
+                        if (value instanceof String) {
+                            alias = NameFactory.create((String) value);
+                        } else if (value instanceof String[]) {
+                            final String[] values = (String[]) value;
+                            final GenericName[] names = new GenericName[values.length];
+                            for (int i=0; i<values.length; i++) {
+                                names[i] = NameFactory.create(values[i]);
+                            }
+                            alias = names;
+                        } else if (value instanceof GenericName) {
+                            alias = new GenericName[] {(GenericName) value};
+                        } else {
+                            alias = value;
+                        }
+                        continue NEXT_KEY;
+                    }
+                    break;
+                }
+                case 1368189162: {
+                    if (key.equals(IDENTIFIERS_PROPERTY)) {
+                        if (value != null) {
+                            if (value instanceof Identifier) {
+                                identifiers = new Identifier[] {(Identifier) value};
+                            } else {
+                                identifiers = value;
+                            }
+                        }
+                        continue NEXT_KEY;
+                    }
+                    break;
+                }
+                case 1091415283: {
+                    if (key.equals(REMARKS_PROPERTY)) {
+                        if (value instanceof InternationalString) {
+                            remarks = value;
+                            continue NEXT_KEY;
+                        }
+                    }
+                    break;
+                }
             }
-            Locale locale = getLocale(key, NAME_PROPERTY );
-            if (locale != null) {
-                if( value instanceof String ){
-                    name.addLocalizedString( locale, (String) value);
-                    continue CHECK;
+            /*
+             * Search for additional locales for remarks (e.g. "remarks_fr").
+             */
+            if (value instanceof String) {
+                if (growable == null) {
+                    if (remarks instanceof GrowableInternationalString) {
+                        growable = (GrowableInternationalString) remarks;
+                    } else {
+                        growable = new GrowableInternationalString();
+                    }
                 }
-                else if ( value instanceof InternationalString ){
-                    name = (InternationalString) value;
-                    continue CHECK;                    
+                if (growable.add(REMARKS_PROPERTY, key, value.toString())) {
+                    continue NEXT_KEY;
                 }
             }
-            locale = getLocale(key, REMARKS_PROPERTY );
-            if (locale != null) {
-                if( value instanceof String ){
-                    remarks.addLocalizedString( locale, (String) value);
-                    continue CHECK;                    
-                }
-                if ( value instanceof InternationalString ){
-                    remarks = (InternationalString) value;
-                    continue CHECK;                    
-                }
+            /*
+             * Search for user-specified localizable properties.
+             */
+            if (subProperties == null) {
+                continue NEXT_KEY;
             }
             if (localizables != null) {
                 for (int i=0; i<localizables.length; i++) {
                     final String prefix = localizables[i];
-                    locale = getLocale(key, prefix);
-                    if (locale != null) {
-                        Map map = (Map)subProperties.get(prefix);
-                        map = addLocalizedString(map, locale, value);
-                        subProperties.put(prefix, map);
-                        continue CHECK;
+                    if (key.equals(prefix)) {
+                        if (value instanceof InternationalString) {
+                            // Stores the value in 'subProperties' after the loop.
+                            break;
+                        }
+                    }
+                    if (value instanceof String) {
+                        if (subGrowables == null) {
+                            subGrowables = new GrowableInternationalString[localizables.length];
+                        }
+                        if (subGrowables[i] == null) {
+                            final Object previous = subProperties.get(prefix);
+                            if (previous instanceof GrowableInternationalString) {
+                                subGrowables[i] = (GrowableInternationalString) previous;
+                            } else {
+                                subGrowables[i] = new GrowableInternationalString();
+                            }
+                        }
+                        if (subGrowables[i].add(prefix, key, value.toString())) {
+                            continue NEXT_KEY;
+                        }
                     }
                 }
             }
-            if( subProperties != null ){
-                subProperties.put(key, value);
+            subProperties.put(key, value);
+        }
+        /*
+         * Get the localized remarks, if it was not yet set. If a user specified remarks
+         * both as InternationalString and as String for some locales (which is a weird
+         * usage...), then current implementation discart the later with a warning.
+         */
+        if (growable!=null && !growable.getLocales().isEmpty()) {
+            if (remarks == null) {
+                remarks = growable;
+            } else {
+                Logger.getLogger("org.geotools.referencing").warning(
+                                 Resources.format(ResourceKeys.WARNING_LOCALES_DISCARTED));
             }
         }
-        this.name        = name;
-        this.identifiers = identifiers;
-        this.remarks     = remarks;
-        ensureNonNull("name", name);
-        ensureNonNull("name", name.toString());         
-        //org.geotools.referencing.Identifier.canonicalizeKeys(name);
-        //org.geotools.referencing.Identifier.canonicalizeKeys(remarks);
+        if (subProperties!=null && subGrowables!=null) {
+            for (int i=0; i<subGrowables.length; i++) {
+                if (subGrowables[i]!=null && !subGrowables[i].getLocales().isEmpty()) {
+                    final String prefix = localizables[i];
+                    if (subProperties.get(prefix) == null) {
+                        subProperties.put(prefix, subGrowables[i]);
+                    } else {
+                        Logger.getLogger("org.geotools.referencing").warning(
+                                         Resources.format(ResourceKeys.WARNING_LOCALES_DISCARTED));
+                    }
+                }
+            }
+        }
+        /*
+         * Stores the definitive reference to the attributes. Note that casts are performed only
+         * there (not before). This is a wanted feature, since we want to catch ClassCastExceptions
+         * are rethrown them as more informative exceptions.
+         */
+        String key=null; Object value=null;
+        try {
+            key=        NAME_PROPERTY; this.name        = (Identifier)          (value=name);
+            key=       ALIAS_PROPERTY; this.alias       = (GenericName[])  clone(value=alias);
+            key= IDENTIFIERS_PROPERTY; this.identifiers = (Identifier[])   clone(value=identifiers);
+            key=     REMARKS_PROPERTY; this.remarks     = (InternationalString) (value=remarks);
+        } catch (ClassCastException exception) {
+            InvalidParameterValueException e = new InvalidParameterValueException(Resources.format(
+                                   ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, value), key, value);
+            e.initCause(exception);
+            throw e;
+        }
+        ensureNonNull(NAME_PROPERTY, name);
+        ensureNonNull(NAME_PROPERTY, name.toString());
     }
 
     /**
-     * The name by which this object is identified. 
-     *
-     * @param  locale The desired locale for the name to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The name, or <code>null</code> if not available.
+     * If the specified object is an array, clone it.
      */
-    public String getName(final Locale locale) {
-        if( locale == null ){
-            return name.toString();
+    private static Object clone(Object object) {
+        if (object instanceof Object[]) {
+            final Object[] array = (Object[]) object;
+            object = (array.length!=0) ? array.clone() : null;
         }
-        return name.toString( locale );        
+        return object;
     }
-    public org.opengis.util.InternationalString getName(){
+
+    /**
+     * The primary name by which this object is identified.
+     */
+    public Identifier getName(){
         return name;
     }
+
     /**
-     * Set of alternative identifications of this object. The first identifier, if
-     * any, is normally the primary identification code, and any others are aliases.
+     * An alternative name by which this object is identified.
+     *         
+     * @return The aliases, or an empty array if there is none.
+     */
+    public GenericName[] getAlias() {
+        if (alias != null) {
+            return (GenericName[]) alias.clone();
+        }
+        return NO_ALIAS;
+    }
+
+    /**
+     * An identifier which references elsewhere the object's defining information.
+     * Alternatively an identifier by which this object can be referenced.
      *
      * @return This object identifiers, or an empty array if there is none.
      */
@@ -304,26 +442,16 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
 
     /**
      * Comments on or information about this object, including data source information.
-     *
-     * @param  locale The desired locale for the remarks to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The remarks, or <code>null</code> if not available.
      */
-    public String getRemarks(final Locale locale) {
-        if( locale == null ){
-            return remarks.toString();
-        }         
-        return remarks.toString( locale);
-    }
-    public org.opengis.util.InternationalString getRemarks(){       
+    public InternationalString getRemarks(){       
         return remarks;
     }
     
     /**
-     * Returns a hash value for this info. {@linkplain #getName Name},
+     * Returns a hash value for this identified object. {@linkplain #getName Name},
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
-     * are not taken in account. In other words, two info objects will return the same
-     * hash value if they are equal in the sense of
+     * are not taken in account. In other words, two identified objects will return
+     * the same hash value if they are equal in the sense of
      * <code>{@link #equals(IdentifiedObject,boolean) equals}(IdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
@@ -335,88 +463,77 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     }
 
     /**
-     * Returns <code>true</code> if at least one {@linkplain #getIdentifiers identifier} matches
-     * the specified string. The comparaison is case-insensitive. If the <code>identifier</code>
-     * to compare contains the ':' character, then the part before ':' will be compared to the
-     * {@linkplain org.geotools.referencing.Identifier#getCodeSpace code space} and the part after
-     * ':' will be compared to the {@linkplain org.geotools.referencing.Identifier#getCode code}.
-     * If this info contains no identifier, then this method compares its unlocalized
-     * {@linkplain #getName name}.
+     * Returns <code>true</code> if either the {@linkplain #getName primary name} or at least
+     * one {@linkplain #getAlias alias} matches the specified string. This method performs the
+     * search in the following order:
+     * <ul>
+     *   <li>The {@linkplain #getName primary name} of this object</li>
+     *   <li>The {@linkplain org.geotools.util.ScopedName fully qualified name} of an alias</li>
+     *   <li>The {@linkplain org.geotools.util.LocalName local name} of an alias</li>
+     * </ul>
      *
-     * @param  identifier The identifier.
-     * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
-     *         matches the specified <code>identifier</code>.
+     * @param  name The name to compare.
+     * @return <code>true</code> if the primary name of at least one alias
+     *         matches the specified <code>name</code>.
      */
-    public boolean identifierMatches(final String identifier) {
-        return identifierMatches(this, identifiers, identifier);
+    public boolean nameMatches(final String name) {
+        return nameMatches(this, alias, name);
     }
 
     /**
-     * Returns <code>true</code> if at least one identifier matches the specified string.
-     * This method performs the same check than the {@linkplain #identifierMatches(String)
-     * non-static method} on arbitrary object implementing the OpenGIS interface.
+     * Returns <code>true</code> if either the {@linkplain #getName primary name} or at least
+     * one {@linkplain #getAlias alias} matches the specified string. This method performs the
+     * same check than the {@linkplain #nameMatches(String) non-static method} on arbitrary
+     * object implementing the OpenGIS interface.
      *
-     * @param  info The object to check.
-     * @param  identifier The identifier.
-     * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
-     *         matches the specified <code>identifier</code>.
+     * @param  object The object to check.
+     * @param  name The name.
+     * @return <code>true</code> if the primary name of at least one alias
+     *         matches the specified <code>name</code>.
      */
-    public static boolean identifierMatches(final org.opengis.referencing.IdentifiedObject info,
-                                            final String identifier)
+    public static boolean nameMatches(final org.opengis.referencing.IdentifiedObject object,
+                                      final String name)
     {
-        if (info instanceof IdentifiedObject) {
-            return ((IdentifiedObject) info).identifierMatches(identifier);
+        if (object instanceof IdentifiedObject) {
+            return ((IdentifiedObject) object).nameMatches(name);
         } else {
-            return identifierMatches(info, info.getIdentifiers(), identifier);
+            return nameMatches(object, object.getAlias(), name);
         }
     }
 
     /**
-     * Implementation of <code>identifierMatches</code> method.
+     * Implementation of <code>nameMatches</code> method.
      *
-     * @param  info The object to check.
-     * @param  identifiers The list of identifiers in <code>info</code>.
-     * @param  identifier The identifier.
-     * @return <code>true</code> if at least one info's {@linkplain #getIdentifiers identifier}
-     *         matches the specified <code>identifier</code>.
+     * @param  object The object to check.
+     * @param  alias  The list of alias in <code>object</code> (may be <code>null</code>).
+     *                This method will never modify this list. Concequently, it may be a
+     *                direct reference to an internal array.
+     * @param  name The name.
+     * @return <code>true</code> if the primary name of at least one alias
+     *         matches the specified <code>name</code>.
      */
-    private static boolean identifierMatches(final org.opengis.referencing.IdentifiedObject info,
-                                             final Identifier[] identifiers,
-                                             String identifier)
+    private static boolean nameMatches(final org.opengis.referencing.IdentifiedObject object,
+                                       final GenericName[] alias, String name)
     {
-        identifier = identifier.trim();
-        if (identifiers==null || identifiers.length==0) {
-            return identifier.equalsIgnoreCase(info.getName().toString(null).trim());
+        name = name.trim();
+        if (name.equalsIgnoreCase(object.getName().getCode().trim())) {
+            return true;
         }
-        final String code, codespace;
-        final int separator = identifier.indexOf(':');
-        if (separator >= 0) {
-            code = identifier.substring(separator+1).trim();
-            codespace = identifier.substring(0, separator).trim();
-        } else {
-            code = identifier;
-            codespace = null;
-        }
-        for (int i=0; i<identifiers.length; i++) {
-            final Identifier candidate = identifiers[i];
-            if (code.equalsIgnoreCase(candidate.getCode().trim())) {
-                if (codespace == null) {
+        if (alias != null) {
+            for (int i=0; i<alias.length; i++) {
+                if (name.equalsIgnoreCase(alias[i].asScopedName().toString().trim())) {
                     return true;
                 }
-                String check = candidate.getCodeSpace();
-                if (check != null) {
-                    check = check.trim();
-                } else {
-                    check = "";
+                if (name.equalsIgnoreCase(alias[i].asLocalName().toString().trim())) {
+                    return true;
                 }
-                return codespace.equalsIgnoreCase(check);
             }
         }
         return false;
     }
     
     /**
-     * Compares the specified object with this info for equality.
+     * Compares the specified object with this object for equality.
      *
      * @param  object The other object (may be <code>null</code>).
      * @return <code>true</code> if both objects are equal.
@@ -436,7 +553,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
      * only the properties needed for computing transformations. In other words,
      * <code>sourceCS.equals(targetCS, false)</code> returns <code>true</code> only if
      * the transformation from <code>sourceCS</code> to <code>targetCS</code> is
-     * the identity transform, no matter what {@link #getIdentifiers} saids.
+     * the identity transform, no matter what {@link #getName} saids.
      *
      * @param  object The object to compare to <code>this</code>.
      * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
@@ -448,25 +565,12 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
             if (!compareMetadata) {
                 return true;
             }
-            return equals(name,        object.name       ) &&
-                   equals(identifiers, object.identifiers) &&
-                   equals(remarks,     object.remarks    );
+            return Utilities.equals(name,        object.name       ) &&
+                      Arrays.equals(alias,       object.alias      ) &&
+                      Arrays.equals(identifiers, object.identifiers) &&
+                   Utilities.equals(remarks,     object.remarks    );
         }
         return false;
-    }
-
-    /**
-     * Compare two objects for equality. This method is equivalent to
-     * <code>object1.<b>equals</b>(object2)</code> except that one or
-     * both arguments may be null. This convenience method is provided
-     * for implementation of <code>equals</code> in subclasses.
-     *
-     * @param  object1 The first object to compare (may be <code>null</code>).
-     * @param  object2 The second object to compare (may be <code>null</code>).
-     * @return <code>true</code> if both objects are equal.
-     */
-    protected static boolean equals(final Object object1, final Object object2) {
-        return Utilities.equals(object1, object2);
     }
 
     /**
@@ -502,8 +606,8 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
                                     final org.opengis.referencing.IdentifiedObject object2,
                                     final boolean compareMetadata)
     {
-        if (!(object1 instanceof IdentifiedObject)) return equals(object1, object2);
-        if (!(object2 instanceof IdentifiedObject)) return equals(object2, object1);
+        if (!(object1 instanceof IdentifiedObject)) return Utilities.equals(object1, object2);
+        if (!(object2 instanceof IdentifiedObject)) return Utilities.equals(object2, object1);
         return equals((IdentifiedObject)object1, (IdentifiedObject)object2, compareMetadata);
     }
 
@@ -571,7 +675,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     
     /**
      * Makes sure that the specified unit is a temporal one.
-     *  This is a convenience method for subclass constructors.
+     * This is a convenience method for subclass constructors.
      *
      * @param  unit Unit to check.
      * @throws IllegalArgumentException if <code>unit</code> is not a temporal unit.
@@ -585,7 +689,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     
     /**
      * Makes sure that the specified unit is a linear one.
-     *  This is a convenience method for subclass constructors.
+     * This is a convenience method for subclass constructors.
      *
      * @param  unit Unit to check.
      * @throws IllegalArgumentException if <code>unit</code> is not a linear unit.
@@ -599,7 +703,7 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     
     /**
      * Makes sure that the specified unit is an angular one.
-     *  This is a convenience method for subclass constructors.
+     * This is a convenience method for subclass constructors.
      *
      * @param  unit Unit to check.
      * @throws IllegalArgumentException if <code>unit</code> is not an angular unit.
@@ -609,36 +713,6 @@ CHECK:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
             throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_NON_ANGULAR_UNIT_$1, unit));
         }
-    }
-
-    /**
-     * Returns a localized entry in the given map. The keys must be {@link Locale} objects
-     * and the value must be {@link String}s. If the <code>locale</code> argument is not
-     * found in the map, then this method will try to remove first the
-     * {@linkplain Locale#getVariant variant}, then the {@linkplain Locale#getCountry country}
-     * part of the locale. For example if the <code>"fr_CA"</code> locale was requested but not
-     * found, then this method will looks for the <code>"fr"</code> locale. The <code>null</code>
-     * value (which stand for unlocalized message) is tried last.
-     *
-     * @param map The map to look into.
-     * @param locale The locale to look for, or <code>null</code>.
-     */
-    protected static String getLocalized(final Map map, final Locale locale) {
-        return org.geotools.referencing.Identifier.getLocalized(map, locale);
-    }
-
-    /**
-     * Convenience method which delegate the work to {@link org.geotools.referencing.Identifier}.
-     */
-    private static Locale getLocale(final String key, final String prefix) {
-        return org.geotools.referencing.Identifier.getLocale(key, prefix);
-    }
-
-    /**
-     * Convenience method which delegate the work to {@link org.geotools.referencing.Identifier}.
-     */
-    private static Map addLocalizedString(final Map map, final Locale locale, final Object value) {
-        return org.geotools.referencing.Identifier.addLocalizedString(map, locale, value);
     }
     
     /**

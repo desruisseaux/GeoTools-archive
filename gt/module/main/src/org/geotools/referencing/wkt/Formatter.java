@@ -22,8 +22,10 @@
  */
 package org.geotools.referencing.wkt;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Locale;
+import java.util.Iterator;
+import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import javax.units.NonSI;
 import javax.units.SI;
@@ -32,6 +34,7 @@ import javax.units.UnitFormat;
 
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
+import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.parameter.ParameterDescriptor;
@@ -44,7 +47,6 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.parameter.Parameters;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -56,7 +58,6 @@ import org.geotools.resources.cts.ResourceKeys;
  * Known Text</cite> (WKT)</A>.
  *
  * A formatter is constructed with a specified locale, which will be used for querying
- * {@linkplain org.geotools.referencing.IdentifiedObject#getName names} and
  * {@linkplain org.geotools.metadata.citation.Citation#getTitle authority titles}.
  *
  * @version $Id$
@@ -80,6 +81,18 @@ public class Formatter {
      * Usually <code>']'</code>, but <code>')'</code> is legal as well.
      */
     private static final char CLOSE = ']';
+
+    /**
+     * The character used for opening an array or enumeration.
+     * Usually <code>'{'</code>.
+     */
+    private static final char OPEN_ARRAY = '{';
+
+    /**
+     * The character used for closing an array or enumeration.
+     * Usually <code>'}'</code>.
+     */
+    private static final char CLOSE_ARRAY = '}';
 
     /**
      * The character used for quote.
@@ -106,8 +119,6 @@ public class Formatter {
 
     /**
      * The preferred authority for object or parameter names.
-     *
-     * @todo Probably need a less restrictive comparaison process.
      */
     private final Citation authority = org.geotools.metadata.citation.Citation.OPEN_GIS;
 
@@ -140,7 +151,7 @@ public class Formatter {
 
     /**
      * The amount of space to write on the left side of each line. This amount is increased
-     * by <code>indentation</code> every time a {@link Formattable} object is appenned in a
+     * by <code>indentation</code> every time a {@link Formattable} object is appended in a
      * new indentation level.
      */
     private int margin;
@@ -225,7 +236,7 @@ public class Formatter {
                                     ? (IdentifiedObject) formattable : null;
         if (info != null) {
             buffer.append(QUOTE);
-            buffer.append(info.getName().toString(locale));
+            buffer.append(info.getName().getCode());
             buffer.append(QUOTE);
         }
         String keyword = formattable.formatWKT(this);
@@ -310,9 +321,8 @@ public class Formatter {
      */
     public void append(final GeneralParameterValue parameter) {
         if (parameter instanceof ParameterValueGroup) {
-            final GeneralParameterValue[] parameters = Parameters.array( (ParameterValueGroup)parameter);
-            for (int i=0; i<parameters.length; i++) {
-                append(parameters[i]);
+            for (final Iterator it=((ParameterValueGroup)parameter).values().iterator(); it.hasNext();) {
+                append((GeneralParameterValue) it.next());
             }
         }
         if (parameter instanceof ParameterValue) {
@@ -334,17 +344,41 @@ public class Formatter {
             if (unit != null) {
                 buffer.append(param.doubleValue(unit));
             } else {
-                final Object value = param.getValue();
-                final boolean isNumber = (value instanceof Number);
-                if (!isNumber) {
-                    buffer.append(QUOTE);
-                }
-                buffer.append(value);
-                if (!isNumber) {
-                    buffer.append(QUOTE);
-                }
+                append(buffer, param.getValue());
             }
             buffer.append(CLOSE);
+        }
+    }
+
+    /**
+     * Append the specified value to a string buffer. If the value is an array, then the
+     * array elements are appended recursively (i.e. the array may contains sub-array).
+     */
+    private static void append(final StringBuffer buffer, final Object value) {
+        if (value == null) {
+            buffer.append("null");
+            return;
+        }
+        if (value.getClass().isArray()) {
+            buffer.append(OPEN_ARRAY);
+            final int length = Array.getLength(value);
+            for (int i=0; i<length; i++) {
+                if (i != 0) {
+                    buffer.append(SEPARATOR);
+                    buffer.append(SPACE);
+                }
+                append(buffer, Array.get(value, i));
+            }
+            buffer.append(CLOSE_ARRAY);
+            return;
+        }
+        final boolean isNumeric = (value instanceof Number);
+        if (!isNumeric) {
+            buffer.append(QUOTE);
+        }
+        buffer.append(value);
+        if (!isNumeric) {
+            buffer.append(QUOTE);
         }
     }
 
@@ -425,7 +459,7 @@ public class Formatter {
             if (identifiers != null) {
                 for (int i=0; i<identifiers.length; i++) {
                     final Identifier id = identifiers[i];
-                    if (authority.equals(id.getAuthority())) {
+                    if (authorityMatches(id.getAuthority())) {
                         return id;
                     }
                     if (first == null) {
@@ -438,17 +472,41 @@ public class Formatter {
     }
 
     /**
+     * Checks if the specified authority can be recognized as the expected authority.
+     * This implementation do not requires an exact matches. A matching title is enough.
+     */
+    private boolean authorityMatches(final Citation citation) {
+        return authority.getTitle().toString(null).equalsIgnoreCase(
+                citation.getTitle().toString(null));
+    }
+
+    /**
      * Returns the preferred name for the specified object. If the specified
      * object contains a name from the preferred authority (usually
      * {@linkplain org.geotools.metadata.citation.Citation#OPEN_GIS OpenGIS}),
      * then this name is returned. Otherwise, the first name found is returned.
      *
-     * @param  info The object to looks for a preferred identifier.
-     * @return The preferred identifier, or <code>null</code> if none.
+     * @param  info The object to looks for a preferred name.
+     * @return The preferred name.
      */
     public String getName(final IdentifiedObject info) {
-        final Identifier identifier = getIdentifier(info);
-        return (identifier!=null) ? identifier.getCode() : info.getName().toString( null );
+        final Identifier name = info.getName();
+        if (!authorityMatches(name.getAuthority())) {
+            final GenericName[] aliases = info.getAlias();
+            if (aliases != null) {
+                final String title = authority.getTitle().toString(null);
+                for (int i=0; i<aliases.length; i++) {
+                    GenericName alias = aliases[i];
+                    final GenericName scope = alias.getScope();
+                    if (scope != null) {
+                        if (title.equalsIgnoreCase(scope.toString())) {
+                            return alias.asLocalName().toString();
+                        }
+                    }
+                }
+            }    
+        }
+        return name.getCode();
     }
 
     /**

@@ -32,6 +32,7 @@ import org.opengis.referencing.datum.PixelInCell;
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -60,7 +61,7 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
      * @param pixelInCell the way the image grid is associated with the image data attributes.
      */
     public ImageDatum(final String name, final PixelInCell pixelInCell) {
-        this(Collections.singletonMap("name", name), pixelInCell);
+        this(Collections.singletonMap(NAME_PROPERTY, name), pixelInCell);
     }
 
     /**
@@ -99,7 +100,7 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
         }
         if (super.equals(object, compareMetadata)) {
             final ImageDatum that = (ImageDatum) object;
-            return equals(this.pixelInCell, that.pixelInCell);
+            return Utilities.equals(this.pixelInCell, that.pixelInCell);
         }
         return false;
     }

@@ -487,8 +487,8 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * required if at least one rectangle may be the bounding box of a perfectly horizontal
      * or vertical line; such a bounding box has 0 width or height.
      *
-     * @param  rect1 The first rectangle to test.
-     * @param  rect2 The second rectangle to test.
+     * @param  outter The first rectangle to test.
+     * @param  inner The second rectangle to test.
      * @return <code>true</code> if the interior of <code>inner</code> is inside the interior
      *         and/or the edge of <code>outter</code>.
      *

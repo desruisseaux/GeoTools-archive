@@ -23,26 +23,25 @@ package org.geotools.referencing;
 import java.io.*;
 import java.util.*;
 import javax.units.SI;
-import java.awt.geom.AffineTransform;
 import junit.framework.*;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.MathTransform;
+import org.opengis.parameter.InvalidParameterValueException;
 
 // Geotools dependencies
-import org.geotools.parameter.*;
 import org.geotools.referencing.*;
 import org.geotools.referencing.cs.*;
 import org.geotools.referencing.crs.*;
 import org.geotools.referencing.datum.*;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.util.SimpleInternationalString;
+import org.geotools.metadata.citation.Citation;
 
 
 /**
- * Test the creation of {@link Info} and its subclasses. Some basic features and
+ * Test the creation of {@link IdentifiedObject} and its subclasses. Some basic features and
  * simple <cite>Well Know Text</cite> (WKT) formatting are also tested.
  *
  * @version $Id$
@@ -77,53 +76,105 @@ public class BasicTest extends TestCase {
      * the correct value.
      */
     public void testIdentifier() {
-        if (true) return;
-        Map properties = new HashMap();
-        properties.put("code",          "This is a code");
-        properties.put("codeSpace",     "This is a code space");
-        properties.put("version",       "This is a version");
-        properties.put("dummy",         "Doesn't matter");
-        properties.put("remarks",       "There is remarks");
-        properties.put("remarks_fr",    "Voici des remarques");
-        properties.put("remarks_fr_CA", "Pareil");
+        final Map properties = new HashMap();
+        assertNull(properties.put("code",          "This is a code"));
+        assertNull(properties.put("authority",     "This is an authority"));
+        assertNull(properties.put("version",       "This is a version"));
+        assertNull(properties.put("dummy",         "Doesn't matter"));
+        assertNull(properties.put("remarks",       "There is remarks"));
+        assertNull(properties.put("remarks_fr",    "Voici des remarques"));
+        assertNull(properties.put("remarks_fr_CA", "Pareil"));
 
         Identifier identifier = new Identifier(properties);
         assertEquals("code",          "This is a code",        identifier.getCode());
-        assertEquals("codeSpace",     "This is a code space",  identifier.getCodeSpace());
+        assertEquals("authority",     "This is an authority",  identifier.getAuthority().getTitle().toString());
         assertEquals("version",       "This is a version",     identifier.getVersion());
-        assertEquals("remarks",       "There is remarks",      identifier.getRemarks(Locale.ENGLISH));
-        assertEquals("remarks_fr",    "Voici des remarques",   identifier.getRemarks(Locale.FRENCH));
-        assertEquals("remarks_fr_CA", "Pareil",                identifier.getRemarks(Locale.CANADA_FRENCH));
-        assertEquals("remarks_fr_BE", "Voici des remarques",   identifier.getRemarks(new Locale("fr", "BE")));
+        assertEquals("remarks",       "There is remarks",      identifier.getRemarks().toString(Locale.ENGLISH));
+        assertEquals("remarks_fr",    "Voici des remarques",   identifier.getRemarks().toString(Locale.FRENCH));
+        assertEquals("remarks_fr_CA", "Pareil",                identifier.getRemarks().toString(Locale.CANADA_FRENCH));
+        assertEquals("remarks_fr_BE", "Voici des remarques",   identifier.getRemarks().toString(new Locale("fr", "BE")));
+
+        if (false) {
+            // Disabled in order to avoid logging a warning (it disturb the JUnit output)
+            properties.put("remarks", new SimpleInternationalString("Overrides remarks"));
+            identifier = new Identifier(properties);
+            assertEquals("remarks", "Overrides remarks", identifier.getRemarks().toString(Locale.ENGLISH));
+        }
+
+        assertNotNull(properties.remove("authority"));
+        assertNull   (properties.put("AutHOrITY", new Citation("An other authority")));
+        identifier = new Identifier(properties);
+        assertEquals("authority", "An other authority", identifier.getAuthority().getTitle().toString(Locale.ENGLISH));
+
+        assertNotNull(properties.remove("AutHOrITY"));
+        assertNull   (properties.put("authority", Locale.CANADA));
+        try {
+            identifier = new Identifier(properties);
+            fail();
+        } catch (InvalidParameterValueException exception) {
+            // This is the expected exception
+        }
+    }
+
+    /**
+     * Test {@link IdentifiedObject}.
+     */
+    public void testIdentifiedObject() {
+        final Map properties = new HashMap();
+        assertNull(properties.put("name",             "This is a name"));
+        assertNull(properties.put("remarks",          "There is remarks"));
+        assertNull(properties.put("remarks_fr",       "Voici des remarques"));
+        assertNull(properties.put("dummy",            "Doesn't matter"));
+        assertNull(properties.put("dummy_fr",         "Rien d'intéressant"));
+        assertNull(properties.put("local",            "A custom localized string"));
+        assertNull(properties.put("local_fr",         "Une chaîne personalisée"));
+        assertNull(properties.put("anchorPoint",      "Anchor point"));
+        assertNull(properties.put("realizationEpoch", "Realization epoch"));
+        assertNull(properties.put("validArea",        "Valid area"));
+
+        final Map remaining = new HashMap();
+        final IdentifiedObject reference = new IdentifiedObject(properties, remaining, new String[] {"local"});
+        assertEquals("name",       "This is a name",         reference.getName().getCode());
+        assertEquals("remarks",    "There is remarks",       reference.getRemarks().toString(null));
+        assertEquals("remarks_fr", "Voici des remarques",    reference.getRemarks().toString(Locale.FRENCH));
+
+        // Check extra properties
+        assertEquals("Size:",    6,                    remaining.size());
+        assertEquals("dummy",    "Doesn't matter",     remaining.get("dummy"));
+        assertEquals("dummy_fr", "Rien d'intéressant", remaining.get("dummy_fr"));
+        assertEquals("local",    "A custom localized string", ((InternationalString) remaining.get("local")).toString(null));
+        assertEquals("local_fr", "Une chaîne personalisée",   ((InternationalString) remaining.get("local")).toString(Locale.FRENCH));
+        assertFalse ("local_fr", remaining.containsKey("local_fr"));
+
+        // Check the case of some special property keys
+        assertEquals("anchorPoint",      "Anchor point",      remaining.get("anchorPoint"));
+        assertEquals("realizationEpoch", "Realization epoch", remaining.get("realizationEpoch"));
+        assertEquals("validArea",        "Valid area",        remaining.get("validArea"));
     }
 
     /**
      * Test {@link ReferenceSystem}.
      */
     public void testReferenceSystem() {
-        if (true) return;
-        Map properties = new HashMap();
-        properties.put("name",          "This is a name");
-        properties.put("name_fr",       "Voici un nom");                
-        properties.put("scope",         "This is a scope");
-        properties.put("scope_fr",      "Valide dans ce domaine");
-        properties.put("remarks",       "There is remarks");
-        properties.put("remarks_fr",    "Voici des remarques");
+        final Map properties = new HashMap();
+        assertNull(properties.put("name",       "This is a name"));
+        assertNull(properties.put("scope",      "This is a scope"));
+        assertNull(properties.put("scope_fr",   "Valide dans ce domaine"));
+        assertNull(properties.put("remarks",    "There is remarks"));
+        assertNull(properties.put("remarks_fr", "Voici des remarques"));
 
-        ReferenceSystem reference = new ReferenceSystem(properties);
-        assertEquals("name",          "This is a name",         reference.getName   (null));
-        assertEquals("name_fr",       "Voici un nom",           reference.getName   (Locale.FRENCH));
-        assertEquals("scope",         "This is a scope",        reference.getScope  (null));
-        assertEquals("scope_fr",      "Valide dans ce domaine", reference.getScope  (Locale.FRENCH));
-        assertEquals("remarks",       "There is remarks",       reference.getRemarks(null));
-        assertEquals("remarks_fr",    "Voici des remarques",    reference.getRemarks(Locale.FRENCH));
+        final ReferenceSystem reference = new ReferenceSystem(properties);
+        assertEquals("name",          "This is a name",         reference.getName()   .getCode());
+        assertEquals("scope",         "This is a scope",        reference.getScope()  .toString(null));
+        assertEquals("scope_fr",      "Valide dans ce domaine", reference.getScope()  .toString(Locale.FRENCH));
+        assertEquals("remarks",       "There is remarks",       reference.getRemarks().toString(null));
+        assertEquals("remarks_fr",    "Voici des remarques",    reference.getRemarks().toString(Locale.FRENCH));
     }
 
     /**
      * Tests {@link CoordinateSystemAxis} constants.
      */
     public void testAxis() {
-        if (true) return;
         // Test Well Know Text
         assertEquals("x",         "AXIS[\"x\", EAST]",         CoordinateSystemAxis.X        .toWKT(0));
         assertEquals("y",         "AXIS[\"y\", NORTH]",        CoordinateSystemAxis.Y        .toWKT(0));
@@ -139,10 +190,10 @@ public class BasicTest extends TestCase {
         assertEquals("Latitude",  "AXIS[\"Spherical latitude\", NORTH]", CoordinateSystemAxis.SPHERICAL_LATITUDE .toWKT(0));
 
         // Test localization
-        assertEquals("English", "Time",  CoordinateSystemAxis.TIME.getName(Locale.ENGLISH));
-        assertEquals("French",  "Temps", CoordinateSystemAxis.TIME.getName(Locale.FRENCH ));
+        assertEquals("English", "Time",  CoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.ENGLISH));
+        assertEquals("French",  "Temps", CoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.FRENCH ));
 
-        // Test 
+        // Test geocentric
         assertFalse("X",         CoordinateSystemAxis.X        .equals(CoordinateSystemAxis.GEOCENTRIC_X,        false));
         assertFalse("Longitude", CoordinateSystemAxis.LONGITUDE.equals(CoordinateSystemAxis.GEODETIC_LONGITUDE,  false));
         assertFalse("Longitude", CoordinateSystemAxis.LONGITUDE.equals(CoordinateSystemAxis.SPHERICAL_LONGITUDE, false));
@@ -152,25 +203,23 @@ public class BasicTest extends TestCase {
      * Tests {@link CoordinateSystem}.
      */
     public void testCoordinateSystems() {
-        if (true) return;
         // Test dimensions
         assertEquals("Cartesian 2D",   2, CartesianCS  .PROJECTED  .getDimension());
         assertEquals("Cartesian 3D",   3, CartesianCS  .GEOCENTRIC .getDimension());
         assertEquals("Ellipsoidal 2D", 2, EllipsoidalCS.GEODETIC_2D.getDimension());
         assertEquals("Ellipsoidal 3D", 3, EllipsoidalCS.GEODETIC_3D.getDimension());
         assertEquals("Vertical",       1, VerticalCS   .DEPTH      .getDimension());
-        assertEquals("Temporal",       1, TemporalCS   .DAYS       .getDimension());
+        assertEquals("Temporal",       1, TimeCS       .DAYS       .getDimension());
     }
 
     /**
      * Test {@link Datum} and well-know text formatting.
      */
     public void testDatum() {
-        if (true) return;
         // WGS84 components and equalities
         assertEquals("Ellipsoid",     Ellipsoid    .WGS84,     GeodeticDatum.WGS84.getEllipsoid());
         assertEquals("PrimeMeridian", PrimeMeridian.GREENWICH, GeodeticDatum.WGS84.getPrimeMeridian());
-        assertFalse ("VerticalDatum", VerticalDatum.GEOIDAL.equals(VerticalDatum.ELLIPSOIDAL));
+        assertFalse ("VerticalDatum", VerticalDatum.GEOIDAL .equals( VerticalDatum.ELLIPSOIDAL));
         assertEquals("Geoidal",       VerticalDatumType.GEOIDAL,     VerticalDatum.GEOIDAL    .getVerticalDatumType());
         assertEquals("Ellipsoidal",   VerticalDatumType.ELLIPSOIDAL, VerticalDatum.ELLIPSOIDAL.getVerticalDatumType());
 
@@ -183,9 +232,8 @@ public class BasicTest extends TestCase {
                                       "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]]", GeodeticDatum.WGS84      .toWKT(0));
 
         // Test properties
-        Map properties = new HashMap();
+        final Map properties = new HashMap();
         properties.put("name",          "This is a name");
-        properties.put("name_fr",       "Voici un nom");
         properties.put("scope",         "This is a scope");
         properties.put("scope_fr",      "Valide dans ce domaine");
         properties.put("remarks",       "There is remarks");
@@ -193,30 +241,19 @@ public class BasicTest extends TestCase {
 
         GeodeticDatum datum = new GeodeticDatum(properties,
                                                 Ellipsoid.createEllipsoid("Test", 1000, 1000, SI.METER),
-                                                new PrimeMeridian("Test", 12));
-        assertEquals("name",          "This is a name",         datum.getName   (null));
-        assertEquals("name_fr",       "Voici un nom",           datum.getName   (Locale.FRENCH));
-        assertEquals("scope",         "This is a scope",        datum.getScope  (null));
-        assertEquals("scope_fr",      "Valide dans ce domaine", datum.getScope  (Locale.FRENCH));
-        assertEquals("remarks",       "There is remarks",       datum.getRemarks(null));
-        assertEquals("remarks_fr",    "Voici des remarques",    datum.getRemarks(Locale.FRENCH));
-    }
+                                                new PrimeMeridian("Test", 12), null);
 
-    /**
-     * Test {@link Parameter}.
-     */
-    public void testParameter() {
-        if (true) return;
-        assertEquals(   "intValue", 14,  new Parameter("Test", 14).intValue());
-        assertEquals("doubleValue", 27,  new Parameter("Test", 27).doubleValue(), 0);
-        assertEquals("doubleValue", 300, new Parameter("Test",  3, SI.METER).doubleValue(SI.CENTI(SI.METER)), 0);
+        assertEquals("name",          "This is a name",         datum.getName   ().getCode());
+        assertEquals("scope",         "This is a scope",        datum.getScope  ().toString(null));
+        assertEquals("scope_fr",      "Valide dans ce domaine", datum.getScope  ().toString(Locale.FRENCH));
+        assertEquals("remarks",       "There is remarks",       datum.getRemarks().toString(null));
+        assertEquals("remarks_fr",    "Voici des remarques",    datum.getRemarks().toString(Locale.FRENCH));
     }
 
     /**
      * Tests {@link CoordinateReferenceSystem}.
      */
     public void testCoordinateReferenceSystems() {
-        if (true) return;
         // Test dimensions
         assertEquals("WGS84 2D", 2, GeographicCRS.WGS84   .getCoordinateSystem().getDimension());
         assertEquals("WGS84 3D", 3, GeographicCRS.WGS84_3D.getCoordinateSystem().getDimension());
@@ -233,54 +270,24 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Test WKT formatting of transforms backed by matrix.
-     */
-    public void testMatrix() {
-        if (true) return;
-        final Formatter  formatter = new Formatter(null);
-        final GeneralMatrix matrix = new GeneralMatrix(4);
-        matrix.setElement(0,2,  4);
-        matrix.setElement(1,0, -2);
-        matrix.setElement(2,3,  7);
-        MathTransform transform = ProjectiveTransform.create(matrix);
-        assertFalse(transform instanceof AffineTransform);
-        formatter.append(transform);
-        assertEquals("PARAM_MT[\"Affine\", "          +
-                     "PARAMETER[\"num_row\", 4], "    +
-                     "PARAMETER[\"num_col\", 4], "    +
-                     "PARAMETER[\"elt_0_2\", 4.0], "  +
-                     "PARAMETER[\"elt_1_0\", -2.0], " +
-                     "PARAMETER[\"elt_2_3\", 7.0]]", formatter.toString());
-        matrix.setSize(3,3);
-        transform = ProjectiveTransform.create(matrix);
-        assertTrue(transform instanceof AffineTransform);
-        formatter.clear();
-        formatter.append(transform);
-        assertEquals("PARAM_MT[\"Affine\", "          +
-                     "PARAMETER[\"num_row\", 3], "    +
-                     "PARAMETER[\"num_col\", 3], "    +
-                     "PARAMETER[\"elt_0_2\", 4.0], "  +
-                     "PARAMETER[\"elt_1_0\", -2.0]]", formatter.toString());
-    }
-
-    /**
      * Test serialization of various objects.
      */
     public void testSerialization() throws IOException, ClassNotFoundException {
-        if (true) return;
-        serialize(GeodeticDatum.WGS84);
-        serialize(PrimeMeridian.GREENWICH);
+        serialize(CoordinateSystemAxis.X);
+        serialize(CoordinateSystemAxis.GEOCENTRIC_X);
+        serialize(CoordinateSystemAxis.GEODETIC_LONGITUDE);
         serialize(CartesianCS.PROJECTED);
         serialize(CartesianCS.GEOCENTRIC);
         serialize(EllipsoidalCS.GEODETIC_2D);
         serialize(EllipsoidalCS.GEODETIC_3D);
+        serialize(GeodeticDatum.WGS84);
+        serialize(PrimeMeridian.GREENWICH);
     }
 
     /**
      * Test the serialization of the given object.
      */
     private static void serialize(final Object object) throws IOException, ClassNotFoundException {
-        if (true) return;
         final ByteArrayOutputStream out  = new ByteArrayOutputStream();
         final ObjectOutputStream    outs = new ObjectOutputStream(out);
         outs.writeObject(object);
@@ -291,5 +298,6 @@ public class BasicTest extends TestCase {
         in.close();
 
         assertEquals("Serialization", object, test);
+        assertEquals("Serialization", object.hashCode(), test.hashCode());
     }
 }

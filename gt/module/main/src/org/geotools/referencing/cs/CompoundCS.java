@@ -63,7 +63,7 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
      * @param cs The set of coordinate syztem.
      */
     public CompoundCS(CoordinateSystem[] cs) {
-        super(getName(cs=clone(cs), null), getAxis(cs));
+        super(getName(cs=clone(cs)), getAxis(cs));
         this.cs = cs;
     }
 
@@ -107,29 +107,15 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
      * @param cs The coordinate systems.
      * @param locale The locale for the name.
      */
-    private static String getName(final CoordinateSystem[] cs, final Locale locale) {
+    private static String getName(final CoordinateSystem[] cs) {
         final StringBuffer buffer = new StringBuffer();
         for (int i=0; i<cs.length; i++) {
             if (buffer.length() != 0) {
                 buffer.append(" / ");
             }
-            buffer.append(cs[i].getName().toString(locale));
+            buffer.append(cs[i].getName().getCode());
         }
         return buffer.toString();
-    }
-
-    /**
-     * The name by which this coordinate system is identified. 
-     *
-     * @param  locale The desired locale for the name to be returned,
-     *         or <code>null</code> for a non-localized string.
-     * @return The remarks, or <code>null</code> if not available.
-     */
-    public String getName(Locale locale) {
-        if (locale == null) {
-            return super.getName(locale);
-        }
-        return getName(cs, locale);
     }
 
     /**

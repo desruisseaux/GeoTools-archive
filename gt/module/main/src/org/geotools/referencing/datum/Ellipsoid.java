@@ -33,6 +33,7 @@ import javax.units.Unit;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.XMath;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -148,7 +149,7 @@ public class Ellipsoid extends IdentifiedObject implements org.opengis.referenci
                                             final double semiMinorAxis,
                                             final Unit   unit)
     {
-        return createEllipsoid(Collections.singletonMap("name", name),
+        return createEllipsoid(Collections.singletonMap(NAME_PROPERTY, name),
                                semiMajorAxis, semiMinorAxis, unit);
     }
 
@@ -189,7 +190,7 @@ public class Ellipsoid extends IdentifiedObject implements org.opengis.referenci
                                                   final double inverseFlattening,
                                                   final Unit   unit)
     {
-        return createFlattenedSphere(Collections.singletonMap("name", name),
+        return createFlattenedSphere(Collections.singletonMap(NAME_PROPERTY, name),
                                      semiMajorAxis, inverseFlattening, unit);
     }
     
@@ -451,7 +452,7 @@ public class Ellipsoid extends IdentifiedObject implements org.opengis.referenci
                    Double.doubleToLongBits(this.semiMajorAxis)     == Double.doubleToLongBits(that.semiMajorAxis)     &&
                    Double.doubleToLongBits(this.semiMinorAxis)     == Double.doubleToLongBits(that.semiMinorAxis)     &&
                    Double.doubleToLongBits(this.inverseFlattening) == Double.doubleToLongBits(that.inverseFlattening) &&
-                   equals(this.unit, that.unit);
+                   Utilities.equals(this.unit, that.unit);
         }
         return false;
     }

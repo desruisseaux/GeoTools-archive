@@ -88,6 +88,7 @@ public interface ResourceKeys
     public static final int WESTING                                     =    64;
 
     public static final int WARNING_AMBIGUOUS_ELLIPSOID                 =    65;
+    public static final int WARNING_LOCALES_DISCARTED                   =   128;
     public static final int WARNING_UNKNOW_PARAMETER_$3                 =    66;
 
     public static final int ERROR_ANGLE_OVERFLOW_$1                     =    67;
@@ -95,6 +96,7 @@ public interface ResourceKeys
     public static final int ERROR_AZIMUTH_OUT_OF_RANGE_$1               =    69;
     public static final int ERROR_CANT_COMPUTE_DERIVATIVE               =    70;
     public static final int ERROR_CANT_CONCATENATE_CS_$2                =    71;
+    public static final int ERROR_CANT_CREATE_FROM_TEXT_$1              =   129;
     public static final int ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1      =    72;
     public static final int ERROR_COLINEAR_AXIS_$2                      =    73;
     public static final int ERROR_DISTANCE_OUT_OF_RANGE_$4              =    74;

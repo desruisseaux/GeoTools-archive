@@ -76,7 +76,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
     public ConcatenatedOperation(final String name,
                                  final CoordinateOperation[] operations)
     {
-        this(Collections.singletonMap("name", name), operations);
+        this(Collections.singletonMap(NAME_PROPERTY, name), operations);
     }
 
     /**

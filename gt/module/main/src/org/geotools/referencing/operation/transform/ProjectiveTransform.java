@@ -55,7 +55,7 @@ import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.parameter.MatrixParameterValues;
 import org.geotools.parameter.MatrixParameters;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.parameter.ParameterGroupDescriptor;
+import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -442,7 +442,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          *
          * @todo We should register EPSG parameter identifiers (A0, A1, A2, B0, B1, B2) as well.
          */
-        static final ParameterGroupDescriptor PARAMETERS;
+        static final ParameterDescriptorGroup PARAMETERS;
         static {
             final Map properties = new HashMap(4);
             properties.put("name", "Affine");

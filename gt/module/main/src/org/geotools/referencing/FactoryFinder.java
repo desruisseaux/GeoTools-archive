@@ -92,16 +92,19 @@ public final class FactoryFinder {
     /**
      * Returns the providers for the specified category. This method will initialize
      * the {@link ServiceRegistry} and scan for plugin the first time it will be invoked.
+     *
+     * @todo revisit
      */
     private static Iterator getProviders(final Class category) {
         assert Thread.holdsLock(FactoryFinder.class);
         if (registry == null) {
-            registry = new ServiceRegistry(Arrays.asList(new Class[] {
-                                           DatumFactory.class,
-                                           CSFactory.class,
-                                           CRSFactory.class,
-                                           MathTransformFactory.class,
-                                           CoordinateOperationFactory.class}).iterator());
+            throw new RuntimeException();
+//            registry = new ServiceRegistry(Arrays.asList(new Class[] {
+//                                           DatumFactory.class,
+//                                           CSFactory.class,
+//                                           CRSFactory.class,
+//                                           MathTransformFactory.class,
+//                                           CoordinateOperationFactory.class}).iterator());
         }
         Iterator iterator = registry.getServiceProviders(category, false);
         if (!iterator.hasNext()) {

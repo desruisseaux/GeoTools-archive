@@ -225,7 +225,7 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
     {
         GeodeticDatum datum;
         try {
-            datum = new org.geotools.referencing.datum.GeodeticDatum(properties, ellipsoid, primeMeridian);
+            datum = new org.geotools.referencing.datum.GeodeticDatum(properties, ellipsoid, primeMeridian, null);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -532,16 +532,16 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      * @param  axis The axis.
      * @throws FactoryException if the object creation failed.
      */
-    public TemporalCS createTemporalCS(Map            properties,
-                                       CoordinateSystemAxis axis) throws FactoryException
+    public TimeCS createTimeCS(Map            properties,
+                               CoordinateSystemAxis axis) throws FactoryException
     {
-        TemporalCS cs;
+        TimeCS cs;
         try {
-            cs = new org.geotools.referencing.cs.TemporalCS(properties, axis);
+            cs = new org.geotools.referencing.cs.TimeCS(properties, axis);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
-        cs = (TemporalCS) canonicalize(cs);
+        cs = (TimeCS) canonicalize(cs);
         return cs;
     }
 
@@ -856,7 +856,7 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
      */
     public TemporalCRS createTemporalCRS(Map      properties,
                                          TemporalDatum datum,
-                                         TemporalCS       cs) throws FactoryException
+                                         TimeCS           cs) throws FactoryException
     {
         TemporalCRS crs;
         try {
