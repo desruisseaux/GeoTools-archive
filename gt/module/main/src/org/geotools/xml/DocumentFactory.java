@@ -18,6 +18,7 @@ package org.geotools.xml;
 
 import org.xml.sax.SAXException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 import java.util.logging.Level;
@@ -95,6 +96,37 @@ public class DocumentFactory {
 
         try {
             parser.parse(desiredDocument.toString(), xmlContentHandler);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
+
+        return xmlContentHandler.getDocument();
+    }
+
+    /**
+     * <p>
+     * Parses the instance data provided. This method assumes that the XML
+     * document is fully described using XML Schemas. Failure to be fully
+     * described as Schemas will result in errors, as opposed to a vid parse.
+     * </p>
+     *
+     * @param desiredDocument
+     * @param hints May be null.
+     * @param level
+     *
+     * @return
+     *
+     * @throws SAXException
+     */
+    public static Object getInstance(InputStream is, Map hints, Level level)
+        throws SAXException {
+        SAXParser parser = getParser();
+
+        XMLSAXHandler xmlContentHandler = new XMLSAXHandler(hints);
+        XMLSAXHandler.setLogLevel(level);
+
+        try {
+            parser.parse(is, xmlContentHandler);
         } catch (IOException e) {
             throw new SAXException(e);
         }

@@ -25,6 +25,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -94,6 +95,19 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     public XMLSAXHandler(URI intendedDocument, Map hints) {
         instanceDocument = intendedDocument;
+        this.hints = hints;
+    }
+    /**
+     * <p>
+     * This contructor is intended to create an XMLSAXHandler to be used when
+     * parsing an XML instance document. The instance document's uri is also
+     * be provided, as this will allow the parser to resolve relative uri's.
+     * </p>
+     *
+     * @param intendedDocument
+     * @param hints DOCUMENT ME!
+     */
+    public XMLSAXHandler(Map hints) {
         this.hints = hints;
     }
 
@@ -212,7 +226,12 @@ e.printStackTrace();
                         String uri = targ2uri[(i * 2) + 1];
                         String targ = targ2uri[i * 2];
                         String prefix = (String) schemaProxy.get(targ);
-                        URI targUri = instanceDocument.resolve(uri);
+                        URI targUri = null;
+                        try {
+                            targUri = instanceDocument==null?new URI(uri):instanceDocument.resolve(uri);
+                        } catch (URISyntaxException e1) {
+                            logger.warning(e1.toString());
+                        }
                         ehf.startPrefixMapping(prefix, targ, targUri);
                         schemaProxy.remove(targ);
                     }
