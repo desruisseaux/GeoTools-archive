@@ -5,8 +5,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.dir.AbstractFileDataStore;
 import org.geotools.feature.FeatureType;
 import org.geotools.xml.gml.FCBuffer;
 

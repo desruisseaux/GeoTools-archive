@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
-import org.geotools.data.dir.FileDataStoreFactorySpi;
+import org.geotools.data.FileDataStoreFactorySpi;
 
 /**
  * <p> 
