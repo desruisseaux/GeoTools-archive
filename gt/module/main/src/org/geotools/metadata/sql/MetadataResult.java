@@ -20,6 +20,7 @@
 package org.geotools.metadata.sql;
 
 // J2SE dependencies
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -139,7 +140,8 @@ final class MetadataResult {
      * @throws SQLException if an SQL operation failed.
      */
     public Object getArray(final int identifier, final String columnName) throws SQLException {
-        return getResultSet(identifier).getArray(columnName).getArray();
+        final Array array = getResultSet(identifier).getArray(columnName);
+        return (array!=null) ? array.getArray() : null;
     }
 
     /**

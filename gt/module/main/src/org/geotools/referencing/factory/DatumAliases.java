@@ -108,7 +108,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     /**
      * The column separators in the file to parse.
      */
-    private static final String SEPARATORS = ",";
+    private static final String SEPARATORS = ";";
 
     /**
      * Array used as a marker for alias that has been discarted because never used.

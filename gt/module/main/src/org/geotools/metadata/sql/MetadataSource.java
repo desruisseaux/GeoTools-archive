@@ -39,7 +39,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 // OpenGIS dependencies
 import org.opengis.metadata.MetaData;
@@ -200,14 +201,14 @@ public class MetadataSource {
          */
         if (Collection.class.isAssignableFrom(valueType)) {
             final Collection collection;
-            if (Set.class.isAssignableFrom(valueType)) {
-                collection = new LinkedHashSet();
-            } else if (List.class.isAssignableFrom(valueType)) {
+            if (List.class.isAssignableFrom(valueType)) {
                 collection = new ArrayList();
+            } else if (SortedSet.class.isAssignableFrom(valueType)) {
+                collection = new TreeSet();
             } else {
-                // TODO: localize
-                throw new MetadataException("Unsupported collection type: "+getClassName(valueType));
+                collection = new LinkedHashSet();
             }
+            assert valueType.isAssignableFrom(collection.getClass());
             final Object elements = result.getArray(identifier, columnName);
             if (elements != null) {
                 final Class  elementType = getElementType(className, method);
