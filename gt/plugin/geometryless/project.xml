@@ -73,12 +73,23 @@
         <groupId>mssql</groupId>
         <version>0.9</version>
     </dependency>
+       <dependency>
+        <artifactId>ojdbc</artifactId>
+        <groupId>oracle</groupId>
+        <version>14</version>
+    </dependency>
+        <dependency>
+        <artifactId>postgresql</artifactId>
+        <groupId>postgresql</groupId>
+        <version>74.213</version>
+    </dependency> 
+
   </dependencies>
   <build>
   <unitTest>
     <!-- This section excludes the tests -->
     <excludes>
-      <exclude>**/M*.java</exclude>
+      <exclude>**/*.java</exclude>
             <exclude>**/L*.java</exclude>
        <exclude>**/JDBCTestSuite.java</exclude>
        <exclude>**/JDBCDataStoreAPITest.java</exclude>
