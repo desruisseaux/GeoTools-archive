@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <pomVersion>3</pomVersion>
   <name>geotools-gtbuild</name>
@@ -270,7 +270,7 @@
     </dependency>
     <dependency>
       <id>geoapi</id>
-      <version>20050210</version>
+      <version>20050211</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <!-- <dependency>
