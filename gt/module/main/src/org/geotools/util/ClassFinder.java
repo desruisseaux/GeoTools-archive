@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,19 +16,21 @@
  */
 package org.geotools.util;
 
+// J2SE dependencies
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
 import javax.imageio.spi.ServiceRegistry;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
+
 /**
- * A utility class that uses a pre-configured ServiceRegistry to search for
- * provides and catagories.
+ * A utility class that uses a pre-configured {@link ServiceRegistry} to search for
+ * providers and catagories.
  * 
  * Example use:
  * <pre>
@@ -39,6 +41,8 @@ import org.geotools.resources.Utilities;
  * </pre>
  *
  * @author rgould
+ *
+ * @deprecated Use {@link org.geotools.factory.FactoryRegistry} instead.
  */
 public class ClassFinder {
     /**
@@ -53,7 +57,7 @@ public class ClassFinder {
      *
      * @param registry DOCUMENT ME!
      */
-    private static synchronized void scanForPlugins(ServiceRegistry registry) {
+    private static void scanForPlugins(ServiceRegistry registry) {
         /*
          * Note: if the registry was not yet initialized, then there is no need to scan for
          * plug-ins now, since they will be scanned the first time a service provider will

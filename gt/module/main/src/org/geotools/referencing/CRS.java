@@ -1,7 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le D�veloppement
+ * (C) 2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,10 +18,12 @@
  */
 package org.geotools.referencing;
 
+// J2SE dependencies
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -32,9 +33,10 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.CoordinateOperation;
 
+
 /**
- * This is a simple utility class for making use of the
- * CoordinateReferenceSystem and assocaited Factory implementations.
+ * Simple utility class for making use of the {@link CoordinateReferenceSystem}
+ * and associated {@link Factory} implementations.
  * <p>
  * Other proposals:
  * <ul>
@@ -45,12 +47,21 @@ import org.opengis.referencing.operation.CoordinateOperation;
  * <p>
  * <b>Note:</b> this utility class is made up of static final functions, this class is
  * not a Factory or a Builder. It makes use of the GeoAPI Factory interfaces
- * provided by FactoryFinder in the most direct manner possible.
+ * provided by {@link FactoryFinder} in the most direct manner possible.
  * </p>
+ * @version $Id$
  * @author Jody Garnett, Refractions Research
  * @since 2.1.0
  */
 public class CRS {
+    /**
+     * Implement this method to visit each available {@link CoordinateOperationFactory}
+     * known to {@link FactoryFinder}.
+     *
+     * @version $Id$
+     * @author Jody Garnett, Refractions Research
+     * @since 2.1.0
+     */
     public interface OperationVisitor {
         /**
          * Implement this method to visit each available CoordinateOperationFactory
@@ -64,6 +75,7 @@ public class CRS {
          */
         public Object  factory( CoordinateOperationFactory factory ) throws FactoryException;
     }
+
     /**
      * Grab transform between two CoordianteReference Systems.
      * <p>
@@ -79,7 +91,7 @@ public class CRS {
      */
     public static MathTransform transform( final CoordinateReferenceSystem from, final CoordinateReferenceSystem to ) throws FactoryException {
         List list = visit( new OperationVisitor() {
-            public Object factory( CoordinateOperationFactory factory ) throws FactoryException{
+            public Object factory( CoordinateOperationFactory factory ) throws FactoryException {
                 CoordinateOperation opperation = factory.createOperation( from, to );                
                 return opperation.getMathTransform();                
             }
@@ -124,6 +136,7 @@ public class CRS {
         }
         return list;
     }
+
     /**
      * Locate for CoordinateReferenceSystem for specific code.
      * <p>

@@ -24,14 +24,16 @@ package org.geotools.referencing.cs;
 
 // J2SE dependencies and extensions
 import java.util.Map;
-
 import javax.units.Converter;
 import javax.units.Unit;
 
-import org.geotools.measure.Measure;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.measure.Measure;
 
 
 /**

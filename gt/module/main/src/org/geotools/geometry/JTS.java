@@ -18,14 +18,25 @@
  */
 package org.geotools.geometry;
 
-import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
-import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
+// OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
+// Geotools dependencies
+import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
+
+// JTS dependencies
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import java.util.NoSuchElementException;
+
 
 /**
  * JTS Geometry utility methods, bringing geotools to JTS.
@@ -77,5 +88,29 @@ public class JTS {
     	transformer.setMathTransform(transform);
 		return transformer.transform(geom);	    
 	}
-	
+    
+    /**
+     * Transforms the envelope from its current crs to WGS84 coordinate system.
+     *
+     * @param env The envelope to transform.
+     * @param crs The CRS the envelope is currently in.
+     * @return The envelope transformed to be in WGS84 CRS.
+     * @throws OperationNotFoundException
+     * @throws NoSuchElementException
+     * @throws FactoryException
+     * @throws TransformException
+     *
+     * @todo We may catch some exceptions and rethrown them in a simplier one.
+     *       After all, this is a convenience method (not an "official" one).
+     */
+    public static Envelope toGeographic(Envelope env, CoordinateReferenceSystem crs)
+            throws OperationNotFoundException, NoSuchElementException, FactoryException, TransformException
+    {
+    	if (crs.equals(GeographicCRS.WGS84)) {
+            return env;
+        }
+        MathTransform transform = FactoryFinder.getCoordinateOperationFactory()
+                .createOperation(crs, GeographicCRS.WGS84).getMathTransform();
+        return JTS.transform(env, transform);
+    }
 }

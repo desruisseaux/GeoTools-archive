@@ -2,19 +2,21 @@
 
 <HTML>
   <HEAD>
-    <TITLE>org.geotools.data.factory</TITLE>
+    <TITLE>org.geotools.factory</TITLE>
   </HEAD>
   <BODY>
-    Utility classes which enable dynamic binding to factory implementations at
-runtime.<p>
-    Because the core module consists almost excusivly of interfaces Factories
-play a vital role in how developers use the API.<p>
-    Although the interfaces that are declared in core are implemented in
-defaultcore you should not use classes in defaultcore directly.  Instead you
-should use factories. <br> But if you can't use defaultcore how can you get at the
-implementations of factories that are in it? <p> 
-
-The answer is the FactoryFinder in this package, read its documentation for
-details on how it works.
+    Utility classes which enable dynamic binding to factory implementations at runtime.
+    
+    <P ALIGN="justify">Because Geotools core API consists almost excusivly of interfaces
+    (including <A HREF="http://geoapi.sourceforge.net">GeoAPI</A>), factories play a vital
+    role in how developers use the API. Although the interfaces that are declared in GeoAPI
+    are implemented in various Geotools packages you should not use those classes directly.
+    Instead you should use factories.</P>
+ 
+    <P ALIGN="justify">J2SE's {@link javax.imageio.spi.ServiceRegistry} provides a truly general
+    way (even if it is defined in a <code>javax.imageio</code> subpackage) to instantiate and
+    manage factories (also called providers). This <code>org.geotools.factory</code> package
+    follows the same spirit and provides some more capabilities, for example allowing a
+    factory to be specified as a {@linkplain java.lang.System#getProperty system property}.</P>
   </BODY>
 </HTML>

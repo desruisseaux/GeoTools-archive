@@ -98,7 +98,7 @@ public final class FactoryFinder {
      */
     private static Object newInstance(String clazz, ClassLoader loader) {
         Logger logger = Logger.getLogger("org.geotools.factory");
-        logger.finest("Creating instance from '" + clazz + "'");
+        logger.finest("Creating instance from '" + clazz + '\'');
         
         try {
             Class spiClass;
@@ -129,7 +129,10 @@ public final class FactoryFinder {
             + "is it private or is the empty constructor private?", iae);
         }
     }
-    
+
+    /**
+     * Returns the context class loaded (if available) as well as the system class loader.
+     */
     public static ClassLoader[] findClassLoaders() {
         Logger logger = Logger.getLogger("org.geotools.factory");
         logger.finest("Finding ClassLoader");
@@ -141,6 +144,7 @@ public final class FactoryFinder {
         try {
             contextLoader = Thread.currentThread().getContextClassLoader();
         } catch (SecurityException se) {
+            // Ignore: the returned array will not contains context loader.
         }
         
         ClassLoader systemLoader = FactoryFinder.class.getClassLoader();
@@ -162,6 +166,13 @@ public final class FactoryFinder {
         return classLoaders;
     }
     
+    /**
+     * Loads the first class class with the name listed in the <code>resource</code> file,
+     * and returns an instance of this class.
+     *
+     * @param resource An URL to a file containing the class name.
+     * @param loader The class loader to use.
+     */
     private static Factory getFactory(URL resource, ClassLoader loader)
     throws IOException {
         Logger.getLogger("org.geotools.factory").finest(
@@ -176,15 +187,19 @@ public final class FactoryFinder {
         return getFactory(in, loader);
     }
     
+    /**
+     * Loads the first class class with the name listed in the <code>in</code> stream,
+     * and returns an instance of this class.
+     *
+     * @param in The stream to a file containing the class name.
+     * @param loader The class loader to use.
+     */
     private static Factory getFactory(InputStream in, ClassLoader loader)
     throws IOException {
-        Logger log = Logger.getLogger("org.geotools.factory");
-        
-        log.finest("Reading Factory , has stream : " + (in != null));
+        LOG.finest("Reading Factory , has stream : " + (in != null));
         
         if (in != null) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(in,
-            "UTF-8"));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             
             String factoryClassName = rd.readLine().trim();
             rd.close();
@@ -193,15 +208,24 @@ public final class FactoryFinder {
                 return (Factory) newInstance(factoryClassName, loader);
             }
             
-            log
-            .finest("Factory name unacceptable : '" + factoryClassName
-            + "'");
+            LOG.finest("Factory name unacceptable : '" + factoryClassName + '\'');
         }
         
         return null;
     }
     
+    /**
+     * The logger to use for repporting progress and warnings.
+     */
     static final Logger LOG = Logger.getLogger("org.geotools.factory"); 
+    
+    /**
+     * Loads all classes with the name listed in the <code>resource</code> file,
+     * and returns an instance of this class.
+     *
+     * @param resource An URL to a file containing the class name.
+     * @param loader The class loader to use.
+     */
     private static List getFactories(URL resource, ClassLoader loader)
     throws IOException {
         
@@ -216,23 +240,27 @@ public final class FactoryFinder {
         return getFactories(in, loader);
     }
     
+    /**
+     * Loads all classes with the name listed in the <code>in</code> stream,
+     * and returns an instance of this class.
+     *
+     * @param in The stream to a file containing the class name.
+     * @param loader The class loader to use.
+     */
     private static List getFactories(InputStream in, ClassLoader loader)
     throws IOException {
-        Logger log = Logger.getLogger("org.geotools.factory");
-        
-        log.finest("Reading Factory , has stream : " + (in != null));
+        LOG.finest("Reading Factory , has stream : " + (in != null));
         ArrayList list = new ArrayList();
         if (in != null) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(in,
-            "UTF-8"));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             
             String factoryClassName = rd.readLine();
-            while(factoryClassName != null && factoryClassName.trim().length() >0){
-                factoryClassName=factoryClassName.trim();
+            while (factoryClassName != null && factoryClassName.trim().length() >0) {
+                factoryClassName = factoryClassName.trim();
                 
                 list.add(newInstance(factoryClassName, loader));
                 
-                log.finest("Factory name unacceptable : '" + factoryClassName + "'");
+                LOG.finest("Factory name unacceptable : '" + factoryClassName + '\'');
                 factoryClassName = rd.readLine();
             }
             
@@ -265,9 +293,7 @@ public final class FactoryFinder {
     public static Factory findFactory(String factoryKey, String defaultImpl,
     ClassLoader classLoader) throws FactoryConfigurationError,
     ClassCastException {
-        Logger logger = Logger.getLogger("org.geotools.factory");
-        logger.finest("findFactory(" + factoryKey + "," + defaultImpl + ","
-        + classLoader + ")");
+        LOG.finest("findFactory(" + factoryKey + ',' + defaultImpl + ',' + classLoader + ')');
         
         ClassLoader[] loaders;
         
@@ -280,36 +306,35 @@ public final class FactoryFinder {
         
         for (int i = 0; i < loaders.length; i++) {
             
-            logger.finest("ClassLoader : " + loaders[i]);
+            LOG.finest("ClassLoader : " + loaders[i]);
             
         }
         // Use the system property first
         try {
-            logger.finest("Searching system properties");
+            LOG.finest("Searching system properties");
             
             String systemProp = System.getProperty(factoryKey);
             
             if (systemProp != null) {
-                logger.finest(factoryKey + "=" + systemProp);
+                LOG.finest(factoryKey + '=' + systemProp);
                 for (int i = 0; i < loaders.length; i++) {
                     try {
                         return (Factory) newInstance(systemProp, loaders[i]);
                     } catch (Exception e) {
-                        logger
-                        .finest("Could not create an instance using loader: "
+                        LOG.finest("Could not create an instance using loader: "
                         + loaders[i]);
                     }
                 }
             }
             
-            logger.finest("Key '" + factoryKey + "' not found");
+            LOG.finest("Key '" + factoryKey + "' not found");
         } catch (SecurityException se) {
-            logger.finest("SecurityException " + se.getMessage());
+            LOG.finest("SecurityException " + se.getMessage());
         }
         
         String serviceId = "META-INF/services/" + factoryKey;
         
-        logger.finest("Searching for service: " + serviceId);
+        LOG.finest("Searching for service: " + serviceId);
         
         // try to find services in CLASSPATH
         try {
@@ -323,22 +348,23 @@ public final class FactoryFinder {
                 }
             }
             
-            logger.finest("Service '" + serviceId + "' not found");
+            LOG.finest("Service '" + serviceId + "' not found");
         } catch (Exception ex) {
-            logger.finest("Exception " + ex.getMessage());
+            LOG.finest("Exception " + ex.getMessage());
         }
         
-        logger.finest("Resorting to default");
+        LOG.finest("Resorting to default");
         
         if (defaultImpl == null) {
-            logger.finest("No default");
+            LOG.finest("No default");
             throw new FactoryConfigurationError("Provider for " + factoryKey
             + " cannot be found", null);
         }
         for (int i = 0; i < loaders.length-1; i++) {
-            try{
+            try {
                 return (Factory) newInstance(defaultImpl, loaders[i]);
-            }catch( FactoryConfigurationError e){}
+            } catch ( FactoryConfigurationError e) {
+            }
         }
         return (Factory) newInstance(defaultImpl, loaders[loaders.length-1]);
     }

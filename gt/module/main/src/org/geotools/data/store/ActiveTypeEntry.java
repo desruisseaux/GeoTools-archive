@@ -33,7 +33,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.geometry.JTS;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
@@ -163,7 +163,7 @@ final class ActiveTypeEntry implements TypeEntry {
             }
             try {
                 CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
-                bbox = FactoryFinder.toGeographic(bbox,cs);
+                bbox = JTS.toGeographic(bbox,cs);
             }
             catch (Error badRepoject ) {
                 badRepoject.printStackTrace();

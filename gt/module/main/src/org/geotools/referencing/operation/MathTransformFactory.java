@@ -32,8 +32,21 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.imageio.spi.ServiceRegistry;
+// OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.Operation;
+import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.Projection;
 
+// Geotools dependencies
+import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;
@@ -46,20 +59,8 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.geotools.util.ClassFinder;
 import org.geotools.util.DerivedSet;
 import org.geotools.util.WeakHashSet;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.Operation;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.Projection;
 
 
 /**
@@ -118,7 +119,10 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      */
     private final WeakHashSet pool = new WeakHashSet();
 
-	private ServiceRegistry registry;
+    /**
+     * The service registry for finding {@link MathTransformProvider} implementations.
+     */
+    private final FactoryRegistry registry;
     
     /**
      * Construct a default {@link MathTransform math transform} factory.
@@ -135,8 +139,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      *                   of {@link MathTransformProvider}.
      */
     private MathTransformFactory(final Class[] categories) {
-        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-        registry = new ServiceRegistry((Iterator) Arrays.asList(categories).iterator());
+        registry = new FactoryRegistry(Arrays.asList(categories));
     }
 
     /**
@@ -182,7 +185,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
      * @see #createParameterizedTransform
      */
     public Set/*<OperationMethod>*/ getAvailableMethods(final Class type) {
-        Set methods = new LazySet(ClassFinder.getProviders(registry, MathTransformProvider.class));
+        Set methods = new LazySet(registry.getServiceProviders(MathTransformProvider.class));
         if (type != null) {
             methods = new FilteredSet(methods, type);
         }
@@ -249,7 +252,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
         if (provider!=null && provider.nameMatches(method)) {
             return provider;
         }
-        final Iterator providers = ClassFinder.getProviders(registry, MathTransformProvider.class);        
+        final Iterator providers = registry.getServiceProviders(MathTransformProvider.class);        
         while (providers.hasNext()) {
             provider = (MathTransformProvider) providers.next();            
             if (provider.nameMatches(method)) {
@@ -472,6 +475,20 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
             }
             throw new FactoryException(exception);
         }
+    }
+
+    /**
+     * Scans for factory plug-ins on the application class path. This method is
+     * needed because the application class path can theoretically change, or
+     * additional plug-ins may become available. Rather than re-scanning the
+     * classpath on every invocation of the API, the class path is scanned
+     * automatically only on the first invocation. Clients can call this
+     * method to prompt a re-scan. Thus this method need only be invoked by
+     * sophisticated applications which dynamically make new plug-ins
+     * available at runtime.
+     */
+    public void scanForPlugins() {
+        registry.scanForPlugins();
     }
 
     /**

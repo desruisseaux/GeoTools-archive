@@ -28,32 +28,23 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import javax.imageio.spi.RegisterableService;
-import javax.imageio.spi.ServiceRegistry;
-
-import org.geotools.geometry.JTS;
-import org.geotools.io.TableWriter;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.LazySet;
-import org.geotools.resources.Utilities;
-import org.geotools.util.ClassFinder;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.Factory;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.OperationNotFoundException;
-import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Envelope;
+// Geotools dependencies
+import org.geotools.factory.FactoryRegistry;
+import org.geotools.io.TableWriter;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.LazySet;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -85,55 +76,12 @@ import com.vividsolutions.jts.geom.Envelope;
  * @todo Allows the user to set ordering (i.e. preferred implementation).
  */
 public final class FactoryFinder {
-
-	/**
-	 * The service registry for this manager.
-	 * Will be initialized only when first needed.
-	 */
-	private static ServiceRegistry registry;
-	
-	/**
-	 * This method will initialize the {@link ServiceRegistry} and scan for
-	 * plugin the first time it will be invoked.
-	 * @return 
-	 */
-	public static ServiceRegistry getServiceRegistry() {
-	    if (registry == null) {
-			//TODO: remove the cast when we will be allowed to compile against J2SE 1.5.
-			registry = new ServiceRegistry((Iterator) Arrays.asList(new Class[] {
-					DatumFactory.class,
-                    CSFactory.class,
-                    CRSFactory.class,
-                    CRSAuthorityFactory.class,
-                    MathTransformFactory.class,
-                    AuthorityFactory.class,
-                    CoordinateOperationFactory.class}).iterator());
-	    }
-	    return registry;
-	}
-
     /**
-     * Programtic managment of AuthorityFactory.
-     * <p>
-     * Needed for user managed, not plug-in manged, AuthorityFactory. Also
-     * useful for testcases.
-     * <p>
-     * @param authority 
+     * The service registry for this manager.
+     * Will be initialized only when first needed.
      */
-    public static void addAuthority( AuthorityFactory authority ){
-        getServiceRegistry().registerServiceProvider( authority );
-    }
-    /**
-     * Programtic managment of AuthorityFactory.
-     * <p>
-     * Needed for user managed, not plug-in manged, AuthorityFactory. Also
-     * useful for testcases.
-     * <p>
-     * @param authority 
-     */
-    public static void removeAuthority( AuthorityFactory authority ){
-        getServiceRegistry().deregisterServiceProvider( authority );
-    }
+    private static FactoryRegistry registry;
+
     /**
      * Do not allows any instantiation of this class.
      */
@@ -142,96 +90,125 @@ public final class FactoryFinder {
     }
 
     /**
+     * Returns the service registry. The registry will be created the first
+     * time this method is invoked.
+     */
+    private static FactoryRegistry getServiceRegistry() {
+        assert Thread.holdsLock(FactoryFinder.class);
+        if (registry == null) {
+            registry = new FactoryRegistry(Arrays.asList(new Class[] {
+                    DatumFactory.class,
+                    CSFactory.class,
+                    CRSFactory.class,
+                    CRSAuthorityFactory.class,
+                    MathTransformFactory.class,
+                    AuthorityFactory.class,
+                    CoordinateOperationFactory.class}));
+        }
+        return registry;
+    }
+
+    /**
+     * Programmatic management of authority factories.
+     * <br><br>
+     * Needed for user managed, not plug-in mangaed, authority factory.
+     * Also useful for testcases.
+     *
+     * @param authority The authority to add.
+     */
+    public static synchronized void addAuthority(final AuthorityFactory authority) {
+        getServiceRegistry().registerServiceProvider(authority);
+    }
+
+    /**
+     * Programmatic management of authority factories.
+     * <br><br>
+     * Needed for user managed, not plug-in mangaed, authority factory.
+     * Also useful for testcases.
+     *
+     * @param authority The authority to remove.
+     */
+    public static synchronized void removeAuthority(final AuthorityFactory authority) {
+        getServiceRegistry().deregisterServiceProvider(authority);
+    }
+
+    /**
      * Returns the default implementation of {@link DatumFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
      * registered, an arbitrary one is selected.
-     * @return First DatumFactory found, not determinisitc
      *
+     * @return First datum factory found, not deterministic.
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link DatumFactory} interface.
      */
     public static synchronized DatumFactory getDatumFactory() throws NoSuchElementException {
-        return (DatumFactory) ClassFinder.getProviders(getServiceRegistry(), DatumFactory.class).next();
+        return (DatumFactory) getServiceRegistry().getServiceProviders(DatumFactory.class).next();
     }
 
     /**
      * Returns a set of all available implementations for the {@link DatumFactory} interface.
-     * @return Set of available DatumFactory
+     *
+     * @return Set of available datum factory implementations.
      */
     public static synchronized Set getDatumFactories() {
-        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), DatumFactory.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(DatumFactory.class));
     }
 
     /**
      * Returns the default implementation of {@link CSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
      * registered, an arbitrary one is selected.
-     * @return The first CSFactory found - not deterministic 
      *
+     * @return The first coordinate system Factory found - not deterministic 
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CSFactory} interface.
      */
     public static synchronized CSFactory getCSFactory() throws NoSuchElementException {
-        return (CSFactory) ClassFinder.getProviders(getServiceRegistry(), CSFactory.class).next();
+        return (CSFactory) getServiceRegistry().getServiceProviders(CSFactory.class).next();
     }
 
     /**
      * Returns a set of all available implementations for the {@link CSFactory} interface.
-     * @return Set of available CSFactory implementations
+     *
+     * @return Set of available coordinate system factory implementations.
      */
     public static synchronized Set getCSFactories() {
-        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CSFactory.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(CSFactory.class));
     }
 
     /**
      * Returns the default implementation of {@link CRSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
      * registered, an arbitrary one is selected.
-     * @return The first CRSFactory found - not deterministic
      *
+     * @return The first coordinate reference system factory found - not deterministic
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CRSFactory} interface.
      */
     public static synchronized CRSFactory getCRSFactory() throws NoSuchElementException {
-        return (CRSFactory) ClassFinder.getProviders(getServiceRegistry(), CRSFactory.class).next();
+        return (CRSFactory) getServiceRegistry().getServiceProviders(CRSFactory.class).next();
     }
 
     /**
      * Returns a set of all available implementations for the {@link CRSFactory} interface.
-     * @return Set of available CRSFactory
+     *
+     * @return Set of available coordinate reference system factory implementations.
      */
     public static synchronized Set getCRSFactories() {
-        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CRSFactory.class));
-    }
-    
-    /**
-     * Transforms the envelope from its current crs to WGS84 coordinate system. 
-     * @param env The envelope to transform
-     * @param crs The CRS the envelope is currently in.
-     * @return env transformed to be in WGS84 CRS.
-     * @throws OperationNotFoundException
-     * @throws NoSuchElementException
-     * @throws FactoryException
-     * @throws TransformException
-     */
-    public static Envelope toGeographic(Envelope env, CoordinateReferenceSystem crs) throws OperationNotFoundException, NoSuchElementException, FactoryException, TransformException{
-    	if( crs.equals(GeographicCRS.WGS84) )
-    		return env;
-        MathTransform transform=getCoordinateOperationFactory().createOperation(crs, GeographicCRS.WGS84).getMathTransform();
-        return JTS.transform(env, transform);
+        return new LazySet(getServiceRegistry().getServiceProviders(CRSFactory.class));
     }
     
     /**
      * Returns a set of all available implementations for the {@link AuthorityFactory} interface.
      * <p>
-     * This Set can be used to list the available codes known to all authorities.
+     * This set can be used to list the available codes known to all authorities.
      * In the event that the same code is understood by more then one authority
      * you will need to assume both are close enough, or make use of this set directly
      * rather than use the decode method.
      * </p>
      */
     public static synchronized Set getCRSAuthorityFactories() {
-        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CRSAuthorityFactory.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(CRSAuthorityFactory.class));
     }
 
     /**
@@ -242,10 +219,8 @@ public final class FactoryFinder {
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link MathTransformFactory} interface.
      */
-    public static synchronized MathTransformFactory getMathTransformFactory()
-            throws NoSuchElementException
-    {
-        return (MathTransformFactory) ClassFinder.getProviders(getServiceRegistry(), MathTransformFactory.class).next();
+    public static synchronized MathTransformFactory getMathTransformFactory() throws NoSuchElementException {
+        return (MathTransformFactory) getServiceRegistry().getServiceProviders(MathTransformFactory.class).next();
     }
 
     /**
@@ -253,7 +228,7 @@ public final class FactoryFinder {
      * {@link MathTransformFactory} interface.
      */
     public static synchronized Set getMathTransformFactories() {
-        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), MathTransformFactory.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(MathTransformFactory.class));
     }
 
     /**
@@ -264,10 +239,8 @@ public final class FactoryFinder {
      * @throws NoSuchElementException if no implementation was found for the
      *         {@link CoordinateOperationFactory} interface.
      */
-    public static synchronized CoordinateOperationFactory getCoordinateOperationFactory()
-            throws NoSuchElementException
-    {
-        return (CoordinateOperationFactory) ClassFinder.getProviders(getServiceRegistry(), CoordinateOperationFactory.class).next();
+    public static synchronized CoordinateOperationFactory getCoordinateOperationFactory() throws NoSuchElementException {
+        return (CoordinateOperationFactory) getServiceRegistry().getServiceProviders(CoordinateOperationFactory.class).next();
     }
 
     /**
@@ -275,7 +248,7 @@ public final class FactoryFinder {
      * {@link CoordinateOperationFactory} interface.
      */
     public static synchronized Set getCoordinateOperationFactories() {
-        return new LazySet(ClassFinder.getProviders(getServiceRegistry(), CoordinateOperationFactory.class));
+        return new LazySet(getServiceRegistry().getServiceProviders(CoordinateOperationFactory.class));
     }
 
     /**
@@ -292,7 +265,7 @@ public final class FactoryFinder {
     public static synchronized void listProviders(final Writer out, final Locale locale)
             throws IOException
     {
-        ClassFinder.getProviders(getServiceRegistry(), DatumFactory.class); // Force the initialization of ServiceRegistry
+        getServiceRegistry().getServiceProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
         final TableWriter table  = new TableWriter(out, " \u2502 ");
         table.setMultiLinesCells(true);
         table.writeHorizontalSeparator();
@@ -305,7 +278,7 @@ public final class FactoryFinder {
             table.write(Utilities.getShortName(category));
             table.nextColumn();
             boolean first = true;
-            for (final Iterator providers=ClassFinder.getProviders(getServiceRegistry(), category); providers.hasNext();) {
+            for (final Iterator providers=getServiceRegistry().getServiceProviders(category); providers.hasNext();) {
                 if (!first) {
                     table.write('\n');
                 }
