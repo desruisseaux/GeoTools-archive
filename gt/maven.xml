@@ -427,7 +427,7 @@ ${required}"/>
             </j:forEach>
             <echo message="reactor list = ${todo}"/>
              <ant:delete dir="${basedir}/target/forMerge"/>
-            <maven:reactor basedir="${basedir}/module" includes="${todo}" goals="moveLib,moveForMerge,moveSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
+            <maven:reactor basedir="${basedir}/module" includes="${todo}" goals="jar:install,moveLib,moveForMerge,moveSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
             <echo message="done with reactor for main"/>
             <ant:mkdir dir="${basedir}/target/binRelease/module"/>
             <ant:jar destfile="${basedir}/target/binRelease/module/gt2-main.jar">
@@ -447,7 +447,7 @@ ${required}"/>
             </j:forEach>
             <echo message="plugin reactor list = ${todo}"/>
             <attainGoal name="moveBuildFiles"/>
-            <maven:reactor basedir="${basedir}/plugin" includes="${todo}" goals="moveLib,movePluginBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
+            <maven:reactor basedir="${basedir}/plugin" includes="${todo}" goals="jar:install,moveLib,movePluginBin,moveSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
             
             <!-- add optional extentions seperatly -->
             <loadfile property="release.optional" srcFile="ext/ReleaseList.txt"/>
@@ -457,7 +457,7 @@ ${required}"/>
                 <j:set var="todo" value="${item}/project.xml,${todo}"/>
             </j:forEach>
             <echo message="extention reactor list = ${todo}"/>
-            <maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="moveLib,moveExtBin,moveSrc" banner="binary release" ignoreFailures="true" postProcessing="true"/>
+            <maven:reactor basedir="${basedir}/ext" includes="${todo}" goals="jar:install,moveLib,moveExtBin,moveSrc" banner="binary release" ignoreFailures="false" postProcessing="true"/>
        
                  
             <echo message="dist directory is ${maven.dist.dir}"/>
