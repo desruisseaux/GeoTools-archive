@@ -93,6 +93,15 @@
       </roles>
     </developer>
     <developer>
+      <name>David Zwiers</name>
+      <id>dzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Rueben Schulz</name>
       <organization>University of British Columbia</organization>
       <roles>

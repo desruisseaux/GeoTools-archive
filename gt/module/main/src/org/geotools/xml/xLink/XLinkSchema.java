@@ -95,12 +95,15 @@ public class XLinkSchema implements Schema{
 		}
 	
 		// list of allowable enumeration values
-		private static List lookUpTable = {
+		private static List lookUpTable = loadTable();
+		
+		private static List loadTable(){
 				lookUpTable = new LinkedList();
 				lookUpTable.add("onLoad");
 				lookUpTable.add("onRequest");
 				lookUpTable.add("other");
 				lookUpTable.add("none");
+				return lookUpTable;
 		};
 		
 		/**
@@ -168,13 +171,16 @@ public class XLinkSchema implements Schema{
 		}
 	
 		// static enumeration list
-		private static List lookUpTable = {
+		private static List lookUpTable = loadTable();
+		
+		private static List loadTable(){
 				lookUpTable = new LinkedList();
 				lookUpTable.add("new");
 				lookUpTable.add("replace");
 				lookUpTable.add("embed");
 				lookUpTable.add("other");
 				lookUpTable.add("none");
+				return lookUpTable;
 		};
 		
 		/**
