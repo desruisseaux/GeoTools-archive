@@ -16,7 +16,7 @@
  */
 package org.geotools.data.arcgrid;
 
-import org.opengis.referencing.Identifier;
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.OperationParameter;
