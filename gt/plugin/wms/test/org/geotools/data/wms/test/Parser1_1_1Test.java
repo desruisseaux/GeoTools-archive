@@ -19,19 +19,19 @@ package org.geotools.data.wms.test;
 import java.io.File;
 import java.net.URL;
 
-import org.geotools.data.wms.CapabilitiesParser;
+import junit.framework.TestCase;
+
+import org.geotools.data.wms.Parser1_1_1;
 import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.resources.TestData;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
-import junit.framework.TestCase;
-
 /**
  * @author Richard Gould
  */
-public class CapabilitiesParserTest extends TestCase {
+public class Parser1_1_1Test extends TestCase {
 	
 	private URL getCapsURL;
 
@@ -44,15 +44,18 @@ public class CapabilitiesParserTest extends TestCase {
 		getCapsURL = getCaps.toURL();
 	}
 
-	public void testParseCapabilities() throws Exception {
+	public void testConstructCapabilities() throws Exception {
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(getCapsURL);
 
 		Element root = document.getRootElement(); //Root = "WMT_MS_Capabilities"
-		Capabilities capabilities = CapabilitiesParser.parseCapabilities(root);
+		
+		Parser1_1_1 parser = new Parser1_1_1();
+		
+		Capabilities capabilities = parser.constructCapabilities(root);
 		assertNotNull(capabilities);
 		assertEquals(capabilities.getService().getName(), "OGC:WMS");
-		assertEquals(capabilities.getService().getKeywordList().size(), 6);
+		assertEquals(capabilities.getService().getKeywordList().length, 6);
 		
 		assertEquals(capabilities.getRequest().getGetCapabilities().getFormats().length, 1);
 		assertEquals(capabilities.getLayers()[0].getTitle(), "Microsoft TerraServer Map Server");

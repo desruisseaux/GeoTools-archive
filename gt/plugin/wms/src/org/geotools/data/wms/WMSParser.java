@@ -25,8 +25,8 @@ public interface WMSParser {
 	/**
 	 * 
 	 * @param element
-	 * @return an Enumeration consisting of NO, GENERIC, or CUSTOM
+	 * @return an int, the value of which is NO, GENERIC, or CUSTOM
 	 */
-	public Enumeration canProcess(Element element);
-	public Capabilities constructCapabilities(Element capabilitiesElement);
+	public int canProcess(Element element);
+	public Capabilities constructCapabilities(Element capabilitiesElement) throws ParseCapabilitiesException;
 }
