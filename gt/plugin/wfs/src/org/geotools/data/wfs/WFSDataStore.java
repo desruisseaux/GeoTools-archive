@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -30,6 +29,7 @@ import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.Transaction;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.WFSCapabilities;
@@ -335,50 +335,50 @@ public class WFSDataStore extends AbstractDataStore{
     /**
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
      */
-    protected FeatureReader getFeatureReader(String typeName) throws IOException {
-        WFSFeatureReader t = null;
-        if((protos & POST_FIRST) == POST_FIRST && t == null){
-            try {
-                t = getFeatureReaderPost(typeName,null);
-            } catch (SAXException e) {
-                logger.warning(e.toString());
-                throw new IOException(e.toString());
-            }
-        }
-
-        if((protos & GET_FIRST) == GET_FIRST && t == null)
-            try {
-                t = getFeatureReaderGet(typeName,null);
-            } catch (SAXException e) {
-                logger.warning(e.toString());
-                throw new IOException(e.toString());
-            }
-        
-        if((protos & POST_OK) == POST_OK && t == null)
-            try {
-                t = getFeatureReaderPost(typeName,null);
-            } catch (SAXException e) {
-                logger.warning(e.toString());
-                throw new IOException(e.toString());
-            }
-
-        if((protos & GET_OK) == GET_OK && t == null)
-            try {
-                t = getFeatureReaderGet(typeName,null);
-            } catch (SAXException e) {
-                logger.warning(e.toString());
-                throw new IOException(e.toString());
-            }
-            
-        if(t.hasNext()){ // opportunity to throw exception
-            if(t.getFeatureType()!=null)
-                return t;
-            throw new IOException("There are features but no feature type ... odd");
-        }
-        return null;
-    }
+//    protected FeatureReader getFeatureReader(String typeName) throws IOException {
+//        WFSFeatureReader t = null;
+//        if((protos & POST_FIRST) == POST_FIRST && t == null){
+//            try {
+//                t = getFeatureReaderPost(typeName,null);
+//            } catch (SAXException e) {
+//                logger.warning(e.toString());
+//                throw new IOException(e.toString());
+//            }
+//        }
+//
+//        if((protos & GET_FIRST) == GET_FIRST && t == null)
+//            try {
+//                t = getFeatureReaderGet(typeName,null);
+//            } catch (SAXException e) {
+//                logger.warning(e.toString());
+//                throw new IOException(e.toString());
+//            }
+//        
+//        if((protos & POST_OK) == POST_OK && t == null)
+//            try {
+//                t = getFeatureReaderPost(typeName,null);
+//            } catch (SAXException e) {
+//                logger.warning(e.toString());
+//                throw new IOException(e.toString());
+//            }
+//
+//        if((protos & GET_OK) == GET_OK && t == null)
+//            try {
+//                t = getFeatureReaderGet(typeName,null);
+//            } catch (SAXException e) {
+//                logger.warning(e.toString());
+//                throw new IOException(e.toString());
+//            }
+//            
+//        if(t.hasNext()){ // opportunity to throw exception
+//            if(t.getFeatureType()!=null)
+//                return t;
+//            throw new IOException("There are features but no feature type ... odd");
+//        }
+//        return null;
+//    }
     
-    private WFSFeatureReader getFeatureReaderGet(String typeName, Query request) throws SAXException, IOException{
+    private WFSFeatureReader getFeatureReaderGet(Query request) throws SAXException, IOException{
         URL getUrl = capabilities.getGetFeature().getGet();
 
 		if(getUrl == null)
@@ -401,7 +401,7 @@ public class WFSDataStore extends AbstractDataStore{
         if(query==null || query.indexOf("REQUEST")==-1){
             url += "&REQUEST=GetFeature";
 	    }
-        url += "&TYPENAME="+typeName;
+        url += "&TYPENAME="+request.getTypeName();
         
         if(request!=null){
         	if(request.getMaxFeatures()!=Query.DEFAULT_MAX)
@@ -476,7 +476,7 @@ System.out.println(url); // url to request
     	return e.getMinX()+","+e.getMinY()+","+e.getMaxX()+","+e.getMaxY();
     }
     
-    private WFSFeatureReader getFeatureReaderPost(String typeName, Query query) throws SAXException, IOException{
+    private WFSFeatureReader getFeatureReaderPost(Query query) throws SAXException, IOException{
         URL postUrl = capabilities.getGetFeature().getPost();
 
 		if(postUrl == null)
@@ -494,12 +494,6 @@ System.out.println(url); // url to request
 
 Writer sw = new StringWriter();
 try{
-	if(query == null){
-		query = new DefaultQuery(typeName);
-   	}else{
-    if(!typeName.equals(query.getTypeName())){
-    	logger.warning("typeName != query.getTypeName() :: causes conflict");
-    }}
     DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
 }catch(OperationNotSupportedException e){
     logger.warning(e.toString());
@@ -512,12 +506,6 @@ System.out.println("FILTER WAS "+query.getFilter());
         
         
         try{
-        	if(query == null){
-        		query = new DefaultQuery(typeName);
-        	}else{
-            if(!typeName.equals(query.getTypeName())){
-            	logger.warning("typeName != query.getTypeName() :: causes conflict");
-            }}
             DocumentWriter.writeDocument(query,WFSSchema.getInstance(),w,hints);
         }catch(OperationNotSupportedException e){
             logger.warning(e.toString());
@@ -534,15 +522,24 @@ System.out.println("FILTER WAS "+query.getFilter());
         return ft;
     }
     
-    /**
-     * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String, org.geotools.data.Query)
-     */
+    protected FeatureReader getFeatureReader(String typeName) throws IOException {
+    	return getFeatureReader(typeName,new DefaultQuery(typeName));
+    }
     protected FeatureReader getFeatureReader(String typeName, Query query)
             throws IOException {
+    	if(query.getTypeName() == null || !query.getTypeName().equals(typeName)){
+    		Query q = new DefaultQuery(typeName, query.getNamespace(), query.getFilter(), query.getMaxFeatures(),
+    				query.getPropertyNames(), query.getHandle());
+    		return getFeatureReader(q,Transaction.AUTO_COMMIT);
+    	}
+    	return getFeatureReader(query,Transaction.AUTO_COMMIT);
+    }
+    
+    public FeatureReader getFeatureReader(Query query,Transaction transaction) throws IOException {
         WFSFeatureReader t = null;
         if((protos & POST_FIRST) == POST_FIRST && t == null){
             try {
-                t = getFeatureReaderPost(typeName,query);
+                t = getFeatureReaderPost(query);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -551,7 +548,7 @@ System.out.println("FILTER WAS "+query.getFilter());
 
         if((protos & GET_FIRST) == GET_FIRST && t == null)
             try {
-                t = getFeatureReaderGet(typeName,query);
+                t = getFeatureReaderGet(query);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -559,7 +556,7 @@ System.out.println("FILTER WAS "+query.getFilter());
         
         if((protos & POST_OK) == POST_OK && t == null)
             try {
-                t = getFeatureReaderPost(typeName,query);
+                t = getFeatureReaderPost(query);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());
@@ -567,7 +564,7 @@ System.out.println("FILTER WAS "+query.getFilter());
 
         if((protos & GET_OK) == GET_OK && t == null)
             try {
-                t = getFeatureReaderGet(typeName,query);
+                t = getFeatureReaderGet(query);
             } catch (SAXException e) {
                 logger.warning(e.toString());
                 throw new IOException(e.toString());

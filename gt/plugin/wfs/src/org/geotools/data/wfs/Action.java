@@ -28,56 +28,46 @@ public interface Action {
 //	public String getTypeName();
 	public Filter getFilter();
 
-	public static class ActionFactory{
-		private ActionFactory(){}
-		private static ActionFactory instance = new ActionFactory();
-		public static ActionFactory getInstance(){
-			return instance;
+	public static class UpdateAction implements Action{
+		private Filter filter;
+		private Map properties;
+		private String typeName;
+		private UpdateAction(){}
+		public UpdateAction(String typeName, Filter f, Map properties){
+			filter = f;
+			this.properties = properties;
+			this.typeName = typeName;
 		}
-		
-		public static class InsertAction implements Action{
-			private Feature feature;
-			private String typeName;
-			private InsertAction(){}
-			protected InsertAction(String typeName, Feature f){
-				this.typeName = typeName;
-				feature = f;
-			}
-			public int getType(){return INSERT;}
-			public Feature getFeature(){return feature;}
-			public String getTypeName(){return typeName;}
-			public Filter getFilter(){return feature.getID()==null?null:(FilterFactory.createFilterFactory().createFidFilter(feature.getID()));}
+		public int getType(){return UPDATE;}
+		public Object getProperty(String name){return properties==null?null:properties.get(name);}
+		public String[] getPropertyNames(){return (String[])properties.keySet().toArray(new String[properties.keySet().size()]);}
+		public Map getProperties(){return new HashMap(properties);}
+		public String getTypeName(){return typeName;}
+		public Filter getFilter(){return filter;}
+	}
+
+	public static class DeleteAction implements Action{
+		private Filter filter;
+		private String typeName;
+		private DeleteAction(){}
+		public DeleteAction(String typeName, Filter f){
+			filter=f;
+			this.typeName = typeName;
 		}
-		
-		public static class UpdateAction implements Action{
-			private Filter filter;
-			private Map properties;
-			private String typeName;
-			private UpdateAction(){}
-			protected UpdateAction(String typeName, Filter f, Map properties){
-				filter = f;
-				this.properties = properties;
-				this.typeName = typeName;
-			}
-			public int getType(){return UPDATE;}
-			public Object getProperty(String name){return properties==null?null:properties.get(name);}
-			public String[] getPropertyNames(){return (String[])properties.keySet().toArray(new String[properties.keySet().size()]);}
-			public Map getProperties(){return new HashMap(properties);}
-			public String getTypeName(){return typeName;}
-			public Filter getFilter(){return filter;}
+		public int getType(){return DELETE;}
+		public String getTypeName(){return typeName;}
+		public Filter getFilter(){return filter;}
+	}
+
+	public static class InsertAction implements Action{
+		private Feature feature;
+		private InsertAction(){}
+		public InsertAction(Feature f){
+			feature = f;
 		}
-		
-		public static class DeleteAction implements Action{
-			private Filter filter;
-			private String typeName;
-			private DeleteAction(){}
-			protected DeleteAction(String typeName, Filter f){
-				filter=f;
-				this.typeName = typeName;
-			}
-			public int getType(){return DELETE;}
-			public String getTypeName(){return typeName;}
-			public Filter getFilter(){return filter;}
-		}
+		public int getType(){return INSERT;}
+		public Feature getFeature(){return feature;}
+		public String getTypeName(){return feature==null?null:feature.getFeatureType().getTypeName();}
+		public Filter getFilter(){return feature.getID()==null?null:(FilterFactory.createFilterFactory().createFidFilter(feature.getID()));}
 	}
 }
