@@ -14,82 +14,46 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.filter;
+package org.geotools.filter.visitor;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
-
-import org.geotools.filter.parser.ParseException;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.BetweenFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FidFilter;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.LikeFilter;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.LogicFilter;
+import org.geotools.filter.MathExpression;
+import org.geotools.filter.NullFilter;
 
 
 /**
  *
  */
-public class EnvironmentVariableResolver implements org.geotools.filter.FilterVisitor {
+public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor {
    
 
   
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
-   
-  
+
     /**
      * Empty constructor
      */
-    public EnvironmentVariableResolver() {
-    }
-
-    
-
-   
-
-   
-    /**
-     *
-     */
-    public void resolve(Filter filter, double mapScale) throws ParseException {  
-        
-         String input = filter.toString();
-        Filter output = (Filter)ExpressionBuilder.parse(input);
-        
-    
-    }
-    
-    
-    /**
-     * 
-     */
-    public Expression resolve(Expression exp, double mapScale) throws ParseException {     
-           
-                String input = exp.toString();
-                input = input.replaceAll("sld:MapScaleDenominator", ""+mapScale);
-                Expression output = (Expression)ExpressionBuilder.parse(input);
-                return output;
-    }
-    
-    public boolean needsResolving(Filter f){
-        return true;
+    public AbstractFilterVisitor() {
     }
 
     /**
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
      */
     public void visit(Filter filter) {
-        if (filter instanceof BetweenFilter) {
-            visit((BetweenFilter) filter);
-        } else if (filter instanceof CompareFilter) {
-            visit((CompareFilter) filter);
-        } else if (filter instanceof GeometryFilter) {
-            visit((GeometryFilter) filter);
-        } else if (filter instanceof LikeFilter) {
-            visit((LikeFilter) filter);
-        } else if (filter instanceof LogicFilter) {
-            visit((LogicFilter) filter);
-        } else if (filter instanceof NullFilter) {
-            visit((NullFilter) filter);
-        } else if (filter instanceof FidFilter) {
-            visit((FidFilter) filter);
-        }
+       // unknown filter type
     }
 
     /**
@@ -182,9 +146,7 @@ public class EnvironmentVariableResolver implements org.geotools.filter.FilterVi
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
      */
     public void visit(Expression expression) {
-      if(expression instanceof MapScaleDenominator){
-        System.err.println("FOUND ONE");
-      }
+      // nothing to do
     }
 
     /**
