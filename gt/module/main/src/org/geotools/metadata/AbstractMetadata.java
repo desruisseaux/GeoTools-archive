@@ -34,6 +34,9 @@ import java.util.List;
  * if the element is not a simple entity a entity for that class will can be created as well.
  * All Metadata.Entities and Elements are created when requested (Lazily)
  *
+ * TODO: We should switch this over to use BeanInfo/Introspector reflection to allow for
+ * recognition of boolean isFoo as "foo", getBar as "bar" and getURL as "URL".
+ * 
  * @author jeichar
  * @since 2.1
  */
@@ -152,7 +155,7 @@ public abstract class AbstractMetadata implements Metadata {
 
             return (EntityImpl) entityMap.get(clazz);
         }
-
+        
         private void init(Class clazz) {
             getMethods = new ArrayList();
 
@@ -270,8 +273,9 @@ public abstract class AbstractMetadata implements Metadata {
          */
         public ElementImpl(Class elementClass, Method method) {
             this.getMethod = method;
-            type = elementClass;
+            type = elementClass;            
             name = method.getName().substring(3);
+            name = name.substring(0,1).toLowerCase() + name.substring(1);
 
             if (Metadata.class.isAssignableFrom(elementClass)) {
                 entity = EntityImpl.getEntity(elementClass);
