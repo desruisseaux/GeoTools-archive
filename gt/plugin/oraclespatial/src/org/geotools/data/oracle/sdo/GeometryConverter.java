@@ -24,14 +24,14 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateList;
 
 import oracle.jdbc.OracleConnection;
-//import oracle.sql.STRUCT;
-//import oracle.sql.ARRAY;
-//import oracle.sql.ArrayDescriptor;
-//import oracle.sql.CHAR;
-////import oracle.sql.CharacterSet;
-//import oracle.sql.Datum;
-//import oracle.sql.NUMBER;
-//import oracle.sql.StructDescriptor;
+import oracle.sql.STRUCT;
+import oracle.sql.ARRAY;
+import oracle.sql.ArrayDescriptor;
+import oracle.sql.CHAR;
+//import oracle.sql.CharacterSet;
+import oracle.sql.Datum;
+import oracle.sql.NUMBER;
+import oracle.sql.StructDescriptor;
 /**
  * Sample use of SDO class for simple JTS Geometry.
  * <p>
