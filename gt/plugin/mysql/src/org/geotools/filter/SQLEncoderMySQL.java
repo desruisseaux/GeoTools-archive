@@ -74,7 +74,7 @@ public class SQLEncoderMySQL extends SQLEncoder
     public SQLEncoderMySQL() {
         capabilities = createFilterCapabilities();
 
-        setColnameEscape("");
+        setSqlNameEscape("");
     }
 
     public SQLEncoderMySQL(int srid) {
