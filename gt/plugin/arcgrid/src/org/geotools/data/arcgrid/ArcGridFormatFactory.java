@@ -16,12 +16,8 @@
  */
 package org.geotools.data.arcgrid;
 
-import java.net.URL;
-
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.opengis.coverage.grid.Format;
 
 
 /**
@@ -40,36 +36,8 @@ public class ArcGridFormatFactory
         return true;
     }
 
-    /**
-     * Returns an instance of a ArcGridFormat.
-     *
-     * @return Format used to process ArcGridCoverage files
-     */
     public Format createFormat() {
         return new ArcGridFormat();
     }
 
-    /**
-     * @see org.geotools.data.GridFormatFactorySpi#createReader(java.lang.Object)
-     */
-    public GridCoverageReader createReader(Object source) {
-        return new ArcGridReader(source);
-    }
-
-    /**
-     * @see org.geotools.data.GridFormatFactorySpi#createWriter(java.lang.Object)
-     */
-    public GridCoverageWriter createWriter(Object destination) {
-        return new ArcGridWriter(destination);
-    }
-
-    /** 
-     * @see org.geotools.data.GridFormatFactorySpi#accepts(java.net.URL)
-     */
-    public boolean accepts(URL input) {
-        String pathname=input.getFile();
-        if( pathname.endsWith(".asc") )
-            return true;
-        return false;
-    }
 }

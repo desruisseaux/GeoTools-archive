@@ -17,6 +17,7 @@
 package org.geotools.data.arcgrid;
 
 import com.vividsolutions.jts.geom.Envelope;
+
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.data.DataSourceException;
@@ -24,7 +25,7 @@ import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.gc.GridCoverage;
 import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.coverage.grid.Format;
+import org.geotools.data.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterTypeException;
