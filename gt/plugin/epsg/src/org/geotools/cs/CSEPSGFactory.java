@@ -40,6 +40,8 @@ import org.geotools.units.Unit;
 /**
  * Default implementation for a coordinate system factory backed
  * by the EPSG property file.
+ *
+ * @deprecated Replaced by {@linnk org.geotools.referencing.crs.CRSEPSGPropertyFileFactory}.
  */
 public class CSEPSGFactory extends CoordinateSystemAuthorityFactory implements CRSAuthoritySpi  {
     /**
