@@ -66,7 +66,7 @@ public class Keywords extends MetadataEntity
     private Citation thesaurusName;
 
     /**
-     * Construct an initially empty keywords.
+     * Constructs an initially empty keywords.
      */
     public Keywords() {
         super();

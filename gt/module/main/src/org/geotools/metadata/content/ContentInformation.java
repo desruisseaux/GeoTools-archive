@@ -42,7 +42,7 @@ public class ContentInformation extends MetadataEntity
     private static final long serialVersionUID = -1609535650982322560L;
 
     /**
-     * Construct an initially empty content information.
+     * Constructs an initially empty content information.
      */
     public ContentInformation() {
     }

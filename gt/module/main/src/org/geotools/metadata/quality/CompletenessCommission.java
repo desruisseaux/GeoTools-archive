@@ -39,7 +39,7 @@ public class CompletenessCommission extends Completeness
     private static final long serialVersionUID = 1565144822249562765L;
 
     /**
-     * Construct an initially empty completeness commission.
+     * Constructs an initially empty completeness commission.
      */
     public CompletenessCommission() {
     }

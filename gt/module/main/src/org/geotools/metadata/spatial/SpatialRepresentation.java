@@ -42,7 +42,7 @@ public class SpatialRepresentation extends MetadataEntity
     private static final long serialVersionUID = 1443170876207840116L;
 
     /**
-     * Construct an initially empty spatial representation.
+     * Constructs an initially empty spatial representation.
      */
     public SpatialRepresentation() {
     }

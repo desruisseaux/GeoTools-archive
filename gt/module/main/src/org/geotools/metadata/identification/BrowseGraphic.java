@@ -70,7 +70,7 @@ public class BrowseGraphic extends MetadataEntity
     private String fileType;
 
     /**
-     * Construct an initially empty browse graphic.
+     * Constructs an initially empty browse graphic.
      */
     public BrowseGraphic() {
     }

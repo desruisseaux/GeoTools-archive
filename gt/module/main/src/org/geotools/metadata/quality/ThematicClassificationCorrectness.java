@@ -39,7 +39,7 @@ public class ThematicClassificationCorrectness extends ThematicAccuracy
     private static final long serialVersionUID = -5484398738783800915L;
 
     /**
-     * Construct an initially empty thematic classification correctness.
+     * Constructs an initially empty thematic classification correctness.
      */
     public ThematicClassificationCorrectness() {
     }

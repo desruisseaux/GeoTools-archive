@@ -69,11 +69,13 @@ public class Series extends MetadataEntity
      * Constructs a series with the specified name.
      */
     public Series(final CharSequence name) {
+        final InternationalString n;
         if (name instanceof InternationalString) {
-            this.name = (InternationalString) name;
+            n = (InternationalString) name;
         } else {
-            this.name = new SimpleInternationalString(name.toString());
+            n = new SimpleInternationalString(name.toString());
         }
+        setName(n);
     }
 
     /**

@@ -47,13 +47,20 @@ public class GeographicExtent extends MetadataEntity
      */
     private boolean inclusion;
 
-   /**
-     * Construct an initially empty GeographicExtent.
+    /**
+     * Constructs an initially empty geographic extent.
      */
     public GeographicExtent() {
     }
 
-   /**
+    /**
+     * Constructs a geographic extent initialized with the specified inclusion value.
+     */
+    public GeographicExtent(final boolean inclusion) {
+        setInclusion(inclusion);
+    }
+
+    /**
      * Indication of whether the bounding polygon encompasses an area covered by the data
      * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
      *

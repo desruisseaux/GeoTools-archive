@@ -39,7 +39,7 @@ public class NonQuantitativeAttributeCorrectness extends ThematicAccuracy
     private static final long serialVersionUID = -4976754662775709253L;
 
     /**
-     * Construct an initially empty non quantitative attribute correctness.
+     * Constructs an initially empty non quantitative attribute correctness.
      */
     public NonQuantitativeAttributeCorrectness() {
     }

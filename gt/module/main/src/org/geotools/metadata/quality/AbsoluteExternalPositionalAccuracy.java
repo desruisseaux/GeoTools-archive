@@ -42,7 +42,7 @@ public class AbsoluteExternalPositionalAccuracy extends PositionalAccuracy
     private static final long serialVersionUID = 4116627805950579738L;
     
     /**
-     * Construct an initially empty absolute external positional accuracy.
+     * Constructs an initially empty absolute external positional accuracy.
      */
     public AbsoluteExternalPositionalAccuracy() {
     }    

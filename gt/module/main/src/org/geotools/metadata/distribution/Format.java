@@ -80,7 +80,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
     private Collection formatDistributors;
     
     /**
-     * Construct an initially empty format.
+     * Constructs an initially empty format.
      */
     public Format() {
     }

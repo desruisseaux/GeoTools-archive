@@ -63,7 +63,7 @@ public class ConformanceResult extends Result
     private boolean pass;
     
     /**
-     * Construct an initially empty conformance result.
+     * Constructs an initially empty conformance result.
      */
     public ConformanceResult() {
     }

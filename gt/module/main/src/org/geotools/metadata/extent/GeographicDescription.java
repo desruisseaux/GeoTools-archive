@@ -48,7 +48,7 @@ public class GeographicDescription extends GeographicExtent
     private Identifier geographicIdentifier;
     
     /**
-     * Construct an initially empty geographic description.
+     * Constructs an initially empty geographic description.
      */
     public GeographicDescription() {
     }

@@ -83,7 +83,7 @@ public class Medium extends MetadataEntity implements org.opengis.metadata.distr
     private InternationalString mediumNote;
     
     /**
-     * Construct an initially empty medium.
+     * Constructs an initially empty medium.
      */
     public Medium() {
     }

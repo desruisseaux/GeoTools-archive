@@ -67,7 +67,7 @@ public class StandardOrderProcess extends MetadataEntity implements org.opengis.
     private InternationalString turnaround;
 
     /**
-     * Construct an initially empty standard order process.
+     * Constructs an initially empty standard order process.
      */
     public StandardOrderProcess() {
     }

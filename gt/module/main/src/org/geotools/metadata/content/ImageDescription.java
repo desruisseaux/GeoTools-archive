@@ -112,7 +112,7 @@ public class ImageDescription extends CoverageDescription
     private boolean lensDistortionInformationAvailable;
 
     /**
-     * Construct an initially empty image description.
+     * Constructs an initially empty image description.
      */
     public ImageDescription() {
     }

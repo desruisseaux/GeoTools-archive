@@ -39,7 +39,7 @@ public class CompletenessOmission extends Completeness
     private static final long serialVersionUID = 6614084398532053054L;
     
     /**
-     * Construct an initially empty completeness omission.
+     * Constructs an initially empty completeness omission.
      */
     public CompletenessOmission() {
     }

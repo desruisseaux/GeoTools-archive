@@ -96,7 +96,7 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
     private Result result;
 
     /**
-     * Construct an initially empty element.
+     * Constructs an initially empty element.
      */
     public Element() {
     }

@@ -39,7 +39,7 @@ public class QuantitativeAttributeAccuracy extends ThematicAccuracy
     private static final long serialVersionUID = 7030401943270178746L;
     
     /**
-     * Construct an initially empty quantitative attribute accuracy.
+     * Constructs an initially empty quantitative attribute accuracy.
      */
     public QuantitativeAttributeAccuracy() {
     }

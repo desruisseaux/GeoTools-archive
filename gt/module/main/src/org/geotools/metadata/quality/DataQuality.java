@@ -69,7 +69,7 @@ public class DataQuality extends MetadataEntity
     private Lineage lineage;
     
     /**
-     * Construct an initially empty data quality.
+     * Constructs an initially empty data quality.
      */
     public DataQuality() {
     }

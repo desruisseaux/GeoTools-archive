@@ -40,7 +40,7 @@ public class TopologicalConsistency extends LogicalConsistency
     private static final long serialVersionUID = -255014076679068944L;
 
     /**
-     * Construct an initially empty topological consistency.
+     * Constructs an initially empty topological consistency.
      */
     public TopologicalConsistency() {
     }

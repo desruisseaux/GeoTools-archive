@@ -135,13 +135,13 @@ public class ExtendedElementInformation extends MetadataEntity implements org.op
     /**
      * Create an extended element information initialized to the given values.
      */
-    public ExtendedElementInformation(final String name, 
+    public ExtendedElementInformation(final String              name, 
                                       final InternationalString definition, 
                                       final InternationalString condition, 
-                                      final Datatype datatype, 
-                                      final Collection parentEntity, 
+                                      final Datatype            datatype, 
+                                      final Collection          parentEntity, 
                                       final InternationalString rule,
-                                      final Collection sources)
+                                      final Collection          sources)
     {
         setName        (name);
         setDefinition  (definition);

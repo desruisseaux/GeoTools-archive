@@ -56,7 +56,7 @@ public class GeometricObjects extends MetadataEntity
     private int geometricObjectCount;
 
     /**
-     * Construct an initially empty geometric objects.
+     * Constructs an initially empty geometric objects.
      */
     public GeometricObjects() {
     }

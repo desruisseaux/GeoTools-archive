@@ -76,7 +76,7 @@ public class Extent extends MetadataEntity implements org.opengis.metadata.exten
     private Collection/*<VerticalExtent>*/ verticalElements;
 
     /**
-     * Construct an initially empty extent.
+     * Constructs an initially empty extent.
      */
     public Extent() {
     }

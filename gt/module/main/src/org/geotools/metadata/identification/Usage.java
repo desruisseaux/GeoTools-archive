@@ -73,13 +73,13 @@ public class Usage extends MetadataEntity implements org.opengis.metadata.identi
     private Collection userContactInfo;
     
     /**
-     * Construct an initially empty usage.
+     * Constructs an initially empty usage.
      */
     public Usage() {
     }
 
     /**
-     * Create an usage initialized to the specified values.
+     * Creates an usage initialized to the specified values.
      */
     public Usage(final InternationalString specificUsage,
                  final Collection          userContactInfo)

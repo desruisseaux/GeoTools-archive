@@ -40,7 +40,7 @@ public class LogicalConsistency extends Element
     private static final long serialVersionUID = -2470752876057569947L;
     
     /**
-     * Construct an initially empty logical consistency.
+     * Constructs an initially empty logical consistency.
      */
     public LogicalConsistency() {
     }

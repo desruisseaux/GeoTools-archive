@@ -68,7 +68,7 @@ public class VerticalExtent extends MetadataEntity
     private VerticalDatum verticalDatum;
     
     /**
-     * Construct an initially empty vertical extent.
+     * Constructs an initially empty vertical extent.
      */
     public VerticalExtent() {
     }

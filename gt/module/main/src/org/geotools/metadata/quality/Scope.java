@@ -56,7 +56,7 @@ public class Scope extends MetadataEntity implements org.opengis.metadata.qualit
     private Extent extent;
 
     /**
-     * Construct an initially empty scope.
+     * Constructs an initially empty scope.
      */
     public Scope() {
     }

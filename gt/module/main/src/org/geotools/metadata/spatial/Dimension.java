@@ -61,7 +61,7 @@ public class Dimension extends MetadataEntity
     private double resolution;
 
     /**
-     * Construct an initially empty dimension.
+     * Constructs an initially empty dimension.
      */
     public Dimension() {
     }

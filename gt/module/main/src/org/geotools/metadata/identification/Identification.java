@@ -120,7 +120,7 @@ public class Identification extends MetadataEntity
     private Collection resourceConstraints;
     
     /**
-     * Construct an initially empty identification.
+     * Constructs an initially empty identification.
      */
     public Identification() {
     }

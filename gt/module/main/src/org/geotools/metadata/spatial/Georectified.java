@@ -98,7 +98,7 @@ public class Georectified extends GridSpatialRepresentation
     private Collection transformationDimensionMapping;
     
     /**
-     * Construct an initially empty georectified object.
+     * Constructs an initially empty georectified object.
      */
     public Georectified() {
     }

@@ -40,7 +40,7 @@ public class FormalConsistency extends LogicalConsistency
     private static final long serialVersionUID = -6474410938957783954L;;
 
     /**
-     * Construct an initially empty formal consistency.
+     * Constructs an initially empty formal consistency.
      */
     public FormalConsistency() {
     }

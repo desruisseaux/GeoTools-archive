@@ -69,7 +69,7 @@ public class GridSpatialRepresentation extends SpatialRepresentation
     private boolean transformationParameterAvailable;
 
     /**
-     * Construct an initially empty grid spatial representation.
+     * Constructs an initially empty grid spatial representation.
      */
     public GridSpatialRepresentation() {
     }

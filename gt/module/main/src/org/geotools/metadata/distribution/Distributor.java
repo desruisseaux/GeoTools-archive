@@ -73,7 +73,7 @@ public class Distributor extends MetadataEntity
     private Collection distributorTransferOptions;
     
     /**
-     * Construct an initially empty distributor.
+     * Constructs an initially empty distributor.
      */
     public Distributor() {
     }

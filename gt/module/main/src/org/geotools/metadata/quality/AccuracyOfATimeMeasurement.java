@@ -39,7 +39,7 @@ public class AccuracyOfATimeMeasurement extends TemporalAccuracy
     private static final long serialVersionUID = -7934234071852119486L;
 
     /**
-     * Construct an initially empty accuracy of a time measurement.
+     * Constructs an initially empty accuracy of a time measurement.
      */
     public AccuracyOfATimeMeasurement() {
     }

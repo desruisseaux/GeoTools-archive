@@ -39,7 +39,7 @@ public class DomainConsistency extends LogicalConsistency
     private static final long serialVersionUID = -358082990944183859L;
 
     /**
-     * Construct an initially empty domain consistency.
+     * Constructs an initially empty domain consistency.
      */
     public DomainConsistency() {
     }

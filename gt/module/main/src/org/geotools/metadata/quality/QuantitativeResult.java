@@ -69,13 +69,13 @@ public class QuantitativeResult extends Result
     private InternationalString errorStatistic;
 
     /**
-     * Construct an initially empty quantitative result.
+     * Constructs an initially empty quantitative result.
      */
     public QuantitativeResult() {
     }
 
     /**
-     * Construct a quantitative result initialized to the specified value.
+     * Constructs a quantitative result initialized to the specified value.
      */
     public QuantitativeResult(final double[] values) {
         setValues(values);

@@ -57,7 +57,7 @@ public class SpatialTemporalExtent extends TemporalExtent
     private Collection spatialExtent;
     
     /**
-     * Construct an initially empty spatial-temporal extent.
+     * Constructs an initially empty spatial-temporal extent.
      */
     public SpatialTemporalExtent() {
     }

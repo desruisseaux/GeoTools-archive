@@ -57,7 +57,7 @@ public class Resolution extends MetadataEntity
     private double distance;
 
     /**
-     * Construct an initially empty Resolution.
+     * Constructs an initially empty Resolution.
      */
     public Resolution() {
     }

@@ -39,7 +39,7 @@ public class TemporalValidity extends TemporalAccuracy
     private static final long serialVersionUID = 2866684429712027839L;
 
     /**
-     * Construct an initially empty temporal validity.
+     * Constructs an initially empty temporal validity.
      */
     public TemporalValidity() {
     }

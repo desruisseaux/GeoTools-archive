@@ -75,7 +75,7 @@ public class FeatureCatalogueDescription extends ContentInformation
     private Collection featureCatalogueCitations;
 
     /**
-     * Construct an initially empty feature catalogue description.
+     * Constructs an initially empty feature catalogue description.
      */
     public FeatureCatalogueDescription() {
     }

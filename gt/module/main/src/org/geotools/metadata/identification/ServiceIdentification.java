@@ -40,7 +40,7 @@ public class ServiceIdentification extends Identification
     private static final long serialVersionUID = -8337161132057617851L;
 
     /**
-     * Construct an initially empty service identification.
+     * Constructs an initially empty service identification.
      */
     public ServiceIdentification() {
     }

@@ -53,7 +53,7 @@ public class BoundingPolygon extends GeographicExtent
     private Collection/*<Geometry>*/ polygons;
 
     /**
-     * Construct an initially empty bounding polygon.
+     * Constructs an initially empty bounding polygon.
      */
     public BoundingPolygon() {
     }

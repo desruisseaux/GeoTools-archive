@@ -72,7 +72,7 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
     private Collection sources;
 
     /**
-     * Construct an initially empty lineage.
+     * Constructs an initially empty lineage.
      */
     public Lineage() {
     }

@@ -67,7 +67,7 @@ public class Distribution extends MetadataEntity
     private Collection transferOptions;
     
     /**
-     * Construct an initially empty distribution.
+     * Constructs an initially empty distribution.
      */
     public Distribution() {
     }

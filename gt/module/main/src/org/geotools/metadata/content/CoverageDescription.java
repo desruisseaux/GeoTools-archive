@@ -59,7 +59,7 @@ public class CoverageDescription extends ContentInformation
     private RangeDimension dimension;
 
     /**
-     * Construct an empty coverage description.
+     * Constructs an empty coverage description.
      */
     public CoverageDescription() {
     }

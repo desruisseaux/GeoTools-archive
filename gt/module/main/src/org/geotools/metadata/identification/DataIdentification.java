@@ -113,7 +113,7 @@ public class DataIdentification extends Identification
     private InternationalString supplementalInformation;
 
     /**
-     * Construct an initially empty data identification.
+     * Constructs an initially empty data identification.
      */
     public DataIdentification() {
     }

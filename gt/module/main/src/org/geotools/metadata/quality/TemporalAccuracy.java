@@ -39,7 +39,7 @@ public class TemporalAccuracy extends Element
     private static final long serialVersionUID = 4525353962603986621L;
 
     /**
-     * Construct an initially empty temporal accuracy.
+     * Constructs an initially empty temporal accuracy.
      */
     public TemporalAccuracy() {
     }

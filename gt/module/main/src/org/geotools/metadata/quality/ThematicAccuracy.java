@@ -40,7 +40,7 @@ public class ThematicAccuracy extends Element
     private static final long serialVersionUID = -781072634778767137L;
 
     /**
-     * Construct an initially empty thematic accuracy.
+     * Constructs an initially empty thematic accuracy.
      */
     public ThematicAccuracy() {
     }

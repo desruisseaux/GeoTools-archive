@@ -42,7 +42,7 @@ public class PositionalAccuracy extends Element
     private static final long serialVersionUID = 6043381860937480828L;
 
     /**
-     * Construct an initially empty positional accuracy.
+     * Constructs an initially empty positional accuracy.
      */
     public PositionalAccuracy() {
     }

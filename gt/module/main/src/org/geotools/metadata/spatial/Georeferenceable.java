@@ -78,7 +78,7 @@ public class Georeferenceable extends GridSpatialRepresentation
     private Collection parameterCitation;
 
     /**
-     * Construct an initially empty georeferenceable.
+     * Constructs an initially empty georeferenceable.
      */
     public Georeferenceable() {
     }

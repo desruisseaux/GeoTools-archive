@@ -39,7 +39,7 @@ public class GriddedDataPositionalAccuracy extends PositionalAccuracy
     private static final long serialVersionUID = -3852184823135498458L;
 
     /**
-     * Construct an initially empty gridded data positional acccuracy.
+     * Constructs an initially empty gridded data positional acccuracy.
      */
     public GriddedDataPositionalAccuracy() {
     }

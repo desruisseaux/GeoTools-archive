@@ -68,7 +68,7 @@ public class GeographicBoundingBox extends GeographicExtent
     private double northBoundLatitude;
 
     /**
-     * Construct an initially empty geographic bounding box.
+     * Constructs an initially empty geographic bounding box.
      */
     public GeographicBoundingBox() {
     }
@@ -81,6 +81,7 @@ public class GeographicBoundingBox extends GeographicExtent
                                  final double southBoundLatitude,
                                  final double northBoundLatitude)
     {
+        super(true);
         setWestBoundLongitude( westBoundLongitude);
         setEastBoundLongitude( eastBoundLongitude);
         setSouthBoundLatitude(southBoundLatitude );

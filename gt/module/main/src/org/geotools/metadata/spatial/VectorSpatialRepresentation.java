@@ -58,7 +58,7 @@ public class VectorSpatialRepresentation extends SpatialRepresentation
     private Collection geometricObjects;
 
     /**
-     * Construct an initially empty vector spatial representation.
+     * Constructs an initially empty vector spatial representation.
      */
     public VectorSpatialRepresentation() {
     }

@@ -347,11 +347,13 @@ public class Citation extends MetadataEntity
      * @param title The title, as a {@link String} or an {@link InternationalString} object.
      */
     public Citation(final CharSequence title) {
+        final InternationalString t;
         if (title instanceof InternationalString) {
-            this.title = (InternationalString) title;
+            t = (InternationalString) title;
         } else {
-            this.title = new SimpleInternationalString(title.toString());
+            t = new SimpleInternationalString(title.toString());
         }
+        setTitle(t);
     }
 
     /**

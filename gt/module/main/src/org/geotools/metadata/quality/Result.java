@@ -42,7 +42,7 @@ public class Result extends MetadataEntity
     private static final long serialVersionUID = 2961355780515174732L;
     
     /**
-     * Construct an initially empty result.
+     * Constructs an initially empty result.
      */
     public Result() {
     }

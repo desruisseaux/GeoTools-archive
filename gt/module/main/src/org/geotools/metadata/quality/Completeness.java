@@ -39,7 +39,7 @@ public class Completeness extends Element
     private static final long serialVersionUID = -7893993264874215741L;
     
     /**
-     * Construct an initially empty completeness.
+     * Constructs an initially empty completeness.
      */
     public Completeness() {
     }

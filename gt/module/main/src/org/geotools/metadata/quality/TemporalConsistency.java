@@ -39,7 +39,7 @@ public class TemporalConsistency extends TemporalAccuracy
     private static final long serialVersionUID = -2549290466982699190L;
 
     /**
-     * Construct an initially empty temporal consistency.
+     * Constructs an initially empty temporal consistency.
      */
     public TemporalConsistency() {
     }

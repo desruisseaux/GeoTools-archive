@@ -73,7 +73,7 @@ public class DigitalTransferOptions extends MetadataEntity
     private Medium offLines;
     
     /**
-     * Construct an initially empty digital transfer options.
+     * Constructs an initially empty digital transfer options.
      */
     public DigitalTransferOptions() {
     }

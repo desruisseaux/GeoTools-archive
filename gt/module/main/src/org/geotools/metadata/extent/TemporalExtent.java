@@ -60,7 +60,7 @@ public class TemporalExtent extends MetadataEntity
     private long endTime = Long.MIN_VALUE;
     
    /**
-     * Construct an initially empty temporal extent.
+     * Constructs an initially empty temporal extent.
      */
     public TemporalExtent() {
     }

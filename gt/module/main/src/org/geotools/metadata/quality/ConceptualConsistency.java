@@ -39,7 +39,7 @@ public class ConceptualConsistency extends LogicalConsistency
     private static final long serialVersionUID = 7143342570712197486L;
 
     /**
-     * Construct an initially empty conceptual consistency.
+     * Constructs an initially empty conceptual consistency.
      */
     public ConceptualConsistency() {
     }

@@ -72,7 +72,6 @@ public class Identifier extends MetadataEntity
      * Creates an identifier initialized to the given code.
      */
     public Identifier(final String code) {
-        super();
         setCode(code);
     }
 

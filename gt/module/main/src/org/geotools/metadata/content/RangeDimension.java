@@ -58,7 +58,7 @@ public class RangeDimension extends MetadataEntity
     private InternationalString descriptor;
 
     /**
-     * Construct an initially empty range dimension.
+     * Constructs an initially empty range dimension.
      */
     public RangeDimension() {
     }

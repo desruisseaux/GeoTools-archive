@@ -40,7 +40,7 @@ public class RelativeInternalPositionalAccuracy extends PositionalAccuracy
     private static final long serialVersionUID = -8216355887797408106L;
 
     /**
-     * Construct an initially empty relative internal positional accuracy.
+     * Constructs an initially empty relative internal positional accuracy.
      */
     public RelativeInternalPositionalAccuracy() {
     }
