@@ -454,11 +454,13 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * @param  locale The locale, or <code>null</code> for the default one.
      * @return The localized description. If no description was available
      *         in the specified locale, a default locale is used.
+     *
+     * @todo Returns InternationalString instead.
      */
     public final String getName(final Locale locale) {
         final StringBuffer buffer = new StringBuffer(30);
         if (main != null) {
-            buffer.append(main.getName(locale));
+            buffer.append(main.getName());
         } else {
             buffer.append('(');
             buffer.append(Resources.getResources(locale).getString(ResourceKeys.UNTITLED));
@@ -695,7 +697,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
                 }
                 last = category;
             }
-            return category.getName(locale);
+            return category.getName().toString(null);
         }
         return format(value, true, locale, new StringBuffer()).toString();
     }

@@ -40,6 +40,7 @@ import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -49,6 +50,7 @@ import org.geotools.gp.Hints;  // TODO
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimension;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.gcs.Resources;
@@ -391,10 +393,11 @@ final class GridSampleDimension extends SampleDimension {
         for (int b=0; b<numBands; b++) {
             NumberRange geophysicsValueRange = new NumberRange(min[b], max[b]).castTo(classe);
             final Color[] c = colors!=null ? colors[b] : null;
+            final InternationalString n = new SimpleInternationalString(name);
             if (needScaling) {
-                categories[0] = new Category(name, c, sampleValueRange, geophysicsValueRange);
+                categories[0] = new Category(n, c, sampleValueRange, geophysicsValueRange);
             } else {
-                categories[0] = new Category(name, c, sampleValueRange, LinearTransform1D.IDENTITY);
+                categories[0] = new Category(n, c, sampleValueRange, LinearTransform1D.IDENTITY);
             }
             dst[b] = new SampleDimension(categories, units).geophysics(true);
         }

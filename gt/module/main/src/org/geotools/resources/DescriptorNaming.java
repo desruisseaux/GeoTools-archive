@@ -127,8 +127,8 @@ public final class DescriptorNaming {
     private void bindDefaults(final String method) {
         try {
             final  Class c = Class.forName(initializer);
-            final Method m = c.getMethod("getDefaults", null);
-            m.invoke(null, null);
+            final Method m = c.getMethod("getDefaults", (Class[])null);
+            m.invoke(null, (Object[])null);
         } catch (ClassNotFoundException exception) {
             Utilities.unexpectedException(logger, "DescriptorNaming", method, exception);
         } catch (NoSuchMethodException exception) {

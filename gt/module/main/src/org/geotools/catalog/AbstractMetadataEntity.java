@@ -61,7 +61,7 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
             Method method = (Method) iter.next();
 
             try {
-                elements.add(method.invoke(this, null));
+                elements.add(method.invoke(this, (Object[])null));
             } catch (Exception e) {
                 throw new RuntimeException(
                         "There must be a bug in the EntityImpl class during the introspection.",
@@ -114,7 +114,7 @@ public abstract class AbstractMetadataEntity implements MetadataEntity {
 
     private Object invoke(Method m) {
         try {
-            return m.invoke(this, null);
+            return m.invoke(this, (Object[])null);
         } catch (Exception e) {
             System.out.println( this.getClass().getName() + " could not invoke "+ m.getDeclaringClass().getName()+" "+m.getName());
             throw new RuntimeException(

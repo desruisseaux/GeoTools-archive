@@ -52,6 +52,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 // Miscellaneous
+import java.util.Map;
 import java.util.Locale;
 import java.io.Serializable;
 import java.util.ConcurrentModificationException;
@@ -827,7 +828,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          *        {@link Graphics2D#getFontRenderContext}.
          */
         public TickIterator(final FontRenderContext fontContext) {
-            this.hints = new RenderingHints(Axis2D.this.hints);
+            this.hints = new RenderingHints((Map) Axis2D.this.hints);
             this.fontContext = fontContext;
             refresh();
         }

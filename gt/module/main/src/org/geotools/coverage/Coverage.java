@@ -284,7 +284,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             final CoordinateSystem cs = crs.getCoordinateSystem();
             final String[] names = new String[cs.getDimension()];
             for (int i=0; i<names.length; i++) {
-                names[i] = cs.getAxis(i).getName().toString(locale);
+                names[i] = cs.getAxis(i).getName().getCode();
             }
             return names;
         } else {
@@ -982,7 +982,7 @@ public abstract class Coverage extends PropertySourceImpl implements org.opengis
             buffer.append(", ");
             buffer.append(Utilities.getShortClassName(crs));
             buffer.append("[\"");
-            buffer.append(crs.getName().toString(locale));
+            buffer.append(crs.getName().getCode());
             buffer.append("\"]");
         }
         buffer.append(']');

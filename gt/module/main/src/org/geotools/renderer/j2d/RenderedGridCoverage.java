@@ -448,7 +448,7 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
                 if (hints != null) {
                     hints.add(renderer.hints);
                 } else {
-                    hints = new RenderingHints(renderer.hints);
+                    hints = new RenderingHints((Map) renderer.hints);
                 }
                 if (hints.get(JAI.KEY_IMAGE_LAYOUT) == null) {
                     hints.put(JAI.KEY_IMAGE_LAYOUT, new ImageLayout());

@@ -16,10 +16,17 @@
  */
 package org.geotools.data;
 
+// J2SE dependencies
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.URI;
 
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystem;
+
+// Geotools dependencies
 import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystemFactory;
@@ -31,11 +38,11 @@ import org.geotools.ct.MathTransform;
 import org.geotools.feature.FeatureType;
 import org.geotools.pt.CoordinatePoint;
 import org.geotools.units.Unit;
-import org.geotools.util.InternationalString;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.CoordinateSystem;
+import org.geotools.util.SimpleInternationalString;
 
+// JTS dependencies
 import com.vividsolutions.jts.geom.Envelope;
+
 
 /**
  * Metadata derived from a FeatureSource.
@@ -73,8 +80,8 @@ public class FeatureTypeMetadataEntity extends AbstractMetadataEntity {
     public FeatureTypeMetadataEntity( DataStore store, URI namespace, String typeName ){
         this.store = store;
         this.typeName = typeName;
-        this.displayName = new InternationalString( typeName.substring(0,1).toUpperCase() + typeName.substring(1).toLowerCase() );
-        this.description = new InternationalString( "Feature type "+typeName );
+        this.displayName = new SimpleInternationalString( typeName.substring(0,1).toUpperCase() + typeName.substring(1).toLowerCase() );
+        this.description = new SimpleInternationalString( "Feature type "+typeName );
         try {
             source = store.getFeatureSource( typeName );
             source.addFeatureListener( new FeatureListener(){

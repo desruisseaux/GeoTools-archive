@@ -307,7 +307,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
         if (cs != null) {
             final String[] names = new String[cs.getDimension()];
             for (int i=0; i<names.length; i++) {
-                names[i] = cs.getAxis(i).getName().toString(locale);
+                names[i] = cs.getAxis(i).getName().getCode();
             }
             return names;
         } else {
@@ -945,7 +945,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
             buffer.append(", ");
             buffer.append(Utilities.getShortClassName(cs));
             buffer.append("[\"");
-            buffer.append(cs.getName().toString(locale));
+            buffer.append(cs.getName().getCode());
             buffer.append("\"]");
         }
         buffer.append(']');

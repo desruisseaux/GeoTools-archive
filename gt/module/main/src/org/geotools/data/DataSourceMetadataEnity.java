@@ -16,6 +16,7 @@
  */
 package org.geotools.data;
 
+// J2SE dependencies
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +24,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.geotools.util.InternationalString;
+// OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.catalog.MetadataEntity;
+
+// Geotools dependencies
+import org.geotools.util.SimpleInternationalString;
+
 
 // **********************************************************
 // DONT COPY THIS AS AN EXAMPLE METADATAENTITY IMPLEMENTATION
@@ -68,13 +74,13 @@ public class DataSourceMetadataEnity implements MetadataEntity {
         
     public DataSourceMetadataEnity( File directory, String description ){
         host = directory.getParent();
-        name = new InternationalString( directory.getName() );
-        this.description = new InternationalString( description );
+        name = new SimpleInternationalString( directory.getName() );
+        this.description = new SimpleInternationalString( description );
     }
     public DataSourceMetadataEnity( String host, String name, String description ){
         this.host = host;
-        this.name = new InternationalString( name );
-        this.description = new InternationalString( description );
+        this.name = new SimpleInternationalString( name );
+        this.description = new SimpleInternationalString( description );
     }
     
     /**

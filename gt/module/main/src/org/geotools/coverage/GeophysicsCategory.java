@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.util.Locale;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
@@ -70,9 +71,9 @@ final class GeophysicsCategory extends Category {
     /**
      * Returns the category name localized in the specified locale.
      */
-    public String getName(final Locale locale) {
+    public InternationalString getName() {
         assert !(inverse instanceof GeophysicsCategory);
-        return inverse.getName(locale);
+        return inverse.getName();
     }
     
     /**

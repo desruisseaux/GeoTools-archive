@@ -35,6 +35,7 @@ import javax.media.jai.util.Range;
 import javax.media.jai.operator.PiecewiseDescriptor; // For Javadoc
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.referencing.operation.MathTransform; // For Javadoc
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
@@ -108,33 +109,52 @@ public class Category implements Serializable {
     static final WeakHashSet pool = new WeakHashSet();
 
     /**
+     * The 0 value as a byte. Used for {@link #FALSE} categories.
+     */
+    private static final NumberRange BYTE_0;
+    static {
+        final Byte index = new Byte((byte) 0);
+        BYTE_0 = new NumberRange(Byte.class, index, index);
+    }
+
+    /**
+     * The 1 value as a byte. Used for {@link #TRUE} categories.
+     */
+    private static final NumberRange BYTE_1;
+    static {
+        final Byte index = new Byte((byte) 1);
+        BYTE_1 = new NumberRange(Byte.class, index, index);
+    }
+
+    /**
      * A default category for "no data" values. This default qualitative category use
      * sample value 0, which is mapped to geophysics value {@link Float#NaN} for those who work
      * with floating point images. The rendering color default to a fully transparent color and
      * the name is "no data" localized to the requested locale.
      */
-    public static final Category NODATA = new Localized(ResourceKeys.NODATA, new Color(0,0,0,0), 0);
+    public static final Category NODATA = new Category(
+            Resources.formatInternational(ResourceKeys.NODATA), new Color(0,0,0,0), 0);
 
     /**
      * A default category for the boolean "{@link Boolean#FALSE false}" value. This default
      * identity category uses sample value 0, the color {@linkplain Color#BLACK black} and
      * the name "false" localized to the specified locale.
      */
-    public static final Category FALSE = new Localized(ResourceKeys.FALSE, Color.BLACK,
-                                                       new Byte((byte)0));
+    public static final Category FALSE = new Category(
+            Resources.formatInternational(ResourceKeys.FALSE), Color.BLACK, false);
 
     /**
      * A default category for the boolean "{@link Boolean#TRUE true}" value. This default
      * identity category uses sample value 1, the color {@linkplain Color#WHITE white}
      * and the name "true" localized to the specified locale.
      */
-    public static final Category TRUE = new Localized(ResourceKeys.TRUE, Color.WHITE,
-                                                      new Byte((byte)1));
+    public static final Category TRUE = new Category(
+            Resources.formatInternational(ResourceKeys.TRUE), Color.WHITE, true);
     
     /**
-     * The category name (may not be localized).
+     * The category name.
      */
-    private final String name;
+    private final InternationalString name;
     
     /**
      * The minimal sample value (inclusive). This category is made of all values
@@ -204,15 +224,29 @@ public class Category implements Serializable {
     };
     
     /**
+     * Construct a qualitative category for a boolean value.
+     *
+     * @param  name    The category name.
+     * @param  color   The category color, or <code>null</code> for a default color.
+     * @param  sample  The sample value as a boolean.
+     */
+    public Category(final InternationalString name,
+                    final Color              color,
+                    final boolean           sample)
+    {
+        this(name, new Color[]{color}, sample ? BYTE_0 : BYTE_1, LinearTransform1D.IDENTITY);
+    }
+    
+    /**
      * Construct a qualitative category for sample value <code>sample</code>.
      *
      * @param  name    The category name.
      * @param  color   The category color, or <code>null</code> for a default color.
      * @param  sample  The sample value as an integer, usually in the range 0 to 255.
      */
-    public Category(final String name,
-                    final Color  color,
-                    final int    sample)
+    public Category(final InternationalString name,
+                    final Color              color,
+                    final int               sample)
     {
         this(name, toARGB(color, sample), new Integer(sample));
         assert minimum == sample : minimum;
@@ -226,9 +260,9 @@ public class Category implements Serializable {
      * @param  color   The category color, or <code>null</code> for a default color.
      * @param  sample  The sample value as a double. May be one of <code>NaN</code> values.
      */
-    public Category(final String name,
-                    final Color  color,
-                    final double sample)
+    public Category(final InternationalString name,
+                    final Color              color,
+                    final double            sample)
     {
         this(name, toARGB(color, (int)sample), new Double(sample));
         assert Double.doubleToRawLongBits(minimum) == Double.doubleToRawLongBits(sample) : minimum;
@@ -238,9 +272,9 @@ public class Category implements Serializable {
     /**
      * Construct a qualitative category for sample value <code>sample</code>.
      */
-    private Category(final String  name,
-                     final int[]   ARGB,
-                     final Number  sample)
+    private Category(final InternationalString name,
+                     final int[]               ARGB,
+                     final Number            sample)
     {
         this(name, ARGB, new NumberRange(sample.getClass(), sample, sample), null);
         assert Double.isNaN(inverse.minimum) : inverse.minimum;
@@ -256,8 +290,8 @@ public class Category implements Serializable {
      *                 is usually {@link Integer}, but {@link Float} and {@link Double} are
      *                 accepted as well.
      */
-    public Category(final String      name,
-                    final Color       color,
+    public Category(final InternationalString     name,
+                    final Color                  color,
                     final NumberRange sampleValueRange) throws IllegalArgumentException
     {
         this(name, new Color[] {color}, sampleValueRange, (MathTransform1D) null);
@@ -290,9 +324,9 @@ public class Category implements Serializable {
      * @throws IllegalArgumentException if <code>scale</code> or <code>offset</code> are
      *         not real numbers.
      */
-    public Category(final String  name,
-                    final Color[] colors,
-                    final int     lower,
+    public Category(final InternationalString name,
+                    final Color[]           colors,
+                    final int                lower,
                     final int     upper,
                     final double  scale,
                     final double  offset) throws IllegalArgumentException
@@ -330,8 +364,8 @@ public class Category implements Serializable {
      * @throws IllegalArgumentException if <code>scale</code> or <code>offset</code> are
      *         not real numbers.
      */
-    public Category(final String      name,
-                    final Color[]     colors,
+    public Category(final InternationalString     name,
+                    final Color[]               colors,
                     final NumberRange sampleValueRange,
                     final double      scale,
                     final double      offset) throws IllegalArgumentException
@@ -380,8 +414,8 @@ public class Category implements Serializable {
      * @throws ClassCastException if the range element class is not a {@link Number} subclass.
      * @throws IllegalArgumentException if the range is invalid.
      */
-    public Category(final String      name,
-                    final Color[]     colors,
+    public Category(final InternationalString     name,
+                    final Color[]               colors,
                     final NumberRange sampleValueRange,
                     final NumberRange geophysicsValueRange) throws IllegalArgumentException
     {
@@ -411,9 +445,9 @@ public class Category implements Serializable {
      * @throws ClassCastException if the range element class is not a {@link Number} subclass.
      * @throws IllegalArgumentException if the range is invalid.
      */
-    public Category(final String          name,
-                    final Color[]         colors,
-                    final NumberRange     sampleValueRange,
+    public Category(final InternationalString     name,
+                    final Color[]               colors,
+                    final NumberRange sampleValueRange,
                     final MathTransform1D sampleToGeophysics) throws IllegalArgumentException
     {
         this(name, toARGB(colors), sampleValueRange, sampleToGeophysics);
@@ -425,12 +459,12 @@ public class Category implements Serializable {
      * {@link #recolor} in order to construct a new category similar to this one except for
      * ARGB codes.
      */
-    private Category(final String      name,
-                     final int[]       ARGB,
-                     final NumberRange range,
+    private Category(final InternationalString     name,
+                     final int[]                   ARGB,
+                     final NumberRange            range,
                      MathTransform1D sampleToGeophysics) throws IllegalArgumentException
     {
-        this.name      = name.trim();
+        this.name      = name; // TODO: ensure non null
         this.ARGB      = ARGB;
         this.range     = range;
         Class type     = range.getElementClass();
@@ -672,15 +706,9 @@ public class Category implements Serializable {
     }
     
     /**
-     * Returns the category name localized in the specified locale. If no name is
-     * available for the specified locale, then an arbitrary locale may be used.
-     * The default implementation returns the <code>name</code> argument specified
-     * at construction time.
-     *
-     * @param  locale The desired locale, or <code>null</code> for the default locale.
-     * @return The category name, localized if possible.
+     * Returns the category name.
      */
-    public String getName(final Locale locale) {
+    public InternationalString getName() {
         return name;
     }
     
@@ -931,50 +959,5 @@ public class Category implements Serializable {
      */
     private Object writeReplace() throws ObjectStreamException {
         return pool.canonicalize(this);
-    }
-
-    /**
-     * A category with a localized name. Used for the pre-defined categories
-     * {@link #NODATA}, {@link #FALSE} and {@link #TRUE}.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    private static final class Localized extends Category {
-        /**
-         * The key for the localized string.
-         */
-        private final int key;
-
-        /**
-         * Construct a localized qualitative category.
-         * Used for the construction of the {@link #NODATA} category.
-         */
-        public Localized(final int key, final Color color, final int index) {
-            super(Resources.format(key), color, index);
-            this.key = key;
-        }
-
-        /**
-         * Construct a localized identity category.
-         * Used for the construction of the {@link #FALSE} and {@link #TRUE} categories.
-         */
-        public Localized(final int key, final Color color, final Byte index) {
-            super(Resources.format(key), new Color[]{color},
-                  new NumberRange(Byte.class, index, index),
-                  LinearTransform1D.IDENTITY);
-            this.key = key;
-        }
-
-        /**
-         * Returns the category name localized in the specified locale.
-         */
-        public String getName(final Locale locale) {
-            if (locale != null) {
-                return Resources.getResources(locale).getString(key);
-            } else {
-                return super.getName(locale);
-            }
-        }
     }
 }

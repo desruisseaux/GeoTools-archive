@@ -43,6 +43,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.util.Range;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.ColorInterpretation;
 import org.opengis.coverage.PaletteInterpretation;
@@ -51,6 +52,7 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.XMath;
 import org.geotools.resources.XArray;
@@ -243,7 +245,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         }
         final Category[] categories = new Category[names.length];
         for (int i=0; i<categories.length; i++) {
-            categories[i] = new Category(names[i], colors[i], i);
+            categories[i] = new Category(new SimpleInternationalString(names[i]), colors[i], i);
         }
         return list(categories, null);
     }
@@ -367,7 +369,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
             }
             final NumberRange range = new NumberRange(value.getClass(), value, value);
             final Color[] colors = ColorUtilities.subarray(palette, intValue, intValue+1);
-            categoryList.add(new Category(name, colors, range, (MathTransform1D)null));
+            categoryList.add(new Category(new SimpleInternationalString(name),
+                                          colors, range, (MathTransform1D)null));
         }
         /*
          * STEP 2 - Add a qualitative category for each category name.
@@ -397,7 +400,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                 }
                 final NumberRange range = new NumberRange(classe, min, max);
                 final Color[] colors = ColorUtilities.subarray(palette, lower, upper);
-                categoryList.add(new Category(name, colors, range, (MathTransform1D)null));
+                categoryList.add(new Category(new SimpleInternationalString(name),
+                                              colors, range, (MathTransform1D)null));
                 lower = upper;
             }
         }
@@ -429,7 +433,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                         final double xmin = ((Number)min).doubleValue();
                         final double xmax = ((Number)max).doubleValue();
                         if (!rangeContains(xmin, xmax, nodata)) {
-                            final String name = category.getName(null);
+                            final InternationalString name = category.getName();
                             final Color[] colors = category.getColors();
                             category = new Category(name, colors, range, scale, offset);
                             categoryList.set(i, category);
@@ -484,8 +488,9 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
                 final Color[] colors = ColorUtilities.subarray(palette,
                                                      (int)Math.ceil (minimum),
                                                      (int)Math.floor(maximum));
-                categoryList.add(new Category(description!=null ? description : "(automatic)",
-                                 colors, range, scale, offset));
+                categoryList.add(new Category(
+                    new SimpleInternationalString(description!=null ? description : "(automatic)"),
+                    colors, range, scale, offset));
                 needQuantitative = false;
             }
         }
@@ -816,39 +821,37 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
         }
         throw new IllegalArgumentException(String.valueOf(value));
     }
-
-    /**
-     * Get the sample dimension title or description.
-     *
-     * @deprecated Uses {@link #getDescription(Locale)} instead.
-     *             This method may be removed in GeoAPI 1.1.
-     */
-    public String getDescription() {
-        return getDescription(Locale.getDefault());
-    }    
     
     /**
      * Get the sample dimension title or description.
      * This string may be <code>null</code> if no description is present.
      *
-     * @param  locale The locale, or <code>null</code> for the default one.
-     * @return The localized description, or <code>null</code> if none.
-     *         If no description was available in the specified locale,
-     *         then a default locale is used.
+     * @todo CategoryList.getName() should returns directly an international string.
      */
-    public String getDescription(final Locale locale) {
+    public InternationalString getDescription() {
+        return (categories!=null) ? new SimpleInternationalString(categories.getName(null)) : null;
+    }
+    
+    /**
+     * @deprecated Use {@link #getDescription()} instead.
+     */
+    public String getDescription(Locale locale) {
         return (categories!=null) ? categories.getName(locale) : null;
     }
 
     /**
      * Returns a sequence of category names for the values contained in this sample dimension.
      *
-     * @deprecated Uses {@link #getCategoryNames(Locale)} instead.
-     *             This method may be removed in GeoAPI 1.1.
+     * @todo Not yet fully implemented.
      */
-    public String[] getCategoryNames() {
-        return getCategoryNames(Locale.getDefault());
-    }    
+    public InternationalString[] getCategoryNames() {
+        final String[] names = getCategoryNames(Locale.getDefault());
+        final InternationalString[] n = new InternationalString[names.length];
+        for (int i=0; i<names.length; i++) {
+            n[i] = new SimpleInternationalString(names[i]);
+        }
+        return n;
+    }
 
     /**
      * Returns a sequence of category names for the values contained in this sample dimension.
@@ -870,6 +873,8 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
      *
      * @see #getCategories
      * @see #getCategory
+     *
+     * @todo Returns InternationalString instead.
      */
     public String[] getCategoryNames(final Locale locale) throws IllegalStateException {
         if (categories == null) {
@@ -893,7 +898,7 @@ public class SampleDimension implements org.opengis.coverage.SampleDimension, Se
             if (names == null) {
                 names = new String[upper+1];
             }
-            Arrays.fill(names, lower, upper+1, category.getName(locale));
+            Arrays.fill(names, lower, upper+1, category.getName().toString(locale));
         }
         return names;
     }

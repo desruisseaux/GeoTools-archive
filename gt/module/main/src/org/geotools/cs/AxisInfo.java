@@ -123,7 +123,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      *
      * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getName}.
      */
-    public final InternationalString name;
+    public final org.opengis.metadata.Identifier name;
     
     /**
      * Enumerated value for orientation.
@@ -146,7 +146,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * @param orientation The axis orientation.
      */
     public AxisInfo(final String name, final AxisOrientation orientation) {
-        this.name        = new InternationalString( name );
+        this.name        = new org.geotools.referencing.Identifier(null, name);
         this.orientation = orientation;
         this.unit        = null;
         Info.ensureNonNull("name",        name);
@@ -169,9 +169,14 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * @param locale The locale, or <code>null</code> for the default locale.
      * @return The localized string.
      */
-    public org.opengis.util.InternationalString getName() {
+    public org.opengis.metadata.Identifier getName() {
         return name;
     }
+
+    /** For compatibility with GeoAPI interfaces. */
+    public org.opengis.util.GenericName[] getAlias() {
+        return new org.opengis.util.GenericName[0];
+    }    
     
     /**
      * Returns a hash value for this axis.

@@ -31,11 +31,12 @@ import org.opengis.cs.CS_AngularUnit;
 
 // OpenGIS dependencies (GeoAPI)
 import org.opengis.metadata.Identifier;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.units.Unit;
 import org.geotools.util.WeakHashSet;
-import org.geotools.util.InternationalString;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.RemoteProxy;
 import org.geotools.resources.cts.Resources;
@@ -105,7 +106,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
     /**
      * The non-localized object name.
      */
-    private final InternationalString name;
+    private final Identifier name;
     
     /**
      * The non-localized object remarks.
@@ -149,8 +150,8 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
         } else {
             properties = null;
         }
-        this.name = new InternationalString( name.toString() );
-        this.remarks = new InternationalString();        
+        this.remarks = new SimpleInternationalString("");
+        this.name = new org.geotools.referencing.Identifier(null, name.toString());
     }
     
     /**
@@ -164,7 +165,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      *
      * @see org.opengis.cs.CS_Info#getName()
      */
-    public org.opengis.util.InternationalString getName() {
+    public Identifier getName() {
         return name;
     }
     
@@ -223,6 +224,11 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
     public String getAlias(final Locale locale) {
         return getProperty("alias");
     }
+
+    /** For compatibility with GeoAPI interfaces. */
+    public org.opengis.util.GenericName[] getAlias() {
+        return new org.opengis.util.GenericName[0];
+    }    
     
     /**
      * Gets the abbreviation, or <code>null</code> if there is none.
@@ -251,7 +257,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      *
      * @see org.opengis.cs.CS_Info#getRemarks()
      */
-    public org.opengis.util.InternationalString getRemarks() {
+    public InternationalString getRemarks() {
         return remarks;
     }
     
@@ -390,7 +396,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      * To be overriden by {@link Projection} only.
      */
     String getWKTName(final Locale locale) {
-        return name.toString(locale);
+        return name.getCode();
     }
     
     /**
@@ -579,7 +585,6 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
     public String toWKT() {
         return toString();
     }
-    
     
     
     /////////////////////////////////////////////////////////////////////////
