@@ -1,8 +1,13 @@
-// The following were calculated with ArcGIS 8.3 
-// (minor changes needed in projection names and parameters between ArcGIS and gt2)
-// points with an //Error: comment could not be calculated with ArcGIS, 
-// and were instead calculated with libproj4
-// Note, the lambert is undefined at one of the poles (these points were removed below)
+// Test points for the Lambert Conformal Conic Projection 
+// (EPSG 9801, 9802, and 9803)
+//
+// The following test points were calculated with ArcGIS 8.3
+// ArcGIS does not support a separate "Lambert_Conformal_Conic_1SP",
+// so this was calculated by setting SP1 == latOfOrigin.
+// Points with an //Error: comment could not be calculated with ArcGIS, 
+// and were instead calculated with libproj4.
+// Note: the lambert is undefined at one of the poles and
+// these points were removed below.
 //
 // Rueben Schulz - May 17, 2004
 //
@@ -16,6 +21,7 @@
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
 // than the value specified in the last "test tolerance" statement, then a failure is reported.
+// Inverse transforms are tested if java assertions are enabled.
 // If some test fails, "print" statements can be added in this script for debugging purpose:
 //
 //    print crs            (prints the source and target CRS, and the transform between them)
@@ -95,7 +101,7 @@ target pt = (0.00000000,      11056513.27858567)
 ////////////////////////////////////////////
 //Elliptical 1SP tests (SP1 != lat of origin)
 //Lambert_Conformal_Conic_2SP
-set _Lambert2_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", 0.0], PARAMETER["latitude_of_origin", -50.0], PARAMETER["false_easting", 100000.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -40.0], PARAMETER["standard_parallel_2", -40.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Lambert2_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", 0.0], PARAMETER["latitude_of_origin", -50.0], PARAMETER["false_easting", 100000.0], PARAMETER["false_northing", 0.0], UNIT["metre",1.0], PARAMETER["standard_parallel_1", -40.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 source crs = _WGS84_
 target crs = _Lambert2_
@@ -163,7 +169,7 @@ target pt = (100000.00000000, -6494483.78125990)
 ////////////////////////////////////////////
 //Elliptical 2SP tests
 //Lambert_Conformal_Conic_2SP
-set _Lambert3_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", 180.0], PARAMETER["latitude_of_origin", -10.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["feet", 0.304800609601219], PARAMETER["standard_parallel_1", 30.0], PARAMETER["standard_parallel_2", 60.0], AXIS["x",EAST], AXIS["y",NORTH]]
+set _Lambert3_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic"], PARAMETER["central_meridian", 180.0], PARAMETER["latitude_of_origin", -10.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["feet", 0.304800609601219], PARAMETER["standard_parallel_1", 30.0], PARAMETER["standard_parallel_2", 60.0], AXIS["x",EAST], AXIS["y",NORTH]]
 set _Lambert4_=PROJCS["Lambert", GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian", 35.0], PARAMETER["latitude_of_origin", 70.0], PARAMETER["false_easting", 100.0], PARAMETER["false_northing", 0.0], UNIT["feet", 0.304800609601219], PARAMETER["standard_parallel_1", 70.0], PARAMETER["standard_parallel_2", 80.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 source crs = _WGS84_
