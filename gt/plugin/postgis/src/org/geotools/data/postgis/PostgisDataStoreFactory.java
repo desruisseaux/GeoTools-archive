@@ -174,6 +174,9 @@ public class PostgisDataStoreFactory
      *         or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
+        // Try processing params first so we can get an error message
+        // back to the user
+        //
         if (canProcess(params)) {
         } else {
             throw new IOException("The parameteres map isn't correct!!");
@@ -185,13 +188,6 @@ public class PostgisDataStoreFactory
         Integer port = (Integer) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
-
-        // Try processing params first so we can get an error message
-        // back to the user
-        //
-        if (!canProcess(params)) {
-            return null;
-        }
 
         PostgisConnectionFactory connFact = new PostgisConnectionFactory(host,
                 port.toString(), database);
