@@ -82,7 +82,7 @@ public class PostgisDataStoreFactoryTest extends TestCase {
             assertNotNull( "created", temp );
         }
         catch( DataSourceException expected){
-            assertEquals("Could not get connection",expected.getMessage());
+        	assertTrue( expected.getMessage().startsWith("Connection failed:"));            
         }                        
     }
     public void testRemote() throws Exception {
@@ -102,7 +102,7 @@ public class PostgisDataStoreFactoryTest extends TestCase {
             assertNotNull( "created", temp );
         }
         catch( DataSourceException expected){
-            assertEquals("Could not get connection",expected.getMessage());
+        	assertTrue( expected.getMessage().startsWith("Connection failed:"));
         }               
     }    
 }
