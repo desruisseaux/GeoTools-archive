@@ -19,6 +19,8 @@
 package org.geotools.resources;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -95,7 +97,12 @@ public class TestData {
      * @return URL or null of named test-data could not be found
      */
     public static final URL getResource(final Class caller, final String name) throws IOException {
-        return caller.getResource("test-data/"+name);
+    	if( name == null ){
+    		return caller.getResource("test-data");
+    	}
+    	else {
+    		return caller.getResource("test-data/"+name);
+    	}
     }
 
     // REVISIT: Should this be getURL() - or simply url
@@ -108,6 +115,42 @@ public class TestData {
      * @return URL or null of named test-data could not be found 
      */
     public static final URL getResource(final Object caller, final String name) throws IOException {
-        return caller.getClass().getResource("test-data/"+name);       
+    	if( name == null ){
+    		return caller.getClass().getResource("test-data");
+    	}
+    	else {
+    		return caller.getClass().getResource("test-data/"+name);
+    	}
+    }
+    /**
+     * Access to getResource( caller, path ) as a File.
+     * <p>
+     * You can access the test-data directory with:
+     * <pre><code>
+     * TestData.file( this, null )
+     * </code></pre>
+     * </p>
+     * @param caller Calling object used to locate test-data
+     * @param path Path to file in testdata
+     * @return File from test-data
+     * @throws IOException
+     */
+    public static final File file( final Object caller, final String path ) throws IOException {
+    	URL url = getResource( caller, path );
+    	// Based SVGTest
+    	File file = new File(java.net.URLDecoder.decode( url.getFile(),"UTF-8"));
+    	if( !file.exists() ) {
+    		throw new FileNotFoundException("Could not locate test-data: "+path );    		
+    	}
+    	return file;    	
+    }
+    public static final File temp( final Object caller, final String name ) throws IOException{
+    	File testData = file( caller, null );
+    	int split = name.lastIndexOf(".");
+    	String prefix = split == -1 ? name : name.substring(0,split);
+    	String suffix = split == -1 ? null : name.substring(split+1);
+    	File tmp = File.createTempFile( prefix, suffix, testData );
+    	tmp.deleteOnExit();    	
+    	return tmp;
     }
 }
