@@ -256,7 +256,6 @@ public class ProjectionTest extends TestCase {
      * Some tests for the Lambert Conic Conformal Projection.
      */
     public void testLambert() throws FactoryException, TransformException {
-        if (true) return; // TODO: temporary disabled test.
 
         ///////////////////////////////////////
         // Lambert_Conformal_Conic_1SP tests //
@@ -359,10 +358,10 @@ public class ProjectionTest extends TestCase {
         // Lambert_Conformal_Conic_2SP_Belgium test  //
         ///////////////////////////////////////////////
         if (VERBOSE) {
-            printParameters("Lambert_Conic_Conformal_2SP_Belgium");
+            printParameters("Lambert_Conformal_Conic_2SP_Belgium");
         }    
         //epsg p. 19
-        params = mtFactory.getDefaultParameters("Lambert_Conic_Conformal_2SP_Belgium");
+        params = mtFactory.getDefaultParameters("Lambert_Conformal_Conic_2SP_Belgium");
         params.parameter("semi_major")         .setValue(6378388.0);
         params.parameter("semi_minor")         .setValue(6356911.946);
         params.parameter("central_meridian")   .setValue(      4.356939722);
