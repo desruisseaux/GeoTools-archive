@@ -2890,8 +2890,8 @@ public class GMLComplexTypes {
                 	    featureCollectionBuffer.state = 
                 	        (featureCollectionBuffer.getCapacity() - 
                 	        featureCollectionBuffer.getSize())/3;
-                		logger.finest("New State "+featureCollectionBuffer.state+" "+featureCollectionBuffer.getSize());
-                		while(featureCollectionBuffer.getSize()>featureCollectionBuffer.getCapacity()*2/3){
+            		logger.finest("New State "+featureCollectionBuffer.state+" "+featureCollectionBuffer.getSize());
+                		while(featureCollectionBuffer.getSize()>featureCollectionBuffer.getCapacity()-1){
                 		    logger.finest("waiting for reader");
                 		    Thread.yield();
                 		}

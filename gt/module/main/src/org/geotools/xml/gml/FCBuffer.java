@@ -142,8 +142,10 @@ public class FCBuffer extends Thread implements FeatureReader{
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
-        if(exception != null)
+        if(exception != null){
+            state = STOP;
             throw new IOException(exception.toString());
+        }
         size --;
         Feature f =  features[head++];
         if(head == features.length)
@@ -161,16 +163,17 @@ public class FCBuffer extends Thread implements FeatureReader{
             return false;
         if(exception != null)
             throw new IOException(exception.toString());
-        int t = features.length/3;
-        logger.finest("hasNext "+size+" "+t);
-        while (size<=t && state != FINISH){
+        logger.finest("hasNext "+size);
+        while (size<=1 && state != FINISH){
             logger.finest("waiting for parser");
             Thread.yield();
         }
         if(state == FINISH)
             return !(size == 0);
-        if(size == 0)
+        if(size == 0){
+            state = STOP;
             throw new IOException("There was an error");
+        }
         return true;
     }
 
@@ -191,8 +194,10 @@ public class FCBuffer extends Thread implements FeatureReader{
             // start parsing until buffer part full, then yield();
         }catch(StopException e){
             exception = e;
+            state = STOP;
         }catch(SAXException e){
             exception = e;
+            state = STOP;
         }
         
     }
