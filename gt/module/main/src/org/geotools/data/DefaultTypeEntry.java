@@ -195,7 +195,7 @@ public class DefaultTypeEntry implements TypeEntry {
      * </p>
      */
     public synchronized Envelope getBounds() {        
-        if( bounds != null ) {
+        if( bounds == null ) {
             bounds = createBounds();            
         }
         return bounds;        
@@ -218,7 +218,7 @@ public class DefaultTypeEntry implements TypeEntry {
                 CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
                 bbox = CRSService.toGeographic( bbox, cs );
             }
-            catch (Error badRepoject ) {
+            catch (Throwable badRepoject ) {
                 badRepoject.printStackTrace();
             }
         } catch (Exception e) {
