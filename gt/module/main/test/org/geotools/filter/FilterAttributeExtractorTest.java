@@ -31,6 +31,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
@@ -280,7 +281,8 @@ public class FilterAttributeExtractorTest extends TestCase {
         Expression left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 
-        Expression geom = new LiteralExpressionImpl(new LineString(coords, new PrecisionModel(), 1));
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        Expression geom = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(geom);
         assertAttributeName(filter, "testGeometry");
 
@@ -304,8 +306,9 @@ public class FilterAttributeExtractorTest extends TestCase {
         coords2[3] = new Coordinate(10, 15);
         coords2[4] = new Coordinate(10, 10);
 
-        Expression right = new LiteralExpressionImpl(new Polygon(
-                    new LinearRing(coords2, new PrecisionModel(), 1), null, new PrecisionModel(), 1));
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        Expression right = new LiteralExpressionImpl(gf.createPolygon(
+                    gf.createLinearRing(coords2), null));
         filter.addRightGeometry(right);
         filter.setDistance(20);
 

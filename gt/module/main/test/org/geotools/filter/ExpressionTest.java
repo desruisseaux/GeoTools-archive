@@ -31,6 +31,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -164,7 +165,8 @@ public class ExpressionTest extends TestCase {
 
         // Builds the test feature
         Object[] attributes = new Object[10];
-        attributes[0] = new LineString(coords, new PrecisionModel(), 1);
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        attributes[0] = gf.createLineString(coords);
         attributes[1] = new Boolean(true);
         attributes[2] = new Character('t');
         attributes[3] = new Byte("10");
@@ -299,9 +301,10 @@ public class ExpressionTest extends TestCase {
     }
     
     public void testDisalowedLeftAndRightExpressions() throws IllegalFilterException {
-        Expression geom = new LiteralExpressionImpl(new Point(new Coordinate(2,2),null,2));
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        Expression geom = new LiteralExpressionImpl(gf.createPoint(new Coordinate(2,2)));
         Expression text = new LiteralExpressionImpl("text");
-        MathExpressionImpl mathTest = new MathExpressionImpl(DefaultExpression.MATH_ADD);
+        MathExpressionImpl mathTest = new MathExpressionImpl(Expression.MATH_ADD);
         try{
             mathTest.addLeftValue(geom);
             fail("geometries are not allowed in math expressions");

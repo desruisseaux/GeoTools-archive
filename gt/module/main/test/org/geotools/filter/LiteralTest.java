@@ -27,6 +27,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -53,8 +55,8 @@ public class LiteralTest extends TestCase {
         LiteralExpression a = new LiteralExpressionImpl(new Double(10));
         LiteralExpression b = new LiteralExpressionImpl("Label");
         LiteralExpression c = new LiteralExpressionImpl(new Integer(10));
-        LiteralExpression d = new LiteralExpressionImpl(new GeometryCollection(
-                    null, null, -1));
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        LiteralExpression d = new LiteralExpressionImpl(gf.createGeometryCollection(null));
     }
 
     public void testInvalidConstruction1() throws Exception {

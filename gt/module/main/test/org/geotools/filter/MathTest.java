@@ -34,6 +34,8 @@ import org.geotools.feature.FeatureTypeFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -71,16 +73,17 @@ public class MathTest extends TestCase {
                 },"testSchema");
 
         Feature[] f = new Feature[3];
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
         f[0] = schema.create(new Object[] {
-                    new Integer(12), new GeometryCollection(null, null, -1),
+                    new Integer(12), gf.createGeometryCollection(null),
                     "first"
                 });
         f[1] = schema.create(new Object[] {
-                    new Integer(3), new GeometryCollection(null, null, -1),
+                    new Integer(3), gf.createGeometryCollection(null),
                     "second"
                 });
         f[2] = schema.create(new Object[] {
-                    new Integer(15), new GeometryCollection(null, null, -1),
+                    new Integer(15), gf.createGeometryCollection(null),
                     "third"
                 });
 

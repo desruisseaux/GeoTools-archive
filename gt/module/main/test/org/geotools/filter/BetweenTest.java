@@ -35,7 +35,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -47,8 +48,6 @@ public class BetweenTest extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter");
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory
-        .newInstance();
 
     public BetweenTest(java.lang.String testName) {
         super(testName);
@@ -69,8 +68,8 @@ public class BetweenTest extends TestCase {
         //but we can start with a set of hard coded tests
         BetweenFilterImpl a = new BetweenFilterImpl();
 
-        AttributeType a1 = attFactory.newAttributeType("value", Integer.class);
-        AttributeType a2 = attFactory.newAttributeType("geometry",
+        AttributeType a1 = AttributeTypeFactory.newAttributeType("value", Integer.class);
+        AttributeType a2 = AttributeTypeFactory.newAttributeType("geometry",
                 Geometry.class);
         FeatureType schema = FeatureTypeFactory.newFeatureType(new AttributeType[] {
                     a1, a2
@@ -88,20 +87,21 @@ public class BetweenTest extends TestCase {
         LOGGER.fine("schema has value in it ? "
             + schema.hasAttributeType("value"));
 
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
         Feature f1 = schema.create(new Object[] {
-                    new Integer(12), new GeometryCollection(null, null, -1)
+                    new Integer(12), gf.createGeometryCollection(null)
                 });
         Feature f2 = schema.create(new Object[] {
-                    new Integer(3), new GeometryCollection(null, null, -1)
+                    new Integer(3), gf.createGeometryCollection(null)
                 });
         Feature f3 = schema.create(new Object[] {
-                    new Integer(15), new GeometryCollection(null, null, -1)
+                    new Integer(15), gf.createGeometryCollection(null)
                 });
         Feature f4 = schema.create(new Object[] {
-                    new Integer(5), new GeometryCollection(null, null, -1)
+                    new Integer(5), gf.createGeometryCollection(null)
                 });
         Feature f5 = schema.create(new Object[] {
-                    new Integer(30), new GeometryCollection(null, null, -1)
+                    new Integer(30), gf.createGeometryCollection(null)
                 });
 
         assertEquals(true, a.contains(f1)); // in between

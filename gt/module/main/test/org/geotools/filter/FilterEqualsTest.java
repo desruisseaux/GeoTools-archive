@@ -35,6 +35,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -170,7 +171,8 @@ public class FilterEqualsTest extends TestCase {
 
         // Builds the test feature
         Object[] attributes = new Object[11];
-        attributes[0] = new LineString(coords, new PrecisionModel(), 1);
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        attributes[0] = gf.createLineString(coords);
         attributes[1] = new Boolean(true);
         attributes[2] = new Character('t');
         attributes[3] = new Byte("10");

@@ -31,6 +31,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
@@ -179,7 +180,8 @@ public class FilterTest extends TestCase {
 
         // Builds the test feature
         Object[] attributes = new Object[11];
-        attributes[0] = new LineString(coords, new PrecisionModel(), 1);
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        attributes[0] = gf.createLineString(coords);
         attributes[1] = new Boolean(true);
         attributes[2] = new Character('t');
         attributes[3] = new Byte("10");
@@ -519,8 +521,8 @@ public class FilterTest extends TestCase {
         Expression left = new AttributeExpressionImpl(testSchema, "testGeometry");
         filter.addLeftGeometry(left);
 
-        Expression right = new LiteralExpressionImpl(new LineString(coords,
-                    new PrecisionModel(), 1));
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        Expression right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
         //LOGGER.info( filter.toString());            
@@ -528,8 +530,7 @@ public class FilterTest extends TestCase {
         assertTrue(filter.contains(testFeature));
 
         coords[0] = new Coordinate(0, 0);
-        right = new LiteralExpressionImpl(new LineString(coords,
-                    new PrecisionModel(), 1));
+        right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
         //LOGGER.info( filter.toString());            
@@ -544,8 +545,7 @@ public class FilterTest extends TestCase {
         coords[0] = new Coordinate(0, 0);
         coords[1] = new Coordinate(3, 0);
         coords[2] = new Coordinate(6, 0);
-        right = new LiteralExpressionImpl(new LineString(coords,
-                    new PrecisionModel(), 1));
+        right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
         //LOGGER.info( filter.toString());            
@@ -555,8 +555,7 @@ public class FilterTest extends TestCase {
         coords[0] = new Coordinate(1, 2);
         coords[1] = new Coordinate(3, 0);
         coords[2] = new Coordinate(6, 0);
-        right = new LiteralExpressionImpl(new LineString(coords,
-                    new PrecisionModel(), 1));
+        right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
         //LOGGER.info( filter.toString());            
@@ -574,9 +573,8 @@ public class FilterTest extends TestCase {
         coords2[2] = new Coordinate(10, 10);
         coords2[3] = new Coordinate(0, 10);
         coords2[4] = new Coordinate(0, 0);
-        right = new LiteralExpressionImpl(new Polygon(
-                    new LinearRing(coords2, new PrecisionModel(), 1), null,
-                    new PrecisionModel(), 1));
+        right = new LiteralExpressionImpl(gf.createPolygon(gf.createLinearRing(
+                    coords2),null));
         filter.addRightGeometry(right);
 
         //LOGGER.info( filter.toString());
@@ -588,9 +586,8 @@ public class FilterTest extends TestCase {
         coords2[2] = new Coordinate(1, 1);
         coords2[3] = new Coordinate(0, 1);
         coords2[4] = new Coordinate(0, 0);
-        right = new LiteralExpressionImpl(new Polygon(
-                    new LinearRing(coords2, new PrecisionModel(), 1), null,
-                    new PrecisionModel(), 1));
+        right = new LiteralExpressionImpl(gf.createPolygon(gf.createLinearRing(
+                coords2),null));
         filter.addRightGeometry(right);
 
         //LOGGER.info( filter.toString());            
@@ -611,9 +608,9 @@ public class FilterTest extends TestCase {
         coords2[3] = new Coordinate(10, 15);
         coords2[4] = new Coordinate(10, 10);
 
-        Expression right = new LiteralExpressionImpl(new Polygon(
-                    new LinearRing(coords2, new PrecisionModel(), 1), null,
-                    new PrecisionModel(), 1));
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
+        Expression right = new LiteralExpressionImpl(gf.createPolygon(gf.createLinearRing(
+                coords2),null));
         filter.addRightGeometry(right);
         filter.setDistance(20);
         LOGGER.info(filter.toString());

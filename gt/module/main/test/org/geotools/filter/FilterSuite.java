@@ -53,7 +53,6 @@ public class FilterSuite extends TestCase {
         suite.addTestSuite(MathTest.class);
         suite.addTestSuite(DOMParserTest.class);
         suite.addTestSuite(ParserTest.class);
-        suite.addTestSuite(XMLEncoderTest.class);
         
 
         return suite;

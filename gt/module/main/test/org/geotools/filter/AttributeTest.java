@@ -33,7 +33,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**
@@ -42,7 +43,6 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * @author James Macgill
  */
 public class AttributeTest extends TestCase {
-    private static AttributeTypeFactory attFactory = AttributeTypeFactory.newInstance();
     FeatureType schema = null;
 
     public AttributeTest(java.lang.String testName) {
@@ -60,25 +60,26 @@ public class AttributeTest extends TestCase {
     }
 
     public Feature[] sampleFeatures() throws Exception {
-        AttributeType a1 = attFactory.newAttributeType("value", Integer.class);
-        AttributeType a2 = attFactory.newAttributeType("geometry",
+        AttributeType a1 = AttributeTypeFactory.newAttributeType("value", Integer.class);
+        AttributeType a2 = AttributeTypeFactory.newAttributeType("geometry",
                 Geometry.class);
-        AttributeType a3 = attFactory.newAttributeType("name", String.class);
+        AttributeType a3 = AttributeTypeFactory.newAttributeType("name", String.class);
         schema = FeatureTypeFactory.newFeatureType(new AttributeType[] {
                     a1, a2, a3
                 }, "test");
 
+        GeometryFactory gf = new GeometryFactory(new PrecisionModel());
         Feature[] f = new Feature[3];
         f[0] = schema.create(new Object[] {
-                    new Integer(12), new GeometryCollection(null, null, -1),
+                    new Integer(12), gf.createGeometryCollection(null),
                     "first"
                 });
         f[1] = schema.create(new Object[] {
-                    new Integer(3), new GeometryCollection(null, null, -1),
+                    new Integer(3), gf.createGeometryCollection(null),
                     "second"
                 });
         f[2] = schema.create(new Object[] {
-                    new Integer(15), new GeometryCollection(null, null, -1),
+                    new Integer(15), gf.createGeometryCollection(null),
                     "third"
                 });
 
