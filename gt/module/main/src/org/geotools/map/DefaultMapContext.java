@@ -46,6 +46,7 @@ import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListener;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.cs.CartesianCS;
@@ -495,7 +496,7 @@ public class DefaultMapContext implements MapContext {
                     if ((sourceCs != null) && (crs != null)
                             && !sourceCs.equals(crs)) {
                         
-                    	MathTransform transform = FactoryFinder.getCoordinateOperationFactory().createOperation(sourceCs,crs).getMathTransform();
+                    	MathTransform transform = CRS.transform(sourceCs,crs);
 
                         if (transform != null) {
                             env = JTS.transform(env, transform);
