@@ -4,24 +4,20 @@
  */
 package org.geotools.data.arcsde;
 
-import com.esri.sde.sdk.client.SeColumnDefinition;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
 import com.esri.sde.sdk.client.SeTable;
-import org.geotools.data.DataSourceException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.Vector;
-import java.util.logging.Logger;
 
 
 /**
@@ -71,7 +67,7 @@ import java.util.logging.Logger;
  * </ul>
  * </p>
  *
- * @author Gabriel Rold?n
+ * @author Gabriel Roldán
  * @version $Id: ArcSDEConnectionPool.java,v 1.1 2004/03/11 00:17:09 groldan Exp $
  */
 public class ArcSDEConnectionPool {
@@ -154,9 +150,22 @@ public class ArcSDEConnectionPool {
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a number of SeConnection's to be managed by this pool.
+     * 
+     * <p>
+     * The number of connections that will be created depends on the state of 
+     * the pool. If it is going to be populated by the first time, then it will try
+     * to create the number of connections indicated by the <code>pool.minConnections</code>
+	 * parameter. By the other hand, if this method is called as the result of an attempt
+	 * to get a connection when no free connection is available, then it wil try to create
+	 * <code>pool.increment</code> number of connections, stopping creating connections if
+	 * the pool limit marked by the <code>pool.maxConnections</code> total number of 
+	 * connections holded is reached
+     * </p>
      *
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws DataSourceException if an error occurs trying to instantiate a 
+	 * connection. This can happen, for example, if the ArcSDE server referenced
+	 * by the specified parameters is down, or the parameters are incorrect.
      */
     private void populate() throws DataSourceException {
         synchronized (mutex) {
@@ -186,7 +195,8 @@ public class ArcSDEConnectionPool {
      * returns the number of actual connections holded by this connection pool.
      * In other words, the sum of used and available connections, regardless
      *
-     * @return DOCUMENT ME!
+     * @return the total number of connections, both free and in use, this 
+	 * pool holds.
      */
     public int getPoolSize() {
         synchronized (mutex) {
@@ -195,9 +205,11 @@ public class ArcSDEConnectionPool {
     }
 
     /**
-     * DOCUMENT ME!
+     * Tells the connection pool that <code>seConnection</code> is not in use
+	 * and can be returned to the list of available connections, in order to be
+	 * ready to be reused on future calls to <code>getConnection()</code>
      *
-     * @param seConnection DOCUMENT ME!
+     * @param seConnection the connection to be freed
      */
     public void release(SeConnection seConnection) {
         if (seConnection == null) {
