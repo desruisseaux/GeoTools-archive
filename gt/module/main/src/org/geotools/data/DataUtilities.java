@@ -788,7 +788,7 @@ public class DataUtilities {
      * <p></p>
      *
      * @param featureType
-     * @param properties
+     * @param properties - if null, every property of the feature type in input will be used
      * @param override
      *
      * @return
