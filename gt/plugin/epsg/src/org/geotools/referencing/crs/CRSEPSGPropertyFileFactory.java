@@ -31,6 +31,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.util.InternationalString;
 
 import org.geotools.referencing.FactoryFinder;
 
@@ -54,6 +55,11 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
      */
     protected static CRSEPSGPropertyFileFactory DEFAULT;
     
+    /**
+     * The properties object for our properties file. Keys are the EPSG
+     * code for a coordinate reference system and the associated value is a 
+     * WKT string for the CRS.
+     */
     protected Properties epsg = new Properties();
     
     //object factory
@@ -74,17 +80,12 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
                        	 URL definition) {
         this.crsFactory = factory;
         
-        //super(factory);
-        //Info.ensureNonNull("definition", definition );
-        System.out.println("url: " + definition);
         try {
             epsg.load( definition.openStream() );
         }
         catch (IOException io ){
             // could not load properties file
-            //probably want to throw a factory error
-            System.out.println("Could not load properties file");
-            
+            throw new FactoryException("Could not load properties file: " + definition);  
         }
     }
     
@@ -134,11 +135,58 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
         return org.geotools.metadata.citation.Citation.EPSG;
     }
     
-//clazz is the class of codes to return (to filter set)
-//will want to filter wkt strings based on "PROJCS" and "GEOGCS"  
+    /**  
+     * Returns the set of authority codes of the given type. The type  
+     * argument specify the base class. For example if this factory is 
+     * an instance of CRSAuthorityFactory, then:
+     * <ul>
+     *  <li>CoordinateReferenceSystem.class  asks for all authority codes accepted 
+     *      by createGeographicCRS, createProjectedCRS, createVerticalCRS, createTemporalCRS and their friends.</li>
+     *  <li>ProjectedCRS.class  asks only for authority codes accepted by createProjectedCRS.</li>
+     * </ul>
+     *
+     * The following implementaiton filters the set of codes based on the
+     * "PROJCS" and "GEOGCS" at the start of the WKT strings. It is assumed
+     * that we only have GeographicCRS and ProjectedCRS's here.
+     *
+     * @param type The spatial reference objects type (may be Object.class). 
+     * @return The set of authority codes for spatial reference objects of the given type. 
+     * If this factory doesn't contains any object of the given type, then this method returns 
+     * an empty set. 
+     * @throws FactoryException if access to the underlying database failed.
+     */
     public Set getAuthorityCodes(Class clazz) throws FactoryException {
-//wrong
-        return epsg.keySet();        
+        //could cashe this info if it is time consuming to filter
+        if (clazz.getName().equalsIgnoreCase(CoordinateReferenceSystem.class.getName())) {
+            return epsg.keySet();  
+            
+        } else if (clazz.getName().equalsIgnoreCase(GeographicCRS.class.getName())) {
+            Set all = epsg.keySet();
+            Set geoCRS = new java.util.TreeSet();
+            for(java.util.Iterator i = all.iterator(); i.hasNext();) {
+                String code = (String) i.next();
+                String wkt = epsg.getProperty( code );
+                if (wkt.startsWith("GEOGCS")) {
+                    geoCRS.add(code);
+                }
+            }  
+            return geoCRS;
+            
+        } else if (clazz.getName().equalsIgnoreCase(ProjectedCRS.class.getName())) {
+            Set all = epsg.keySet();
+            Set projCRS = new java.util.TreeSet();
+            for(java.util.Iterator i = all.iterator(); i.hasNext();) {
+                String code = (String) i.next();
+                String wkt = epsg.getProperty( code );
+                if (wkt.startsWith("PROJCS")) {
+                    projCRS.add(code);
+                }
+            }  
+            return projCRS;
+            
+        } else {
+            return new java.util.TreeSet();
+        }
     }
     
     public ObjectFactory getObjectFactory() {
@@ -149,9 +197,22 @@ public class CRSEPSGPropertyFileFactory implements CRSAuthorityFactory {
          return org.geotools.metadata.citation.Citation.GEOTOOLS;
     }
     
-    public org.opengis.util.InternationalString getDescriptionText(String str) throws FactoryException {
-//should implement this (return the crs name)        
-        throw new FactoryException("Not implemented");
+    public InternationalString getDescriptionText(String code) throws FactoryException { 
+        if (code == null) {
+            return null;
+        }
+        if (code.startsWith("EPSG:")) { // EPSG:26907
+            code = code.substring(5);
+        }
+        code = code.trim();
+        String wkt = epsg.getProperty( code );
+        if( wkt == null ) {
+            throw new FactoryException("Unknonwn EPSG code: '"+code+"'" );
+        }
+        wkt = wkt.trim();
+        int start = wkt.indexOf('"');
+        int end = wkt.indexOf('"',start + 1);
+        return new org.geotools.util.SimpleInternationalString(wkt.substring(start + 1, end));
     } 
     
     public org.opengis.referencing.crs.CompoundCRS createCompoundCRS(String str) throws FactoryException {
