@@ -106,6 +106,9 @@ You can find out more about the mailing lists and recent news by going to the
 GeoTools homepage at:
 http://www.geotools.org
 
+And by reading the GeoTools guide at:
+http://docs.codehaus.org/display/GEOTOOLS/Home
+
 Good luck and many thanks for your interest in GeoTools2
 
 The GeoTools2 Project Management Committee
