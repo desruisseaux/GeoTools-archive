@@ -22,6 +22,9 @@
  */
 package org.geotools.referencing;
 
+// OpenGIS dependencies
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+
 
 /**
  * Base class for all authority factories. An <cite>authority</cite> is an
@@ -43,5 +46,25 @@ public abstract class AuthorityFactory extends Factory
      * Construct a default instance.
      */
     protected AuthorityFactory() {
+    }
+
+    /**
+     * Creates an exception for an unknow authority code. This convenience method is provided
+     * for implementation of <code>createXXX</code> methods.
+     *
+     * @param  type The GeoAPI interface that was to be created
+     *              (e.g. <code>CoordinateReferenceSystem.class</code>).
+     * @param  code The unknow authority code.
+     * @return An error message initialized with an error message built
+     *         from the specified informations.
+     *
+     * @todo Localize the error message.
+     */
+    protected NoSuchAuthorityCodeException noSuchAuthorityCode(final Class  type,
+                                                               final String code)
+    {
+        final String authority = getAuthority().getTitle().toString();
+        return new NoSuchAuthorityCodeException(
+                "No code \""+code+"\" for authority \""+authority+"\".", authority, code);
     }
 }
