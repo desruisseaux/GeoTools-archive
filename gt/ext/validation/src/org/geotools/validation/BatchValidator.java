@@ -97,7 +97,7 @@ public class BatchValidator {
 		
         Iterator it = dsm.keySet().iterator();
 		
-		/** set up the data repositroy */
+		/** set up the data repository */
 		while (it.hasNext()) 
 	   	{
 			String typeRef = it.next().toString();
@@ -145,7 +145,7 @@ public class BatchValidator {
 		}
 		
 		Envelope envelope = makeEnvelope();
-					
+		
 		
 		/** do the integrity validation dance */
 		try
@@ -161,6 +161,10 @@ public class BatchValidator {
 		
 		if (true)	//HACK premature evacuation
 			return;
+		
+		// --------------------------------------------------
+		// start of the old code
+		
 		
 	   	//v.integrityValidation()
 		//v.featureValidation( , fs.getSchema(),fs.getFeatures().reader(), vr);
@@ -432,11 +436,13 @@ public class BatchValidator {
         }
     }
 
+
+
     private synchronized static Map loadDataStores() {
         String dsIds = dataStoreProp.getProperty("DataStoreIds");
         String[] ids = dsIds.split(",");
         Map result = new HashMap();
-        int rcount = 0;
+        //int rcount = 0;
 
         // remove whitespace
         for (int i = 0; i < ids.length; i++) 
@@ -512,10 +518,10 @@ public class BatchValidator {
             System.exit(1);
         }
 
-        Map m = null;
+        Map plugIns = null;
 
         try {
-            m = XMLReader.loadPlugIns(plugInDir);
+            plugIns = XMLReader.loadPlugIns(plugInDir);
         } catch (ValidationException e) {
             System.err.println("PlugIn load had errors.");
             System.err.println(plugInDir.toString());
@@ -523,14 +529,14 @@ public class BatchValidator {
             System.exit(1);
         }
 
-        if (m == null) {
+        if (plugIns == null) {
             System.err.println("PlugIn load had errors.");
             System.err.println("No plugins were loaded");
             System.err.println(plugInDir.toString());
             System.exit(1);
         }
 
-        if (m.size() == 0) {
+        if (plugIns.size() == 0) {
             System.err.println("PlugIn load had errors.");
             System.err.println("No plugins were found");
             System.err.println(plugInDir.toString());
@@ -545,14 +551,14 @@ public class BatchValidator {
         Map ts = new HashMap(numSuites);
         for(int i=0;i<numSuites;i++){
         	String path = transProp.getProperty("TestSuiteFile."+(i+1));
-        	loadTestSuite(ts,m,path);
+        	loadTestSuite(ts,plugIns,path);
         }
 
         // We need to make our own validator for batch
         // processing
         // (for starters it should use a custom FeatureResults
         //  that logs fail/warning information)
-        BatchValidatorProcessor gv = new BatchValidatorProcessor(ts, m);
+        BatchValidatorProcessor gv = new BatchValidatorProcessor(ts, plugIns);
 
         return gv;
     }
@@ -698,11 +704,14 @@ class BatchValidatorProcessor extends ValidationProcessor {
         Set plugInNames = new HashSet();
         Iterator i = testSuites.keySet().iterator();
 
-        while (i.hasNext()) {
+		// go through each test suite
+        while (i.hasNext()) 
+        {
             TestSuiteDTO dto = (TestSuiteDTO) testSuites.get(i.next());
             Iterator j = dto.getTests().keySet().iterator();
-
-            while (j.hasNext()) {
+			// go through each test plugIn
+            while (j.hasNext()) 
+            {
                 TestDTO tdto = (TestDTO) dto.getTests().get(j.next());
                 plugInNames.add(tdto.getPlugIn().getName());
             }
@@ -710,6 +719,8 @@ class BatchValidatorProcessor extends ValidationProcessor {
 
         i = plugIns.values().iterator();
         Map errors = new HashMap();
+        
+        // go through each plugIn and add it to errors
         while (i.hasNext())
             errors.put(i.next(), Boolean.FALSE);
 
@@ -717,6 +728,7 @@ class BatchValidatorProcessor extends ValidationProcessor {
         Map defaultPlugIns = new HashMap(plugInNames.size());
         i = plugInNames.iterator();
 
+		// go through each plugIn
         while (i.hasNext()) 
         {
             String plugInName = (String) i.next();
@@ -753,7 +765,7 @@ class BatchValidatorProcessor extends ValidationProcessor {
                 continue;
             }
 
-            errors.put(dto, Boolean.TRUE);
+            errors.put(dto, Boolean.TRUE);	// store the plugIn
         }
 
         // step 3 configure plug-ins with tests + add to processor
@@ -812,6 +824,7 @@ class BatchValidatorProcessor extends ValidationProcessor {
             }
 
             errors.put(tdto, Boolean.TRUE);
-        }
-    }
+        } // end while each test suite
+    }// end load method
+    
 }
