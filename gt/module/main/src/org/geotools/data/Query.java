@@ -19,31 +19,12 @@ package org.geotools.data;
 import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import java.net.URI;
 import java.util.Arrays;
 
 
 /**
  * Encapsulates a data request.
- * 
- * <p>
- * DataSource API:
- * </p>
- * 
- * <p>
- * The query object is used by the getFeature method of the DataSource
- * interface, to encapsulate a request.  It defines which feature type  to
- * query, what properties to retrieve and what constraints (spatial  and
- * non-spatial) to apply to those properties.  It is designed to  closesly
- * match a WFS Query element of a GetFeature request.   The only difference is
- * the addition of the maxFeatures element, which  allows more control over
- * the features selected.  It allows a full  GetFeature request to properly
- * control how many features it gets from each query, instead of requesting
- * and discarding when the max is reached.
- * </p>
- * 
- * <p>
- * DataStore API
- * </p>
  * 
  * <p>
  * The query object is used by the FeatureSource.getFeatures(Query) to
@@ -59,18 +40,22 @@ import java.util.Arrays;
  * <ul>
  * <li>
  * Transient CoordianteSystem override
+ * done getCoordianteSystem()
  * </li>
  * <li>
  * Transient Geometry reproject to an alternate CoordinateSystem
+ * - done getCoordinateSystemReproject()
  * </li>
  * <li>
  * Consider Namespace, FeatueType name override
+ * - not done considered evil
  * </li>
  * <li>
  * DataStore.getFeatureReader( Query, Transaction )
  * </li>
  * <li>
  * DataStore.getView( Query )
+ * - prototype in AbstractDataStore (not really ready for primetime, see Expr)
  * </li>
  * </ul>
  * 
@@ -79,6 +64,12 @@ import java.util.Arrays;
  * @version $Id: Query.java,v 1.13 2004/03/07 02:08:58 cholmesny Exp $
  */
 public interface Query {
+    
+    /**
+     * TODO: should this be ANY_URI
+     */
+    static final URI NO_NAMESPACE = null;
+    
     /** So getMaxFeatures does not return null we use a very large number. */
     static final int DEFAULT_MAX = Integer.MAX_VALUE;
 
@@ -199,20 +190,21 @@ public interface Query {
     /**
      * The typeName attribute is used to indicate the name of the feature type
      * to be queried.  If no typename is specified, then the default typeName
-     * should be returned from the dataSource.  If the datasource only
+     * should be returned from the dataStore.  If the datasstore only
      * supports one feature type then this part of the query may be ignored.
      * 
-     * <p>
-     * All our datasources now assume one feature type per datasource, but it
-     * doesn't seem like we should constrain ourselves to that.  This field
-     * will allow us to create a postgis datasource that can make use of the
-     * whole db, specifying with each request which type to get.
-     * </p>
-     *
      * @return the name of the feature type to be returned with this query.
      */
     String getTypeName();
 
+    /**
+     * The namespace attribute is used to indicate the namespace of the
+     * schema being represented. 
+     * 
+     * @return the gml namespace of the feature type to be returned with this query
+     */
+    URI getNamespace();
+    
     /**
      * The handle attribute is included to allow a client to associate  a
      * mnemonic name to the Query request. The purpose of the handle attribute
@@ -326,6 +318,9 @@ class FIDSQuery implements Query {
 
     public String getTypeName() {
         return null;
+    }
+    public URI getNamespace() {
+        return NO_NAMESPACE;
     }
 
     public String getHandle() {
@@ -454,7 +449,9 @@ class ALLQuery implements Query {
     public final String getTypeName() {
         return null;
     }
-
+    public URI getNamespace() {
+        return NO_NAMESPACE;
+    }
     public final String getHandle() {
         return "Request All Features";
     }
