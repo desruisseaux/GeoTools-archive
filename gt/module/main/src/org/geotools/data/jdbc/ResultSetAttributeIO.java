@@ -161,7 +161,8 @@ public class ResultSetAttributeIO extends AbstractAttributeIO
      */    
     protected int convertIndex(final int i) {
         if (i > getAttributeCount()) {
-			throw new ArrayIndexOutOfBoundsException("read called with " + i + " but there are only " +				getAttributeCount() + " attributes in the schema.");
+			throw new ArrayIndexOutOfBoundsException("read called with " + i + " but there are only " +
+				getAttributeCount() + " attributes in the schema.");
 		}
 		
 		int rsPosition = startColumn + i;
