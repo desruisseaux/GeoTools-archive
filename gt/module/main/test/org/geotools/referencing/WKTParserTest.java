@@ -218,6 +218,15 @@ public class WKTParserTest extends TestCase {
         assertEquals("scale_factor",        0.95, param.parameter("scale_factor"      ).doubleValue(), 1E-8);
         assertEquals("false_easting",        0.0, param.parameter("false_easting"     ).doubleValue(), 1E-8);
         assertEquals("false_northing",       0.0, param.parameter("false_northing"    ).doubleValue(), 1E-8);
+        /*
+         * Try with a number using scientific notation.
+         */
+        wkt1 = "GEOGCS[\"NAD83 / NFIS Seconds\",DATUM[\"North_American_Datum_1983\",\n" +
+               "  SPHEROID[\"GRS 1980\", 6378137, 298.257222101]],\n"                   +
+               "  PRIMEM[\"Greenwich\", 0],\n"                                          +
+               "  UNIT[\"Decimal_Second\", 4.84813681109536e-06],\n"                    +
+               "  AUTHORITY[\"EPSG\", \"100001\"]]";
+        parser.parseObject(wkt1);
     }
 
     /**

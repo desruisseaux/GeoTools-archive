@@ -24,20 +24,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -52,6 +56,15 @@ import org.opengis.referencing.operation.MathTransform;
  */
 public abstract class AbstractParser extends Format {
     /**
+     * Set to <code>true</code> if parsing of number in scientific notation is allowed.
+     * The way to achieve that is currently a hack, because {@link NumberFormat} has no
+     * API for managing that as of J2SE 1.5.
+     *
+     * @todo See if a future version of J2SE allows us to get ride of this ugly hack.
+     */
+    private static final boolean SCIENTIFIC_NOTATION = true;
+
+    /**
      * A formatter using the same symbols than this parser.
      * Will be created by the {@link #format} method only when first needed.
      */
@@ -63,9 +76,9 @@ public abstract class AbstractParser extends Format {
     final Symbols symbols;
 
     /**
-     * The object to use for formatting numbers.
+     * The object to use for parsing numbers.
      */
-    final NumberFormat numberFormat;
+    private final NumberFormat numberFormat;
     
     /**
      * Construct a parser using the specified set of symbols.
@@ -73,6 +86,18 @@ public abstract class AbstractParser extends Format {
     public AbstractParser(final Symbols symbols) {
         this.symbols      = symbols;
         this.numberFormat = (NumberFormat) symbols.numberFormat.clone();
+        if (SCIENTIFIC_NOTATION && numberFormat instanceof DecimalFormat) {
+            final DecimalFormat numberFormat = (DecimalFormat) this.numberFormat;
+            String pattern = numberFormat.toPattern();
+            if (pattern.indexOf("E0") < 0) {
+                final int split = pattern.indexOf(';');
+                if (split >= 0) {
+                    pattern = pattern.substring(0, split) + "E0" + pattern.substring(split);
+                }
+                pattern += "E0";
+                numberFormat.applyPattern(pattern);
+            }
+        }
     }
 
     /**
@@ -132,6 +157,33 @@ public abstract class AbstractParser extends Format {
     }
 
     /**
+     * Parse the number at the given position.
+     */
+    final Number parseNumber(String text, final ParsePosition position) {
+        if (SCIENTIFIC_NOTATION) {
+            /*
+             * HACK: DecimalFormat.parse(...) do not understand lower case 'e' for scientific
+             *       notation. It understand upper case 'E' only. Performs the replacement...
+             */
+            final int base = position.getIndex();
+            Number number = numberFormat.parse(text, position);
+            if (number != null) {
+                int i = position.getIndex();
+                if (i<text.length() && text.charAt(i)=='e') {
+                    final StringBuffer buffer = new StringBuffer(text);
+                    buffer.setCharAt(i, 'E');
+                    text = buffer.toString();
+                    position.setIndex(base);
+                    number = numberFormat.parse(text, position);
+                }
+            }
+            return number;
+        } else {
+            return numberFormat.parse(text, position);
+        }
+    }
+
+    /**
      * Parses the next element in the specified <cite>Well Know Text</cite> (WKT) tree.
      *
      * @param  element The element to be parsed.
@@ -158,7 +210,14 @@ public abstract class AbstractParser extends Format {
      */
     private Formatter getFormatter() {
         if (formatter == null) {
-            formatter = new Formatter(symbols, numberFormat);
+            if (SCIENTIFIC_NOTATION) {
+                // We do not want to expose the "scientific notation hack" to the formatter.
+                // TODO: Remove this block if some future version of J2SE 1.5 provides something
+                //       like 'allowScientificNotationParsing(true)' in DecimalFormat.
+                formatter = new Formatter(symbols, (NumberFormat) symbols.numberFormat.clone());
+            } else {
+                formatter = new Formatter(symbols, numberFormat);
+            }
         }
         return formatter;
     }

@@ -159,7 +159,7 @@ public final class Element {
             //
             lower = position.getIndex();        
             if (!Character.isUnicodeIdentifierStart(text.charAt(lower))) {
-                final Number number = parser.numberFormat.parse(text, position);
+                final Number number = parser.parseNumber(text, position);
                 if (number == null) {
                     // Do not update the error index; it is already updated by NumberFormat.
                     throw unparsableString(text, position);

@@ -419,36 +419,36 @@ target pt = (356672.14701,12183.56326)
 ///////////////////////////////////////////////////////////////
 // Test Fitted coordinate systems, and axes flips
 
-//source crs = _ZOsgb36_
-//target crs = _ZMinus7FitOsgb36_
-//test tolerance = 1e-3
+source crs = _ZOsgb36_
+target crs = _ZMinus7FitOsgb36_
+test tolerance = 1e-3
 
-//source pt = (0,2102,2003)
-//target pt = (-7,100,2000)
+source pt = (0,2102,2003)
+target pt = (-7,100,2000)
 
-//source crs = _Vmslh_
-//target crs = _VmslhMinus7_
-//test tolerance = 1e-3
+source crs = _Vmslh_
+target crs = _VmslhMinus7_
+test tolerance = 1e-3
 
-//source pt = (23)
-//target pt = (16)
+source pt = (23)
+target pt = (16)
 
-//source crs = _ZkmFitOsgb36_
-//target crs = _ZOsgb36_
-//test tolerance = 1e-3
+source crs = _ZkmFitOsgb36_
+target crs = _ZOsgb36_
+test tolerance = 1e-3
 
-//source pt = (0,100,2000)
-//target pt = (0,2102,2003)
+source pt = (0,100,2000)
+target pt = (0,2102,2003)
 
-//source crs = _FitOsgb36_
-//target crs = _Osgb36_
-//test tolerance = 1e-3
+source crs = _FitOsgb36_
+target crs = _Osgb36_
+test tolerance = 1e-3
 
-//source pt = (0,0)
-//target pt = (2,3)
+source pt = (0,0)
+target pt = (2,3)
 
-//source pt = (100,2000)
-//target pt = (2102,2003)
+source pt = (100,2000)
+target pt = (2102,2003)
 
 source crs = _Osgb36Z_
 target crs = _Osgb36Zkm_
