@@ -112,7 +112,7 @@ public class RowFieldTest extends TestCase
     {
       varRowField = new RowField(new Double(testVals[i]), DATA_LONG_FLOAT);
       assertEquals("Test RowField for double value: "+testVals[i],
-                   testVals[i], varRowField.getAsDouble(), 0);
+                   testVals[i], varRowField.doubleValue(), 0);
     } // end of for (int i = 0; i < testVals.length; i++)
   } // end of testGetAsDouble()
 
@@ -128,7 +128,7 @@ public class RowFieldTest extends TestCase
     {
       varRowField = new RowField(new Float(testVals[i]), DATA_SHORT_FLOAT);
       assertEquals("Test RowField for float value: "+testVals[i],
-                   testVals[i], varRowField.getAsFloat(), 0);
+                   testVals[i], varRowField.floatValue(), 0);
     } // end of for (int i = 0; i < testVals.length; i++)
   } // end of testGetAsFloat()
 
@@ -143,7 +143,7 @@ public class RowFieldTest extends TestCase
     {
       varRowField = new RowField(new Integer(testVals[i]), DATA_LONG_INTEGER);
       assertEquals("Testing RowField for integer value: "+testVals[i],
-                   testVals[i], varRowField.getAsInt());
+                   testVals[i], varRowField.intValue());
     } // end of for (int i = 0; i < testVals.length; i++)
   } // end of testGetAsInt()
 
@@ -158,7 +158,7 @@ public class RowFieldTest extends TestCase
     {
       varRowField = new RowField(new Long(testVals[i]), DATA_LONG_INTEGER);
       assertEquals("Testing RowField for long value: "+testVals[i],
-                   testVals[i], varRowField.getAsLong());
+                   testVals[i], varRowField.longValue());
     } // end of for (int i = 0; i < testVals.length; i++)
   } // end of testGetAsLong()
 
@@ -173,7 +173,7 @@ public class RowFieldTest extends TestCase
     {
       varRowField = new RowField(new Short(testVals[i]), DATA_SHORT_INTEGER);
       assertEquals("Testing RowField for short value: "+testVals[i],
-                   testVals[i], varRowField.getAsShort());
+                   testVals[i], varRowField.shortValue());
     } // end of for (int i = 0; i < testVals.length; i++)
   } // end of testGetAsShort()
 
@@ -188,7 +188,7 @@ public class RowFieldTest extends TestCase
     {
       varRowField = new RowField(testVals[i], DATA_TEXT);
       assertEquals("Testing RowField for String value: "+testVals[i],
-                   testVals[i], varRowField.getAsString());
+                   testVals[i], varRowField.toString());
     } // end of for (int i = 0; i < testVals.length; i++)
   } // end of testGetAsString()
 
