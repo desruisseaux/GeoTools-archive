@@ -700,5 +700,6 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
         </j:forEach>
 
     </ant:javadoc>
+    </goal>
 
 </project>
