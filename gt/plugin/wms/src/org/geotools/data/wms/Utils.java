@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.wms.getCapabilities.Layer;
-import org.geotools.data.wms.getCapabilities.Style;
+import org.geotools.data.wms.capabilities.Layer;
+import org.geotools.data.wms.capabilities.Style;
 
 /**
  * @author Richard Gould

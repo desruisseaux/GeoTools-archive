@@ -34,7 +34,7 @@ import junit.framework.TestCase;
 
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;

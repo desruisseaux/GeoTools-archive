@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 import org.geotools.data.wms.CapabilitiesParser;
 import org.geotools.data.wms.ParseCapabilitiesException;
-import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;

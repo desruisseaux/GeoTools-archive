@@ -15,12 +15,12 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.data.wms.SimpleLayer;
+import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSOperationParameter;
 import org.geotools.data.wms.gce.WMSParameterValue;
 import org.geotools.data.wms.gce.WMSReader;
-import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.geotools.gc.GridCoverage;
 import org.opengis.parameter.GeneralOperationParameter;
 

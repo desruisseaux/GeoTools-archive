@@ -24,9 +24,9 @@ import java.util.TreeSet;
 
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Utils;
-import org.geotools.data.wms.getCapabilities.Layer;
-import org.geotools.data.wms.getCapabilities.Style;
-import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.Layer;
+import org.geotools.data.wms.capabilities.Style;
+import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralOperationParameter;
 

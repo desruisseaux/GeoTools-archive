@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.geotools.data.wms.SimpleLayer;
-import org.geotools.data.wms.getCapabilities.Layer;
+import org.geotools.data.wms.capabilities.Layer;
 
 
 /**

@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.wms.getCapabilities.DCPType;
-import org.geotools.data.wms.getCapabilities.Get;
-import org.geotools.data.wms.getCapabilities.Layer;
-import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
+import org.geotools.data.wms.capabilities.DCPType;
+import org.geotools.data.wms.capabilities.Get;
+import org.geotools.data.wms.capabilities.Layer;
+import org.geotools.data.wms.capabilities.WMT_MS_Capabilities;
 import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;

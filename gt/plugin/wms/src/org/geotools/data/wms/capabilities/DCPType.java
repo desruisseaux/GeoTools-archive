@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.wms.getCapabilities;
+package org.geotools.data.wms.capabilities;
 
 /**
  * @author rgould
