@@ -305,7 +305,8 @@ public class ObliqueMercator extends MapProjection {
                 
         /**
          * The operation parameter descriptor for the {@link #alpha_c}
-         * parameter value. Valid values range is from -90 to 90�. Default value is 0.
+         * parameter value. Valid values range is from -360 to -270, -90 to 90, 
+         * and 270 to 360 degrees. Default value is 0.
          */
         public static final ParameterDescriptor AZIMUTH = createDescriptor(
                 new Identifier[] {
@@ -314,7 +315,7 @@ public class ObliqueMercator extends MapProjection {
                     new Identifier(Citation.EPSG,     "Azimuth of initial line"),
                     new Identifier(Citation.GEOTIFF,  "AzimuthAngle")
                 },
-                0, -90, 90, NonSI.DEGREE_ANGLE);
+                0, -360, 360, NonSI.DEGREE_ANGLE);
                 
         /**
          * The operation parameter descriptor for the {@link #rectGridAngle}
@@ -647,7 +648,16 @@ public class ObliqueMercator extends MapProjection {
                        
             longitudeOfCentre = doubleValue(expected, Provider.LONG_OF_CENTRE, parameters);
             ensureLongitudeInRange(Provider.LONG_OF_CENTRE, longitudeOfCentre, true);
+            
             alpha_c = doubleValue(expected, Provider.AZIMUTH, parameters);
+            //already checked for +-360 deg. above. 
+            if ((alpha_c > -1.5*Math.PI && alpha_c < -0.5*Math.PI) ||
+                (alpha_c > 0.5*Math.PI && alpha_c < 1.5*Math.PI)) {
+                    throw new IllegalArgumentException(
+                        Resources.format(ResourceKeys.ERROR_VALUE_OUT_OF_BOUNDS_$3,
+                        new Double(Math.toDegrees(alpha_c)), new Double(-90), new Double(90)));
+            }
+            
             rectGridAngle = doubleValue(expected, Provider.RECTIFIED_GRID_ANGLE, parameters);
             if (Double.isNaN(rectGridAngle)) {
                 rectGridAngle = alpha_c;
