@@ -17,18 +17,16 @@
 package org.geotools.data.wms;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.wms.capabilities.Layer;
 import org.geotools.data.wms.capabilities.Capabilities;
+import org.geotools.data.wms.capabilities.Layer;
 import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.GetCapabilitiesRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
@@ -160,10 +158,10 @@ public class WebMapServer {
 		parsers = new WMSParser[1];
 		parsers[0] = new Parser1_1_1();
 		
-		if (wait) 
+		if (wait) {
 			return;
-		
-		issueRequest(new GetCapabilitiesRequest(serverURL), !wait);
+		}
+		issueRequest( negotiateVersion( serverURL ), !wait);
 	}
 	/**
 	 * Negotiate for WMS GetCapabilities Document we know how to handle.
@@ -186,11 +184,153 @@ public class WebMapServer {
 	 *     a version number higher than that sent by the server.
 	 * </ul>
 	 * </p>
+	 * <p>
+	 * Example 1:<br>
+	 * Server understands versions 1, 2, 4, 5 and 8.<br>
+	 * Client understands versions 1,3, 4, 6, and 7.<br>
+	 * <ol>
+	 * <li>Client requests version 7. Server responds with version 5.
+	 * <li>Client requests version 4. Server responds with version 4
+	 * <li>Client does understands, negotiation ends successfully.
+	 * </ol>
+	 * </p>
+	 * <p>
+	 * Example 2:<br>
+	 * Server understands versions 4, 5 and 8.<br>
+	 * Client understands version 3.<br>
+	 * <ol>
+	 * <li>Client requests version 3. Server responds with version 4.
+	 * <li>Client does not understand that version or any higher version, so negotiation fails
+	 * </ol>
 	 * @return GetCapabilitiesRequest suitable for use with a parser
 	 */
-	private GetCapabilitiesRequest negotiateGetCapDocument( GetCapabilitiesRequest request ){
-	    // right now this is a pass though
-	    return request;
+	private GetCapabilitiesRequest negotiateVersion( URL server ){
+	    List specs = specifications();
+	    List versions = new ArrayList( specs.size() );
+	    for( Iterator i=specs.iterator(); i.hasNext(); ){
+	        Specification specification = (Specification) i.next();
+	        versions.add( specification.getVersion() );
+	    }
+	    int minClient = 0;
+	    int maxClient = specs.size()-1;
+	    
+	    int test = maxClient;	    	   
+	    while( minClient <= test && test <= maxClient ){
+	        Specification specification = (Specification) specs.get( test );
+	        String clientVersion = specification.getVersion();
+	        
+	        GetCapabilitiesRequest request = specification.createRequest( server );
+	        String serverVersion = queryVersion( request );
+	        
+	        int compare = serverVersion.compareTo( clientVersion );
+	        if( compare == 0 ){
+	            return request; // we have an exact match
+	        }
+	        if( versions.contains( serverVersion )){
+               // we can communicate with this server
+	           // 
+	           test = versions.indexOf( serverVersion );	           
+	        }
+	        else if( compare < 0 ){ 
+	           // server responded lower then we asked - and we don't understand.	           
+	           maxClient = test-1; // set current version as limit
+	           
+	           // lets try and go one lower?
+	           //	           
+	           clientVersion = before( versions, serverVersion );
+	           if( clientVersion == null ){
+	               return null; // do not know any lower version numbers
+	           }
+	           test = versions.indexOf( clientVersion );      	            
+	        }
+	        else {
+               // server responsed higher than we asked - and we don't understand
+	           minClient = test+1; // set current version as lower limit
+	           
+	           // lets try and go one higher
+	           clientVersion = after( versions, serverVersion );
+	           if( clientVersion == null ){
+	               return null; // do not know any higher version numbers
+	           }
+	           test = versions.indexOf( clientVersion );
+	        }	        
+	    }	    
+	    // could not talk to this server
+	    return null;
+	}
+	
+	/**
+	 * Utility method returning the known version,
+	 * just before the provided version
+	 */
+	String before( List known, String version ){
+	    if( known.isEmpty() ) {
+	        return null;
+	    }
+	    String before = null;	    
+	    for( Iterator i=known.iterator(); i.hasNext(); ){
+            String test = (String) i.next();
+            if( test.compareTo( version ) < 0 ){
+                if( before == null || before.compareTo( test ) > 0 ){
+                    before = test;
+                }
+            }
+        }
+	    return before;
+	}
+	/**
+	 * Utility method returning the known version,
+	 * just after the provided version
+	 */
+	String after( List known, String version ){
+	    if( known.isEmpty() ) {
+	        return null;
+	    }
+	    String after = null;	    
+	    for( Iterator i=known.iterator(); i.hasNext(); ){
+            String test = (String) i.next();
+            if( test.compareTo( version ) > 0 ){
+                if( after == null || after.compareTo( test ) < 0 ){
+                    after = test;
+                }
+            }
+        }
+	    return after;
+	}
+	    
+	/**
+	 * Map of known specification.
+	 * <p>
+	 * We could do the plug-in thing here to add specificaitons at a later date.
+	 * @return Sorted Map of Specifications by version number.
+	 */
+	private List specifications(){
+	    List specs = new ArrayList( 2 );	    
+	    specs.add( new WMS1_0() );
+	    specs.add( new WMS1_1_1() );
+	    return specs;
+	}
+	
+	private String queryVersion( GetCapabilitiesRequest request ) {
+	    URL url = request.getFinalURL();
+	    Document document;
+		try {
+		    SAXBuilder builder = new SAXBuilder();
+		    URLConnection connection = url.openConnection();
+		    String mimeType = connection.getContentType();
+		    // should be:
+		    // - application/vnd.ogc.wms_xml (Great!)
+            // - application/xml
+            // - text/xml		    
+		    document = builder.build( connection.getInputStream() );
+        } catch (JDOMException badXML) {
+            return null;
+        } catch (IOException badIO) {
+            return null;
+        }
+        Element element = document.getRootElement(); //Root = 		
+	    String version;
+	    return element.getAttributeValue("version");	    
 	}
 	/**
 	 * Gets the current status of the GetCapabilities document.

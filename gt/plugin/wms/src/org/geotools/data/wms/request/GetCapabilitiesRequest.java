@@ -31,15 +31,13 @@ public class GetCapabilitiesRequest extends AbstractRequest {
 	 */
 	public GetCapabilitiesRequest(URL serverURL) {
 		super(serverURL);
-
-		setProperty("REQUEST", "GetCapabilities");
-		setProperty("SERVICE", "WMS");
-		//TODO VERSION SUPPORT HERE
-		//setProperty("VERSION", "1.1.1");
-
-		//Need to strip off the query, as getFinalURL will add it back
-		//on, with all the other properties. If we don't, elements will
-		//be duplicated.
+		initRequest();
+		initService();
+		initVersion();	
+		
+		// Need to strip off the query, as getFinalURL will add it back
+		// on, with all the other properties. If we don't, elements will
+		// be duplicated.
 		int index = serverURL.toExternalForm().lastIndexOf("?");
 		String urlWithoutQuery = null;
 		if (index <= 0) {
@@ -54,8 +52,8 @@ public class GetCapabilitiesRequest extends AbstractRequest {
 			throw new RuntimeException("Error parsing URL");
 		}
 		
-		//Doing this preserves all of the query parameters while
-		//enforcing the mandatory ones
+		// Doing this preserves all of the query parameters while
+		// enforcing the mandatory ones
 
 		if (serverURL.getQuery() != null) {		
 			StringTokenizer tokenizer = new StringTokenizer(serverURL.getQuery(), "&");
@@ -65,5 +63,34 @@ public class GetCapabilitiesRequest extends AbstractRequest {
 				setProperty(param[0], param[1]);
 			}
 		}
+	}
+	/**
+	 * Default implementation REQUEST = GetCapabilities
+	 * <p>
+	 * Subclass can override if needed.
+	 * </p>
+	 */
+	protected void initRequest(){
+	    setProperty("REQUEST", "GetCapabilities");
+	}
+	/**
+	 * Default implementation SERVICE = WMS
+	 */
+	protected void initService(){
+	    setProperty("SERVICE", "WMS");
+	}
+	/**
+	 * Default implementation VERSION = 1.1.1
+	 * <p>
+	 * Subclass can override if needed:
+	 * <pre><code>
+	 * protected void initVersion(){
+	 *   setProperty("WEBVER", "1.0.0");
+	 * }
+	 * </code></pre>
+	 * </p>
+	 */
+	protected void initVersion(){
+	    setProperty("VERSION", "1.1.1");
 	}
 }

@@ -59,7 +59,7 @@ public abstract class AbstractWMSParser implements WMSParser {
      * @return Name string in the format ""
      */
     public String getName(){
-        return "WMT_MS_Capabilities";
+        return "WMT_MS_Capabilities";        
     }
     /**
      * Version number understood by this parser.
@@ -213,7 +213,48 @@ public abstract class AbstractWMSParser implements WMSParser {
             );    
         }        
     }
-    /** parse List<String> from opperation element */
+    
+    /**
+     * Parse List<String> from opperation element.
+     * <p>
+     * Values are taken to be mine types? We could restrict this list
+     * to types we know how to deal with (incase image/svg comes up).
+     * I figure we should reflect reality and leave it to
+     * client code - like WMSFormat to cull this list.
+     * </p>
+     * <p>
+     * Normal Mime Types:
+     * <ul>
+     * <li>image/gif
+     * <li>image/jpeg
+     * <li>image/png
+     * <li>image/svg
+     * <li>text/xml - generic XML mime type
+     * <li>application/xml - generic XML mime type
+     * </ul>
+     * </p>
+     * <p>
+     * OGC-specific Mime Types:
+     * <ul>
+     * <li>application/vnd.ogc.wms_xml - WMS Capabilities XML
+     * <li>application/vnd.ogc.gml - Geography Markup Language XML
+     * <li>application/vnd.ogc.se_xml - Service Exception XML
+     * </p>
+     * <p>
+     * Speaking of reality WMS 1.0.0 is unreal - it does not use
+     * mime types (of any form) and makes use of the following
+     * well known formats:
+     * <pre><code>
+     * GIF | JPEG | PNG | WebCGM |
+     * SVG | GML.1 | GML.2 | GML.3 |
+     * WBMP | WMS_XML | MIME | INIMAGE |
+     * TIFF | GeoTIFF | PPM | BLANK
+     * <code></pre>
+     * In the interests of sanity we ask that a WMS 1.0.0 parser
+     * convert these formats to mime types for the rest of the api.
+     * </p>
+     * @param op Opperation Element (like getMap)
+     */
     protected List queryFormats( Element op ){
         Iterator iter;
         
@@ -226,6 +267,7 @@ public abstract class AbstractWMSParser implements WMSParser {
         }        
         return formats;
     }
+    
     protected URL queryPost(Element element) throws MalformedURLException { 
         List dcpTypeElements = element.getChildren("DCPType");
         for( Iterator i = dcpTypeElements.iterator(); i.hasNext(); ) {

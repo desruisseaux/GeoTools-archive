@@ -41,8 +41,8 @@ public class AbstractRequest {
         this.onlineResource = onlineResource;
         
         properties = new Properties();
-//      TODO remove this when more version support comes along
-        setProperty("VERSION", "1.1.1");
+        //      TODO remove this when more version support comes along
+        // setProperty("VERSION", "1.1.1");
 	}
 
 	public URL getFinalURL() {
