@@ -22,36 +22,7 @@ import org.geotools.data.wms.SimpleLayer;
  */
 public abstract class AbstractGetMapRequest extends AbstractRequest implements GetMapRequest {
 
-    /** Represents the ELEVATION parameter */
-    public static final String ELEVATION = "ELEVATION"; //$NON-NLS-1$
-    /** Represents the TIME parameter */
-    public static final String TIME = "TIME"; //$NON-NLS-1$
-    /** Represents the EXCEPTIONS parameter */
-    public static final String EXCEPTIONS = "EXCEPTIONS"; //$NON-NLS-1$
-    /** Represents the BGCOLOR parameter */
-    public static final String BGCOLOR = "BGCOLOR"; //$NON-NLS-1$
-    /** Represents the TRANSPARENT parameter */
-    public static final String TRANSPARENT = "TRANSPARENT"; //$NON-NLS-1$
-    /** Represents the WIDTH parameter */
-    public static final String WIDTH = "WIDTH"; //$NON-NLS-1$
-    /** Represents the HEIGHT parameter */
-    public static final String HEIGHT = "HEIGHT"; //$NON-NLS-1$
-    /** Represents the FORMAT parameter */
-    public static final String FORMAT = "FORMAT"; //$NON-NLS-1$
-    /** Represents the BBOX parameter */
-    public static final String BBOX = "BBOX"; //$NON-NLS-1$
-    /** Represents the SRS parameter */
-    public static final String SRS = "SRS"; //$NON-NLS-1$
-    /** Represents the LAYERS parameter */
-    public static final String LAYERS = "LAYERS"; //$NON-NLS-1$
-    /** Represents the STYLES parameter */
-    public static final String STYLES = "STYLES"; //$NON-NLS-1$
-    
-    /** Represents the EXCEPTION_INIMAGE value */
-    public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage"; //$NON-NLS-1$
-    /** Represents the EXCEPTION_BLANK value */
-    public static final String EXCEPTION_BLANK = "application/vnd.ogc.se_blank"; //$NON-NLS-1$
-    
+
     private List availableLayers;
     private Set availableSRSs;
     private List availableFormats;
