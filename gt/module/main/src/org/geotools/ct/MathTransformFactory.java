@@ -164,6 +164,7 @@ public class MathTransformFactory {
                 new              MatrixTransform.Provider(),      // Affine (default to 4x4)
                 new          GeocentricTransform.Provider(false), // Ellipsoid_To_Geocentric
                 new          GeocentricTransform.Provider(true),  // Geocentric_To_Ellipsoid
+                new          MolodenskiTransform.Provider(),      // Molodenski
                 new  AbridgedMolodenskiTransform.Provider(),      // Abridged_Molodenski
                 new       ExponentialTransform1D.Provider(false), // Exponential
                 new       ExponentialTransform1D.Provider(true)   // Logarithmic
