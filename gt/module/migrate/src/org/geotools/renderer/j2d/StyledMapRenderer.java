@@ -29,7 +29,6 @@ import java.util.logging.Level;
 
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.ows.Layer;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
