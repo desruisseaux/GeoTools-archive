@@ -167,18 +167,22 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
      * @return <tt>true</tt> if this collection changed as a result of the call
      */
     public boolean add(Object o) {
-    	//TODO check inheritance with FeatureType here!!!
-        Feature feature = (Feature) o;
+        return add((Feature)o,true);
+    }
+    protected boolean add(Feature feature,boolean fire) {
+        //TODO check inheritance with FeatureType here!!!
+
         feature.setParent(this);
 
         // This cast is neccessary to keep with the contract of Set!
-        boolean changed = features.add(feature);
-
-        if (changed) {
-            fireChange(feature, CollectionEvent.FEATURES_ADDED);
+        if(!features.contains(feature)){
+            features.add(feature);
+            if(fire)
+                fireChange(feature, CollectionEvent.FEATURES_ADDED);
+            return true;
         }
 
-        return changed;
+        return false;
     }
 
     /**
@@ -203,8 +207,7 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
         List featuresAdded = new ArrayList(c.size());
         while (iter.hasNext()) {
             Feature f = (Feature) iter.next();
-            f.setParent(this);
-            boolean added = features.add(f);
+            boolean added = add(f,false);
             changed |= added;
             
             if(added) featuresAdded.add(f);
