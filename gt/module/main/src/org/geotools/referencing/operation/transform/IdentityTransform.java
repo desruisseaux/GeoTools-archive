@@ -41,8 +41,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class IdentityTransform extends AbstractMathTransform
-                           implements LinearTransform, Serializable
+public class IdentityTransform extends AbstractMathTransform
+                            implements LinearTransform, Serializable
 {
     /**
      * Serial number for interoperability with different versions.

@@ -24,7 +24,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.RenderedImage;
-import java.awt.geom.AffineTransform;
 import java.util.Random;
 
 // JAI dependencies
@@ -46,7 +45,7 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.CategoryListTest;
 import org.geotools.coverage.SampleDimensionGT;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 
 
 /**
@@ -150,7 +149,7 @@ public class SampleTranscoderTest extends TestCase {
         for (int i=0; i<array.length; i++) {
             array[i] = (byte) random.nextInt(161);
         }
-        final MathTransform identity = ProjectiveTransform.create(new AffineTransform());
+        final MathTransform identity = IdentityTransform.create(2);
         GridCoverage2D coverage;
         coverage = new GridCoverage2D("Test", source, GeographicCRS.WGS84, identity,
                                       new SampleDimensionGT[]{band}, null, null);

@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.coverage.grid;
+package org.geotools.coverage.operation;
 
 // J2SE dependencies
 import java.awt.Rectangle;
@@ -35,21 +35,21 @@ import java.util.List;
 // JAI dependencies
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
-import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListDescriptor;
-import javax.media.jai.ParameterListDescriptorImpl;
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
 
 // OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.PointOutsideCoverageException;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.processing.Operation2D;
 import org.geotools.resources.image.ImageUtilities;
 
 
@@ -251,7 +251,7 @@ public final class Interpolator2D extends GridCoverage2D {
      *         geophysics values, or {@code false} to get the packed version.
      * @return The newly created grid coverage.
      */
-    GridCoverage2D createGeophysics(final boolean geo) {
+    protected GridCoverage2D createGeophysics(final boolean geo) {
         return create(getSource().geophysics(geo), getInterpolations());
     }
 
@@ -609,48 +609,40 @@ public final class Interpolator2D extends GridCoverage2D {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-//    static final class Operation extends org.geotools.gp.Operation {
-//        /**
-//         * Construct an "Interpolate" operation.
-//         */
-//        public Operation() {
-//            super("Interpolate", new ParameterListDescriptorImpl(
-//                  null,          // the object to be reflected upon for enumerated values.
-//                  new String[] { // the names of each parameter.
-//                      "Source",
-//                      "Type"
-//                  },
-//                  new Class[] {  // the class of each parameter.
-//                      GridCoverage.class,
-//                      Object.class
-//                  },
-//                  new Object[] { // The default values for each parameter.
-//                      ParameterListDescriptor.NO_PARAMETER_DEFAULT,
-//                      "NearestNeighbor"
-//                  },
-//                  null // Defines the valid values for each parameter.
-//              ));
-//        }
-//
-//        /**
-//         * Apply an interpolation to a grid coverage. This method is invoked
-//         * by {@link GridCoverageProcessor2D} for the "Interpolate" operation.
-//         */
-//        protected GridCoverage doOperation(final ParameterList  parameters,
-//                                           final RenderingHints hints)
-//        {
-//            final GridCoverage   source = (GridCoverage)parameters.getObjectParameter("Source");
-//            final Object           type =               parameters.getObjectParameter("Type"  );
-//            final Interpolation[] interpolations;
-//            if (type.getClass().isArray()) {
-//                interpolations = new Interpolation[Array.getLength(type)];
-//                for (int i=0; i<interpolations.length; i++) {
-//                    interpolations[i] = toInterpolation(Array.get(type, i));
-//                }
-//            } else {
-//                interpolations = new Interpolation[] {toInterpolation(type)};
-//            }
-//            return create(source, interpolations);
-//        }
-//    }
+    public static final class Operation extends Operation2D {
+        /**
+         * The parameter descriptor for the interpolation type.
+         */
+        public static final ParameterDescriptor TYPE = new org.geotools.parameter.ParameterDescriptor(
+                "Type", Object.class, null, "NearestNeighbor");
+
+        /**
+         * Constructs an "Interpolate" operation.
+         */
+        public Operation() {
+            super(new org.geotools.parameter.ParameterDescriptorGroup("Interpolate",
+                  new ParameterDescriptor[] {SOURCE_0, TYPE}));
+        }
+
+        /**
+         * Apply an interpolation to a grid coverage. This method is invoked
+         * by {@link GridCoverageProcessor2D} for the "Interpolate" operation.
+         */
+        protected GridCoverage2D doOperation(final ParameterValueGroup parameters,
+                                             final RenderingHints hints)
+        {
+            final GridCoverage2D source = (GridCoverage2D)parameters.parameter("Source").getValue();
+            final Object         type =                   parameters.parameter("Type"  );
+            final Interpolation[] interpolations;
+            if (type.getClass().isArray()) {
+                interpolations = new Interpolation[Array.getLength(type)];
+                for (int i=0; i<interpolations.length; i++) {
+                    interpolations[i] = ImageUtilities.toInterpolation(Array.get(type, i));
+                }
+            } else {
+                interpolations = new Interpolation[] {ImageUtilities.toInterpolation(type)};
+            }
+            return create(source, interpolations);
+        }
+    }
 }

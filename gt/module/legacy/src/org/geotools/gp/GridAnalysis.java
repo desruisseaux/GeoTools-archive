@@ -45,6 +45,8 @@ import org.geotools.gc.GridCoverage;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated No replacement.
  */
 abstract class GridAnalysis extends GridCoverage {
     /**

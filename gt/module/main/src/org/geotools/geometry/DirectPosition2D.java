@@ -77,10 +77,23 @@ public class DirectPosition2D extends Point2D.Double implements DirectPosition, 
     }
     
     /**
+     * Construct a 2D position from the specified ordinates in the specified CRS.
+     */
+    public DirectPosition2D(final CoordinateReferenceSystem crs,
+                            final double x, final double y)
+    {
+        super(x,y);
+        setCoordinateReferenceSystem(crs);
+    }
+    
+    /**
      * Construct a position from the specified {@link Point2D}.
      */
     public DirectPosition2D(final Point2D point) {
-        this(point.getX(), point.getY());
+        super(point.getX(), point.getY());
+        if (point instanceof DirectPosition) {
+            setCoordinateReferenceSystem(((DirectPosition) point).getCoordinateReferenceSystem());
+        }
     }
     
     /**

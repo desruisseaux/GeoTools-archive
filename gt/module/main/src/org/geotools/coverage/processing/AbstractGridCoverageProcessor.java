@@ -27,6 +27,8 @@ package org.geotools.coverage.processing;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // JAI dependencies
 import javax.media.jai.PropertySource;
@@ -71,6 +73,26 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * The sequence of string to returns when there is no metadata.
      */
     private static final String[] NO_PROPERTIES = new String[0];
+
+    /**
+     * The logger for grid coverage processing operations.
+     */
+    public static final Logger LOGGER = Logger.getLogger("org.geotools.coverage.processing");
+
+    /**
+     * The logging level for reporting grid coverage operations.
+     * This level is equals or slightly lower than {@link Level#INFO}.
+     */
+    public static final Level OPERATION = new LogLevel("OPERATION", 780);
+
+    /**
+     * The grid coverage logging level type.
+     */
+    private static final class LogLevel extends Level {
+        protected LogLevel(final String name, final int level) {
+            super(name, level);
+        }
+    }
 
     /**
      * The comparator for ordering of operation names.

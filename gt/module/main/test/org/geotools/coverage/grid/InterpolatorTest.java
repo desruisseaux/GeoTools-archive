@@ -32,6 +32,9 @@ import junit.framework.TestSuite;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.spatialschema.geometry.Envelope;
 
+// Geotools dependencies
+import org.geotools.coverage.operation.Interpolator2D;
+
 
 /**
  * Tests the {@link Interpolator2D} implementation. This method inherit all tests from

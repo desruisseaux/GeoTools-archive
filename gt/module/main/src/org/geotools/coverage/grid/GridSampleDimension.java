@@ -47,6 +47,7 @@ import org.opengis.util.InternationalString;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimensionGT;
 import org.geotools.coverage.TypeMap;
+import org.geotools.factory.Hints;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.gcs.ResourceKeys;

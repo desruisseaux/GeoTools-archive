@@ -63,6 +63,8 @@ import org.opengis.gc.GC_ParameterInfo;
  * @author Martin Desruisseaux
  *
  * @see GC_ParameterInfo
+ *
+ * @deprecated Replaced by {@link org.opengis.parameter.ParameterDescriptor}.
  */
 public class ParameterInfo implements Serializable {
     /**

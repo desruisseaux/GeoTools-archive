@@ -27,25 +27,32 @@ package org.geotools.coverage.processing;
 import java.awt.RenderingHints;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+
+// JAI dependencies
+import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.TileCache;
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.processing.Operation;
-import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.coverage.processing.OperationNotFoundException;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
-import org.geotools.coverage.grid.Hints;
-import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.operation.Interpolator2D;
+import org.geotools.factory.FactoryRegistry;
+import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
@@ -71,8 +78,7 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
                 cache.setMemoryCapacity(targetCapacity);
             }
         }
-        final Logger logger = Logger.getLogger("org.geotools.gp");
-        logger.config("Java Advanced Imaging: "+JAI.getBuildVersion()+
+        LOGGER.config("Java Advanced Imaging: "+JAI.getBuildVersion()+
                     ", TileCache capacity="+(float)(cache.getMemoryCapacity()/(1024*1024))+" Mb");
         /*
          * Verify that the tile cache has some reasonable value. A lot of users seem to
@@ -81,7 +87,7 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
          * for serious trouble.
          */
         if (cache.getMemoryCapacity() + (4*1024*1024) >= maxMemory) {
-            logger.severe(Resources.format(ResourceKeys.WARNING_EXCESSIVE_TILE_CACHE_$1,
+            LOGGER.severe(Resources.format(ResourceKeys.WARNING_EXCESSIVE_TILE_CACHE_$1,
                                            new Double(maxMemory/(1024*1024.0))));
         }
     }
@@ -103,6 +109,11 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
      * to returns pre-computed images as much as possible.
      */
     private final transient Map cache = new WeakValueHashMap();
+
+    /**
+     * The service registry for finding {@link Operation2D} implementations.
+     */
+    private final FactoryRegistry registry;
     
     /**
      * Constructs a grid coverage processor with no operation and using the
@@ -117,9 +128,11 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
      */
     protected GridCoverageProcessor2D() {
         super(null, null);
+        registry = new FactoryRegistry(Collections.singleton(Operation2D.class));
         hints = new RenderingHints(Hints.GRID_COVERAGE_PROCESSOR, this);
         hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
         hints.put(JAI.KEY_TRANSFORM_ON_COLORMAP,     Boolean.FALSE);
+        scanForPlugins(); // TODO: Should not be invoked in constructor.
     }
 
     /**
@@ -149,13 +162,12 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
      * Returns the default grid coverage processor.
      */
     public static synchronized GridCoverageProcessor2D getDefault() {
-//        if (DEFAULT==null) {
-//            DEFAULT = new GridCoverageProcessor2D();
-//            //
-//            // OpenGIS operations
-//            //
+        if (DEFAULT == null) {
+            DEFAULT = new GridCoverageProcessor2D();
+            //
+            // OpenGIS operations
+            //
 //            DEFAULT.addOperation(new Resampler.Operation());
-//            DEFAULT.addOperation(new Interpolator2D.Operation());
 //            DEFAULT.addOperation(new SelectSampleDimension.Operation());
 //            DEFAULT.addOperation(new MaskFilterOperation("MinFilter"));
 //            DEFAULT.addOperation(new MaskFilterOperation("MaxFilter"));
@@ -163,9 +175,9 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
 //            DEFAULT.addOperation(new ConvolveOperation("LaplaceType1Filter", ConvolveOperation.LAPLACE_TYPE_1));
 //            DEFAULT.addOperation(new ConvolveOperation("LaplaceType2Filter", ConvolveOperation.LAPLACE_TYPE_2));
 //            DEFAULT.addOperation(new BilevelOperation("Threshold", "Binarize"));
-//            //
-//            // JAI operations
-//            //
+            //
+            // JAI operations
+            //
 //            DEFAULT.addOperation(new ConvolveOperation());
 //            DEFAULT.addOperation(new OperationJAI("Absolute"));
 //            DEFAULT.addOperation(new OperationJAI("Add"));
@@ -198,16 +210,16 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
 //                 * used only for some computation purpose  and  will never be required if the user
 //                 * doesn't ask explicitly for them.
 //                 */
-//                Logger.getLogger("org.geotools.gp").warning(exception.getLocalizedMessage());
+//                LOGGER.getLogger("org.geotools.coverage.grid").warning(exception.getLocalizedMessage());
 //            }
-//            /*
-//             * Remove the GRID_COVERAGE_PROCESSOR hints It will avoid its serialization and a strong
-//             * reference in RenderedImage's properties for the common case where we are using the
-//             * default instance. The method Operation.getGridCoverageProcessor will automatically
-//             * maps the null value to the default instance anyway.
-//             */
-//            DEFAULT.hints.remove(Hints.GRID_COVERAGE_PROCESSOR);
-//        }
+            /*
+             * Remove the GRID_COVERAGE_PROCESSOR hint. It will avoid its serialization and a strong
+             * reference in RenderedImage's properties for the common case where we are using the
+             * default instance. The method Operation.getGridCoverageProcessor will automatically
+             * maps the null value to the default instance anyway.
+             */
+            DEFAULT.hints.remove(Hints.GRID_COVERAGE_PROCESSOR);
+        }
         return DEFAULT;
     }
 
@@ -246,52 +258,57 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
             source = null;
         }
         /*
-         * Check if the result for this operation is already available in the cache.
+         * Checks if the result for this operation is already available in the cache.
          */
-//        final String operationName = operation.getName();
-//        final CacheKey cacheKey = new CacheKey(operation, parameters);
-//        GridCoverage coverage = (GridCoverage) cache.get(cacheKey);
-//        if (coverage != null) {
-//            log(source, coverage, operationName, true);
-//            return coverage;
-//        }
-//        /*
-//         * Detects the interpolation type for the source grid coverage.
-//         * The same interpolation will be applied on the result.
-//         */
-//        Interpolation[] interpolations = null;
-//        if (!operationName.equalsIgnoreCase("Interpolate")) {
-//            final String[] paramNames = parameters.getParameterListDescriptor().getParamNames();
-//            for (int i=0; i<paramNames.length; i++) {
-//                final Object param = parameters.getObjectParameter(paramNames[i]);
-//                if (param instanceof Interpolator2D) {
-//                    // If all sources use the same interpolation,  preserve the
-//                    // interpolation for the resulting coverage. Otherwise, use
-//                    // the default interpolation (nearest neighbor).
-//                    final Interpolation[] interp = ((Interpolator2D) param).getInterpolations();
-//                    if (interpolations == null) {
-//                        interpolations = interp;
-//                    } else if (!Arrays.equals(interpolations, interp)) {
-//                        // Set to no interpolation.
-//                        interpolations = null;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        /*
-//         * Apply the operation, apply the same interpolation and log a message.
-//         */
-//        coverage = operation.doOperation(parameters, hints);
-//        if (interpolations!=null && coverage!=null && !(coverage instanceof Interpolator2D)) {
-//            coverage = Interpolator2D.create(coverage, interpolations);
-//        }
-//        if (coverage != source) {
-//            log(source, coverage, operationName, false);
-//            cache.put(cacheKey, coverage);
-//        }
-//        return coverage;
-        throw new UnsupportedOperationException("Implementation comming soon...");
+        final String operationName = operation.getName();
+        final CachedOperation cacheKey = new CachedOperation(operation, parameters);
+        GridCoverage2D coverage = (GridCoverage2D) cache.get(cacheKey);
+        if (coverage != null) {
+            log(source, coverage, operationName, true);
+            return coverage;
+        }
+        /*
+         * Detects the interpolation type for the source grid coverage.
+         * The same interpolation will be applied on the result.
+         */
+        Interpolation[] interpolations = null;
+        if (!operationName.equalsIgnoreCase("Interpolate")) {
+            for (final Iterator it=parameters.values().iterator(); it.hasNext();) {
+                final GeneralParameterValue param = (GeneralParameterValue) it.next();
+                if (param instanceof ParameterValue) {
+                    final Object value = ((ParameterValue) param).getValue();
+                    if (value instanceof Interpolator2D) {
+                        // If all sources use the same interpolation,  preserve the
+                        // interpolation for the resulting coverage. Otherwise, use
+                        // the default interpolation (nearest neighbor).
+                        final Interpolation[] interp = ((Interpolator2D) value).getInterpolations();
+                        if (interpolations == null) {
+                            interpolations = interp;
+                        } else if (!Arrays.equals(interpolations, interp)) {
+                            // Set to no interpolation.
+                            interpolations = null;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        /*
+         * Apply the operation, apply the same interpolation and log a message.
+         */
+        if (operation instanceof Operation2D) {
+            coverage = ((Operation2D) operation).doOperation(parameters, hints);
+            if (interpolations!=null && coverage!=null && !(coverage instanceof Interpolator2D)) {
+                coverage = Interpolator2D.create(coverage, interpolations);
+            }
+            if (coverage != source) {
+                log(source, coverage, operationName, false);
+                cache.put(cacheKey, coverage);
+            }
+            return coverage;
+        }
+        throw new OperationNotFoundException(Resources.format(
+                  ResourceKeys.ERROR_OPERATION_NOT_FOUND_$1, operationName));
     }
 
     /**
@@ -315,12 +332,32 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
             }
             final Locale locale = null; // Set locale here (if any).
             final LogRecord record = Resources.getResources(locale).getLogRecord(
-                                     Level.FINE, ResourceKeys.APPLIED_OPERATION_$4,
+                                     OPERATION, ResourceKeys.APPLIED_OPERATION_$4,
                                      ((source!=null) ? source : result).getName().toString(locale),
                                      operationName, interp, new Integer(fromCache ? 1:0));
             record.setSourceClassName("GridCoverageProcessor2D");
             record.setSourceMethodName("doOperation");
-            Logger.getLogger("org.geotools.coverage").log(record);
+            LOGGER.log(record);
+        }
+    }
+
+    /**
+     * Scans for factory plug-ins on the application class path. This method is
+     * needed because the application class path can theoretically change, or
+     * additional plug-ins may become available. Rather than re-scanning the
+     * classpath on every invocation of the API, the class path is scanned
+     * automatically only on the first invocation. Clients can call this
+     * method to prompt a re-scan. Thus this method need only be invoked by
+     * sophisticated applications which dynamically make new plug-ins
+     * available at runtime.
+     *
+     * @todo This method should be public, but can be executed only once in current
+     *       implementation. We suffer from GeoAPI limitation here; the GridCoverage
+     *       API really need a redesign.
+     */
+    private void scanForPlugins() {
+        for (final Iterator it=registry.getServiceProviders(Operation2D.class); it.hasNext();) {
+            addOperation((Operation2D) it.next());
         }
     }
 
@@ -334,7 +371,7 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
     public synchronized void print(final Writer out) throws IOException {
         final CoverageParameterWriter writer = new CoverageParameterWriter(out);
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        for (final Iterator it=operations.keySet().iterator(); it.hasNext();) {
+        for (final Iterator it=operations.values().iterator(); it.hasNext();) {
             out.write(lineSeparator);
             writer.format(((Operation2D) it.next()).descriptor);
         }

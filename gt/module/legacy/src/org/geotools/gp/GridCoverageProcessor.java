@@ -78,6 +78,8 @@ import org.geotools.util.WeakValueHashMap;
  * @version $Id$
  * @author <a href="www.opengis.org">OpenGIS</a>
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.coverage.processing.GridCoverageProcessor2D}.
  */
 public class GridCoverageProcessor {
     /**

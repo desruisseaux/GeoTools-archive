@@ -5,8 +5,9 @@
     <TITLE>package org.geotools.coverage.processing</TITLE>
   </HEAD>
   <BODY>
-    Grid coverage processing implementation. An explanation for this
-    package is provided in the {@linkplain org.opengis.coverage.processing OpenGIS&reg; javadoc}.
+    {@linkplain org.geotools.coverage.processing.GridCoverageProcessor2D Grid coverage processing}
+    implementation. An explanation for this package is provided in the
+    {@linkplain org.opengis.coverage.processing OpenGIS&reg; javadoc}.
     The remaining discussion on this page is specific to the Geotools implementation.
 
     <H1><A NAME="operation-list"><U>Supported operations</U></A></H1>
@@ -639,7 +640,7 @@
         <td align="center">N/A</td>
       </tr>
       <tr>
-        <td>"CoordinateSystem"</td>
+        <td>"CoordinateReferenceSystem"</td>
         <td>{@link org.opengis.referencing.crs.CoordinateReferenceSystem}</td>
         <td>Same as source grid coverage</td>
         <td align="center">N/A</td>
@@ -657,7 +658,7 @@
     {@link org.opengis.referencing.operation.CoordinateOperationFactory} for creating a
     transformation from the source to the destination coordinate systems. If
     a custom factory is desired, it may be supplied as a rendering hint with
-    the {@link org.geotools.coverage.grid.Hints#COORDINATE_OPERATION_FACTORY}
+    the {@link org.geotools.factory.Hints#COORDINATE_OPERATION_FACTORY}
     key. Rendering hints can be supplied to
     {@link org.geotools.coverage.processing.GridCoverageProcessor2D}
     at construction time.</P>

@@ -69,7 +69,7 @@ import org.geotools.ct.CoordinateTransformationFactory; // For Javadoc
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.Hints}.
+ * @deprecated Replaced by {@link org.geotools.factory.Hints}.
  */
 public final class Hints extends RenderingHints.Key {
     /**

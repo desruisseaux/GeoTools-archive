@@ -59,6 +59,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.util.Singleton;
+import org.geotools.resources.XArray;
 
 
 /**
@@ -256,7 +257,7 @@ public class FactoryGroup {
             throw new FactoryException(cause);
         }
         /*
-         * Create a concatenation of the matrix computed above and the projection.
+         * Creates a concatenation of the matrix computed above and the projection.
          * If 'method' is null, an exception will be thrown in 'createProjectedCRS'.
          */
         final Singleton methods = (method==null) ? new Singleton() : null;
@@ -286,9 +287,7 @@ public class FactoryGroup {
      *
      * @todo Consider extensions of this method to projected CRS if it is usefull for GEOT-401.
      */
-    public CoordinateReferenceSystem toGeodetic3D(final CompoundCRS crs)
-            throws FactoryException
-    {
+    public CoordinateReferenceSystem toGeodetic3D(final CompoundCRS crs) throws FactoryException {
         final SingleCRS[] components = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(crs);
         GeographicCRS horizontal = null;
         VerticalCRS   vertical   = null;
@@ -360,7 +359,78 @@ public class FactoryGroup {
         }
         return crs;
     }
-    
+
+    /**
+     * Returns a new coordinate reference system with only the specified dimension.
+     * This method is used for example in order to get a component of a
+     * {@linkplain CompoundCRS compound CRS}.
+     *
+     * @param  crs The original (usually compound) CRS.
+     * @param  dimensions The dimensions to keep.
+     * @return The CRS with only the specified dimensions.
+     */
+    public CoordinateReferenceSystem separate(final CoordinateReferenceSystem crs,
+                                              final int[] dimensions)
+            throws FactoryException
+    {
+        final int length = dimensions.length;
+        final int crsDimension = crs.getCoordinateSystem().getDimension();
+        if (length==0 || dimensions[0]<0 || dimensions[length-1]>=crsDimension ||
+            !XArray.isStrictlySorted(dimensions))
+        {
+            throw new IllegalArgumentException("Illegal dimension array."); // TODO: localize.
+        }
+        if (length == crsDimension) {
+            return crs;
+        }
+        /*
+         * If the CRS is a compound one, separate each components independently.
+         * For each component, we search the sub-array of 'dimensions' that apply
+         * to this component and invoke 'separate' recursively.
+         */
+        if (crs instanceof CompoundCRS) {
+            int count=0, lowerDimension=0, lowerIndex=0;
+            final CoordinateReferenceSystem[] sources, targets;
+            sources = ((CompoundCRS) crs).getCoordinateReferenceSystems();
+            targets = new CoordinateReferenceSystem[sources.length];
+search:     for (int i=0; i<sources.length; i++) {
+                final CoordinateReferenceSystem source = sources[i];
+                final int upperDimension = lowerDimension + source.getCoordinateSystem().getDimension();
+                while (dimensions[lowerIndex] < lowerDimension) {
+                    if (++lowerIndex == dimensions.length) {
+                        break search;
+                    }
+                }
+                int upperIndex = lowerIndex;
+                while (dimensions[upperIndex] < upperDimension) {
+                    if (++upperIndex == dimensions.length) {
+                        break;
+                    }
+                }
+                if (lowerIndex != upperIndex) {
+                    final int[] sub = new int[upperIndex - lowerIndex];
+                    for (int j=0; j<sub.length; j++) {
+                        sub[j] = dimensions[j+lowerIndex] - lowerDimension;
+                    }
+                    targets[count++] = separate(source, sub);
+                }
+                lowerDimension = upperDimension;
+                lowerIndex     = upperIndex;
+            }
+            if (count == 1) {
+                return targets[0];
+            }
+            return getCRSFactory().createCompoundCRS(getTemporaryName(crs),
+                    (CoordinateReferenceSystem[]) XArray.resize(targets, count));
+        }
+        /*
+         * TODO: Implement other cases here (3D-GeographicCRS, etc.).
+         *       It may requires the creation of new CoordinateSystem objects,
+         *       which is why this method live in 'FactoryGroup'.
+         */
+        throw new FactoryException("Can't separate the CRS."); // TODO: localize
+    }
+
     /**
      * Returns a temporary name for object derived from the specified one.
      */

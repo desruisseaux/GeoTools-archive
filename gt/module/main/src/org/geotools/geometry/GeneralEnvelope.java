@@ -24,14 +24,17 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.geometry.XRectangle2D;
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.geometry.XRectangle2D;
 
 
 /**
@@ -66,7 +69,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
     private CoordinateReferenceSystem crs;
     
     /**
-     * Construct a new envelope with the same data than the specified envelope.
+     * Constructs a new envelope with the same data than the specified envelope.
      */
     public GeneralEnvelope(final Envelope envelope) {
         if (envelope instanceof GeneralEnvelope) {
@@ -96,7 +99,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
     }
     
     /**
-     * Construct an empty envelope of the specified dimension.
+     * Constructs an empty envelope of the specified dimension.
      * All ordinates are initialized to 0.
      */
     public GeneralEnvelope(final int dimension) {
@@ -104,7 +107,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
     }
     
     /**
-     * Construct one-dimensional envelope defined by a range of values.
+     * Constructs one-dimensional envelope defined by a range of values.
      *
      * @param min The minimal value.
      * @param max The maximal value.
@@ -115,7 +118,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
     }
     
     /**
-     * Construct a envelope defined by two positions.
+     * Constructs a envelope defined by two positions.
      *
      * @param  minCP Minimum ordinate values.
      * @param  maxCP Maximum ordinate values.
@@ -138,7 +141,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
     }
     
     /**
-     * Construct a envelope defined by two positions.
+     * Constructs a envelope defined by two positions.
      *
      * @param  minCP Point containing minimum ordinate values.
      * @param  maxCP Point containing maximum ordinate values.
@@ -153,7 +156,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
     }
     
     /**
-     * Construct two-dimensional envelope defined by a {@link Rectangle2D}.
+     * Constructs two-dimensional envelope defined by a {@link Rectangle2D}.
      */
     public GeneralEnvelope(final Rectangle2D rect) {
         ordinates = new double[] {
@@ -164,7 +167,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
     }
     
     /**
-     * Check if ordinate values in the minimum point are less than or
+     * Checks if ordinate values in the minimum point are less than or
      * equal to the corresponding ordinate value in the maximum point.
      *
      * @throws IllegalArgumentException if an ordinate value in the minimum
@@ -208,20 +211,6 @@ public class GeneralEnvelope implements Envelope, Serializable {
     }
 
     /**
-     * A coordinate position consisting of all the maximal ordinates for each
-     * dimension for all points within the <code>Envelope</code>.
-     *
-     * @return The upper corner.
-     */
-    public DirectPosition getUpperCorner() {
-        final int dim = ordinates.length/2;
-        final GeneralDirectPosition position = new GeneralDirectPosition(dim);
-        System.arraycopy(ordinates, dim, position.ordinates, 0, dim);
-        position.setCoordinateReferenceSystem(crs);
-        return position;
-    }
-
-    /**
      * A coordinate position consisting of all the minimal ordinates for each
      * dimension for all points within the <code>Envelope</code>.
      *
@@ -231,6 +220,20 @@ public class GeneralEnvelope implements Envelope, Serializable {
         final int dim = ordinates.length/2;
         final GeneralDirectPosition position = new GeneralDirectPosition(dim);
         System.arraycopy(ordinates, 0, position.ordinates, 0, dim);
+        position.setCoordinateReferenceSystem(crs);
+        return position;
+    }
+
+    /**
+     * A coordinate position consisting of all the maximal ordinates for each
+     * dimension for all points within the <code>Envelope</code>.
+     *
+     * @return The upper corner.
+     */
+    public DirectPosition getUpperCorner() {
+        final int dim = ordinates.length/2;
+        final GeneralDirectPosition position = new GeneralDirectPosition(dim);
+        System.arraycopy(ordinates, dim, position.ordinates, 0, dim);
         position.setCoordinateReferenceSystem(crs);
         return position;
     }
@@ -485,17 +488,21 @@ public class GeneralEnvelope implements Envelope, Serializable {
      * different implementations of the same class.
      */
     public int hashCode() {
-        return GeneralDirectPosition.hashCode(ordinates) ^ (int)serialVersionUID;
+        int code = GeneralDirectPosition.hashCode(ordinates) ^ (int)serialVersionUID;
+        if (crs != null) {
+            code ^= crs.hashCode();
+        }
+        return code;
     }
     
     /**
-     * Compares the specified object with
-     * this envelope for equality.
+     * Compares the specified object with this envelope for equality.
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
             final GeneralEnvelope that = (GeneralEnvelope) object;
-            return Arrays.equals(this.ordinates, that.ordinates);
+            return Arrays.equals(this.ordinates, that.ordinates) &&
+                   Utilities.equals(this.crs, that.crs);
         }
         return false;
     }

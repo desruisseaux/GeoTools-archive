@@ -16,24 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.gp;
+package org.geotools.coverage.processing;
 
 
 /**
@@ -42,30 +26,28 @@ package org.geotools.gp;
  *
  * @version $Id$
  * @author  Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.processing.CannotReprojectException}.
  */
-public class CannotReprojectException extends org.geotools.coverage.processing.CannotReprojectException {
+public class CannotReprojectException extends RuntimeException {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -8145425848361056027L;
-    
+
     /**
-     * Creates a new <code>CannotReprojectException</code> without detail message.
+     * Creates a new exception without detail message.
      */
     public CannotReprojectException() {
     }
-    
+
     /**
-     * Constructs a <code>CannotReprojectException</code> with the specified detail message.
+     * Constructs a new exception with the specified detail message.
      *
      * @param message the detail message.
      */
     public CannotReprojectException(final String message) {
         super(message);
     }
-    
+
     /**
      * Constructs a new exception with the specified detail message and cause.
      *

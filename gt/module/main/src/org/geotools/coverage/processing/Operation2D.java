@@ -40,8 +40,8 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.coverage.grid.Hints;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.factory.Hints;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;

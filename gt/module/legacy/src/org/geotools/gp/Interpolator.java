@@ -55,6 +55,8 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Replaced by {@link org.geotools.coverage.operation.Interpolator2D}.
  */
 final class Interpolator extends GridCoverage {
     /**

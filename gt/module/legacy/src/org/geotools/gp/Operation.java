@@ -63,6 +63,8 @@ import org.opengis.gp.GP_Operation;
  * @author Martin Desruisseaux
  *
  * @see GP_Operation
+ *
+ * @deprecated Replaced by {@link org.geotools.coverage.processing.Operation2D}.
  */
 public abstract class Operation implements Serializable {
     /**

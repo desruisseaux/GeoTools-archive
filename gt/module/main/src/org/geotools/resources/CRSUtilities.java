@@ -413,7 +413,7 @@ public final class CRSUtilities {
      *         than the original envelope.
      * @throws TransformException if a transform failed.
      */
-    public static Envelope transform(final MathTransform transform, final GeneralEnvelope envelope)
+    public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
             throws TransformException
     {
         final int sourceDim = transform.getSourceDimensions();

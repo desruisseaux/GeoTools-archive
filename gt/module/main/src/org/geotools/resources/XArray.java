@@ -1003,6 +1003,17 @@ public final class XArray {
     }
 
     /**
+     * Returns {code true} if all elements in the specified array are in strictly increasing order.
+     * This method is usefull in assertions.
+     */
+    public static boolean isStrictlySorted(final int[] array) {
+        for (int i=1; i<array.length; i++)
+            if (array[i] <= array[i-1])
+                return false;
+        return true;
+    }
+
+    /**
      * Returns {code true} if the specified array contains at least one
      * {@link Double#NaN NaN} value.
      */

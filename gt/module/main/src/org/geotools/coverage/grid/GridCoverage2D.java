@@ -85,6 +85,7 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.InvalidRangeException;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -99,8 +100,11 @@ import org.opengis.util.Cloneable;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.factory.Hints;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -171,6 +175,12 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * first needed. May appears also in the {@link #sources} list.
      */
     private transient GridCoverage2D inverse;
+
+    /**
+     * The two-dimensional part of the coordinate reference system.
+     * This is usually (but not always) identical to {@link #crs}.
+     */
+    private final CoordinateReferenceSystem crs2D;
     
     /**
      * The raster data.
@@ -194,7 +204,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * some extend in other dimensions (for example a depth, or
      * a start and end time).
      */
-    private final Envelope envelope;
+    private final GeneralEnvelope envelope;
     
     /**
      * List of sample dimension information for the grid coverage.
@@ -220,6 +230,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     protected GridCoverage2D(final GridCoverage2D coverage) {
         super(coverage);
+        crs2D            = coverage.crs2D;
         image            = coverage.image;
         gridGeometry     = coverage.gridGeometry;
         envelope         = coverage.envelope;
@@ -426,8 +437,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     private GridCoverage2D(final CharSequence             name,
                            final WritableRaster         raster,
                            final CoordinateReferenceSystem crs,
-                                 GridGeometry2D   gridGeometry, // ONE and only one of those
-                                 Envelope             envelope, // two arguments should be non-null.
+                           final GridGeometry2D   gridGeometry, // ONE and only one of those two
+                           final GeneralEnvelope      envelope, // arguments should be non-null.
                            final SampleDimensionGT[]     bands)
             throws MismatchedDimensionException, IllegalArgumentException
     {
@@ -545,8 +556,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     private GridCoverage2D(final CharSequence             name,
                            final PlanarImage             image,
                            final CoordinateReferenceSystem crs,
-                                 GridGeometry2D   gridGeometry, // ONE and only one of those
-                                 Envelope             envelope, // two arguments should be non-null.
+                                 GridGeometry2D   gridGeometry, // ONE and only one of those two
+                                 GeneralEnvelope      envelope, // arguments should be non-null.
                            final SampleDimensionGT[]   sdBands,
                            final GridCoverage[]        sources,
                            final Map                properties)
@@ -589,7 +600,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                 throw new IllegalArgumentException(error);
             }
             if (envelope == null) {
-                envelope = gridGeometry.getEnvelope();
+                envelope = new GeneralEnvelope(gridGeometry.getEnvelope());
             }
         }
         final int dimension = envelope.getDimension();
@@ -599,7 +610,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                         new Integer(cs.getDimension()),
                         new Integer(envelope.getDimension())));
         }
-        this.envelope = (Envelope) pool.canonicalize(envelope);
+        envelope.setCoordinateReferenceSystem(crs);
+        this.envelope = (GeneralEnvelope) pool.canonicalize(envelope);
         /*
          * Computes the grid geometry. The math transform will be computed from the envelope.
          * A pool of shared grid geometries will be used in order to recycle existing objects.
@@ -646,12 +658,27 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         if (error != null) {
             throw new IllegalArgumentException(error);
         }
-        if (dimension <= Math.max(gridGeometry.xAxis, gridGeometry.yAxis) ||
-            !(this.envelope.getLength(gridGeometry.xAxis) > 0) ||
-            !(this.envelope.getLength(gridGeometry.yAxis) > 0))
+        if (dimension <= Math.max(gridGeometry.axisDimensionX, gridGeometry.axisDimensionY) ||
+            !(this.envelope.getLength(gridGeometry.axisDimensionX) > 0) ||
+            !(this.envelope.getLength(gridGeometry.axisDimensionY) > 0))
         {
             throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ENVELOPE));
         }
+        /*
+         * Constructs the two-dimensional CRS.
+         */
+        try {
+            crs2D = new FactoryGroup().separate(crs, new int[] {gridGeometry.axisDimensionX,
+                                                                gridGeometry.axisDimensionY});
+        } catch (FactoryException exception) {
+            final IllegalArgumentException e =
+                new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
+                    org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "crs",
+                    crs.getName().getClass()));
+            e.initCause(exception); // TODO: inline in the constructor with J2SE 1.5.
+            throw e;
+        }
+        assert crs2D.getCoordinateSystem().getDimension() == 2 : crs2D;
     }
 
     /**
@@ -671,11 +698,11 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         for (int i=0; i<dimension; i++) {
             final int min, length;
             final Object label;
-            if (i == grid.xAxis) {
+            if (i == grid.gridDimensionX) {
                 min    = image.getMinX();
                 length = image.getWidth();
                 label  = "\"X\"";
-            } else if (i == grid.yAxis) {
+            } else if (i == grid.gridDimensionY) {
                 min    = image.getMinY();
                 length = image.getHeight();
                 label  = "\"Y\"";
@@ -714,13 +741,35 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Returns The bounding box for the coverage domain in coordinate reference system coordinates.
+     * Returns the bounding box for the coverage domain in coordinate reference system coordinates.
      */
     public Envelope getEnvelope() {
         if (envelope instanceof Cloneable) {
             return (Envelope) ((Cloneable) envelope).clone();
         }
         return envelope;
+    }
+
+    /**
+     * Returns the two-dimensional bounding box for the coverage domain in coordinate reference
+     * system coordinates.
+     */
+    public Envelope2D getEnvelope2D() {
+        return new Envelope2D(crs2D,
+                envelope.getMinimum(gridGeometry.gridDimensionX),
+                envelope.getMinimum(gridGeometry.gridDimensionY),
+                envelope.getLength (gridGeometry.gridDimensionX),
+                envelope.getLength (gridGeometry.gridDimensionY));
+    }
+
+    /**
+     * Returns the two-dimensional part of this grid coverage CRS. This is usually (but not
+     * always) identical to the {@linkplain #getCoordinateReferenceSystem full CRS}.
+     *
+     * @see #getCoordinateReferenceSystem
+     */
+    public CoordinateReferenceSystem getCoordinateReferenceSystem2D() {
+        return crs2D;
     }
 
     /**
@@ -739,6 +788,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     public SampleDimension getSampleDimension(final int index) {
         return sampleDimensions[index];
+    }
+
+    /**
+     * Returns all sample dimensions for this grid coverage.
+     */
+    public SampleDimensionGT[] getSampleDimensions() {
+        return (SampleDimensionGT[]) sampleDimensions.clone();
     }
 
     /**
@@ -856,8 +912,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         if (point instanceof Point2D) {
             return (Point2D) point;
         }
-        return new Point2D.Double(point.getOrdinate(gridGeometry.xAxis),
-                                  point.getOrdinate(gridGeometry.yAxis));
+        return new Point2D.Double(point.getOrdinate(gridGeometry.axisDimensionX),
+                                  point.getOrdinate(gridGeometry.axisDimensionY));
     }
 
     /**
@@ -994,8 +1050,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     public int[] getOptimalDataBlockSizes() {
         final int[] size = new int[getDimension()];
         Arrays.fill(size, 1);
-        size[gridGeometry.xAxis] = image.getTileWidth();
-        size[gridGeometry.yAxis] = image.getTileHeight();
+        size[gridGeometry.gridDimensionX] = image.getTileWidth();
+        size[gridGeometry.gridDimensionY] = image.getTileHeight();
         return size;
     }
 
@@ -1116,7 +1172,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *       (as of JAI's "extrema" operation). If would suffice to add a check making
      *       sure that the range of transformed values doesn't contains 0.
      */
-    GridCoverage2D createGeophysics(final boolean geo) {
+    protected GridCoverage2D createGeophysics(final boolean geo) {
         /*
          * STEP 1 - Gets the source image and prepare the target sample dimensions.
          *          As a slight optimisation, we skip the "Null" operations since

@@ -274,7 +274,7 @@ public class DimensionFilter {
         }
         final int[] target = targetDimensions;
         transform = separateInput(transform);
-        assert XArray.isSorted(targetDimensions);
+        assert XArray.isStrictlySorted(targetDimensions);
         if (target != null) {
             final int[] step = targetDimensions;
             targetDimensions = new int[target.length];
@@ -317,7 +317,7 @@ public class DimensionFilter {
         final int dimInput  = sourceDimensions.length;
         final int lower     = sourceDimensions[0];
         final int upper     = sourceDimensions[dimInput-1] + 1;
-        assert XArray.isSorted(sourceDimensions);
+        assert XArray.isStrictlySorted(sourceDimensions);
         if (upper > dimSource) {
             throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
@@ -483,7 +483,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
         final int dimOutput = targetDimensions.length;
         final int lower     = targetDimensions[0];
         final int upper     = targetDimensions[dimOutput-1];
-        assert XArray.isSorted(targetDimensions);
+        assert XArray.isStrictlySorted(targetDimensions);
         if (upper > dimTarget) {
             throw new IllegalArgumentException(Resources.format(
                       ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
@@ -551,7 +551,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
             return true;
         }
         if (sequence != null) {
-            assert XArray.isSorted(sequence);
+            assert XArray.isStrictlySorted(sequence);
             int index = Arrays.binarySearch(sequence, lower);
             if (index >= 0) {
                 index += --upper - lower;
@@ -576,7 +576,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
             return true;
         }
         if (sequence != null) {
-            assert XArray.isSorted(sequence);
+            assert XArray.isStrictlySorted(sequence);
             int index = Arrays.binarySearch(sequence, lower);
             if (index >= 0) {
                 return true;
@@ -601,7 +601,7 @@ reduce:     for (int j=0; j<rows.length; j++) {
         if (sequence == null) {
             return new int[] {dimension};
         }
-        assert XArray.isSorted(sequence);
+        assert XArray.isStrictlySorted(sequence);
         int i = Arrays.binarySearch(sequence, dimension);
         if (i < 0) {
             i = ~i;   // Tild, not the minus sign.

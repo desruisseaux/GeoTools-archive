@@ -16,26 +16,27 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.gp;
+package org.geotools.coverage.operation;
 
-// J2SE and JAI dependencies
+// J2SE dependencies
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.RasterFormatException;
 
+// JAI dependencies
 import javax.media.jai.Warp;
 
-import org.geotools.ct.MathTransform2D;
-import org.geotools.resources.CTSUtilities;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
-import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -43,14 +44,12 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.operation.WarpTransform}.
  */
 final class WarpTransform extends Warp {
     /**
      * The coverage name. Used for formatting error message.
      */
-    private final String name;
+    private final InternationalString name;
 
     /**
      * The <strong>inverse</strong> of the transform to apply.
@@ -59,13 +58,13 @@ final class WarpTransform extends Warp {
     private final MathTransform2D inverse;
     
     /**
-     * Construct a new <code>WarpTransform</code>.
+     * Constructs a new <code>WarpTransform</code>.
      *
      * @param name    The coverage name. Used for formatting error message.
      * @param inverse The <strong>inverse</strong> of the transformation
      *                to apply from source to target image.
      */
-    public WarpTransform(final String name, final MathTransform2D inverse) {
+    public WarpTransform(final InternationalString name, final MathTransform2D inverse) {
         this.name    = name;
         this.inverse = inverse;
     }
@@ -78,13 +77,13 @@ final class WarpTransform extends Warp {
                                   final int width,   final int height,
                                   final int periodX, final int periodY, float[] destRect)
     {
-        if (periodX<1) throw new IllegalArgumentException(String.valueOf(periodX));
-        if (periodY<1) throw new IllegalArgumentException(String.valueOf(periodY));
-        
-        final int xmax  = xmin+width;
-        final int ymax  = ymin+height;
+        if (periodX < 1) throw new IllegalArgumentException(String.valueOf(periodX));
+        if (periodY < 1) throw new IllegalArgumentException(String.valueOf(periodY));
+
+        final int xmax  = xmin + width;
+        final int ymax  = ymin + height;
         final int count = ((width+(periodX-1))/periodX) * ((height+(periodY-1))/periodY);
-        if (destRect==null) {
+        if (destRect == null) {
             destRect = new float[2*count];
         }
         int index = 0;
@@ -119,7 +118,7 @@ final class WarpTransform extends Warp {
             Rectangle2D bounds = new Rectangle2D.Double(
                     destRect.x-0.5, destRect.y-0.5, destRect.width, destRect.height);
             // TODO: This rectangle may be approximative. We should improve the algorithm.
-            bounds = CTSUtilities.transform(inverse, bounds, bounds);
+            bounds = CRSUtilities.transform(inverse, bounds, bounds);
             return bounds.getBounds();
         } catch (TransformException exception) {
             IllegalArgumentException e = new IllegalArgumentException(Resources.format(
@@ -141,7 +140,7 @@ final class WarpTransform extends Warp {
             Rectangle2D bounds = new Rectangle2D.Double(
                     sourceRect.x-0.5, sourceRect.y-0.5, sourceRect.width, sourceRect.height);
             // TODO: This rectangle may be approximative. We should improve the algorithm.
-            bounds = CTSUtilities.transform((MathTransform2D)inverse.inverse(), bounds, bounds);
+            bounds = CRSUtilities.transform((MathTransform2D)inverse.inverse(), bounds, bounds);
             return bounds.getBounds();
         } catch (TransformException exception) {
             IllegalArgumentException e = new IllegalArgumentException(Resources.format(
