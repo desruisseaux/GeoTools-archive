@@ -138,7 +138,10 @@ public interface GetMapRequest extends Request{
     /**
      * A list of type <code>SimpleLayer</code> used to set the layers and
      * styles for this request. The first element in the List is the first
-     * Layer in the request.
+     * Layer in the request (and the layer drawn on the bottom).
+     * 
+     * Typically, each layer name and style name is passed through an
+     * encoder before being added to the final URL.
      * 
      * @param layers a List of type SimpleLayer
      */

@@ -48,11 +48,9 @@ import org.xml.sax.SAXException;
 public class WMS1_1_0Test extends WMS1_0_0Test {
     protected URL getStylesURL; 
 
-	public WMS1_1_0Test() throws Exception {
+    public WMS1_1_0Test() throws Exception {
 		server = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
 		spec = new WMS1_1_0();
-		
-
 	}
 	
 	public void testGetVersion() {
@@ -240,7 +238,7 @@ public class WMS1_1_0Test extends WMS1_0_0Test {
         request.setFormat("image/jpeg");
         System.out.println(request.getFinalURL().toExternalForm());
         
-        assertTrue(request.getFinalURL().toExternalForm().indexOf("image%2Fjpeg") >= 0);
+        assertTrue(request.getFinalURL().toExternalForm().indexOf("image/jpeg") >= 0);
     }
     
     protected WebMapServer getCustomWMS( URL featureURL ) throws SAXException, URISyntaxException, IOException {

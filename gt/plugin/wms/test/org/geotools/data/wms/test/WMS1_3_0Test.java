@@ -16,23 +16,35 @@
  */
 package org.geotools.data.wms.test;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
+import javax.imageio.ImageIO;
 
 import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
+import org.geotools.data.ows.LayerDescription;
 import org.geotools.data.ows.WMSCapabilities;
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_3_0;
 import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetFeatureInfoRequest;
+import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
+import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
+import org.geotools.data.wms.response.GetLegendGraphicResponse;
+import org.geotools.data.wms.response.GetMapResponse;
 import org.xml.sax.SAXException;
 
 /**
@@ -43,9 +55,11 @@ import org.xml.sax.SAXException;
  */
 public class WMS1_3_0Test extends WMS1_1_1Test{
 
+	private URL server2;
 	public WMS1_3_0Test() throws Exception {
 		this.spec = new WMS1_3_0();
-		this.server = new URL("http://www2.dmsolutions.ca/cgi-bin/mswms_gmap?VERSION=1.1.0&REQUEST=GetCapabilities");
+		this.server = new URL("http://www.demis.nl/mapserver/request.asp?Service=WMS&Version=1.3.0&Request=GetCapabilities");
+		this.server2 = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&REQUEST=GetCapabilities");
 	}
 
 	public void testGetVersion() {
@@ -165,6 +179,17 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
 	}
 	
 	
+	
+	public void testCreateGetMapRequest() throws Exception {
+        WebMapServer wms = new WebMapServer(server);
+        WMSCapabilities caps = wms.getCapabilities();
+        GetMapRequest request = wms.createGetMapRequest();
+        request.setFormat("image/jpeg");
+        System.out.println(request.getFinalURL().toExternalForm());
+        
+        assertTrue(request.getFinalURL().toExternalForm().indexOf("image%2Fjpeg") >= 0);
+	}
+	
     public void testCreateGetFeatureInfoRequest() throws Exception {
         URL featureURL = new URL("http://demo.cubewerx.com/cipi12/cubeserv/cubeserv.cgi?service=wms&request=getcapabilities");
         WebMapServer wms = getCustomWMS(featureURL);
@@ -223,6 +248,103 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
 
         
     }
+	
+	public void testCreateDescribeLayerRequest() throws Exception {
+		WebMapServer wms = new CustomWMS(server2);
+		
+        DescribeLayerRequest request = wms.createDescribeLayerRequest();
+        assertNotNull(request);
+//        http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&REQUEST=DescribeLayer&SERVICE=wms&VERSION=1.3.0&LAYERS=BARRIERL_1M:Foundation,POLBNDP_1M:Foundation,DQLINE_UTIL_1M:Foundation
+        request.setLayers("BARRIERL_1M:Foundation,POLBNDP_1M:Foundation,DQLINE_UTIL_1M:Foundation");
+        System.out.println(request.getFinalURL());
+        DescribeLayerResponse response = (DescribeLayerResponse) wms.issueRequest(request);
+        assertNotNull(response);
+        
+        LayerDescription[] layerDescs = response.getLayerDescs();
+        assertEquals(layerDescs.length, 3);
+        
+        assertEquals(layerDescs[0].getName(), "BARRIERL_1M:Foundation");
+        assertEquals(layerDescs[1].getName(), "POLBNDP_1M:Foundation");
+        assertEquals(layerDescs[2].getName(), "DQLINE_UTIL_1M:Foundation");
+        
+        assertEquals(layerDescs[0].getWfs(), new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WFS&DATASTORE=Foundation&"));
+        assertEquals(layerDescs[1].getWfs(), new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WFS&DATASTORE=Foundation&"));
+        assertEquals(layerDescs[2].getWfs(), new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&SERVICE=WFS&DATASTORE=Foundation&"));
+        
+        assertEquals(layerDescs[0].getQueries().length, 1);
+        assertEquals(layerDescs[1].getQueries().length, 1);
+        assertEquals(layerDescs[2].getQueries().length, 1);
+        
+        assertEquals(layerDescs[0].getQueries()[0], "BARRIERL_1M");
+        assertEquals(layerDescs[1].getQueries()[0], "POLBNDP_1M");
+        assertEquals(layerDescs[2].getQueries()[0], "DQLINE_UTIL_1M");
+
+	}
+		
+	public void testCreateGetLegendGraphicRequest() throws Exception {
+        WebMapServer wms = new CustomWMS(server2);
+        GetLegendGraphicRequest request = wms.createGetLegendGraphicRequest();
+        
+        assertNotNull(request);
+        
+        SimpleLayer[] layers = request.getLayers();
+        SimpleLayer layer = null;
+        for (int i = 0; i < layers.length; i++) {
+            if (layers[i].getName().equals("BARRIERL_1M:Foundation")) {
+                layer = layers[i];
+                break;
+            }
+        }
+        
+        assertNotNull(layer);
+        
+        layer.setStyle("");
+        request.setLayer(layer);
+        
+        request.setFormat("image/gif");
+        
+        request.setWidth("50");
+        request.setHeight("50");
+        
+        System.out.println(request.getFinalURL());
+        
+        GetLegendGraphicResponse response = (GetLegendGraphicResponse) wms.issueRequest(request);
+        assertNotNull(response);
+        
+        assertEquals(response.getContentType(), "image/gif");
+
+        BufferedImage image = ImageIO.read(response.getInputStream());
+        assertEquals(image.getHeight(), 50);
+
+	}
+	
+	public void testParamEncoding () throws Exception {
+		//this request does not work because it is encoded properly
+		//Let's make sure that this doesn't happen again.
+//		http://demo.cubewerx.com/cipi12/cubeserv/cubeserv.cgi?LAYERS=BARRIERL_1M%3AFoundation%2CBNDTXT_1M%3AFoundation&
+//		FORMAT=image%2Fpng&TRANSPARENT=TRUE&HEIGHT=296&REQUEST=GetMap&
+//		BBOX=9.543194770812995%2C2.9407237508305797%2C119.99700164794902%2C59.50530305123241&
+//		WIDTH=577&STYLES=%2C&SRS=EPSG%3A4269&VERSION=1.1.1
+		
+		WebMapServer wms = new CustomWMS(server2);
+		GetMapRequest request = wms.createGetMapRequest();
+		
+		List layers = new ArrayList();
+		layers.add(new SimpleLayer("BARRIERL_1M:Foundation", ""));
+		layers.add(new SimpleLayer("BNDTXT_1M:Foundation", ""));
+		request.setLayers(layers);
+		request.setSRS("EPSG:4269");
+		request.setDimensions("566", "296");
+		request.setTransparent(true);
+		request.setFormat("image/png");
+		request.setBBox("9.543194770812995,2.9407237508305797,119.99700164794902,59.50530305123241");
+		
+		GetMapResponse response = wms.issueRequest(request);
+		
+		BufferedImage image = ImageIO.read(response.getInputStream());
+		assertEquals(image.getHeight(), 296);
+	}
+	
 	
     protected WebMapServer getCustomWMS( URL featureURL ) throws SAXException, URISyntaxException, IOException {
         return new CustomWMS(featureURL);

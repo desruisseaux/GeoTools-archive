@@ -6,7 +6,9 @@
  */
 package org.geotools.data.wms.request;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -81,8 +83,16 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
 
         for (int i = 0; i < layers.size(); i++) {
             SimpleLayer simpleLayer = (SimpleLayer) layers.get(i);
-            layerString = layerString + simpleLayer.getName();
-            styleString = styleString + simpleLayer.getStyle();
+            try {
+				layerString = layerString + URLEncoder.encode(simpleLayer.getName(), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				layerString = layerString + simpleLayer.getName();
+			}
+            try {
+				styleString = styleString + URLEncoder.encode(simpleLayer.getStyle(), "UTF-8");
+			} catch (UnsupportedEncodingException e1) {
+				styleString = styleString + simpleLayer.getStyle();
+			}
 
             if (i != (layers.size() - 1)) {
                 layerString = layerString + ","; //$NON-NLS-1$

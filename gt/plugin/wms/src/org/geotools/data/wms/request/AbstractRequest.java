@@ -117,12 +117,7 @@ public class AbstractRequest implements Request{
         while (iter.hasNext()) {
             Map.Entry entry = (Map.Entry) iter.next();
             
-            String value = null;
-            try {
-                value = URLEncoder.encode((String) entry.getValue(), "UTF-8");
-            } catch (UnsupportedEncodingException e1) {
-                value = (String) entry.getValue();
-            }
+            String value = (String) entry.getValue();
             String param = entry.getKey() + "=" + value;
 
             if (iter.hasNext()) {
@@ -135,6 +130,7 @@ public class AbstractRequest implements Request{
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
+        	e.printStackTrace();
             //If something is wrong here, this is something wrong with the code above.
         }
 

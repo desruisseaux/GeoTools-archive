@@ -39,7 +39,7 @@ public class GetCapabilitiesRequestTest extends TestCase {
 
         HashMap map = new HashMap();
         map.put("VERSION", "1.1.1");
-        map.put("MAP", "%2Fopt%2Fdra2%2Forthophotos%2Ftiles.map");
+        map.put("MAP", "/opt/dra2/orthophotos/tiles.map");
         map.put("REQUEST", "GetCapabilities");
         map.put("SERVICE", "WMS");
 

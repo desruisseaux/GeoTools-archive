@@ -6,7 +6,9 @@
  */
 package org.geotools.data.wms;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
@@ -65,6 +67,16 @@ public class WMS1_3_0 extends WMS1_1_1 {
         protected void initVersion() {
             setVersion("1.3.0");
         }
+        
+        
+		public void setFormat(String value) {
+			try {
+				value = URLEncoder.encode(value, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			super.setFormat(value);
+		}
 	}
 	
 	public static class GetFeatureInfoRequest extends WMS1_1_1.GetFeatureInfoRequest {

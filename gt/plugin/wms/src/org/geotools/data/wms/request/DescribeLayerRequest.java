@@ -28,6 +28,7 @@ public interface DescribeLayerRequest extends Request {
     public static final String LAYERS = "LAYERS"; //$NON-NLS-1$
     
     /**
+     * TODO Change this to be a String[] or List<String> so we can encode properly.
      * Sets the LAYERS parameter
      * 
      * @param layers A comma delimited String of named layers
