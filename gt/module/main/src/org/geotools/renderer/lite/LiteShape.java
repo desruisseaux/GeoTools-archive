@@ -44,7 +44,7 @@ public class LiteShape implements Shape {
 
     /** The transform needed to go from the object space to the device space */
     private AffineTransform transform = null;
-    private boolean generalize = true;
+    private boolean generalize = false;
     private double maxDistance = 1;
 
     
@@ -573,5 +573,13 @@ public class LiteShape implements Shape {
         LinearRing lr = geometry.getFactory().createLinearRing(coords);
 
         return geometry.getFactory().createPolygon(lr, null);
+    }
+    
+    /**
+     * Returns the affine transform for this lite shape
+     * @return
+     */
+    public AffineTransform getTransform() {
+        return transform;
     }
 }
