@@ -20,6 +20,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
  * file format or resources.
  *
  * @UML abstract CV_Format
+ * @deprecated You should use org.opengis.coverage.grid.Format instead
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
  * @version <A HREF="http://www.opengis.org/docs/01-004.pdf">Grid Coverage specification 1.0</A>
  */
@@ -90,7 +91,7 @@ public interface Format {
      * </p>
      */
     ParameterDescriptorGroup getWriteParameters();
-    
+
     /**
      * @todo javadoc
      */
@@ -102,6 +103,6 @@ public interface Format {
     GridCoverageWriter getWriter(Object destination);
 
     boolean accepts(Object input);
-    
+
     boolean equals(Format f);
 }
