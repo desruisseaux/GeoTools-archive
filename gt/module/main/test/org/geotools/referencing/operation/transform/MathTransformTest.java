@@ -30,17 +30,21 @@ import junit.framework.TestSuite;
 
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformFactory;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
@@ -109,6 +113,19 @@ public class MathTransformTest extends TestCase {
         }
     }
 
+    public void testDirectPositionTransform() throws Exception {
+        CoordinateReferenceSystem crs=FactoryFinder.getCRSFactory().createFromWKT(
+                "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
+        
+        MathTransform t=FactoryFinder.getCoordinateOperationFactory().createOperation( GeographicCRS.WGS84, crs).getMathTransform();
+        
+        DirectPosition position=new GeneralDirectPosition(-123, 55);
+        
+        t.transform(position, position);
+        
+        
+    }
+    
     /**
      * Test various linear transformations. We test for many differents dimensions.
      * The factory class should have created specialized classes for 1D and 2D cases.
