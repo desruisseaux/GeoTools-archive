@@ -3,6 +3,7 @@ package org.geotools.metadata.iso19115;
 import java.util.Set;
 
 import org.opengis.util.InternationalString;
+import org.geotools.util.CheckedHashSet;
 
 public class Address extends MetaData implements
 		org.opengis.metadata.citation.Address {
@@ -10,8 +11,8 @@ public class Address extends MetaData implements
     InternationalString administrativeArea;
     InternationalString city;
     InternationalString country;
-    Set deliveryPoints = new SetOf( String.class );
-    Set electronicMailAddresses = new SetOf( String.class );
+    Set deliveryPoints = new CheckedHashSet( String.class );
+    Set electronicMailAddresses = new CheckedHashSet( String.class );
     String postalCode;
     
     public InternationalString getAdministrativeArea() {

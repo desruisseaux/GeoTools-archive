@@ -24,23 +24,24 @@ package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Series;
-
-// Geotools dependencies
-import org.geotools.metadata.iso19115.ListOf;
-import org.geotools.metadata.iso19115.SetOf;
-import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.PresentationForm;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.util.CheckedHashSet;
+import org.geotools.util.CheckedArrayList;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -50,7 +51,14 @@ import org.opengis.util.InternationalString;
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class Citation implements org.opengis.metadata.citation.Citation, Serializable {
+public class Citation extends MetadataEntity
+                   implements org.opengis.metadata.citation.Citation, Serializable
+{
+    /**
+     * Serial number for interoperability with different versions.
+     */
+    private static final long serialVersionUID = -4415559967618358778L;
+    
     /**
      * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
      */
@@ -67,273 +75,343 @@ public class Citation implements org.opengis.metadata.citation.Citation, Seriali
     public static final Citation GEOTOOLS = new Citation("Geotools");
 
     /**
-     * Construct a citation with the specified title.
-     */
-    public Citation(final String title) {
-        this.title = null; // new InternationalString( title )
-    }
-    private List alternateTitles = new ListOf( InternationalString.class );
-    private Set citedResponsibleParties = new SetOf( ResponsibleParty.class );
-
-    private InternationalString title;
-    private Map dates = new HashMap();
-    private InternationalString edition;
-    private Date editionDate;
-    private Set identifiers = new SetOf( String.class );
-    private Set identifierTypes = new SetOf( String.class );
-
-    private Set presentationForm = new SetOf( PresentationForm.class );
-    private Series series;
-    private InternationalString otherCitationDetails;
-    private InternationalString collectiveTitle;
-    private String ISBN;
-    private String ISSN;
-    public List getAlternateTitles() {
-        return alternateTitles;
-    }
-    public void setAlternateTitles(List alternateTitles) {
-        this.alternateTitles = alternateTitles;
-    }
-    public Set getCitedResponsibleParties() {
-        return citedResponsibleParties;
-    }
-    public void setCitedResponsibleParties(Set citedResponsibleParties) {
-        this.citedResponsibleParties = citedResponsibleParties;
-    }
-    public InternationalString getCollectiveTitle() {
-        return collectiveTitle;
-    }
-    public void setCollectiveTitle(InternationalString collectiveTitle) {
-        this.collectiveTitle = collectiveTitle;
-    }
-    public Map getDates() {
-        return dates;
-    }
-    public void setDates(Map dates) {
-        this.dates = dates;
-    }
-    public InternationalString getEdition() {
-        return edition;
-    }
-    public void setEdition(InternationalString edition) {
-        this.edition = edition;
-    }
-    public Date getEditionDate() {
-        return editionDate;
-    }
-    public void setEditionDate(Date editionDate) {
-        this.editionDate = editionDate;
-    }
-    public Set getIdentifiers() {
-        return identifiers;
-    }
-    public void setIdentifiers(Set identifiers) {
-        this.identifiers.clear();
-        this.identifiers.addAll( identifiers );
-    }
-    public Set getIdentifierTypes() {
-        return identifierTypes;
-    }
-    public void setIdentifierTypes(Set identifierTypes) {
-        this.identifierTypes.clear();
-        this.identifierTypes.addAll(identifierTypes);
-    }
-    public String getISBN() {
-        return ISBN;
-    }
-    public void setISBN(String isbn) {
-        ISBN = isbn;
-    }
-    public String getISSN() {
-        return ISSN;
-    }
-    public void setISSN(String issn) {
-        ISSN = issn;
-    }
-    public InternationalString getOtherCitationDetails() {
-        return otherCitationDetails;
-    }
-    public void setOtherCitationDetails(InternationalString otherCitationDetails) {
-        this.otherCitationDetails = otherCitationDetails;
-    }
-    public Set getPresentationForm() {
-        return presentationForm;
-    }
-    public void setPresentationForm(Set presentationForm) {
-        this.presentationForm.clear();
-        this.presentationForm.addAll( presentationForm );
-    }
-    public Series getSeries() {
-        return series;
-    }
-    public void setSeries(Series series) {
-        this.series = series;
-    }
-    public InternationalString getTitle() {
-        return title;
-    }
-    public void setTitle(InternationalString title) {
-        this.title = title;
-    }
-}
-class Commented {
-    /**
-     * An immutable empty array of strings.
-     */
-    private static final String[] EMPTY = new String[0];
-    /**
-     * An immutable empty array of responsible party.
-     */
-    private static final ResponsibleParty[] EMPTY_RESPONSIBLE = new ResponsibleParty[0];
-
-    /**
-     * An immutable empty array of presentation form.
-     */
-    private static final PresentationForm[] EMPTY_PRESENTATION = new PresentationForm[0];
-    
-    private String title;
-    /**
      * Name by which the cited resource is known.
-     *
-     * @param  locale The desired locale for the title to be returned, or <code>null</code>
-     *         for a title in some default locale (may or may not be the
-     *         {@linkplain Locale#getDefault() system default}).
-     * @return The citation title in the given locale.
-     *         If no name is available in the given locale, then some default locale is used.
      */
-    public String getTitle(final Locale locale) {
-        return title;
-    }
+    private InternationalString title;
 
     /**
      * Short name or other language name by which the cited information is known.
      * Example: "DCW" as an alternative title for "Digital Chart of the World.
-     *
-     * @param  locale The desired locale for the title to be returned, or <code>null</code>
-     *         for a title in some default locale (may or may not be the
-     *         {@linkplain Locale#getDefault() system default}).
-     * @return The citation title in the given locale.
-     *         If no name is available in the given locale, then some default locale is used.
      */
-    public String[] getAlternateTitles(final Locale locale) {
-        return EMPTY;
-    }
-    
+    private List alternateTitles;
+
     /**
      * Reference date for the cited resource.
-     *
-     * @todo This information is mandatory. We should not returns <code>null</code>.
      */
-    public Date[] getDates() {
-        return null;
-    }
-    
+    private Map dates;
+
     /**
      * Version of the cited resource.
-     *
-     * @param  locale The desired locale for the edition to be returned, or <code>null</code>
-     *         for an edition in some default locale (may or may not be the
-     *         {@linkplain Locale#getDefault() system default}).
-     * @return The edition in the given locale.
-     *         If no edition is available in the given locale, then some default locale is used.
      */
-    public String getEdition(Locale locale) {
-        return null;
-    }
-    
+    private InternationalString edition;
+
     /**
      * Date of the edition, or <code>null</code> if none.
      */
-    public Date getEditionDate() {
-        return null;
-    }
-    
+    private Date editionDate;
+
     /**
      * Unique identifier for the resource. Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public String[] getIdentifiers() {
-        return EMPTY;
-    }
-    
+    private Set identifiers;
+
     /**
      * Reference form of the unique identifier (ID). Example: Universal Product Code (UPC),
      * National Stock Number (NSN).
      */
-    public String[] getIdentifierTypes() {
-        return EMPTY;
-    }
+    private Set identifierTypes;
 
     /**
      * Name and position information for an individual or organization that is responsible
      * for the resource. Returns an empty string if there is none.
      */
-    public ResponsibleParty[] getCitedResponsibleParties() {
-        return EMPTY_RESPONSIBLE;
-    }
-    
+    private Set citedResponsibleParties;
+
     /**
      * Mode in which the resource is represented, or an empty string if none.
      */
-    public PresentationForm[] getPresentationForm() {
-        return EMPTY_PRESENTATION;
-    }
-    
+    private Set presentationForm;
+
     /**
      * Information about the series, or aggregate dataset, of which the dataset is a part.
      * Returns <code>null</code> if none.
-     *
-     * @param  locale The desired locale for the series to be returned, or <code>null</code>
-     *         for a series in some default locale (may or may not be the
-     *         {@linkplain Locale#getDefault() system default}).
-     * @return The series in the given locale.
-     *         If no series is available in the given locale, then some default locale is used.
      */
-    public Series getSeries(Locale locale) {
-        return null;
-    }
-    
+    private Series series;
+
     /**
      * Other information required to complete the citation that is not recorded elsewhere.
      * Returns <code>null</code> if none.
-     *
-     * @param  locale The desired locale for the details to be returned, or <code>null</code>
-     *         for details in some default locale (may or may not be the
-     *         {@linkplain Locale#getDefault() system default}).
-     * @return The details in the given locale.
-     *         If no details is available in the given locale, then some default locale is used.
      */
-    public String getOtherCitationDetails(Locale locale) {
-        return null;
-    }
-    
+    private InternationalString otherCitationDetails;
+
     /**
      * Common title with holdings note. Note: title identifies elements of a series
      * collectively, combined with information about what volumes are available at the
      * source cited. Returns <code>null</code> if there is no title.
-     *
-     * @param  locale The desired locale for the title to be returned, or <code>null</code>
-     *         for a title in some default locale (may or may not be the
-     *         {@linkplain Locale#getDefault() system default}).
-     * @return The title in the given locale.
-     *         If no title is available in the given locale, then some default locale is used.
      */
-    public String getCollectiveTitle(Locale locale) {
-        return null;
-    }
-    
+    private InternationalString collectiveTitle;
+
     /**
      * International Standard Book Number, or <code>null</code> if none.
      */
-    public String getISBN() {
-        return null;
-    }
-    
+    private String ISBN;
+
     /**
      * International Standard Serial Number, or <code>null</code> if none.
      */
+    private String ISSN;
+
+    /**
+     * Construct a citation with the specified title.
+     *
+     * @param title The title, as a {@link String} or an {@link InternationalString} object.
+     */
+    public Citation(final CharSequence title) {
+        if (title instanceof InternationalString) {
+            this.title = (InternationalString) title;
+        } else {
+            this.title = new org.geotools.util.InternationalString(title.toString());
+        }
+    }
+
+    /**
+     * Returns the name by which the cited resource is known.
+     */
+    public InternationalString getTitle() {
+        return title;
+    }
+
+    /**
+     * Set the name by which the cited resource is known.
+     */
+    public void setTitle(final InternationalString title) {
+        this.title = title;
+    }
+
+    /**
+     * Returns the short name or other language name by which the cited information is known.
+     * Example: "DCW" as an alternative title for "Digital Chart of the World.
+     */
+    public List getAlternateTitles() {
+        return (alternateTitles!=null) ? alternateTitles : Collections.EMPTY_LIST;
+    }
+
+    /**
+     * Set the short name or other language name by which the cited information is known.
+     */
+    public void setAlternateTitles(final List alternateTitles) {
+        if (this.alternateTitles == null) {
+            this.alternateTitles = new CheckedArrayList(InternationalString.class);
+        } else {
+            this.alternateTitles.clear();
+        }
+        this.alternateTitles.addAll(alternateTitles);
+    }
+
+    /**
+     * Returns the reference date for the cited resource.
+     */
+    public Map getDates() {
+        return (dates!=null) ? dates : Collections.EMPTY_MAP;
+    }
+
+    /**
+     * Set the reference date for the cited resource.
+     *
+     * @todo Defines a {@link HashMap} subclass which transform all {@link Date} object
+     *       into unmidifiable dates.
+     */
+    public void setDates(final Map dates) {
+        if (this.dates == null) {
+            this.dates = new HashMap();
+        } else {
+            this.dates.clear();
+        }
+        this.dates.putAll(dates);
+    }
+
+    /**
+     * Returns the version of the cited resource.
+     */
+    public InternationalString getEdition() {
+        return edition;
+    }
+
+    /**
+     * Set the version of the cited resource.
+     */
+    public void setEdition(final InternationalString edition) {
+        this.edition = edition;
+    }
+
+    /**
+     * Returns the date of the edition, or <code>null</code> if none.
+     */
+    public Date getEditionDate() {
+        return editionDate;
+    }
+
+    /**
+     * Set the date of the edition, or <code>null</code> if none.
+     *
+     * @todo Use an unmodifiable {@link Date} here.
+     */
+    public void setEditionDate(Date editionDate) {
+        if (editionDate != null) {
+            editionDate = new Date(editionDate.getTime());
+        }
+        this.editionDate = editionDate;
+    }
+
+    /**
+     * Returns the unique identifier for the resource. Example: Universal Product Code (UPC),
+     * National Stock Number (NSN).
+     */
+    public Set getIdentifiers() {
+        return (identifiers!=null) ? identifiers : Collections.EMPTY_SET;
+    }
+
+    /**
+     * Set the unique identifier for the resource. Example: Universal Product Code (UPC),
+     * National Stock Number (NSN).
+     */
+    public void setIdentifiers(final Set identifiers) {
+        if (this.identifiers == null) {
+            this.identifiers = new CheckedHashSet(String.class);
+        } else {
+            this.identifiers.clear();
+        }
+        this.identifiers.addAll(identifiers);
+    }
+
+    /**
+     * Returns the reference form of the unique identifier (ID).
+     * Example: Universal Product Code (UPC), National Stock Number (NSN).
+     */
+    public Set getIdentifierTypes() {
+        return (identifierTypes!=null) ? identifierTypes : Collections.EMPTY_SET;
+    }
+
+    /**
+     * Set the reference form of the unique identifier (ID).
+     * Example: Universal Product Code (UPC), National Stock Number (NSN).
+     */
+    public void setIdentifierTypes(final Set identifierTypes) {
+        if (this.identifierTypes == null) {
+            this.identifierTypes = new CheckedHashSet(String.class);
+        } else {
+            this.identifierTypes.clear();
+        }
+        this.identifierTypes.addAll(identifierTypes);
+    }
+
+    /**
+     * Returns the name and position information for an individual or organization that is
+     * responsible for the resource. Returns an empty string if there is none.
+     */
+    public Set getCitedResponsibleParties() {
+        return (citedResponsibleParties!=null) ? citedResponsibleParties : Collections.EMPTY_SET;
+    }
+
+    /**
+     * Set the name and position information for an individual or organization that is responsible
+     * for the resource. Returns an empty string if there is none.
+     */
+    public void setCitedResponsibleParties(final Set citedResponsibleParties) {
+        if (this.citedResponsibleParties == null) {
+            this.citedResponsibleParties = new CheckedHashSet(ResponsibleParty.class);
+        } else {
+            this.citedResponsibleParties.clear();
+        }
+        this.citedResponsibleParties = citedResponsibleParties;
+    }
+
+    /**
+     * Returns the mode in which the resource is represented, or an empty string if none.
+     */
+    public Set getPresentationForm() {
+        return (presentationForm!=null) ? presentationForm : Collections.EMPTY_SET;
+    }
+
+    /**
+     * Set the mode in which the resource is represented, or an empty string if none.
+     */
+    public void setPresentationForm(final Set presentationForm) {
+        if (this.presentationForm == null) {
+            this.presentationForm = new CheckedHashSet(PresentationForm.class);
+        } else {
+            this.presentationForm.clear();
+        }
+        this.presentationForm.addAll( presentationForm );
+    }
+
+    /**
+     * Returns the information about the series, or aggregate dataset, of which the dataset is
+     * a part. Returns <code>null</code> if none.
+     */
+    public Series getSeries() {
+        return series;
+    }
+
+    /**
+     * Set the information about the series, or aggregate dataset, of which the dataset is
+     * a part. Set to <code>null</code> if none.
+     */
+    public void setSeries(final Series series) {
+        this.series = series;
+    }
+
+    /**
+     * Returns other information required to complete the citation that is not recorded elsewhere.
+     * Returns <code>null</code> if none.
+     */
+    public InternationalString getOtherCitationDetails() {
+        return otherCitationDetails;
+    }
+
+    /**
+     * Set other information required to complete the citation that is not recorded elsewhere.
+     * Set to <code>null</code> if none.
+     */
+    public void setOtherCitationDetails(final InternationalString otherCitationDetails) {
+        this.otherCitationDetails = otherCitationDetails;
+    }
+
+    /**
+     * Returns the common title with holdings note. Note: title identifies elements of a series
+     * collectively, combined with information about what volumes are available at the
+     * source cited. Returns <code>null</code> if there is no title.
+     */
+    public InternationalString getCollectiveTitle() {
+        return collectiveTitle;
+    }
+
+    /**
+     * Set the common title with holdings note. Note: title identifies elements of a series
+     * collectively, combined with information about what volumes are available at the
+     * source cited. Set to <code>null</code> if there is no title.
+     */
+    public void setCollectiveTitle(final InternationalString collectiveTitle) {
+        this.collectiveTitle = collectiveTitle;
+    }
+
+    /**
+     * Returns the International Standard Book Number, or <code>null</code> if none.
+     */
+    public String getISBN() {
+        return ISBN;
+    }
+
+    /**
+     * Set the International Standard Book Number, or <code>null</code> if none.
+     */
+    public void setISBN(final String ISBN) {
+        this.ISBN = ISBN;
+    }
+
+    /**
+     * Returns the International Standard Serial Number, or <code>null</code> if none.
+     */
     public String getISSN() {
-        return null;
+        return ISSN;
+    }
+
+    /**
+     * Set the International Standard Serial Number, or <code>null</code> if none.
+     */
+    public void setISSN(final String ISSN) {
+        this.ISSN = ISSN;
     }
 
     /**
@@ -341,23 +419,43 @@ class Commented {
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final Commented that = (Commented) object;
-            return Utilities.equals(this.title, that.title);
+            final Citation that = (Citation) object;
+            return Utilities.equals(this.title,                   that.title                  ) &&
+                   Utilities.equals(this.alternateTitles,         that.alternateTitles        ) &&
+                   Utilities.equals(this.dates,                   that.dates                  ) &&
+                   Utilities.equals(this.edition,                 that.edition                ) &&
+                   Utilities.equals(this.editionDate,             that.editionDate            ) &&
+                   Utilities.equals(this.identifiers,             that.identifiers            ) &&
+                   Utilities.equals(this.identifierTypes,         that.identifierTypes        ) &&
+                   Utilities.equals(this.citedResponsibleParties, that.citedResponsibleParties) &&
+                   Utilities.equals(this.presentationForm,        that.presentationForm       ) &&
+                   Utilities.equals(this.otherCitationDetails,    that.otherCitationDetails   ) &&
+                   Utilities.equals(this.collectiveTitle,         that.collectiveTitle        ) &&
+                   Utilities.equals(this.ISBN,                    that.ISBN                   ) &&
+                   Utilities.equals(this.ISSN,                    that.ISSN                   );
         }
         return false;
     }
 
     /**
-     * Returns a hash code value for this citation.
+     * Returns a hash code value for this citation. For performance reason, this method do
+     * not uses all attributes for computing the hash code. Instead, it uses the attributes
+     * that are the most likely to be unique.
      */
     public int hashCode() {
-        return title.hashCode();
+        int code = (int)serialVersionUID;
+        if (title       != null) code ^= title      .hashCode();
+        if (identifiers != null) code ^= identifiers.hashCode();
+        if (ISBN        != null) code ^= ISBN       .hashCode();
+        if (ISSN        != null) code ^= ISSN       .hashCode();
+        return code;
     }
 
     /**
-     * Returns a string representation of this citation.
+     * Returns a string representation of this citation. The default implementation
+     * returns the title in the default locale.
      */
     public String toString() {
-        return title;
+        return String.valueOf(title);
     }
 }

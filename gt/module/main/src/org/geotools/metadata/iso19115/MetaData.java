@@ -15,6 +15,7 @@ import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.metadata.content.ContentInformation;
 import org.opengis.referencing.ReferenceSystem;
+import org.geotools.util.CheckedHashSet;
 
 public class MetaData extends AbstractMetaData implements
 		org.opengis.metadata.MetaData {
@@ -61,7 +62,7 @@ public class MetaData extends AbstractMetaData implements
 	}	
 	public void setHierarchyLevels(Set hierarchyLevels) {
 		if( this.hierarchyLevels == null ){
-	        this.hierarchyLevels = new SetOf( ScopeCode.class );	        
+	        this.hierarchyLevels = new CheckedHashSet( ScopeCode.class );	        
 	    }
 	    else {	        
 	        this.hierarchyLevels.clear();
@@ -70,13 +71,13 @@ public class MetaData extends AbstractMetaData implements
 	}	
 	public synchronized Set getHierarchyLevels() {
 	    if( hierarchyLevels == null ){
-	        hierarchyLevels = new SetOf( ScopeCode.class );
+	        hierarchyLevels = new CheckedHashSet( ScopeCode.class );
 	    }
 	    return hierarchyLevels;	    
 	}
 	public void setHierarchyLevelNames(Set hierarchyLevelNames) {
 		if( this.hierarchyLevelNames == null ){
-	        this.hierarchyLevelNames = new SetOf( String.class );	        
+	        this.hierarchyLevelNames = new CheckedHashSet( String.class );	        
 	    }
 	    else {	        
 	        this.hierarchyLevelNames.clear();
@@ -85,7 +86,7 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public Set getHierarchyLevelNames() {
 		if( hierarchyLevelNames == null ){
-		    hierarchyLevelNames = new SetOf( String.class );
+		    hierarchyLevelNames = new CheckedHashSet( String.class );
 	    }
 		return hierarchyLevelNames;
 	}
@@ -97,31 +98,31 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public Set getSpatialRepresentationInfo() {
 		if( spatialRepresentationInfo == null ){
-		    spatialRepresentationInfo = new SetOf( SpatialRepresentation.class );
+		    spatialRepresentationInfo = new CheckedHashSet( SpatialRepresentation.class );
 	    }
 	    return spatialRepresentationInfo;	    	
 	}
 	public Set getReferenceSystemInfo() {
 		if( referenceSystemInfo == null ){
-		    referenceSystemInfo = new SetOf( ReferenceSystem.class );
+		    referenceSystemInfo = new CheckedHashSet( ReferenceSystem.class );
 	    }
 	    return referenceSystemInfo;
 	}
 	public Set getMetadataExtensionInfo() {
 	    if( metadataExtensionInfo == null ){
-	        metadataExtensionInfo = new SetOf( MetadataExtensionInformation.class );
+	        metadataExtensionInfo = new CheckedHashSet( MetadataExtensionInformation.class );
 	    }
 	    return metadataExtensionInfo;
 	}
 	public Set getIdentificationInfo() {
 	    if( identificationInfo == null ){
-	        identificationInfo = new SetOf( Identification.class );
+	        identificationInfo = new CheckedHashSet( Identification.class );
 	    }
 	    return identificationInfo;
 	}
 	public Set getContentInfo() {
 		if( contentInfo == null ){
-		    contentInfo = new SetOf( ContentInformation.class );
+		    contentInfo = new CheckedHashSet( ContentInformation.class );
 	    }
 	    return contentInfo;
 	}
@@ -130,25 +131,25 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public Set getDataQualityInfo() {
 		if( dataQualityInfo == null ){
-		    dataQualityInfo = new SetOf( DataQuality.class );
+		    dataQualityInfo = new CheckedHashSet( DataQuality.class );
 	    }
 	    return dataQualityInfo;
 	}
 	public Set getPortrayalCatalogueInfo() {
 		if( portrayalCatalogueInfo == null ){
-		    portrayalCatalogueInfo = new SetOf( PortrayalCatalogueReference.class );
+		    portrayalCatalogueInfo = new CheckedHashSet( PortrayalCatalogueReference.class );
 	    }
 	    return portrayalCatalogueInfo;
 	}
 	public Set getMetadataConstraints() {
 		if( metadataConstraints == null ){
-		    metadataConstraints = new SetOf( Constraints.class );
+		    metadataConstraints = new CheckedHashSet( Constraints.class );
 	    }
 	    return metadataConstraints;
 	}
 	public Set getApplicationSchemaInfo() {
 		if( applicationSchemaInfo == null ){
-		    applicationSchemaInfo = new SetOf( ApplicationSchemaInformation.class );
+		    applicationSchemaInfo = new CheckedHashSet( ApplicationSchemaInformation.class );
 	    }
 	    return applicationSchemaInfo;
 	}
@@ -158,7 +159,7 @@ public class MetaData extends AbstractMetaData implements
 
 	public void setApplicationSchemaInfo( Set applicationSchemaInfo) {
 	    if( this.applicationSchemaInfo == null ){
-	        this.applicationSchemaInfo = new SetOf( ContentInformation.class );	        
+	        this.applicationSchemaInfo = new CheckedHashSet( ContentInformation.class );	        
 	    }
 	    else {	        
 	        this.applicationSchemaInfo.clear();
@@ -172,20 +173,20 @@ public class MetaData extends AbstractMetaData implements
 		this.contact = contact;
 	}
 	
-	/** Lazy construction of a SetOf( ContentInformation.class ) for contentInfo */
+	/** Lazy construction of a CheckedHashSet( ContentInformation.class ) for contentInfo */
 	public void setContentInfo(Set contentInfo) {
 	    if( this.contentInfo == null ){
-	        this.contentInfo = new SetOf( ContentInformation.class );	        
+	        this.contentInfo = new CheckedHashSet( ContentInformation.class );	        
 	    }
 	    else {	        
 	        this.contentInfo.clear();
 	    }
 	    this.contentInfo.addAll( contentInfo );
 	}
-	/** Lazy construction of a SetOf( DataQuality ) for dataQualityInfo */
+	/** Lazy construction of a CheckedHashSet( DataQuality ) for dataQualityInfo */
 	public void setDataQualityInfo(Set dataQualityInfo) {		
 		if( this.dataQualityInfo == null ){
-	        this.dataQualityInfo = new SetOf( DataQuality.class );	        
+	        this.dataQualityInfo = new CheckedHashSet( DataQuality.class );	        
 	    }
 	    else {	        
 	        this.dataQualityInfo.clear();
@@ -200,7 +201,7 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public void setIdentificationInfo(Set identificationInfo) {		
 		if( this.identificationInfo == null ){
-	        this.identificationInfo = new SetOf( Identification.class );	        
+	        this.identificationInfo = new CheckedHashSet( Identification.class );	        
 	    }
 	    else {	        
 	        this.identificationInfo.clear();
@@ -209,7 +210,7 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public void setMetadataConstraints(Set metadataConstraints) {
 		if( this.metadataConstraints == null ){
-	        this.metadataConstraints = new SetOf( Constraints.class );	        
+	        this.metadataConstraints = new CheckedHashSet( Constraints.class );	        
 	    }
 	    else {	        
 	        this.metadataConstraints.clear();
@@ -218,7 +219,7 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public void setMetadataExtensionInfo( Set metadataExtensionInfo) {
 		if( this.metadataExtensionInfo == null ){
-	        this.metadataExtensionInfo = new SetOf( MetadataExtensionInformation.class );	        
+	        this.metadataExtensionInfo = new CheckedHashSet( MetadataExtensionInformation.class );	        
 	    }
 	    else {	        
 	        this.metadataExtensionInfo.clear();
@@ -234,7 +235,7 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public void setPortrayalCatalogueInfo( Set portrayalCatalogueInfo) {
 	    if( this.portrayalCatalogueInfo == null ){
-	        this.portrayalCatalogueInfo = new SetOf( PortrayalCatalogueReference.class );	        
+	        this.portrayalCatalogueInfo = new CheckedHashSet( PortrayalCatalogueReference.class );	        
 	    }
 	    else {	        
 	        this.portrayalCatalogueInfo.clear();
@@ -243,7 +244,7 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public void setReferenceSystemInfo( Set referenceSystemInfo) {
 	    if( this.referenceSystemInfo == null ){
-	        this.referenceSystemInfo = new SetOf( ReferenceSystem.class );	        
+	        this.referenceSystemInfo = new CheckedHashSet( ReferenceSystem.class );	        
 	    }
 	    else {	        
 	        this.referenceSystemInfo.clear();
@@ -252,7 +253,7 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public void setSpatialRepresentationInfo( Set spatialRepresentationInfo) {
 	    if( this.spatialRepresentationInfo == null ){
-	        this.spatialRepresentationInfo = new SetOf( SpatialRepresentation.class );	        
+	        this.spatialRepresentationInfo = new CheckedHashSet( SpatialRepresentation.class );	        
 	    }
 	    else {	        
 	        this.spatialRepresentationInfo.clear();
