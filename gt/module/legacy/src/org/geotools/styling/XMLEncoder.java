@@ -498,4 +498,8 @@ public class XMLEncoder implements org.geotools.styling.StyleVisitor {
             throw new RuntimeException(e);
         }
     }
+
+    public void visit(RasterSymbolizer raster) {
+        throw new UnsupportedOperationException();
+    }
 }
