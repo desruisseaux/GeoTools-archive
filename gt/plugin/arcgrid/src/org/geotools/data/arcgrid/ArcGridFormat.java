@@ -53,11 +53,11 @@ public class ArcGridFormat extends AbstractGridFormat {
 
         readParameters = new GeneralOperationParameter[2];
         readParameters[0] = ArcGridOperationParameter.getGRASSReadParam();
-        readParameters[0] = ArcGridOperationParameter.getCompressReadParam();
+        readParameters[1] = ArcGridOperationParameter.getCompressReadParam();
 
         writeParameters = new GeneralOperationParameter[2];
         writeParameters[0] = ArcGridOperationParameter.getGRASSWriteParam();
-        writeParameters[0] = ArcGridOperationParameter.getCompressWriteParam();
+        writeParameters[1] = ArcGridOperationParameter.getCompressWriteParam();
     }
 
     /**
