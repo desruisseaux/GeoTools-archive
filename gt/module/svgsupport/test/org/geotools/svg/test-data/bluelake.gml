@@ -2,7 +2,11 @@
 
 <!-- Created by iant on 11 March 2002, 10:54 -->
 
-<ccg:featureCollection xmlns:ccg="http://www.ccg.leeds.ac.uk/gml" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ogc.net/gml/base">  
+<ccg:featureCollection
+   xmlns:ccg="http://www.ccg.leeds.ac.uk/gml"
+   xmlns:gml="http://www.opengis.net/gml"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.ogc.net/gml/base">  
     <ccg:queryExtent>
         <gml:Box gid="1" srsName="http://?/epsg.xml#ESPG:4326">
           <gml:coordinates>
