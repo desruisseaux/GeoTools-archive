@@ -63,8 +63,14 @@ public class VPFDataBase implements FileConstants {
 
         while (iter.hasNext()) {
             feature = (Feature) iter.next();
-            library = new VPFLibrary(feature, directory, this);
-            libraries.add(library);
+
+            try {
+              library = new VPFLibrary(feature, directory, this);
+              libraries.add(library);
+            }
+            catch ( java.io.FileNotFoundException ex ) {
+                // This must be a partial data set - the library wasn't found so just ignore it
+            }
         }
 
         //        // read data base header info
