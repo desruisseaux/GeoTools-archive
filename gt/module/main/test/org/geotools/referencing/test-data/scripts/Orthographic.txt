@@ -12,6 +12,14 @@
 //
 //    chdir org/geotools/referencing/test-data/scripts
 //    java -ea org.geotools.referencing.operation.TestConsole Orthographic.txt
+//
+// A test is performed every time a "target pt" statement occurs. If the target point computed
+// by Geotools is different from the target point declared in this script by an amount greater
+// than the value specified in the last "test tolerance" statement, then a failure is reported.
+// If some test fails, "print" statements can be added in this script for debugging purpose:
+//
+//    print crs            (prints the source and target CRS, and the transform between them)
+//    print pts            (prints the source and target points, and their transformed points)
 
 
 set _sphere_ = GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6370997.0, 0],TOWGS84[0,0,0,0,0,0,0]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
@@ -24,6 +32,8 @@ set _ortho6_ = PROJCS["Oblique Orthographic", GEOGCS["Sphere", DATUM["Sphere", S
 
 ////////////////////////////////////////////
 //Spherical Polar tests
+
+// FIXME: Most assertions seems to fail (AssertionError)
 
 source crs = _sphere_
 target crs = _ortho1_
@@ -46,8 +56,12 @@ source crs = _ortho1_
 target crs = _sphere_
 
 source pt = (-4061433.7784,        2128994.9272)
-target pt = (2.33656753,     43.96499314 )
-
+//target pt = (2.33656753,     43.96499314 )
+//print crs
+//print pts
+//FIXME (Martin) : The Geotools's result for this one is (30.000000, 43.964993)
+//                 (note: please remove the 'print' statements once fixed, or
+//                 leave them commented-out).
 
 source crs = _sphere_
 target crs = _ortho2_

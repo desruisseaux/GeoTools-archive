@@ -60,6 +60,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing                    .GeodeticCalculatorTest  .suite());
         suite.addTest(org.geotools.referencing.operation          .BasicTest               .suite());
         suite.addTest(org.geotools.referencing.operation          .ProjectionTest          .suite());
+        suite.addTest(org.geotools.referencing.operation          .TransformationTest      .suite());
         suite.addTest(org.geotools.referencing.operation.transform.MathTransformTest       .suite());
         suite.addTest(org.geotools.referencing.operation.transform.GeocentricTransformTest .suite());
         suite.addTest(org.geotools.referencing.operation.transform.PassthroughTransformTest.suite());

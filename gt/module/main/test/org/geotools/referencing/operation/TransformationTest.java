@@ -22,22 +22,28 @@ package org.geotools.referencing.operation;
 // J2SE dependencies
 import java.util.Random;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.EngineeringCRS;
-import org.geotools.referencing.crs.GeographicCRS;
+// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
+
+// Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.EngineeringCRS;
+import org.geotools.referencing.crs.GeographicCRS;
 
 
 /**
@@ -142,6 +148,37 @@ public class TransformationTest extends TestCase {
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
+    }
+
+    /**
+     * Tests one transformation which imply datum shift.
+     */
+    public void testDatumShift() throws Exception {
+        final CoordinateReferenceSystem sourceCRS = crsFactory.createFromWKT(
+                "GEOGCS[\"NTF (Paris)\",\n"                                             +
+                "  DATUM[\"Nouvelle_Triangulation_Francaise\",\n"                       +
+                "    SPHEROID[\"Clarke 1880 (IGN)\", 6378249.2, 293.466021293627,\n"    +
+                "      AUTHORITY[\"EPSG\",\"7011\"]],\n"                                +
+                "    TOWGS84[-168,-60,320,0,0,0,0],\n"                                  +
+                "    AUTHORITY[\"EPSG\",\"6275\"]],\n"                                  +
+                "  PRIMEM[\"Paris\", 2.5969213, AUTHORITY[\"EPSG\",\"8903\"]],\n"       +
+                "  UNIT[\"grad\", 0.015707963267949, AUTHORITY[\"EPSG\", \"9105\"]],\n" +
+                "  AXIS[\"Lat\",NORTH],\n"+
+                "  AXIS[\"Long\",EAST],\n" +
+                "  AUTHORITY[\"EPSG\",\"4807\"]]");
+
+        final CoordinateReferenceSystem targetCRS = crsFactory.createFromWKT(
+                "GEOGCS[\"WGS84\",\n"                                   +
+                "  DATUM[\"WGS84\",\n"                                  +
+                "    SPHEROID[\"WGS84\", 6378137.0, 298.257223563]],\n" +
+                "  PRIMEM[\"Greenwich\", 0.0],\n"                       +
+                "  UNIT[\"degree\", 0.017453292519943295],\n"+""        +
+                "  AXIS[\"Longitude\",EAST],"                           +
+                "  AXIS[\"Latitude\",NORTH]]");
+
+        final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
+        assertSame(sourceCRS, operation.getSourceCRS());
+        assertSame(targetCRS, operation.getTargetCRS());
     }
     
     /**

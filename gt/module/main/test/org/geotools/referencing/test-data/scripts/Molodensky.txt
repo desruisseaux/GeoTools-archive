@@ -11,6 +11,15 @@
 //
 //    chdir org/geotools/referencing/test-data/scripts
 //    java -ea org.geotools.referencing.operation.TestConsole Molodensky.txt
+//
+// A test is performed every time a "target pt" statement occurs. If the target point computed
+// by Geotools is different from the target point declared in this script by an amount greater
+// than the value specified in the last "test tolerance" statement, then a failure is reported.
+// If some test fails, "print" statements can be added in this script for debugging purpose:
+//
+//    print crs            (prints the source and target CRS, and the transform between them)
+//    print pts            (prints the source and target points, and their transformed points)
+
 
 //nad 27 to nad 83
 set _MT_Mol1_ = PARAM_MT["Molodenski", PARAMETER["dim", 3], PARAMETER["dx", -3.0], PARAMETER["dy", 142.0], PARAMETER["dz", 183.0], PARAMETER["src_semi_major", 6378206.4], PARAMETER["src_semi_minor", 6356583.8], PARAMETER["tgt_semi_major", 6378137.0], PARAMETER["tgt_semi_minor", 6356752.31414036]]

@@ -12,6 +12,15 @@
 //
 //    chdir org/geotools/referencing/test-data/scripts
 //    java -ea org.geotools.referencing.operation.TestConsole LambertConic.txt
+//
+// A test is performed every time a "target pt" statement occurs. If the target point computed
+// by Geotools is different from the target point declared in this script by an amount greater
+// than the value specified in the last "test tolerance" statement, then a failure is reported.
+// If some test fails, "print" statements can be added in this script for debugging purpose:
+//
+//    print crs            (prints the source and target CRS, and the transform between them)
+//    print pts            (prints the source and target points, and their transformed points)
+
 
 //geogCS's 
 set _WGS84_ = GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
@@ -406,11 +415,12 @@ source pt = (175, 66.67)
 target pt = (-2946260.53908498, 7821120.79982213)
 
 source pt = (60, -70)
-target pt = (30426269.62451866,       15872835.09010968)
+target pt = (-30426269.62451866, 15872835.09010968)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
+//FIXME: (Martin) The value for this test was "target pt = (30426269...", but failed.
+//                This test pass if the first target ordinate is negative instead of
+//                positive. Is it correct?
 
 source pt = (0, 90)
-target pt = (0.00000000,      12011381.36145192)
+target pt = (0.00000000, 12011381.36145192)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-
-

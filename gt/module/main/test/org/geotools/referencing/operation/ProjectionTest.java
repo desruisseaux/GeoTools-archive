@@ -24,9 +24,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.geometry.DirectPosition2D;
-import org.geotools.parameter.ParameterWriter;
-import org.geotools.referencing.FactoryFinder;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -35,6 +33,11 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.parameter.ParameterWriter;
+import org.geotools.referencing.FactoryFinder;
 
 
 /**

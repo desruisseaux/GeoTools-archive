@@ -412,7 +412,8 @@ public class Preprocessor extends Format {
      */
     private static boolean isIdentifier(final String text) {
         for (int i=text.length(); --i>=0;) {
-            if (!Character.isJavaIdentifierPart(text.charAt(i))) {
+            final char c = text.charAt(i);
+            if (!Character.isJavaIdentifierPart(c) && c!=':') {
                 return false;
             }
         }

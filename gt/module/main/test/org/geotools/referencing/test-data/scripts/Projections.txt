@@ -9,6 +9,14 @@
 //
 //    chdir org/geotools/referencing/test-data/scripts
 //    java -ea org.geotools.referencing.operation.TestConsole Projections.txt
+//
+// A test is performed every time a "target pt" statement occurs. If the target point computed
+// by Geotools is different from the target point declared in this script by an amount greater
+// than the value specified in the last "test tolerance" statement, then a failure is reported.
+// If some test fails, "print" statements can be added in this script for debugging purpose:
+//
+//    print crs            (prints the source and target CRS, and the transform between them)
+//    print pts            (prints the source and target points, and their transformed points)
 
 
 ////////////////////////////////////////////

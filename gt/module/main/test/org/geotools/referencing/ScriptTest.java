@@ -109,6 +109,15 @@ public class ScriptTest extends TestCase {
     }
     
     /**
+     * Run "Simple.txt".
+     *
+     * @throws Exception If a test failed.
+     */
+//    public void testSimple() throws Exception {
+//        runScript("scripts/Simple.txt");
+//    }
+    
+    /**
      * Run "Projections.txt".
      *
      * @throws Exception If a test failed.
@@ -116,15 +125,6 @@ public class ScriptTest extends TestCase {
     public void testProjections() throws Exception {
         runScript("scripts/Projections.txt");
     }
-    
-    /**
-     * Run the {@link #SIMPLE_SCRIPT}.
-     *
-     * @throws Exception If a test failed.
-     */
-//    public void testSimple() throws Exception {
-//        runScript(SIMPLE_SCRIPT);
-//    }
     
     /**
      * Run "Mercator.txt".
@@ -145,31 +145,13 @@ public class ScriptTest extends TestCase {
     }
     
     /**
-     * Run the {@link #TRANSVERSE_MERCATOR_SCRIPT}.
+     * Run "TransverseMercator.txt".
      *
      * @throws Exception If a test failed.
      */
 //    public void testTransverseMercator() throws Exception {
-//        runScript(TRANSVERSE_MERCATOR_SCRIPT);
+//        runScript("scripts/TransverseMercator.txt");
 //    }   
-    
-    /**
-     * Run the {@link #STEREOGRAPHIC_SCRIPT}.
-     *
-     * @throws Exception If a test failed.
-     */
-//    public void testStereographic() throws Exception {
-//        runScript(STEREOGRAPHIC_SCRIPT);
-//    }
-    
-    /**
-     * Run the {@link #ORTHOGRAPHIC_SCRIPT}.
-     *
-     * @throws Exception If a test failed.
-     */
-//    public void testOrthographic() throws Exception {
-//        runScript(ORTHOGRAPHIC_SCRIPT);
-//    }
     
     /**
      * Run "AlbersEqualArea.txt"
@@ -185,16 +167,43 @@ public class ScriptTest extends TestCase {
      *
      * @throws Exception If a test failed.
      */
-//    public void testLambertConic() throws Exception {
-//        runScript("scripts/LambertConic.txt");
+    public void testLambertConic() throws Exception {
+        runScript("scripts/LambertConic.txt");
+    }
+    
+    /**
+     * Run "Stereographic.txt".
+     *
+     * @throws Exception If a test failed.
+     */
+//    public void testStereographic() throws Exception {
+//        runScript("scripts/Stereographic.txt");
 //    }
     
     /**
-     * Run the {@link #OPENGIS_SCRIPT}.
+     * Run "Orthographic.txt".
+     *
+     * @throws Exception If a test failed.
+     */
+//    public void testOrthographic() throws Exception {
+//        runScript("scripts/Orthographic.txt");
+//    }
+    
+    /**
+     * Run "OpenGIS.txt".
      *
      * @throws Exception If a test failed.
      */
 //    public void testOpenGIS() throws Exception {
-//        runScript(OPENGIS_SCRIPT);
+//        runScript("scripts/OpenGIS.txt");
+//    }
+    
+    /**
+     * Run "NADCON.txt"
+     *
+     * @throws Exception If a test failed.
+     */
+//    public void testNADCON() throws Exception {
+//        runScript("scripts/NADCON.txt");
 //    }
 }

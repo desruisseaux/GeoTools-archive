@@ -27,7 +27,6 @@ package org.geotools.referencing.operation;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.units.ConversionException;
 import javax.units.NonSI;
 import javax.units.SI;
@@ -35,14 +34,7 @@ import javax.units.Unit;
 import javax.vecmath.GMatrix;
 import javax.vecmath.SingularMatrixException;
 
-import org.geotools.referencing.Factory;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.geotools.util.WeakHashSet;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -78,6 +70,16 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.Transformation;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.referencing.Factory;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.util.WeakHashSet;
 
 
 /**
@@ -534,8 +536,8 @@ public class CoordinateOperationFactory extends Factory
     /////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Makes sure that the specified geocentric CRS uses standard axis
-     * and the specified datum.
+     * Makes sure that the specified geocentric CRS uses standard axis,
+     * prime meridian and the specified datum.
      * If <code>crs</code> already meets all those conditions, then it is
      * returned unchanged. Otherwise, a new normalized geocentric CRS is
      * created and returned.
@@ -548,10 +550,16 @@ public class CoordinateOperationFactory extends Factory
                                            final GeodeticDatum datum)
     {
         final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
-        if (equalsIgnoreMetadata(crs.getDatum(), datum) &&
-            hasStandardAxis(crs.getCoordinateSystem(), STANDARD))
-        {
-            return crs;
+        final GeodeticDatum candidate = (GeodeticDatum) crs.getDatum();
+        // TODO: Remove cast once we are allowed to compile against J2SE 1.5.
+        if (equalsIgnorePrimeMeridian(candidate, datum)) {
+            if (getGreenwichLongitude(candidate.getPrimeMeridian(), NonSI.DEGREE_ANGLE) ==
+                getGreenwichLongitude(datum    .getPrimeMeridian(), NonSI.DEGREE_ANGLE))
+            {
+                if (hasStandardAxis(crs.getCoordinateSystem(), STANDARD)) {
+                    return crs;
+                }
+            }
         }
         return new org.geotools.referencing.crs.GeocentricCRS(
                    getTemporaryName(crs), datum, STANDARD);
@@ -582,10 +590,7 @@ public class CoordinateOperationFactory extends Factory
         if (forceGreenwich &&
             getGreenwichLongitude(datum.getPrimeMeridian(), NonSI.DEGREE_ANGLE)!=0)
         {
-            final Map name = getTemporaryName(datum);
-            final Ellipsoid ellipsoid = datum.getEllipsoid();
-            datum = new org.geotools.referencing.datum.GeodeticDatum(name, ellipsoid,
-                        org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+            datum = new StandardDatum(datum);
         } else if (hasStandardAxis(cs, STANDARD)) {
             return crs;
         }
@@ -595,6 +600,30 @@ public class CoordinateOperationFactory extends Factory
          */
         return new org.geotools.referencing.crs.GeographicCRS(
                    getTemporaryName(crs), datum, STANDARD);
+    }
+
+    /**
+     * A datum identical to the specified datum except for the prime meridian, which is replaced
+     * by Greenwich. This datum is processed in a special way by {@link #equalsIgnorePrimeMeridian}.
+     */
+    private static final class StandardDatum extends org.geotools.referencing.datum.GeodeticDatum {
+        /** The wrapped datum. */
+        private final GeodeticDatum datum;
+
+        /** Wrap the specified datum. */
+        public StandardDatum(final GeodeticDatum datum) {
+            super(getTemporaryName(datum), datum.getEllipsoid(),
+                  org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+            this.datum = datum;
+        }
+
+        /** Unwrap the datum. */
+        public static GeodeticDatum unwrap(GeodeticDatum datum) {
+            while (datum instanceof StandardDatum) {
+                datum = ((StandardDatum) datum).datum;
+            }
+            return datum;
+        }
     }
 
     /**
@@ -874,7 +903,7 @@ public class CoordinateOperationFactory extends Factory
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
         final GeodeticDatum sourceDatum = (GeodeticDatum) sourceCRS.getDatum();
         final GeodeticDatum targetDatum = (GeodeticDatum) targetCRS.getDatum();
-        if (equalsIgnoreMetadata(sourceDatum, targetDatum)) {
+        if (equalsIgnorePrimeMeridian(sourceDatum, targetDatum)) {
             /*
              * If both geographic CRS use the same datum, then there is no need for a datum shift.
              * Just swap axis order, and rotate the longitude coordinate if prime meridians are
@@ -898,19 +927,15 @@ public class CoordinateOperationFactory extends Factory
          * The transformation chain is:
          *
          *     source geographic CRS             -->
-         *     geocentric CRS with source datum  -->
          *     geocentric CRS with target datum  -->
          *     target geographic CRS
          */
-        final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
-        final GeocentricCRS  gcrs1 = new org.geotools.referencing.crs.GeocentricCRS(
-                                     getTemporaryName(sourceCRS), sourceDatum, STANDARD);
-        final GeocentricCRS  gcrs3 = new org.geotools.referencing.crs.GeocentricCRS(
+        final CartesianCS  STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
+        final GeocentricCRS stepCRS = new org.geotools.referencing.crs.GeocentricCRS(
                                      getTemporaryName(targetCRS), targetDatum, STANDARD);
-        final CoordinateOperation step1 = createOperationStep(sourceCRS, gcrs1);
-        final CoordinateOperation step2 = createOperationStep(gcrs1,     gcrs3);
-        final CoordinateOperation step3 = createOperationStep(gcrs3, targetCRS);
-        return concatenate(step1, step2, step3);
+        final CoordinateOperation step1 = createOperationStep(sourceCRS, stepCRS);
+        final CoordinateOperation step2 = createOperationStep(stepCRS, targetCRS);
+        return concatenate(step1, step2);
     }
 
     /**
@@ -1051,12 +1076,13 @@ public class CoordinateOperationFactory extends Factory
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
         final GeodeticDatum sourceDatum = (GeodeticDatum) sourceCRS.getDatum();
         final GeodeticDatum targetDatum = (GeodeticDatum) targetCRS.getDatum();
-        final PrimeMeridian    sourcePM = sourceDatum.getPrimeMeridian();
-        final PrimeMeridian    targetPM = targetDatum.getPrimeMeridian();
         final CoordinateSystem sourceCS = sourceCRS.getCoordinateSystem();
         final CoordinateSystem targetCS = targetCRS.getCoordinateSystem();
-        if (equalsIgnoreMetadata(sourceDatum, targetDatum)) {
-            if (equalsIgnoreMetadata(sourcePM, targetPM)) {
+        final double sourcePM, targetPM;
+        sourcePM = getGreenwichLongitude(sourceDatum.getPrimeMeridian(), NonSI.DEGREE_ANGLE);
+        targetPM = getGreenwichLongitude(targetDatum.getPrimeMeridian(), NonSI.DEGREE_ANGLE);
+        if (equalsIgnorePrimeMeridian(sourceDatum, targetDatum)) {
+            if (sourcePM == targetPM) {
                 /*
                  * If both CRS use the same datum and the same prime meridian,
                  * then the transformation is probably just axis swap or unit
@@ -1066,11 +1092,9 @@ public class CoordinateOperationFactory extends Factory
                 final MathTransform transform = factory.createAffineTransform(matrix);
                 return createFromMathTransform(sourceCRS, targetCRS, transform);
             }
-            // If prime meridians are not the same, performs the full transformation.
+            // Prime meridians are differents. Performs the full transformation.
         }
-        if (getGreenwichLongitude(sourcePM, NonSI.DEGREE_ANGLE) != 0 ||
-            getGreenwichLongitude(targetPM, NonSI.DEGREE_ANGLE) != 0)
-        {
+        if (sourcePM!=0 || targetPM!=0) {
             throw new OperationNotFoundException("Rotation of prime meridian not yet implemented");
         }
         /*
@@ -1088,7 +1112,8 @@ public class CoordinateOperationFactory extends Factory
         final GeneralMatrix matrix;
         try {
             final Matrix datumShift = org.geotools.referencing.datum.GeodeticDatum.
-                                      getAffineTransform(sourceDatum, targetDatum);
+                                      getAffineTransform(StandardDatum.unwrap(sourceDatum),
+                                                         StandardDatum.unwrap(targetDatum));
             if (!(datumShift instanceof GMatrix)) {
                 throw new OperationNotFoundException(Resources.format(
                             ResourceKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
@@ -1398,6 +1423,20 @@ public class CoordinateOperationFactory extends Factory
                                                 final IdentifiedObject object2)
     {
         return CRSUtilities.equalsIgnoreMetadata(object1, object2);
+    }
+
+    /**
+     * Compare the specified datum for equality, except the prime meridian.
+     *
+     * @param  object1 The first object to compare (may be null).
+     * @param  object2 The second object to compare (may be null).
+     * @return <code>true</code> if both objects are equals.
+     */
+    private static boolean equalsIgnorePrimeMeridian(GeodeticDatum object1,
+                                                     GeodeticDatum object2)
+    {
+        return equalsIgnoreMetadata(StandardDatum.unwrap(object1),
+                                    StandardDatum.unwrap(object2));
     }
 
     /**
