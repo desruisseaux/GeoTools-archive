@@ -89,13 +89,13 @@ import com.vividsolutions.jts.geom.Polygon;
  * of several parts: an authority, a number separated by a colon.
  * <li>authority: used at the start of a code to indicate which group is responsible for
  * the code definition
- * <li>CRS: shortcut used to indicate coordinate reference
+ * <li>CRS: shortcut used to indicate coordinate reference system
  * <li>CoordinateReferenceSystem: a geoapi interface indicating where CRS information is used.
  * <li>CoordinateSystem origional geotools CRS object from org.geotools.cs slated for replacement
  * in early 2005. CoordianteSystem implements CoordianteReferenceSystem to ease the transition
  * process.
  * <li>CoordinateReferenceSystem: a geotools implementation of CoordinateReferenceSystem currently
- * underdevelopment. 
+ * under development. 
  * </ul>
  * @author Jody Garnett, Refractions Research
  */
