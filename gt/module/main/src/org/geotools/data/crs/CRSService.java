@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
@@ -81,6 +82,21 @@ import com.vividsolutions.jts.geom.Polygon;
  * comes along, it is factory based an should take care of most of the functionality
  * of this module.
  * </p>
+ * <p>
+ * A bit of vocab:
+ * <ul>
+ * <li>code: a string used to identify a CoordinateReferenceSystem, a code is usually made
+ * of several parts: an authority, a number separated by a colon.
+ * <li>authority: used at the start of a code to indicate which group is responsible for
+ * the code definition
+ * <li>CRS: shortcut used to indicate coordinate reference
+ * <li>CoordinateReferenceSystem: a geoapi interface indicating where CRS information is used.
+ * <li>CoordinateSystem origional geotools CRS object from org.geotools.cs slated for replacement
+ * in early 2005. CoordianteSystem implements CoordianteReferenceSystem to ease the transition
+ * process.
+ * <li>CoordinateReferenceSystem: a geotools implementation of CoordinateReferenceSystem currently
+ * underdevelopment. 
+ * </ul>
  * @author Jody Garnett, Refractions Research
  */
 public class CRSService {
@@ -123,8 +139,7 @@ public class CRSService {
      * </p>
      */ 
 	List authorities = new ArrayList();
-    private Properties crsProperties=new Properties();
-	
+    	
 	/**
 	 * Construct a CRSService (will find CRSAuthoritySpi on classpath).
 	 * <p>
@@ -149,29 +164,56 @@ public class CRSService {
             catch( Throwable t ){
                 System.err.println("Could not register "+factory+":"+t );
             }
-        }
-        try {
-            crsProperties.load(getClass().getResource("epsg.properties").openStream());
-        } catch (IOException e) {
-            // TODO Catch e
-        }    
+        }            
 	}
 	
 	/**
-	 * Returns a list of human readable names that uniquely maps to a WKT that can
-	 * be parsed instantiated by the framework. 
-	 * 
-	 * @return a list of human readable names that uniquely maps to a WKT that can
-	 * be parsed instantiated by the framework.
+	 * Returns a list of codes uniquely maps to a an available CRS.
+	 * <p>
+     * These codes include their authority information, because that is the
+     * way things work.
+     * </p>
+     * 
+	 * @return list of codes of available CRS
 	 */
 	public Set getCRSNames(){
-	    return crsProperties.keySet();
+        Set set = new TreeSet();        
+        for( Iterator i=authorities.iterator(); i.hasNext(); ){
+            Object factory = i.next();
+            if( factory instanceof CRSAuthoritySpi) {
+                CRSAuthoritySpi authority = (CRSAuthoritySpi) factory;
+                set.addAll( authority.getCodes() );
+            }
+        }
+        return set;
 	}
-	
-	public CoordinateReferenceSystem createCRSFromName(String crsName) throws FactoryException{
-            return createCRS("EPSG:"+crsName);
-	}
-	
+
+    /**
+     * Procides access to the decoding process provided by known
+     * CRS authorities.
+     * <p>
+     * </p>
+     * @return Decoded CRS or null if encoding technique was not known
+     * @throws IOException If a known encoding was used in an incorrect manner 
+     */
+    public CoordinateReferenceSystem decode(String encoding) throws IOException {
+        Set set = new TreeSet();        
+        for( Iterator i=authorities.iterator(); i.hasNext(); ){
+            Object factory = i.next();
+            if( factory instanceof CRSAuthoritySpi) {
+                CRSAuthoritySpi authority = (CRSAuthoritySpi) factory;
+                CoordinateReferenceSystem crs = authority.decode( encoding );
+                if( crs != null ) {
+                    return crs;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Allows runtime additions to the capabilities of CRSService.
+     */
 	public void register( CoordinateSystemAuthorityFactory factory ){
 	    authorities.add( factory );			
 	}
