@@ -12,17 +12,20 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.feature;
 
+// J2SE dependencies
 import java.rmi.server.UID;
+//import java.util.logging.Logger;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
+// JTS dependencies
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-
-//import java.util.logging.Logger;
 
 /**
  * Provides a more efficient feature representation for the flat and complex
@@ -39,7 +42,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @task TODO: look at synchronization (or locks as IanS thinks)
  */
-public class DefaultFeature implements Feature, org.geotools.util.Cloneable {
+public class DefaultFeature implements Feature, Cloneable {
 
     /** The unique id of this feature */
     protected String featureId;

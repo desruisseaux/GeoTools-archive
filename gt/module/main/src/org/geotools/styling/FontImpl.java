@@ -21,9 +21,12 @@ package org.geotools.styling;
 
 // J2SE dependencies
 //import java.util.logging.Logger;
+
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
 import org.geotools.filter.Expression;
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
 
 /** Provides a Java representation of the Font element of an SLD.
@@ -104,7 +107,7 @@ public class FontImpl implements Font, Cloneable {
     
     /** Creates a clone of the font.
      * 
-     * @see org.geotools.util.Cloneable#clone()
+     * @see Cloneable#clone()
      */
     public Object clone() {        
         try {

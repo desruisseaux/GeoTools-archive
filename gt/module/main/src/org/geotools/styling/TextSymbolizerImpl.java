@@ -19,10 +19,13 @@
  */
 package org.geotools.styling;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
 
 // Geotools dependencies
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
+
+
 /**
  * Provides a Java representation of an SLD TextSymbolizer that
  * defines how text symbols should be rendered.

@@ -18,18 +18,6 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
@@ -38,9 +26,11 @@ package org.geotools.cs;
 // J2SE dependencies
 import java.io.Serializable;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
 import org.geotools.pt.Matrix;
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
 
 

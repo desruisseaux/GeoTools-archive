@@ -25,8 +25,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
 
 

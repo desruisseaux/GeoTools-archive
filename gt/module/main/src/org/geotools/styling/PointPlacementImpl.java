@@ -19,8 +19,12 @@
  */
 package org.geotools.styling;
 
-import org.geotools.util.Cloneable;
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
+// Geotools dependencies
 import org.geotools.resources.Utilities;
+
 
 /**
  * @version $Id: PointPlacementImpl.java,v 1.10 2003/09/06 04:52:31 seangeo Exp $
@@ -111,7 +115,7 @@ public class PointPlacementImpl implements PointPlacement, Cloneable {
      }
     
     /* (non-Javadoc)
-     * @see org.geotools.util.Cloneable#clone()
+     * @see Cloneable#clone()
      */
     public Object clone() {
         try {

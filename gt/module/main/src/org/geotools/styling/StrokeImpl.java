@@ -19,8 +19,10 @@ package org.geotools.styling;
 // J2SE depedencies
 import java.util.Arrays;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
-import org.geotools.util.Cloneable;
 import org.geotools.filter.Expression;
 
 

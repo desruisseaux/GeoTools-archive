@@ -25,11 +25,11 @@ import java.io.Serializable;
 import java.awt.geom.Rectangle2D;
 
 // OpenGIS dependencies
+import org.opengis.util.Cloneable;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.util.Cloneable;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.XRectangle2D;

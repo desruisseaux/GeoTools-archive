@@ -19,8 +19,11 @@
  */
 package org.geotools.styling;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
+// Geotools dependencies
 import org.geotools.filter.Expression;
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
 
 
@@ -84,7 +87,7 @@ public class AnchorPointImpl implements AnchorPoint, Cloneable {
     }
     
     /* (non-Javadoc)
-     * @see org.geotools.util.Cloneable#clone()
+     * @see Cloneable#clone()
      */
     public Object clone() {
         try {

@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.io.Serializable;
 
 // OpenGIS dependencies
+import org.opengis.util.Cloneable;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
@@ -60,7 +61,6 @@ import org.geotools.renderer.style.Style;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.math.Statistics;
-import org.geotools.util.Cloneable;
 
 
 /**

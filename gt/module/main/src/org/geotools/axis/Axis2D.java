@@ -56,12 +56,14 @@ import java.util.Locale;
 import java.io.Serializable;
 import java.util.ConcurrentModificationException;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.AxisOrientation;
 
 // Resources
-import org.geotools.util.Cloneable;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XDimension2D;

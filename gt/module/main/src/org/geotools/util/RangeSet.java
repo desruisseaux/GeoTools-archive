@@ -32,8 +32,10 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import javax.media.jai.util.Range;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.rsc.Resources;

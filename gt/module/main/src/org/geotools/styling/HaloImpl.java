@@ -19,8 +19,12 @@
  */
 package org.geotools.styling;
 
-import org.geotools.util.Cloneable;
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
+// Geotools dependencies
 import org.geotools.resources.Utilities;
+
 
 /**
  * @version $Id: HaloImpl.java,v 1.7 2003/09/06 04:52:31 seangeo Exp $
@@ -80,8 +84,9 @@ public class HaloImpl implements Halo, Cloneable {
         visitor.visit(this);
     }
     
-    /** Creates a deep copy clone of the Halo.
-     * @see org.geotools.util.Cloneable#clone()
+    /**
+     * Creates a deep copy clone of the Halo.
+     *
      * @return The clone.
      */
     public Object clone() {

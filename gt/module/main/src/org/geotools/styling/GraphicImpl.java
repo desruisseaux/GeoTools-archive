@@ -39,8 +39,11 @@ package org.geotools.styling;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
+// Geotools dependencies
 import org.geotools.filter.Expression;
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
 
 

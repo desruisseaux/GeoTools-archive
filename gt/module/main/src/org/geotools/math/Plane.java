@@ -25,8 +25,8 @@ import java.io.Serializable;
 import javax.vecmath.Point3d;
 import javax.vecmath.MismatchedSizeException;
 
-// Geotools dependencies
-import org.geotools.util.Cloneable;
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
 
 
 /**

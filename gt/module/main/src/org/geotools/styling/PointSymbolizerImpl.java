@@ -19,8 +19,10 @@
  */
 package org.geotools.styling;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
-import org.geotools.util.Cloneable;
 import org.geotools.resources.Utilities;
 
 

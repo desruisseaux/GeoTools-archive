@@ -48,6 +48,7 @@ import org.opengis.util.InternationalString;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Jody Garnett
  */
 public class Citation implements org.opengis.metadata.citation.Citation, Serializable {
     /**
@@ -72,21 +73,21 @@ public class Citation implements org.opengis.metadata.citation.Citation, Seriali
         this.title = null; // new InternationalString( title )
     }
     private List alternateTitles = new ListOf( InternationalString.class );
-	private Set citedResponsibleParties = new SetOf( ResponsibleParty.class );
-	
-	private InternationalString title;
-	private Map dates = new HashMap();
-	private InternationalString edition;
-	private Date editionDate;
-	private Set identifiers = new SetOf( String.class );
-	private Set identifierTypes = new SetOf( String.class );
-	
-	private Set presentationForm = new SetOf( PresentationForm.class );
-	private Series series;
-	private InternationalString otherCitationDetails;
-	private InternationalString collectiveTitle;
-	private String ISBN;
-	private String ISSN;
+    private Set citedResponsibleParties = new SetOf( ResponsibleParty.class );
+
+    private InternationalString title;
+    private Map dates = new HashMap();
+    private InternationalString edition;
+    private Date editionDate;
+    private Set identifiers = new SetOf( String.class );
+    private Set identifierTypes = new SetOf( String.class );
+
+    private Set presentationForm = new SetOf( PresentationForm.class );
+    private Series series;
+    private InternationalString otherCitationDetails;
+    private InternationalString collectiveTitle;
+    private String ISBN;
+    private String ISSN;
     public List getAlternateTitles() {
         return alternateTitles;
     }

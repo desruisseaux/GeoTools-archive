@@ -23,8 +23,10 @@ package org.geotools.math;
 import java.util.Locale;
 import java.io.Serializable;
 
+// OpenGIS dependencies
+import org.opengis.util.Cloneable;
+
 // Geotools dependencies
-import org.geotools.util.Cloneable;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
