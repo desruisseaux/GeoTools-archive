@@ -68,8 +68,11 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
      */
     public void testEnvelope() throws Exception {
         FeatureCollection features = loadFeatures(STATE_POP, null);
-        ShapefileDataSource s = new ShapefileDataSource(getTestResource(STATE_POP));
-        assertEquals(features.getBounds(), s.getBounds());
+        ShapefileDataStore s = new ShapefileDataStore(getTestResource(STATE_POP));
+        String typeName = s.getTypeNames()[0];
+        FeatureResults all = s.getFeatureSource( typeName ).getFeatures();
+        
+        assertEquals(features.getBounds(), all.getBounds() );
     }
     
     public void testLoadAndVerify() throws Exception {
