@@ -97,9 +97,9 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author Chris Holmes, TOPP
  * @author Andrea Aime
- * @author Paulo Rizzi
+ * @author Paolo Rizzi
  * @version $Id: PostgisDataStore.java,v 1.18.2.3 2004/05/02 15:31:43 aaime Exp $
- * @task REVISIT: So Paulo Rizzi has a number of improvements in 
+ * @task REVISIT: So Paolo Rizzi has a number of improvements in 
  * http://jira.codehuas.org/browse/GEOT-379  I rolled in a few of them, but 
  * some beg more fundamental questions - like the use of primary keys - in the
  * geotools model.  See the issue for a bit more discussion, and I will attempt
@@ -139,12 +139,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         CLASS_MAPPINGS.put(BigDecimal.class, "DECIMAL");
 
         CLASS_MAPPINGS.put(java.sql.Date.class, "DATE");
+        CLASS_MAPPINGS.put(java.util.Date.class, "DATE");
         CLASS_MAPPINGS.put(java.sql.Time.class, "TIME");
         CLASS_MAPPINGS.put(java.sql.Timestamp.class, "TIMESTAMP");
     }
 
     private static Map GEOM_CLASS_MAPPINGS = new HashMap();
-
+    //why don't we just stick this in with the non-geom class mappings?
     static {
         // init the inverse map
         Set keys = GEOM_TYPE_MAP.keySet();
@@ -711,6 +712,22 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
     /**
+     * Gets the sql geometry column name for this type.
+     * @task TODO: test this, I can just make sure it compiles.
+     */
+    private String getGeometrySQLTypeName(Class type) {
+        String res = (String) GEOM_CLASS_MAPPINGS.get(type);
+
+        if (res == null) {
+            throw new RuntimeException("Uknown type name for class "
+                + type + " please update GEOMETRY_MAPPINGS");
+        }
+
+        return res;
+    }
+
+
+    /**
      *
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
@@ -724,7 +741,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         Statement st = null;
 
-        //fix from Paulo Rizzi, to print sql used to create table if it was
+        //fix from Paolo Rizzi, to print sql used to create table if it was
         //already present.
         boolean shouldExecute = !tablePresent(tableName, con);
 
@@ -797,7 +814,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 st.execute(s);
             }
 
-	    //Ok, so Paulo Rizzi suggested that we get rid of our hand-adding
+	    //Ok, so Paolo Rizzi suggested that we get rid of our hand-adding
             //of geometry column information and use AddGeometryColumn instead
 	    //as it is better (this is in GEOT-379, he attached an extended
             //datastore that does postgis fixes).  But I am pretty positive 
@@ -843,10 +860,15 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
                      String dbName = rs.getString(1);
                      rs.close();
-                     String typeName = geomAttribute.isGeometry() ? 
-                         "GEOMETRY" :
-                         (String) CLASS_MAPPINGS.get(geomAttribute.getType());
-            
+		     String typeName = null;
+		     //this construct seems unneccesary, since we already would
+		     //pass over if this wasn't a geometry...
+		     Class type = geomAttribute.getType();
+		     if (geomAttribute.isGeometry()) {
+			 typeName = getGeometrySQLTypeName(type);
+		     } else {
+                         typeName = (String) CLASS_MAPPINGS.get(type);
+		     }
                      if( typeName != null ) {
                          //SISfixed- dbName was used for schema name, force 
                          //it to 'public' Preserving case for table names 
@@ -893,7 +915,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		}   
                 con.commit();
 
-		//Paulo Rizzi had a VACUUM ANALYZE here, but I'm not sure that
+		//Paolo Rizzi had a VACUUM ANALYZE here, but I'm not sure that
                 //it's needed, since the table is empty.  Waiting for feedback
                 //from dblasby -ch
 
