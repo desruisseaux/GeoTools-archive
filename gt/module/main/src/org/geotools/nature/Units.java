@@ -72,4 +72,12 @@ public final class Units {
     static {
         UnitFormat.label(DEGREE_MINUTE_SECOND, "DMS");
     }
+
+    /**
+     * Parts per million.
+     */
+    public static final Unit PPM = Unit.ONE.multiply(1E-6);
+    static {
+        UnitFormat.label(PPM, "ppm");
+    }
 }

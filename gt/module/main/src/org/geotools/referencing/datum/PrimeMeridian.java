@@ -149,9 +149,19 @@ public class PrimeMeridian extends IdentifiedObject
         }
         if (super.equals(object, compareMetadata)) {
             final PrimeMeridian that = (PrimeMeridian) object;
-            return Double.doubleToLongBits(this.greenwichLongitude) ==
-                   Double.doubleToLongBits(that.greenwichLongitude) &&
-                   Utilities.equals(this.angularUnit, that.angularUnit);
+            if (compareMetadata) {
+                return Double.doubleToLongBits(this.greenwichLongitude) ==
+                       Double.doubleToLongBits(that.greenwichLongitude) &&
+                       Utilities.equals(this.angularUnit, that.angularUnit);
+            } else {
+                return Double.doubleToLongBits(this.getGreenwichLongitude(NonSI.DEGREE_ANGLE)) ==
+                       Double.doubleToLongBits(that.getGreenwichLongitude(NonSI.DEGREE_ANGLE));
+                /*
+                 * Note: if compareMetadata==false, we relax the unit check because EPSG uses
+                 *       sexagesimal degrees for the Greenwich meridian. Requirying the same
+                 *       unit prevent Geodetic.isWGS84(...) method to recognize EPSG's WGS84.
+                 */
+            }
         }
         return false;
     }

@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -70,7 +71,9 @@ import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Parser;

@@ -76,6 +76,11 @@ public class OnLineResource extends MetadataEntity
      * The online resources for <A HREF="http://www.esri.com">ESRI</A>.
      */
     public static final OnLineResource ESRI = new OnLineResource();
+
+    /**
+     * The online resources for <A HREF="http://www.oracle.com">Oracle</A>.
+     */
+    public static final OnLineResource ORACLE = new OnLineResource();
     
     /**
      * The online resources for the <A HREF="http://www.geotools.org">Geotools</A> project.
@@ -88,6 +93,7 @@ public class OnLineResource extends MetadataEntity
             EPSG    .setLinkage(new URL("http://www.epsg.org"                 ));
             GEOTIFF .setLinkage(new URL("http://www.remotesensing.org/geotiff"));
             ESRI    .setLinkage(new URL("http://www.esri.com"                 ));
+            ORACLE  .setLinkage(new URL("http://www.oracle.com"               ));
             GEOTOOLS.setLinkage(new URL("http://www.geotools.org"             ));
         } catch (MalformedURLException exception) {
             // Should never happen.
@@ -98,6 +104,7 @@ public class OnLineResource extends MetadataEntity
         EPSG    .setFunction(OnLineFunction.DOWNLOAD);
         GEOTIFF .setFunction(OnLineFunction.DOWNLOAD);
         ESRI    .setFunction(OnLineFunction.INFORMATION);
+        ORACLE  .setFunction(OnLineFunction.INFORMATION);
         GEOTOOLS.setFunction(OnLineFunction.DOWNLOAD);
         
         OGC     .freeze();
@@ -105,6 +112,7 @@ public class OnLineResource extends MetadataEntity
         EPSG    .freeze();
         GEOTIFF .freeze();
         ESRI    .freeze();
+        ORACLE  .freeze();
         GEOTOOLS.freeze();
     }
     

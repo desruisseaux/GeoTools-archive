@@ -67,20 +67,6 @@ public class Citation extends MetadataEntity
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -4415559967618358778L;
-    
-    /**
-     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
-     *
-     * @see org.geotools.metadata.citation.ResponsibleParty#OPEN_GIS
-     */
-    public static final Citation OPEN_GIS = new Citation("OpenGIS consortium");
-    static {
-        OPEN_GIS.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
-        OPEN_GIS.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("OGC")));
-        OPEN_GIS.setCitedResponsibleParties(Collections.singleton(
-                 org.geotools.metadata.citation.ResponsibleParty.OGC));
-        OPEN_GIS.freeze();
-    }
 
     /**
      * Create a a responsible party metadata entry for OGC involvement.
@@ -180,6 +166,22 @@ public class Citation extends MetadataEntity
     }
     
     /**
+     * The <A HREF="http://www.opengis.org">OpenGIS consortium</A> authority.
+     *
+     * @see org.geotools.metadata.citation.ResponsibleParty#OPEN_GIS
+     *
+     * @todo This citation is using wrong constants: OGC / OPEN_GIS are mixed up.
+     */
+    public static final Citation OPEN_GIS = new Citation("OpenGIS consortium");
+    static {
+        OPEN_GIS.setPresentationForm(Collections.singleton(PresentationForm.DOCUMENT_DIGITAL));
+        OPEN_GIS.setAlternateTitles(Collections.singletonList(new SimpleInternationalString("OGC")));
+        OPEN_GIS.setCitedResponsibleParties(Collections.singleton(
+                 org.geotools.metadata.citation.ResponsibleParty.OGC));
+        OPEN_GIS.freeze();
+    }
+    
+    /**
      * The <A HREF="http://www.epsg.org">European Petroleum Survey Group</A> authority.
      * <p>
      * Here is the assumptions used by the CRSAuthorityFactory to locate an
@@ -224,6 +226,18 @@ public class Citation extends MetadataEntity
         ESRI.setCitedResponsibleParties(Collections.singleton(
              org.geotools.metadata.citation.ResponsibleParty.ESRI));
         ESRI.freeze();
+    }
+    
+    /**
+     * The <A HREF="http://www.oracle.com">Oracle</A> authority.
+     *
+     * @see org.geotools.metadata.citation.ResponsibleParty#ORACLE
+     */
+    public static final Citation ORACLE = new Citation("Oracle");
+    static {
+        ORACLE.setCitedResponsibleParties(Collections.singleton(
+                 org.geotools.metadata.citation.ResponsibleParty.ORACLE));
+        ORACLE.freeze();
     }
 
     /**

@@ -34,7 +34,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,21 +54,30 @@ import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
+import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.cs.CSAuthorityFactory;
+import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
+import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.nature.Units;
+import org.geotools.metadata.extent.GeographicBoundingBox;
 import org.geotools.referencing.AuthorityFactory;
 import org.geotools.referencing.FactoryGroup;
 import org.geotools.referencing.Identifier;
@@ -76,6 +87,7 @@ import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.util.LocalName;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
 
 
@@ -101,14 +113,24 @@ import org.geotools.util.ScopedName;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
+// TODO: vérifier noSuchAuthorityCode, new FactoryException
 public class DefaultFactory extends AuthorityFactory
         implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory
 {
-    /** Preference node for the JDBC driver class name, and its default value. */
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                            ////////
+    ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
+    ////////                                                                            ////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Preference node for the JDBC driver class name, and its default value.
+     */
     private static final String DRIVER = "JDBC driver",
                         DEFAULT_DRIVER = "sun.jdbc.odbc.JdbcOdbcDriver";
 
-    /** Preference node for the EPSG database connection string, and its default value. */
+    /**
+     * Preference node for the EPSG database connection string, and its default value.
+     */
     private static final String CONNECTION = "EPSG connection",
                         DEFAULT_CONNECTION = "jdbc:odbc:EPSG";
 
@@ -141,8 +163,49 @@ public class DefaultFactory extends AuthorityFactory
             case 9110: return Units.SEXAGESIMAL_DMS;
 //TODO      case 9111: return NonSI.SEXAGESIMAL_DM;
             case 9201: return  Unit.ONE;
+            case 9202: return Units.PPM;
             default  : return null;
         }
+    }
+
+    /**
+     * Set a Bursa-Wolf parameter from an EPSG parameter.
+     *
+     * @param  parameters The Bursa-Wolf parameters to modify.
+     * @param  code       The EPSG code for a parameter   from [PARAMETER_CODE]  column.
+     * @param  value      The value of the parameter      from [PARAMETER_VALUE] column.
+     * @param  unit       The unit of the parameter value from [UOM_CODE]        column.
+     * @throws FactoryException if the code is unrecognized.
+     */
+    private static void setBursaWolfParameter(final BursaWolfParameters parameters,
+                                              final int code, double value, final Unit unit)
+            throws FactoryException
+    {
+        Unit target = unit;
+        if (code >= 8605) {
+            if      (code <= 8607) target = SI   .METER;
+            else if (code <= 8710) target = NonSI.SECOND_ANGLE;
+            else if (code == 8611) target = Units.PPM;
+        }
+        if (target != unit) {
+            value = unit.getConverterTo(target).convert(value);
+        }
+        switch (code) {
+            case 8605: parameters.dx  = value; break;
+            case 8606: parameters.dy  = value; break;
+            case 8607: parameters.dz  = value; break;
+            case 8608: parameters.ex  = value; break;
+            case 8609: parameters.ey  = value; break;
+            case 8610: parameters.ez  = value; break;
+            case 8611: parameters.ppm = value; break;
+            default:   throw new FactoryException("Unexpected parameter code: "+code);
+                       // TODO: localize.
+        }
+        /*
+         * NOTE: THERE IS A FEW MORE HARD-CODED CONSTANTS IN createBursaWolfParameters(...).
+         *       Namely: minimum and maximum operation method code (9603 and 9607 respectively)
+         *       and coordinate rotation frame operation method code (9607).
+         */
     }
 
     /**
@@ -165,13 +228,19 @@ public class DefaultFactory extends AuthorityFactory
      * @see #lastObjectType
      */
     private static final String[] OBJECT_TABLES = {
-        "[Coordinate Reference System]", "COORD_REF_SYS_CODE",   // [0]: createCoordinateReferenceSystem
-        "[Coordinate System]",           "COORD_SYS_CODE",       // [2]: createCoordinateSystem
-        "[Datum]",                       "DATUM_CODE",           // [4]: createDatum
-        "[Ellipsoid]",                   "ELLIPSOID_CODE",       // [6]: createEllipsoid
-        "[Prime Meridian]",              "PRIME_MERIDIAN_CODE"   // [8]: createPrimeMeridian
+        "[Coordinate Reference System]", "COORD_REF_SYS_CODE",   // [ 0]: createCoordinateReferenceSystem
+        "[Coordinate System]",           "COORD_SYS_CODE",       // [ 2]: createCoordinateSystem
+        "[Coordinate Axis]",             "COORD_AXIS_CODE",      // [ 4]: createCoordinateSystemAxis
+        "[Datum]",                       "DATUM_CODE",           // [ 6]: createDatum
+        "[Ellipsoid]",                   "ELLIPSOID_CODE",       // [ 8]: createEllipsoid
+        "[Prime Meridian]",              "PRIME_MERIDIAN_CODE"   // [10]: createPrimeMeridian
     };
 
+    ////////////////////////////////////////////////////
+    ////////                                    ////////
+    ////////      END OF HARD CODED VALUES      ////////
+    ////////                                    ////////
+    ////////////////////////////////////////////////////
     /**
      * Last object type returned by {@link #createObject}, or -2 if none.
      * This type is an index in the {@link #OBJECT_TABLES} array and is
@@ -185,6 +254,14 @@ public class DefaultFactory extends AuthorityFactory
      * except at the JVM shutdown.
      */
     private boolean isService;
+
+    /**
+     * The calendar instance for creating {@link java.util.Date} objects from a year
+     * (the "epoch" in datum definition). We use the local timezone, which may not be
+     * quite accurate. But there is no obvious timezone for "epoch", and the "epoch"
+     * is approximative anyway.
+     */
+    private final Calendar calendar = Calendar.getInstance();
 
     /**
      * A pool of prepared statements. Key are {@link String} object related to their
@@ -210,6 +287,14 @@ public class DefaultFactory extends AuthorityFactory
      * Reused every time {@link #createProperties} is invoked.
      */
     private final List alias = new ArrayList();
+
+    /**
+     * A safety guard for preventing never-ending loops in recursive calls to
+     * {@link #createDatum}. This is used by {@link #createBursaWolfParameters},
+     * which need to create a target datum. The target datum could have its own
+     * Bursa-Wolf parameters, with one of them pointing again to the source datum.
+     */
+    private final Set safetyGuard = new HashSet();
 
     /**
      * The connection to the EPSG database.
@@ -503,7 +588,7 @@ public class DefaultFactory extends AuthorityFactory
      * @return The name together with a set of properties.
      */
     private Map createProperties(final String name, final String code, String remarks)
-            throws FactoryException
+            throws SQLException, FactoryException
     {
         final Citation   authority  = getAuthority();
         final Identifier title      = new Identifier(authority, name.trim());
@@ -518,29 +603,25 @@ public class DefaultFactory extends AuthorityFactory
          * Search for alias.
          */
         alias.clear();
-        try {
-            final PreparedStatement stmt;
-            stmt = prepareStatement("Alias", "SELECT NAMING_SYSTEM_NAME,"
-                                           +       " ALIAS"
-                                           + " FROM [Alias] INNER JOIN [Naming System]"
-                                           +   " ON [Alias].NAMING_SYSTEM_CODE ="
-                                           +      " [Naming System].NAMING_SYSTEM_CODE"
-                                           + " WHERE OBJECT_CODE = ?");
-            stmt.setString(1, code);
-            final ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                final String scope = getString(result, 1, code);
-                LocalName cached = (LocalName) scopes.get(scope);
-                if (cached == null) {
-                    cached = new LocalName(scope);
-                    scopes.put(scope, cached);
-                }
-                alias.add(new ScopedName(cached, getString(result, 2, code)));
+        final PreparedStatement stmt;
+        stmt = prepareStatement("Alias", "SELECT NAMING_SYSTEM_NAME,"
+                                       +       " ALIAS"
+                                       + " FROM [Alias] INNER JOIN [Naming System]"
+                                       +   " ON [Alias].NAMING_SYSTEM_CODE ="
+                                       +      " [Naming System].NAMING_SYSTEM_CODE"
+                                       + " WHERE OBJECT_CODE = ?");
+        stmt.setString(1, code);
+        final ResultSet result = stmt.executeQuery();
+        while (result.next()) {
+            final String scope = getString(result, 1, code);
+            LocalName cached = (LocalName) scopes.get(scope);
+            if (cached == null) {
+                cached = new LocalName(scope);
+                scopes.put(scope, cached);
             }
-            result.close();
-        } catch (SQLException exception) {
-            throw new FactoryException(exception);
+            alias.add(new ScopedName(cached, getString(result, 2, code)));
         }
+        result.close();
         if (!alias.isEmpty()) {
             properties.put(org.geotools.referencing.IdentifiedObject.ALIAS_PROPERTY,
                            (GenericName[]) alias.toArray(new GenericName[alias.size()]));
@@ -605,11 +686,12 @@ public class DefaultFactory extends AuthorityFactory
                         lastObjectType = i;
                     }
                     switch (lastObjectType) {
-                        case 0:  return createCoordinateReferenceSystem(code);
-                        case 2:  return createCoordinateSystem         (code);
-                        case 4:  return createDatum                    (code);
-                        case 6:  return createEllipsoid                (code);
-                        case 8:  return createPrimeMeridian            (code);
+                        case  0:  return createCoordinateReferenceSystem(code);
+                        case  2:  return createCoordinateSystem         (code);
+                        case  4:  return createCoordinateSystemAxis     (code);
+                        case  6:  return createDatum                    (code);
+                        case  8:  return createEllipsoid                (code);
+                        case 10:  return createPrimeMeridian            (code);
                         default: throw new AssertionError(i); // Should not happen
                     }
                 }
@@ -813,200 +895,381 @@ public class DefaultFactory extends AuthorityFactory
         return returnValue;
     }
 
-//    /**
-//     * Returns the parameter values for an operation method code.
-//     *
-//     * @param  code The operation code.
-//     * @return The parameters.
-//     * @throws FactoryException if an access to the database failed.
-//     */
-//    private ParameterValueGroup createParameters(final String code) throws FactoryException {
-//        final List list = new ArrayList();
-//        final PreparedStatement stmt;
-//        stmt = prepareStatement("Parameters", "SELECT "
-//                                       + " COP.PARAMETER_NAME,"
-//                                       + " COPV.PARAMETER_VALUE,"
-//                                       + " COPV.UOM_CODE"
-//                                       + " FROM [Coordinate_Operation Parameter Usage] AS COPU,"
-//                                       + " [Coordinate_Operation] AS CO,"
-//                                       + " [Coordinate_Operation Parameter] AS COP,"
-//                                       + " [Coordinate_Operation Parameter Value] AS COPV"
-//                                       + " WHERE CO.COORD_OP_CODE = ?"
-//                                       + " AND CO.COORD_OP_METHOD_CODE = COPU.COORD_OP_METHOD_CODE"
-//                                       + " AND COP.PARAMETER_CODE = COPU.PARAMETER_CODE"
-//                                       + " AND COPV.PARAMETER_CODE = COPU.PARAMETER_CODE"
-//                                       + " AND COPV.COORD_OP_CODE = ?"
-//                                       + " ORDER BY COPU.SORT_ORDER");
-//        stmt.setString(1, code);
-//        stmt.setString(2, code);
-//        final ResultSet result = stmt.executeQuery();
-//        while (result.next()) {
-//            final String  name = getString(result, 1, code);
-//            final double value = result.getDouble(2);
-//            if (result.wasNull()) {
-//                /*
-//                 * This a temporary hack because sometimes PARAMETER_VALUE is
-//                 * not defined, it is replaced by PARAMETER_VALUE_FILE_RE.
-//                 */
-//                result.close();
-//                throw new UnsupportedOperationException("Not yet implemented");
-//            }
-//            final String  unit = getString(result, 3, code);
-//            list.add(new Parameter(name, value, createUnit(unit)));
-//        }
-//        result.close();
-//        return (Parameter[]) list.toArray(new Parameter[list.size()]);
-//    }
+    /**
+     * Returns an area of use.
+     *
+     * @param  code Value allocated by authority.
+     * @return The area of use.
+     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
+     * @throws FactoryException if some other kind of failure occured in the backing
+     *         store. This exception usually have {@link SQLException} as its cause.
+     */
+    public synchronized Extent createExtent(final String code)
+            throws FactoryException
+    {
+        Extent returnValue = null;
+        try {
+            final PreparedStatement stmt;
+            stmt = prepareStatement("Area", "SELECT AREA_OF_USE,"
+                                          +       " AREA_SOUTH_BOUND_LAT,"
+                                          +       " AREA_NORTH_BOUND_LAT,"
+                                          +       " AREA_WEST_BOUND_LON,"
+                                          +       " AREA_EAST_BOUND_LON"
+                                          + " FROM [Area]"
+                                          + " WHERE AREA_CODE = ?");
+            stmt.setString(1, code);
+            final ResultSet result = stmt.executeQuery();
+            /*
+             * If the supplied code exists in the database, then we
+             * should find only one record.   However, we will do a
+             * paranoiac check and verify if there is more records.
+             */ 
+            while (result.next()) {
+                final String description = getString(result, 1, code);
+                final org.geotools.metadata.extent.Extent extent =
+                      new org.geotools.metadata.extent.Extent();
+                extent.setDescription(new SimpleInternationalString(description));
+                final double ymin = result.getDouble(2);
+                if (!result.wasNull()) {
+                    final double ymax = result.getDouble(3);
+                    if (!result.wasNull()) {
+                        final double xmin = result.getDouble(4);
+                        if (!result.wasNull()) {
+                            final double xmax = result.getDouble(5);
+                            if (!result.wasNull()) {
+                                extent.setGeographicElement(
+                                        new GeographicBoundingBox(xmin, xmax, ymin, ymax));
+                            }
+                        }
+                    }
+                }
+                returnValue = (Extent) ensureSingleton(extent, returnValue, code);
+            }
+            result.close();
+        } catch (SQLException exception) {
+            throw new FactoryException(exception);
+        }
+        if (returnValue == null) {
+            throw noSuchAuthorityCode(Extent.class, code);
+        }
+        return returnValue;
+    }
 
-//    /** 
-//     * Returns Bursa-Wolf parameters for a geodetic datum. If the specified datum has
-//     * no conversion informations, then this method will returns an empty array.
-//     *  
-//     * @param  code The EPSG code of the {@link GeodeticDatum}.
-//     * @return an array of Bursa-Wolf parameters, which may be empty.
-//     */
-//    private BursaWolfParameters[] createBursaWolfParameters(final String code)
-//            throws FactoryException
-//    {
-//        final List list = new ArrayList();
-//        try {
-//            final PreparedStatement stmt;
-//            stmt = prepareStatement("BursaWolfParameters",
-//                                             "SELECT CO.COORD_OP_CODE,"
-//                                     +             " CO.TARGET_CRS_CODE,"
-//                                     +             " CO.COORD_OP_METHOD_CODE"
-//                                     +       " FROM [Coordinate_Operation] AS CO,"
-//                                     + " INNER JOIN [Coordinate Reference System] AS CRS"
-//                                     +          " ON CO.SOURCE_CRS_CODE = CRS.COORD_REF_SYS_CODE"
-//                                     +       " WHERE CRS.DATUM_CODE = ?"
-//                                     +    " ORDER BY CO.COORD_OP_CODE");
-//            stmt.setString(1, code);
-//            final ResultSet result = stmt.executeQuery();
-//            while (result.next()) {
-//                final Parameter[] param = createParameters(getString(result, 1, code));
-//                if ((param != null) && (param.length != 0)) {
-//                    final String areaOfUse    = result.getString(2); // Accept null.
-//                    final String methodOpCode = getString(result, 3, code);
-//                    // Value could be something else, but I don't know what to do when
-//                    // it is the case (for example 9618, with a radian Unit).
-//                    // So limiting to 9603 and 9606 cases for the moment.
-//                    if (methodOpCode.equals("9603") || methodOpCode.equals("9606")) {
-//                        final WGS84ConversionInfo info = new WGS84ConversionInfo();
-//                        // First we get the description of the area of use
-//                        info.areaOfUse = areaOfUse;
-//
-//                        // Then we get the coordinates. For each one we convert the unit in meter
-//                        info.dx = Unit.METRE.convert(param[0].value, param[0].unit);
-//                        info.dy = Unit.METRE.convert(param[1].value, param[1].unit);
-//                        info.dz = Unit.METRE.convert(param[2].value, param[2].unit);
-//
-//                        if (methodOpCode.equals("9606")) {
-//                            // Here we know that the database provides four more informations
-//                            // for WGS84 conversion : ex, ey, ez and ppm
-//                            info.ex  = Unit.ARC_SECOND.convert(param[3].value, param[3].unit);
-//                            info.ey  = Unit.ARC_SECOND.convert(param[4].value, param[4].unit);
-//                            info.ez  = Unit.ARC_SECOND.convert(param[5].value, param[5].unit);
-//                            info.ppm = param[6].value; // Parts per million, no conversion needed
-//                        }
-//                        list.add(info);
-//                    }
-//                }
-//            }            
-//            result.close();
-//        } catch (SQLException exception) {
-//            throw new FactoryException(code, exception);
-//        }
-//        return (WGS84ConversionInfo[]) list.toArray(new WGS84ConversionInfo[list.size()]);
-//    }
+    /**
+     * Private usage for {@link #createBursaWolfParameters}.
+     */
+    private static final class Info {
+        /** CO.COORD_OP_CODE        */ final String operation;
+        /** CO.COORD_OP_METHOD_CODE */ final int    method;
+        /** CRS1.DATUM_CODE         */ final String target;
+        Info(final String operation, final int method, final String target) {
+            this.operation = operation;
+            this.method    = method;
+            this.target    = target;
+        }
+    }
 
-//    /**
-//     * Returns a datum from a code. This method may
-//     * returns a vertical, horizontal or local datum.
-//     *
-//     * @param  code Value allocated by authority.
-//     * @return The datum object.
-//     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
-//     * @throws FactoryException if some other kind of failure occured in the backing
-//     *         store. This exception usually have {@link SQLException} as its cause.
-//     *
-//     * @task REVISIT: Current implementation maps all "vertical" datum to
-//     *                {@link DatumType#ELLIPSOIDAL} and all "horizontal"
-//     *                datum to {@link DatumType#GEOCENTRIC}. At the time
-//     *                of writting, it was not clear how to maps the exact
-//     *                datum type from the EPSG database.
-//     *
-//     * @task REVISIT: The creation of horizontal datum use only the first
-//     *                {@link WGS84ConversionInfo} object, because current
-//     *                version of {@link CoordinateSystemFactory} do not
-//     *                allows more than one conversion info. We should fix
-//     *                that.
-//     *
-//     * @task TODO:    Datum "engineering" is currently not supported.
-//     */
-//    public Datum createDatum(final String code) throws FactoryException {
-//        Datum returnValue = null;
-//        try {
-//            final PreparedStatement stmt;
-//            stmt = prepareStatement("Datum", "select DATUM_NAME,"
-//                                             + " DATUM_TYPE,"
-//                                             + " REMARKS,"
-//                                             + " ELLIPSOID_CODE"  // Only for horizontal type
-//                                             + " from [Datum]"
-//                                             + " where DATUM_CODE = ?");
-//            stmt.setString(1, code);
-//            final ResultSet result = stmt.executeQuery();
-//            /*
-//             * If the supplied code exists in the database, then we
-//             * should find only one record.   However, we will do a
-//             * paranoiac check and verify if there is more records.
-//             */
-//            while (result.next()) {
-//                final String name    = getString(result, 1, code);
-//                final String type    = getString(result, 2, code);
-//                final String remarks = result.getString( 3);
-//                final CharSequence prp = createProperties(name, code, remarks);
-//                final Datum datum;
-//                if (type.equalsIgnoreCase("vertical")) {
-//                    /*
-//                     * Vertical datum type. Maps to "ELLIPSOIDAL".
-//                     */
-//                    final DatumType.Vertical dtype = DatumType.Vertical.ELLIPSOIDAL; // TODO
-//                    datum = factory.createVerticalDatum(prp, dtype);
-//                } else if (type.equalsIgnoreCase("geodetic")) {
-//                    /*
-//                     * Horizontal datum type. Maps to "GEOCENTRIC".
-//                     */
-//                    final Ellipsoid         ellipsoid = createEllipsoid(getString(result, 4, code));
-//                    final WGS84ConversionInfo[] infos = createWGS84ConversionInfo(code);
-//                    final WGS84ConversionInfo mainInf = (infos.length!=0) ? infos[0] : null;
-//                    final DatumType.Horizontal  dtype = DatumType.Horizontal.GEOCENTRIC; // TODO
-//                    // TODO: on utilise la premiere info seulement pour le moment.
-//                    datum = factory.createHorizontalDatum(prp, dtype, ellipsoid, mainInf);
-//                } else if (type.equalsIgnoreCase("engineering")) {
-//                    /*
-//                     * Local datum type.
-//                     */
-//                    // TODO
-//                    //return factory.createLocalDatum(prp, new DatumType.Local("bidon",0,0));
-//                    result.close();
-//                    throw new UnsupportedOperationException("DatumType.Local not supported.");
-//                } else {
-//                    result.close();
-//                    throw new FactoryException(Resources.format(
-//                                               ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
-//                }
-//                returnValue = (Datum) ensureSingleton(datum, returnValue, code);
-//            }
-//            result.close();
-//        } catch (SQLException exception) {
-//            throw new FactoryException(code, exception);
-//        }
-//        if (returnValue == null) {
-//            throw new NoSuchAuthorityCodeException(code);
-//        }
-//        return returnValue;
-//    }
-    
+    /** 
+     * Returns Bursa-Wolf parameters for a geodetic datum. If the specified datum has
+     * no conversion informations, then this method will returns <code>null</code>.
+     *  
+     * @param  code The EPSG code of the {@link GeodeticDatum}.
+     * @param  toClose The result set to close if this method is going to invokes
+     *         {@link #createDatum} recursively. This hack is necessary because many
+     *         JDBC drivers do not support multiple result sets for the same statement.
+     *         The result set is closed if an only if this method returns a non-null value.
+     * @return an array of Bursa-Wolf parameters (in which case <code>toClose</code> has
+     *         been closed), or <code>null</code> (in which case <code>toClose</code> has
+     *         <strong>not</strong> been closed).
+     */
+    private BursaWolfParameters[] createBursaWolfParameters(final String    code,
+                                                            final ResultSet toClose)
+            throws SQLException, FactoryException
+    {
+        if (safetyGuard.contains(code)) {
+            /*
+             * Do not try to create Bursa-Wolf parameters if the datum is already
+             * in process of being created. This check avoid never-ending loops in
+             * recursive call to 'createDatum'.
+             */
+            return null;
+        }
+        List list = null;
+        PreparedStatement stmt;
+        stmt = prepareStatement("BursaWolfParametersSet",
+                                         "SELECT FIRST(CO.COORD_OP_CODE),"
+                                 +             " FIRST(CO.COORD_OP_METHOD_CODE),"
+                                 +             " CRS2.DATUM_CODE"
+                                 +      " FROM ([Coordinate_Operation] AS CO"
+                                 + " INNER JOIN [Coordinate Reference System] AS CRS1"
+                                 +          " ON CO.SOURCE_CRS_CODE = CRS1.COORD_REF_SYS_CODE)"
+                                 + " INNER JOIN [Coordinate Reference System] AS CRS2"
+                                 +          " ON CO.TARGET_CRS_CODE = CRS2.COORD_REF_SYS_CODE"
+                                 +       " WHERE CO.COORD_OP_METHOD_CODE >= 9603"
+                                 +         " AND CO.COORD_OP_METHOD_CODE <= 9607"
+                                 +         " AND CRS1.DATUM_CODE = ?"
+                                 +    " GROUP BY CRS2.DATUM_CODE");
+        stmt.setString(1, code);
+        ResultSet result = stmt.executeQuery();
+        while (result.next()) {
+            if (list == null) {
+                list = new ArrayList();
+            }
+            list.add(new Info(getString(result, 1, code),
+                              getInt   (result, 2, code),
+                              getString(result, 3, code)));
+        }
+        result.close();
+        if (list == null) {
+            return null;
+        }
+        toClose.close();
+        /*
+         * We got all the needed informations before to built Bursa-Wolf parameters because the
+         * 'createDatum(...)' call below may invokes 'createBursaWolfParameters(...)' recursively,
+         * and not all JDBC drivers supported multi-result set for the same statement. Now, iterate
+         * throw the results and fetch the parameter values for each BursaWolfParameters object.
+         */
+        stmt = prepareStatement("BursaWolfParameters", "SELECT PARAMETER_CODE,"
+                                                     +       " PARAMETER_VALUE,"
+                                                     +       " UOM_CODE"
+                                                     + " FROM [Coordinate_Operation Parameter Value]"
+                                                     + " WHERE COORD_OP_CODE = ?"
+                                                     +   " AND COORD_OP_METHOD_CODE = ?");
+        final int size = list.size();
+        for (int i=0; i<size; i++) {
+            final Info info = (Info) list.get(i);
+            final GeodeticDatum datum;
+            try {
+                safetyGuard.add(code);
+                datum = createGeodeticDatum(info.target);
+            } finally {
+                safetyGuard.remove(code);
+            }
+            final BursaWolfParameters parameters = new BursaWolfParameters(datum);
+            stmt.setString(1, info.operation);
+            stmt.setInt   (2, info.method);
+            result = stmt.executeQuery();
+            while (result.next()) {
+                setBursaWolfParameter(parameters,
+                                      getInt   (result, 1, info.operation),
+                                      getDouble(result, 2, info.operation),
+                           createUnit(getString(result, 3, info.operation)));
+            }
+            result.close();
+            if (info.method == 9607) {
+                // Coordinate frame rotation: same as 9606,
+                // except for the sign of rotation parameters.
+                parameters.ex = -parameters.ex;
+                parameters.ey = -parameters.ey;
+                parameters.ey = -parameters.ey;
+            }
+            list.set(i, parameters);
+        }            
+        return (BursaWolfParameters[]) list.toArray(new BursaWolfParameters[size]);
+    }
+
+    /**
+     * Returns a datum from a code.
+     *
+     * @param  code Value allocated by authority.
+     * @return The datum object.
+     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
+     * @throws FactoryException if some other kind of failure occured in the backing
+     *         store. This exception usually have {@link SQLException} as its cause.
+     *
+     * @todo Current implementation maps all "vertical" datum to
+     *       {@link VerticalDatumType#ELLIPSOIDAL}. We don't know yet how
+     *       to maps the exact vertical datum type from the EPSG database.
+     */
+    public synchronized Datum createDatum(final String code) throws FactoryException {
+        Datum returnValue = null;
+        try {
+            final PreparedStatement stmt;
+            stmt = prepareStatement("Datum", "SELECT DATUM_NAME,"
+                                           +       " DATUM_TYPE,"
+                                           +       " ORIGIN_DESCRIPTION,"
+                                           +       " REALIZATION_EPOCH,"
+                                           +       " AREA_OF_USE_CODE,"
+                                           +       " DATUM_SCOPE,"
+                                           +       " REMARKS,"
+                                           +       " ELLIPSOID_CODE,"     // Only for geodetic type
+                                           +       " PRIME_MERIDIAN_CODE" // Only for geodetic type
+                                           + " FROM [Datum]"
+                                           + " WHERE DATUM_CODE = ?");
+            stmt.setString(1, code);
+            final ResultSet result = stmt.executeQuery();
+            /*
+             * If the supplied code exists in the database, then we
+             * should find only one record.   However, we will do a
+             * paranoiac check and verify if there is more records.
+             */
+            boolean stop = false;
+            while (result.next()) {
+                final String name    = getString(result, 1, code);
+                final String type    = getString(result, 2, code);
+                final String anchor  = result.getString( 3);
+                final int    epoch   = result.getInt   ( 4);
+                final String area    = result.getString( 5);
+                final String scope   = result.getString( 6);
+                final String remarks = result.getString( 7);
+                Map properties = createProperties(name, code, remarks);
+                if (anchor != null) {
+                    properties.put(org.geotools.referencing.datum.Datum.
+                                   ANCHOR_POINT_PROPERTY, anchor);
+                }
+                if (epoch != 0) {
+                    calendar.clear();
+                    calendar.set(epoch, 0, 1);
+                    properties.put(org.geotools.referencing.datum.Datum.
+                                   REALIZATION_EPOCH_PROPERTY, calendar.getTime());
+                }
+                if (area != null) {
+                    properties.put(org.geotools.referencing.datum.Datum.
+                                   VALID_AREA_PROPERTY, createExtent(area));
+                }
+                if (scope != null) {
+                    properties.put(org.geotools.referencing.datum.Datum.
+                                   SCOPE_PROPERTY, scope);
+                }
+                final DatumFactory factory = factories.getDatumFactory();
+                final Datum datum;
+                /*
+                 * Now build datum according their datum type. Constructions are straightforward,
+                 * except for the "geodetic" datum type which need some special processing:
+                 *
+                 *   - Because it invokes again 'createProperties' indirectly (through calls to
+                 *     'createEllipsoid' and 'createPrimeMeridian'), it must protect 'properties'
+                 *     from changes.
+                 *
+                 *   - Because 'createBursaWolfParameters' may invokes 'createDatum' recursively,
+                 *     we must close the result set if Bursa-Wolf parameters are found. In this
+                 *     case, we lost our paranoiac check for duplication.
+                 */
+                if (type.equalsIgnoreCase("engineering")) {
+                    datum = factory.createEngineeringDatum(properties);
+                } else if (type.equalsIgnoreCase("vertical")) {
+                    // TODO: Find the right datum type.
+                    datum = factory.createVerticalDatum(properties, VerticalDatumType.ELLIPSOIDAL);
+                } else if (type.equalsIgnoreCase("geodetic")) {
+                    properties = new HashMap(properties); // Protect from changes
+                    final Ellipsoid         ellipsoid = createEllipsoid    (getString(result, 8, code));
+                    final PrimeMeridian      meridian = createPrimeMeridian(getString(result, 9, code));
+                    final BursaWolfParameters[] param = createBursaWolfParameters(code, result);
+                    if (param != null) {
+                        properties.put(org.geotools.referencing.datum.GeodeticDatum.
+                                       BURSA_WOLF_PROPERTY, param);
+                        stop = true;
+                    }
+                    datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
+                } else {
+                    result.close();
+                    throw new FactoryException(Resources.format(
+                                               ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
+                }
+                returnValue = (Datum) ensureSingleton(datum, returnValue, code);
+                if (stop) {
+                    // Bypass the 'result.close()' line below:
+                    // the ResultSet has already been closed.
+                    return returnValue;
+                }
+            }
+            result.close();
+        } catch (SQLException exception) {
+            throw new FactoryException(exception);
+        }
+        if (returnValue == null) {
+            throw noSuchAuthorityCode(Datum.class, code);
+        }
+        return returnValue;
+    }
+
+    /**
+     * Returns a {@linkplain CoordinateSystemAxis coordinate system axis} from a code.
+     *
+     * @param  code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     *
+     * @todo Not yet implemented.
+     */
+    public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
+            throws FactoryException
+    {
+        throw new FactoryException("Not yet implemented.");
+    }
+
+    /**
+     * Returns the coordinate system axis from an EPSG code for a {@link CoordinateSystem}.
+     *
+     * @param  code the EPSG code for coordinate system owner.
+     * @param  dimension of the coordinate system, which is also the size of the returned array.
+     * @return An array of coordinate system axis.
+     * @throws SQLException if an error occured during database access.
+     * @throws FactoryException if the code has not been found.
+     *
+     * @todo WARNING!! The EPSG database use "ORDER" as a column name.
+     *       This is tolerated by Access, but MySQL doesn't accept this name.
+     */
+    private CoordinateSystemAxis[] createCoordinateSystemAxis(String code, final int dimension)
+            throws SQLException, FactoryException
+    {
+        final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[dimension];
+        final PreparedStatement stmt;
+        stmt = prepareStatement("Axis", "SELECT CA.COORD_AXIS_CODE,"
+                                +             " CAN.COORD_AXIS_NAME,"
+                                +             " CA.COORD_AXIS_ORIENTATION,"
+                                +             " CA.COORD_AXIS_ABBREVIATION,"
+                                +             " CA.UOM_CODE,"
+                                +             " CAN.DESCRIPTION,"
+                                +             " CAN.REMARKS"
+                                +       " FROM [Coordinate Axis] AS CA"
+                                + " INNER JOIN [Coordinate Axis Name] AS CAN"
+                                +          " ON CA.COORD_AXIS_NAME_CODE = CAN.COORD_AXIS_NAME_CODE"
+                                +       " WHERE CA.COORD_SYS_CODE = ?"
+                                +    " ORDER BY [CA.ORDER]");
+                                // WARNING: Be careful about the column name :
+                                //          MySQL rejects ORDER as a column name !!!
+        stmt.setString(1, code);
+        final ResultSet result = stmt.executeQuery();
+        final CSFactory factory = factories.getCSFactory();
+        int i = 0;
+        while (result.next()) {
+            if (i >= axis.length) {
+                // An exception will be thrown after the loop.
+                continue;
+            }
+                         code         = getString(result, 1, code);
+            final String name         = getString(result, 2, code);
+            final String orientation  = getString(result, 3, code);
+            final String abbreviation = getString(result, 4, code);
+            final String unit         = getString(result, 5, code);
+                  String description  = result.getString( 6);
+            final String remarks      = result.getString( 7);
+            final AxisDirection direction;
+            try {
+                direction = org.geotools.referencing.cs.CoordinateSystemAxis.getDirection(orientation);
+            } catch (NoSuchElementException exception) {
+                throw new FactoryException(Resources.format(
+                                           ResourceKeys.ERROR_UNKNOW_TYPE_$1, name), exception);
+            }
+            if (description == null) {
+                description = remarks;
+            } else if (remarks != null) {
+                description += System.getProperty("line.separator", "\n") + remarks;
+            }
+            final Map properties = createProperties(name, code, description);
+            axis[i++] = factory.createCoordinateSystemAxis(properties, abbreviation, direction,
+                                                           createUnit(unit));
+        }
+        result.close();
+        if (i != axis.length) {
+            throw new FactoryException(Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                                       new Integer(axis.length), new Integer(i)));
+        }
+        return axis;
+    }
+
 //    /**
 //     * Returns a coordinate system from a code.
 //     *
@@ -1193,6 +1456,51 @@ public class DefaultFactory extends AuthorityFactory
 //        }
 //        return (ProjectedCoordinateSystem) returnValue;
 //    }
+
+//    /**
+//     * Returns the parameter values for an operation method code.
+//     *
+//     * @param  code The operation code.
+//     * @return The parameters.
+//     * @throws FactoryException if an access to the database failed.
+//     */
+//    private ParameterValueGroup createParameters(final String code) throws FactoryException {
+//        final List list = new ArrayList();
+//        final PreparedStatement stmt;
+//        stmt = prepareStatement("Parameters", "SELECT "
+//                                       + " COP.PARAMETER_NAME,"
+//                                       + " COPV.PARAMETER_VALUE,"
+//                                       + " COPV.UOM_CODE"
+//                                       + " FROM [Coordinate_Operation Parameter Usage] AS COPU,"
+//                                       + " [Coordinate_Operation] AS CO,"
+//                                       + " [Coordinate_Operation Parameter] AS COP,"
+//                                       + " [Coordinate_Operation Parameter Value] AS COPV"
+//                                       + " WHERE CO.COORD_OP_CODE = ?"
+//                                       + " AND CO.COORD_OP_METHOD_CODE = COPU.COORD_OP_METHOD_CODE"
+//                                       + " AND COP.PARAMETER_CODE = COPU.PARAMETER_CODE"
+//                                       + " AND COPV.PARAMETER_CODE = COPU.PARAMETER_CODE"
+//                                       + " AND COPV.COORD_OP_CODE = ?"
+//                                       + " ORDER BY COPU.SORT_ORDER");
+//        stmt.setString(1, code);
+//        stmt.setString(2, code);
+//        final ResultSet result = stmt.executeQuery();
+//        while (result.next()) {
+//            final String  name = getString(result, 1, code);
+//            final double value = result.getDouble(2);
+//            if (result.wasNull()) {
+//                /*
+//                 * This a temporary hack because sometimes PARAMETER_VALUE is
+//                 * not defined, it is replaced by PARAMETER_VALUE_FILE_RE.
+//                 */
+//                result.close();
+//                throw new UnsupportedOperationException("Not yet implemented");
+//            }
+//            final String  unit = getString(result, 3, code);
+//            list.add(new Parameter(name, value, createUnit(unit)));
+//        }
+//        result.close();
+//        return (Parameter[]) list.toArray(new Parameter[list.size()]);
+//    }
 //    
 //    /**
 //     * Returns a vertical coordinate system from an EPSG code.
@@ -1296,59 +1604,7 @@ public class DefaultFactory extends AuthorityFactory
 //        }
 //        return returnValue; 
 //    }
-//    
-//    /**
-//     * Returns the {@link AxisInfo}s from an
-//     * EPSG code for a {@link CoordinateSystem}.
-//     *
-//     * @param  code the EPSG code.
-//     * @param  dimension of the coordinate system, which is also the
-//     *         size of the returned Array.
-//     * @return an array of AxisInfo.
-//     * @throws SQLException if an error occured during database access.
-//     * @throws FactoryException if the code has not been found.
-//     *
-//     * @task HACK: WARNING!! The EPSG database use "ORDER" as a column name.
-//     *             This is tolerated by Access, but MySQL doesn't accept this name.
-//     */
-//    private AxisInfo[] createAxisInfos(final String code, final int dimension)
-//            throws SQLException, FactoryException
-//    {
-//        final AxisInfo[] axis = new AxisInfo[dimension];
-//        final PreparedStatement stmt;
-//        stmt = prepareStatement("AxisInfo", "select COORD_AXIS_NAME,"
-//                                           + " COORD_AXIS_ORIENTATION"
-//                                           + " from [Coordinate Axis] as CA,"
-//                                           + " [Coordinate Axis Name] as CAN"
-//                                           + " where COORD_SYS_CODE = ?"
-//                                           + " and CA.COORD_AXIS_NAME_CODE = CAN.COORD_AXIS_NAME_CODE"
-//                                           // WARNING: Be careful about the table name :
-//                                           //          MySQL refuse ORDER as a column name !!!
-//                                           + " order by [ORDER]");
-//        stmt.setString(1, code);
-//        final ResultSet result = stmt.executeQuery();
-//        int i = 0;
-//        while (result.next()) {
-//            final String name = getString(result, 1, code);
-//            final AxisOrientation orientation;
-//            try {
-//                orientation = AxisOrientation.getEnum(getString(result, 2, code));
-//            } catch (NoSuchElementException exception) {
-//                throw new FactoryException(Resources.format(
-//                                           ResourceKeys.ERROR_UNKNOW_TYPE_$1, name), exception);
-//            }
-//            if (i < axis.length) {
-//                axis[i++] = new AxisInfo(name, orientation);
-//            }
-//        }
-//        result.close();
-//        if (i != axis.length) {
-//            throw new FactoryException(Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-//                                       new Integer(axis.length), new Integer(i)));
-//        }
-//        return axis;
-//    }
-//    
+
 //    /**
 //     * Returns the Unit for 1D and 2D coordinate system. This method scan the unit of
 //     * all axis for the specified coordinate system. All axis must use the same units.

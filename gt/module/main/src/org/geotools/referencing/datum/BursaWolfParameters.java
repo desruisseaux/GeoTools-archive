@@ -200,7 +200,10 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
         formatter.append(ez);
         formatter.append(ppm);
         if (!org.geotools.referencing.datum.GeodeticDatum.isWGS84(targetDatum)) {
-            formatter.setInvalidWKT();
+            if (targetDatum != null) {
+                formatter.append(targetDatum.getName().getCode());
+            }
+            return super.formatWKT(formatter);
         }
         return "TOWGS84";
     }

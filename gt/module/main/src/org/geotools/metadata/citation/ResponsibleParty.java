@@ -158,6 +158,18 @@ public class ResponsibleParty extends MetadataEntity
         ESRI.setContactInfo(org.geotools.metadata.citation.Contact.ESRI);
         ESRI.freeze();
     }
+
+    /**
+     * The <A HREF="http://www.oracle.com">Oracle</A> responsible party.
+     *
+     * @see org.geotools.metadata.citation.Contact#ORACLE
+     */
+    public static ResponsibleParty ORACLE = new ResponsibleParty(Role.PRINCIPAL_INVESTIGATOR);
+    static {
+        ORACLE.setOrganisationName(new SimpleInternationalString("Oracle"));
+        ORACLE.setContactInfo(org.geotools.metadata.citation.Contact.ORACLE);
+        ORACLE.freeze();
+    }
     
     /**
      * The <A HREF="http://www.geotools.org">Geotools</A> project.

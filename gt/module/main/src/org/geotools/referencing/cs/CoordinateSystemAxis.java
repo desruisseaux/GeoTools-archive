@@ -22,24 +22,27 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
+import java.util.NoSuchElementException;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
+// OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.NameFactory;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -475,6 +478,28 @@ public class CoordinateSystemAxis extends IdentifiedObject
                                  final Unit          unit)
     {
         this(Resources.formatInternational(name), abbreviation, direction, unit);
+    }
+
+    /**
+     * Returns an axis direction constants from its name.
+     *
+     * @param  direction The direction name (e.g. "north", "east", etc.).
+     * @return The axis direction for the given name/.
+     * @throws NoSuchElementException if the given name is not a know axis direction.
+     */
+    public static AxisDirection getDirection(final String direction) throws NoSuchElementException {
+        final String search = direction.trim().toUpperCase();
+        final AxisDirection[] values = AxisDirection.values();
+        for (int i=0; i<values.length; i++) {
+            final AxisDirection candidate = values[i];
+            final String name = candidate.name();
+            assert name.equals(name.toUpperCase()) : name;
+            if (search.equals(name)) {
+                return candidate;
+            }
+        }
+        // TODO: localize
+        throw new NoSuchElementException("Unknow axis direction: \""+direction+"\".");
     }
 
     /**

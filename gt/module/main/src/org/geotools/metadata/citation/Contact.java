@@ -101,6 +101,17 @@ public class Contact extends MetadataEntity
         ESRI.setOnLineResource(org.geotools.metadata.citation.OnLineResource.ESRI);
         ESRI.freeze();
     }
+
+    /**
+     * Contact informations for <A HREF="http://www.oracle.com">Oracle</A>.
+     *
+     * @see org.geotools.metadata.citation.OnLineResource#ORACLE
+     */
+    public static final Contact ORACLE = new Contact();
+    static {
+        ORACLE.setOnLineResource(org.geotools.metadata.citation.OnLineResource.ORACLE);
+        ORACLE.freeze();
+    }
     
     /**
      * Contact informations for the <A HREF="http://www.geotools.org">Geotools</A> project.

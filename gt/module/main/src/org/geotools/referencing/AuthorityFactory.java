@@ -67,6 +67,7 @@ import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
 
 // Geotools dependencies
+import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -105,7 +106,7 @@ public abstract class AuthorityFactory extends Factory
      * category} for the same {@linkplain #getAuthority authority} and from the same
      * {@linkplain #getVendor vendor}.
      *
-     * @see onRegistration
+     * @see #onRegistration
      */
     public static final int MIN_PRIORITY = 1;
 
@@ -115,7 +116,7 @@ public abstract class AuthorityFactory extends Factory
      * category}, for the same {@linkplain #getAuthority authority} and from the same
      * {@linkplain #getVendor vendor}.
      *
-     * @see onRegistration
+     * @see #onRegistration
      */
     public static final int MAX_PRIORITY = 10;
 
@@ -835,7 +836,9 @@ public abstract class AuthorityFactory extends Factory
     {
         final String authority = getAuthority().getTitle().toString();
         return new NoSuchAuthorityCodeException(
-               "No code \""+code+"\" for authority \""+authority+"\".", authority, code);
+                "No code \""+code+"\" from the authority \""+authority+
+                "\" was found for object of type "+Utilities.getShortName(type)+".",
+                authority, code);
     }
 
     /**

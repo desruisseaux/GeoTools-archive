@@ -372,7 +372,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
     }
 
     /**
-     * Concatenate two operation steps. If an operation is an {@link #AXIS_CHANGE},
+     * Concatenate two operation steps. If an operation is an {@link #AXIS_CHANGES},
      * it will be included as part of the second operation instead of creating an
      * {@link ConcatenatedOperation}. If a concatenated operation is created, it
      * will get an automatically generated name.
@@ -419,7 +419,7 @@ public abstract class AbstractCoordinateOperationFactory extends Factory
 
     /**
      * Concatenate three transformation steps. If the first and/or the last operation is an
-     * {@link #AXIS_CHANGE}, it will be included as part of the second operation instead of
+     * {@link #AXIS_CHANGES}, it will be included as part of the second operation instead of
      * creating an {@link ConcatenatedOperation}. If a concatenated operation is created, it
      * will get an automatically generated name.
      *

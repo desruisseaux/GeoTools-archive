@@ -36,6 +36,7 @@ import java.util.TreeSet;
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.operation.Conversion;
