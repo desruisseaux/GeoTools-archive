@@ -114,6 +114,80 @@ public class ArcSDEJavaApiTest extends TestCase {
      *
      * @throws Exception DOCUMENT ME!
      */
+    public void testGetBoundsWhileFetchingRows() throws Exception {
+        try {
+            ArcSDEConnectionPool pool = testData.getDataStore()
+                                                .getConnectionPool();
+            String typeName = testData.getPolygon_table();
+            String where = "POP_ADMIN < 270000";
+
+            String[] columns = { "POP_ADMIN" };
+            SeSqlConstruct sql = new SeSqlConstruct(typeName, where);
+
+            SeQueryInfo qInfo = new SeQueryInfo();
+            qInfo.setConstruct(sql);
+
+            //add a bounding box filter and verify both spatial and non spatial
+            //constraints affects the COUNT statistics
+            SeExtent extent = new SeExtent(-68, -55, -63, -52);
+
+            SeLayer layer = pool.getSdeLayer(typeName);
+            SeShape filterShape = new SeShape(layer.getCoordRef());
+            filterShape.generateRectangle(extent);
+
+            SeShapeFilter bboxFilter = new SeShapeFilter(typeName,
+                    layer.getSpatialColumn(), filterShape,
+                    SeFilter.METHOD_ENVP, true);
+            SeFilter[] spatFilters = { bboxFilter };
+
+            SeConnection conn = pool.getConnection();
+
+            for (int i = 0; i < 26; i++) {
+                LOGGER.info("Running iteration #" + i);
+
+                SeQuery rowQuery = new SeQuery(conn, columns, sql);
+                rowQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatFilters);
+                rowQuery.prepareQuery();
+                rowQuery.execute();
+
+                //fetch some rows
+                rowQuery.fetch();
+                rowQuery.fetch();
+                rowQuery.fetch();
+
+                SeQuery countQuery = new SeQuery(conn, columns, sql);
+                countQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true,
+                    spatFilters);
+
+                final int expCount = 2;
+
+                SeTable.SeTableStats tableStats = countQuery
+                    .calculateTableStatistics("POP_ADMIN",
+                        SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
+
+                rowQuery.fetch();
+                rowQuery.fetch();
+
+                int resultCount = tableStats.getCount();
+
+                assertEquals(expCount, resultCount);
+
+                rowQuery.close();
+                countQuery.close();
+            }
+            LOGGER.info("TEST PASSED");
+        } catch (SeException e) {
+            LOGGER.warning(e.getSeError().getErrDesc());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
+     */
     public void testCalculateCount() throws Exception {
         try {
             ArcSDEConnectionPool pool = testData.getDataStore()
@@ -134,6 +208,7 @@ public class ArcSDEJavaApiTest extends TestCase {
                     SeTable.SeTableStats.SE_COUNT_STATS, qInfo, 0);
 
             assertEquals(expCount, tableStats.getCount());
+            query.close();
 
             //add a bounding box filter and verify both spatial and non spatial
             //constraints affects the COUNT statistics
@@ -143,8 +218,11 @@ public class ArcSDEJavaApiTest extends TestCase {
             SeShape filterShape = new SeShape(layer.getCoordRef());
             filterShape.generateRectangle(extent);
 
-            SeShapeFilter bboxFilter = new SeShapeFilter(typeName, "THE_GEOM",
-                    filterShape, SeFilter.METHOD_ENVP, true);
+            query = new SeQuery(conn, columns, sql);
+
+            SeShapeFilter bboxFilter = new SeShapeFilter(typeName,
+                    layer.getSpatialColumn(), filterShape,
+                    SeFilter.METHOD_ENVP, true);
             SeFilter[] spatFilters = { bboxFilter };
 
             query.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true, spatFilters);
@@ -158,6 +236,7 @@ public class ArcSDEJavaApiTest extends TestCase {
             assertEquals(expCount, resultCount);
         } catch (SeException e) {
             LOGGER.warning(e.getSeError().getErrDesc());
+            e.printStackTrace();
             throw e;
         }
     }

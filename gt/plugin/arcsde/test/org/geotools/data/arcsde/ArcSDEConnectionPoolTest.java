@@ -19,6 +19,8 @@ package org.geotools.data.arcsde;
 import com.esri.sde.sdk.client.SeConnection;
 import junit.framework.TestCase;
 import org.geotools.data.DataSourceException;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
@@ -144,6 +146,31 @@ public class ArcSDEConnectionPoolTest extends TestCase {
         return this.pool;
     }
 
+    /**
+     * tests that a connection to a live ArcSDE database can be established
+     * with the parameters defined int testparams.properties, and a
+     * ArcSDEConnectionPool can be properly setted up
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    public void testConnect() throws IOException {
+        LOGGER.info("testing connection to the sde database");
+
+        ConnectionPoolFactory pf = ConnectionPoolFactory.getInstance();
+        ConnectionConfig congfig = null;
+
+        congfig = new ConnectionConfig(connectionParameters);
+
+        try {
+            ArcSDEConnectionPool pool = pf.createPool(congfig);
+            LOGGER.info("connection succeed " + pool.getPoolSize()
+                + " connections ready");
+        } catch (DataSourceException ex) {
+            throw ex;
+        } finally {
+            pf.clear(); //close and remove all pools
+        }
+    }
     /**
      * Checks that after creation the pool has the specified initial number of
      * connections.

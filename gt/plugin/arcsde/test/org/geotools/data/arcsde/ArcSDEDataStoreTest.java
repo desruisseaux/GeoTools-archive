@@ -19,7 +19,6 @@ package org.geotools.data.arcsde;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import junit.framework.TestCase;
-import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultQuery;
@@ -34,11 +33,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.BBoxExpression;
+import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFilter;
+import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LogicFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
@@ -130,28 +131,54 @@ public class ArcSDEDataStoreTest extends TestCase {
     }
 
     /**
-     * tests that a connection to a live ArcSDE database can be established
-     * with the parameters defined int testparams.properties, and a
-     * ArcSDEConnectionPool can be properly setted up
+     * DOCUMENT ME!
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws Exception DOCUMENT ME!
      */
-    public void testConnect() throws IOException {
-        LOGGER.info("testing connection to the sde database");
-
-        ConnectionPoolFactory pf = ConnectionPoolFactory.getInstance();
-        ConnectionConfig congfig = null;
-
-        congfig = new ConnectionConfig(testData.getConProps());
-
+    public void testStress() throws Exception {
         try {
-            ArcSDEConnectionPool pool = pf.createPool(congfig);
-            LOGGER.info("connection succeed " + pool.getPoolSize()
-                + " connections ready");
-        } catch (DataSourceException ex) {
-            throw ex;
-        } finally {
-            pf.clear(); //close and remove all pools
+            DataStore ds = testData.getDataStore();
+            String typeName = testData.getPoint_table();
+
+            FeatureSource source = ds.getFeatureSource(typeName);
+            FeatureType schema = source.getSchema();
+            Envelope layerBounds = source.getBounds();
+
+            FilterFactory ff = FilterFactory.createFilterFactory();
+            GeometryFilter bbox = ff.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+
+            bbox.addLeftGeometry(ff.createAttributeExpression(schema,
+                    schema.getDefaultGeometry().getName()));
+
+            Envelope bounds = new Envelope(layerBounds.getMinX() + 10,
+                    layerBounds.getMaxX() - 10, layerBounds.getMinY() + 10,
+                    layerBounds.getMaxY() - 10);
+            bbox.addRightGeometry(ff.createBBoxExpression(bounds));
+
+            for(int i = 0; i < 26; i++){
+            	LOGGER.info("Running iteration #" + i);
+            	
+            	FeatureResults res = source.getFeatures(bbox);
+            	FeatureReader reader = res.reader();
+
+            	reader.next();
+
+            	int count = res.getCount();
+            	Envelope resBounds = res.getBounds();
+            	
+            	reader.next();
+            	
+            	count = res.getCount();
+            	resBounds = res.getBounds();
+
+            	reader.next();
+            	
+            	reader.close();
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -326,7 +353,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         //build the attnames in inverse order
         for (int i = queryAtts.length, j = 0; i > 0; j++) {
-        	--i;
+            --i;
             queryAtts[j] = schema.getAttributeType(i).getName();
         }
 
@@ -338,6 +365,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         FeatureType resultSchema = reader.getFeatureType();
         assertEquals(queriedAttributeCount, resultSchema.getAttributeCount());
+
         for (int i = 0; i < queriedAttributeCount; i++) {
             assertEquals(queryAtts[i],
                 resultSchema.getAttributeType(i).getName());
@@ -830,7 +858,6 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private void testFilter(Filter filter, FeatureSource fsource, int expected)
         throws IOException {
-    	
         FeatureResults results = fsource.getFeatures(filter);
         FeatureCollection fc = results.collection();
         int resCount = results.getCount();

@@ -377,24 +377,18 @@ public class ArcSDEAdapter {
             LOGGER.warning("ArcSDE layer " + sdeLayer.getName()
                 + " does not provides a Coordinate Reference System");
         } else {
-        	LOGGER.warning("Do not forget to change the hardcoded use of " +
-        			"EPSGCRSAuthorityFactory when we have an embedded " +
-					"EPSG database");
-        	//@REVISIT: generalize this, by now just a quick fix due to
-        	//the epsg factory backed by the EPSG database throwing an error
-            //CRSFactory crsFactory = FactoryFinder.getCRSFactory();
-        	CRSFactory crsFactory = (CRSFactory)EPSGCRSAuthorityFactory.getDefault();
-
             try {
+                CRSFactory crsFactory = FactoryFinder.getCRSFactory();
                 crs = crsFactory.createFromWKT(WKT);
                 LOGGER.fine("ArcSDE CRS correctly parsed from layer "
                     + sdeLayer.getName());
             } catch (FactoryException e) {
                 String msg = "CRS factory does not knows how to parse the "
                     + "CRS for layer " + sdeLayer.getName() + ": " + WKT;
-                LOGGER.log(Level.WARNING, msg, e);
-                throw new DataSourceException(msg, e);
+                LOGGER.log(Level.SEVERE, msg, e);
+                //throw new DataSourceException(msg, e);
             }
+            
         }
 
         return crs;

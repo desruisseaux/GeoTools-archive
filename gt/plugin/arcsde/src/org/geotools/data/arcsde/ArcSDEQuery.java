@@ -33,9 +33,13 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.GeometryEncoderException;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.transform.TransformerException;
 
 
 /**
@@ -287,8 +291,10 @@ class ArcSDEQuery {
                         e);
                 }
 
-                extentQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true,
-                    geometryFilters);
+                if ((geometryFilters != null) && (geometryFilters.length > 0)) {
+                    extentQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
+                        true, geometryFilters);
+                }
             }
 
             SeQueryInfo sdeQueryInfo = new SeQueryInfo();
@@ -300,6 +306,21 @@ class ArcSDEQuery {
             LOGGER.info("got extent: " + extent + ", built envelope: "
                 + envelope);
         } catch (SeException ex) {
+            ////////////////////////
+            try {
+				String filter = new FilterTransformer().transform(filters
+				        .getGeometryFilter());
+				String sql = (sqlConstruct == null) ? null : sqlConstruct.getWhere();
+				LOGGER.log(Level.SEVERE, "***********************\n" +
+						ex.getSeError().getErrDesc() + 
+						"\nfilter: " + filter +
+						"\nSQL: " + sql, ex);
+				
+			} catch (TransformerException e) {
+				e.printStackTrace();
+			}
+
+            /////////////////////////
             ex.printStackTrace();
             throw new DataSourceException("Can't consult the query extent: "
                 + ex.getSeError().getErrDesc(), ex);
