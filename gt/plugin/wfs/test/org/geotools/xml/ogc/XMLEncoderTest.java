@@ -35,22 +35,19 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * Unit test for expressions.  This is a complimentary test suite with the
- * filter test suite.
+ * This code uses the filter parser to generate test cases, and runs it through the encoder.
+ * 
+ * TODO create the filters manually, and check the output.
  *
  * @author James MacGill, CCG
  * @author Rob Hranac, TOPP
+ * @author David Zwiers
  */
 public class XMLEncoderTest extends FilterTestSupport {
-    /** Feature on which to preform tests */
-    private Filter filter = null;
 
-    /** Test suite for this test case */
-    TestSuite suite = null;
 
     /** Constructor with test name. */
     String dataFolder = "";
-    boolean setup = false;
 
     public XMLEncoderTest(String testName) {
         super(testName);
@@ -121,6 +118,11 @@ public class XMLEncoderTest extends FilterTestSupport {
     public void test8() throws Exception {
         Filter test = parseDocument("test8.xml");
 
+        StringWriter output = new StringWriter();
+        DocumentWriter.writeFragment(test,
+            FilterSchema.getInstance(), output, null);
+        
+        System.out.println(output);
         //LOGGER.fine("parsed filter is: " + test);
     }
 
@@ -180,17 +182,14 @@ public class XMLEncoderTest extends FilterTestSupport {
 
                 filter = FilterDOMParser.parseFilter(child);
 
-                //_log.getLoggerRepository().setThreshold(Level.DEBUG);
-                //                LOGGER.fine("filter: " + filter);
                 StringWriter output = new StringWriter();
                 DocumentWriter.writeFragment(filter,
                     FilterSchema.getInstance(), output, null);
-
-                //                LOGGER.fine("Resulting filter XML is \n"
-                //                    + output.getBuffer().toString());
+                
+//                System.out.println(output);
             }
         }
-
+        
         return filter;
     }
 }

@@ -70,6 +70,41 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author dzwiers
  */
 public class FilterOpsComplexTypes {
+    
+    protected static void encodeFilter(Filter filter, PrintHandler output, Map hints) throws OperationNotSupportedException, IOException{
+
+        if (filter instanceof LogicFilter) {
+            FilterType.elems[2].getType().encode(FilterType.elems[2], filter, output, hints);
+        } else {
+            if (filter instanceof CompareFilter) {
+                FilterType.elems[1].getType().encode(FilterType.elems[1], filter, output, hints);
+            } else {
+                if (filter instanceof FidFilter) {
+                    //deal with multi instance inside the type-writer
+                    FilterType.elems[3].getType().encode(FilterType.elems[3], filter, output,
+                        hints);
+                } else {
+                    if (filter instanceof GeometryFilter) {
+                        FilterType.elems[0].getType().encode(FilterType.elems[0], filter, output,
+                            hints);
+                    } else {
+                        if (filter instanceof LikeFilter) {
+                            FilterType.elems[1].getType().encode(FilterType.elems[1], filter,
+                                output, hints);
+                        } else {
+                            if (filter instanceof NullFilter) {
+                                FilterType.elems[1].getType().encode(FilterType.elems[1], filter,
+                                    output, hints);
+
+                                //          }else{
+                                //              throw new OperationNotSupportedException("The Filter type is not known: please try again. "+filter == null?"null":filter.getClass().getName());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     protected static void encodeExpr(Expression expr, PrintHandler output,
         Map hints) throws OperationNotSupportedException, IOException {
         int i = 0;
@@ -553,7 +588,6 @@ public class FilterOpsComplexTypes {
 
             case LOGIC_OR:
 
-                // TODO simplify this here?
                 BinaryLogicOpType.getInstance().encode(new FilterElement("Or",
                         BinaryLogicOpType.getInstance(), element), value,
                     output, hints);
@@ -591,7 +625,7 @@ public class FilterOpsComplexTypes {
         //			<xsd:element ref="ogc:FeatureId" maxOccurs="unbounded"/>
         //		</xsd:choice>
         //		</xsd:complexType>
-        private static Element[] elems = new Element[] {
+        final static Element[] elems = new Element[] {
                 new FilterElement("spatialOps", SpatialOpsType.getInstance()),
                 new FilterElement("comparisonOps",
                     ComparisonOpsType.getInstance()),
@@ -703,38 +737,8 @@ public class FilterOpsComplexTypes {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);
             }
-
-            if (filter instanceof LogicFilter) {
-                elems[2].getType().encode(elems[2], filter, output, hints);
-            } else {
-                if (filter instanceof CompareFilter) {
-                    elems[1].getType().encode(elems[1], filter, output, hints);
-                } else {
-                    if (filter instanceof FidFilter) {
-                        //deal with multi instance inside the type-writer
-                        elems[3].getType().encode(elems[3], filter, output,
-                            hints);
-                    } else {
-                        if (filter instanceof GeometryFilter) {
-                            elems[0].getType().encode(elems[0], filter, output,
-                                hints);
-                        } else {
-                            if (filter instanceof LikeFilter) {
-                                elems[1].getType().encode(elems[1], filter,
-                                    output, hints);
-                            } else {
-                                if (filter instanceof NullFilter) {
-                                    elems[1].getType().encode(elems[1], filter,
-                                        output, hints);
-
-                                    //        	}else{
-                                    //        		throw new OperationNotSupportedException("The Filter type is not known: please try again. "+filter == null?"null":filter.getClass().getName());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            
+            encodeFilter(filter,output,hints);
 
             if (element != null) {
                 output.endElement(element.getNamespace(), element.getName());
@@ -2110,8 +2114,10 @@ public class FilterOpsComplexTypes {
             Iterator i = lf.getFilterIterator();
             output.startElement(element.getNamespace(), element.getName(), null);
 
-            while (i.hasNext())
-                FilterType.getInstance().encode(null, i.next(), output, hints);
+            while (i.hasNext()){
+                Filter f = (Filter)i.next();
+                encodeFilter(f, output, hints);
+            }
 
             output.endElement(element.getNamespace(), element.getName());
         }
@@ -2228,8 +2234,8 @@ public class FilterOpsComplexTypes {
 
             while (i.hasNext()) {
                 if (c < 1) {
-                    FilterType.getInstance().encode(null, i.next(), output,
-                        hints);
+                    Filter f = (Filter)i.next();
+                    encodeFilter(f, output, hints);
                     c++;
                 } else {
                     throw new OperationNotSupportedException(

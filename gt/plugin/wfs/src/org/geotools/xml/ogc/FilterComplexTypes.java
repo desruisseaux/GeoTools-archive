@@ -950,7 +950,7 @@ public class FilterComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            if (hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
+            if (hints != null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
                 FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if (fc.getScalarOps() == FilterCapabilities.NO_OP) {
@@ -1119,7 +1119,7 @@ public class FilterComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            if (hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
+            if (hints != null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
                 FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if ((fc.getScalarOps() & FilterCapabilities.SIMPLE_ARITHMETIC) != FilterCapabilities.SIMPLE_ARITHMETIC) {
@@ -1238,7 +1238,7 @@ public class FilterComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            if (hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
+            if (hints != null && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
                 FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
 
                 if ((fc.getScalarOps() & FilterCapabilities.FUNCTIONS) != FilterCapabilities.FUNCTIONS) {
