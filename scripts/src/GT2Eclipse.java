@@ -341,16 +341,16 @@ public class GT2Eclipse {
 	if (new File(project, path + "/" + target + "/src").exists()) {
 	    classpath.println("    <classpathentry kind=\"src\"");
             classpath.println("        excluding=\"**/.svn/\"");
-	    // comment out output so it uses target\eclipse so M9 and Maven don't trip on each other
-	  //classpath.println("        output=\"" + path + "/" + target + "/target/classes\"");
+	    // eclipse needs its own output directory so it does not trip on maven
+	    classpath.println("        output=\"" + path + "/" + target + "/target/eclipse\"");
 	    classpath.println("        path=\"" + path + "/" + target + "/src\"/>");
 	}
 	if (new File(project, path + "/" + target + "/test").exists()) {
 	    classpath.print("      <classpathentry");
 	    classpath.println(" kind=\"src\"");
             classpath.println("        excluding=\"**/.svn/\"");
-	    // comment out output so it uses target\eclipse so M9 and Maven don't trip on each other
-         // classpath.println("        output=\"" + path + "/" + target + "/target/test-classes\"");
+	    // eclipse needs its own output directory so it does not trip on maven
+            classpath.println("        output=\"" + path + "/" + target + "/target/eclipse\"");
 	    classpath.println("        path=\"" + path + "/" + target + "/test\"/>");
 	}
     }
@@ -443,8 +443,7 @@ public class GT2Eclipse {
 		project.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		project.println("<projectDescription>");
 		project.println("  <name>gtbuild</name>");
-		project
-				.println("  <comment>Welcome to the homepage of the GeoTool2 build process In the left side bar you should see a list of active modules, visit each for more details on the status of each module.</comment>");
+		project.println("  <comment>Welcome to the homepage of the GeoTool2 build process In the left side bar you should see a list of active modules, visit each for more details on the status of each module.</comment>");
 		project.println("  <projects>");
 		project.println("  </projects>");
 		project.println("  <buildSpec>");
