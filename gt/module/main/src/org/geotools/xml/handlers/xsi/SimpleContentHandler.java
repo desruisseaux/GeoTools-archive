@@ -48,12 +48,8 @@ public class SimpleContentHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
-        //        id = atts.getValue("", "id");
-        //
-        //        if (id == null) {
-        //            id = atts.getValue(namespaceURI, "id");
-        //        }
+        Attributes atts){
+        // do nothing
     }
 
     /**
@@ -124,7 +120,7 @@ public class SimpleContentHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

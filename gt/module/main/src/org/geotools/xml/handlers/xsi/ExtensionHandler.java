@@ -161,7 +161,7 @@ public class ExtensionHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts){
         base = atts.getValue("", "base");
 
         if (base == null) {
@@ -213,7 +213,7 @@ public class ExtensionHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

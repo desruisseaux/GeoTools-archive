@@ -40,6 +40,7 @@ public class AttributeGT implements Attribute {
     private boolean form;
 
     private AttributeGT() {
+        // do nothing
     }
 
     /**

@@ -31,6 +31,7 @@ public class AttributeValueGT implements AttributeValue {
     private Attribute attribute;
 
     private AttributeValueGT() {
+        // do nothing
     }
 
     /**

@@ -34,6 +34,7 @@ public class SequenceGT implements Sequence {
     private int max;
 
     private SequenceGT() {
+        // do nothing
     }
 
     public SequenceGT(ElementGrouping[] children) {

@@ -39,6 +39,7 @@ public class GroupGT implements Group {
     private int max;
 
     private GroupGT() {
+        // do nothing
     }
 
     /**
@@ -114,9 +115,7 @@ public class GroupGT implements Group {
     /**
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      */
-    public Element findChildElement(String name) {
-//System.out.println("GroupGT "+this.name+" "+this.namespace);
-//System.out.println("GroupGT ... "+child.getClass().getName());
-        return (child == null) ? null : child.findChildElement(name);
+    public Element findChildElement(String name1) {
+        return (child == null) ? null : child.findChildElement(name1);
     }
 }

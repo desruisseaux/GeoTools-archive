@@ -37,6 +37,7 @@ public class AttributeGroupGT implements AttributeGroup {
     private URI namespace;
 
     private AttributeGroupGT() {
+        // do nothing
     }
 
     /**

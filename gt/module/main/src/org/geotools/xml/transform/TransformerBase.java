@@ -413,8 +413,8 @@ public abstract class TransformerBase {
             NamespaceSupport additional = trans.getNamespaceSupport();
             java.util.Enumeration declared = additional.getDeclaredPrefixes();
             while (declared.hasMoreElements()) {
-                String prefix = declared.nextElement().toString();
-                nsSupport.declarePrefix(prefix, additional.getURI(prefix));
+                String prefix1 = declared.nextElement().toString();
+                nsSupport.declarePrefix(prefix1, additional.getURI(prefix1));
             }
         }
 
@@ -506,9 +506,8 @@ public abstract class TransformerBase {
 
             if (uri == null) {
                 return "";
-            } else {
-                return nsURI + " " + uri;
             }
+            return nsURI + " " + uri;
         }
 
         public String getSchemaLocation(Set namespaces) {

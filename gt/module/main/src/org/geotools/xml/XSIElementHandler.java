@@ -46,7 +46,7 @@ public abstract class XSIElementHandler implements Serializable {
     /**
      * the logger -- should be used for debugging (assuming there are bugs LOL)
      */
-    protected final static Logger logger = Logger.getLogger(
+    public final static Logger logger = Logger.getLogger(
             "net.refractions.xsi.element");
     private static Level level = Level.WARNING;
 
@@ -61,6 +61,9 @@ public abstract class XSIElementHandler implements Serializable {
 
     /** Type constants */
     public static final int RESTRICTION = 4;
+
+    /** Type constants */
+    public static final int EXTENSION = 64;
 
     /** Type constants */
     public static final int SIMPLETYPE = 8;

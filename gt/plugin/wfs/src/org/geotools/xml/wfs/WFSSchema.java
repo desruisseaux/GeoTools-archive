@@ -167,7 +167,7 @@ public class WFSSchema implements Schema {
         };
     static final SimpleType[] simpleTypes = new SimpleType[] {
             new SimpleTypeGT(null, "AllSomeType", NAMESPACE,
-                SimpleTypeGT.RESTRICTION,
+                SimpleType.RESTRICTION,
                 new SimpleType[] { XSISimpleTypes.String.getInstance() },
                 new Facet[] {
                     new FacetGT(Facet.ENUMERATION, "ALL"),
@@ -312,15 +312,7 @@ public class WFSSchema implements Schema {
      * @see org.geotools.xml.schema.Schema#includesURI(java.net.URI)
      */
     public boolean includesURI(URI uri) {
-        //        if (uri.toString().toLowerCase().endsWith("wfs-basic.xsd")
-        //                || uri.toString().toLowerCase().endsWith("wfs-capabilities.xsd")
-        //                || uri.toString().toLowerCase().endsWith("wfs-transaction.xsd")) {
-        //            return true;
-        //        }
-        //
-        //        return false;
         // this is a spec ... we never want the def modified.
-        // TODO see if this affects printing
         return true;
     }
 
@@ -467,6 +459,7 @@ public class WFSSchema implements Schema {
          * Should never be called
          */
         private WFSElement() {
+            // no op const
         }
 
         /**
@@ -528,9 +521,9 @@ public class WFSSchema implements Schema {
         /**
          * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
          */
-        public Element findChildElement(String name) {
+        public Element findChildElement(String name1) {
             if (this.name != null) {
-                if (this.name.equals(name)) {
+                if (this.name.equals(name1)) {
                     return this;
                 }
             }

@@ -20,7 +20,9 @@ public class GMLFeatureCollection extends DefaultFeatureCollection {
 
 	private Envelope bounds;
 	
-	private GMLFeatureCollection(){}
+	private GMLFeatureCollection(){
+       // no-op constructor   
+    }
 	protected GMLFeatureCollection(Envelope b){
 		bounds = b;
 	}

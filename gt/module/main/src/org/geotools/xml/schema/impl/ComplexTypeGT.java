@@ -213,13 +213,13 @@ public class ComplexTypeGT implements ComplexType {
      * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
      * @param element
      * @param value
-     * @param attrs
+     * @param attrs1
      * @param hints
      * @return
      * @throws SAXException
      * @throws OperationNotSupportedException
      */
-    public Object getValue( Element element, ElementValue[] value, Attributes attrs, Map hints ) throws SAXException,
+    public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints ) throws
             OperationNotSupportedException {
         throw new OperationNotSupportedException();
     }
@@ -278,7 +278,7 @@ public class ComplexTypeGT implements ComplexType {
      * @throws IOException
      * @throws OperationNotSupportedException
      */
-    public void encode( Element element, Object value, PrintHandler output, Map hints ) throws IOException,
+    public void encode( Element element, Object value, PrintHandler output, Map hints ) throws 
             OperationNotSupportedException {
         throw new OperationNotSupportedException();
     }
@@ -287,11 +287,11 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for findChildElement ...
      * 
      * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
-     * @param name
+     * @param name1
      * @return
      */
-    public Element findChildElement( String name ) {
-        return getChild()!=null?getChild().findChildElement(name):null;
+    public Element findChildElement( String name1 ) {
+        return getChild()!=null?getChild().findChildElement(name1):null;
     }
 
 }

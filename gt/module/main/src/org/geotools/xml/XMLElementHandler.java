@@ -54,6 +54,7 @@ public abstract class XMLElementHandler implements Serializable {
      * the sub-packages
      */
     protected XMLElementHandler() {
+        // do nothing
     }
 
     /**

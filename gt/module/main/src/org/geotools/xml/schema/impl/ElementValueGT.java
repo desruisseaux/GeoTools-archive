@@ -31,6 +31,7 @@ public class ElementValueGT implements ElementValue {
     private Object value;
 
     private ElementValueGT() {
+        // do nothing
     }
 
     /**

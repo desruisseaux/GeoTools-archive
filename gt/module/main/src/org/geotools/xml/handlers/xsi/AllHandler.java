@@ -51,8 +51,7 @@ public class AllHandler extends ElementGroupingHandler {
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XSIElementHandler getHandler(String namespaceURI, String localName)
-        throws SAXException {
+    public XSIElementHandler getHandler(String namespaceURI, String localName){
         if (SchemaHandler.namespaceURI.equalsIgnoreCase(namespaceURI)) {
             // child types
             //
@@ -78,34 +77,34 @@ public class AllHandler extends ElementGroupingHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts){
         id = atts.getValue("", "id");
 
         if (id == null) {
             id = atts.getValue(namespaceURI, "id");
         }
 
-        String minOccurs = atts.getValue("", "minOccurs");
+        String minOccurs1 = atts.getValue("", "minOccurs");
 
-        if (minOccurs == null) {
-            minOccurs = atts.getValue(namespaceURI, "minOccurs");
+        if (minOccurs1 == null) {
+            minOccurs1 = atts.getValue(namespaceURI, "minOccurs");
         }
 
-        if (minOccurs == null || minOccurs.length() == 0) {
+        if (minOccurs1 == null || minOccurs1.length() == 0) {
         	this.minOccurs = 1;
         } else {
-        	this.minOccurs = Integer.parseInt(minOccurs);
+        	this.minOccurs = Integer.parseInt(minOccurs1);
         }
 
-        String maxOccurs = atts.getValue("", "maxOccurs");
+        String maxOccurs1 = atts.getValue("", "maxOccurs");
 
-        if (maxOccurs == null) {
-            maxOccurs = atts.getValue(namespaceURI, "maxOccurs");
+        if (maxOccurs1 == null) {
+            maxOccurs1 = atts.getValue(namespaceURI, "maxOccurs");
         }
-        if (maxOccurs == null || maxOccurs.length() == 0) {
+        if (maxOccurs1 == null || maxOccurs1.length() == 0) {
         	this.maxOccurs = 1;
         } else {
-        	this.maxOccurs = Integer.parseInt(maxOccurs);
+        	this.maxOccurs = Integer.parseInt(maxOccurs1);
         }
     }
 
@@ -166,8 +165,8 @@ public class AllHandler extends ElementGroupingHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 
     /**

@@ -16,14 +16,11 @@
  */
 package org.geotools.xml.xLink;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.naming.OperationNotSupportedException;
 
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
@@ -290,7 +287,7 @@ public class XLinkSchema implements Schema {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints){
             // it's an attribute ... do nothing
         }
 
@@ -543,7 +540,7 @@ public class XLinkSchema implements Schema {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints){
             // it's an attribute ... do nothing
         }
 
@@ -630,7 +627,7 @@ public class XLinkSchema implements Schema {
      */
     public static class Href extends XLinkAttribute {
         // singleton instance
-        private static Attribute instance;
+        static Attribute instance1;
 
         // internal storage for the attribute's use (required,optional ...)
         private int use = Attribute.OPTIONAL;
@@ -668,11 +665,11 @@ public class XLinkSchema implements Schema {
          * @return A default instance
          */
         public static Attribute getInstance() {
-            if (instance == null) {
-                instance = new Href();
+            if (instance1 == null) {
+                instance1 = new Href();
             }
 
-            return instance;
+            return instance1;
         }
 
         /*
@@ -707,10 +704,10 @@ public class XLinkSchema implements Schema {
     }
 
     public static class Role extends XLinkAttribute {
-        private static Attribute instance = new Role();
+        static Attribute instance1 = new Role();
 
         public static Attribute getInstance() {
-            return instance;
+            return instance1;
         }
 
         /**
@@ -749,15 +746,15 @@ public class XLinkSchema implements Schema {
      */
     public static class Arcrole extends XLinkAttribute {
         // the instance singleton
-        private static Attribute instance;
+        static Attribute instance1;
 
         // returns the default instance
         public static Attribute getInstance() {
-            if (instance == null) {
-                instance = new Arcrole();
+            if (instance1 == null) {
+                instance1 = new Arcrole();
             }
 
-            return instance;
+            return instance1;
         }
 
         /**
@@ -796,7 +793,7 @@ public class XLinkSchema implements Schema {
      */
     public static class Title extends XLinkAttribute {
         // the default singleton instance
-        private static Attribute instance;
+        static Attribute instance1;
 
         /**
          * Returns the default singleton instance
@@ -804,11 +801,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static Attribute getInstance() {
-            if (instance == null) {
-                instance = new Title();
+            if (instance1 == null) {
+                instance1 = new Title();
             }
 
-            return instance;
+            return instance1;
         }
 
         /**
@@ -847,7 +844,7 @@ public class XLinkSchema implements Schema {
      */
     public static class Show extends XLinkAttribute {
         // the singleton instance
-        private static Attribute instance;
+        static Attribute instance1;
 
         // the asociated simpletype
         private static SimpleType simpleType = new ShowSimpleType();
@@ -858,7 +855,7 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static Attribute getInstance() {
-            return instance;
+            return instance1;
         }
 
         /**
@@ -897,7 +894,7 @@ public class XLinkSchema implements Schema {
      */
     public static class Actuate extends XLinkAttribute {
         // the singleton instance
-        private static Attribute instance;
+        static Attribute instance1;
 
         // the simpletype for the attribute
         private static SimpleType simpleType = new ActuateSimpleType();
@@ -908,11 +905,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static Attribute getInstance() {
-            if (instance == null) {
-                instance = new Actuate();
+            if (instance1 == null) {
+                instance1 = new Actuate();
             }
 
-            return instance;
+            return instance1;
         }
 
         /**
@@ -951,7 +948,7 @@ public class XLinkSchema implements Schema {
      */
     public static class Label extends XLinkAttribute {
         // the singleton instance
-        private static Attribute instance;
+        static Attribute instance1;
 
         /**
          * Returns a singleton of Label
@@ -959,7 +956,7 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static Attribute getInstance() {
-            return instance;
+            return instance1;
         }
 
         /**
@@ -998,7 +995,7 @@ public class XLinkSchema implements Schema {
      */
     public static class From extends XLinkAttribute {
         // the singleton instance
-        private static Attribute instance;
+        static Attribute instance1;
 
         /**
          * Returns the singleton From instance
@@ -1006,11 +1003,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static Attribute getInstance() {
-            if (instance == null) {
-                instance = new From();
+            if (instance1 == null) {
+                instance1 = new From();
             }
 
-            return instance;
+            return instance1;
         }
 
         /**
@@ -1049,7 +1046,7 @@ public class XLinkSchema implements Schema {
      */
     public static class To extends XLinkAttribute {
         // the static instance
-        private static Attribute instance;
+        static Attribute instance1;
 
         /**
          * Returns the singleton To instance
@@ -1057,11 +1054,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static Attribute getInstance() {
-            if (instance == null) {
-                instance = new To();
+            if (instance1 == null) {
+                instance1 = new To();
             }
 
-            return instance;
+            return instance1;
         }
 
         /**
@@ -1183,19 +1180,19 @@ public class XLinkSchema implements Schema {
      */
     public static class SimpleLink extends XLinkAttributeGroup {
         // the singleton instance
-        private static AttributeGroup instance;
+        private static AttributeGroup instance1;
 
         // the static attribute list
-        private static final Attribute[] attributes = {
-                Href.instance, Role.instance, Arcrole.instance, Title.instance,
-                Show.instance, Actuate.instance,
+        private static final Attribute[] attributes1 = {
+                Href.instance1, Role.instance1, Arcrole.instance1, Title.instance1,
+                Show.instance1, Actuate.instance1,
             };
 
         /**
          * @see schema.AttributeGroup#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1211,11 +1208,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static AttributeGroup getInstance() {
-            if (instance == null) {
-                instance = new SimpleLink();
+            if (instance1 == null) {
+                instance1 = new SimpleLink();
             }
 
-            return instance;
+            return instance1;
         }
     }
 
@@ -1227,18 +1224,18 @@ public class XLinkSchema implements Schema {
      */
     public static class ExtendedLink extends XLinkAttributeGroup {
         // the singleton instance
-        private static AttributeGroup instance;
+        private static AttributeGroup instance1;
 
         // the list of static attributes
-        private static final Attribute[] attributes = {
-                Role.instance, Title.instance,
+        private static final Attribute[] attributes1 = {
+                Role.instance1, Title.instance1,
             };
 
         /**
          * @see schema.AttributeGroup#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1254,11 +1251,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static AttributeGroup getInstance() {
-            if (instance == null) {
-                instance = new ExtendedLink();
+            if (instance1 == null) {
+                instance1 = new ExtendedLink();
             }
 
-            return instance;
+            return instance1;
         }
     }
 
@@ -1269,19 +1266,19 @@ public class XLinkSchema implements Schema {
      */
     public static class LocatorLink extends XLinkAttributeGroup {
         // the singleton instance
-        private static AttributeGroup instance;
+        private static AttributeGroup instance1;
 
         // the static attribute list
-        private static final Attribute[] attributes = {
+        private static final Attribute[] attributes1 = {
                 new Type("extended"), new Href(Attribute.REQUIRED),
-                Role.instance, Title.instance, Label.instance
+                Role.instance1, Title.instance1, Label.instance1
             };
 
         /**
          * @see schema.AttributeGroup#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1297,11 +1294,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static AttributeGroup getInstance() {
-            if (instance == null) {
-                instance = new LocatorLink();
+            if (instance1 == null) {
+                instance1 = new LocatorLink();
             }
 
-            return instance;
+            return instance1;
         }
     }
 
@@ -1312,19 +1309,19 @@ public class XLinkSchema implements Schema {
      */
     public static class ArcLink extends XLinkAttributeGroup {
         // the singleton instance
-        private static AttributeGroup instance;
+        private static AttributeGroup instance1;
 
         //	the static attribute list
-        private static final Attribute[] attributes = {
-                new Type("arc"), Arcrole.instance, Title.instance, Show.instance,
-                Actuate.instance, From.instance, To.instance,
+        private static final Attribute[] attributes1 = {
+                new Type("arc"), Arcrole.instance1, Title.instance1, Show.instance1,
+                Actuate.instance1, From.instance1, To.instance1,
             };
 
         /**
          * @see schema.AttributeGroup#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1340,11 +1337,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static AttributeGroup getInstance() {
-            if (instance == null) {
-                instance = new ArcLink();
+            if (instance1 == null) {
+                instance1 = new ArcLink();
             }
 
-            return instance;
+            return instance1;
         }
     }
 
@@ -1356,19 +1353,19 @@ public class XLinkSchema implements Schema {
      */
     public static class ResourceLink extends XLinkAttributeGroup {
         // the singleton instance
-        private static AttributeGroup instance;
+        private static AttributeGroup instance1;
 
         // the static attribute list
-        private static final Attribute[] attributes = {
-                new Type("resource"), Role.instance, Title.instance,
-                Label.instance,
+        private static final Attribute[] attributes1 = {
+                new Type("resource"), Role.instance1, Title.instance1,
+                Label.instance1,
             };
 
         /**
          * @see schema.AttributeGroup#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1384,11 +1381,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static AttributeGroup getInstance() {
-            if (instance == null) {
-                instance = new ResourceLink();
+            if (instance1 == null) {
+                instance1 = new ResourceLink();
             }
 
-            return instance;
+            return instance1;
         }
     }
 
@@ -1399,16 +1396,16 @@ public class XLinkSchema implements Schema {
      */
     public static class TitleLink extends XLinkAttributeGroup {
         // the singleton instance
-        private static AttributeGroup instance;
+        private static AttributeGroup instance1;
 
         // the static attribute list
-        static final Attribute[] attributes = { new Type("title"), };
+        static final Attribute[] attributes1 = { new Type("title"), };
 
         /**
          * @see schema.AttributeGroup#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1424,11 +1421,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static AttributeGroup getInstance() {
-            if (instance == null) {
-                instance = new TitleLink();
+            if (instance1 == null) {
+                instance1 = new TitleLink();
             }
 
-            return instance;
+            return instance1;
         }
     }
 
@@ -1439,16 +1436,16 @@ public class XLinkSchema implements Schema {
      */
     public static class EmptyLink extends XLinkAttributeGroup {
         // the singleton instance
-        private static AttributeGroup instance;
+        private static AttributeGroup instance1;
 
         // the static attribute list
-        static final Attribute[] attributes = { new Type("empty"), };
+        static final Attribute[] attributes1 = { new Type("empty"), };
 
         /**
          * @see schema.AttributeGroup#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1464,11 +1461,11 @@ public class XLinkSchema implements Schema {
          * @return
          */
         public static AttributeGroup getInstance() {
-            if (instance == null) {
-                instance = new EmptyLink();
+            if (instance1 == null) {
+                instance1 = new EmptyLink();
             }
 
-            return instance;
+            return instance1;
         }
     }
 }

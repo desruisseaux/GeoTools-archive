@@ -46,6 +46,7 @@ public class RootHandler extends XSIElementHandler {
      * should not be called
      */
     private RootHandler() {
+        // do nothing
     }
 
     /**
@@ -69,8 +70,7 @@ public class RootHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XSIElementHandler getHandler(String namespaceURI, String localName)
-        throws SAXException {
+    public XSIElementHandler getHandler(String namespaceURI, String localName){
         if (SchemaHandler.LOCALNAME.equalsIgnoreCase(localName)
                 && SchemaHandler.namespaceURI.equalsIgnoreCase(namespaceURI)) {
             if (schema == null) {
@@ -137,7 +137,7 @@ public class RootHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

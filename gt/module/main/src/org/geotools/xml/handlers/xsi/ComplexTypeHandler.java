@@ -63,17 +63,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
     /** 'complexType' */
     public final static String LOCALNAME = "complexType";
 
-    /** NONE */
-    public static final int NONE = 0;
-
-    /** EXTENSION */
-    public static final int EXTENSION = 1;
-
-    /** RESTRICTION */
-    public static final int RESTRICTION = 2;
-
     /** ALL */
-    public static final int ALL = 4;
+    public static final int ALL = 128;
     private static int offset = 0;
     private String id;
     private String name;
@@ -256,48 +247,48 @@ public class ComplexTypeHandler extends XSIElementHandler {
             name = atts.getValue(namespaceURI, "name");
         }
 
-        String abstracT = atts.getValue("", "abstract");
+        String abstracT1 = atts.getValue("", "abstract");
 
-        if (abstracT == null) {
-            abstracT = atts.getValue(namespaceURI, "abstract");
+        if (abstracT1 == null) {
+            abstracT1 = atts.getValue(namespaceURI, "abstract");
         }
 
-        if ((abstracT == null) || "".equals(abstracT)) {
+        if ((abstracT1 == null) || "".equals(abstracT1)) {
             this.abstracT = false;
         } else {
-            this.abstracT = Boolean.valueOf(abstracT).booleanValue();
+            this.abstracT = Boolean.valueOf(abstracT1).booleanValue();
         }
 
-        String block = atts.getValue("", "block");
+        String block1 = atts.getValue("", "block");
 
-        if (block == null) {
-            block = atts.getValue(namespaceURI, "block");
+        if (block1 == null) {
+            block1 = atts.getValue(namespaceURI, "block");
         }
 
-        this.block = ComplexTypeHandler.findBlock(block);
+        this.block = ComplexTypeHandler.findBlock(block1);
 
-        String finaL = atts.getValue("", "final");
+        String finaL1 = atts.getValue("", "final");
 
-        if (finaL == null) {
-            finaL = atts.getValue(namespaceURI, "final");
+        if (finaL1 == null) {
+            finaL1 = atts.getValue(namespaceURI, "final");
         }
 
-        this.finaL = ComplexTypeHandler.findFinal(finaL);
+        this.finaL = ComplexTypeHandler.findFinal(finaL1);
 
-        String mixed = atts.getValue("", "mixed");
+        String mixed1 = atts.getValue("", "mixed");
 
-        if (mixed == null) {
-            mixed = atts.getValue(namespaceURI, "mixed");
+        if (mixed1 == null) {
+            mixed1 = atts.getValue(namespaceURI, "mixed");
         }
 
-        if ((mixed == null) || "".equalsIgnoreCase(mixed)) {
+        if ((mixed1 == null) || "".equalsIgnoreCase(mixed1)) {
             this.mixed = false;
         } else {
-            this.mixed = Boolean.getBoolean(mixed);
+            this.mixed = Boolean.getBoolean(mixed1);
         }
 
-        this.block = findBlock(block);
-        this.finaL = findFinal(finaL);
+        this.block = findBlock(block1);
+        this.finaL = findFinal(finaL1);
     }
 
     /**
@@ -322,7 +313,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
      */
     public static int findBlock(String block) throws SAXException {
         if ((block == null) || "".equalsIgnoreCase(block)) {
-            return NONE;
+            return DEFAULT;
         }
 
         if ("extension".equalsIgnoreCase(block)) {
@@ -713,8 +704,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 
     /**
@@ -737,6 +728,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
          * Should not be called
          */
         private DefaultSequence() {
+            // do nothing
         }
 
         /**
@@ -904,17 +896,17 @@ public class ComplexTypeHandler extends XSIElementHandler {
             return getChildElements(child);
         }
 
-        public Element[] getChildElements(ElementGrouping child) {
-            switch (child.getGrouping()) {
+        public Element[] getChildElements(ElementGrouping child11) {
+            switch (child11.getGrouping()) {
             case ElementGrouping.ALL:
-                return ((All) child).getElements();
+                return ((All) child11).getElements();
 
             case ElementGrouping.ANY:
                 return null;
 
             case ElementGrouping.CHOICE:
 
-                ElementGrouping[] children = ((Choice) child).getChildren();
+                ElementGrouping[] children = ((Choice) child11).getChildren();
                 List l = new LinkedList();
 
                 for (int i = 0; i < children.length; i++) {
@@ -929,16 +921,16 @@ public class ComplexTypeHandler extends XSIElementHandler {
                 ? (Element[]) l.toArray(new Element[l.size()]) : null;
 
             case ElementGrouping.ELEMENT:
-                return new Element[] { (Element) child, };
+                return new Element[] { (Element) child11, };
 
             case ElementGrouping.GROUP:
 
-                ElementGrouping c = ((Group) child).getChild();
+                ElementGrouping c = ((Group) child11).getChild();
 
                 return getChildElements(c);
 
             case ElementGrouping.SEQUENCE:
-                children = ((Sequence) child).getChildren();
+                children = ((Sequence) child11).getChildren();
                 l = new LinkedList();
                 if(children!=null){
                 for (int i = 0; i < children.length; i++) {
@@ -1098,10 +1090,9 @@ public class ComplexTypeHandler extends XSIElementHandler {
         /**
          * @see org.geotools.xml.xsi.ComplexType#findChildElement(java.lang.String)
          */
-        public Element findChildElement(String name) {
-//System.out.println("ComplexTypeHandler.DefaultComplexType ... "+this.name+" ... "+(child == null?null:child.getClass().getName()));
-            Element e = (child == null) ? null : child.findChildElement(name);
-            e = e==null?(parent==null?null:parent.findChildElement(name)):e;
+        public Element findChildElement(String name1) {
+            Element e = (child == null) ? null : child.findChildElement(name1);
+            e = e==null?(parent==null?null:parent.findChildElement(name1)):e;
             return e;
         }
 
@@ -1110,18 +1101,10 @@ public class ComplexTypeHandler extends XSIElementHandler {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            //            System.out.println("Checking to encode "+element.getName());
-            //            System.out.println("Parent = "+(parent == null?"null":parent.getName()));
-            //            System.out.println("Value Type = "+value==null?null:value.getClass().getName());
             if ((parent != null) && parent.canEncode(element, value, hints)) {
-                //                System.out.println("Parent can Encode :)");
                 return true;
             }
 
-            // TODO check children if length works
-            //            if(value instanceof Object[]){
-            //                Object[] vals = (Object[])value;
-            //            }
             return false;
         }
 

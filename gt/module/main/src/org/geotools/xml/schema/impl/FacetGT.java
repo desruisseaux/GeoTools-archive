@@ -30,6 +30,7 @@ public class FacetGT implements Facet {
     private String value;
 
     private FacetGT() {
+        // do nothing
     }
 
     /**

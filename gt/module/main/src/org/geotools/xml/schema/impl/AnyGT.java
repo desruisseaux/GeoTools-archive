@@ -37,6 +37,7 @@ public class AnyGT implements Any {
     private URI ns = null;
 
     private AnyGT() {
+        // do nothing
     }
 
     public AnyGT(URI namespace) {

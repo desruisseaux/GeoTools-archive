@@ -57,7 +57,7 @@ public class DOMXPath extends XPath {
         for (node = node.getFirstChild(); node != null;
                 node = node.getNextSibling())
             if (node.getNodeType() == Node.TEXT_NODE) {
-                String value = (String) node.getNodeValue();
+                String value = node.getNodeValue();
                 value = value.replaceAll("\n+", " ");
                 value = value.trim();
 
@@ -148,6 +148,7 @@ public class DOMXPath extends XPath {
         }
 
         public void remove() {
+            // do nothing?
         }
     }
 }

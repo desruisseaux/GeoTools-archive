@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
@@ -60,7 +58,7 @@ public class GMLSchema implements Schema {
     public static final URI NAMESPACE = makeURI("http://www.opengis.net/gml");
 
     // static attribute set
-    private static Attribute[] attributes = AttributeList.attributes;
+    private static Attribute[] attributes = AttributeList.attributes1;
 
     // static complexType set
     private static ComplexType[] complexTypes = loadComplexTypes();
@@ -81,6 +79,7 @@ public class GMLSchema implements Schema {
      * Creates a new GMLSchema object.
      */
     private GMLSchema() {
+        // no op constructor
     }
 
     public static void setLogLevel(Level l) {
@@ -114,45 +113,45 @@ public class GMLSchema implements Schema {
      * associated with the GML Schema
      */
     private static final ComplexType[] loadComplexTypes() {
-        ComplexType[] complexTypes = new ComplexType[31];
-        complexTypes[0] = GMLComplexTypes.AbstractGeometryType.getInstance();
-        complexTypes[1] = GMLComplexTypes.AbstractGeometryCollectionBaseType
+        ComplexType[] complexTypes1 = new ComplexType[31];
+        complexTypes1[0] = GMLComplexTypes.AbstractGeometryType.getInstance();
+        complexTypes1[1] = GMLComplexTypes.AbstractGeometryCollectionBaseType
             .getInstance();
-        complexTypes[2] = GMLComplexTypes.GeometryAssociationType.getInstance();
-        complexTypes[3] = GMLComplexTypes.PointMemberType.getInstance();
-        complexTypes[4] = GMLComplexTypes.LineStringMemberType.getInstance();
-        complexTypes[5] = GMLComplexTypes.PolygonMemberType.getInstance();
-        complexTypes[6] = GMLComplexTypes.LinearRingMemberType.getInstance();
-        complexTypes[7] = GMLComplexTypes.PointType.getInstance();
-        complexTypes[8] = GMLComplexTypes.LineStringType.getInstance();
-        complexTypes[9] = GMLComplexTypes.LinearRingType.getInstance();
-        complexTypes[10] = GMLComplexTypes.BoxType.getInstance();
-        complexTypes[11] = GMLComplexTypes.PolygonType.getInstance();
-        complexTypes[12] = GMLComplexTypes.GeometryCollectionType.getInstance();
-        complexTypes[13] = GMLComplexTypes.MultiPointType.getInstance();
-        complexTypes[14] = GMLComplexTypes.MultiLineStringType.getInstance();
-        complexTypes[15] = GMLComplexTypes.MultiPolygonType.getInstance();
-        complexTypes[16] = GMLComplexTypes.CoordType.getInstance();
-        complexTypes[17] = GMLComplexTypes.CoordinatesType.getInstance();
-        complexTypes[18] = GMLComplexTypes.AbstractFeatureType.getInstance();
-        complexTypes[19] = GMLComplexTypes.AbstractFeatureCollectionsBaseType
+        complexTypes1[2] = GMLComplexTypes.GeometryAssociationType.getInstance();
+        complexTypes1[3] = GMLComplexTypes.PointMemberType.getInstance();
+        complexTypes1[4] = GMLComplexTypes.LineStringMemberType.getInstance();
+        complexTypes1[5] = GMLComplexTypes.PolygonMemberType.getInstance();
+        complexTypes1[6] = GMLComplexTypes.LinearRingMemberType.getInstance();
+        complexTypes1[7] = GMLComplexTypes.PointType.getInstance();
+        complexTypes1[8] = GMLComplexTypes.LineStringType.getInstance();
+        complexTypes1[9] = GMLComplexTypes.LinearRingType.getInstance();
+        complexTypes1[10] = GMLComplexTypes.BoxType.getInstance();
+        complexTypes1[11] = GMLComplexTypes.PolygonType.getInstance();
+        complexTypes1[12] = GMLComplexTypes.GeometryCollectionType.getInstance();
+        complexTypes1[13] = GMLComplexTypes.MultiPointType.getInstance();
+        complexTypes1[14] = GMLComplexTypes.MultiLineStringType.getInstance();
+        complexTypes1[15] = GMLComplexTypes.MultiPolygonType.getInstance();
+        complexTypes1[16] = GMLComplexTypes.CoordType.getInstance();
+        complexTypes1[17] = GMLComplexTypes.CoordinatesType.getInstance();
+        complexTypes1[18] = GMLComplexTypes.AbstractFeatureType.getInstance();
+        complexTypes1[19] = GMLComplexTypes.AbstractFeatureCollectionsBaseType
             .getInstance();
-        complexTypes[20] = GMLComplexTypes.AbstractFeatureCollectionType
+        complexTypes1[20] = GMLComplexTypes.AbstractFeatureCollectionType
             .getInstance();
-        complexTypes[21] = GMLComplexTypes.GeometryPropertyType.getInstance();
-        complexTypes[22] = GMLComplexTypes.FeatureAssociationType.getInstance();
-        complexTypes[23] = GMLComplexTypes.BoundingShapeType.getInstance();
-        complexTypes[24] = GMLComplexTypes.PointPropertyType.getInstance();
-        complexTypes[25] = GMLComplexTypes.PolygonPropertyType.getInstance();
-        complexTypes[26] = GMLComplexTypes.LineStringPropertyType.getInstance();
-        complexTypes[27] = GMLComplexTypes.MultiPointPropertyType.getInstance();
-        complexTypes[28] = GMLComplexTypes.MultiLineStringPropertyType
+        complexTypes1[21] = GMLComplexTypes.GeometryPropertyType.getInstance();
+        complexTypes1[22] = GMLComplexTypes.FeatureAssociationType.getInstance();
+        complexTypes1[23] = GMLComplexTypes.BoundingShapeType.getInstance();
+        complexTypes1[24] = GMLComplexTypes.PointPropertyType.getInstance();
+        complexTypes1[25] = GMLComplexTypes.PolygonPropertyType.getInstance();
+        complexTypes1[26] = GMLComplexTypes.LineStringPropertyType.getInstance();
+        complexTypes1[27] = GMLComplexTypes.MultiPointPropertyType.getInstance();
+        complexTypes1[28] = GMLComplexTypes.MultiLineStringPropertyType
             .getInstance();
-        complexTypes[29] = GMLComplexTypes.MultiPolygonPropertyType.getInstance();
-        complexTypes[30] = GMLComplexTypes.MultiGeometryPropertyType
+        complexTypes1[29] = GMLComplexTypes.MultiPolygonPropertyType.getInstance();
+        complexTypes1[30] = GMLComplexTypes.MultiGeometryPropertyType
             .getInstance();
 
-        return complexTypes;
+        return complexTypes1;
     }
 
     /**
@@ -167,149 +166,149 @@ public class GMLSchema implements Schema {
      * representing the element set in the GML Schema
      */
     private static final Element[] loadElements() {
-        Element[] elements = new Element[48];
+        Element[] elements1 = new Element[48];
 
-        elements[0] = new GMLElement("_Feature",
+        elements1[0] = new GMLElement("_Feature",
                 GMLComplexTypes.AbstractFeatureType.getInstance(), 1, 1, true,
                 null); // gml:AbstractFeatureType
-        elements[1] = new GMLElement("featureCollection",
+        elements1[1] = new GMLElement("featureCollection",
                 GMLComplexTypes.AbstractFeatureCollectionType.getInstance(), 1,
-                1, true, elements[0]); // gml:AbstractFeatureCollectionType
-        elements[2] = new GMLElement("featureMember",
+                1, true, elements1[0]); // gml:AbstractFeatureCollectionType
+        elements1[2] = new GMLElement("featureMember",
                 GMLComplexTypes.FeatureAssociationType.getInstance(), 1, 1,
                 false, null); // gml:FeatureAssociationType
-        elements[3] = new GMLElement("_geometryProperty",
+        elements1[3] = new GMLElement("_geometryProperty",
                 GMLComplexTypes.GeometryAssociationType.getInstance(), 1, 1,
                 true, null); // gml:GeometryAssociationType
-        elements[4] = new GMLElement("geometryProperty",
+        elements1[4] = new GMLElement("geometryProperty",
                 GMLComplexTypes.GeometryAssociationType.getInstance(), 1, 1,
                 false, null); // gml:GeometryAssociationType
-        elements[5] = new GMLElement("boundedBy",
+        elements1[5] = new GMLElement("boundedBy",
                 GMLComplexTypes.BoundingShapeType.getInstance(), 1, 1, false,
                 null); // gml:BoundingShapeType
-        elements[6] = new GMLElement("pointProperty",
+        elements1[6] = new GMLElement("pointProperty",
                 GMLComplexTypes.PointPropertyType.getInstance(), 1, 1, false,
-                elements[3]); // gml:PointPropertyType
-        elements[7] = new GMLElement("polygonProperty",
+                elements1[3]); // gml:PointPropertyType
+        elements1[7] = new GMLElement("polygonProperty",
                 GMLComplexTypes.PolygonPropertyType.getInstance(), 1, 1, false,
-                elements[3]); // gml:PolygonPropertyType
-        elements[8] = new GMLElement("lineStringProperty",
+                elements1[3]); // gml:PolygonPropertyType
+        elements1[8] = new GMLElement("lineStringProperty",
                 GMLComplexTypes.LineStringPropertyType.getInstance(), 1, 1,
-                false, elements[3]); // gml:LineStringPropertyType
-        elements[9] = new GMLElement("multiPointProperty",
+                false, elements1[3]); // gml:LineStringPropertyType
+        elements1[9] = new GMLElement("multiPointProperty",
                 GMLComplexTypes.MultiPointPropertyType.getInstance(), 1, 1,
-                false, elements[3]); // gml:MultiPointPropertyType
-        elements[10] = new GMLElement("multiLineStringProperty",
+                false, elements1[3]); // gml:MultiPointPropertyType
+        elements1[10] = new GMLElement("multiLineStringProperty",
                 GMLComplexTypes.MultiLineStringPropertyType.getInstance(), 1,
-                1, false, elements[3]); // gml:MultiLineStringPropertyType
-        elements[11] = new GMLElement("multiPolygonProperty",
+                1, false, elements1[3]); // gml:MultiLineStringPropertyType
+        elements1[11] = new GMLElement("multiPolygonProperty",
                 GMLComplexTypes.MultiPolygonPropertyType.getInstance(), 1, 1,
-                false, elements[3]); // gml:MultiPolygonPropertyType
-        elements[12] = new GMLElement("multiGeometryProperty",
+                false, elements1[3]); // gml:MultiPolygonPropertyType
+        elements1[12] = new GMLElement("multiGeometryProperty",
                 GMLComplexTypes.MultiGeometryPropertyType.getInstance(), 1, 1,
-                false, elements[3]); // gml:MultiGeometryPropertyType
-        elements[13] = new GMLElement("location",
+                false, elements1[3]); // gml:MultiGeometryPropertyType
+        elements1[13] = new GMLElement("location",
                 GMLComplexTypes.PointPropertyType.getInstance(), 1, 1, false,
-                elements[6]); // gml:PointPropertyType
-        elements[14] = new GMLElement("centerOf",
+                elements1[6]); // gml:PointPropertyType
+        elements1[14] = new GMLElement("centerOf",
                 GMLComplexTypes.PointPropertyType.getInstance(), 1, 1, false,
-                elements[6]); // gml:PointPropertyType
-        elements[15] = new GMLElement("position",
+                elements1[6]); // gml:PointPropertyType
+        elements1[15] = new GMLElement("position",
                 GMLComplexTypes.PointPropertyType.getInstance(), 1, 1, false,
-                elements[6]); // gml:PointPropertyType
-        elements[16] = new GMLElement("extentOf",
+                elements1[6]); // gml:PointPropertyType
+        elements1[16] = new GMLElement("extentOf",
                 GMLComplexTypes.PolygonPropertyType.getInstance(), 1, 1, false,
-                elements[7]); // gml:PolygonPropertyType
-        elements[17] = new GMLElement("coverage",
+                elements1[7]); // gml:PolygonPropertyType
+        elements1[17] = new GMLElement("coverage",
                 GMLComplexTypes.PolygonPropertyType.getInstance(), 1, 1, false,
-                elements[7]); // gml:PolygonPropertyType
-        elements[18] = new GMLElement("edgeOf",
+                elements1[7]); // gml:PolygonPropertyType
+        elements1[18] = new GMLElement("edgeOf",
                 GMLComplexTypes.LineStringPropertyType.getInstance(), 1, 1,
-                false, elements[8]); // gml:LineStringPropertyType
-        elements[19] = new GMLElement("centerLineOf",
+                false, elements1[8]); // gml:LineStringPropertyType
+        elements1[19] = new GMLElement("centerLineOf",
                 GMLComplexTypes.LineStringPropertyType.getInstance(), 1, 1,
-                false, elements[8]); // gml:LineStringPropertyType
-        elements[20] = new GMLElement("multiLocation",
+                false, elements1[8]); // gml:LineStringPropertyType
+        elements1[20] = new GMLElement("multiLocation",
                 GMLComplexTypes.MultiPointPropertyType.getInstance(), 1, 1,
-                false, elements[9]); // gml:MultiPointPropertyType
-        elements[21] = new GMLElement("multiCenterOf",
+                false, elements1[9]); // gml:MultiPointPropertyType
+        elements1[21] = new GMLElement("multiCenterOf",
                 GMLComplexTypes.MultiPointPropertyType.getInstance(), 1, 1,
-                false, elements[9]); // gml:MultiPointPropertyType
-        elements[22] = new GMLElement("multiPosition",
+                false, elements1[9]); // gml:MultiPointPropertyType
+        elements1[22] = new GMLElement("multiPosition",
                 GMLComplexTypes.MultiPointPropertyType.getInstance(), 1, 1,
-                false, elements[9]); // gml:MultiPointPropertyType
-        elements[23] = new GMLElement("multiCenterLineOf",
+                false, elements1[9]); // gml:MultiPointPropertyType
+        elements1[23] = new GMLElement("multiCenterLineOf",
                 GMLComplexTypes.MultiLineStringPropertyType.getInstance(), 1,
-                1, false, elements[10]); // gml:MultiLineStringPropertyType
-        elements[24] = new GMLElement("multiEdgeOf",
+                1, false, elements1[10]); // gml:MultiLineStringPropertyType
+        elements1[24] = new GMLElement("multiEdgeOf",
                 GMLComplexTypes.MultiLineStringPropertyType.getInstance(), 1,
-                1, false, elements[10]); // gml:MultiLineStringPropertyType
-        elements[25] = new GMLElement("multiCoverage",
+                1, false, elements1[10]); // gml:MultiLineStringPropertyType
+        elements1[25] = new GMLElement("multiCoverage",
                 GMLComplexTypes.MultiPolygonPropertyType.getInstance(), 1, 1,
-                false, elements[11]); // gml:MultiPolygonPropertyType
-        elements[26] = new GMLElement("multiExtentOf",
+                false, elements1[11]); // gml:MultiPolygonPropertyType
+        elements1[26] = new GMLElement("multiExtentOf",
                 GMLComplexTypes.MultiPolygonPropertyType.getInstance(), 1, 1,
-                false, elements[11]); // gml:MultiPolygonPropertyType
-        elements[28] = new GMLElement("name",
+                false, elements1[11]); // gml:MultiPolygonPropertyType
+        elements1[28] = new GMLElement("name",
                 XSISimpleTypes.String.getInstance(), 1, 1, false, null); //xs:string 
-        elements[27] = new GMLElement("description",
+        elements1[27] = new GMLElement("description",
                 XSISimpleTypes.String.getInstance(), 1, 1, false, null); //xs:string
-        elements[29] = new GMLElement("_Geometry",
+        elements1[29] = new GMLElement("_Geometry",
                 GMLComplexTypes.AbstractGeometryType.getInstance(), 1, 1, true,
                 null); // gml:AbstractGeometryType
-        elements[30] = new GMLElement("GeometryCollection",
+        elements1[30] = new GMLElement("GeometryCollection",
                 GMLComplexTypes.GeometryCollectionType.getInstance(), 1, 1,
-                true, elements[29]); // gml:GeometryCollectionType
-        elements[31] = new GMLElement("geometryMember",
+                true, elements1[29]); // gml:GeometryCollectionType
+        elements1[31] = new GMLElement("geometryMember",
                 GMLComplexTypes.GeometryAssociationType.getInstance(), 1, 1,
                 false, null); // gml:GeometryAssociationType 
-        elements[32] = new GMLElement("pointMember",
+        elements1[32] = new GMLElement("pointMember",
                 GMLComplexTypes.PointMemberType.getInstance(), 1, 1, false,
-                elements[31]); // gml:PointMemberType 
-        elements[33] = new GMLElement("lineStringMember",
+                elements1[31]); // gml:PointMemberType 
+        elements1[33] = new GMLElement("lineStringMember",
                 GMLComplexTypes.PointMemberType.getInstance(), 1, 1, false,
-                elements[31]); // gml:PointMemberType 
-        elements[34] = new GMLElement("polygonMember",
+                elements1[31]); // gml:PointMemberType 
+        elements1[34] = new GMLElement("polygonMember",
                 GMLComplexTypes.PointMemberType.getInstance(), 1, 1, false,
-                elements[31]); // gml:PointMemberType 
-        elements[35] = new GMLElement("outerBoundaryIs",
+                elements1[31]); // gml:PointMemberType 
+        elements1[35] = new GMLElement("outerBoundaryIs",
                 GMLComplexTypes.LinearRingMemberType.getInstance(), 1, 1,
                 false, null); // gml:LinearRingMemberType 
-        elements[36] = new GMLElement("innerBoundaryIs",
+        elements1[36] = new GMLElement("innerBoundaryIs",
                 GMLComplexTypes.LinearRingMemberType.getInstance(), 1, 1,
                 false, null); // gml:LinearRingMemberType 
-        elements[37] = new GMLElement("Point",
+        elements1[37] = new GMLElement("Point",
                 GMLComplexTypes.PointType.getInstance(), 1, 1, false,
-                elements[29]); // gml:PointType
-        elements[38] = new GMLElement("LineString",
+                elements1[29]); // gml:PointType
+        elements1[38] = new GMLElement("LineString",
                 GMLComplexTypes.LineStringType.getInstance(), 1, 1, false,
-                elements[29]); // gml:LineStringType
-        elements[39] = new GMLElement("LinearRing",
+                elements1[29]); // gml:LineStringType
+        elements1[39] = new GMLElement("LinearRing",
                 GMLComplexTypes.LinearRingType.getInstance(), 1, 1, false,
-                elements[29]); // gml:LinearRingType
-        elements[40] = new GMLElement("Polygon",
+                elements1[29]); // gml:LinearRingType
+        elements1[40] = new GMLElement("Polygon",
                 GMLComplexTypes.PolygonType.getInstance(), 1, 1, false,
-                elements[29]); // gml:PolygonType
-        elements[41] = new GMLElement("Box",
+                elements1[29]); // gml:PolygonType
+        elements1[41] = new GMLElement("Box",
                 GMLComplexTypes.BoxType.getInstance(), 1, 1, false, null); // gml:BoxType
-        elements[42] = new GMLElement("MultiGeometry",
+        elements1[42] = new GMLElement("MultiGeometry",
                 GMLComplexTypes.GeometryCollectionType.getInstance(), 1, 1,
-                false, elements[29]); // gml:GeometryCollectionType
-        elements[43] = new GMLElement("MultiPoint",
+                false, elements1[29]); // gml:GeometryCollectionType
+        elements1[43] = new GMLElement("MultiPoint",
                 GMLComplexTypes.MultiPointType.getInstance(), 1, 1, false,
-                elements[29]); // gml:MultiPointType
-        elements[44] = new GMLElement("MultiLineString",
+                elements1[29]); // gml:MultiPointType
+        elements1[44] = new GMLElement("MultiLineString",
                 GMLComplexTypes.MultiLineStringType.getInstance(), 1, 1, false,
-                elements[29]); // gml:MultiLineStringType
-        elements[45] = new GMLElement("MultiPolygon",
+                elements1[29]); // gml:MultiLineStringType
+        elements1[45] = new GMLElement("MultiPolygon",
                 GMLComplexTypes.MultiPolygonType.getInstance(), 1, 1, false,
-                elements[29]); // gml:MultiPolygonType
-        elements[46] = new GMLElement("coord",
+                elements1[29]); // gml:MultiPolygonType
+        elements1[46] = new GMLElement("coord",
                 GMLComplexTypes.CoordType.getInstance(), 1, 1, false, null); // gml:CoordType
-        elements[47] = new GMLElement("coordinates",
+        elements1[47] = new GMLElement("coordinates",
                 GMLComplexTypes.CoordinatesType.getInstance(), 1, 1, false, null); // gml:CoordinatesType
 
-        return elements;
+        return elements1;
     }
 
     /**
@@ -428,7 +427,7 @@ public class GMLSchema implements Schema {
     }
 
     static class AttributeList {
-        static final Attribute[] attributes = {
+        static final Attribute[] attributes1 = {
                 new GMLAttribute("remoteSchema",
                     XSISimpleTypes.AnyURI.getInstance()),
             };
@@ -459,6 +458,7 @@ public class GMLSchema implements Schema {
          * Should never be called
          */
         private GMLElement() {
+            // no op constructor
         }
 
         /**
@@ -503,9 +503,9 @@ public class GMLSchema implements Schema {
         /**
          * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
          */
-        public Element findChildElement(String name) {
+        public Element findChildElement(String name1) {
             if (this.name != null) {
-                if (this.name.equals(name)) {
+                if (this.name.equals(name1)) {
                     return this;
                 }
             }
@@ -718,6 +718,7 @@ public class GMLSchema implements Schema {
          * Should never be called
          */
         private GMLAttribute() {
+            // no op constructor
         }
 
         /**
@@ -830,7 +831,7 @@ public class GMLSchema implements Schema {
      */
     static class GMLAssociationAttributeGroup implements AttributeGroup {
         // package visible attribute set
-        static final Attribute[] attributes = {
+        static final Attribute[] attributes1 = {
                 new GMLAttribute("remoteSchema",
                     XSISimpleTypes.AnyURI.getInstance()),
             };
@@ -856,7 +857,7 @@ public class GMLSchema implements Schema {
          * @see schema.Schema#getAttributes()
          */
         public Attribute[] getAttributes() {
-            return attributes;
+            return attributes1;
         }
 
         /**
@@ -1004,7 +1005,7 @@ public class GMLSchema implements Schema {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws IOException{
             output.startElement(element.getNamespace(), element.getName(), null);
             output.characters(value.toString());
             output.endElement(element.getNamespace(), element.getName());

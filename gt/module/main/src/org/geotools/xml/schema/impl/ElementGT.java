@@ -19,6 +19,7 @@ package org.geotools.xml.schema.impl;
 import java.net.URI;
 
 import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.Type;
 
@@ -222,17 +223,17 @@ public class ElementGT implements Element {
      * @return
      */
     public int getGrouping() {
-        return Element.ELEMENT;
+        return ElementGrouping.ELEMENT;
     }
 
     /**
      * TODO summary sentence for findChildElement ...
      * 
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
-     * @param name
+     * @param name1
      * @return
      */
-    public Element findChildElement( String name ) {
-        return (getName()!=null && getName().equals(name))?this:null;
+    public Element findChildElement( String name1 ) {
+        return (getName()!=null && getName().equals(name1))?this:null;
     }
 }

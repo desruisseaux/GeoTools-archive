@@ -136,20 +136,20 @@ public class SimpleTypeHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts){
         id = atts.getValue("", "id");
 
         if (id == null) {
             id = atts.getValue(namespaceURI, "id");
         }
 
-        String finaL = atts.getValue("", "final");
+        String finaL1 = atts.getValue("", "final");
 
-        if (finaL == null) {
-            finaL = atts.getValue(namespaceURI, "final");
+        if (finaL1 == null) {
+            finaL1 = atts.getValue(namespaceURI, "final");
         }
 
-        this.finaL = findFinal(finaL);
+        this.finaL = findFinal(finaL1);
 
         name = atts.getValue("", "name");
 
@@ -344,7 +344,7 @@ public class SimpleTypeHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

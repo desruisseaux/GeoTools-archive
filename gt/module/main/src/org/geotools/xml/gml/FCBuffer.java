@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;
 
@@ -227,7 +226,7 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature next()
-        throws IOException, IllegalAttributeException, NoSuchElementException {
+        throws IOException, NoSuchElementException {
         if (exception != null) {
             state = STOP;
             throw new IOException(exception.toString());
@@ -248,7 +247,7 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature peek()
-        throws IOException, IllegalAttributeException, NoSuchElementException {
+        throws IOException, NoSuchElementException {
         if (exception != null) {
             state = STOP;
             throw new IOException(exception.toString());
@@ -318,7 +317,7 @@ public class FCBuffer extends Thread implements FeatureReader {
     /**
      * @see org.geotools.data.FeatureReader#close()
      */
-    public void close() throws IOException {
+    public void close(){
         state = STOP; // note for the sax parser
 
         // TODO better here !!!

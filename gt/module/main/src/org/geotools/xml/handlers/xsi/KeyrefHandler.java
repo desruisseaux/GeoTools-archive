@@ -99,7 +99,7 @@ public class KeyrefHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts) {
         id = atts.getValue("", "id");
 
         if (id == null) {
@@ -192,7 +192,7 @@ public class KeyrefHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

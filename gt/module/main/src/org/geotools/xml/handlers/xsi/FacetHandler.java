@@ -72,8 +72,8 @@ public abstract class FacetHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 
     /**
@@ -114,28 +114,12 @@ public abstract class FacetHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
-        //        id = atts.getValue("", "id");
-        //
-        //        if (id == null) {
-        //            id = atts.getValue(namespaceURI, "id");
-        //        }
+        Attributes atts){
         value = atts.getValue("", "value");
 
         if (value == null) {
             value = atts.getValue(namespaceURI, "value");
         }
-
-        //
-        //        String fixed = atts.getValue("", "fixed");
-        //
-        //        if (fixed == null) {
-        //            fixed = atts.getValue(namespaceURI, "fixed");
-        //        }
-        //
-        //        if (!((fixed == null) || "".equalsIgnoreCase(fixed))) {
-        //            this.fixed = Boolean.getBoolean(fixed);
-        //        }
     }
 
     /**

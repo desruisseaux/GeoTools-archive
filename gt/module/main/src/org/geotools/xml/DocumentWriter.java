@@ -473,7 +473,7 @@ public class DocumentWriter {
 
         if (element.getMaxOccurs() != 1) {
             ai.addAttribute("", "maxOccurs", "", "Union",
-                (element.getMaxOccurs() == Integer.MAX_VALUE) ? "unbounded"
+                (element.getMaxOccurs() == ElementGrouping.UNBOUNDED) ? "unbounded"
                                                               : (""
                 + element.getMaxOccurs()));
         }
@@ -766,7 +766,7 @@ public class DocumentWriter {
 
         if (group.getMaxOccurs() != 1) {
             ai.addAttribute("", "maxOccurs", "", "Union",
-                (group.getMaxOccurs() == Integer.MAX_VALUE) ? "unbounded"
+                (group.getMaxOccurs() == ElementGrouping.UNBOUNDED) ? "unbounded"
                                                             : (""
                 + group.getMaxOccurs()));
         }
@@ -1031,7 +1031,7 @@ public class DocumentWriter {
 
         if (choice.getMaxOccurs() != 1) {
             ai.addAttribute("", "maxOccurs", "", "Union",
-                (choice.getMaxOccurs() == Integer.MAX_VALUE) ? "unbounded"
+                (choice.getMaxOccurs() == ElementGrouping.UNBOUNDED) ? "unbounded"
                                                              : (""
                 + choice.getMaxOccurs()));
         }
@@ -1095,7 +1095,7 @@ public class DocumentWriter {
 
         if (sequence.getMaxOccurs() != 1) {
             ai.addAttribute("", "maxOccurs", "", "Union",
-                (sequence.getMaxOccurs() == Integer.MAX_VALUE) ? "unbounded"
+                (sequence.getMaxOccurs() == ElementGrouping.UNBOUNDED) ? "unbounded"
                                                                : (""
                 + sequence.getMaxOccurs()));
         }
@@ -1154,7 +1154,7 @@ public class DocumentWriter {
 
         if (all.getMaxOccurs() != 1) {
             ai.addAttribute("", "maxOccurs", "", "Union",
-                (all.getMaxOccurs() == Integer.MAX_VALUE) ? "unbounded"
+                (all.getMaxOccurs() == ElementGrouping.UNBOUNDED) ? "unbounded"
                                                           : (""
                 + all.getMaxOccurs()));
         }
@@ -1186,7 +1186,7 @@ public class DocumentWriter {
 
         if (any.getMaxOccurs() != 1) {
             ai.addAttribute("", "maxOccurs", "", "Union",
-                (any.getMaxOccurs() == Integer.MAX_VALUE) ? "unbounded"
+                (any.getMaxOccurs() == ElementGrouping.UNBOUNDED) ? "unbounded"
                                                           : (""
                 + any.getMaxOccurs()));
         }
@@ -1384,11 +1384,11 @@ public class DocumentWriter {
             }
         }
 
-        private void printXMLNSDecs(Map hints) throws IOException {
+        private void printXMLNSDecs(Map arg0) throws IOException {
             Schema[] imports = getSchemaOrdering();
             String s = "";
-            Map schemaLocs = (Map) ((hints == null) ? null
-                                                    : hints.get(SCHEMA_LOCATION_HINT));
+            Map schemaLocs = (Map) ((arg0 == null) ? null
+                                                    : arg0.get(SCHEMA_LOCATION_HINT));
             schemaLocs = (schemaLocs == null) ? new HashMap() : schemaLocs;
 
             for (int i = 0; i < imports.length; i++) {
@@ -1660,18 +1660,18 @@ public class DocumentWriter {
          * @see PrintHandler#findElement(Object)
          */
         public Element findElement(Object value) {
-            Schema[] searchOrder;
+            Schema[] searchOrder1;
 
             try {
-                searchOrder = getSchemaOrdering();
+                searchOrder1 = getSchemaOrdering();
             } catch (IOException e) {
                 logger.warning(e.toString());
 
                 return null;
             }
 
-            for (int i = 0; i < searchOrder.length; i++) {
-                Element[] elems = searchOrder[i].getElements();
+            for (int i = 0; i < searchOrder1.length; i++) {
+                Element[] elems = searchOrder1[i].getElements();
 
                 if (elems != null) {
                     for (int j = 0; j < elems.length; j++)
@@ -1690,18 +1690,18 @@ public class DocumentWriter {
          * @see PrintHandler#findElement(String)
          */
         public Element findElement(String name) {
-            Schema[] searchOrder;
+            Schema[] searchOrder1;
 
             try {
-                searchOrder = getSchemaOrdering();
+                searchOrder1 = getSchemaOrdering();
             } catch (IOException e) {
                 logger.warning(e.toString());
 
                 return null;
             }
 
-            for (int i = 0; i < searchOrder.length; i++) {
-                Element[] elems = searchOrder[i].getElements();
+            for (int i = 0; i < searchOrder1.length; i++) {
+                Element[] elems = searchOrder1[i].getElements();
 
                 if (elems != null) {
                     for (int j = 0; j < elems.length; j++)

@@ -125,7 +125,7 @@ public class AttributeGroupHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts){
         id = atts.getValue("", "id");
 
         if (id == null) {
@@ -208,7 +208,7 @@ public class AttributeGroupHandler extends XSIElementHandler {
             attributes = (Attribute[]) h.toArray(new Attribute[h.size()]);
         }
 
-        String name = this.name;
+        String name1 = this.name;
 
         if ((ref != null) && !"".equalsIgnoreCase(ref)) {
             AttributeGroup ag = parent.lookUpAttributeGroup(ref);
@@ -218,7 +218,7 @@ public class AttributeGroupHandler extends XSIElementHandler {
                     + "' was refered and not found");
             }
 
-            name = ag.getName();
+            name1 = ag.getName();
 
             if ((anyAttribute == null)
                     || "".equalsIgnoreCase(anyAttribute.getNamespace())) {
@@ -233,7 +233,7 @@ public class AttributeGroupHandler extends XSIElementHandler {
             attributes = ag.getAttributes();
         }
 
-        cache = new AttributeGroupGT(id, name,
+        cache = new AttributeGroupGT(id, name1,
                 parent.getTargetNamespace(), attributes, anyAttributeNamespace);
 
         return cache;
@@ -250,7 +250,7 @@ public class AttributeGroupHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

@@ -103,15 +103,15 @@ public class ComplexElementHandler extends XMLElementHandler {
     /**
      * @see org.geotools.xml.XMLElementHandler#characters(java.lang.String)
      */
-    public void characters(String text) throws SAXException {
+    public void characters(String text1) throws SAXException {
         if (type.isMixed()) {
             if (this.text != null) {
-                this.text = this.text.concat(text);
+                this.text = this.text.concat(text1);
             } else {
-                this.text = text;
+                this.text = text1;
             }
         } else {
-            if (!"".equals(text.trim())) {
+            if (!"".equals(text1.trim())) {
                 if (type.getName() == null) {
                     throw new SAXException(
                         "This type may not have mixed content");
@@ -485,10 +485,10 @@ public class ComplexElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.net.URI, java.lang.String, org.xml.sax.Attributes)
      * @param namespaceURI
      * @param localName
-     * @param attr
+     * @param attr1
      */
-    public void startElement(URI namespaceURI, String localName, Attributes attr) {
-        this.attr = new AttributesImpl(attr);
+    public void startElement(URI namespaceURI, String localName, Attributes attr1) {
+        this.attr = new AttributesImpl(attr1);
     }
 
     /**

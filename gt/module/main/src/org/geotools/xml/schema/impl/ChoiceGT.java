@@ -34,6 +34,7 @@ public class ChoiceGT implements Choice {
     private ElementGrouping[] children;
 
     private ChoiceGT() {
+        // do nothing
     }
 
     /**

@@ -125,7 +125,7 @@ public class WFSCapabilitiesComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
+            // 
             return null;
         }
 
@@ -189,7 +189,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -200,7 +200,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
         }
@@ -237,7 +237,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -255,7 +255,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
         }
@@ -367,7 +367,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -385,7 +385,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
         }
@@ -492,7 +492,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -510,7 +510,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException(
                 "Method not completed yet.");
         }
@@ -673,7 +673,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -684,12 +684,10 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
         /**
-         * TODO summary sentence for isMixed ...
-         * 
          * @see org.geotools.xml.schema.ComplexType#isMixed()
          * @return
          */
@@ -823,7 +821,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -834,7 +832,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -926,7 +924,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -937,7 +935,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -1055,7 +1053,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -1066,7 +1064,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -1154,7 +1152,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -1165,7 +1163,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -1376,7 +1374,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -1387,7 +1385,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -1479,7 +1477,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -1490,7 +1488,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -1590,7 +1588,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -1601,7 +1599,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -1895,7 +1893,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -1906,7 +1904,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -2053,7 +2051,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -2064,7 +2062,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -2186,7 +2184,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -2197,7 +2195,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -2321,7 +2319,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -2332,7 +2330,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -2358,9 +2356,7 @@ public class WFSCapabilitiesComplexTypes {
                     1, false, null),
                 new WFSElement("FeatureTypeList",
                     FeatureTypeListType.getInstance(), 1, 1, false, null),
-                
 
-                // TODO Add Filter_Capababilities from filterCapabilities.xsd
                 new WFSElement("Filter_Capabilities",
                     Filter_CapabilitiesType.getInstance(), 1, 1, false, null) {
                         /**
@@ -2427,7 +2423,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -2438,7 +2434,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
 
@@ -2455,7 +2451,6 @@ public class WFSCapabilitiesComplexTypes {
                     if (!(element.getType() instanceof ComplexType)) {
                         ComplexType t = (ComplexType) element.getType();
 
-                        // TODO use equals here
                         while ((t != null) && (t != this))
                             t = (t.getParent() instanceof ComplexType)
                                 ? (ComplexType) t.getParent() : null;
@@ -2612,11 +2607,9 @@ public class WFSCapabilitiesComplexTypes {
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-            // TODO merge one with only post, and one with only get?
             List l = new LinkedList();
 
             for (int i = 0; i < value.length; i++) {
-                //System.out.println(value[i].getElement().getName()+" "+value[i].getValue().getClass());
                 OperationType t = (OperationType) value[i].getValue();
                 l.add(t);
             }
@@ -2643,7 +2636,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -2654,7 +2647,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -2727,7 +2720,6 @@ public class WFSCapabilitiesComplexTypes {
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
 
-            // TODO merge one with only post, and one with only get?
             List l = new LinkedList();
             List sdl = null;
 
@@ -2739,8 +2731,6 @@ public class WFSCapabilitiesComplexTypes {
                 } else {
                     OperationType t = (OperationType) value[i].getValue();
                     l.add(t);
-
-                    //                    c[i].setType(OperationType.DESCRIBE_FEATURE_TYPE);
                 }
             }
 
@@ -2773,7 +2763,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -2784,7 +2774,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -2883,7 +2873,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -2894,7 +2884,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }
@@ -3009,7 +2999,7 @@ public class WFSCapabilitiesComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
+            // 
             return false;
         }
 
@@ -3020,7 +3010,7 @@ public class WFSCapabilitiesComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // 
             throw new OperationNotSupportedException();
         }
     }

@@ -61,8 +61,8 @@ public class DocumentHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(URI namespaceURI, String localName, Map hints)
-        throws SAXException {
+    public void endElement(URI namespaceURI, String localName, Map hints){
+        // do nothing
     }
 
     /**
@@ -93,8 +93,8 @@ public class DocumentHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(URI namespaceURI, String localName, Attributes attr)
-        throws SAXException {
+    public void startElement(URI namespaceURI, String localName, Attributes attr){
+        // do nothing
     }
 
     /**

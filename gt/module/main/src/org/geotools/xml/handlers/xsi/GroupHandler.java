@@ -126,7 +126,7 @@ public class GroupHandler extends ElementGroupingHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts){
         id = atts.getValue("", "id");
 
         if (id == null) {
@@ -156,7 +156,7 @@ public class GroupHandler extends ElementGroupingHandler {
         if (ref == null || "".equals(ref)) {
             ref = atts.getValue(namespaceURI, "ref"); // mutally exclusive with
         }
-//System.out.println("REF ^^^ ="+ref);
+
         // name ...
         if ((min != null) && !"".equalsIgnoreCase(min)) {
             minOccurs = Integer.parseInt(min);
@@ -164,7 +164,7 @@ public class GroupHandler extends ElementGroupingHandler {
 
         if ((max != null) && !"".equalsIgnoreCase(max)) {
             if ("unbounded".equalsIgnoreCase(max)) {
-                maxOccurs = ElementTypeHandler.UNBOUNDED;
+                maxOccurs = ElementGrouping.UNBOUNDED;
             } else {
                 maxOccurs = Integer.parseInt(max);
             }
@@ -244,8 +244,7 @@ public class GroupHandler extends ElementGroupingHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
         // do nothing
     }
     protected static class DefaultGroup implements Group{
@@ -331,8 +330,8 @@ public class GroupHandler extends ElementGroupingHandler {
          * @param name
          * @return
          */
-        public Element findChildElement( String name ) {
-            return child==null?null:child.findChildElement(name);
+        public Element findChildElement( String arg1 ) {
+            return child==null?null:child.findChildElement(arg1);
         }
         
     }

@@ -65,8 +65,7 @@ public class ImportHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XSIElementHandler getHandler(String namespaceURI, String localName)
-        throws SAXException {
+    public XSIElementHandler getHandler(String namespaceURI, String localName){
         return null;
     }
 
@@ -76,11 +75,6 @@ public class ImportHandler extends XSIElementHandler {
      */
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
-        //        id = atts.getValue("", "id");
-        //
-        //        if (id == null) {
-        //            id = atts.getValue(namespaceURI, "id");
-        //        }
         String sl = atts.getValue("", "schemaLocation");
 
         if (sl == null) {
@@ -93,20 +87,20 @@ public class ImportHandler extends XSIElementHandler {
             throw new SAXException(e);
 		}
 
-        String namespace = atts.getValue("", "namespace");
+        String namespace1 = atts.getValue("", "namespace");
 
-        if (namespace == null) {
-            namespace = atts.getValue(namespaceURI, "namespace");
+        if (namespace1 == null) {
+            namespace1 = atts.getValue(namespaceURI, "namespace");
         }
 
         try {
-            this.namespace = new URI(namespace);
+            this.namespace = new URI(namespace1);
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
 
-        if (namespaceURI.equalsIgnoreCase(namespace)) {
+        if (namespaceURI.equalsIgnoreCase(namespace1)) {
             throw new SAXException(
                 "You may not import a namespace with the same name as the current namespace");
         }
@@ -152,7 +146,7 @@ public class ImportHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

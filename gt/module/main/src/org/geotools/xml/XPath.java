@@ -280,7 +280,7 @@ public abstract class XPath {
         if (root instanceof List) {
             //check that all elements in the list are legal nodes.
             for (Iterator iter = ((List) root).iterator(); iter.hasNext();) {
-                Object element = (Object) iter.next();
+                Object element = iter.next();
 
                 if (!isLegalNode(element, operation, true)) {
                     return false;
@@ -401,6 +401,7 @@ public abstract class XPath {
          * Not meaningful
          */
         public void remove() {
+            // Not meaningful
         }
     }
 }

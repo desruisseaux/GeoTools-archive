@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.geotools.xml.XSIElementHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -56,8 +55,7 @@ public class UnionHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XSIElementHandler getHandler(String namespaceURI, String localName)
-        throws SAXException {
+    public XSIElementHandler getHandler(String namespaceURI, String localName){
         if (SchemaHandler.namespaceURI.equalsIgnoreCase(namespaceURI)) {
             // child types
             //
@@ -82,7 +80,7 @@ public class UnionHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts){
         id = atts.getValue("", "id");
 
         if (id == null) {
@@ -132,7 +130,7 @@ public class UnionHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

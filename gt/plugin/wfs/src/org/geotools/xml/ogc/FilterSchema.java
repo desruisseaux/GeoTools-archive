@@ -534,8 +534,8 @@ public class FilterSchema implements Schema {
         /**
          * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
          */
-        public Element findChildElement(String name) {
-            return (((getName() != null) && getName().equals(name)) ? this : null);
+        public Element findChildElement(String name1) {
+            return (((getName() != null) && getName().equals(name1)) ? this : null);
         }
     }
 

@@ -18,7 +18,6 @@ package org.geotools.xml.handlers.xsi;
 
 import org.geotools.xml.XSIElementHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -53,8 +52,7 @@ public class AnyAttributeHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XSIElementHandler getHandler(String namespaceURI, String localName)
-        throws SAXException {
+    public XSIElementHandler getHandler(String namespaceURI, String localName){
         return null;
     }
 
@@ -63,25 +61,13 @@ public class AnyAttributeHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
-        //        id = atts.getValue("", "id");
-        //
-        //        if (id == null) {
-        //            id = atts.getValue(namespaceURI, "id");
-        //        }
+        Attributes atts){
+
         namespace = atts.getValue("", "namespace");
 
         if (namespace == null) {
             namespace = atts.getValue(namespaceURI, "namespace");
         }
-
-        //        String processContents = atts.getValue("", "processContents");
-        //
-        //        if (processContents == null) {
-        //            processContents = atts.getValue(namespaceURI, "processContents");
-        //        }
-        //
-        //        this.processContents = AnyHandler.findProcess(processContents);
     }
 
     /**
@@ -111,7 +97,7 @@ public class AnyAttributeHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

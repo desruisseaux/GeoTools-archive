@@ -98,30 +98,30 @@ public class AnyHandler extends ElementGroupingHandler {
             max = atts.getValue(namespaceURI, "maxOccurs");
         }
 
-        String namespace = atts.getValue("", "namespace");
+        String namespace1 = atts.getValue("", "namespace");
 
-        if (namespace == null) {
-            namespace = atts.getValue(namespaceURI, "namespace");
+        if (namespace1 == null) {
+            namespace1 = atts.getValue(namespaceURI, "namespace");
         }
 
         try {
-            if (namespace != null) {
-                if(namespace.toLowerCase().equals("##any")){
+            if (namespace1 != null) {
+                if(namespace1.toLowerCase().equals("##any")){
                     this.namespace = Any.ALL;
                 }else{
-                if(namespace.toLowerCase().equals("##other")){
+                if(namespace1.toLowerCase().equals("##other")){
                     // TODO improve this
                     this.namespace = Any.ALL;
                 }else{
-                if(namespace.toLowerCase().equals("##targetNamespace")){
+                if(namespace1.toLowerCase().equals("##targetNamespace")){
                     try{
                         this.namespace = new URI(namespaceURI);
                     } catch (URISyntaxException e) {
                         logger.warning(e.toString());
-                        this.namespace = new URI(namespace);
+                        this.namespace = new URI(namespace1);
                     }
                 }else{
-                    this.namespace = new URI(namespace);
+                    this.namespace = new URI(namespace1);
                 }}}
             }
         } catch (URISyntaxException e) {
@@ -139,7 +139,7 @@ public class AnyHandler extends ElementGroupingHandler {
             maxOccurs = 1;
         } else {
             if ("unbounded".equalsIgnoreCase(max)) {
-                maxOccurs = ElementTypeHandler.UNBOUNDED;
+                maxOccurs = ElementGrouping.UNBOUNDED;
             } else {
                 maxOccurs = Integer.parseInt(max);
             }

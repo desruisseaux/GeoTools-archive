@@ -91,23 +91,23 @@ public class SchemaHandler extends XSIElementHandler {
      * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
      *      java.lang.String)
      */
-    public void startPrefixMapping(String pref, String uri) {
+    public void startPrefixMapping(String pref, String uri1) {
         if (targetNamespace == null) {
             if (prefixCache == null) {
                 prefixCache = new HashMap();
             }
 
-            prefixCache.put(uri, pref);
+            prefixCache.put(uri1, pref);
             
             if(this.uri == null && (pref == null || "".equals(pref)))
                 try {
-                    this.uri = new URI(uri);
+                    this.uri = new URI(uri1);
                 } catch (URISyntaxException e) {
                     logger.warning(e.getMessage());
                 }
         } else {
             // we have already started
-            if (targetNamespace.equals(uri.toString())) {
+            if (targetNamespace.equals(uri1.toString())) {
                 prefix = pref;
             }
         }
@@ -117,31 +117,31 @@ public class SchemaHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(String namespaceURI, String localName,
+    public void startElement(String namespaceURI1, String localName,
         Attributes atts) throws SAXException {
         // targetNamespace
-        String targetNamespace = atts.getValue("", "targetNamespace");
+        String targetNamespace1 = atts.getValue("", "targetNamespace");
 
-        if (targetNamespace == null) {
-            targetNamespace = atts.getValue(namespaceURI, "targetNamespace");
+        if (targetNamespace1 == null) {
+            targetNamespace1 = atts.getValue(namespaceURI1, "targetNamespace");
         }
 
         try {
-            this.targetNamespace = new URI(targetNamespace);
+            this.targetNamespace = new URI(targetNamespace1);
         } catch (URISyntaxException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
         }
 
         //System.out.println("NS = "+targetNamespace);
-        if ((prefixCache != null) && (targetNamespace != null)
-                && (!targetNamespace.equals(""))) {
+        if ((prefixCache != null) && (targetNamespace1 != null)
+                && (!targetNamespace1.equals(""))) {
             Iterator i = prefixCache.keySet().iterator();
 
             while ((i != null) && i.hasNext()) {
                 String uriT = (String) i.next();
 
-                if (targetNamespace.equals(uriT)) {
+                if (targetNamespace1.equals(uriT)) {
                     prefix = (String) prefixCache.get(uriT);
                     i = null;
                 }
@@ -151,55 +151,55 @@ public class SchemaHandler extends XSIElementHandler {
 //        prefixCache = null;
 
         // attributeFormDefault
-        String attributeFormDefault = atts.getValue("", "attributeFormDefault");
+        String attributeFormDefault1 = atts.getValue("", "attributeFormDefault");
 
-        if (attributeFormDefault == null) {
-            attributeFormDefault = atts.getValue(namespaceURI,
+        if (attributeFormDefault1 == null) {
+            attributeFormDefault1 = atts.getValue(namespaceURI1,
                     "attributeFormDefault");
         }
 
-        this.attributeFormDefault = "qualified".equalsIgnoreCase(attributeFormDefault);
+        this.attributeFormDefault = "qualified".equalsIgnoreCase(attributeFormDefault1);
 
         // blockDefault
-        String blockDefault = atts.getValue("", "blockDefault");
+        String blockDefault1 = atts.getValue("", "blockDefault");
 
-        if (blockDefault == null) {
-            blockDefault = atts.getValue(namespaceURI, "blockDefault");
+        if (blockDefault1 == null) {
+            blockDefault1 = atts.getValue(namespaceURI1, "blockDefault");
         }
 
-        this.blockDefault = ComplexTypeHandler.findBlock(blockDefault);
+        this.blockDefault = ComplexTypeHandler.findBlock(blockDefault1);
 
         // elementFormDefault
-        String elementFormDefault = atts.getValue("", "elementFormDefault");
+        String elementFormDefault1 = atts.getValue("", "elementFormDefault");
 
-        if (elementFormDefault == null) {
-            elementFormDefault = atts.getValue(namespaceURI,
+        if (elementFormDefault1 == null) {
+            elementFormDefault1 = atts.getValue(namespaceURI1,
                     "elementFormDefault");
         }
 
-        this.elementFormDefault = "qualified".equalsIgnoreCase(elementFormDefault);
+        this.elementFormDefault = "qualified".equalsIgnoreCase(elementFormDefault1);
 
         // finalDefault
-        String finalDefault = atts.getValue("", "finalDefault");
+        String finalDefault1 = atts.getValue("", "finalDefault");
 
-        if (finalDefault == null) {
-            finalDefault = atts.getValue(namespaceURI, "finalDefault");
+        if (finalDefault1 == null) {
+            finalDefault1 = atts.getValue(namespaceURI1, "finalDefault");
         }
 
-        this.finalDefault = SimpleTypeHandler.findFinal(finalDefault);
+        this.finalDefault = SimpleTypeHandler.findFinal(finalDefault1);
 
         // id
         id = atts.getValue("", "id");
 
         if (id == null) {
-            id = atts.getValue(namespaceURI, "id");
+            id = atts.getValue(namespaceURI1, "id");
         }
 
         // version
         version = atts.getValue("", "version");
 
         if (version == null) {
-            version = atts.getValue(namespaceURI, "version");
+            version = atts.getValue(namespaceURI1, "version");
         }
     }
 
@@ -207,10 +207,9 @@ public class SchemaHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String,
      *      java.lang.String)
      */
-    public XSIElementHandler getHandler(String namespaceURI, String localName)
-        throws SAXException {
+    public XSIElementHandler getHandler(String namespaceURI1, String localName){
         // check that we are working with a known namespace
-        if (SchemaHandler.namespaceURI.equalsIgnoreCase(namespaceURI)) {
+        if (SchemaHandler.namespaceURI.equalsIgnoreCase(namespaceURI1)) {
             // child elements:
             //
             // This list order has been picked in an adhock manner
@@ -409,7 +408,7 @@ public class SchemaHandler extends XSIElementHandler {
         // imports may be schema or schemaHandler
         if (this.imports != null) {
             // 	have now loaded the included stuff.
-            HashSet imports = new HashSet();
+            HashSet imports1 = new HashSet();
             it = this.imports.iterator();
 
             while (it.hasNext()) {
@@ -438,38 +437,38 @@ public class SchemaHandler extends XSIElementHandler {
                     Schema cs = SchemaFactory.getInstance(imp.getNamespace(),
                             incURI, logger.getLevel());
 
-                    imports.add(cs);
+                    imports1.add(cs);
                 } else {
-                    imports.add(obj);
+                    imports1.add(obj);
                 }
             }
 
-            this.imports = imports;
+            this.imports = imports1;
         }
 
         // TODO redefines?
         // should do over-writing here
         //build schema object ... be thrown out
-        DefaultSchema schema = new DefaultSchema();
-        schema.attributeFormDefault = attributeFormDefault;
-        schema.elementFormDefault = elementFormDefault;
-        schema.finalDefault = finalDefault;
-        schema.blockDefault = blockDefault;
-        schema.id = id;
-        schema.prefix = prefix;
-        schema.targetNamespace = targetNamespace;
-        schema.version = version;
-        schema.uri = uri;
+        DefaultSchema schema1 = new DefaultSchema();
+        schema1.attributeFormDefault = attributeFormDefault;
+        schema1.elementFormDefault = elementFormDefault;
+        schema1.finalDefault = finalDefault;
+        schema1.blockDefault = blockDefault;
+        schema1.id = id;
+        schema1.prefix = prefix;
+        schema1.targetNamespace = targetNamespace;
+        schema1.version = version;
+        schema1.uri = uri;
 
         if (imports != null) {
-            schema.imports = (Schema[]) imports.toArray(new Schema[imports.size()]);
+            schema1.imports = (Schema[]) imports.toArray(new Schema[imports.size()]);
         }
 
         // these need to be retyped
         int i;
 
         if (simpleTypes != null) {
-            schema.simpleTypes = new SimpleType[simpleTypes.size()];
+            schema1.simpleTypes = new SimpleType[simpleTypes.size()];
             i = 0;
             it = simpleTypes.iterator();
 
@@ -477,15 +476,15 @@ public class SchemaHandler extends XSIElementHandler {
                 Object t = it.next();
 
                 if (t instanceof SimpleTypeHandler) {
-                    schema.simpleTypes[i++] = ((SimpleTypeHandler) t).compress(this);
+                    schema1.simpleTypes[i++] = ((SimpleTypeHandler) t).compress(this);
                 } else {
-                    schema.simpleTypes[i++] = (SimpleType) t;
+                    schema1.simpleTypes[i++] = (SimpleType) t;
                 }
             }
         }
 
         if (attributeGroups != null) {
-            schema.attributeGroups = new AttributeGroup[attributeGroups.size()];
+            schema1.attributeGroups = new AttributeGroup[attributeGroups.size()];
             i = 0;
             it = attributeGroups.iterator();
 
@@ -493,16 +492,16 @@ public class SchemaHandler extends XSIElementHandler {
                 Object t = it.next();
 
                 if (t instanceof AttributeGroupHandler) {
-                    schema.attributeGroups[i++] = ((AttributeGroupHandler) t)
+                    schema1.attributeGroups[i++] = ((AttributeGroupHandler) t)
                         .compress(this);
                 } else {
-                    schema.attributeGroups[i++] = (AttributeGroup) t;
+                    schema1.attributeGroups[i++] = (AttributeGroup) t;
                 }
             }
         }
 
         if (attributes != null) {
-            schema.attributes = new Attribute[attributes.size()];
+            schema1.attributes = new Attribute[attributes.size()];
             i = 0;
             it = attributes.iterator();
 
@@ -510,15 +509,15 @@ public class SchemaHandler extends XSIElementHandler {
                 Object t = it.next();
 
                 if (t instanceof AttributeHandler) {
-                    schema.attributes[i++] = ((AttributeHandler) t).compress(this);
+                    schema1.attributes[i++] = ((AttributeHandler) t).compress(this);
                 } else {
-                    schema.attributes[i++] = (Attribute) t;
+                    schema1.attributes[i++] = (Attribute) t;
                 }
             }
         }
 
         if (complexTypes != null) {
-            schema.complexTypes = new ComplexType[complexTypes.size()];
+            schema1.complexTypes = new ComplexType[complexTypes.size()];
             i = 0;
             it = complexTypes.iterator();
 
@@ -526,16 +525,16 @@ public class SchemaHandler extends XSIElementHandler {
                 Object t = it.next();
 
                 if (t instanceof ComplexTypeHandler) {
-                    schema.complexTypes[i++] = ((ComplexTypeHandler) t)
+                    schema1.complexTypes[i++] = ((ComplexTypeHandler) t)
                         .compress(this);
                 } else {
-                    schema.complexTypes[i++] = (ComplexType) t;
+                    schema1.complexTypes[i++] = (ComplexType) t;
                 }
             }
         }
 
         if (elements != null) {
-            schema.elements = new Element[elements.size()];
+            schema1.elements = new Element[elements.size()];
             i = 0;
             it = elements.iterator();
 
@@ -543,16 +542,16 @@ public class SchemaHandler extends XSIElementHandler {
                 Object t = it.next();
 
                 if (t instanceof ElementTypeHandler) {
-                    schema.elements[i++] = (Element) ((ElementTypeHandler) t)
+                    schema1.elements[i++] = (Element) ((ElementTypeHandler) t)
                         .compress(this);
                 } else {
-                    schema.elements[i++] = (Element) t;
+                    schema1.elements[i++] = (Element) t;
                 }
             }
         }
 
         if (groups != null) {
-            schema.groups = new Group[groups.size()];
+            schema1.groups = new Group[groups.size()];
             i = 0;
             it = groups.iterator();
 
@@ -560,16 +559,16 @@ public class SchemaHandler extends XSIElementHandler {
                 Object t = it.next();
 
                 if (t instanceof GroupHandler) {
-                    schema.groups[i++] = (Group) ((GroupHandler) t).compress(this);
+                    schema1.groups[i++] = (Group) ((GroupHandler) t).compress(this);
                 } else {
-                    schema.groups[i++] = (Group) t;
+                    schema1.groups[i++] = (Group) t;
                 }
             }
         }
 
         attributeGroups = attributes = complexTypes = simpleTypes = elements = groups = imports = includes = redefines = null;
 
-        return schema;
+        return schema1;
     }
 
     /*
@@ -620,19 +619,19 @@ public class SchemaHandler extends XSIElementHandler {
      */
     protected SimpleType lookUpSimpleType(String qname) {
         int index = qname.indexOf(":");
-        String localName,prefix;
-        localName = prefix = null;
+        String localName,prefix1;
+        localName = prefix1 = null;
         if(index>=0){
             localName = qname.substring(index + 1);
-            prefix = qname.substring(0,index);
+            prefix1 = qname.substring(0,index);
         }else{
-            prefix = "";
+            prefix1 = "";
             localName = qname;
         }
-        logger.finest("prefix is " + prefix);
+        logger.finest("prefix is " + prefix1);
         logger.finest("localName is " + localName);
         Iterator it;
-        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+        if((this.prefix == null && prefix1 == null)||(this.prefix!=null && this.prefix.equals(prefix1))){
             if(schema!=null)
                 return lookUpSimpleType(localName, schema, new LinkedList());
         }else{
@@ -644,7 +643,7 @@ public class SchemaHandler extends XSIElementHandler {
                 String ns = s.getTargetNamespace().toString();
 //System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
-                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     SimpleType st = lookUpSimpleType(localName, s, new LinkedList());
                 	if (st != null) {
                 	    return st;
@@ -736,20 +735,20 @@ public class SchemaHandler extends XSIElementHandler {
     protected ComplexType lookUpComplexType(String qname)
         throws SAXException {
         int index = qname.indexOf(":");
-        String localName,prefix;
-        localName = prefix = null;
+        String localName,prefix1;
+        localName = prefix1 = null;
         if(index>=0){
             localName = qname.substring(index + 1);
-            prefix = qname.substring(0,index);
+            prefix1 = qname.substring(0,index);
         }else{
-            prefix = "";
+            prefix1 = "";
             localName = qname;
         }
-        logger.finest("prefix is " + prefix);
+        logger.finest("prefix is " + prefix1);
         logger.finest("localName is " + localName);
 
         Iterator it;
-        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+        if((this.prefix == null && prefix1 == null)||(this.prefix!=null && this.prefix.equals(prefix1))){
             if(schema!=null)
                 return lookUpComplexType(localName, schema, new LinkedList());
         }else{
@@ -761,7 +760,7 @@ public class SchemaHandler extends XSIElementHandler {
                 String ns = s.getTargetNamespace().toString();
 //System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
-                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     ComplexType ct = lookUpComplexType(localName, s, new LinkedList());
                 	if (ct != null) {
                 	    return ct;
@@ -847,31 +846,30 @@ public class SchemaHandler extends XSIElementHandler {
      */
     protected Element lookUpElement(String qname) throws SAXException {
         int index = qname.indexOf(":");
-        String localName,prefix;
-        localName = prefix = null;
+        String localName,prefix1;
+        localName = prefix1 = null;
         if(index>=0){
             localName = qname.substring(index + 1);
-            prefix = qname.substring(0,index);
+            prefix1 = qname.substring(0,index);
         }else{
-            prefix = "";
+            prefix1 = "";
             localName = qname;
         }
-        logger.finest("prefix is " + prefix);
+        logger.finest("prefix is " + prefix1);
         logger.finest("localName is " + localName);
 
         Iterator it;
-        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+        if((this.prefix == null && prefix1 == null)||(this.prefix!=null && this.prefix.equals(prefix1))){
             if(schema!=null)
                 return lookupElement(localName, schema, new LinkedList());
         }else{if(imports!=null){
             it = imports.iterator();
-//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
 //System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
-                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     Element ct = lookupElement(localName, s, new LinkedList());
                 	if (ct != null) {
                 	    return ct;
@@ -886,7 +884,7 @@ public class SchemaHandler extends XSIElementHandler {
                           String ns = s.getTargetNamespace().toString();
 //          System.out.println(ns);
                           String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
-                          if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                          if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                               Element ct = lookupElement(localName, s, new LinkedList());
                           	if (ct != null) {
                           	    return ct;
@@ -967,20 +965,20 @@ public class SchemaHandler extends XSIElementHandler {
      */
     protected Group lookUpGroup(String qname) throws SAXException {
         int index = qname.indexOf(":");
-        String localName,prefix;
-        localName = prefix = null;
+        String localName,prefix1;
+        localName = prefix1 = null;
         if(index>=0){
             localName = qname.substring(index + 1);
-            prefix = qname.substring(0,index);
+            prefix1 = qname.substring(0,index);
         }else{
-            prefix = "";
+            prefix1 = "";
             localName = qname;
         }
-        logger.finest("prefix is " + prefix);
+        logger.finest("prefix is " + prefix1);
         logger.finest("localName is " + localName);
         
         Iterator it;
-        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+        if((this.prefix == null && prefix1 == null)||(this.prefix!=null && this.prefix.equals(prefix1))){
             if(schema!=null)
                 return lookUpGroup(localName, schema, new LinkedList());
         }else{
@@ -992,7 +990,7 @@ public class SchemaHandler extends XSIElementHandler {
                 String ns = s.getTargetNamespace().toString();
 //System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
-                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     Group ct = lookUpGroup(localName, s, new LinkedList());
                 	if (ct != null) {
                 	    return ct;
@@ -1078,32 +1076,31 @@ public class SchemaHandler extends XSIElementHandler {
     protected AttributeGroup lookUpAttributeGroup(String qname)
         throws SAXException {
         int index = qname.indexOf(":");
-        String localName,prefix;
-        localName = prefix = null;
+        String localName,prefix1;
+        localName = prefix1 = null;
         if(index>=0){
             localName = qname.substring(index + 1);
-            prefix = qname.substring(0,index);
+            prefix1 = qname.substring(0,index);
         }else{
-            prefix = "";
+            prefix1 = "";
             localName = qname;
         }
-        logger.finest("prefix is " + prefix);
+        logger.finest("prefix is " + prefix1);
         logger.finest("localName is " + localName);
         
         Iterator it;
-        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+        if((this.prefix == null && prefix1 == null)||(this.prefix!=null && this.prefix.equals(prefix1))){
             if(schema!=null)
                 return lookUpAttributeGroup(localName, schema, new LinkedList());
         }else{
             if(imports!=null){
             it = imports.iterator();
-//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
 //System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
-                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     AttributeGroup ct = lookUpAttributeGroup(localName, s, new LinkedList());
                 	if (ct != null) {
                 	    return ct;
@@ -1187,32 +1184,30 @@ public class SchemaHandler extends XSIElementHandler {
      */
     protected Attribute lookUpAttribute(String qname) throws SAXException {
         int index = qname.indexOf(":");
-        String localName,prefix;
-        localName = prefix = null;
+        String localName,prefix1;
+        localName = prefix1 = null;
         if(index>=0){
             localName = qname.substring(index + 1);
-            prefix = qname.substring(0,index);
+            prefix1 = qname.substring(0,index);
         }else{
-            prefix = "";
+            prefix1 = "";
             localName = qname;
         }
-        logger.finest("prefix is " + prefix);
+        logger.finest("prefix is " + prefix1);
         logger.finest("localName is " + localName);
 
         Iterator it;
-        if((this.prefix == null && prefix == null)||(this.prefix!=null && this.prefix.equals(prefix))){
+        if((this.prefix == null && prefix1 == null)||(this.prefix!=null && this.prefix.equals(prefix1))){
             if(schema!=null)
                 return lookUpAttribute(localName, schema, new LinkedList());
         }else{
             if(imports!=null){
             it = imports.iterator();
-//System.out.println("prefixLookup == null? "+(prefixCache==null)+" "+this.uri + " ");
             while (it.hasNext()) {
                 Schema s = (Schema) it.next();
                 String ns = s.getTargetNamespace().toString();
-//System.out.println(ns);
                 String prefixLookup = prefixCache!=null?(String)prefixCache.get(ns):null;
-                if(prefix == null || prefixLookup==null || prefix.equals(prefixLookup)){
+                if(prefix1 == null || prefixLookup==null || prefix1.equals(prefixLookup)){
                     Attribute ct = lookUpAttribute(localName, s, new LinkedList());
                 	if (ct != null) {
                 	    return ct;
@@ -1379,9 +1374,8 @@ public class SchemaHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
-        //System.out.println("NS END = "+targetNamespace);
+    public void endElement(String namespaceURI1, String localName){
+        // do nothing
     }
 
     /**
@@ -1520,8 +1514,8 @@ public class SchemaHandler extends XSIElementHandler {
         /**
          * @see org.geotools.xml.xsi.Schema#includesURI(java.net.URI)
          */
-        public boolean includesURI(URI uri) {
-            return this.uri.equals(uri);
+        public boolean includesURI(URI uri1) {
+            return this.uri.equals(uri1);
         }
 
         /**

@@ -77,7 +77,7 @@ public class WFSSchemaFactory extends SchemaFactory {
          * @see org.geotools.xml.XSIElementHandler#getHandler(java.lang.String, java.lang.String)
          */
         public XSIElementHandler getHandler(String namespaceURI,
-            String localName) throws SAXException {
+            String localName){
             XSIElementHandler r = null;
             r = super.getHandler(namespaceURI, localName);
 

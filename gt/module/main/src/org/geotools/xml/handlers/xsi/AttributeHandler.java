@@ -117,34 +117,34 @@ public class AttributeHandler extends XSIElementHandler {
      *      java.lang.String, org.xml.sax.Attributes)
      */
     public void startElement(String namespaceURI, String localName,
-        Attributes atts) throws SAXException {
+        Attributes atts){
         id = atts.getValue("", "id");
 
         if (id == null) {
             id = atts.getValue(namespaceURI, "id");
         }
 
-        String name = atts.getValue("", "name");
+        String name1 = atts.getValue("", "name");
 
-        if (name == null) {
-            name = atts.getValue(namespaceURI, "name");
+        if (name1 == null) {
+            name1 = atts.getValue(namespaceURI, "name");
         }
 
-        String ref = atts.getValue("", "ref");
+        String ref1 = atts.getValue("", "ref");
 
-        if (ref == null) {
-            ref = atts.getValue(namespaceURI, "ref");
+        if (ref1 == null) {
+            ref1 = atts.getValue(namespaceURI, "ref");
         }
 
-        String type = atts.getValue("", "type");
+        String type1 = atts.getValue("", "type");
 
-        if (type == null) {
-            type = atts.getValue(namespaceURI, "type");
+        if (type1 == null) {
+            type1 = atts.getValue(namespaceURI, "type");
         }
 
-        this.name = name;
-        this.type = type;
-        this.ref = ref;
+        this.name = name1;
+        this.type = type1;
+        this.ref = ref1;
 
         def = atts.getValue("", "default");
 
@@ -159,13 +159,13 @@ public class AttributeHandler extends XSIElementHandler {
         }
 
         // form -- Ignore
-        String use = atts.getValue("", "use");
+        String use1 = atts.getValue("", "use");
 
-        if (use == null) {
-            use = atts.getValue(namespaceURI, "use");
+        if (use1 == null) {
+            use1 = atts.getValue(namespaceURI, "use");
         }
 
-        this.use = findUse(use);
+        this.use = findUse(use1);
     }
 
     /**
@@ -255,10 +255,10 @@ public class AttributeHandler extends XSIElementHandler {
 
         // a.form = form; TODO add form support?
         SimpleType st = null;
-        String name = this.name;
-        String def = this.def;
-        String fixed = this.fixed;
-        int use = this.use;
+        String name1 = this.name;
+        String def1 = this.def;
+        String fixed1 = this.fixed;
+        int use1 = this.use;
 
         if (simpleType != null) {
             st = simpleType.compress(parent);
@@ -272,15 +272,15 @@ public class AttributeHandler extends XSIElementHandler {
                 }
 
                 st = refA.getSimpleType();
-                name = refA.getName();
-                use = use | refA.getUse();
+                name1 = refA.getName();
+                use1 = use1 | refA.getUse();
 
-                if ((def == null) || "".equalsIgnoreCase(def)) {
-                    def = refA.getDefault();
+                if ((def1 == null) || "".equalsIgnoreCase(def1)) {
+                    def1 = refA.getDefault();
                 }
 
-                if ((fixed == null) || "".equalsIgnoreCase(fixed)) {
-                    fixed = refA.getFixed();
+                if ((fixed1 == null) || "".equalsIgnoreCase(fixed1)) {
+                    fixed1 = refA.getFixed();
                 }
             } else if ((type != null) && (!"".equalsIgnoreCase(type))) {
                 // 	look it up --- find it
@@ -288,8 +288,8 @@ public class AttributeHandler extends XSIElementHandler {
             }
         }
 
-        cache = new AttributeGT(id, name, parent.getTargetNamespace(), st,
-                use, def, fixed, false);
+        cache = new AttributeGT(id, name1, parent.getTargetNamespace(), st,
+                use1, def1, fixed1, false);
 
         id = type = ref = null;
 
@@ -307,7 +307,7 @@ public class AttributeHandler extends XSIElementHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 }

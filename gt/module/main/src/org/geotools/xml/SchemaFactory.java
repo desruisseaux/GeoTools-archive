@@ -160,6 +160,7 @@ public class SchemaFactory {
         try {
             contextLoader = Thread.currentThread().getContextClassLoader();
         } catch (SecurityException se) {
+            // do nothing
         }
 
         ClassLoader systemLoader = FactoryFinder.class.getClassLoader();
@@ -195,9 +196,9 @@ public class SchemaFactory {
         return getInstance(targetNamespace, desiredSchema, Level.WARNING);
     }
 
-    public static Schema getInstance(URI targetNamespace, InputStream is)
+    public static Schema getInstance(URI targetNamespace, InputStream is1)
         throws SAXException {
-        return getInstance(targetNamespace, is, Level.WARNING);
+        return getInstance(targetNamespace, is1, Level.WARNING);
     }
 
     /**
@@ -322,12 +323,12 @@ public class SchemaFactory {
     }
 
     public static synchronized Schema getInstance(URI targetNamespace,
-        InputStream is, Level level) throws SAXException {
-        return getInstance().getRealInstance(targetNamespace, is, level);
+        InputStream is1, Level level) throws SAXException {
+        return getInstance().getRealInstance(targetNamespace, is1, level);
     }
 
     private synchronized Schema getRealInstance(URI targetNamespace,
-        InputStream is, Level level) throws SAXException {
+        InputStream is1, Level level) throws SAXException {
         if ((targetNamespace == null) || (schemas.get(targetNamespace) == null)) {
             setParser();
 
@@ -335,7 +336,7 @@ public class SchemaFactory {
             XSISAXHandler.setLogLevel(level);
 
             try {
-                parser.parse(is, contentHandler);
+                parser.parse(is1, contentHandler);
             } catch (IOException e) {
                 throw new SAXException(e);
             }
@@ -356,7 +357,7 @@ public class SchemaFactory {
             XSISAXHandler.setLogLevel(level);
 
             try {
-                parser.parse(is, contentHandler);
+                parser.parse(is1, contentHandler);
             } catch (IOException e) {
                 throw new SAXException(e);
             }
@@ -799,12 +800,12 @@ public class SchemaFactory {
         /**
          * @see schema.Schema#includesURI(java.net.URI)
          */
-        public boolean includesURI(URI uri) {
-            if (uri == null) {
+        public boolean includesURI(URI uri1) {
+            if (uri1 == null) {
                 return false;
             }
 
-            return this.uri.equals(uri);
+            return this.uri.equals(uri1);
         }
 
         /**

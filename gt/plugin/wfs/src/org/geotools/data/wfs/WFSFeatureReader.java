@@ -153,15 +153,13 @@ public class WFSFeatureReader extends FCBuffer {
             loadElement();
         } catch (NoSuchElementException e) {
             return false;
-        } catch (IllegalAttributeException e) {
-            return false;
         }
 
         return next != null;
     }
 
     private boolean loadElement()
-        throws NoSuchElementException, IOException, IllegalAttributeException {
+        throws NoSuchElementException, IOException {
         if (ts == null) {
             while ((next == null) && super.hasNext())
                 next = super.next();
@@ -190,8 +188,14 @@ public class WFSFeatureReader extends FCBuffer {
                                 String[] propNames = ua.getPropertyNames();
 
                                 for (int j = 0; j < propNames.length; j++) {
-                                    next.setAttribute(propNames[j],
-                                        ua.getProperty(propNames[j]));
+                                    try {
+                                        next.setAttribute(propNames[j],
+                                            ua.getProperty(propNames[j]));
+                                    } catch (IllegalAttributeException e) {
+                                        NoSuchElementException ee = new NoSuchElementException(e.getMessage());
+                                        ee.initCause(e);
+                                        throw ee;
+                                    }
                                 }
                             }
                         }
@@ -229,8 +233,14 @@ public class WFSFeatureReader extends FCBuffer {
 
                                     for (int j = 0; j < propNames.length;
                                             j++) {
-                                        next.setAttribute(propNames[j],
-                                            ua.getProperty(propNames[j]));
+                                        try {
+                                            next.setAttribute(propNames[j],
+                                                ua.getProperty(propNames[j]));
+                                        } catch (IllegalAttributeException e) {
+                                            NoSuchElementException ee = new NoSuchElementException(e.getMessage());
+                                            ee.initCause(e);
+                                            throw ee;
+                                        }
                                     }
                                 }
                             }
@@ -251,7 +261,7 @@ public class WFSFeatureReader extends FCBuffer {
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature next()
-        throws IOException, IllegalAttributeException, NoSuchElementException {
+        throws IOException, NoSuchElementException {
         if (next == null) {
             loadElement(); // load it
 

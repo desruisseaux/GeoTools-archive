@@ -1123,7 +1123,7 @@ public class GMLComplexTypes {
             for (int i = 1; i < gp.length; i++)
                 r[i] = gp[i];
 
-            r[gp.length] = AttributeList.attributes[0];
+            r[gp.length] = AttributeList.attributes1[0];
 
             return r;
         }
@@ -1294,7 +1294,7 @@ public class GMLComplexTypes {
          */
         private static Attribute[] loadAttributes() {
             Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes;
+            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
             Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
@@ -1475,7 +1475,7 @@ public class GMLComplexTypes {
          */
         private static Attribute[] loadAttributes() {
             Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes;
+            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
             Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
@@ -1655,7 +1655,7 @@ public class GMLComplexTypes {
          */
         private static Attribute[] loadAttributes() {
             Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes;
+            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
             Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
@@ -1838,7 +1838,7 @@ public class GMLComplexTypes {
          */
         private static Attribute[] loadAttributes() {
             Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes;
+            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
             Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
@@ -2161,7 +2161,7 @@ public class GMLComplexTypes {
         private static final Element[] elements = {
                 new GMLElement("coord",
                     GMLComplexTypes.CoordType.getInstance(), 2,
-                    Integer.MAX_VALUE, false, null),
+                    ElementGrouping.UNBOUNDED, false, null),
                 new GMLElement("coordinates",
                     GMLComplexTypes.CoordinatesType.getInstance(), 1, 1, false,
                     null)
@@ -2778,7 +2778,7 @@ public class GMLComplexTypes {
                     false, null),
                 new GMLElement("innerBoundaryIs",
                     GMLComplexTypes.LinearRingMemberType.getInstance(), 0,
-                    Integer.MAX_VALUE, false, null)
+                    ElementGrouping.UNBOUNDED, false, null)
             };
 
         // static sequence
@@ -2953,7 +2953,7 @@ public class GMLComplexTypes {
         private static final Element[] elements = {
                 new GMLElement("geometryMember",
                     GMLComplexTypes.GeometryAssociationType.getInstance(), 1,
-                    Integer.MAX_VALUE, false, null),
+                    ElementGrouping.UNBOUNDED, false, null),
             };
 
         // static sequence
@@ -3112,7 +3112,7 @@ public class GMLComplexTypes {
         private static final Element[] elements = {
                 new GMLElement("pointMember",
                     GMLComplexTypes.PointMemberType.getInstance(), 1,
-                    Integer.MAX_VALUE, false,
+                    ElementGrouping.UNBOUNDED, false,
                     new GMLElement("geometryMember",
                         GMLComplexTypes.GeometryAssociationType.getInstance(),
                         1, 1, false, null)),
@@ -3274,7 +3274,7 @@ public class GMLComplexTypes {
         private static final Element[] elements = {
                 new GMLElement("lineStringMember",
                     GMLComplexTypes.LineStringMemberType.getInstance(), 1,
-                    Integer.MAX_VALUE, false,
+                    ElementGrouping.UNBOUNDED, false,
                     new GMLElement("geometryMember",
                         GMLComplexTypes.GeometryAssociationType.getInstance(),
                         1, 1, false, null)),
@@ -3436,7 +3436,7 @@ public class GMLComplexTypes {
         private static final Element[] elements = {
                 new GMLElement("polygonMember",
                     GMLComplexTypes.PolygonMemberType.getInstance(), 1,
-                    Integer.MAX_VALUE, false,
+                    ElementGrouping.UNBOUNDED, false,
                     new GMLElement("geometryMember",
                         GMLComplexTypes.GeometryAssociationType.getInstance(),
                         1, 1, false, null)),
@@ -4337,7 +4337,7 @@ public class GMLComplexTypes {
      */
     public static class AbstractFeatureCollectionsBaseType extends AbstractFeatureType {
         // static element list
-        private static final Element[] elements = {
+        private static final Element[] elements1 = {
                 new GMLElement("description",
                     XSISimpleTypes.String.getInstance(), 0, 1, false, null),
                 new GMLElement("name", XSISimpleTypes.String.getInstance(), 0,
@@ -4348,10 +4348,10 @@ public class GMLComplexTypes {
             };
 
         //static sequence
-        private static final DefaultSequence seq = new DefaultSequence(elements);
+        private static final DefaultSequence seq1 = new DefaultSequence(elements1);
 
         // singleton instance
-        private static final GMLComplexType instance = new AbstractFeatureCollectionsBaseType();
+        private static final GMLComplexType instance1 = new AbstractFeatureCollectionsBaseType();
 
         /*
          * part of the singleton pattern
@@ -4359,7 +4359,7 @@ public class GMLComplexTypes {
          * @see GMLComplexType#getInstance()
          */
         public static GMLComplexType getInstance() {
-            return instance;
+            return instance1;
         }
 
         /**
@@ -4387,7 +4387,7 @@ public class GMLComplexTypes {
          * @see schema.ComplexType#getChildren()
          */
         public ElementGrouping getChild() {
-            return seq;
+            return seq1;
         }
 
         /**
@@ -4405,9 +4405,9 @@ public class GMLComplexTypes {
                 return null;
             }
 
-            for (int i = 0; i < elements.length; i++)
-                if (name.equals(elements[i].getName())) {
-                    return elements[i];
+            for (int i = 0; i < elements1.length; i++)
+                if (name.equals(elements1[i].getName())) {
+                    return elements1[i];
                 }
 
             return null;
@@ -4449,7 +4449,7 @@ public class GMLComplexTypes {
                     false, null),
                 new GMLElement("featureMember",
                     GMLComplexTypes.FeatureAssociationType.getInstance(), 0,
-                    Integer.MAX_VALUE, false, null),
+                    ElementGrouping.UNBOUNDED, false, null),
             };
 
         // static sequence
@@ -4731,7 +4731,7 @@ public class GMLComplexTypes {
             for (int i = 1; i < gp.length; i++)
                 r[i] = gp[i];
 
-            r[gp.length] = GMLSchema.AttributeList.attributes[0];
+            r[gp.length] = GMLSchema.AttributeList.attributes1[0];
 
             return r;
         }
@@ -4908,7 +4908,7 @@ public class GMLComplexTypes {
             for (int i = 1; i < gp.length; i++)
                 r[i] = gp[i];
 
-            r[gp.length] = GMLSchema.AttributeList.attributes[0];
+            r[gp.length] = GMLSchema.AttributeList.attributes1[0];
 
             return r;
         }

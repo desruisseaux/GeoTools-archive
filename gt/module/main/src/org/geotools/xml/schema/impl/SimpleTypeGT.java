@@ -97,7 +97,7 @@ public class SimpleTypeGT implements SimpleType {
     /**
      * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
      */
-    public Element findChildElement(String name) {
+    public Element findChildElement(String name1) {
         return null; // will never happen
     }
 

@@ -98,11 +98,11 @@ public class SimpleElementHandler extends XMLElementHandler {
     /**
      * @see org.geotools.xml.XMLElementHandler#characters(java.lang.String)
      */
-    public void characters(String text){
+    public void characters(String text1){
         if (this.text != null) {
-            this.text = this.text.concat(text);
+            this.text = this.text.concat(text1);
         } else {
-            this.text = text;
+            this.text = text1;
         }
     }
 
@@ -128,8 +128,8 @@ public class SimpleElementHandler extends XMLElementHandler {
      * @see org.geotools.xml.XMLElementHandler#startElement(java.lang.String,
      *      java.lang.String, org.xml.sax.Attributes)
      */
-    public void startElement(URI namespaceURI, String localName, Attributes attr){
-        this.attr = new AttributesImpl(attr);
+    public void startElement(URI namespaceURI, String localName, Attributes attr1){
+        this.attr = new AttributesImpl(attr1);
     }
 
     /**

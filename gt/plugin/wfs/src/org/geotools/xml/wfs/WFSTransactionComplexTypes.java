@@ -227,9 +227,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -409,9 +408,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -599,9 +597,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -747,9 +744,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -867,9 +863,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -1013,9 +1008,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -1155,9 +1149,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -1278,9 +1271,8 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -1314,7 +1306,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws IOException {
             AttributesImpl attributes = new AttributesImpl();
             attributes.addAttribute(WFSSchema.NAMESPACE.toString(),
                 attrs[0].getName(), null, "string", "www.refractions.net");
@@ -1397,7 +1389,6 @@ public class WFSTransactionComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
             throw new SAXNotSupportedException("");
         }
 
@@ -1618,7 +1609,6 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1628,8 +1618,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -1726,7 +1715,6 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1736,8 +1724,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -1834,7 +1821,6 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1844,8 +1830,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -1940,7 +1925,7 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
             if ((element == null) || (value == null)
                     || (element.getType() == null)) {
@@ -1990,7 +1975,6 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -2000,8 +1984,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -2092,7 +2075,7 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
             if ((element == null) || (value == null)
                     || (element.getType() == null)) {
@@ -2162,7 +2145,6 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -2172,8 +2154,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -2233,7 +2214,7 @@ public class WFSTransactionComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
+            Attributes attrs1, Map hints)
             throws SAXException, SAXNotSupportedException {
             if ((element == null) || (value == null)
                     || (element.getType() == null)) {
@@ -2279,7 +2260,6 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -2289,8 +2269,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -2388,7 +2367,6 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -2398,8 +2376,7 @@ public class WFSTransactionComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            Map hints) throws OperationNotSupportedException {
             throw new OperationNotSupportedException();
         }
     }
@@ -2413,62 +2390,61 @@ public class WFSTransactionComplexTypes {
 
         // 	   <xsd:complexType name="EmptyType"/>
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
             return null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
             return null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
             return null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
+            Attributes attrs, Map hints){
             return null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
             return "EmptyType";
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
             return null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
             return element != null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws IOException{
             output.element(element.getNamespace(), element.getName(), null);
         }
     }
@@ -2491,60 +2467,58 @@ public class WFSTransactionComplexTypes {
         //    	      </xsd:restriction>
         //    	   </xsd:simpleType>
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.SimpleType#getFinal()
          */
         public int getFinal() {
             return 0;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.SimpleType#getId()
          */
         public String getId() {
             return null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.SimpleType#toAttribute(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
          */
         public AttributeValue toAttribute(Attribute attribute, Object value,
             Map hints) {
-            // TODO Auto-generated method stub
             return null;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.SimpleType#canCreateAttributes(org.geotools.xml.schema.Attribute, java.lang.Object, java.util.Map)
          */
         public boolean canCreateAttributes(Attribute attribute, Object value,
             Map hints) {
-            // TODO Auto-generated method stub
             return false;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.SimpleType#getChildType()
          */
         public int getChildType() {
             return RESTRICTION;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.SimpleType#getParents()
          */
         public SimpleType[] getParents() {
             return new SimpleType[] { XSISimpleTypes.String.getInstance(), };
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.SimpleType#getFacets()
          */
         public Facet[] getFacets() {
             return facets;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
@@ -2568,28 +2542,28 @@ public class WFSTransactionComplexTypes {
             throw new SAXNotSupportedException("Invalid child value type.");
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#getName()
          */
         public String getName() {
             return "AllSomeType";
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#getNamespace()
          */
         public URI getNamespace() {
             return WFSSchema.NAMESPACE;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
             return String.class;
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
@@ -2599,11 +2573,11 @@ public class WFSTransactionComplexTypes {
             && ("ALL".equals(value) || "SOME".equals(value));
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws IOException{
             if (canEncode(element, value, hints)) {
                 output.startElement(element.getNamespace(), element.getName(),
                     null);
@@ -2613,7 +2587,7 @@ public class WFSTransactionComplexTypes {
             output.endElement(element.getNamespace(), element.getName());
         }
 
-        /* (non-Javadoc)
+        /**
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {

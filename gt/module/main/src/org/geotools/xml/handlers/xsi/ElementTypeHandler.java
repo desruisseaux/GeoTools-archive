@@ -43,7 +43,6 @@ public class ElementTypeHandler extends ElementGroupingHandler {
     public final static String LOCALNAME = "element";
 
     /** UNBOUNDED */
-    public static final int UNBOUNDED = Integer.MAX_VALUE;
     private static int offset = 0;
     private String id;
     private String name;
@@ -154,26 +153,26 @@ public class ElementTypeHandler extends ElementGroupingHandler {
     public void startElement(String namespaceURI, String localName,
         Attributes atts) throws SAXException {
         // abstract
-        String abstracT = atts.getValue("", "abstracT");
+        String abstracT1 = atts.getValue("", "abstracT");
 
-        if (abstracT == null) {
-            abstracT = atts.getValue(namespaceURI, "abstracT");
+        if (abstracT1 == null) {
+            abstracT1 = atts.getValue(namespaceURI, "abstracT");
         }
 
-        if ((abstracT == null) || "".equalsIgnoreCase(abstracT)) {
+        if ((abstracT1 == null) || "".equalsIgnoreCase(abstracT1)) {
             this.abstracT = false;
         } else {
-            this.abstracT = Boolean.getBoolean(abstracT);
+            this.abstracT = Boolean.getBoolean(abstracT1);
         }
 
         // block
-        String block = atts.getValue("", "block");
+        String block1 = atts.getValue("", "block");
 
-        if (block == null) {
-            block = atts.getValue(namespaceURI, "block");
+        if (block1 == null) {
+            block1 = atts.getValue(namespaceURI, "block");
         }
 
-        this.block = ComplexTypeHandler.findBlock(block);
+        this.block = ComplexTypeHandler.findBlock(block1);
 
         // default
         defaulT = atts.getValue("", "default");
@@ -183,13 +182,13 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         }
 
         // final
-        String finaL = atts.getValue("", "final");
+        String finaL1 = atts.getValue("", "final");
 
-        if (finaL == null) {
-            finaL = atts.getValue(namespaceURI, "final");
+        if (finaL1 == null) {
+            finaL1 = atts.getValue(namespaceURI, "final");
         }
 
-        this.finaL = ComplexTypeHandler.findFinal(finaL);
+        this.finaL = ComplexTypeHandler.findFinal(finaL1);
 
         // fixed
         fixed = atts.getValue("", "fixed");
@@ -199,13 +198,13 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         }
 
         // form
-        String form = atts.getValue("", "form");
+        String form1 = atts.getValue("", "form");
 
-        if (form == null) {
-            form = atts.getValue(namespaceURI, "form");
+        if (form1 == null) {
+            form1 = atts.getValue(namespaceURI, "form");
         }
 
-        this.form = "qualified".equalsIgnoreCase(form);
+        this.form = "qualified".equalsIgnoreCase(form1);
 
         // id
         id = atts.getValue("", "id");
@@ -215,31 +214,31 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         }
 
         // maxOccurs
-        String maxOccurs = atts.getValue("", "maxOccurs");
+        String maxOccurs1 = atts.getValue("", "maxOccurs");
 
-        if (maxOccurs == null) {
-            maxOccurs = atts.getValue(namespaceURI, "maxOccurs");
+        if (maxOccurs1 == null) {
+            maxOccurs1 = atts.getValue(namespaceURI, "maxOccurs");
         }
 
-        if ((maxOccurs != null) && !"".equalsIgnoreCase(maxOccurs)) {
-            if ("unbounded".equalsIgnoreCase(maxOccurs)) {
-                this.maxOccurs = UNBOUNDED;
+        if ((maxOccurs1 != null) && !"".equalsIgnoreCase(maxOccurs1)) {
+            if ("unbounded".equalsIgnoreCase(maxOccurs1)) {
+                this.maxOccurs = ElementGrouping.UNBOUNDED;
             } else {
-                this.maxOccurs = Integer.parseInt(maxOccurs);
+                this.maxOccurs = Integer.parseInt(maxOccurs1);
             }
         } else {
             this.maxOccurs = 1;
         }
 
         // minOccurs
-        String minOccurs = atts.getValue("", "minOccurs");
+        String minOccurs1 = atts.getValue("", "minOccurs");
 
-        if (minOccurs == null) {
-            minOccurs = atts.getValue(namespaceURI, "minOccurs");
+        if (minOccurs1 == null) {
+            minOccurs1 = atts.getValue(namespaceURI, "minOccurs");
         }
 
-        if ((minOccurs != null) && !"".equalsIgnoreCase(minOccurs)) {
-            this.minOccurs = Integer.parseInt(minOccurs);
+        if ((minOccurs1 != null) && !"".equalsIgnoreCase(minOccurs1)) {
+            this.minOccurs = Integer.parseInt(minOccurs1);
         } else {
             this.minOccurs = 1;
         }
@@ -252,17 +251,17 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         }
 
         // nillable
-        String nillable = atts.getValue("", "nillable");
+        String nillable1 = atts.getValue("", "nillable");
 
-        if (nillable == null) {
-            nillable = atts.getValue(namespaceURI, "nillable");
+        if (nillable1 == null) {
+            nillable1 = atts.getValue(namespaceURI, "nillable");
         }
 
-        if ((nillable == null) || "".equalsIgnoreCase(nillable)) {
+        if ((nillable1 == null) || "".equalsIgnoreCase(nillable1)) {
             this.nillable = false;
         } else {
             //System.out.print("Parse Nill "+nillable+" : ");
-            this.nillable = Boolean.valueOf(nillable).booleanValue();
+            this.nillable = Boolean.valueOf(nillable1).booleanValue();
 
             //System.out.println(this.nillable+" : "+name);
         }
@@ -405,8 +404,8 @@ public class ElementTypeHandler extends ElementGroupingHandler {
      * @see org.geotools.xml.XSIElementHandler#endElement(java.lang.String,
      *      java.lang.String)
      */
-    public void endElement(String namespaceURI, String localName)
-        throws SAXException {
+    public void endElement(String namespaceURI, String localName){
+        // do nothing
     }
 
     /**
@@ -435,14 +434,14 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         /**
          * @see org.geotools.xml.xsi.ElementGrouping#findChildElement(java.lang.String)
          */
-        public Element findChildElement(String name) {
+        public Element findChildElement(String name1) {
             if (this.name != null) {
-                if (this.name.equalsIgnoreCase(name)) {
+                if (this.name.equalsIgnoreCase(name1)) {
                     return this;
                 }
             }
 
-            return (type == null) ? null : type.findChildElement(name);
+            return (type == null) ? null : type.findChildElement(name1);
         }
 
         /**

@@ -42,7 +42,6 @@ import org.geotools.xml.wfs.WFSSchema.WFSElement;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
 
 
@@ -131,9 +130,7 @@ public class WFSBasicComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
+            Attributes attrs1, Map hints){
             return null;
         }
 
@@ -276,9 +273,7 @@ public class WFSBasicComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
+            Attributes attrs1, Map hints){
             return null;
         }
 
@@ -401,9 +396,7 @@ public class WFSBasicComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
+            Attributes attrs1, Map hints){
             return null;
         }
 
@@ -436,7 +429,7 @@ public class WFSBasicComplexTypes {
          *      java.util.Map)
          */
         public void encode(Element element, Object value, PrintHandler output,
-            Map hints) throws IOException, OperationNotSupportedException {
+            Map hints) throws IOException {
             AttributesImpl attributes = new AttributesImpl();
             attributes.addAttribute(WFSSchema.NAMESPACE.toString(),
                 attrs[0].getName(), null, "string", attrs[0].getFixed());
@@ -510,9 +503,7 @@ public class WFSBasicComplexTypes {
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints)
-            throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
+            Attributes attrs1, Map hints){
             return null;
         }
 
@@ -573,6 +564,7 @@ public class WFSBasicComplexTypes {
                             query.getVersion());
                     }
                 } catch (Throwable t) {
+                    // ...
                 }
 
                 output.startElement(element.getNamespace(), element.getName(),
