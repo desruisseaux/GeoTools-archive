@@ -19,6 +19,9 @@
  */
 package org.geotools.referencing;
 
+import java.util.Iterator;
+
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -63,7 +66,7 @@ public class CRS {
         }
         final String AUTHORITY = code.substring( 0, split );
         Throwable trouble = null;
-        for( Iterator i = .getAuthorityFactories().iterator(); i.hasNext(); ){
+        for( Iterator i = FactoryFinder.getAuthorityFactories().iterator(); i.hasNext(); ){
             AuthorityFactory factory = (AuthorityFactory) i.next();
             factory.getAuthority().getIdentifierTypes().contains( AUTHORITY );
             try {
