@@ -34,6 +34,7 @@ import org.geotools.referencing.IdentifiedObject;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import java.net.URL;
 import java.util.HashMap;
@@ -97,7 +98,7 @@ public class WMSReaderTest extends TestCase {
                     .getDescriptor();
 
                 ParameterDescriptorGroup layerGroup = (ParameterDescriptorGroup) paramDescriptor;
-
+                
                 List layerDescriptors = layerGroup.descriptors();
                 GeneralParameterValue[] layerParameterValues = new GeneralParameterValue[layerDescriptors.size()];
 
@@ -111,7 +112,7 @@ public class WMSReaderTest extends TestCase {
                     Set styles = layerDesc.getValidValues();
                     layerValue.setValue(styles.iterator().next());
 
-                    groupValue.add(layerValue);
+                    groupValue.values().add(layerValue);
                 }
 
                 continue;
