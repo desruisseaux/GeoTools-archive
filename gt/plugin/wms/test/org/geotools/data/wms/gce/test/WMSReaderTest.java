@@ -42,7 +42,7 @@ public class WMSReaderTest extends TestCase {
 		super.setUp();
 		server = new URL("http://terraservice.net/ogccapabilities.ashx?version=1.1.1&request=GetCapabilties");
 		WMSGridCoverageExchange exchange = new WMSGridCoverageExchange(server);
-		capabilities = exchange.getCapabilities();
+
 		reader = (WMSReader) exchange.getReader(server);
 		format = (WMSFormat) reader.getFormat();
 	}
