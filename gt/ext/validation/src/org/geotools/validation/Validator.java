@@ -114,7 +114,7 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public boolean featureValidation(String dsid, 
+	public ValidationResults featureValidation(String dsid, 
 										FeatureReader features)
 		throws IOException, Exception//, WfsTransactionException 
 	{
@@ -123,7 +123,7 @@ public class Validator
 		if (validationProcessor == null)
 		{
 			LOGGER.warning("ValidationProcessor unavailable");
-			return true;
+			return null;
 		}
 		
 		FeatureType type = features.getFeatureType();
@@ -140,7 +140,7 @@ public class Validator
 		}
 
 		if (failed.isEmpty()) {
-			return true; // everything worked out
+			return results; // everything worked out
 		}
 
 		StringBuffer message = new StringBuffer();
@@ -152,7 +152,7 @@ public class Validator
 			message.append(entry.getValue());
 			message.append("\n");
 		}
-		return false;
+		return results;
 		//throw new Exception("Validation - " + message.toString());
 		//throw new WfsTransactionException(message.toString(), "validation");
 	}
@@ -219,14 +219,14 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public boolean integrityValidation(Map stores, Envelope bBox)
+	public ValidationResults integrityValidation(Map stores, Envelope bBox)
 		throws IOException, Exception// WfsTransactionException 
 	{
 		//Data catalog = request.getWFS().getData();
 		//ValidationProcessor validation = request.getValidationProcessor();
 		if( validationProcessor == null ) {
 			LOGGER.warning( "Validation Processor unavaialble" );
-			return true;
+			return null;
 		}
 		LOGGER.finer( "Required to validate "+stores.size()+" typeRefs" );
 		LOGGER.finer( "within "+bBox );
@@ -301,7 +301,7 @@ public class Validator
 		if (failed.isEmpty()) 
 		{
 			LOGGER.finer( "All validation tests passed" );            
-			return true; // everything worked out
+			return results; // everything worked out
 		}
 		
 		/** One or more of the tests failed if we reached here, so dump out
@@ -316,7 +316,7 @@ public class Validator
 			message.append(entry.getValue());
 			message.append("\n");
 		}
-		return false;
+		return results;
 		//throw new Exception("Validation - " + message.toString());
 		//throw new WfsTransactionException(message.toString(), "validation");
 	}
