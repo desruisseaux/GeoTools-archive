@@ -898,7 +898,7 @@ public class DataUtilities {
      * </p>
      * 
      * <p>
-     * You may indicate the default Geometry with an astrix.
+     * You may indicate the default Geometry with an astrix: "*geom:Geometry".
      * </p>
      * 
      * <p>
