@@ -59,7 +59,7 @@ public class WMS1_3_0Test extends WMS1_1_1Test{
 	private URL server2;
 	public WMS1_3_0Test() throws Exception {
 		this.spec = new WMS1_3_0();
-		this.server = new URL("http://www.demis.nl/mapserver/request.asp?Service=WMS&Version=1.3.0&Request=GetCapabilities");
+		this.server = new URL("http://www2.demis.nl/mapserver/Request.asp?Service=WMS&Version=1.3.0&Request=GetCapabilities");
 		this.server2 = new URL("http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?CONFIG=main&REQUEST=GetCapabilities");
 	}
 

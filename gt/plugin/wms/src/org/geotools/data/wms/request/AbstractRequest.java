@@ -31,7 +31,7 @@ import java.util.StringTokenizer;
  *
  * @author Richard Gould
  */
-public class AbstractRequest implements Request{
+public abstract class AbstractRequest implements Request{
     /** Represents OGC Exception MIME types */
     public static final String EXCEPTION_XML = "application/vnd.ogc.se_xml"; //$NON-NLS-1$
     
@@ -96,6 +96,7 @@ public class AbstractRequest implements Request{
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
                 String[] param = token.split("="); //$NON-NLS-1$
+                
                 setProperty(param[0].toUpperCase(), param[1]);
             }
         }
@@ -118,7 +119,13 @@ public class AbstractRequest implements Request{
             Map.Entry entry = (Map.Entry) iter.next();
             
             String value = (String) entry.getValue();
-            String param = entry.getKey() + "=" + value;
+            /*
+             * Some servers do not follow the rule that parameter names 
+             * must be case insensitive. We will let each specification
+             * implementation deal with it in their own way.
+             */
+            String param = processKey((String) entry.getKey()) + "=" + value;
+            
 
             if (iter.hasNext()) {
                 param = param.concat("&"); //$NON-NLS-1$
@@ -135,6 +142,20 @@ public class AbstractRequest implements Request{
         }
 
         return null;
+    }
+
+    /**
+     * Some WebMapServers do not abide by the fact that parameter keys should
+     * be case insensitive. 
+     * 
+     * This method will allow a specification to determine the way that the
+     * parameter keys should be encoded in requests made by the server.
+     * 
+     * @param key the key to be processed
+     * @return the key, after being processed. (made upper case, for example)
+     */
+    protected String processKey (String key ) {
+        return key;
     }
 
     /**

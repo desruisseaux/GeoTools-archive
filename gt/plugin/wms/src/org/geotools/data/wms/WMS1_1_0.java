@@ -17,6 +17,7 @@ import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 import org.geotools.data.wms.request.AbstractGetLegendGraphicRequest;
 import org.geotools.data.wms.request.AbstractGetStylesRequest;
 import org.geotools.data.wms.request.AbstractPutStylesRequest;
+import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetStylesRequest;
@@ -106,6 +107,10 @@ public class WMS1_1_0 extends WMS1_0_0 {
 		protected void initVersion() {
 			setProperty("VERSION", "1.1.0");
 		}
+        
+        protected String processKey (String key ) {
+            return key.trim().toUpperCase();
+        }
 	}
 	
 	public static class GetMapRequest extends WMS1_0_0.GetMapRequest {
@@ -124,6 +129,13 @@ public class WMS1_1_0 extends WMS1_0_0 {
 
         protected String getRequestFormat( String format ) {
             return format;
+        }
+        
+        protected String getRequestException( String exception ) {
+            return exception;
+        }
+        protected String processKey (String key ) {
+            return key.trim().toUpperCase();
         }
   	}
 	
@@ -144,6 +156,9 @@ public class WMS1_1_0 extends WMS1_0_0 {
         }
         protected void initVersion() {
             setProperty("VERSION", "1.1.0");
+        }
+        protected String processKey (String key ) {
+            return key.trim().toUpperCase();
         }
 	}
 	

@@ -3793,6 +3793,12 @@ public class WMSComplexTypes {
 				Map hints) throws IOException, OperationNotSupportedException {
 			throw new OperationNotSupportedException();
 		}
+        /*
+         * @see org.geotools.xml.schema.ComplexType#isMixed()
+         */
+        public boolean isMixed() {
+            return true;
+        }
 	}
 
 	protected static class _FeatureListURLType extends WMSComplexType {
@@ -4093,6 +4099,12 @@ public class WMSComplexTypes {
 				Map hints) throws IOException, OperationNotSupportedException {
 			throw new OperationNotSupportedException();
 		}
+        /*
+         * @see org.geotools.xml.schema.ComplexType#isMixed()
+         */
+        public boolean isMixed() {
+            return true;
+        }
 	}
 
 	protected static class _StyleSheetURLType extends WMSComplexType {
@@ -4283,6 +4295,12 @@ public class WMSComplexTypes {
 				Map hints) throws IOException, OperationNotSupportedException {
 			throw new OperationNotSupportedException();
 		}
+        /*
+         * @see org.geotools.xml.schema.ComplexType#isMixed()
+         */
+        public boolean isMixed() {
+            return true;
+        }
 	}
 
 	protected static class _ScaleHintType extends WMSComplexType {
@@ -4793,7 +4811,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("GIF");
+			return WMS1_0_0.toFormatMIME("GIF");
 		}
 
 		/*
@@ -4880,7 +4898,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("JPEG");
+			return WMS1_0_0.toFormatMIME("JPEG");
 		}
 
 		/*
@@ -4967,7 +4985,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("PNG");
+			return WMS1_0_0.toFormatMIME("PNG");
 		}
 
 		/*
@@ -5054,7 +5072,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("PPM");
+			return WMS1_0_0.toFormatMIME("PPM");
 		}
 
 		/*
@@ -5141,7 +5159,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("TIFF");
+			return WMS1_0_0.toFormatMIME("TIFF");
 		}
 
 		/*
@@ -5228,7 +5246,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("GeoTIFF");
+			return WMS1_0_0.toFormatMIME("GeoTIFF");
 		}
 
 		/*
@@ -5315,7 +5333,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("WebCGM");
+			return WMS1_0_0.toFormatMIME("WebCGM");
 		}
 
 		/*
@@ -5402,7 +5420,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("SVG");
+			return WMS1_0_0.toFormatMIME("SVG");
 		}
 
 		/*
@@ -5489,7 +5507,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("WMS_XML");
+			return WMS1_0_0.toFormatMIME("WMS_XML");
 		}
 
 		/*
@@ -5576,7 +5594,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("GML.1");
+			return WMS1_0_0.toFormatMIME("GML.1");
 		}
 
 		/*
@@ -5663,7 +5681,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("GML.2");
+			return WMS1_0_0.toFormatMIME("GML.2");
 		}
 
 		/*
@@ -5750,7 +5768,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("GML.3");
+			return WMS1_0_0.toFormatMIME("GML.3");
 		}
 
 		/*
@@ -5837,7 +5855,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("WBMP");
+			return WMS1_0_0.toFormatMIME("WBMP");
 		}
 
 		/*
@@ -5924,7 +5942,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("BMP");
+			return WMS1_0_0.toFormatMIME("BMP");
 		}
 
 		/*
@@ -6011,7 +6029,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("MIME");
+			return WMS1_0_0.toFormatMIME("MIME");
 		}
 
 		/*
@@ -6098,7 +6116,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("INIMAGE");
+			return WMS1_0_0.toFormatMIME("INIMAGE");
 		}
 
 		/*
@@ -6185,7 +6203,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("BLANK");
+			return WMS1_0_0.toFormatMIME("BLANK");
 		}
 
 		/*
@@ -6272,7 +6290,7 @@ public class WMSComplexTypes {
 		public Object getValue(Element element, ElementValue[] value,
 				Attributes attrs, Map hints) throws SAXException,
 				OperationNotSupportedException {
-			return WMS1_0_0.toMIME("CW_WKB");
+			return WMS1_0_0.toFormatMIME("CW_WKB");
 		}
 
 		/*
