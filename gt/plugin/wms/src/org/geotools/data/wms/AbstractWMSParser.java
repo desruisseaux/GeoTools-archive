@@ -335,14 +335,21 @@ public abstract class AbstractWMSParser implements WMSParser {
         String name = serviceElement.getChildText("Name");
 		String title = serviceElement.getChildText("Title");
 		
-		URL onlineResource = parseOnlineResource(serviceElement.getChild("OnlineResource"));
+		URL onlineResource = queryServiceOnlineResource(serviceElement);
+		
 	    String description = serviceElement.getChildText("Abstract");
 	    
-	    
-		String keywords[] = queryKeywords(serviceElement);
-		
-		
+	    String keywords[] = queryKeywords(serviceElement);
+				
 		builder.buildService( name, title, onlineResource,description, keywords );				
+    }
+    
+    /**
+     * @param serviceElement
+     * @return
+     */
+    protected  URL queryServiceOnlineResource(Element serviceElement) throws MalformedURLException{
+        return parseOnlineResource(serviceElement.getChild("OnlineResource"));;
     }
     
     /**

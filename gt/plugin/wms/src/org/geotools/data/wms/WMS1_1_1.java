@@ -69,7 +69,7 @@ public class WMS1_1_1 extends Specification {
     }
     
     /** Factory method to create WMS 1.1.1 GetCapabilities Request */
-    public GetCapabilitiesRequest createRequest( URL server ){
+    public GetCapabilitiesRequest createGetCapabilitiesRequest( URL server ){
         return new GetCapsRequest( server );
     }
     /**

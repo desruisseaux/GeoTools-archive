@@ -223,7 +223,7 @@ public class WebMapServer {
 	        Specification specification = (Specification) specs.get( test );
 	        String clientVersion = specification.getVersion();
 	        
-	        GetCapabilitiesRequest request = specification.createRequest( server );
+	        GetCapabilitiesRequest request = specification.createGetCapabilitiesRequest( server );
 	        String serverVersion = queryVersion( request );
 	        
 	        if (getProblem() != null) {

@@ -66,7 +66,7 @@ public abstract class Specification {
         
     
     /** Factory method to create WMSGetCapabilities Request */
-    public abstract GetCapabilitiesRequest createRequest( URL server );
+    public abstract GetCapabilitiesRequest createGetCapabilitiesRequest( URL server );
     /**
      * Create parser given document generated from createRequest.
      * <p>

@@ -165,7 +165,7 @@ public class WMS1_0_0 extends Specification {
     /* (non-Javadoc)
      * @see org.geotools.data.wms.Specification#createRequest(java.net.URL)
      */
-    public GetCapabilitiesRequest createRequest(URL server) {
+    public GetCapabilitiesRequest createGetCapabilitiesRequest(URL server) {
         return new GetCapsRequest( server );
     }
     /**
@@ -270,6 +270,10 @@ public class WMS1_0_0 extends Specification {
                 }
             }
             return null;      
+        }
+        protected URL queryServiceOnlineResource(Element serviceElement)
+                throws MalformedURLException {
+            return new URL(serviceElement.getChildText("OnlineResource"));
         }
     }
 }
