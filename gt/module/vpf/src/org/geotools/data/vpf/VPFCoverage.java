@@ -42,7 +42,7 @@ public class VPFCoverage implements VPFCoverageIfc, FileConstants {
 
     /** Creates a new instance of VPFCoverage */
     public VPFCoverage(TableRow tr, File directory, VPFDataBase base)
-                throws IOException, Exception {
+                throws IOException {
         this.base = base;
         name = tr.get(FIELD_COVERAGE_NAME).getAsString().trim();
         description = tr.get(FIELD_DESCRIPTION).getAsString().trim();
@@ -51,7 +51,7 @@ public class VPFCoverage implements VPFCoverageIfc, FileConstants {
         setFeatureClasses();
     }
 
-    private void setFeatureClasses() throws IOException, Exception {
+    private void setFeatureClasses() throws IOException {
         if (!name.equals("rference") && !name.equals("libref") && 
                 !name.equals("tileref") && !name.equals("dq")) {
             //System.out.println( "Navnet er: " + name);

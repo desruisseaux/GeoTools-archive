@@ -42,7 +42,7 @@ public class VPFDataBase implements FileConstants {
     private TableRow[][] coverages = null;
     private HashMap tilingSchema = null;
 
-    public VPFDataBase(File directory) throws IOException, Exception {
+    public VPFDataBase(File directory) throws IOException {
         // read data base header info
         //this.directory = directory;
         String vpfTableName = new File(directory, DATABASE_HEADER_TABLE).toString();

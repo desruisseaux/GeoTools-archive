@@ -46,12 +46,7 @@ public class VPFDataStore extends AbstractDataStore implements DataStore {
     private VPFDataBase dataBase = null;
 
     public VPFDataStore(File file) throws IOException {
-        try {
-            //this.file = file;
-            dataBase = new VPFDataBase(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        dataBase = new VPFDataBase(file);        
     }
 
     public VPFFeatureReader getFeatureReader2(String typename)
