@@ -27,11 +27,13 @@ import java.net.URL;
 import java.lang.reflect.*;
 import java.net.URLDecoder;
 import java.util.logging.Logger;
-import junit.framework.*;
 
 // OpenGIS dependencies
 import org.opengis.util.CodeList;
 import org.opengis.referencing.cs.AxisDirection;
+
+// JUnit dependencies
+import junit.framework.*;
 
 
 /**
@@ -41,6 +43,18 @@ import org.opengis.referencing.cs.AxisDirection;
  * @author Martin Desruisseaux
  */
 public class CodeListTest extends TestCase implements FileFilter {
+    /**
+     * Set to <code>true</code> for verbose mode (for debugging only).
+     */
+    private static final boolean VERBOSE = false;
+    
+    /**
+     * List of enums to ignore in the {@link #process} operation.
+     * Must be static because JUnit seems to recreate this object
+     * for each test.
+     */
+    private static final Set toIgnore = new HashSet();
+
     /**
      * Construct a test case.
      */
@@ -147,38 +161,52 @@ public class CodeListTest extends TestCase implements FileFilter {
      */
     private File defaultRootDirectory() {
         final Class c = getClass();
-        URL url = c.getClassLoader().getResource( "." );
-        
-        System.out.println( "here:"+url );
-        if (url ==null || !url.getProtocol().trim().equalsIgnoreCase("file")){
-        	return null; // bad developer no test not on filesystem
+        URL url = c.getClassLoader().getResource(".");
+        if (VERBOSE) {
+            System.out.println("here: "+url);
+        }
+        if (url==null || !url.getProtocol().trim().equalsIgnoreCase("file")) {
+            return null; // bad developer no test not on filesystem
         }
         String path = url.getPath();
-        if( path.charAt(0) == '/' && path.charAt(2) == ':' ){
-        	path = path.substring(1);
+        if (path.length()>=3 && path.charAt(0)=='/' && path.charAt(2)==':' ) {
+            // Windows drive letter (e.g. /C:). Trim the leading '/'.
+            path = path.substring(1);
         }
-        System.out.println( "path:"+path );        
+        if (VERBOSE) {
+            System.out.println("path: "+path);
+        }
         try {
-        	url = new URL( "file", null, 0, path );
+            url = new URL("file", null, 0, path);
         }
-        catch (MalformedURLException ignore ){
-        	return null;
+        catch (MalformedURLException ignore ) {
+            return null;
         }
-        System.out.println( "url:"+url );        
-        File file = new File( path );
-        System.out.println( "file:"+file );
-        if( file.exists() && file.isDirectory() ){
-        	return file;
+        if (VERBOSE) {
+            System.out.println("url: "+url);
+        }
+        File file = new File(path);
+        if (VERBOSE) {
+            System.out.println("file: "+file);
+        }
+        if (file.exists() && file.isDirectory()) {
+            return file;
         }
         url = c.getClassLoader().getResource(c.getName().replace('.','/')+".class");
-        System.out.println( "class:"+url );
+        if (VERBOSE) {
+            System.out.println("class: "+url);
+        }
         if (url!=null && url.getProtocol().trim().equalsIgnoreCase("file")) {
-            try{
-                file = new File(URLDecoder.decode(url.toExternalForm(),"UTF-8"));
-                System.out.println( "file:"+file );
+            try {
+                file = new File(URLDecoder.decode(url.toExternalForm(), "UTF-8"));
+                if (VERBOSE) {
+                    System.out.println("file: "+file);
+                }
                 final String[] packages = c.getPackage().getName().split("\\.");
                 for (int i=packages.length; --i>=0;) {
-                	System.out.println( i+ " package:"+packages[i] );                	
+                    if (VERBOSE) {
+                        System.out.println(i+" package: "+packages[i]);
+                    }
                     file = file.getParentFile();
                     if (file==null || !file.getName().equals(packages[i])) {
                         fail("Wrong directory name: "+file);
@@ -186,10 +214,12 @@ public class CodeListTest extends TestCase implements FileFilter {
                     }
                 }
                 file = file.getParentFile();
-                System.out.println( "file:"+file );                
+                if (VERBOSE) {
+                    System.out.println("file: "+file);
+                }
                 return file;
             }
-            catch(UnsupportedEncodingException uee){
+            catch (UnsupportedEncodingException uee) {
                 return null;
             }
         }
@@ -200,8 +230,7 @@ public class CodeListTest extends TestCase implements FileFilter {
      * Scan the directory and all subdirectory for classes implementing {@link CodeList}.
      */
     private void scan(final File directory, final File base) {
-        if (directory == null || !directory.exists()
-        		|| !directory.isDirectory()) {
+        if (directory == null || !directory.exists() || !directory.isDirectory()) {
             Logger.getLogger("org.geotools").warning("No directory to scan:"+directory);
             return; // Just a warning; do not fails.
         }
@@ -291,11 +320,4 @@ public class CodeListTest extends TestCase implements FileFilter {
             }
         }
     }
-    
-    /**
-     * List of enums to ignore in the {@link #process} operation.
-     * Must be static because JUnit seems to recreate this object
-     * for each test.
-     */
-    private static final Set toIgnore = new HashSet();
 }
