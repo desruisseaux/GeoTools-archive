@@ -1,15 +1,9 @@
 //Tests for the oblique mercator projection, mostly calculated with ArcGIS 9.0.
 //Some test points comes from the proj4 email list, epsg guidebook 7 and Snyder.
 //The test for an azimuth of -90 was actually calculated for azimuth of -89.999999
-//run with asserts enabled to test the inverse projection
+//Run with asserts enabled to test the inverse projection
 //Jan 2, 2005
 
-//remove line cariage returns from file
-
-//need snyder tests
-//failure with latc of 0 for spherical rso (recalculate with proper wkt)
-//check rotation > 90
-//check latc = 0 with scaleFactor !=0
 
 //geogCS's 
 set _WGS84_=GEOGCS["WGS84", DATUM["WGS84", SPHEROID["WGS84", 6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
