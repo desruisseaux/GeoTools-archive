@@ -19,37 +19,32 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
- *
  *    This package contains formulas from the PROJ package of USGS.
  *    USGS's work is fully acknowledged here.
  */
-package org.geotools.ct.proj;
+package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Locale;
 import java.awt.geom.Point2D;
+import javax.units.NonSI;
+
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
-import org.geotools.cs.Projection;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransformProvider; // For Javadoc 
-import org.geotools.ct.MissingParameterException;
-
-// Resources
-import org.geotools.resources.cts.Resources;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.MathTransformFactory;  // For Javadoc
+import org.geotools.referencing.operation.MathTransformProvider; // For Javadoc
+import org.geotools.metadata.citation.Citation;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -83,11 +78,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
- *
- * @deprecated Replaced by {@linnk org.geotools.referencing.operation.projection.Mercator}.
  */
-public class Mercator extends CylindricalProjection {
-    
+public class Mercator extends MapProjection {
     /**
      * Standard Parallel used for the <code>Mercator_2SP</code> case.
      * Set to {@link Double#NaN} for the <code>Mercator_1SP</code> case.
@@ -95,12 +87,58 @@ public class Mercator extends CylindricalProjection {
     protected final double standardParallel;
 
     /**
-     * The {@link MathTransformProvider} for a {@link Mercator} projection. Exactly
-     * two instances of this provider are constructed by the default implementation
-     * of {@link org.geotools.ct.MathTransformFactory}: one for the 1SP case and one
-     * for the 2SP case.
+     * The {@link MathTransformProvider} for a {@link Mercator} 1SP projection.
      *
      * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
+     * @see MathTransformFactory
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     * @author Rueben Schulz
+     */
+    static final class Provider1SP extends Provider {
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+                new Identifier(Citation.OPEN_GIS, "Mercator_1SP"),
+                new Identifier(Citation.EPSG,     "9804"),
+                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
+                                                  ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+            }, new ParameterDescriptor[] {
+                SEMI_MAJOR,       SEMI_MINOR,
+                CENTRAL_MERIDIAN, SCALE_FACTOR,
+                FALSE_EASTING,    FALSE_NORTHING
+            });
+
+        /**
+         * Construct a new provider. 
+         */
+        public Provider1SP() {
+            super(PARAMETERS);
+        }
+
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            if (isSpherical(parameters)) {
+                return new Spherical(parameters, false);
+            } else {
+                return new Mercator(parameters, false);
+            }
+        }
+    }
+
+    /**
+     * The {@link MathTransformProvider} for a {@link Mercator} projection 2SP.
+     *
      * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
      * @see org.geotools.ct.MathTransformFactory
      *
@@ -108,36 +146,51 @@ public class Mercator extends CylindricalProjection {
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */
-    static final class Provider extends org.geotools.ct.proj.Provider {
+    static final class Provider2SP extends Provider {
         /**
-         * <code>true</code> for 2SP, or <code>false</code> for 1SP projection.
+         * The operation parameter descriptor for the {@link #standardParallel standard parallel}
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         *
+         * @todo Specify alias. The API is already available, just a little bit more complicated.
          */
-        private final boolean sp2;
-        
+        public static final ParameterDescriptor STANDARD_PARALLEL = new org.geotools.parameter.ParameterDescriptor(
+                "standard_parallel_1", 0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+                new Identifier(Citation.OPEN_GIS, "Mercator_2SP"),
+                new Identifier(Citation.EPSG,     "9805"),
+                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
+                                                  ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+            }, new ParameterDescriptor[] {
+                SEMI_MAJOR,       SEMI_MINOR,
+                CENTRAL_MERIDIAN, STANDARD_PARALLEL,
+                FALSE_EASTING,    FALSE_NORTHING
+            });
+
         /**
          * Construct a new provider. 
-         * @param sp2 <code>false</code> for a Mercator_1SP provider,
-         *            <code>true</code> for a Mercator_2SP provider.
          */
-        public Provider(boolean sp2) {
-            super(sp2 ? "Mercator_2SP": "Mercator_1SP", 
-                  ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION);
-            remove("latitude_of_origin");
-            if (sp2) {
-                remove("scale_factor");
-                put("standard_parallel_1", 0, LATITUDE_RANGE); 
-            }
-            this.sp2 = sp2;
+        public Provider2SP() {
+            super(PARAMETERS);
         }
-        
+
         /**
-         * Create a new map projection based on the parameters. 
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform create(final Projection parameters) throws MissingParameterException {
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
             if (isSpherical(parameters)) {
-                return new Spherical(parameters, sp2);
+                return new Spherical(parameters, true);
             } else {
-                return new Mercator(parameters, sp2);
+                return new Mercator(parameters, true);
             }
         }
     }
@@ -147,10 +200,12 @@ public class Mercator extends CylindricalProjection {
      * Construct a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
-     * @throws MissingParameterException if a mandatory parameter is missing.
+     * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    protected Mercator(final Projection parameters) throws MissingParameterException {
-        this(parameters, contains(parameters, "2SP"));
+    protected Mercator(final ParameterValueGroup parameters)
+            throws ParameterNotFoundException
+    {
+        this(parameters, parameters.getDescriptor().getName().getCode().endsWith("2SP"));
     }
 
     /**
@@ -158,9 +213,11 @@ public class Mercator extends CylindricalProjection {
      *
      * @param  parameters The parameter values in standard units.
      * @param  sp2 Indicates if this is a 1 or 2 standard parallel case of the mercator projection.
-     * @throws MissingParameterException if a mandatory parameter is missing.
+     * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
-    Mercator(final Projection parameters, final boolean sp2) throws MissingParameterException {
+    Mercator(final ParameterValueGroup parameters, final boolean sp2)
+            throws ParameterNotFoundException
+    {
         //Fetch parameters 
         super(parameters);
         if (sp2) {
@@ -168,8 +225,8 @@ public class Mercator extends CylindricalProjection {
             // the standard parallel.   The super-class constructor should have initialized
             // 'scaleFactor' to 1. We still use the '*=' operator rather than '=' in case a
             // user implementation still provides a scale factor for its custom projections.
-            standardParallel = latitudeToRadians(Math.abs(
-                               parameters.getValue("standard_parallel_1", 0)), false);
+            standardParallel = Math.abs(doubleValue(Provider2SP.STANDARD_PARALLEL, parameters));
+            ensureLatitudeInRange(Provider2SP.STANDARD_PARALLEL, standardParallel, false);
             if (isSpherical) {
                 scaleFactor *= Math.cos(standardParallel);
             }  else {
@@ -185,10 +242,10 @@ public class Mercator extends CylindricalProjection {
     }
 
     /**
-     * Returns a human readable name localized for the specified locale.
+     * {@link inheritDoc}
      */
-    public String getName(final Locale locale) {
-        return Resources.getResources(locale).getString(ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION);
+    public ParameterValueGroup getParameterValues() {
+        return null; // TODO
     }
     
     /**
@@ -243,10 +300,10 @@ public class Mercator extends CylindricalProjection {
          *
          * @param  parameters The parameter values in standard units.
          * @param  sp2 Indicates if this is a 1 or 2 standard parallel case of the mercator projection.
-         * @throws MissingParameterException if a mandatory parameter is missing.
+         * @throws ParameterNotFoundException if a mandatory parameter is missing.
          */
-        protected Spherical(final Projection parameters, final boolean sp2)
-                throws MissingParameterException
+        protected Spherical(final ParameterValueGroup parameters, final boolean sp2)
+                throws ParameterNotFoundException
         {
             super(parameters, sp2);
             assert isSpherical;
@@ -321,15 +378,5 @@ public class Mercator extends CylindricalProjection {
             return equals(this.standardParallel,  that.standardParallel);
         }
         return false;
-    }
-    
-    /**
-     * Complete the WKT for this map projection.
-     */
-    void toString(final StringBuffer buffer) {
-        super.toString(buffer);
-        if (!Double.isNaN(standardParallel)) {
-            addParameter(buffer, "standard_parallel_1", Math.toDegrees(standardParallel));
-        }
     }
 }

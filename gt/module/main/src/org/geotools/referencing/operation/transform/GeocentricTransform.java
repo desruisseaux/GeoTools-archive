@@ -603,14 +603,13 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                                               final String epsg,
                                               final int geotools)
         {
-            return group(
-                     new Identifier[] {
-                        new Identifier(Citation.OPEN_GIS, ogc),
-                        new Identifier(Citation.EPSG,     epsg),
-                        new Identifier(Citation.GEOTOOLS, Resources.formatInternational(geotools))
-                     }, new ParameterDescriptor[] {
-                        SEMI_MAJOR, SEMI_MINOR, DIM
-                     });
+            return group(new Identifier[] {
+                    new Identifier(Citation.OPEN_GIS, ogc),
+                    new Identifier(Citation.EPSG,     epsg),
+                    new Identifier(Citation.GEOTOOLS, Resources.formatInternational(geotools))
+                }, new ParameterDescriptor[] {
+                    SEMI_MAJOR, SEMI_MINOR, DIM
+                });
         }
 
         /**

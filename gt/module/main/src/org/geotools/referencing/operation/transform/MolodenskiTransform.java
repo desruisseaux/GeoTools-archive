@@ -381,17 +381,16 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(
-                     new Identifier[] {
-                        new Identifier(Citation.OPEN_GIS, "Molodenski"),
-                        new Identifier(Citation.EPSG,     "9604"),
-                        new Identifier(Citation.GEOTOOLS,
-                            Resources.formatInternational(ResourceKeys.MOLODENSKI_TRANSFORM))
-                     }, new ParameterDescriptor[] {
-                        DIM, DX, DY, DZ,
-                        SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
-                        TGT_SEMI_MAJOR, TGT_SEMI_MINOR
-                     });
+        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+                new Identifier(Citation.OPEN_GIS, "Molodenski"),
+                new Identifier(Citation.EPSG,     "9604"),
+                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
+                                                  ResourceKeys.MOLODENSKI_TRANSFORM))
+            }, new ParameterDescriptor[] {
+                DIM, DX, DY, DZ,
+                SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
+                TGT_SEMI_MAJOR, TGT_SEMI_MINOR
+            });
 
         /**
          * Constructs a provider.

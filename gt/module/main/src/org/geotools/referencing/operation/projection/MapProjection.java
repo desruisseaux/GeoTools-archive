@@ -41,6 +41,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterValue;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
@@ -212,21 +213,44 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     protected MapProjection(final ParameterValueGroup values) throws ParameterNotFoundException {
-        semiMajor           = values.parameter("semi_major")        .doubleValue(SI.METER);
-        semiMinor           = values.parameter("semi_minor")        .doubleValue(SI.METER);
-        centralMeridian     = values.parameter("central_meridian")  .doubleValue(SI.RADIAN);
-        latitudeOfOrigin    = values.parameter("latitude_of_origin").doubleValue(SI.RADIAN);
-        scaleFactor         = values.parameter("scale_factor")      .doubleValue(Unit.ONE);
-        falseEasting        = values.parameter("false_easting")     .doubleValue(SI.METER);
-        falseNorthing       = values.parameter("false_northing")    .doubleValue(SI.METER);
+        semiMajor           = doubleValue(Provider.SEMI_MAJOR,         values);
+        semiMinor           = doubleValue(Provider.SEMI_MINOR,         values);
+        centralMeridian     = doubleValue(Provider.CENTRAL_MERIDIAN,   values);
+        latitudeOfOrigin    = doubleValue(Provider.LATITUDE_OF_ORIGIN, values);
+        scaleFactor         = doubleValue(Provider.SCALE_FACTOR,       values);
+        falseEasting        = doubleValue(Provider.FALSE_EASTING,      values);
+        falseNorthing       = doubleValue(Provider.FALSE_NORTHING,     values);
         isSpherical         = (semiMajor == semiMinor);
         excentricitySquared = 1.0 - (semiMinor*semiMinor)/(semiMajor*semiMajor);
         excentricity        = Math.sqrt(excentricitySquared);
         globalScale         = scaleFactor*semiMajor;
-        ensureLongitudeInRange("central_meridian",   centralMeridian,  true);
-        ensureLatitudeInRange ("latitude_of_origin", latitudeOfOrigin, true);
+        ensureLongitudeInRange(Provider.CENTRAL_MERIDIAN,   centralMeridian,  true);
+        ensureLatitudeInRange (Provider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, true);
     }
-    
+
+    /**
+     * Returns the parameter value for the specified operation parameter.
+     * Values are automatically converted into the standard units specified
+     * by the supplied <code>param</code> argument.
+     * This convenience method is used by subclasses for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
+     *
+     * @param  param The parameter to look for.
+     * @param  group The parameter value group to search into.
+     * @return The requested parameter value.
+     * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @see MathTransformProvider#doubleValue
+     */
+    static double doubleValue(final ParameterDescriptor param,
+                              final ParameterValueGroup group)
+            throws ParameterNotFoundException
+    {
+        final Unit unit = param.getUnit();
+        final ParameterValue value = group.parameter(param.getName().getCode());
+        return (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
+    }
+
     /**
      * Ensures that the latitude is within allowed limits (&plusmn;&pi;/2).
      * This method is useful to check the validity of projection parameters,
@@ -236,7 +260,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @param  edge <code>true</code> to accept latitudes of &plusmn;&pi;/2.
      * @throws IllegalArgumentException if the latitude is out of range.
      */
-    static void ensureLatitudeInRange(final String name, double y, final boolean edge)
+    static void ensureLatitudeInRange(final ParameterDescriptor name, double y, final boolean edge)
             throws IllegalArgumentException
     {
         if (edge ? (y>=Latitude.MIN_VALUE*Math.PI/180 && y<=Latitude.MAX_VALUE*Math.PI/180) :
@@ -246,7 +270,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         }
         y = Math.toDegrees(y);
         throw new InvalidParameterValueException(Resources.format(
-                ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)), name, y);
+                ResourceKeys.ERROR_LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)),
+                name.getName().getCode(), y);
     }
     
     /**
@@ -258,7 +283,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @param  edge <code>true</code> for accepting longitudes of &plusmn;&pi;.
      * @throws IllegalArgumentException if the longitude is out of range.
      */
-    static void ensureLongitudeInRange(final String name, double x, final boolean edge)
+    static void ensureLongitudeInRange(final ParameterDescriptor name, double x, final boolean edge)
             throws IllegalArgumentException
     {
         if (edge ? (x>=Longitude.MIN_VALUE*Math.PI/180 && x<=Longitude.MAX_VALUE*Math.PI/180) :
@@ -268,32 +293,16 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         }
         x = Math.toDegrees(x);
         throw new InvalidParameterValueException(Resources.format(
-                ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)), name, x);
+                ResourceKeys.ERROR_LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)),
+                name.getName().getCode(), x);
     }
-    
+
     /**
-     * Returns the value for the specified parameter name. Values are always returned
-     * in {@linkplain SI#METER meters}, {@link NonSI#DEGREE_ANGLE degrees} or as a
-     * {@linkplain Unit#ONE dimensionless} unit.
+     * Returns the parameter values for this map projection.
      *
-     * @param  name The parameter name as one of WKT name.
-     * @return The parameter value for the specified name.
-     * @throws InvalidParameterNameException if <code>name</code> is not a know parameter name.
-     *
-     * @todo
+     * @return A copy of the parameter values for this map projection.
      */
-    public double getParameterValue(String name) throws InvalidParameterNameException {
-        name = name.trim().toLowerCase();
-        if (name.equals("semi_major"))         return semiMajor;
-        if (name.equals("semi_minor"))         return semiMinor;
-        if (name.equals("central_meridian"))   return Math.toDegrees(centralMeridian);
-        if (name.equals("latitude_of_origin")) return Math.toDegrees(latitudeOfOrigin);
-        if (name.equals("scale_factor"))       return scaleFactor;
-        if (name.equals("false_easting"))      return falseEasting;
-        if (name.equals("false_northing"))     return falseNorthing;
-        throw new InvalidParameterNameException(Resources.format(
-                  ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "name", name), name);
-    }
+    public abstract ParameterValueGroup getParameterValues();
     
     /**
      * Returns the dimension of input points.
@@ -415,7 +424,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *
      * @todo The <code>ptDst</code> argument will be removed and the return type changed if
      * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
-     * is implemented efficiently in a future J2SE release (maybe J2SE 1.5?).
+     * is implemented efficiently in a future J2SE release (maybe J2SE 1.6?).
      */
     protected abstract Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException;
@@ -454,7 +463,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *
      * @todo The <code>ptDst</code> argument will be removed and the return type changed if
      * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
-     * is implemented efficiently in a future J2SE release (maybe J2SE 1.5?).
+     * is implemented efficiently in a future J2SE release (maybe J2SE 1.6?).
      */
     protected abstract Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException;
@@ -966,6 +975,14 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public Provider(final ParameterDescriptorGroup parameters) {
             super(2, 2, parameters);
+        }
+
+        /**
+         * Returns <code>true</code> is the parameters use a spherical datum.
+         */
+        static boolean isSpherical(final ParameterValueGroup values) {
+            return doubleValue(SEMI_MAJOR, values) ==
+                   doubleValue(SEMI_MINOR, values);
         }
     }
 }

@@ -19,13 +19,14 @@
  */
 package org.geotools.referencing.operation;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Collection;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.util.GenericName;
@@ -340,6 +341,8 @@ public abstract class MathTransformProvider extends OperationMethod {
 
     /**
      * Returns the parameter value for the specified operation parameter.
+     * Values are automatically converted into the standard units specified
+     * by the supplied <code>param</code> argument.
      * This convenience method is used by subclasses for initializing
      * {@linkplain MathTransform math transform} from a set of parameters.
      *
@@ -347,14 +350,13 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @param  group The parameter value group to search into.
      * @return The requested parameter value.
      * @throws ParameterNotFoundException if the parameter is not found.
-     *
-     * @todo What to do with unit? (if some action is taken, don't forget to check
-     *       for null units).
      */
     protected static double doubleValue(final ParameterDescriptor param,
                                         final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        return getValue(param, group).doubleValue();
+        final Unit unit = param.getUnit();
+        final ParameterValue value = getValue(param, group);
+        return (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
     }
 }

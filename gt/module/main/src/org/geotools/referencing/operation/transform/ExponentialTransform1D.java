@@ -337,13 +337,12 @@ public class ExponentialTransform1D extends AbstractMathTransform
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(
-                     new Identifier[] {
-                        new Identifier(Citation.GEOTOOLS,
-                            Resources.formatInternational(ResourceKeys.EXPONENTIAL))
-                     }, new ParameterDescriptor[] {
-                        BASE, SCALE
-                     });
+        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
+                                                  ResourceKeys.EXPONENTIAL))
+            }, new ParameterDescriptor[] {
+                BASE, SCALE
+            });
 
         /**
          * Create a provider for logarithmic transforms.

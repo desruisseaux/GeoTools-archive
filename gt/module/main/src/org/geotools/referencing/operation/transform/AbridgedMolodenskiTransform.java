@@ -421,17 +421,16 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(
-                     new Identifier[] {
-                        new Identifier(Citation.OPEN_GIS, "Abridged_Molodenski"),
-                        new Identifier(Citation.EPSG,     "9605"),
-                        new Identifier(Citation.GEOTOOLS,
-                            Resources.format(ResourceKeys.ABRIDGED_MOLODENSKI_TRANSFORM))
-                     }, new ParameterDescriptor[] {
-                        DIM, DX, DY, DZ,
-                        SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
-                        TGT_SEMI_MAJOR, TGT_SEMI_MINOR
-                     });
+        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+                new Identifier(Citation.OPEN_GIS, "Abridged_Molodenski"),
+                new Identifier(Citation.EPSG,     "9605"),
+                new Identifier(Citation.GEOTOOLS, Resources.format(
+                                                  ResourceKeys.ABRIDGED_MOLODENSKI_TRANSFORM))
+            }, new ParameterDescriptor[] {
+                DIM, DX, DY, DZ,
+                SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
+                TGT_SEMI_MAJOR, TGT_SEMI_MINOR
+            });
 
         /**
          * Constructs a provider.

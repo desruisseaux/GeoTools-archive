@@ -303,13 +303,12 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = group(
-                     new Identifier[] {
-                        new Identifier(Citation.GEOTOOLS,
-                            Resources.formatInternational(ResourceKeys.LOGARITHMIC))
-                     }, new ParameterDescriptor[] {
-                        BASE, OFFSET
-                     });
+        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
+                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
+                                                  ResourceKeys.LOGARITHMIC))
+            }, new ParameterDescriptor[] {
+                BASE, OFFSET
+            });
 
         /**
          * Create a provider for logarithmic transforms.
