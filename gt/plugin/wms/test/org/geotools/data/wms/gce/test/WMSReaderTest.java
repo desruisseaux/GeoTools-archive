@@ -8,18 +8,18 @@ package org.geotools.data.wms.gce.test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.wms.WebMapServer;
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSOperationParameter;
-import org.geotools.data.wms.gce.WMSParameterMaker;
 import org.geotools.data.wms.gce.WMSParameterValue;
 import org.geotools.data.wms.gce.WMSReader;
-import org.geotools.data.wms.getCapabilities.Layer;
 import org.geotools.data.wms.getCapabilities.WMT_MS_Capabilities;
 import org.geotools.gc.GridCoverage;
 import org.opengis.parameter.GeneralOperationParameter;
@@ -55,47 +55,72 @@ public class WMSReaderTest extends TestCase {
 		assertEquals(new WMSFormat().getClass(), reader.getFormat().getClass());
 	}
 
-	public void testGetSource() {
-		assertEquals(server, reader.getSource());
-	}
-
 	public void testHasMoreGridCoverages() {
 	}
 
 	public void testRead() {
 		try {
-			WMSParameterValue[] params = new WMSParameterValue[10];
-			
-			WMSParameterMaker maker = new WMSParameterMaker(capabilities);
-			
-			params[0] = new WMSParameterValue("1.1.1", maker.createVersionReadParam());
-			params[1] = new WMSParameterValue("GetMap", maker.createRequestReadParam());
-			String layerList = "";
-			Iterator iter = capabilities.getCapability().getLayer().getSubLayers().iterator();
-			while (iter.hasNext()) {
-				Layer layer = (Layer) iter.next();
-				layerList = layerList + layer.getName();	
-				if (iter.hasNext()) {
-					layerList = layerList + ",";
-				}
-			}
-			params[2] = new WMSParameterValue(layerList, WMSParameterMaker.createLayersReadParam());
-			params[3] = new WMSParameterValue("", WMSParameterMaker.createStylesReadParam());
-			params[4] = new WMSParameterValue("EPSG:26904", maker.createSRSReadParam());
-			params[5] = new WMSParameterValue("366800,2170400,816000,2460400", WMSParameterMaker.createBBoxReadParam());
-			params[6] = new WMSParameterValue("400", maker.createWidthReadParam());
-			params[7] = new WMSParameterValue("400", maker.createHeightReadParam());
+			WMSParameterValue[] params = new WMSParameterValue[16];
 
-			//params[8] = new WMSParameterValue("image/jpeg", WMSOperationParameter.createFormatReadParam());
+			
 			GeneralOperationParameter[] newParams = format.getReadParameters();
-			WMSOperationParameter param = (WMSOperationParameter) newParams[0];
-			String formatValue = "image/jpeg";
-			Iterator iter2 = param.getValidValues().iterator();
-			while (iter2.hasNext()) {
-				String format = (String) iter2.next();
-				System.out.println("FORMAT: "+format);				
+			for (int i = 0; i < newParams.length; i++) {
+				WMSOperationParameter parameter = (WMSOperationParameter) newParams[i];
+				
+				if (parameter.getName(null).equals("LAYERS")) {
+					ArrayList layerList = new ArrayList();
+					List availableLayers = parameter.getAvailableLayers();
+					for (int j = 0; j < availableLayers.size(); j++) {
+						SimpleLayer simpleLayer = (SimpleLayer) availableLayers.get(j);
+						simpleLayer.setStyle("");
+						layerList.add(j, simpleLayer);
+					}
+					params[i] = new WMSParameterValue(layerList, parameter);
+					continue;
+				}
+				
+				if (parameter.getName(null).equals("FORMAT")) {
+					Iterator iter = parameter.getValidValues().iterator();
+					if (iter.hasNext()) {
+						String format = (String) iter.next();
+						params[i] = new WMSParameterValue(format, parameter);
+					}
+					continue;
+				}				
+				
+				if (parameter.getName(null).equals("WIDTH") || parameter.getName(null).equals("HEIGHT")) {
+					params[i] = new WMSParameterValue("400", parameter);
+					continue;
+				}
+				
+				if (parameter.getName(null).equals("SRS")) {
+					params[i] = new WMSParameterValue("EPSG:26904", parameter);
+					continue;
+				}
+
+				if (parameter.getName(null).equals("BBOX_MINX")) {
+					params[i] = new WMSParameterValue("366800", parameter);
+					continue;
+				}
+				
+				if (parameter.getName(null).equals("BBOX_MINY")) {
+					params[i] = new WMSParameterValue("2170400", parameter);
+					continue;
+				}
+				
+				if (parameter.getName(null).equals("BBOX_MAXX")) {
+					params[i] = new WMSParameterValue("816000", parameter);
+					continue;
+				}
+				
+				if (parameter.getName(null).equals("BBOX_MAXY")) {
+					params[i] = new WMSParameterValue("2460400", parameter);
+					continue;
+				}
+				
+				params[i] = new WMSParameterValue(parameter.getDefaultValue(), parameter);
 			}
-			params[8] = new WMSParameterValue(formatValue, param);
+
 			GridCoverage coverage = reader.read(params);
 			
 			System.out.println(coverage.getEnvelope());
