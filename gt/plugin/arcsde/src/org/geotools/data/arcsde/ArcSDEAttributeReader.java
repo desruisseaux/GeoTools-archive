@@ -161,6 +161,7 @@ public class ArcSDEAttributeReader implements AttributeReader {
             }
         } catch (SeException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            query.close();
             throw new DataSourceException("Error retrieveing column " + index
                 + ": " + ex.getMessage(), ex);
         }
@@ -176,6 +177,7 @@ public class ArcSDEAttributeReader implements AttributeReader {
             fidPrefix.append(currentShape.getFeatureId().longValue());
         } catch (SeException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            query.close();
             throw new DataSourceException("Can't read FID value: "
                 + ex.getMessage(), ex);
         }
