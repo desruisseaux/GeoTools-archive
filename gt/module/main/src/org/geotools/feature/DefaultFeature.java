@@ -12,18 +12,17 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.feature;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.util.Cloneable;
 
 // J2SE dependencies
 import java.rmi.server.UID;
 import java.util.List;
-
-import org.opengis.util.Cloneable;
-
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -39,21 +38,21 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Ian Schneider ARS-USDA
  *
  * @task TODO: look at synchronization (or locks as IanS thinks)
- * @task REVISIT: Right now we always validate, which means whenever a 
- * Feature is created or a new value set then an operation must be performed.
- * One thing we should consider is to allow a Feature to turn off its 
- * its validation - which would likely improve performance with large
- * datasets.  If you are reading from a database, with a FeatureType you got
- * from the database, it is probably a reasonable assumption that the Features 
- * contained in it will properly validate.  I am not sure if this should with
- * a switch in DefaultFeature, or perhaps an interface that says if it is validating
- * or not, or maybe even an option in Feature.  But it would be a nice option to
- * have - if datastore implementors could at least create their features without
- * validating (though probably should return Features that will check for validity
- * if someone else tries to change them). 
+ * @task REVISIT: Right now we always validate, which means whenever a  Feature
+ *       is created or a new value set then an operation must be performed.
+ *       One thing we should consider is to allow a Feature to turn off its
+ *       its validation - which would likely improve performance with large
+ *       datasets.  If you are reading from a database, with a FeatureType you
+ *       got from the database, it is probably a reasonable assumption that
+ *       the Features  contained in it will properly validate.  I am not sure
+ *       if this should with a switch in DefaultFeature, or perhaps an
+ *       interface that says if it is validating or not, or maybe even an
+ *       option in Feature.  But it would be a nice option to have - if
+ *       datastore implementors could at least create their features without
+ *       validating (though probably should return Features that will check
+ *       for validity if someone else tries to change them).
  */
 public class DefaultFeature implements SimpleFeature, Cloneable {
-
     /** The unique id of this feature */
     protected String featureId;
 
@@ -121,7 +120,6 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
     String defaultID() {
         return "fid-" + (new UID()).toString();
     }
-
 
     /**
      * Gets a reference to the feature type schema for this feature.
@@ -218,15 +216,15 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
     }
 
     /**
-     * Sets the attribute value at a given position, performing no parsing or validation.
-     * This is so subclasses can have access to setting the array, without opening it up
-     * completely.
-     * 
+     * Sets the attribute value at a given position, performing no parsing or
+     * validation. This is so subclasses can have access to setting the array,
+     * without opening it up completely.
+     *
      * @param position the index of the attribute to set.
      * @param val the new value to give the attribute at position.
      */
     protected void setAttributeValue(int position, Object val) {
-	attributes[position] = val;
+        attributes[position] = val;
     }
 
     /**
@@ -305,7 +303,6 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
      */
     public void setDefaultGeometry(Geometry geometry)
         throws IllegalAttributeException {
-        
         int idx = schema.defaultGeomIdx;
 
         if (idx < 0) {
@@ -515,128 +512,150 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
     }
 
     public Feature toComplex() {
-	try {
-	    return new ComplexWrapper(this);
-	} catch (IllegalAttributeException iae) {
-	    throw new RuntimeException("the impossible has happened: ", iae);
-	}
+        try {
+            return new ComplexWrapper(this);
+        } catch (IllegalAttributeException iae) {
+            throw new RuntimeException("the impossible has happened: ", iae);
+        }
     }
 
-    static final class ComplexWrapper extends DefaultFeature implements ComplexFeature {
-	/**
-	 * Private constructor to wrap the attributes in list.  Could consider
-	 * making this public, but for now it seems better to keep it private
-	 * since we do no check to make sure tha attribute array isn't already
-	 * complex - and thus if it was we would wrap it in Lists again.
-	 */
-	private ComplexWrapper(DefaultFeatureType fType, Object[] atts, String fid) throws IllegalAttributeException{
-	    super(fType, wrapInList(atts, fType.getAttributeCount()), fid);
-	}
+    static final class ComplexWrapper extends DefaultFeature
+        implements ComplexFeature {
+        /**
+         * Private constructor to wrap the attributes in list.  Could consider
+         * making this public, but for now it seems better to keep it private
+         * since we do no check to make sure tha attribute array isn't already
+         * complex - and thus if it was we would wrap it in Lists again.
+         *
+         * @param fType DOCUMENT ME!
+         * @param atts DOCUMENT ME!
+         * @param fid DOCUMENT ME!
+         *
+         * @throws IllegalAttributeException DOCUMENT ME!
+         */
+        private ComplexWrapper(DefaultFeatureType fType, Object[] atts,
+            String fid) throws IllegalAttributeException {
+            super(fType, wrapInList(atts, fType.getAttributeCount()), fid);
+        }
 
-	public ComplexWrapper(DefaultFeatureType fType, Object[] atts) throws IllegalAttributeException {
-	    this(fType, atts, null);
-	    }
-	
-	//This could be problematic, not sure if all SimpleFeatures will have
-	//DefaultFeatureTypes.
-	public ComplexWrapper(SimpleFeature feature) throws IllegalAttributeException {
-	    this((DefaultFeatureType)feature.getFeatureType(), feature.getAttributes(null), feature.getID());
-	}
-	
-	
-	/*public Object getAttribute(String name) {
-	    return wrapInList(super.getAttribute(name));
-	}
+        public ComplexWrapper(DefaultFeatureType fType, Object[] atts)
+            throws IllegalAttributeException {
+            this(fType, atts, null);
+        }
 
-	public Object getAttribute(int index) {
-	    return wrapInList(super.getAttribute(index));
-	    }*/
+        //This could be problematic, not sure if all SimpleFeatures will have
+        //DefaultFeatureTypes.
+        public ComplexWrapper(SimpleFeature feature)
+            throws IllegalAttributeException {
+            this((DefaultFeatureType) feature.getFeatureType(),
+                feature.getAttributes(null), feature.getID());
+        }
 
-	public void setAttribute(int index, Object value) throws IllegalAttributeException {
-	    checkList(value);
-	    List valList = (List) value;
-	    int listSize = valList.size();
-	    if (listSize == 0) {
-	        super.setAttribute(index, wrapInList(null));
-	    } else {
-		AttributeType type = super.getFeatureType().getAttributeType(index);
-		    Object val = valList.get(0);
-		try {
-		    Object parsed = type.parse(val);
-		    type.validate(parsed);
-		    setAttributeValue(index, wrapInList(parsed));
-		} catch (IllegalArgumentException iae) {
-		    throw new IllegalAttributeException(type, val, iae);
-		}
-	    }
-	}
+        /*public Object getAttribute(String name) {
+           return wrapInList(super.getAttribute(name));
+           }
+           public Object getAttribute(int index) {
+               return wrapInList(super.getAttribute(index));
+               }*/
+        public void setAttribute(int index, Object value)
+            throws IllegalAttributeException {
+            checkList(value);
 
-	/*public Object[] getAttributes(Object[] array) {
-	    Object[] retArray;
+            List valList = (List) value;
+            int listSize = valList.size();
 
-	    if (array == null) {
-		retArray = new Object[super.getNumberOfAttributes()];
-	    } else {
-		retArray = array;
-	    }
-	    for (int i = 0; i < array.length; i++) {
-		retArray[i] = wrapInList(array[i]);
-	    }
-	    
-	    return retArray;
-	    }*/
+            if (listSize == 0) {
+                super.setAttribute(index, wrapInList(null));
+            } else {
+                AttributeType type = super.getFeatureType().getAttributeType(index);
+                Object val = valList.get(0);
 
-	public void checkList(Object value) throws IllegalAttributeException {
-	      if (value instanceof List) {
-		List valList = (List) value;
-		int listSize = valList.size();
-		if (listSize > 1) {
-		    String errMsg = "The attribute: " + valList + " has more "
-			+ "attributes (" + listSize + ") than is allowed by an "
-			+ " attributeType in a Simple Feature (1)";
-		    throw new IllegalAttributeException(errMsg);
-		} 
-	      } else {		
-		String errMsg = "All objects set in a ComplexFeature must be "
-		    + "Lists, to account for multiplicity";
-		throw new IllegalAttributeException(errMsg);
-	    }
-	}
+                try {
+                    Object parsed = type.parse(val);
+                    type.validate(parsed);
+                    setAttributeValue(index, wrapInList(parsed));
+                } catch (IllegalArgumentException iae) {
+                    throw new IllegalAttributeException(type, val, iae);
+                }
+            }
+        }
 
-	/**
-	 * Sets the attribute at the given xPath.  Note that right now this just does the
-	 * name, and will fail on anything other than the name.
-	 * @param xPath The name of the attribute to Set.
-	 * @param attribute The value to set - must be a List, for this Complex Feature.
-	 * @TODO: Revisit xPath stuff - get it working or do external implementation.
-	 */
-	public void setAttribute(String xPath, Object attribute)
-	    throws IllegalAttributeException {
-	    int idx = super.getFeatureType().find(xPath);
+        /*public Object[] getAttributes(Object[] array) {
+           Object[] retArray;
+           if (array == null) {
+               retArray = new Object[super.getNumberOfAttributes()];
+           } else {
+               retArray = array;
+           }
+           for (int i = 0; i < array.length; i++) {
+               retArray[i] = wrapInList(array[i]);
+           }
+        
+           return retArray;
+           }*/
+        public void checkList(Object value) throws IllegalAttributeException {
+            if (value instanceof List) {
+                List valList = (List) value;
+                int listSize = valList.size();
 
-	    if (idx < 0) {
-		throw new IllegalAttributeException("No attribute named " + xPath);
-	    }
-	    
-	    setAttribute(idx, attribute);
-	}
+                if (listSize > 1) {
+                    String errMsg = "The attribute: " + valList + " has more "
+                        + "attributes (" + listSize
+                        + ") than is allowed by an "
+                        + " attributeType in a Simple Feature (1)";
+                    throw new IllegalAttributeException(errMsg);
+                }
+            } else {
+                String errMsg = "All objects set in a ComplexFeature must be "
+                    + "Lists, to account for multiplicity";
+                throw new IllegalAttributeException(errMsg);
+            }
+        }
 
-	protected static List wrapInList(Object attribute){
-	    return java.util.Collections.singletonList(attribute);
-	}
-	
-	protected static Object[] wrapInList(Object[] attributes, int defaultSize) {
-	    Object[] retArray = attributes;
-	    if (attributes == null) {
-		retArray = new Object[defaultSize];
-	    } else {
-		retArray = attributes;
-	    }
-	    for (int i = 0; i < attributes.length; i++) {
-		retArray[i] = wrapInList(attributes[i]);
-	    }
-	    return retArray;
-	}
+        /**
+         * Sets the attribute at the given xPath.  Note that right now this
+         * just does the name, and will fail on anything other than the name.
+         *
+         * @param xPath The name of the attribute to Set.
+         * @param attribute The value to set - must be a List, for this Complex
+         *        Feature.
+         *
+         * @throws IllegalAttributeException DOCUMENT ME!
+         *
+         * @task TODO: Revisit xPath stuff - get it working or do external
+         *       implementation.
+         */
+        public void setAttribute(String xPath, Object attribute)
+            throws IllegalAttributeException {
+            int idx = super.getFeatureType().find(xPath);
+
+            if (idx < 0) {
+                throw new IllegalAttributeException("No attribute named "
+                    + xPath);
+            }
+
+            setAttribute(idx, attribute);
+        }
+
+        protected static List wrapInList(Object attribute) {
+            return java.util.Collections.singletonList(attribute);
+        }
+
+        protected static Object[] wrapInList(Object[] attributes,
+            int defaultSize) {
+            Object[] retArray = attributes;
+
+            if (attributes == null) {
+                retArray = new Object[defaultSize];
+            } else {
+                retArray = attributes;
+            }
+
+            for (int i = 0; i < attributes.length; i++) {
+                retArray[i] = wrapInList(attributes[i]);
+            }
+
+            return retArray;
+        }
     }
-    
 }
