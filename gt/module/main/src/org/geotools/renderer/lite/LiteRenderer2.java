@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 import javax.media.jai.util.Range;
 
-import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
@@ -61,7 +60,6 @@ import org.geotools.referencing.operation.CoordinateOperationFactory;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;
-import org.geotools.renderer.j2d.StyledShapePainter;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.styling.FeatureTypeStyle;
@@ -77,7 +75,6 @@ import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.OperationNotFoundException;
@@ -1026,7 +1023,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     private MathTransform2D getMathTransform(
         CoordinateReferenceSystem sourceCrs,
         CoordinateReferenceSystem destinationCrs, AffineTransform at)
-        throws CannotCreateTransformException, OperationNotFoundException, FactoryException {
+        throws OperationNotFoundException, FactoryException {
         MathTransform2D transform = (MathTransform2D) transformMap.get(sourceCrs);
 
         if (transform != null) {
