@@ -218,11 +218,11 @@ public abstract class JDBCDataStore implements DataStore {
      *
      * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
      *             object.
-     */
+     *
     public JDBCDataStore(ConnectionPool connectionPool) throws IOException {
         this(connectionPool, null, new HashMap(), "");
     }
-
+     */
     /** List of TypeEntry entries - one for each featureType provided by this Datastore */
     public List entries() {
         if( contents == null ) {
@@ -309,12 +309,12 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
      *             object.
-     */
+     *
     public JDBCDataStore(ConnectionPool connectionPool, String databaseSchemaName)
         throws IOException {
         this(connectionPool, databaseSchemaName, new HashMap(), databaseSchemaName);
     }
-
+     */
     /**
      * 
      *
@@ -326,16 +326,16 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
      *             object.
-     */
+     *
     public JDBCDataStore(
         ConnectionPool connectionPool,
         String databaseSchemaName,
         Map fidGenerationTypes)
         throws IOException {
         this(connectionPool, databaseSchemaName, fidGenerationTypes, databaseSchemaName);
-    }
+    }*/
 
-    /**
+    /*
      * 
      *
      * @param connectionPool
@@ -347,7 +347,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
      *             object.
-     */
+     *
     public JDBCDataStore(
         ConnectionPool connectionPool,
         String databaseSchemaName,
@@ -357,8 +357,16 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         this(
             connectionPool,
             new JDBCDataStoreConfig(namespace, databaseSchemaName, new HashMap(), fidMapperTypes));
-    }
+    }*/
 
+    /**
+     * Construct a JDBCDataStore with ConnectionPool and associated configuration.
+     * 
+     * @param connectionPool 
+     * @param config 
+     * @throws IOException 
+     * 
+     */
     public JDBCDataStore(ConnectionPool connectionPool, JDBCDataStoreConfig config)
         throws IOException {
         this.connectionPool = connectionPool;
