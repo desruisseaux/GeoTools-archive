@@ -127,6 +127,13 @@ public class AreaGeometryFactory extends VPFGeometryFactory
                     // If both faceIds are this faceId then this is a line extending into
                     // the face and not an edge line of the face so don't add it's points
                     // to the coordinates list.  Except if it's the first edge encountered.
+                    // ASCII art showing this case:
+                    //   /-----------\
+                    //   |           |
+                    //   +---+       |
+                    //   | ^^        |
+                    //   | This one  |
+                    //   \-----------/
                     if (faceId == leftFace && faceId == rightFace && prevNodeId != -1) {
                         addPoints = false;
                         if (prevNodeId == startNode) {
