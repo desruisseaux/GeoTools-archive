@@ -92,9 +92,9 @@ public class sldSchema implements Schema {
     private static ComplexType[] complexTypes = null;
     public ComplexType[] getComplexTypes() {
         if (complexTypes == null) {
-            complexTypes = new ComplexType[]{sldComplexTypes.SelectedChannelType.getInstance(),
-                    sldComplexTypes.ParameterValueType.getInstance(),
-                    sldComplexTypes.SymbolizerType.getInstance()};
+            complexTypes = new ComplexType[]{sldComplexTypes2.SelectedChannelType.getInstance(),
+                    sldComplexTypes2.ParameterValueType.getInstance(),
+                    sldComplexTypes2.SymbolizerType.getInstance()};
         }
         return complexTypes;
     }
@@ -116,22 +116,22 @@ public class sldSchema implements Schema {
                                                                                      * double
                                                                                      */,
                             null, 1, 1),
-                    new sldElement("PolygonSymbolizer", sldComplexTypes._PolygonSymbolizer.getInstance(),
-                            new sldElement("Symbolizer", sldComplexTypes.SymbolizerType
+                    new sldElement("PolygonSymbolizer", sldComplexTypes2._PolygonSymbolizer.getInstance(),
+                            new sldElement("Symbolizer", sldComplexTypes2.SymbolizerType
                                     .getInstance(), null, 1, 1), 1, 1),
                     new sldElement("ColorMapEntry", sldComplexTypes._ColorMapEntry.getInstance(), null, 1, 1),
-                    new sldElement("GreenChannel", sldComplexTypes.SelectedChannelType
+                    new sldElement("GreenChannel", sldComplexTypes2.SelectedChannelType
                             .getInstance(), null, 1, 1),
                     new sldElement("LATEST_ON_TOP", sldComplexTypes._LATEST_ON_TOP.getInstance(), null, 1, 1),
-                    new sldElement("LayerFeatureConstraints", sldComplexTypes._LayerFeatureConstraints.getInstance(),
+                    new sldElement("LayerFeatureConstraints", sldComplexTypes2._LayerFeatureConstraints.getInstance(),
                             null, 1, 1),
-                    new sldElement("Size", sldComplexTypes.ParameterValueType.getInstance(), null,
+                    new sldElement("Size", sldComplexTypes2.ParameterValueType.getInstance(), null,
                             1, 1),
-                    new sldElement("LineSymbolizer", sldComplexTypes._LineSymbolizer.getInstance(),
-                            new sldElement("Symbolizer", sldComplexTypes.SymbolizerType
+                    new sldElement("LineSymbolizer", sldComplexTypes2._LineSymbolizer.getInstance(),
+                            new sldElement("Symbolizer", sldComplexTypes2.SymbolizerType
                                     .getInstance(), null, 1, 1), 1, 1),
-                    new sldElement("PointSymbolizer", sldComplexTypes._PointSymbolizer.getInstance(),
-                            new sldElement("Symbolizer", sldComplexTypes.SymbolizerType
+                    new sldElement("PointSymbolizer", sldComplexTypes2._PointSymbolizer.getInstance(),
+                            new sldElement("Symbolizer", sldComplexTypes2.SymbolizerType
                                     .getInstance(), null, 1, 1), 1, 1),
                     new sldElement("ChannelSelection", sldComplexTypes._ChannelSelection.getInstance(), null, 1,
                             1),
@@ -155,19 +155,19 @@ public class sldSchema implements Schema {
                                                                                      */,
                             null, 1, 1),
                     new sldElement("BlueChannel",
-                            sldComplexTypes.SelectedChannelType.getInstance(), null, 1, 1),
-                    new sldElement("RANDOM", sldComplexTypes._RANDOM.getInstance(), null, 1, 1),
+                            sldComplexTypes2.SelectedChannelType.getInstance(), null, 1, 1),
+                    new sldElement("RANDOM", sldComplexTypes2._RANDOM.getInstance(), null, 1, 1),
                     new sldElement("FeatureTypeName", org.geotools.xml.xsi.XSISimpleTypes.String
                             .getInstance()/* simpleType name is string */, null, 1, 1),
                     new sldElement("Font", sldComplexTypes._Font.getInstance(), null, 1, 1),
                     new sldElement("Title", org.geotools.xml.xsi.XSISimpleTypes.String
                             .getInstance()/* simpleType name is string */, null, 1, 1),
-                    new sldElement("UserStyle", sldComplexTypes._UserStyle.getInstance(), null, 1, 1),
-                    new sldElement("PointPlacement", sldComplexTypes._PointPlacement.getInstance(), null, 1, 1),
-                    new sldElement("Rotation", sldComplexTypes.ParameterValueType.getInstance(),
+                    new sldElement("UserStyle", sldComplexTypes2._UserStyle.getInstance(), null, 1, 1),
+                    new sldElement("PointPlacement", sldComplexTypes2._PointPlacement.getInstance(), null, 1, 1),
+                    new sldElement("Rotation", sldComplexTypes2.ParameterValueType.getInstance(),
                             null, 1, 1),
-                    new sldElement("OnlineResource", sldComplexTypes._OnlineResource.getInstance(), null, 1, 1),
-                    new sldElement("Mark", sldComplexTypes._Mark.getInstance(), null, 1, 1),
+                    new sldElement("OnlineResource", sldComplexTypes2._OnlineResource.getInstance(), null, 1, 1),
+                    new sldElement("Mark", sldComplexTypes2._Mark.getInstance(), null, 1, 1),
                     new sldElement("BrightnessOnly", org.geotools.xml.xsi.XSISimpleTypes.Boolean
                             .getInstance()/* simpleType name is boolean */, null, 1, 1),
                     new sldElement(
@@ -182,7 +182,7 @@ public class sldSchema implements Schema {
                             1),
                     new sldElement("Geometry", sldComplexTypes._Geometry.getInstance(), null, 1, 1),
                     new sldElement("ElseFilter", sldComplexTypes._ElseFilter.getInstance(), null, 1, 1),
-                    new sldElement("StyledLayerDescriptor", sldComplexTypes._StyledLayerDescriptor.getInstance(),
+                    new sldElement("StyledLayerDescriptor", sldComplexTypes2._StyledLayerDescriptor.getInstance(),
                             null, 1, 1),
                     new sldElement("Abstract", org.geotools.xml.xsi.XSISimpleTypes.String
                             .getInstance()/* simpleType name is string */, null, 1, 1),
@@ -194,13 +194,13 @@ public class sldSchema implements Schema {
                             1),
                     new sldElement("Format", org.geotools.xml.xsi.XSISimpleTypes.String
                             .getInstance()/* simpleType name is string */, null, 1, 1),
-                    new sldElement("DisplacementY", sldComplexTypes.ParameterValueType
+                    new sldElement("DisplacementY", sldComplexTypes2.ParameterValueType
                             .getInstance(), null, 1, 1),
-                    new sldElement("DisplacementX", sldComplexTypes.ParameterValueType
+                    new sldElement("DisplacementX", sldComplexTypes2.ParameterValueType
                             .getInstance(), null, 1, 1),
-                    new sldElement("NamedLayer", sldComplexTypes._NamedLayer.getInstance(), null, 1, 1),
-                    new sldElement("TextSymbolizer", sldComplexTypes._TextSymbolizer.getInstance(),
-                            new sldElement("Symbolizer", sldComplexTypes.SymbolizerType
+                    new sldElement("NamedLayer", sldComplexTypes2._NamedLayer.getInstance(), null, 1, 1),
+                    new sldElement("TextSymbolizer", sldComplexTypes2._TextSymbolizer.getInstance(),
+                            new sldElement("Symbolizer", sldComplexTypes2.SymbolizerType
                                     .getInstance(), null, 1, 1), 1, 1),
                     new sldElement("LabelPlacement", sldComplexTypes._LabelPlacement.getInstance(), null, 1, 1),
                     new sldElement("Value", org.geotools.xml.xsi.XSISimpleTypes.String
@@ -208,55 +208,55 @@ public class sldSchema implements Schema {
                     new sldElement("Histogram", sldComplexTypes._Histogram.getInstance(), null, 1, 1),
                     new sldElement("ExternalGraphic", sldComplexTypes._ExternalGraphic.getInstance(), null, 1,
                             1),
-                    new sldElement("NamedStyle", sldComplexTypes._NamedStyle.getInstance(), null, 1, 1),
+                    new sldElement("NamedStyle", sldComplexTypes2._NamedStyle.getInstance(), null, 1, 1),
                     new sldElement("AnchorPointY",
-                            sldComplexTypes.ParameterValueType.getInstance(), null, 1, 1),
-                    new sldElement("RemoteOWS", sldComplexTypes._RemoteOWS.getInstance(), null, 1, 1),
+                            sldComplexTypes2.ParameterValueType.getInstance(), null, 1, 1),
+                    new sldElement("RemoteOWS", sldComplexTypes2._RemoteOWS.getInstance(), null, 1, 1),
                     new sldElement("CssParameter", sldComplexTypes._CssParameter.getInstance(), null, 1, 1),
-                    new sldElement("PerpendicularOffset", sldComplexTypes.ParameterValueType
+                    new sldElement("PerpendicularOffset", sldComplexTypes2.ParameterValueType
                             .getInstance(), null, 1, 1),
-                    new sldElement("Label", sldComplexTypes.ParameterValueType.getInstance(), null,
+                    new sldElement("Label", sldComplexTypes2.ParameterValueType.getInstance(), null,
                             1, 1),
-                    new sldElement("OverlapBehavior", sldComplexTypes._OverlapBehavior.getInstance(), null, 1,
+                    new sldElement("OverlapBehavior", sldComplexTypes2._OverlapBehavior.getInstance(), null, 1,
                             1),
                     new sldElement("Halo", sldComplexTypes._Halo.getInstance(), null, 1, 1),
                     new sldElement("ImageOutline", sldComplexTypes._ImageOutline.getInstance(), null, 1, 1),
                     new sldElement("Fill", sldComplexTypes._Fill.getInstance(), null, 1, 1),
-                    new sldElement("ShadedRelief", sldComplexTypes._ShadedRelief.getInstance(), null, 1, 1),
+                    new sldElement("ShadedRelief", sldComplexTypes2._ShadedRelief.getInstance(), null, 1, 1),
                     new sldElement("SourceChannelName", org.geotools.xml.xsi.XSISimpleTypes.String
                             .getInstance()/* simpleType name is string */, null, 1, 1),
                     new sldElement("Service", sldSimpleTypes._Service.getInstance(), null, 1, 1),
                     new sldElement("GrayChannel",
-                            sldComplexTypes.SelectedChannelType.getInstance(), null, 1, 1),
-                    new sldElement("Rule", sldComplexTypes._Rule.getInstance(), null, 1, 1),
-                    new sldElement("RedChannel", sldComplexTypes.SelectedChannelType.getInstance(),
+                            sldComplexTypes2.SelectedChannelType.getInstance(), null, 1, 1),
+                    new sldElement("Rule", sldComplexTypes2._Rule.getInstance(), null, 1, 1),
+                    new sldElement("RedChannel", sldComplexTypes2.SelectedChannelType.getInstance(),
                             null, 1, 1),
                     new sldElement("GraphicFill", sldComplexTypes._GraphicFill.getInstance(), null, 1, 1),
-                    new sldElement("LegendGraphic", sldComplexTypes._LegendGraphic.getInstance(), null, 1, 1),
+                    new sldElement("LegendGraphic", sldComplexTypes2._LegendGraphic.getInstance(), null, 1, 1),
                     new sldElement("AVERAGE", sldComplexTypes._AVERAGE.getInstance(), null, 1, 1),
                     new sldElement("IsDefault", org.geotools.xml.xsi.XSISimpleTypes.Boolean
                             .getInstance()/* simpleType name is boolean */, null, 1, 1),
-                    new sldElement("LinePlacement", sldComplexTypes._LinePlacement.getInstance(), null, 1, 1),
-                    new sldElement("Normalize", sldComplexTypes._Normalize.getInstance(), null, 1, 1),
+                    new sldElement("LinePlacement", sldComplexTypes2._LinePlacement.getInstance(), null, 1, 1),
+                    new sldElement("Normalize", sldComplexTypes2._Normalize.getInstance(), null, 1, 1),
                     new sldElement("Extent", sldComplexTypes._Extent.getInstance(), null, 1, 1),
                     new sldElement("ReliefFactor", org.geotools.xml.xsi.XSISimpleTypes.Double
                             .getInstance()/* simpleType name is double */, null, 1, 1),
-                    new sldElement("RasterSymbolizer", sldComplexTypes._RasterSymbolizer.getInstance(),
-                            new sldElement("Symbolizer", sldComplexTypes.SymbolizerType
+                    new sldElement("RasterSymbolizer", sldComplexTypes2._RasterSymbolizer.getInstance(),
+                            new sldElement("Symbolizer", sldComplexTypes2.SymbolizerType
                                     .getInstance(), null, 1, 1), 1, 1),
                     new sldElement("FeatureTypeConstraint", sldComplexTypes._FeatureTypeConstraint.getInstance(),
                             null, 1, 1),
-                    new sldElement("Stroke", sldComplexTypes._Stroke.getInstance(), null, 1, 1),
+                    new sldElement("Stroke", sldComplexTypes2._Stroke.getInstance(), null, 1, 1),
                     new sldElement("ColorMap", sldComplexTypes._ColorMap.getInstance(), null, 1, 1),
-                    new sldElement("UserLayer", sldComplexTypes._UserLayer.getInstance(), null, 1, 1),
-                    new sldElement("Symbolizer", sldComplexTypes.SymbolizerType.getInstance(),
+                    new sldElement("UserLayer", sldComplexTypes2._UserLayer.getInstance(), null, 1, 1),
+                    new sldElement("Symbolizer", sldComplexTypes2.SymbolizerType.getInstance(),
                             null, 1, 1),
-                    new sldElement("Opacity", sldComplexTypes.ParameterValueType.getInstance(),
+                    new sldElement("Opacity", sldComplexTypes2.ParameterValueType.getInstance(),
                             null, 1, 1),
-                    new sldElement("Radius", sldComplexTypes.ParameterValueType.getInstance(),
+                    new sldElement("Radius", sldComplexTypes2.ParameterValueType.getInstance(),
                             null, 1, 1),
                     new sldElement("AnchorPointX",
-                            sldComplexTypes.ParameterValueType.getInstance(), null, 1, 1)};
+                            sldComplexTypes2.ParameterValueType.getInstance(), null, 1, 1)};
         }
         return elements;
     }
