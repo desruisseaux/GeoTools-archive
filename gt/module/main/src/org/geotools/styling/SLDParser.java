@@ -513,7 +513,15 @@ public class SLDParser {
                 rule.setAbstract(child.getFirstChild().getNodeValue());
             }
             
-            if (childName.equalsIgnoreCase("Filter")) {
+			if (childName.equalsIgnoreCase("MinScaleDenominator")) {
+				rule.setMinScaleDenominator(Double.parseDouble(child.getFirstChild().getNodeValue()));
+			}
+			
+			if (childName.equalsIgnoreCase("MaxScaleDenominator")) {
+				rule.setMaxScaleDenominator(Double.parseDouble(child.getFirstChild().getNodeValue()));
+	        } 
+			
+			if (childName.equalsIgnoreCase("Filter")) {
                 NodeList list = child.getChildNodes();
                 Node kid = null;
                 
