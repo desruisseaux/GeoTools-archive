@@ -90,15 +90,22 @@ public class AllHandler extends ElementGroupingHandler {
             minOccurs = atts.getValue(namespaceURI, "minOccurs");
         }
 
-        this.minOccurs = Integer.parseInt(minOccurs);
+        if (minOccurs == null || minOccurs.length() == 0) {
+        	this.minOccurs = 1;
+        } else {
+        	this.minOccurs = Integer.parseInt(minOccurs);
+        }
 
         String maxOccurs = atts.getValue("", "maxOccurs");
 
         if (maxOccurs == null) {
             maxOccurs = atts.getValue(namespaceURI, "maxOccurs");
         }
-
-        this.maxOccurs = Integer.parseInt(maxOccurs);
+        if (maxOccurs == null || maxOccurs.length() == 0) {
+        	this.maxOccurs = 1;
+        } else {
+        	this.maxOccurs = Integer.parseInt(maxOccurs);
+        }
     }
 
     /**
