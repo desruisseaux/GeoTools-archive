@@ -19,6 +19,7 @@ package org.geotools.catalog;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.opengis.catalog.MetadataEntity;
 
@@ -120,19 +121,25 @@ public class XPath {
 
         return result;
     }
-
-    private List find(String term, List elements) {
+    
+    /**
+     * Utility method for dealing with a single term in a XPath expression.
+     * 
+     * @param term Single term in XPath expression
+     * @param elements List of MetadataEntity.Element
+     * @return List of Elemenets with matching name
+     */
+    public static final List find(String term, List elements) {
         List result = new ArrayList();
 
+        Pattern pattern = Pattern.compile( term );        
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             MetadataEntity.Element element = (MetadataEntity.Element) iter.next();
-            String n = element.getName();
-
-            if (n.matches(term)) {
+            String name = element.getName();
+            if ( pattern.matcher( name ).matches() ){            
                 result.add(element);
             }
         }
-
         return result;
     }
 

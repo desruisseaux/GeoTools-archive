@@ -16,6 +16,7 @@
  */
 package org.geotools.catalog;
 
+import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,24 +27,24 @@ import org.opengis.catalog.MetadataEntity;
 
 
 /**
- * A superclass for most metadata.
- *
- * A subclass implements *MUST* implement minimum one subinterface of the Metadata interface
- *
- * DefaultMetadata uses reflection to identify all the getXXX() methods.
+ * MetadataEntity superclass that uses reflection for EntityType information.
+ * <p>
+ * AbstractMetadata uses reflection to identify all the getXXX() methods.
  * The getXXX() are used to construct all the Metadata.Entity and Metadata.Element objects
  * The return type of each is used to determine whether the element is a simple element or an entity,
  * if the element is not a simple entity a entity for that class will can be created as well.
  * All Metadata.Entities and Elements are created when requested (Lazily)
- *
- * TODO: We should switch this over to use BeanInfo/Introspector reflection to allow for
+ * </p>
+ * <p>
+ * We should switch this over to use BeanInfo/Introspector reflection to allow for
  * recognition of boolean isFoo as "foo", getBar as "bar" and getURL as "URL".
+ * </p>
  * 
  * @author jeichar
  * @since 2.1
  */
-public class DefaultMetadataEntity implements MetadataEntity {
-    EntityImpl entity;
+public abstract class AbstractMetadataEntity implements MetadataEntity {    
+    static EntityImpl entity = null;
 
     /**
      * @see org.geotools.metadata.Metadata#elements()
@@ -110,6 +111,10 @@ public class DefaultMetadataEntity implements MetadataEntity {
     }
 
     /**
+     * Builds EntityType based on reflection.
+     * <p>
+     * The EntityType will not be built until the first time it is needed.
+     * </p>
      * @see org.geotools.metadata.Metadata#getEntity()
      */
     public EntityType getEntityType() {
@@ -149,43 +154,37 @@ public class DefaultMetadataEntity implements MetadataEntity {
             if (!entityMap.containsKey(clazz)) {
                 entityMap.put(clazz, new EntityImpl(clazz));
             }
-
             return (EntityImpl) entityMap.get(clazz);
         }
         
         private void init(Class clazz) {
             getMethods = new ArrayList();
 
-            ArrayList ifaces = new ArrayList();
-            getInterfaces(clazz, ifaces);
-
+            Method methods[] = clazz.getMethods();
+            
             /*
-             * Inspects each interface. If the interface is not the
-             * MetadataEntity interface then its getXXX() methods are used to
-             * identify the MetadataElements of the Metadata
+             * locate and add field that match getXXX(), or boolean isXXX() indicates
              */
-            for (Iterator iter = ifaces.iterator(); iter.hasNext();) {
-                Class iface = (Class) iter.next();
+            for (int i = 0; i < methods.length; i++) {
+                Method method = methods[i];
 
-                Method[] newmethods = iface.getDeclaredMethods();
+                if (method.getName().startsWith("get")) {
+                    getMethods.add(method);
 
-                /*
-                 * locate and add field that the getXXX() indicates
-                 */
-                for (int j = 0; j < newmethods.length; j++) {
-                    Method method = newmethods[j];
+                    Class elementClass = method.getReturnType();
 
-                    if (method.getName().startsWith("get")) {
-                        getMethods.add(method);
-
-                        Class elementClass = method.getReturnType();
-
-                        ElementImpl element = new ElementImpl(elementClass,
-                                method);
-                        elemMap.put(method.getName().substring(3), element);
-                        elemList.add(element);
-                    }
-                } //for
+                    ElementImpl element = new ElementImpl(elementClass,method);
+                    elemMap.put( element.getName(), element );
+                    elemList.add(element);
+                }
+                if (method.getName().startsWith("is") &&
+                    method.getReturnType().equals( Boolean.TYPE )) {
+                    
+                    getMethods.add(method);
+                    ElementImpl element = new ElementImpl( Boolean.TYPE,method);
+                    elemMap.put( element.getName(), element );
+                    elemList.add(element);
+                }
             } //for
         }
 
@@ -270,10 +269,16 @@ public class DefaultMetadataEntity implements MetadataEntity {
          */
         public ElementImpl(Class elementClass, Method method) {
             this.getMethod = method;
-            type = elementClass;            
-            name = method.getName().substring(3);
-            name = name.substring(0,1).toLowerCase() + name.substring(1);
-
+            type = elementClass;           
+            name = method.getName();
+            if( name.startsWith("get")){
+                name = name.substring( 3 );
+            }
+            else if ( name.startsWith("is")){
+                name = name.substring(2);
+            }
+            name = Introspector.decapitalize( name );
+            
             if (MetadataEntity.class.isAssignableFrom(elementClass)) {
                 entity = EntityImpl.getEntity(elementClass);
             }
