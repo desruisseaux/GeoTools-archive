@@ -13,3 +13,10 @@ org.geotools.referencing.operation.projection.AlbersEqualArea$Provider
 org.geotools.referencing.operation.projection.LambertConformal$Provider1SP
 org.geotools.referencing.operation.projection.LambertConformal$Provider2SP
 org.geotools.referencing.operation.projection.LambertConformal$Provider2SP_Belgium
+org.geotools.referencing.operation.projection.Orthographic$Provider
+org.geotools.referencing.operation.projection.Stereographic$Provider_Oblique
+org.geotools.referencing.operation.projection.Stereographic$Provider_Polar_A
+org.geotools.referencing.operation.projection.Stereographic$Provider_Polar_B
+org.geotools.referencing.operation.projection.Stereographic$Provider_North_Pole
+org.geotools.referencing.operation.projection.Stereographic$Provider_South_Pole
+org.geotools.referencing.operation.projection.Stereographic$Provider_USGS
