@@ -729,7 +729,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class AbstractGeometryType extends GMLComplexType {
+    public static class AbstractGeometryType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -754,7 +754,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -874,7 +874,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class AbstractGeometryCollectionBaseType extends GMLComplexType {
+    public static class AbstractGeometryCollectionBaseType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -976,7 +976,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -1018,7 +1018,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class GeometryAssociationType extends GMLComplexType {
+    public static class GeometryAssociationType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -1048,7 +1048,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -1192,7 +1192,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class PointMemberType extends GMLComplexType {
+    public static class PointMemberType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -1224,7 +1224,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -1373,7 +1373,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class LineStringMemberType extends GMLComplexType {
+    public static class LineStringMemberType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -1405,7 +1405,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -1551,7 +1551,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class PolygonMemberType extends GMLComplexType {
+    public static class PolygonMemberType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -1583,7 +1583,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -1732,7 +1732,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class LinearRingMemberType extends GMLComplexType {
+    public static class LinearRingMemberType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -1764,7 +1764,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -1912,7 +1912,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class PointType extends GMLComplexType {
+    public static class PointType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -1941,7 +1941,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -2089,7 +2089,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class LineStringType extends GMLComplexType {
+    public static class LineStringType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -2119,7 +2119,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -2278,7 +2278,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class LinearRingType extends GMLComplexType {
+    public static class LinearRingType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -2307,7 +2307,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -2465,7 +2465,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class BoxType extends GMLComplexType {
+    public static class BoxType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -2494,7 +2494,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -2685,7 +2685,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class PolygonType extends GMLComplexType {
+    public static class PolygonType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -2715,7 +2715,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -2859,7 +2859,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class GeometryCollectionType extends GMLComplexType {
+    public static class GeometryCollectionType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -2886,7 +2886,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -3016,7 +3016,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class MultiPointType extends GMLComplexType {
+    public static class MultiPointType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -3046,7 +3046,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -3176,7 +3176,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class MultiLineStringType extends GMLComplexType {
+    public static class MultiLineStringType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -3206,7 +3206,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -3336,7 +3336,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class MultiPolygonType extends GMLComplexType {
+    public static class MultiPolygonType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -3366,7 +3366,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -3495,7 +3495,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class CoordType extends GMLComplexType {
+    public static class CoordType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -3525,7 +3525,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -3681,7 +3681,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class CoordinatesType extends GMLComplexType {
+    public static class CoordinatesType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -3708,7 +3708,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -3895,7 +3895,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class AbstractFeatureType extends GMLComplexType {
+    public static class AbstractFeatureType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -3946,7 +3946,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -4231,7 +4231,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class AbstractFeatureCollectionsBaseType extends AbstractFeatureType {
+    public static class AbstractFeatureCollectionsBaseType extends AbstractFeatureType {
         // static element list
         private static final Element[] elements = {
                 new GMLElement("description",
@@ -4254,7 +4254,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -4322,7 +4322,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class AbstractFeatureCollectionType extends GMLComplexType {
+    public static class AbstractFeatureCollectionType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -4356,7 +4356,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -4565,7 +4565,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class GeometryPropertyType extends GMLComplexType {
+    public static class GeometryPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -4595,7 +4595,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -4742,7 +4742,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class FeatureAssociationType extends GMLComplexType {
+    public static class FeatureAssociationType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -4772,7 +4772,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -4924,7 +4924,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class BoundingShapeType extends GMLComplexType {
+    public static class BoundingShapeType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -4951,7 +4951,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -5102,7 +5102,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class PointPropertyType extends GMLComplexType {
+    public static class PointPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -5131,7 +5131,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -5260,7 +5260,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class PolygonPropertyType extends GMLComplexType {
+    public static class PolygonPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -5289,7 +5289,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -5418,7 +5418,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class LineStringPropertyType extends GMLComplexType {
+    public static class LineStringPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -5447,7 +5447,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -5577,7 +5577,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class MultiPointPropertyType extends GMLComplexType {
+    public static class MultiPointPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -5606,7 +5606,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -5736,7 +5736,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class MultiLineStringPropertyType extends GMLComplexType {
+    public static class MultiLineStringPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -5766,7 +5766,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -5896,7 +5896,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class MultiPolygonPropertyType extends GMLComplexType {
+    public static class MultiPolygonPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -5926,7 +5926,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 
@@ -6056,7 +6056,7 @@ public class GMLComplexTypes {
      * @see GMLComplexType
      * @see ComplexType
      */
-    static class MultiGeometryPropertyType extends GMLComplexType {
+    public static class MultiGeometryPropertyType extends GMLComplexType {
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
@@ -6086,7 +6086,7 @@ public class GMLComplexTypes {
          *
          * @see GMLComplexType#getInstance()
          */
-        static GMLComplexType getInstance() {
+        public static GMLComplexType getInstance() {
             return instance;
         }
 

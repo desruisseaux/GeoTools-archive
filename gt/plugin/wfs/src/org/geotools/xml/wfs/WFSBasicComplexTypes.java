@@ -17,11 +17,16 @@
 package org.geotools.xml.wfs;
 
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.gml.GMLComplexTypes;
 import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.DefaultAttribute;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Type;
 import org.geotools.xml.wfs.WFSSchema.WFSComplexType;
+import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
@@ -38,6 +43,8 @@ import javax.naming.OperationNotSupportedException;
  * @author dzwiers
  */
 public class WFSBasicComplexTypes {
+    
+    public final static String LOCK_KEY = "WFSBasicComplexTypes.LOCKID.KEY";
     /**
      * <p>
      * This class represents an GetFeatureTypeType within the WFS Schema.  This
@@ -393,23 +400,26 @@ public class WFSBasicComplexTypes {
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
          */
         public Attribute[] getAttributes() {
-            // TODO Auto-generated method stub
-            return null;
+            return new Attribute[] {new DefaultAttribute(null,"lockId",WFSSchema.NAMESPACE,XSISimpleTypes.String.getInstance(),Attribute.OPTIONAL,null,null,false),};
         }
 
         /**
          * @see org.geotools.xml.schema.ComplexType#getChild()
          */
         public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
+            return ((ComplexType)getParent()).getChild();
         }
 
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getParent()
+         */
+        public Type getParent() {
+            return GMLComplexTypes.AbstractFeatureCollectionType.getInstance();
+        }
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
         public Element[] getChildElements() {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -421,8 +431,16 @@ public class WFSBasicComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints)
             throws SAXException, SAXNotSupportedException {
-            // TODO Auto-generated method stub
-            return null;
+            
+            String lock = null;
+            lock = attrs.getValue("","lockID");
+            if(lock == null || "".equals(lock))
+                lock = attrs.getValue(WFSSchema.NAMESPACE,"lockID");
+            
+            if(hints!=null && lock!=null && (!"".equals(lock)))
+                hints.put(LOCK_KEY,lock);
+            
+            return getParent().getValue(element,value,attrs,hints);
         }
 
         /**
@@ -436,8 +454,7 @@ public class WFSBasicComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            // TODO Auto-generated method stub
-            return null;
+            return getParent().getInstanceType();
         }
 
         /**
@@ -445,8 +462,7 @@ public class WFSBasicComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-            // TODO Auto-generated method stub
-            return false;
+            return getParent().canEncode(element,value,hints);
         }
 
         /**
@@ -456,7 +472,8 @@ public class WFSBasicComplexTypes {
          */
         public void encode(Element element, Object value, PrintHandler output,
             Map hints) throws IOException, OperationNotSupportedException {
-            // TODO Auto-generated method stub
+            // TODO add the lockId attribute
+            getParent().encode(element,value,output,hints);
         }
     }
 }
