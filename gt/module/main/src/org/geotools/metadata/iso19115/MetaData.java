@@ -1,6 +1,5 @@
 package org.geotools.metadata.iso19115;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -59,22 +58,36 @@ public class MetaData extends AbstractMetaData implements
 	}	
 	public String getParentIdentifier() {
 		return parentIdentifier;
-	}
-	public Set getHierarchyLevels() {
+	}	
+	public void setHierarchyLevels(Set hierarchyLevels) {
+		if( this.hierarchyLevels == null ){
+	        this.hierarchyLevels = new SetOf( ScopeCode.class );	        
+	    }
+	    else {	        
+	        this.hierarchyLevels.clear();
+	    }
+	    this.hierarchyLevels.addAll( hierarchyLevels );		
+	}	
+	public synchronized Set getHierarchyLevels() {
 	    if( hierarchyLevels == null ){
-	        return Collections.EMPTY_SET;
+	        hierarchyLevels = new SetOf( ScopeCode.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( hierarchyLevels );
+	    return hierarchyLevels;	    
+	}
+	public void setHierarchyLevelNames(Set hierarchyLevelNames) {
+		if( this.hierarchyLevelNames == null ){
+	        this.hierarchyLevelNames = new SetOf( String.class );	        
 	    }
+	    else {	        
+	        this.hierarchyLevelNames.clear();
+	    }
+	    this.hierarchyLevelNames.addAll( hierarchyLevelNames );
 	}
 	public Set getHierarchyLevelNames() {
 		if( hierarchyLevelNames == null ){
-	        return Collections.EMPTY_SET;
+		    hierarchyLevelNames = new SetOf( String.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( hierarchyLevelNames );
-	    }
+		return hierarchyLevelNames;
 	}
 	public ResponsibleParty getContact() {
 		return contact;
@@ -84,78 +97,60 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public Set getSpatialRepresentationInfo() {
 		if( spatialRepresentationInfo == null ){
-	        return Collections.EMPTY_SET;
+		    spatialRepresentationInfo = new SetOf( SpatialRepresentation.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( spatialRepresentationInfo );
-	    }		
+	    return spatialRepresentationInfo;	    	
 	}
 	public Set getReferenceSystemInfo() {
 		if( referenceSystemInfo == null ){
-	        return Collections.EMPTY_SET;
+		    referenceSystemInfo = new SetOf( ReferenceSystem.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( referenceSystemInfo );
-	    }
+	    return referenceSystemInfo;
 	}
 	public Set getMetadataExtensionInfo() {
 	    if( metadataExtensionInfo == null ){
-	        return Collections.EMPTY_SET;
+	        metadataExtensionInfo = new SetOf( MetadataExtensionInformation.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( metadataExtensionInfo );
-	    }		
+	    return metadataExtensionInfo;
 	}
 	public Set getIdentificationInfo() {
 	    if( identificationInfo == null ){
-	        return Collections.EMPTY_SET;
+	        identificationInfo = new SetOf( Identification.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( identificationInfo );
-	    }		
+	    return identificationInfo;
 	}
 	public Set getContentInfo() {
 		if( contentInfo == null ){
-	        return Collections.EMPTY_SET;
+		    contentInfo = new SetOf( ContentInformation.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( contentInfo );
-	    }
+	    return contentInfo;
 	}
 	public Distribution getDistributionInfo() {
 		return distributionInfo;
 	}
 	public Set getDataQualityInfo() {
 		if( dataQualityInfo == null ){
-	        return Collections.EMPTY_SET;
+		    dataQualityInfo = new SetOf( DataQuality.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( dataQualityInfo );
-	    }
+	    return dataQualityInfo;
 	}
 	public Set getPortrayalCatalogueInfo() {
 		if( portrayalCatalogueInfo == null ){
-	        return Collections.EMPTY_SET;
+		    portrayalCatalogueInfo = new SetOf( PortrayalCatalogueReference.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( portrayalCatalogueInfo );
-	    }		
+	    return portrayalCatalogueInfo;
 	}
 	public Set getMetadataConstraints() {
 		if( metadataConstraints == null ){
-	        return Collections.EMPTY_SET;
+		    metadataConstraints = new SetOf( Constraints.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( metadataConstraints );
-	    }
+	    return metadataConstraints;
 	}
 	public Set getApplicationSchemaInfo() {
 		if( applicationSchemaInfo == null ){
-	        return Collections.EMPTY_SET;
+		    applicationSchemaInfo = new SetOf( ApplicationSchemaInformation.class );
 	    }
-	    else {
-	        return Collections.unmodifiableSet( applicationSchemaInfo );
-	    }		
+	    return applicationSchemaInfo;
 	}
 	public MaintenanceInformation getMetadataMaintenance() {
 		return metadataMaintenance;
@@ -202,24 +197,6 @@ public class MetaData extends AbstractMetaData implements
 	}
 	public void setDistributionInfo(Distribution distributionInfo) {
 		this.distributionInfo = distributionInfo;
-	}
-	public void setHierarchyLevelNames(Set hierarchyLevelNames) {
-		if( this.hierarchyLevelNames == null ){
-	        this.hierarchyLevelNames = new SetOf( String.class );	        
-	    }
-	    else {	        
-	        this.hierarchyLevelNames.clear();
-	    }
-	    this.hierarchyLevelNames.addAll( hierarchyLevelNames );
-	}
-	public void setHierarchyLevels(Set hierarchyLevels) {
-		if( this.hierarchyLevels == null ){
-	        this.hierarchyLevels = new SetOf( ScopeCode.class );	        
-	    }
-	    else {	        
-	        this.hierarchyLevels.clear();
-	    }
-	    this.hierarchyLevels.addAll( hierarchyLevels );		
 	}
 	public void setIdentificationInfo(Set identificationInfo) {		
 		if( this.identificationInfo == null ){
