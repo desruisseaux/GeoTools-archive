@@ -156,7 +156,7 @@ public class CRS {
         if( split == -1 ){
             throw new NoSuchAuthorityCodeException("No authority was defined - did you forget 'AUTHORITY:NUMBER'?", "unknown", code );
         }
-        final String AUTHORITY = code.substring( 0, split );
+        final String AUTHORITY = code.substring( 0, split ).trim().toUpperCase();
         Throwable trouble = null;
         
         // FIXME: FactoryFinder does not appear to work for other modules
