@@ -136,7 +136,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
             if (attributeTypes[i].isGeometry()) {
                 String geomName = attributeTypes[i].getName();
                 int srid = ftInfo.getSRID(geomName);
-                ((Geometry) attributes[i]).setSRID(srid);
+                // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
                 aios[i].write(statement, baseIndex + i, attributes[i]);
             } else {
                 aios[i].write(statement, baseIndex + i, attributes[i]);
@@ -344,7 +344,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
             if (attributeTypes[i].isGeometry()) {
                 String geomName = attributeTypes[i].getName();
                 int srid = ftInfo.getSRID(geomName);
-                ((Geometry) attributes[i]).setSRID(srid);
+                // ((Geometry) attributes[i]).setSRID(srid); // SRID is a bad assumption
                 aios[i].write(statement, i + 1, attributes[i]);
             } else {
                 aios[i].write(statement, i + 1, attributes[i]);
