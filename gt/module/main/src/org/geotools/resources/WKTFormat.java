@@ -47,7 +47,7 @@ import java.text.ParseException;
  * etc.). This is a relatively light object compared to their subclasses and can be used when
  * parsing are not needed.
  *
- * @version $Id: WKTFormat.java,v 1.5 2003/08/04 17:11:18 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
@@ -79,8 +79,8 @@ public abstract class WKTFormat extends Format {
 
     /**
      * List of caracters acceptable as opening bracket. The closing bracket must
-     * be the character in {@link #closingBrackets} at the same index than the
-     * opening bracket.
+     * be the character in the <code>closingBrackets</code> array at the same index
+     * than the opening bracket.
      */
     final char[] openingBrackets = {'[', '('};
 
@@ -106,7 +106,7 @@ public abstract class WKTFormat extends Format {
     /**
      * Construct a format for the specified locale.
      *
-     * @param local The locale for parsing and formatting numbers.
+     * @param locale The locale for parsing and formatting numbers.
      */
     public WKTFormat(final Locale locale) {
         this.locale = locale;
@@ -126,7 +126,6 @@ public abstract class WKTFormat extends Format {
      * @param  text       The text to parse.
      * @param  position   In input, the position where to start parsing from.
      *                    In output, the first character after the separator.
-     * @param  separator  The character to search.
      */
     protected final WKTElement getTree(final String text, final ParsePosition position)
         throws ParseException

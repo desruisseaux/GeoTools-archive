@@ -46,7 +46,7 @@ import org.geotools.gc.InvalidGridGeometryException;
  * A set of utilities methods for the Grid Coverage package. Those methods are not really
  * rigorous; must of them should be seen as temporary implementations.
  *
- * @version $Id: GCSUtilities.java,v 1.11 2003/11/12 14:13:53 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class GCSUtilities {
@@ -112,11 +112,11 @@ public final class GCSUtilities {
      * <strong>Note about conversion of floating point values to integers:</strong><br>
      * In previous versions, we used {@link Math#floor} and {@link Math#ceil} in order to
      * make sure that the grid range encompass all the envelope (something similar to what
-     * <cite>Java2D</cite> does when casting {@link Rectangle2D} to {@link Rectangle}).
-     * But it had the undesirable effect of changing image width. For example the range
-     * <code>[-0.25  99.75]</code> were changed to <code>[-1  100]</code>, which is not
-     * what the {@link javax.media.jai.operator.AffineDescriptor Affine} operation expects
-     * for instance. Rounding to nearest integer produces better results. Note that the
+     * <cite>Java2D</cite> does when casting {@link java.awt.geom.Rectangle2D} to
+     * {@link java.awt.Rectangle}). But it had the undesirable effect of changing image width.
+     * For example the range <code>[-0.25  99.75]</code> were changed to <code>[-1  100]</code>,
+     * which is not what the {@link javax.media.jai.operator.AffineDescriptor Affine} operation
+     * expects for instance. Rounding to nearest integer produces better results. Note that the
      * rounding mode do not alter the significiance of the "Resample" operation, since this
      * operation will respect the "grid to coordinate system" transform no matter what the
      * grid range is.

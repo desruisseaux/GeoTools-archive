@@ -39,14 +39,14 @@ package org.geotools.resources.image;
 import java.awt.image.RasterFormatException;
 
 // JAI dependencies
-import javax.media.jai.PlanarImage;  // For Javadoc
+import javax.media.jai.OpImage;  // For Javadoc
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.WritableRectIter;
 
 
 /**
  * A {@link WritableRectIter} that take source from {@link RectIter} and write to an other
- * {@link WritableRectIter}. This class is useful for implementing {@link PlanarImage#computeRect}
+ * {@link WritableRectIter}. This class is useful for implementing {@link OpImage#computeRect}
  * methods.
  *
  * @version $Id: DualRectIter.java,v 1.2 2003/08/04 19:07:23 desruisseaux Exp $

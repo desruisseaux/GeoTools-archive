@@ -50,7 +50,7 @@ import java.util.Date;
  * Number myObjectAsANumber = {@link ClassChanger#toNumber ClassChanger.toNumber}(someArbitraryObject);
  * </pre></blockquote>
  *
- * @version $Id: ClassChanger.java,v 1.6 2003/08/10 20:26:30 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class ClassChanger {
@@ -125,7 +125,7 @@ public abstract class ClassChanger {
     /**
      * Returns an instance of the converted classe from a numerical value.
      *
-     * @param  The value to wrap.
+     * @param  value The value to wrap.
      * @return An instance of the source classe.
      */
     protected abstract Comparable inverseConvert(final Number value);

@@ -343,7 +343,7 @@ public final class ImageUtilities {
      * class name start with "CLib". It work for Sun's 1.0 implementation, but may change in
      * future versions. If this method doesn't recognize the class name, it does nothing.
      *
-     * @param operation The format name (e.g. "png").
+     * @param format The format name (e.g. "png").
      * @param writer <code>false</code> to set the reader, or <code>true</code> to set the writer.
      * @param allowed <code>false</code> to disallow native acceleration.
      */

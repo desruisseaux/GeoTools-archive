@@ -53,6 +53,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
+import javax.swing.event.InternalFrameListener;     // For javadoc
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 
@@ -73,7 +74,7 @@ import org.geotools.resources.gui.ResourceKeys;
  *       internal frames instead of frames.</li>
  * </ul>
  *
- * @version $Id: SwingUtilities.java,v 1.4 2003/05/13 11:01:39 desruisseaux Exp $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class SwingUtilities {

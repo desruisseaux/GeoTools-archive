@@ -214,7 +214,7 @@ public final class Utilities {
      * array according Java language usage,  for example "double[]" instead
      * of "[D".
      *
-     * @param  object The object (may be <code>null</code>).
+     * @param  classe The object class (may be <code>null</code>).
      * @return A short class name for the specified object.
      */
     public static String getShortName(Class classe) {

@@ -53,6 +53,7 @@ import java.util.logging.LogRecord;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.TileRequest;
+import javax.media.jai.TileScheduler; // For javadoc
 import javax.media.jai.TileComputationListener;
 
 // Geotools dependencies
@@ -185,7 +186,7 @@ public final class DeferredPlanarImage extends PlanarImage
     /**
      * Construct a new instance of <code>DeferredPlanarImage</code>.
      *
-     * @param image The source image.
+     * @param source The source image.
      */
     public DeferredPlanarImage(final RenderedImage source) {
         super(new ImageLayout(source), toVector(source), null);

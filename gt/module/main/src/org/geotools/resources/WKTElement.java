@@ -62,7 +62,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * The result is a tree, which can be printed with {@link #print}.
  * Elements can be pull in a <cite>first in, first out</cite> order.
  *
- * @version $Id: WKTElement.java,v 1.6 2003/08/04 17:11:18 desruisseaux Exp $
+ * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
@@ -479,7 +479,7 @@ public final class WKTElement {
      * The key is used only for only for formatting an error message.
      *
      * @param  key The parameter name. Used only for formatting an error message.
-     * @param  The next {@link WKTElement} on the list with no bracket.
+     * @return The next {@link WKTElement} in the list, with no bracket.
      * @throws ParseException if no more void element is available.
      */
     public WKTElement pullVoidElement(final String key) throws ParseException {

@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.resources.image;
 
@@ -166,9 +153,9 @@ public final class ColorUtilities {
      * Returns a tolerant index color model for the specified ARGB code. This color model accept
      * image with the specified number of bands.
      *
-     * @param  ARGB         An array of ARGB values.
-     * @param  numBands     The number of bands.
-     * @param  visibleBands The band to display.
+     * @param  ARGB        An array of ARGB values.
+     * @param  numBands    The number of bands.
+     * @param  visibleBand The band to display.
      * @return An index color model for the specified array.
      */
     public static IndexColorModel getIndexColorModel(final int[] ARGB,
