@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -207,9 +208,10 @@ public class MapInfoDataSource {
      * </p>
      * @param url location of the mif file to read
      * @throws MalformedURLException invalid URL was used
+     * @throws UnsupportedEncodingException 
      */
-    MapInfoDataSource(URL url) throws java.net.MalformedURLException {
-        filename = java.net.URLDecoder.decode( url.getFile() );
+    MapInfoDataSource(URL url) throws UnsupportedEncodingException {
+        filename = java.net.URLDecoder.decode( url.getFile(),null );
         geomFactory = new GeometryFactory();
     }
     

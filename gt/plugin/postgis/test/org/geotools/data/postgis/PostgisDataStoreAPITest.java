@@ -619,7 +619,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
     public void testGetSchemaRoad() throws IOException {
         FeatureType expected = roadType;
         FeatureType actual = data.getSchema("road");
-        assertEquals("namespace", expected.getNamespace(), actual.getNamespace());
+        assertEquals("namespace", expected.getNamespaceURI(), actual.getNamespaceURI());
         assertEquals("typeName", expected.getTypeName(), actual.getTypeName());
 
         //assertEquals( "compare", 0, DataUtilities.compare( expected, actual ));
@@ -639,7 +639,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
     public void testGetSchemaRiver() throws IOException {
         FeatureType expected = riverType;
         FeatureType actual = data.getSchema("river");
-        assertEquals("namespace", expected.getNamespace(), actual.getNamespace());
+        assertEquals("namespace", expected.getNamespaceURI(), actual.getNamespaceURI());
         assertEquals("typeName", expected.getTypeName(), actual.getTypeName());
 
         //assertEquals( "compare", 0, DataUtilities.compare( expected, actual ));
@@ -1449,7 +1449,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
         assertEquals(e, some.getBounds());
         assertEquals(some.getSchema(), road.getSchema());
 
-        DefaultQuery query = new DefaultQuery(rd12Filter,
+        DefaultQuery query = new DefaultQuery("road",rd12Filter,
                 new String[] { "name" });
 
         FeatureResults half = road.getFeatures(query);
@@ -1463,7 +1463,7 @@ public class PostgisDataStoreAPITest extends DataTestCase {
         FeatureType actual = half.getSchema();
 
         assertEquals(type.getTypeName(), actual.getTypeName());
-        assertEquals(type.getNamespace(), actual.getNamespace());
+        assertEquals(type.getNamespaceURI(), actual.getNamespaceURI());
         assertEquals(type.getAttributeCount(), actual.getAttributeCount());
 
         for (int i = 0; i < type.getAttributeCount(); i++) {
