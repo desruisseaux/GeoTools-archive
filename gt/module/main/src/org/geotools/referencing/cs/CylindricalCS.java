@@ -54,26 +54,22 @@ public class CylindricalCS extends org.geotools.referencing.cs.CoordinateSystem
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -8290402732390917909L;
-
-    /**
-     * The polar coordinate system.
-     */
-    private final PolarCS polarCS;
+    private static final long serialVersionUID = -8290402732390917907L;
 
     /**
      * Construct a three-dimensional coordinate system from a name.
      *
-     * @param name    The coordinate system name.
-     * @param polarCS The polar coordinate system.
-     * @param axis    The perpendicular axis.
+     * @param name  The coordinate system name.
+     * @param axis0 The first axis.
+     * @param axis1 The second axis.
+     * @param axis2 The third axis.
      */
     public CylindricalCS(final String               name,
-                         final PolarCS           polarCS,
-                         final CoordinateSystemAxis axis)
+                         final CoordinateSystemAxis axis0,
+                         final CoordinateSystemAxis axis1,
+                         final CoordinateSystemAxis axis2)
     {
-        super(name, new CoordinateSystemAxis[] {polarCS.getAxis(0), polarCS.getAxis(1), axis});
-        this.polarCS = polarCS;
+        super(name, new CoordinateSystemAxis[] {axis0, axis1, axis2});
     }
 
     /**
@@ -82,15 +78,16 @@ public class CylindricalCS extends org.geotools.referencing.cs.CoordinateSystem
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param polarCS    The polar coordinate system.
-     * @param axis       The perpendicular axis.
+     * @param axis0 The first axis.
+     * @param axis1 The second axis.
+     * @param axis2 The third axis.
      */
-    public CylindricalCS(final Map            properties,
-                         final PolarCS           polarCS,
-                         final CoordinateSystemAxis axis)
+    public CylindricalCS(final Map             properties,
+                         final CoordinateSystemAxis axis0,
+                         final CoordinateSystemAxis axis1,
+                         final CoordinateSystemAxis axis2)
     {
-        super(properties, new CoordinateSystemAxis[] {polarCS.getAxis(0), polarCS.getAxis(1), axis});
-        this.polarCS = polarCS;
+        super(properties, new CoordinateSystemAxis[] {axis0, axis1, axis2});
     }
 
     /**

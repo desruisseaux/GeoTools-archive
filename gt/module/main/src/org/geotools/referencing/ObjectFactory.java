@@ -422,6 +422,52 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
     }
 
     /**
+     * Creates a two dimensional coordinate system from the given pair of axis.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  axis0 The first  axis.
+     * @param  axis1 The second axis.
+     * @throws FactoryException if the object creation failed.
+     */
+    public AffineCS createAffineCS(Map             properties,
+                                   CoordinateSystemAxis axis0,
+                                   CoordinateSystemAxis axis1) throws FactoryException
+    {
+        AffineCS cs;
+        try {
+            cs = new org.geotools.referencing.cs.AffineCS(properties, axis0, axis1);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        cs = (AffineCS) canonicalize(cs);
+        return cs;
+    }
+
+    /**
+     * Creates a three dimensional coordinate system from the given set of axis.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  axis0 The first  axis.
+     * @param  axis1 The second axis.
+     * @param  axis2 The third  axis.
+     * @throws FactoryException if the object creation failed.
+     */
+    public AffineCS createAffineCS(Map             properties,
+                                   CoordinateSystemAxis axis0,
+                                   CoordinateSystemAxis axis1,
+                                   CoordinateSystemAxis axis2) throws FactoryException
+    {
+        AffineCS cs;
+        try {
+            cs = new org.geotools.referencing.cs.AffineCS(properties, axis0, axis1, axis2);
+        } catch (IllegalArgumentException exception) {
+            throw new FactoryException(exception);
+        }
+        cs = (AffineCS) canonicalize(cs);
+        return cs;
+    }
+
+    /**
      * Creates a polar coordinate system from the given pair of axis.
      *
      * @param  properties Name and other properties to give to the new object.
@@ -451,14 +497,34 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * @param  polarCS The polar coordinate system.
      * @param  axis The perpendicular axis.
      * @throws FactoryException if the object creation failed.
+     *
+     * @deprecated Uses the method expecting 3 axis instead.
      */
     public CylindricalCS createCylindricalCS(Map            properties,
                                              PolarCS           polarCS,
                                              CoordinateSystemAxis axis) throws FactoryException
     {
+        return createCylindricalCS(properties, polarCS.getAxis(0), polarCS.getAxis(1), axis);
+    }
+
+    /**
+     * Creates a cylindrical coordinate system from the given set of axis.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     *         Available properties are {@linkplain ObjectFactory listed there}.
+     * @param  axis0 The first  axis.
+     * @param  axis1 The second axis.
+     * @param  axis2 The third  axis.
+     * @throws FactoryException if the object creation failed.
+     */
+    public CylindricalCS createCylindricalCS(Map            properties,
+                                             CoordinateSystemAxis axis0,
+                                             CoordinateSystemAxis axis1,
+                                             CoordinateSystemAxis axis2) throws FactoryException
+    {
         CylindricalCS cs;
         try {
-            cs = new org.geotools.referencing.cs.CylindricalCS(properties, polarCS, axis);
+            cs = new org.geotools.referencing.cs.CylindricalCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }

@@ -1,6 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Managment Committee (PMC)
+ * (C) 2005, Geotools Project Managment Committee (PMC)
  * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -60,17 +60,26 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.SphericalCS;
+import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.EngineeringDatum;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
@@ -236,11 +245,14 @@ public class DefaultFactory extends AuthorityFactory
         "[Prime Meridian]",              "PRIME_MERIDIAN_CODE"   // [10]: createPrimeMeridian
     };
 
-    ////////////////////////////////////////////////////
-    ////////                                    ////////
-    ////////      END OF HARD CODED VALUES      ////////
-    ////////                                    ////////
-    ////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    ////////                                                               ////////
+    ////////        E N D   O F   H A R D   C O D E D   V A L U E S        ////////
+    ////////                                                               ////////
+    ////////    NOTE: 'createFoo(...)' methods may still have hard-coded   ////////
+    ////////    values (others than SQL statements) in 'equalsIgnoreCase'  ////////
+    ////////    expressions.                                               ////////
+    ///////////////////////////////////////////////////////////////////////////////
     /**
      * Last object type returned by {@link #createObject}, or -2 if none.
      * This type is an index in the {@link #OBJECT_TABLES} array and is
@@ -559,7 +571,13 @@ public class DefaultFactory extends AuthorityFactory
     }
 
     /**
-     * Make sure that an object constructed from the database is not duplicated.
+     * Make sure that an object constructed from the database is not incoherent.
+     * If the code supplied to a <code>createFoo</code> method exists in the database,
+     * then we should find only one record. However, we will do a paranoiac check and
+     * verify if there is more records, using a <code>while (results.next())</code>
+     * loop instead of <code>if (results.next())</code>. This method is invoked in
+     * the loop for making sure that, if there is more than one record (which should
+     * never happen), at least they have identical contents.
      *
      * @param  newValue The newly constructed object.
      * @param  oldValue The object previously constructed, or <code>null</code> if none.
@@ -613,18 +631,52 @@ public class DefaultFactory extends AuthorityFactory
         stmt.setString(1, code);
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
-            final String scope = getString(result, 1, code);
-            LocalName cached = (LocalName) scopes.get(scope);
-            if (cached == null) {
-                cached = new LocalName(scope);
-                scopes.put(scope, cached);
+            final String scope = result.getString(1);
+            final String local = getString(result, 2, code);
+            final GenericName generic;
+            if (scope == null) {
+                generic = new LocalName(local);
+            } else {
+                LocalName cached = (LocalName) scopes.get(scope);
+                if (cached == null) {
+                    cached = new LocalName(scope);
+                    scopes.put(scope, cached);
+                }
+                generic = new ScopedName(cached, local);
             }
-            alias.add(new ScopedName(cached, getString(result, 2, code)));
+            alias.add(generic);
         }
         result.close();
         if (!alias.isEmpty()) {
             properties.put(org.geotools.referencing.IdentifiedObject.ALIAS_PROPERTY,
                            (GenericName[]) alias.toArray(new GenericName[alias.size()]));
+        }
+        return properties;
+    }
+
+    /**
+     * Returns the name for the {@link IdentifiedObject} to construct.
+     * This method also search for alias.
+     *
+     * @param  name  The name for the {@link IndentifiedObject} to construct.
+     * @param  code  The EPSG code of the object to construct.
+     * @param  area  The area of use, or <code>null</code> if none.
+     * @param  scope The scope, or <code>null</code> if none.
+     * @param  remarks Remarks, or <code>null</code> if none.
+     * @return The name together with a set of properties.
+     */
+    private Map createProperties(final String name, final String code,
+                                 String area, String scope, String remarks)
+            throws SQLException, FactoryException
+    {
+        final Map properties = createProperties(name, code, remarks);
+        if (area != null  &&  (area=area.trim()).length() != 0) {
+            properties.put(org.geotools.referencing.datum.Datum.
+                           VALID_AREA_PROPERTY, createExtent(area));
+        }
+        if (scope != null &&  (scope=scope.trim()).length() != 0) {
+            properties.put(org.geotools.referencing.datum.Datum.
+                           SCOPE_PROPERTY, scope);
         }
         return properties;
     }
@@ -727,11 +779,6 @@ public class DefaultFactory extends AuthorityFactory
                                           + " WHERE UOM_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
-            /*
-             * If the supplied code exists in the database, then we
-             * should find only one record.   However, we will do a
-             * paranoiac check and verify if there is more records.
-             */
             while (result.next()) {
                 final int source = getInt(result,   1, code);
                 final double   b = result.getDouble(2);
@@ -788,11 +835,6 @@ public class DefaultFactory extends AuthorityFactory
                                                + " WHERE ELLIPSOID_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
-            /*
-             * If the supplied code exists in the database, then we
-             * should find only one record.   However, we will do a
-             * paranoiac check and verify if there is more records.
-             */
             while (result.next()) {
                 /*
                  * One of 'semiMinorAxis' and 'inverseFlattening' values can be NULL in
@@ -869,11 +911,6 @@ public class DefaultFactory extends AuthorityFactory
                                                    + " WHERE PRIME_MERIDIAN_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
-            /*
-             * If the supplied code exists in the database, then we
-             * should find only one record.   However, we will do a
-             * paranoiac check and verify if there is more records.
-             */ 
             while (result.next()) {
                 final String name      = getString(result, 1, code);
                 final double longitude = getDouble(result, 2, code);
@@ -919,16 +956,13 @@ public class DefaultFactory extends AuthorityFactory
                                           + " WHERE AREA_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
-            /*
-             * If the supplied code exists in the database, then we
-             * should find only one record.   However, we will do a
-             * paranoiac check and verify if there is more records.
-             */ 
             while (result.next()) {
-                final String description = getString(result, 1, code);
-                final org.geotools.metadata.extent.Extent extent =
-                      new org.geotools.metadata.extent.Extent();
-                extent.setDescription(new SimpleInternationalString(description));
+                org.geotools.metadata.extent.Extent extent = null;
+                final String description = result.getString(1);
+                if (description != null) {
+                    extent = new org.geotools.metadata.extent.Extent();
+                    extent.setDescription(new SimpleInternationalString(description));
+                }
                 final double ymin = result.getDouble(2);
                 if (!result.wasNull()) {
                     final double ymax = result.getDouble(3);
@@ -937,6 +971,9 @@ public class DefaultFactory extends AuthorityFactory
                         if (!result.wasNull()) {
                             final double xmax = result.getDouble(5);
                             if (!result.wasNull()) {
+                                if (extent == null) {
+                                    extent = new org.geotools.metadata.extent.Extent();
+                                }
                                 extent.setGeographicElement(
                                         new GeographicBoundingBox(xmin, xmax, ymin, ymax));
                             }
@@ -1099,11 +1136,6 @@ public class DefaultFactory extends AuthorityFactory
                                            + " WHERE DATUM_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
-            /*
-             * If the supplied code exists in the database, then we
-             * should find only one record.   However, we will do a
-             * paranoiac check and verify if there is more records.
-             */
             boolean stop = false;
             while (result.next()) {
                 final String name    = getString(result, 1, code);
@@ -1113,7 +1145,7 @@ public class DefaultFactory extends AuthorityFactory
                 final String area    = result.getString( 5);
                 final String scope   = result.getString( 6);
                 final String remarks = result.getString( 7);
-                Map properties = createProperties(name, code, remarks);
+                Map properties = createProperties(name, code, area, scope, remarks);
                 if (anchor != null) {
                     properties.put(org.geotools.referencing.datum.Datum.
                                    ANCHOR_POINT_PROPERTY, anchor);
@@ -1123,14 +1155,6 @@ public class DefaultFactory extends AuthorityFactory
                     calendar.set(epoch, 0, 1);
                     properties.put(org.geotools.referencing.datum.Datum.
                                    REALIZATION_EPOCH_PROPERTY, calendar.getTime());
-                }
-                if (area != null) {
-                    properties.put(org.geotools.referencing.datum.Datum.
-                                   VALID_AREA_PROPERTY, createExtent(area));
-                }
-                if (scope != null) {
-                    properties.put(org.geotools.referencing.datum.Datum.
-                                   SCOPE_PROPERTY, scope);
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;
@@ -1146,12 +1170,7 @@ public class DefaultFactory extends AuthorityFactory
                  *     we must close the result set if Bursa-Wolf parameters are found. In this
                  *     case, we lost our paranoiac check for duplication.
                  */
-                if (type.equalsIgnoreCase("engineering")) {
-                    datum = factory.createEngineeringDatum(properties);
-                } else if (type.equalsIgnoreCase("vertical")) {
-                    // TODO: Find the right datum type.
-                    datum = factory.createVerticalDatum(properties, VerticalDatumType.ELLIPSOIDAL);
-                } else if (type.equalsIgnoreCase("geodetic")) {
+                if (type.equalsIgnoreCase("geodetic")) {
                     properties = new HashMap(properties); // Protect from changes
                     final Ellipsoid         ellipsoid = createEllipsoid    (getString(result, 8, code));
                     final PrimeMeridian      meridian = createPrimeMeridian(getString(result, 9, code));
@@ -1162,6 +1181,11 @@ public class DefaultFactory extends AuthorityFactory
                         stop = true;
                     }
                     datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
+                } else if (type.equalsIgnoreCase("vertical")) {
+                    // TODO: Find the right datum type.
+                    datum = factory.createVerticalDatum(properties, VerticalDatumType.ELLIPSOIDAL);
+                } else if (type.equalsIgnoreCase("engineering")) {
+                    datum = factory.createEngineeringDatum(properties);
                 } else {
                     result.close();
                     throw new FactoryException(Resources.format(
@@ -1270,114 +1294,203 @@ public class DefaultFactory extends AuthorityFactory
         return axis;
     }
 
-//    /**
-//     * Returns a coordinate system from a code.
-//     *
-//     * @param  code Value allocated by authority.
-//     * @return The coordinate system object.
-//     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
-//     * @throws FactoryException if some other kind of failure occured in the backing
-//     *         store. This exception usually have {@link SQLException} as its cause.
-//     */
-//    public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
-//            throws FactoryException
-//    {
-//        String type = null;
-//        try {
-//            final PreparedStatement stmt;
-//            stmt = prepareStatement("CoordinateReferenceSystem", "select COORD_REF_SYS_KIND"
-//                                                        + " from [Coordinate Reference System]"
-//                                                        + " where COORD_REF_SYS_CODE = ?");
-//            stmt.setString(1, code);
-//            final ResultSet result = stmt.executeQuery();
-//            while (result.next()) {
-//                final String candidate = getString(result, 1, code);
-//                type = (String) ensureSingleton(candidate, type, code);
-//            }
-//            result.close();
-//        } catch (SQLException exception) {
-//            throw new FactoryException(code, exception);
-//        }
-//        if (type == null) {
-//             throw new NoSuchAuthorityCodeException(code);
-//        }
-//        if (type.equalsIgnoreCase("compound")) {
-//            return createCompoundCoordinateSystem(code);
-//        }
-//        if (type.equalsIgnoreCase("vertical")) {
-//            return createVerticalCoordinateSystem(code);
-//        }
-//        if (type.equalsIgnoreCase("geographic 2D")) {
-//            return createGeographicCoordinateSystem(code);
-//        }
-//        if (type.equalsIgnoreCase("projected")) {
-//            return createProjectedCoordinateSystem(code);
-//        }
-//        throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, code));
-//    }
-//    
-//    /**
-//     * Returns a geographic coordinate system from an EPSG code.
-//     *
-//     * @param  code Value allocated by authority.
-//     * @return The geographic coordinate system object.
-//     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
-//     * @throws FactoryException if some other kind of failure occured in the backing
-//     *         store. This exception usually have {@link SQLException} as its cause.
-//     *
-//     */
-//    public synchronized GeographicCoordinateSystem createGeographicCoordinateSystem(final String code)
-//            throws FactoryException
-//    {
-//        GeographicCoordinateSystem returnValue = null;
-//        try {
-//            final PreparedStatement stmt;
-//            stmt = prepareStatement("GeographicCoordinateSystem", "select DIMENSION,"
-//                                               + " CS.COORD_SYS_CODE,"
-//                                               + " COORD_REF_SYS_NAME,"
-//                                               + " PRIME_MERIDIAN_CODE,"
-//                                               + " D.DATUM_CODE,"
-//                                               + " CRS.REMARKS"
-//                                               + " from [Coordinate Reference System] as CRS,"
-//                                               + " [Coordinate System] as CS,"
-//                                               + " [Datum] as D"
-//                                               + " where COORD_REF_SYS_CODE = ?"
-//                                               + " and CS.COORD_SYS_CODE = CRS.COORD_SYS_CODE"
-//                                               + " and D.DATUM_CODE = CRS.DATUM_CODE");
-//            stmt.setString(1, code);
-//            final ResultSet result = stmt.executeQuery();
-//            /*
-//             * If the supplied code exists in the database, then we
-//             * should find only one record.   However, we will do a
-//             * paranoiac check and verify if there is more records.
-//             */
-//            while (result.next()) {
-//                final int        dimension = getInt   (result, 1, code);
-//                final String  coordSysCode = getString(result, 2, code);
-//                final String          name = getString(result, 3, code);
-//                final String primeMeridian = getString(result, 4, code);
-//                final String         datum = getString(result, 5, code);
-//                final String       remarks = result.getString( 6);
-//                final AxisInfo[] axisInfos = createAxisInfos(coordSysCode, dimension);
-//                final Unit            unit = createUnitCS(coordSysCode);
-//                final CharSequence     prp = createProperties(name, code, remarks);
-//                final CoordinateSystem coordSys;
-//                coordSys = factory.createGeographicCoordinateSystem(prp, unit,
-//                                            createHorizontalDatum(datum),
-//                                            createPrimeMeridian(primeMeridian),
-//                                            axisInfos[0], axisInfos[1]);
-//                returnValue = (GeographicCoordinateSystem) ensureSingleton(coordSys, returnValue, code);
-//            }
-//            result.close();
-//        } catch (SQLException exception) {
-//            throw new FactoryException(code, exception);
-//        }
-//        if (returnValue == null) {
-//            throw new NoSuchAuthorityCodeException(code);
-//        }
-//        return returnValue;
-//    }
-//    
+    /**
+     * Returns a coordinate system from a code.
+     *
+     * @param  code Value allocated by authority.
+     * @return The coordinate system object.
+     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
+     * @throws FactoryException if some other kind of failure occured in the backing
+     *         store. This exception usually have {@link SQLException} as its cause.
+     */
+    public synchronized CoordinateSystem createCoordinateSystem(final String code)
+            throws FactoryException
+    {
+        CoordinateSystem returnValue = null;
+        final PreparedStatement stmt;
+        try {
+            stmt = prepareStatement("CoordinateSystem", "SELECT COORD_SYS_NAME,"
+                                                      +       " COORD_SYS_TYPE,"
+                                                      +       " DIMENSION,"
+                                                      +       " REMARKS"
+                                                      + " FROM [Coordinate System]"
+                                                      + " WHERE COORD_SYS_CODE = ?");
+            stmt.setString(1, code);
+            final ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final String    name = getString(result, 1, code);
+                final String    type = getString(result, 2, code);
+                final int  dimension = getInt   (result, 3, code);
+                final String remarks = result.getString( 4);
+                final CoordinateSystemAxis[] axis = createCoordinateSystemAxis(code, dimension);
+                final Map properties = createProperties(name, code, remarks); // Must be after axis
+                final CSFactory factory = factories.getCSFactory();
+                CoordinateSystem cs = null;
+                if (type.equalsIgnoreCase("ellipsoidal")) {
+                    switch (dimension) {
+                        case 2: cs=factory.createEllipsoidalCS(properties, axis[0], axis[1]); break;
+                        case 3: cs=factory.createEllipsoidalCS(properties, axis[0], axis[1], axis[2]); break;
+                    }
+                } else if (type.equalsIgnoreCase("cartesian")) {
+                    switch (dimension) {
+                        case 2: cs=factory.createCartesianCS(properties, axis[0], axis[1]); break;
+                        case 3: cs=factory.createCartesianCS(properties, axis[0], axis[1], axis[2]); break;
+                    }
+                } else if (type.equalsIgnoreCase("spherical")) {
+                    switch (dimension) {
+                        case 3: cs=factory.createSphericalCS(properties, axis[0], axis[1], axis[2]); break;
+                    }
+                } else if (type.equalsIgnoreCase("gravity-related")) {
+                    switch (dimension) {
+                        case 1: cs=factory.createVerticalCS(properties, axis[0]); break;
+                    }
+                } else if (type.equalsIgnoreCase("linear")) {
+                    switch (dimension) {
+                        case 1: cs=factory.createLinearCS(properties, axis[0]); break;
+                    }
+                } else if (type.equalsIgnoreCase("polar")) {
+                    switch (dimension) {
+                        case 2: cs=factory.createPolarCS(properties, axis[0], axis[1]); break;
+                    }
+                } else if (type.equalsIgnoreCase("cylindrical")) {
+// TODO: Needs a geoapi.jar update.
+//                    switch (dimension) {
+//                        case 3: cs=factory.createCylindricalCS(properties, axis[0], axis[1], axis[2]); break;
+//                    }
+                } else if (type.equalsIgnoreCase("affine")) {
+// TODO: Needs a geoapi.jar update.
+//                    switch (dimension) {
+//                        case 2: cs=factory.createAffineCS(properties, axis[0], axis[1]); break;
+//                        case 3: cs=factory.createAffineCS(properties, axis[0], axis[1], axis[2]); break;
+//                    }
+                } else {
+                    result.close();
+                    throw new FactoryException(Resources.format(
+                                               ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
+                }
+                if (cs == null) {
+                    result.close();
+                    throw new FactoryException("Unexpected dimensions."); // TODO: localize.
+                }
+                returnValue = (CoordinateSystem) ensureSingleton(cs, returnValue, code);
+            }
+            result.close();
+        } catch (SQLException exception) {
+            throw new FactoryException(exception);
+        }
+        if (returnValue == null) {
+            throw noSuchAuthorityCode(CoordinateSystem.class, code);
+        }
+        return returnValue;
+        
+    }
+
+    /**
+     * Returns a coordinate reference system from a code.
+     *
+     * @param  code Value allocated by authority.
+     * @return The coordinate reference system object.
+     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
+     * @throws FactoryException if some other kind of failure occured in the backing
+     *         store. This exception usually have {@link SQLException} as its cause.
+     */
+    public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
+            throws FactoryException
+    {
+        CoordinateReferenceSystem returnValue = null;
+        try {
+            final PreparedStatement stmt;
+            stmt = prepareStatement("CoordinateReferenceSystem",
+                                            "SELECT COORD_REF_SYS_NAME,"
+                                          +       " AREA_OF_USE_CODE,"
+                                          +       " CRS_SCOPE,"
+                                          +       " REMARKS,"
+                                          +       " COORD_REF_SYS_KIND,"
+                                          +       " COORD_SYS_CODE,"
+                                          +       " DATUM_CODE,"
+                                          +       " SOURCE_GEOGCRS_CODE,"  // For ProjectedCRS only
+                                          +       " PROJECTION_CONV_CODE," // For ProjectedCRS only
+                                          +       " CMPD_HORIZCRS_CODE,"   // For CompoundCRS only
+                                          +       " CMPD_VERTCRS_CODE"     // For CompoundCRS only
+                                          + " FROM [Coordinate Reference System]"
+                                          + " WHERE COORD_REF_SYS_CODE = ?");
+            stmt.setString(1, code);
+            final ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final String name    = getString(result, 1, code);
+                final String area    = result.getString( 2);
+                final String scope   = result.getString( 3);
+                final String remarks = result.getString( 4);
+                final String type    = getString(result, 5, code);
+                final String csCode  = getString(result, 6, code);
+                final String dmCode  = getString(result, 7, code);
+                final CRSFactory factory = factories.getCRSFactory();
+                final CoordinateReferenceSystem crs;
+                /*
+                 * Now creates the CRS. NOTE: we can't factor out the call to 'createProperties',
+                 * because they must be after any call to an other 'createFoo' method.
+                 */
+                if (type.equalsIgnoreCase("geographic 2D") ||
+                    type.equalsIgnoreCase("geographic 3D"))
+                {
+                    final EllipsoidalCS cs    = createEllipsoidalCS(csCode);
+                    final GeodeticDatum datum = createGeodeticDatum(dmCode);
+                    crs = factory.createGeographicCRS(
+                          createProperties(name, code, area, scope, remarks), datum, cs);
+                }
+                else if (type.equalsIgnoreCase("projected")) {
+                
+                    throw new FactoryException("TODO");
+                    
+                }
+                else if (type.equalsIgnoreCase("vertical")) {
+                    final VerticalCS    cs    = createVerticalCS   (csCode);
+                    final VerticalDatum datum = createVerticalDatum(dmCode);
+                    crs = factory.createVerticalCRS(
+                          createProperties(name, code, area, scope, remarks), datum, cs);
+                }
+                else if (type.equalsIgnoreCase("compound")) {
+                
+                    throw new FactoryException("TODO");
+                    
+                }
+                else if (type.equalsIgnoreCase("geocentric")) {
+                    final CoordinateSystem cs    = createCoordinateSystem(csCode);
+                    final GeodeticDatum    datum = createGeodeticDatum   (dmCode);
+                    final Map properties = createProperties(name, code, area, scope, remarks);
+                    if (cs instanceof CartesianCS) {
+                        crs = factory.createGeocentricCRS(properties, datum, (CartesianCS) cs);
+                    } else if (cs instanceof SphericalCS) {
+                        crs = factory.createGeocentricCRS(properties, datum, (SphericalCS) cs);
+                    } else {
+                        result.close();
+                        throw new FactoryException("Incompatible CS type.");
+                        // TODO: localize and provide more details.
+                    }
+                }
+                else if (type.equalsIgnoreCase("engineering")) {
+                    final CoordinateSystem cs    = createCoordinateSystem(csCode);
+                    final EngineeringDatum datum = createEngineeringDatum(dmCode);
+                    crs = factory.createEngineeringCRS(
+                          createProperties(name, code, area, scope, remarks), datum, cs);
+                }
+                else {
+                    result.close();
+                    throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, code));
+                }
+                returnValue = (CoordinateReferenceSystem) ensureSingleton(crs, returnValue, code);
+            }
+            result.close();
+        } catch (SQLException exception) {
+            throw new FactoryException(code, exception);
+        }
+        if (returnValue == null) {
+             throw noSuchAuthorityCode(CoordinateReferenceSystem.class, code);
+        }
+        return returnValue;
+    }
+
+
 //    /**
 //     * Returns a projected coordinate system from an EPSG code.
 //     *
@@ -1500,139 +1613,6 @@ public class DefaultFactory extends AuthorityFactory
 //        }
 //        result.close();
 //        return (Parameter[]) list.toArray(new Parameter[list.size()]);
-//    }
-//    
-//    /**
-//     * Returns a vertical coordinate system from an EPSG code.
-//     *
-//     * @param  code Value allocated by authority.
-//     * @return The vertical coordinate system object.
-//     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
-//     * @throws FactoryException if some other kind of failure occured in the backing
-//     *         store. This exception usually have {@link SQLException} as its cause.
-//     */
-//    public synchronized VerticalCoordinateSystem createVerticalCoordinateSystem(final String code)
-//            throws FactoryException
-//    {
-//        VerticalCoordinateSystem returnValue = null;
-//        try {
-//            final PreparedStatement stmt;
-//            stmt = prepareStatement("VerticalCoordinateSystem", "select DIMENSION,"
-//                                               + " CS.COORD_SYS_CODE,"
-//                                               + " COORD_REF_SYS_NAME,"
-//                                               + " DATUM_CODE,"
-//                                               + " CRS.REMARKS"
-//                                               + " from [Coordinate Reference System] as CRS,"
-//                                               + " [Coordinate System] as CS"
-//                                               + " where COORD_REF_SYS_CODE = ?"
-//                                               + " and CS.COORD_SYS_CODE = CRS.COORD_SYS_CODE");
-//            stmt.setString(1, code);
-//            final ResultSet result = stmt.executeQuery();
-//            /*
-//             * If the supplied code exists in the database, then we
-//             * should find only one record.   However, we will do a
-//             * paranoiac check and verify if there is more records.
-//             */
-//            while (result.next()) {
-//                final int        dimension = getInt   (result, 1, code);
-//                final String  coordSysCode = getString(result, 2, code);
-//                final String          name = getString(result, 3, code);
-//                final String         datum = getString(result, 4, code);
-//                final String       remarks = result.getString( 5);
-//                final AxisInfo[] axisInfos = createAxisInfos(coordSysCode, dimension);
-//                final CharSequence     prp = createProperties(name, code, remarks);
-//                final CoordinateSystem  coordSys;
-//                coordSys = factory.createVerticalCoordinateSystem(prp,
-//                                        createVerticalDatum(datum),
-//                                        createUnitCS(coordSysCode), axisInfos[0]);
-//                returnValue = (VerticalCoordinateSystem)ensureSingleton(coordSys,returnValue,code);
-//            }
-//            result.close();
-//        } catch (SQLException exception) {
-//            throw new FactoryException(code, exception);
-//        }
-//        if (returnValue == null) {
-//            throw new NoSuchAuthorityCodeException(code);
-//        }
-//        return returnValue;
-//    }
-//    
-//    /**
-//     * Create a compound coordinate system from the EPSG code.
-//     *
-//     * @param code the EPSG code for the CS.
-//     * @return the compound CS which value was given.
-//     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
-//     * @throws FactoryException if some other kind of failure occured in the backing
-//     *         store. This exception usually have {@link SQLException} as its cause.
-//     */
-//    public synchronized CompoundCoordinateSystem createCompoundCoordinateSystem(final String code)
-//            throws FactoryException
-//    {
-//        CompoundCoordinateSystem returnValue = null;
-//        try {
-//            final PreparedStatement stmt;
-//            stmt = prepareStatement("CompoundCoordinateSystem", "select COORD_REF_SYS_NAME,"
-//                                               + " COORD_REF_SYS_KIND,"
-//                                               + " CMPD_HORIZCRS_CODE,"
-//                                               + " CMPD_VERTCRS_CODE,"
-//                                               + " REMARKS"
-//                                               + " from [Coordinate Reference System]"
-//                                               + " where COORD_REF_SYS_CODE = ?");
-//            stmt.setString(1, code);
-//            final ResultSet result = stmt.executeQuery();
-//            while (result.next()) {
-//                final String name = getString(result, 1, code);
-//                final String type = getString(result, 2, code);
-//                if (!type.equalsIgnoreCase("compound")) {
-//                    throw new FactoryException(Resources.format(
-//                                               ResourceKeys.ERROR_UNKNOW_TYPE_$1, code));
-//                }
-//                final CoordinateSystem  cs1 = createCoordinateReferenceSystem(getString(result, 3, code));
-//                final CoordinateSystem  cs2 = createCoordinateReferenceSystem(getString(result, 4, code));
-//                final CharSequence      prp = createProperties(name, code, result.getString(5));
-//                CompoundCoordinateSystem cs = factory.createCompoundCoordinateSystem(prp, cs1,cs2);
-//                returnValue = (CompoundCoordinateSystem) ensureSingleton(cs, returnValue, code);
-//            }
-//            result.close();
-//        }
-//        catch (SQLException exception) {
-//            throw new FactoryException(code, exception);
-//        }
-//        if (returnValue == null) {
-//            throw new NoSuchAuthorityCodeException(code);
-//        }
-//        return returnValue; 
-//    }
-
-//    /**
-//     * Returns the Unit for 1D and 2D coordinate system. This method scan the unit of
-//     * all axis for the specified coordinate system. All axis must use the same units.
-//     *
-//     * @param  code The coordinate system code.
-//     * @return The unit.
-//     * @throws SQLException if an error occured during database access.
-//     * @throws FactoryException if some other errors has occured.
-//     */
-//    private Unit createUnitCS(final String code) throws SQLException, FactoryException
-//    {
-//        Unit returnValue = null;
-//        final PreparedStatement stmt;
-//        // Note: can't use "Unit" key, because it is already used by "createUnit".
-//        stmt = prepareStatement("UnitCS", "select UOM_CODE"
-//                                          + " from [Coordinate Axis]"
-//                                          + " where COORD_SYS_CODE = ?");
-//        stmt.setString(1, code);
-//        final ResultSet result = stmt.executeQuery();
-//        while (result.next()) {
-//            final Unit unit = createUnit(getString(result, 1, code));
-//            returnValue = (Unit) ensureSingleton(unit, returnValue, code);
-//        }
-//        result.close();
-//        if (returnValue == null) {
-//            throw new NoSuchAuthorityCodeException(code);
-//        }
-//        return replaceAxisUnit(returnValue);
 //    }
 
     /**
