@@ -3,7 +3,7 @@ package org.geotools.xml.ogc;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.Map;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterComplexTypes.BinaryOperatorType;
 import org.geotools.xml.ogc.FilterComplexTypes.Comparison_OperatorsType;
@@ -436,5 +436,81 @@ public class FilterSchema implements Schema {
             return (getName()!=null && getName().equals(name)?this:null);
         }
         
+    }
+    
+    static abstract class FilterComplexType implements ComplexType{
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getParent()
+         */
+        public Type getParent() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#isAbstract()
+         */
+        public boolean isAbstract() {
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAnyAttributeNameSpace()
+         */
+        public String getAnyAttributeNameSpace() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getAttributes()
+         */
+        public Attribute[] getAttributes() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getBlock()
+         */
+        public int getBlock() {
+            return Schema.NONE;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getFinal()
+         */
+        public int getFinal() {
+            return Schema.NONE;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#getId()
+         */
+        public String getId() {
+            return null;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#isMixed()
+         */
+        public boolean isMixed() {
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#isDerived()
+         */
+        public boolean isDerived() {
+            return false;
+        }
+        /**
+         * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
+         */
+        public boolean cache(Element element, Map hints) {
+            return true;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#getNamespace()
+         */
+        public String getNamespace() {
+            return FilterSchema.NAMESPACE;
+        }
+        /**
+         * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
+         */
+        public Element findChildElement(String name) {
+            return getChild()==null?null:
+                getChild().findChildElement(name);
+        }
     }
 }

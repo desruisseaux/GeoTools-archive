@@ -23,6 +23,8 @@ import org.geotools.data.wfs.WFSCapabilities;
 import org.geotools.data.wms.getCapabilities.MetadataURL;
 import org.geotools.data.wms.getCapabilities.Service;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.ogc.FilterSchema;
+import org.geotools.xml.ogc.FilterComplexTypes.Filter_CapabilitiesType;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.DefaultChoice;
@@ -2119,7 +2121,15 @@ public class WFSCapabilitiesComplexTypes {
 
                 // TODO Add Filter_Capababilities from filterCapabilities.xsd
                 new WFSElement("Filter_Capabilities",
-                    XSISimpleTypes.String.getInstance(), 1, 1, false, null)
+                        Filter_CapabilitiesType.getInstance(), 1, 1, false, null){
+
+                    /**
+                     * @see schema.Element#getNamespace()
+                     */
+                    public String getNamespace() {
+                        return FilterSchema.NAMESPACE;
+                    }
+                }
             };
         private static final Attribute[] attributes = {
                 new WFSAttribute("version",
