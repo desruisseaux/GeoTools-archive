@@ -16,8 +16,19 @@
  */
 package org.geotools.data.postgis;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.NoSuchElementException;
+import java.util.PropertyResourceBundle;
+import java.util.logging.Logger;
+
+import junit.framework.TestCase;
+
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -51,16 +62,9 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.NoSuchElementException;
-import java.util.PropertyResourceBundle;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

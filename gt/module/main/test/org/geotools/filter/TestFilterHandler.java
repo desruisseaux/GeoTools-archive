@@ -5,11 +5,12 @@
 
 package org.geotools.filter;
 
-import java.io.*;
-import java.util.*;
 import java.util.logging.Logger;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
  * Uses SAX to extact a GetFeature query from and incoming GetFeature request 

@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,22 +29,21 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
+// Entrï¿½s/sorties
 import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-// Divers
 import org.geotools.resources.Utilities;
 
 
 /**
- * Banque d'unités standards ou courantes. La méthode {@link #main}
+ * Banque d'unitï¿½s standards ou courantes. La mï¿½thode {@link #main}
  * de cette classe construit un tableau de type <code>Unit[]</code> et l'enregistre
- * en binaire dans le fichier {@link #PATHNAME}. Cette banque d'unités pourra être
- * relue par {@link Unit} lorsque des unités sont demandées.
+ * en binaire dans le fichier {@link #PATHNAME}. Cette banque d'unitï¿½s pourra ï¿½tre
+ * relue par {@link Unit} lorsque des unitï¿½s sont demandï¿½es.
  *
  * @version 1.0
  * @author Martin Desruisseaux
@@ -59,25 +58,25 @@ final class UnitSet implements Serializable {
 
     /**
      * Nom et chemin du fichier dans lequel
-     * enregistrer les unités sous une forme
+     * enregistrer les unitï¿½s sous une forme
      * binaire.
      */
     public static final String PATHNAME = "org/geotools/units/database.serialized";
 
     /**
-     * Liste des préfix standards du système SI.
+     * Liste des prï¿½fix standards du systï¿½me SI.
      */
     private final PrefixSet prefix;
 
     /**
-     * Liste de plusieurs unités du système SI
-     * ainsi que quelques autres unités.
+     * Liste de plusieurs unitï¿½s du systï¿½me SI
+     * ainsi que quelques autres unitï¿½s.
      */
     private final Unit[] units;
 
     /**
-     * Crée une liste d'unités par défaut. Cette liste contiendra
-     * la plupart des unités définies dans la brochure SI.
+     * Crï¿½e une liste d'unitï¿½s par dï¿½faut. Cette liste contiendra
+     * la plupart des unitï¿½s dï¿½finies dans la brochure SI.
      */
     private UnitSet() {
         prefix = PrefixSet.getPrefixSet(new Prefix[] {
@@ -87,7 +86,7 @@ final class UnitSet implements Serializable {
             Prefix.getPrefix("femto", "f",  1E-15),
             Prefix.getPrefix("pico",  "p",  1E-12),
             Prefix.getPrefix("nano",  "n",  1E-09),
-            Prefix.getPrefix("micro", "µ",  1E-06),
+            Prefix.getPrefix("micro", "ï¿½",  1E-06),
             Prefix.getPrefix("milli", "m",  1E-03),
             Prefix.getPrefix("centi", "c",  1E-02),
             Prefix.getPrefix("deci",  "d",  1E-01),
@@ -106,22 +105,22 @@ final class UnitSet implements Serializable {
 
         final PrefixSet ALL=prefix;
         final PrefixSet NONE=null;
-        final BaseUnit METRE     = BaseUnit.getInstance("length",                    "m",      ALL); // mètre
+        final BaseUnit METRE     = BaseUnit.getInstance("length",                    "m",      ALL); // mï¿½tre
         final BaseUnit KILOGRAM  = BaseUnit.getInstance("mass",                      "kg",     ALL); // kilogramme
         final BaseUnit SECOND    = BaseUnit.getInstance("time",                      "s",      ALL); // seconde
-        final BaseUnit AMPERE    = BaseUnit.getInstance("electric current",          "A",      ALL); // ampère
+        final BaseUnit AMPERE    = BaseUnit.getInstance("electric current",          "A",      ALL); // ampï¿½re
         final BaseUnit KELVIN    = BaseUnit.getInstance("thermodynamic temperature", "K",      ALL); // kelvin
         final BaseUnit MOLE      = BaseUnit.getInstance("amount of substance",       "mol",    ALL); // mole
         final BaseUnit CANDELA   = BaseUnit.getInstance("luminous intensity",        "cd",     ALL); // candela
         final BaseUnit RADIAN    = BaseUnit.getInstance("plane angle",               "rad",   NONE); // radian
-        final BaseUnit STERADIAN = BaseUnit.getInstance("solid angle",               "sr",    NONE); // stéradian
-        final BaseUnit PSS78     = BaseUnit.getInstance("salinity",                  "PSS78", NONE); // salinité
+        final BaseUnit STERADIAN = BaseUnit.getInstance("solid angle",               "sr",    NONE); // stï¿½radian
+        final BaseUnit PSS78     = BaseUnit.getInstance("salinity",                  "PSS78", NONE); // salinitï¿½
 
-        final SimpleUnit METRE2 = DerivedUnit.getInstance("area", "m²", NONE, new Factor[] {
+        final SimpleUnit METRE2 = DerivedUnit.getInstance("area", "mï¿½", NONE, new Factor[] {
             Factor.getFactor(METRE, +2)
         });
 
-        final SimpleUnit METRE3 = DerivedUnit.getInstance("volume", "m³", NONE, new Factor[] {
+        final SimpleUnit METRE3 = DerivedUnit.getInstance("volume", "mï¿½", NONE, new Factor[] {
             Factor.getFactor(METRE, +3)
         });
 
@@ -130,17 +129,17 @@ final class UnitSet implements Serializable {
             Factor.getFactor(SECOND,   -1)
         });
 
-        final SimpleUnit METRE_PER_SECOND2 = DerivedUnit.getInstance("acceleration", "m/s²", NONE, new Factor[] {
+        final SimpleUnit METRE_PER_SECOND2 = DerivedUnit.getInstance("acceleration", "m/sï¿½", NONE, new Factor[] {
             Factor.getFactor(METRE,  +1),
             Factor.getFactor(SECOND, -2)
         });
     
-        final SimpleUnit METRE2_PER_SECOND = DerivedUnit.getInstance(null, "m²/s", NONE, new Factor[] {
+        final SimpleUnit METRE2_PER_SECOND = DerivedUnit.getInstance(null, "mï¿½/s", NONE, new Factor[] {
             Factor.getFactor(METRE,    +2),
             Factor.getFactor(SECOND,   -1)
         });
 
-        final SimpleUnit PASCAL_SECOND = DerivedUnit.getInstance(null, "Pa·s", NONE, new Factor[] {
+        final SimpleUnit PASCAL_SECOND = DerivedUnit.getInstance(null, "Paï¿½s", NONE, new Factor[] {
             Factor.getFactor(KILOGRAM, +1),
             Factor.getFactor(METRE,    -1),
             Factor.getFactor(SECOND,   -1)
@@ -157,12 +156,12 @@ final class UnitSet implements Serializable {
             Factor.getFactor(AMPERE,   +1)
         });
 
-        final SimpleUnit CANDELA_PER_METRE2 = DerivedUnit.getInstance("luminance", "cd/m²", NONE, new Factor[] {
+        final SimpleUnit CANDELA_PER_METRE2 = DerivedUnit.getInstance("luminance", "cd/mï¿½", NONE, new Factor[] {
             Factor.getFactor(METRE,   -2),
             Factor.getFactor(CANDELA, +1)
         });
 
-        final SimpleUnit WATT_SECOND_PER_METRE2 = DerivedUnit.getInstance(null, "W/(m²·Hz)", NONE, new Factor[] {
+        final SimpleUnit WATT_SECOND_PER_METRE2 = DerivedUnit.getInstance(null, "W/(mï¿½ï¿½Hz)", NONE, new Factor[] {
             Factor.getFactor(KILOGRAM, +1),
             Factor.getFactor(SECOND,   -2)
         });
@@ -306,28 +305,28 @@ final class UnitSet implements Serializable {
             ScaledUnit.getInstance(60,                  SECOND,                 "min",    NONE), // minute
             ScaledUnit.getInstance(60*60,               SECOND,                 "h",      NONE), // heure
             ScaledUnit.getInstance(24*60*60,            SECOND,                 "d",      NONE), // jour
-            ScaledUnit.getInstance(Math.PI/180,         RADIAN,                 "°",      NONE), // degré d'angle
+            ScaledUnit.getInstance(Math.PI/180,         RADIAN,                 "ï¿½",      NONE), // degrï¿½ d'angle
             ScaledUnit.getInstance(Math.PI/(180*60),    RADIAN,                 "'",      NONE), // minute d'angle
             ScaledUnit.getInstance(Math.PI/(180*60*60), RADIAN,                 "\"",     NONE), // seconde d'angle
             ScaledUnit.getInstance(0.001,               METRE3,                 "l",       ALL), // litre
             ScaledUnit.getInstance(0.001,               METRE3,                 "L",       ALL), // litre
             ScaledUnit.getInstance(0.001,               KILOGRAM,               "g",       ALL), // gramme
-            ScaledUnit.getInstance(1000,                KILOGRAM,               "t",      NONE), // tonne métrique
-            ScaledUnit.getInstance(1.6021773349E-19,    JOULE,                  "eV",      ALL), // électronvolt
-            ScaledUnit.getInstance(1.660540210E-27,     KILOGRAM,               "u",      NONE), // unité de masse atomique unifiée
-            ScaledUnit.getInstance(1.4959787069130E+11, METRE,                  "ua",     NONE), // unité astronomique
+            ScaledUnit.getInstance(1000,                KILOGRAM,               "t",      NONE), // tonne mï¿½trique
+            ScaledUnit.getInstance(1.6021773349E-19,    JOULE,                  "eV",      ALL), // ï¿½lectronvolt
+            ScaledUnit.getInstance(1.660540210E-27,     KILOGRAM,               "u",      NONE), // unitï¿½ de masse atomique unifiï¿½e
+            ScaledUnit.getInstance(1.4959787069130E+11, METRE,                  "ua",     NONE), // unitï¿½ astronomique
             ScaledUnit.getInstance(0.0254,              METRE,                  "inch",   NONE), // pouce
             ScaledUnit.getInstance(0.3048,              METRE,                  "foot",   NONE), // pied
             ScaledUnit.getInstance(0.9144,              METRE,                  "yard",   NONE), // yard
             ScaledUnit.getInstance(1.8288,              METRE,                  "fathom", NONE), // brasse anglaise
-            ScaledUnit.getInstance(1.624,               METRE,                  "brasse", NONE), // brasse française
+            ScaledUnit.getInstance(1.624,               METRE,                  "brasse", NONE), // brasse franï¿½aise
             ScaledUnit.getInstance(1609.0,              METRE,                  "mile",   NONE), // mille
             ScaledUnit.getInstance(1852.0,              METRE,                  "nmile",  NONE), // mille marin
             ScaledUnit.getInstance(1852.0/3600,         METRE_PER_SECOND,       "knot",   NONE), // noeud
             ScaledUnit.getInstance(1E+2,                METRE2,                 "are",    NONE), // are
             ScaledUnit.getInstance(1E+4,                METRE2,                 "ha",     NONE), // hectare
             ScaledUnit.getInstance(1E+5,                PASCAL,                 "bar",     ALL), // bar
-            ScaledUnit.getInstance(1E-10,               METRE,                  "Å",      NONE), // ångström
+            ScaledUnit.getInstance(1E-10,               METRE,                  "ï¿½",      NONE), // ï¿½ngstrï¿½m
             ScaledUnit.getInstance(1E-28,               METRE2,                 "barn",   NONE), // barn
             ScaledUnit.getInstance(1E-7,                JOULE,                  "erg",    NONE), // erg
             ScaledUnit.getInstance(1E-5,                NEWTON,                 "dyn",    NONE), // dyne
@@ -340,24 +339,24 @@ final class UnitSet implements Serializable {
             ScaledUnit.getInstance(1E+4,                LUX,                    "ph",     NONE), // phot
             ScaledUnit.getInstance(1E-2,                METRE_PER_SECOND2,      "Gal",    NONE), // gal
             ScaledUnit.getInstance(3.7E+10,             BECQUEREL,              "Ci",     NONE), // curie
-            ScaledUnit.getInstance(2.58E-4,             COULOMB_PER_KILOGRAM,   "R",      NONE), // röntgen
+            ScaledUnit.getInstance(2.58E-4,             COULOMB_PER_KILOGRAM,   "R",      NONE), // rï¿½ntgen
             ScaledUnit.getInstance(1E-2,                GRAY,                   "rd",     NONE), // rad
             ScaledUnit.getInstance(1E-2,                SIEVERT,                "rem",    NONE), // rem
             ScaledUnit.getInstance(1E-26,               WATT_SECOND_PER_METRE2, "Jy",     NONE), // jansky
             ScaledUnit.getInstance(101325.0/760,        PASCAL,                 "Torr",   NONE), // torr
-            ScaledUnit.getInstance(101325.0,            PASCAL,                 "atm",    NONE), // atmosphère normale
+            ScaledUnit.getInstance(101325.0,            PASCAL,                 "atm",    NONE), // atmosphï¿½re normale
             ScaledUnit.getInstance(0.4535,              KILOGRAM,               "pound",  NONE), // livre
             ScaledUnit.getInstance(0.4535/16,           KILOGRAM,               "onze",   NONE), // onze
-            OffsetUnit.getInstance(273.15,              KELVIN,                 "°C",     NONE), // degré celcius
-            OffsetUnit.getInstance(459.66999999999996, ScaledUnit.getInstance(0.5555555555555556, KELVIN), "°F", NONE)
+            OffsetUnit.getInstance(273.15,              KELVIN,                 "ï¿½C",     NONE), // degrï¿½ celcius
+            OffsetUnit.getInstance(459.66999999999996, ScaledUnit.getInstance(0.5555555555555556, KELVIN), "ï¿½F", NONE)
             // NOTE: Le code exacte serait:
             //
-            //       Unit FAHRENHEIT=new OffsetUnit(459.67, new ScaledUnit(5./9, KELVIN), "°F").intern();
+            //       Unit FAHRENHEIT=new OffsetUnit(459.67, new ScaledUnit(5./9, KELVIN), "ï¿½F").intern();
             //
-            //       Mais on réalise que ce code entraîne des erreurs d'arrondissements. Par exemple 0°C
-            //       est convertie en 31.999999999999943°F au lieu de 32°F. Avec les constantes utilisées,
-            //       ces erreurs d'arrondissements semblent s'annuler. Ces constantes ont été obtenues par
-            //       le code ci-dessous, qui suit le même chemin que les méthodes "Unit.convert".
+            //       Mais on rï¿½alise que ce code entraï¿½ne des erreurs d'arrondissements. Par exemple 0ï¿½C
+            //       est convertie en 31.999999999999943ï¿½F au lieu de 32ï¿½F. Avec les constantes utilisï¿½es,
+            //       ces erreurs d'arrondissements semblent s'annuler. Ces constantes ont ï¿½tï¿½ obtenues par
+            //       le code ci-dessous, qui suit le mï¿½me chemin que les mï¿½thodes "Unit.convert".
             //
             //       Unit FAHRENHEIT=CELSIUS.scale(5./9).shift(-32);
         };
@@ -371,8 +370,8 @@ final class UnitSet implements Serializable {
     }
 
     /**
-     * Envoie les nombres spécifié vers le périphérique de sortie standard.
-     * Au passage, vérifie si ces nombres correspondent à ceux qui étaient
+     * Envoie les nombres spï¿½cifiï¿½ vers le pï¿½riphï¿½rique de sortie standard.
+     * Au passage, vï¿½rifie si ces nombres correspondent ï¿½ ceux qui ï¿½taient
      * attendues.
      */
     private static void print(final String message, final double converted, final double expected) {
@@ -389,8 +388,8 @@ final class UnitSet implements Serializable {
     }
 
     /**
-     * Envoie les unités spécifié vers le périphérique de sortie standard.
-     * Au passage, vérifie si ces unités correspondent à celles qui étaient
+     * Envoie les unitï¿½s spï¿½cifiï¿½ vers le pï¿½riphï¿½rique de sortie standard.
+     * Au passage, vï¿½rifie si ces unitï¿½s correspondent ï¿½ celles qui ï¿½taient
      * attendues.
      */
     private static void print(final String message, final Unit unit, final String expected) {
@@ -415,12 +414,12 @@ final class UnitSet implements Serializable {
     }
 
     /**
-     * Procède à la création de la banque des unités. La banque sera enregistrée en binaire dans le fichier
-     * {@link #PATHNAME}. Avant d'effectuer l'enregistrement, cette méthode effectue quelques tests pour
-     * vérifier que les unités fonctionnent correctement.
+     * Procï¿½de ï¿½ la crï¿½ation de la banque des unitï¿½s. La banque sera enregistrï¿½e en binaire dans le fichier
+     * {@link #PATHNAME}. Avant d'effectuer l'enregistrement, cette mï¿½thode effectue quelques tests pour
+     * vï¿½rifier que les unitï¿½s fonctionnent correctement.
      *
      * @throws UnitException Si une erreur est survenue lors des test.
-     * @throws IOException Si une erreur est survenue lors de l'écriture de fichier.
+     * @throws IOException Si une erreur est survenue lors de l'ï¿½criture de fichier.
      */
     public static void main(final String[] args) throws UnitException, IOException {
         final UnitSet units=new UnitSet();
@@ -443,13 +442,13 @@ final class UnitSet implements Serializable {
             print("[m]*[s]"                 , METRE.multiply(SECOND),                "m*s");
             print("[m]/[s]"                 , METRE.divide  (SECOND),                "m/s");
             print("[m].scale(1000)"         , METRE.scale   (1000.0),                "km" );
-            print("[m].scale(1E-6)"         , METRE.scale   (1.0E-6),                "µm" );
+            print("[m].scale(1E-6)"         , METRE.scale   (1.0E-6),                "ï¿½m" );
             print("[m].convert(4,[cm])"     , METRE.convert (4, Unit.get("cm")),     0.04 );
             print();
 
             final Unit METRE_PER_SECOND = Unit.get("m/s");
 
-            print("[m/s].pow(2)"            , METRE_PER_SECOND.pow(2),               "m²/s^2");
+            print("[m/s].pow(2)"            , METRE_PER_SECOND.pow(2),               "mï¿½/s^2");
             print("[m/s]*[m]"               , METRE_PER_SECOND.multiply(METRE),      "m^2/s" );
             print("[m]*[m/s]"               , METRE.multiply(METRE_PER_SECOND),      "m^2/s" );
             print("[m/s]/[m]"               , METRE_PER_SECOND.divide(METRE),        "s^-1"  );
@@ -472,7 +471,7 @@ final class UnitSet implements Serializable {
 
             print();
 
-            print("[mile/h].pow(2)",            MILE_PER_HOUR   .pow(2),                        "mile²/h²"          );
+            print("[mile/h].pow(2)",            MILE_PER_HOUR   .pow(2),                        "mileï¿½/hï¿½"          );
             print("[pound/s]",                 POUND_PER_SECOND,                                "pound/s"           );
             print("[mile/h]*[pound/s]",         MILE_PER_HOUR   .multiply  (POUND_PER_SECOND),  "(mile*pound)/(h*s)");
             print("[pound/s]*[mile/h]",        POUND_PER_SECOND .multiply   (MILE_PER_HOUR),    "(pound/s)*(mile/h)");
@@ -484,11 +483,11 @@ final class UnitSet implements Serializable {
             print("[min].convert(0.01,[Hz])",  Unit.get("min").convert(0.01, Unit.get("Hz"    )), 1.6666666666666667);
             print("[S].convert(50,[\u03A9])",  Unit.get("S"  ).convert(50,   Unit.get("\u03A9")), 0.02);
             print();
-            print("[°F].convert(0,[°C])",      Unit.get("°F" ).convert(0,    Unit.get("°C"    )),   32);
-            print("[°C].convert(32,[°F])",     Unit.get("°C" ).convert(32,   Unit.get("°F"    )),    0);
+            print("[ï¿½F].convert(0,[ï¿½C])",      Unit.get("ï¿½F" ).convert(0,    Unit.get("ï¿½C"    )),   32);
+            print("[ï¿½C].convert(32,[ï¿½F])",     Unit.get("ï¿½C" ).convert(32,   Unit.get("ï¿½F"    )),    0);
 
             print();
-            UnitTransform transform=Unit.get("°C").getTransform(Unit.get("°F"));
+            UnitTransform transform=Unit.get("ï¿½C").getTransform(Unit.get("ï¿½F"));
             System.out.print(transform);
             System.out.print(" 38 ==> ");
             System.out.println(transform.convert(38));
@@ -520,36 +519,36 @@ final class UnitSet implements Serializable {
                 System.out.println(e.getMessage());
             }
             try {
-                Unit.get("°C").pow(2);
-                System.err.println("ERROR: [°C].pow(2)");
+                Unit.get("ï¿½C").pow(2);
+                System.err.println("ERROR: [ï¿½C].pow(2)");
                 System.exit(1);
             } catch (UnitException e) {
                 System.out.println(e.getMessage());
             }
             try {
-                Unit.get("°F").multiply(Unit.get("°C"));
-                System.err.println("ERROR: [°F].multiply([°C])");
+                Unit.get("ï¿½F").multiply(Unit.get("ï¿½C"));
+                System.err.println("ERROR: [ï¿½F].multiply([ï¿½C])");
                 System.exit(1);
             } catch (UnitException e) {
                 System.out.println(e.getMessage());
             }
             try {
-                Unit.get("°C").multiply(Unit.get("°F"));
-                System.err.println("ERROR: [°C].multiply([°F])");
+                Unit.get("ï¿½C").multiply(Unit.get("ï¿½F"));
+                System.err.println("ERROR: [ï¿½C].multiply([ï¿½F])");
                 System.exit(1);
             } catch (UnitException e) {
                 System.out.println(e.getMessage());
             }
             try {
-                Unit.get("°F").divide(Unit.get("°C"));
-                System.err.println("ERROR: [°F].divide([°C])");
+                Unit.get("ï¿½F").divide(Unit.get("ï¿½C"));
+                System.err.println("ERROR: [ï¿½F].divide([ï¿½C])");
                 System.exit(1);
             } catch (UnitException e) {
                 System.out.println(e.getMessage());
             }
             try {
-                Unit.get("°C").divide(Unit.get("°F"));
-                System.err.println("ERROR: [°C].divide([°F])");
+                Unit.get("ï¿½C").divide(Unit.get("ï¿½F"));
+                System.err.println("ERROR: [ï¿½C].divide([ï¿½F])");
                 System.exit(1);
             } catch (UnitException e) {
                 System.out.println(e.getMessage());
@@ -560,7 +559,7 @@ final class UnitSet implements Serializable {
             System.out.flush();
         }
         /*
-         * Enregistre les unités en binaire.
+         * Enregistre les unitï¿½s en binaire.
          */
         if (true) {
             final ObjectOutputStream out=new ObjectOutputStream(new FileOutputStream(new File(PATHNAME)));

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,18 +27,13 @@ package org.geotools.cv;
 import java.awt.Color;
 import java.util.Locale;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.ct.MathTransform1D;
 import org.geotools.ct.MathTransformFactory;
-
-// Resources
-import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.util.NumberRange;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

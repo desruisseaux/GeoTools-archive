@@ -16,9 +16,10 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import org.geotools.data.coverage.grid.Format;
 import java.io.File;
 import java.io.FileFilter;
+
+import org.geotools.data.coverage.grid.Format;
 
 
 /**

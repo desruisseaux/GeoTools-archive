@@ -19,8 +19,8 @@
 package org.geotools.gce.geotiff;
 
 // Geotools dependencies
-import org.geotools.data.coverage.grid.GridFormatFactorySpi ; 
-import org.geotools.data.coverage.grid.Format ; 
+import org.geotools.data.coverage.grid.Format;
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 
 /**
  * The <CODE>GeoTiffFormatFactorySpi</CODE> should never be instantiated

@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.Map;
 
 import junit.framework.TestCase;
-import org.geotools.graph.GraphTestUtil;
 
+import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.opt.OptGraphBuilder;
 import org.geotools.graph.structure.Graph;
 

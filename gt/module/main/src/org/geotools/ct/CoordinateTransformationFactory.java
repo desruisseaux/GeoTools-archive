@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,55 +24,47 @@
 package org.geotools.ct;
 
 // J2SE dependencies
-import java.util.Arrays;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.rmi.ServerException;
 import java.rmi.server.UnicastRemoteObject;
-import java.lang.ref.WeakReference;
-import java.lang.ref.Reference;
+import java.util.Arrays;
 
-// JAI dependencies
-import javax.media.jai.ParameterList;
 import javax.media.jai.IntegerSequence;
+import javax.media.jai.ParameterList;
 import javax.vecmath.SingularMatrixException;
 
-// OpenGIS dependencies
+import org.geotools.cs.AxisInfo;
+import org.geotools.cs.AxisOrientation;
+import org.geotools.cs.CompoundCoordinateSystem;
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.Ellipsoid;
+import org.geotools.cs.FittedCoordinateSystem;
+import org.geotools.cs.GeocentricCoordinateSystem;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.HorizontalCoordinateSystem;
+import org.geotools.cs.HorizontalDatum;
+import org.geotools.cs.LocalCoordinateSystem;
+import org.geotools.cs.PrimeMeridian;
+import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.cs.Projection;
+import org.geotools.cs.TemporalCoordinateSystem;
+import org.geotools.cs.VerticalCoordinateSystem;
+import org.geotools.cs.WGS84ConversionInfo;
+import org.geotools.pt.Dimensioned;
+import org.geotools.pt.Matrix;
+import org.geotools.resources.CTSUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.image.JAIUtilities;
+import org.geotools.units.Unit;
 import org.opengis.cs.CS_CoordinateSystem;
 import org.opengis.ct.CT_CoordinateTransformation;
 import org.opengis.ct.CT_CoordinateTransformationFactory;
-
-// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.cs.AxisInfo;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.Projection;
-import org.geotools.cs.PrimeMeridian;
-import org.geotools.cs.HorizontalDatum;
-import org.geotools.cs.AxisOrientation;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.WGS84ConversionInfo;
-import org.geotools.cs.LocalCoordinateSystem;
-import org.geotools.cs.FittedCoordinateSystem;
-import org.geotools.cs.CompoundCoordinateSystem;
-import org.geotools.cs.ProjectedCoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.GeocentricCoordinateSystem;
-import org.geotools.cs.HorizontalCoordinateSystem;
-import org.geotools.cs.VerticalCoordinateSystem;
-import org.geotools.cs.TemporalCoordinateSystem;
-import org.geotools.pt.Dimensioned;
-
-// Resources
-import org.geotools.units.Unit;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.image.JAIUtilities;
 
 
 /**
@@ -770,7 +762,7 @@ public class CoordinateTransformationFactory {
                  * WEST). Compute the amount of angle to add to the source longitude in order to
                  * get the destination longitude. This amount is measured in units of the target
                  * axis.  The affine transform is then updated in order to take this rotation in
-                 * account. Note that the resulting longitude may be outside the usual [-180..180°]
+                 * account. Note that the resulting longitude may be outside the usual [-180..180ï¿½]
                  * range.
                  */
                 final Unit              unit = targetCS.getUnits(i);
@@ -950,7 +942,7 @@ public class CoordinateTransformationFactory {
      * @throws CannotCreateTransformException if no transformation path has been found.
      *
      * @task TODO: When rotating the prime meridian, we should ensure that
-     *             transformed longitudes stay in the range [-180..+180°].
+     *             transformed longitudes stay in the range [-180..+180ï¿½].
      */
     protected CoordinateTransformation createTransformationStep(
                                         final GeographicCoordinateSystem sourceCS,
@@ -968,7 +960,7 @@ public class CoordinateTransformationFactory {
              * different. Note: this special block is mandatory for avoiding never-ending loop,
              * since it is invoked by 'createTransformationStep(GeocentricCS...)'.
              *
-             * TODO: We should ensure that longitude is in range [-180..+180°].
+             * TODO: We should ensure that longitude is in range [-180..+180ï¿½].
              */
             final CoordinateTransformation horizontalStep;
             final Matrix matrix = swapAndScaleGeoAxis(sourceCS, targetCS);

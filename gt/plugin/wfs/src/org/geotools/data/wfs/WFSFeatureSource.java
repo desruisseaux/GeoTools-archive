@@ -16,7 +16,8 @@
  */
 package org.geotools.data.wfs;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -31,7 +32,8 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import java.io.IOException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

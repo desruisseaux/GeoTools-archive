@@ -9,7 +9,6 @@ package org.geotools.gce.arcgrid;
 
 import java.net.URL;
 
-import org.geotools.gce.arcgrid.ArcGridRaster;
 import org.geotools.resources.TestData;
 
 /**

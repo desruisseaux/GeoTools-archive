@@ -16,6 +16,12 @@
  */
 package org.geotools.xml.handlers;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.ComplexType;
@@ -24,11 +30,6 @@ import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.xml.sax.SAXException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Management Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,19 +24,17 @@
 package org.geotools.coverage.grid;
 
 // J2SE and extensions
-import java.util.Map;
-import java.text.NumberFormat;
 import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.util.Map;
+
 import javax.media.jai.PlanarImage;
 import javax.media.jai.PropertySource;
 import javax.media.jai.util.CaselessStringKey;
 
-// OpenGIS dependencies
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
 import org.geotools.coverage.Coverage;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,13 +26,12 @@ package org.geotools.coverage;
 // J2SE dependencies
 import java.awt.color.ColorSpace;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
 /**
  * Espace de couleurs pour les images dont les valeurs
- * de pixels se situent entre deux nombre réels.
+ * de pixels se situent entre deux nombre rï¿½els.
  *
  * NOTE: Actual implementation is a copy of org.geotools.io.image.ScaledColorSpace.
  *       Future implementation will be differents (interpolate in a color table
@@ -63,18 +62,18 @@ public final class ScaledColorSpace extends ColorSpace {
     private final float scale;
     
     /**
-     * Nombre à aditionner aux pixels après
+     * Nombre ï¿½ aditionner aux pixels aprï¿½s
      * les avoir multiplier par {@link #scale}.
      */
     private final float offset;
     
     /**
-     * Construit un modèle de couleurs.
+     * Construit un modï¿½le de couleurs.
      *
-     * @param band La bande à rendre visible (habituellement 0).
-     * @param numComponents Nombre de composante (seule la première sera prise en compte).
-     * @param minimum La valeur géophysique minimale.
-     * @param maximum La valeur géophysique maximale.
+     * @param band La bande ï¿½ rendre visible (habituellement 0).
+     * @param numComponents Nombre de composante (seule la premiï¿½re sera prise en compte).
+     * @param minimum La valeur gï¿½ophysique minimale.
+     * @param maximum La valeur gï¿½ophysique maximale.
      */
     public ScaledColorSpace(final int band, final int numComponents,
                             final double minimum, final double maximum)
@@ -89,7 +88,7 @@ public final class ScaledColorSpace extends ColorSpace {
     
     /**
      * Retourne une couleur RGB en tons de
-     * gris pour le nombre réel spécifié.
+     * gris pour le nombre rï¿½el spï¿½cifiï¿½.
      */
     public float[] toRGB(final float[] values) {
         float value = (values[band]-offset)/scale;
@@ -98,8 +97,8 @@ public final class ScaledColorSpace extends ColorSpace {
     }
     
     /**
-     * Retourne une valeur réelle pour
-     * le ton de gris spécifié.
+     * Retourne une valeur rï¿½elle pour
+     * le ton de gris spï¿½cifiï¿½.
      */
     public float[] fromRGB(final float[] RGB) {
         final float[] values = new float[getNumComponents()];
@@ -130,14 +129,14 @@ public final class ScaledColorSpace extends ColorSpace {
     }
     
     /**
-     * Retourne la valeur minimale autorisée.
+     * Retourne la valeur minimale autorisï¿½e.
      */
     public float getMinValue(final int component) {
         return MIN_VALUE*scale + offset;
     }
     
     /**
-     * Retourne la valeur maximale autorisée.
+     * Retourne la valeur maximale autorisï¿½e.
      */
     public float getMaxValue(final int component) {
         return MAX_VALUE*scale + offset;

@@ -16,12 +16,8 @@
  */
 package org.geotools.gml;
 
-import com.vividsolutions.jts.geom.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import java.util.*;
+import org.geotools.feature.Feature;
+import org.xml.sax.ContentHandler;
 
 
 /**

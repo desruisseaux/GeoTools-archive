@@ -16,6 +16,12 @@
  */
 package org.geotools.xml.wfs;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.data.Query;
 import org.geotools.filter.Filter;
 import org.geotools.xml.PrintHandler;
@@ -38,10 +44,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
-import javax.naming.OperationNotSupportedException;
 
 
 /**

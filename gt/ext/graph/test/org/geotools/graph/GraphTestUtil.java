@@ -2,7 +2,6 @@ package org.geotools.graph;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.build.opt.OptDirectedGraphBuilder;

@@ -19,34 +19,25 @@
 package org.geotools.gce.geotiff;
 
 //J2SE dependencies
-import java.io.IOException ; 
-import java.awt.geom.AffineTransform ; 
-import javax.imageio.metadata.IIOMetadata ; 
+import java.awt.geom.AffineTransform;
+import java.io.IOException;
 
-//JAI dependencies
-import javax.media.jai.RenderedOp ; 
-import javax.media.jai.JAI ; 
+import javax.imageio.metadata.IIOMetadata;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 
-//JAI ImageIO Tools dependencies
-import com.sun.media.jai.operator.ImageReadDescriptor ;
-
-// geotools dependencies
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemAuthorityFactory;
+import org.geotools.ct.MathTransform;
+import org.geotools.ct.MathTransformFactory;
+import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.Format ; 
-import org.geotools.gc.GridCoverage ; 
-import org.geotools.cs.CoordinateSystem ; 
-import org.geotools.cs.CoordinateSystemFactory ; 
-import org.geotools.cs.CoordinateSystemModifiedEPSGFactory ; 
-import org.geotools.cs.CoordinateSystemAuthorityFactory ;
-import org.geotools.cs.CoordinateSystemEPSGFactory ; 
-import org.geotools.ct.MathTransform ; 
-import org.geotools.ct.MathTransformFactory ; 
-import org.geotools.pt.Envelope ; 
+import org.geotools.gc.GridCoverage;
+import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 
-// OpenGIS dependencies.
-import org.opengis.coverage.MetadataNameNotFoundException ; 
-import org.opengis.parameter.ParameterValueGroup ; 
-import org.opengis.referencing.FactoryException ; 
+import com.sun.media.jai.operator.ImageReadDescriptor;
 
 
 /**

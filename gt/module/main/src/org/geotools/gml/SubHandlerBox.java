@@ -16,8 +16,9 @@
  */
 package org.geotools.gml;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,29 +20,24 @@
 package org.geotools.referencing.wkt;
 
 // Formatting
-import java.util.Locale;
-import java.text.Format;
-import java.text.NumberFormat;
-import java.text.DecimalFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
-import java.text.ParseException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
 
-// OpenGIS dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.GeneralParameterValue;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 
 
 /**

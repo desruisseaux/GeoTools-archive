@@ -19,17 +19,15 @@
 
 package org.geotools.graph.build.line;
 
+import org.geotools.graph.structure.Edge;
+import org.geotools.graph.structure.Graphable;
+import org.geotools.graph.structure.Node;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-
-import org.geotools.graph.build.GraphBuilder;
-import org.geotools.graph.structure.Edge;
-import org.geotools.graph.structure.Graph;
-import org.geotools.graph.structure.Graphable;
-import org.geotools.graph.structure.Node;
 
 /**
  * Builds a graph representing a line network in which edges in the network are

@@ -16,17 +16,12 @@
 package org.geotools.util;
 
 // J2SE dependencies
-import java.util.Iterator;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.util.Cloneable;
 
 
 /**

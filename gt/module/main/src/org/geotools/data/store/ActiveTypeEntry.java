@@ -1,21 +1,12 @@
 package org.geotools.data.store;
 
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.HorizontalDatum;
-import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.CoordinateTransformationFactory;
-import org.geotools.ct.MathTransform;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.AbstractFeatureStore;
@@ -39,15 +30,11 @@ import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.TypeEntry;
-import org.geotools.data.crs.CRSService;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.units.Unit;
 import org.geotools.util.SimpleInternationalString;
-
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 

@@ -20,9 +20,11 @@
 
 package org.geotools.data.shapefile.shp;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.channels.ReadableByteChannel;
 
 
 

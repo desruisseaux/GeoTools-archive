@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -30,16 +30,15 @@
 package org.geotools.units;
 
 // Divers
-import java.io.ObjectStreamException;
-import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.resources.rsc.Resources;
 
 
 /**
- * Classe représentant une unité dérivée de zero, un ou plusieurs unités fondamentales.
- * Les unités fondamentales sont définies par la classe {@link BaseUnit}. Elles représentent par
+ * Classe reprï¿½sentant une unitï¿½ dï¿½rivï¿½e de zero, un ou plusieurs unitï¿½s fondamentales.
+ * Les unitï¿½s fondamentales sont dï¿½finies par la classe {@link BaseUnit}. Elles reprï¿½sentent par
  * exemple des mesures de longueurs (m) ou de temps (s). Les objets de la classe <code>DerivedUnit</code>
- * combinent ensemble quelques unités fondamentales pour créer par exemple des unités de vitesses (m/s).
+ * combinent ensemble quelques unitï¿½s fondamentales pour crï¿½er par exemple des unitï¿½s de vitesses (m/s).
  *
  * @version 1.0
  * @author Steven R. Emmerson
@@ -56,32 +55,32 @@ final class DerivedUnit extends SimpleUnit {
     private static final long serialVersionUID = -4476414709268904273L;
     
     /**
-     * Unité sans dimensions. Cette
-     * unité n'aura aucun symbole.
+     * Unitï¿½ sans dimensions. Cette
+     * unitï¿½ n'aura aucun symbole.
      */
     static final Unit DIMENSIONLESS=new DerivedUnit().intern();
     
     /**
-     * Tableau d'unités fondamentales avec leur exposant (par exemple m²). Les différentes
-     * méthodes de la classe <code>DerivedUnit</code> doivent s'assurer qu'une même unité
-     * n'apparaît pas deux fois dans ce tableau, et qu'aucune unité n'a un exposant de 0.
+     * Tableau d'unitï¿½s fondamentales avec leur exposant (par exemple mï¿½). Les diffï¿½rentes
+     * mï¿½thodes de la classe <code>DerivedUnit</code> doivent s'assurer qu'une mï¿½me unitï¿½
+     * n'apparaï¿½t pas deux fois dans ce tableau, et qu'aucune unitï¿½ n'a un exposant de 0.
      */
     private final Factor[] factors;
     
     /**
-     * Construit une unité sans dimension.
+     * Construit une unitï¿½ sans dimension.
      */
     private DerivedUnit()
     {this("dimensionless", "", null, new Factor[0]);}
     
     /**
-     * Construit une unité dérivée avec le tableau
-     * d'unités fondamentales spécifié ainsi qu'un
+     * Construit une unitï¿½ dï¿½rivï¿½e avec le tableau
+     * d'unitï¿½s fondamentales spï¿½cifiï¿½ ainsi qu'un
      * certain symbole.
      *
-     * @param factors Tableau d'unités fondamentales avec leurs
-     *        exposants. Ce tableau sera supposé déjà simplifié,
-     *        c'est-à-dire que la même unité fondamentale n'y
+     * @param factors Tableau d'unitï¿½s fondamentales avec leurs
+     *        exposants. Ce tableau sera supposï¿½ dï¿½jï¿½ simplifiï¿½,
+     *        c'est-ï¿½-dire que la mï¿½me unitï¿½ fondamentale n'y
      *        apparait pas deux fois et aucun exposant n'est 0.
      */
     private DerivedUnit(final Factor[] factors) {
@@ -90,19 +89,19 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Construit une unité dérivée avec le tableau
-     * d'unités fondamentales spécifié ainsi qu'un
+     * Construit une unitï¿½ dï¿½rivï¿½e avec le tableau
+     * d'unitï¿½s fondamentales spï¿½cifiï¿½ ainsi qu'un
      * certain symbole.
      *
-     * @param quantityName Nom de la quantité (exemple: "Speed").
-     * @param symbol Symbole de cette unité dérivée. Ce symbole
-     *        ne doit pas être nul.
-     * @param prefix Liste des préfix qui peuvent être placés devant le symbole
+     * @param quantityName Nom de la quantitï¿½ (exemple: "Speed").
+     * @param symbol Symbole de cette unitï¿½ dï¿½rivï¿½e. Ce symbole
+     *        ne doit pas ï¿½tre nul.
+     * @param prefix Liste des prï¿½fix qui peuvent ï¿½tre placï¿½s devant le symbole
      *        <code>symbol</code>, ou <code>null</code> s'il n'y en a pas. Cette
-     *        liste sera prise en compte par la méthode {@link #scale}.
-     * @param factors Tableau d'unités fondamentales avec leurs
-     *        exposants. Ce tableau sera supposé déjà simplifié,
-     *        c'est-à-dire que la même unité fondamentale n'y
+     *        liste sera prise en compte par la mï¿½thode {@link #scale}.
+     * @param factors Tableau d'unitï¿½s fondamentales avec leurs
+     *        exposants. Ce tableau sera supposï¿½ dï¿½jï¿½ simplifiï¿½,
+     *        c'est-ï¿½-dire que la mï¿½me unitï¿½ fondamentale n'y
      *        apparait pas deux fois et aucun exposant n'est 0.
      */
     private DerivedUnit(final String quantityName, final String symbol, final PrefixSet prefix, final Factor[] factors) {
@@ -111,19 +110,19 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Construit une unité dérivée avec le tableau d'unités fondamentales spécifié. Un symbole par défaut
-     * sera attribué. Ce symbole ne sera pas nécessairement le plus approprié. Par exemple le symbole
-     * "kg*m²/s²" pourrait être créé à la place de "J" pour les unités d'énergie.
+     * Construit une unitï¿½ dï¿½rivï¿½e avec le tableau d'unitï¿½s fondamentales spï¿½cifiï¿½. Un symbole par dï¿½faut
+     * sera attribuï¿½. Ce symbole ne sera pas nï¿½cessairement le plus appropriï¿½. Par exemple le symbole
+     * "kg*mï¿½/sï¿½" pourrait ï¿½tre crï¿½ï¿½ ï¿½ la place de "J" pour les unitï¿½s d'ï¿½nergie.
      */
     public static SimpleUnit getInstance(final Factor[] factors) {
         return getInstance(null, null, null, factors);
     }
     
     /**
-     * Crée une nouvelle unité dérivée de une ou plusieurs unités de bases.
-     * Par exemple si <code>SECOND</code> est une unité de base mesurant
-     * le temps en secondes et <code>METRE</code> une unité de base pour les
-     * distances, alors on pourrait créer une unité de vitesse avec le code
+     * Crï¿½e une nouvelle unitï¿½ dï¿½rivï¿½e de une ou plusieurs unitï¿½s de bases.
+     * Par exemple si <code>SECOND</code> est une unitï¿½ de base mesurant
+     * le temps en secondes et <code>METRE</code> une unitï¿½ de base pour les
+     * distances, alors on pourrait crï¿½er une unitï¿½ de vitesse avec le code
      * suivant:
      *
      * <blockquote><pre>
@@ -134,24 +133,24 @@ final class DerivedUnit extends SimpleUnit {
      * &nbsp;});
      * </pre></blockquote>
      *
-     * @param  quantityName Nom de la quantité (exemple: "Speed").
-     * @param  symbol Le symbole qui représentera cette unité dérivée
+     * @param  quantityName Nom de la quantitï¿½ (exemple: "Speed").
+     * @param  symbol Le symbole qui reprï¿½sentera cette unitï¿½ dï¿½rivï¿½e
      *         (par exemple "J" pour les joules). Si nul, alors un symbole
-     *         par défaut sera créé. Par exemple le symbole "kg*m²/s²"
-     *         pourrait être créé à la place de "J" pour les unités d'énergie.
-     * @param  prefix Liste des préfix qui peuvent être placés devant le symbole
+     *         par dï¿½faut sera crï¿½ï¿½. Par exemple le symbole "kg*mï¿½/sï¿½"
+     *         pourrait ï¿½tre crï¿½ï¿½ ï¿½ la place de "J" pour les unitï¿½s d'ï¿½nergie.
+     * @param  prefix Liste des prï¿½fix qui peuvent ï¿½tre placï¿½s devant le symbole
      *         <code>symbol</code>, ou <code>null</code> s'il n'y en a pas. Cette
-     *         liste sera prise en compte par la méthode {@link #scale}.
-     * @param  factors Liste des unités de bases ainsi que de
-     *         leurs exposants qui composeront l'unité dérivées.
-     *         Les éléments nuls ainsi que ceux qui ont un exposant
-     *         de 0 seront ignorés.
-     * @return Une nouvelle unité dérivées. S'il existait déjà
-     *         une unité dérivée qui répondait aux spécifications,
-     *         celle-ci sera retournée. Il est possible que cette
-     *         méthode retourne un objet {@link BaseUnit} au lieu
+     *         liste sera prise en compte par la mï¿½thode {@link #scale}.
+     * @param  factors Liste des unitï¿½s de bases ainsi que de
+     *         leurs exposants qui composeront l'unitï¿½ dï¿½rivï¿½es.
+     *         Les ï¿½lï¿½ments nuls ainsi que ceux qui ont un exposant
+     *         de 0 seront ignorï¿½s.
+     * @return Une nouvelle unitï¿½ dï¿½rivï¿½es. S'il existait dï¿½jï¿½
+     *         une unitï¿½ dï¿½rivï¿½e qui rï¿½pondait aux spï¿½cifications,
+     *         celle-ci sera retournï¿½e. Il est possible que cette
+     *         mï¿½thode retourne un objet {@link BaseUnit} au lieu
      *         d'un objet {@link DerivedUnit}, si une telle
-     *         simplification était possible.
+     *         simplification ï¿½tait possible.
      *
      * @see BaseUnit#getInstance
      * @see ScaledUnit#getInstance
@@ -159,9 +158,9 @@ final class DerivedUnit extends SimpleUnit {
      */
     public static SimpleUnit getInstance(final String quantityName, final String symbol, final PrefixSet prefix, Factor[] factors) {
         /*
-         * Construit un tableau de facteurs dans lequel les doublons auront été fusionnés.
-         * Le tableau retourné sera toujours une copie du tableau original, de sorte que
-         * son contenu ne sera pas affecté par d'éventuels changements du tableau original.
+         * Construit un tableau de facteurs dans lequel les doublons auront ï¿½tï¿½ fusionnï¿½s.
+         * Le tableau retournï¿½ sera toujours une copie du tableau original, de sorte que
+         * son contenu ne sera pas affectï¿½ par d'ï¿½ventuels changements du tableau original.
          */
         Factor[] oldFactors=factors;
         factors=new Factor[oldFactors.length];
@@ -198,7 +197,7 @@ final class DerivedUnit extends SimpleUnit {
         }
         /*
          * Maintenant que le tableau <code>factors</code> a
-         * été simplifié, construit des unités avec ce tableau.
+         * ï¿½tï¿½ simplifiï¿½, construit des unitï¿½s avec ce tableau.
          */
         switch (factors.length) {
             case 0: return (SimpleUnit) DIMENSIONLESS;
@@ -212,13 +211,13 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Renvoie une unité identique à celle-ci, mais
-     * avec un nouveau symbole et de nouveaux préfix.
+     * Renvoie une unitï¿½ identique ï¿½ celle-ci, mais
+     * avec un nouveau symbole et de nouveaux prï¿½fix.
      *
-     * @param  symbol Nouveau symbole représentant cette unité. Si ce
-     *         paramètre est nul, un symbole par défaut sera créé.
-     * @param  prefix Liste des préfix autorisés pour le symbole.
-     * @return La même unité, mais avec le nouveau symbole. Peut être
+     * @param  symbol Nouveau symbole reprï¿½sentant cette unitï¿½. Si ce
+     *         paramï¿½tre est nul, un symbole par dï¿½faut sera crï¿½ï¿½.
+     * @param  prefix Liste des prï¿½fix autorisï¿½s pour le symbole.
+     * @return La mï¿½me unitï¿½, mais avec le nouveau symbole. Peut ï¿½tre
      *         <code>this</code>, mais ne sera jamais <code>null</code>.
      */
     public Unit rename(final String symbol, final PrefixSet prefix) {// CAST
@@ -226,11 +225,11 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Élève cette unité à une puissance entière.
+     * ï¿½lï¿½ve cette unitï¿½ ï¿½ une puissance entiï¿½re.
      *
-     * @param power La puissance à laquelle élever cette unité.
-     * @return Les unités résultant de l'élévation des unités
-     *         <code>this</code> à la puissance <code>power</code>.
+     * @param power La puissance ï¿½ laquelle ï¿½lever cette unitï¿½.
+     * @return Les unitï¿½s rï¿½sultant de l'ï¿½lï¿½vation des unitï¿½s
+     *         <code>this</code> ï¿½ la puissance <code>power</code>.
      *
      * @see #multiply
      * @see #divide
@@ -252,15 +251,15 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Élève ces unités à une puissance fractionnaire. Cette méthode est utile entre
-     * autre pour prendre la racine carré d'un nombre, ce qui revient à l'élever à la
-     * puissance ½.
+     * ï¿½lï¿½ve ces unitï¿½s ï¿½ une puissance fractionnaire. Cette mï¿½thode est utile entre
+     * autre pour prendre la racine carrï¿½ d'un nombre, ce qui revient ï¿½ l'ï¿½lever ï¿½ la
+     * puissance ï¿½.
      *
-     * @param power La puissance à laquelle élever cette unité.
-     * @return Les unités résultant de l'élévation des unités
-     *         <code>this</code> à la puissance <code>power</code>.
-     * @throws UnitException Si cette unité ne peut pas être élevée
-     *         à une puissance non-entière.
+     * @param power La puissance ï¿½ laquelle ï¿½lever cette unitï¿½.
+     * @return Les unitï¿½s rï¿½sultant de l'ï¿½lï¿½vation des unitï¿½s
+     *         <code>this</code> ï¿½ la puissance <code>power</code>.
+     * @throws UnitException Si cette unitï¿½ ne peut pas ï¿½tre ï¿½levï¿½e
+     *         ï¿½ une puissance non-entiï¿½re.
      */
     public Unit pow(final double power) throws UnitException {
         final int integer=(int) power;
@@ -281,11 +280,11 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Multiplie cette unité par une autre unité.
+     * Multiplie cette unitï¿½ par une autre unitï¿½.
      *
-     * @param that L'unité par laquelle multiplier cette unité.
+     * @param that L'unitï¿½ par laquelle multiplier cette unitï¿½.
      * @return Le produit de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si l'unité <code>that</code> est de la
+     * @throws UnitException Si l'unitï¿½ <code>that</code> est de la
      *         classe {@link OffsetUnit} ou d'une autre classe invalide.
      *
      * @see #pow
@@ -314,7 +313,7 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Retourne une unité qui résulte de la multiplication de
+     * Retourne une unitï¿½ qui rï¿½sulte de la multiplication de
      * <code>this</code> par les facteurs <code>f</code>.
      */
     final SimpleUnit multiply(final Factor[] f) {
@@ -322,7 +321,7 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Retourne une unité qui résulte de la multiplication des
+     * Retourne une unitï¿½ qui rï¿½sulte de la multiplication des
      * facteurs <code>f1</code> par les facteurs <code>f2</code>.
      */
     private static SimpleUnit multiply(final Factor[] f1, final Factor[] f2, final int power2) {
@@ -338,11 +337,11 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Divise cette unité par une autre unité.
+     * Divise cette unitï¿½ par une autre unitï¿½.
      *
-     * @param that L'unité par laquelle diviser cette unité.
+     * @param that L'unitï¿½ par laquelle diviser cette unitï¿½.
      * @return Le quotient de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si l'unité <code>that</code> est de la
+     * @throws UnitException Si l'unitï¿½ <code>that</code> est de la
      *         classe {@link OffsetUnit} ou d'une autre classe invalide.
      *
      * @see #pow
@@ -440,13 +439,13 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Indique si les unités <code>this</code> et <code>that</code> sont compatibles.
-     * Si elles le sont, alors les méthodes <code>convert</code> ne lanceront jamais
-     * d'exception pour ces unités.
+     * Indique si les unitï¿½s <code>this</code> et <code>that</code> sont compatibles.
+     * Si elles le sont, alors les mï¿½thodes <code>convert</code> ne lanceront jamais
+     * d'exception pour ces unitï¿½s.
      *
-     * @param that Autre unités avec laquelle on veut
-     *        vérifier si ces unités sont compatibles.
-     * @return <code>true</code> Si l'on garantie que les méthodes
+     * @param that Autre unitï¿½s avec laquelle on veut
+     *        vï¿½rifier si ces unitï¿½s sont compatibles.
+     * @return <code>true</code> Si l'on garantie que les mï¿½thodes
      *         <code>convert</code> ne lanceront pas d'exceptions.
      */
     public boolean canConvert(final Unit        that) {return that.canConvert(this);} // Do not move in superclass
@@ -454,14 +453,14 @@ final class DerivedUnit extends SimpleUnit {
            boolean canConvert(final DerivedUnit that) {return compareDimensionality(that)!=0;}
     
     /**
-     * Effectue la conversion d'une mesure exprimée selon d'autres unités. Par
+     * Effectue la conversion d'une mesure exprimï¿½e selon d'autres unitï¿½s. Par
      * exemple <code>METRE_PER_SECOND.convert(1,&nbsp;KILOMETRE_PER_HOUR)</code>
      * retournera <code>0.2778</code>.
      *
-     * @param value La valeur exprimée selon les autres unités (<code>fromUnit</code>).
-     * @param fromUnit Les autres unités.
-     * @return La valeur convertie selon ces unités (<code>this</code>).
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @param value La valeur exprimï¿½e selon les autres unitï¿½s (<code>fromUnit</code>).
+     * @param fromUnit Les autres unitï¿½s.
+     * @return La valeur convertie selon ces unitï¿½s (<code>this</code>).
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     public double convert(final double value, final Unit fromUnit) throws UnitException {
         return fromUnit.inverseConvert(value, this); // Do not move in superclass
@@ -484,15 +483,15 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures exprimées selon d'autres
-     * unités. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
+     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
      *
-     * @param  values En entré, les valeurs exprimées selon les autres unités
-     *         (<code>fromUnit</code>). En sortie, les valeurs exprimées selon ces
-     *         unités (<code>this</code>).
-     * @param  fromUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres unitï¿½s
+     *         (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es selon ces
+     *         unitï¿½s (<code>this</code>).
+     * @param  fromUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     public void convert(final double[] values, final Unit fromUnit) throws UnitException {
         fromUnit.inverseConvert(values, this); // Do not move in superclass
@@ -515,17 +514,17 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures exprimées selon d'autres
-     * unités. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
+     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
      * Notez que d'importantes erreurs d'arrondissement peuvent survenir
      * si <code>fromUnit</code> est de la classe {@link OffsetUnit}.
      *
-     * @param  values En entré, les valeurs exprimées selon les autres
-     *         unités (<code>fromUnit</code>). En sortie, les valeurs exprimées
-     *         selon ces unités (<code>this</code>).
-     * @param  fromUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres
+     *         unitï¿½s (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es
+     *         selon ces unitï¿½s (<code>this</code>).
+     * @param  fromUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     public void convert(final float[] values, final Unit fromUnit) throws UnitException {
         fromUnit.inverseConvert(values, this); // Do not move in superclass
@@ -548,16 +547,16 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Retourne un objet qui saura convertir selon ces unités les valeurs exprimées
-     * selon d'autres unités. Cette méthode est avantageuse si on prévoie faîre
-     * plusieurs conversions, car la transformation à utiliser est déterminée une
+     * Retourne un objet qui saura convertir selon ces unitï¿½s les valeurs exprimï¿½es
+     * selon d'autres unitï¿½s. Cette mï¿½thode est avantageuse si on prï¿½voie faï¿½re
+     * plusieurs conversions, car la transformation ï¿½ utiliser est dï¿½terminï¿½e une
      * fois pour toute.
      *
-     * @param  fromUnit Unités à partir de lesquel faire les conversions.
-     * @return Une transformation des unités <code>fromUnit</code>
-     *         vers les unités <code>this</code>. Cette méthode ne
+     * @param  fromUnit Unitï¿½s ï¿½ partir de lesquel faire les conversions.
+     * @return Une transformation des unitï¿½s <code>fromUnit</code>
+     *         vers les unitï¿½s <code>this</code>. Cette mï¿½thode ne
      *         retourne jamais <code>null</code>.
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     public UnitTransform getTransform(final Unit fromUnit) throws UnitException {
         return fromUnit.getInverseTransform(this); // Do not move in superclass
@@ -580,15 +579,15 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Convertit une mesure vers d'autre unités. Par exemple
+     * Convertit une mesure vers d'autre unitï¿½s. Par exemple
      * <code>METRE_PER_SECOND.inverseConvert(1,&nbsp;KILOMETRE_PER_HOUR)</code>
-     * retournera <code>3.6</code>. Cette méthode est l'inverse de la méthode
+     * retournera <code>3.6</code>. Cette mï¿½thode est l'inverse de la mï¿½thode
      * {@link #convert(double,Unit)}.
      *
-     * @param  value La valeur exprimée selon ces unités (<code>this</code>).
-     * @param  toUnit Les autres unités.
-     * @return La valeur convertie selon les autres unités (<code>toUnit</code>).
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @param  value La valeur exprimï¿½e selon ces unitï¿½s (<code>this</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @return La valeur convertie selon les autres unitï¿½s (<code>toUnit</code>).
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     protected double inverseConvert(final double value, final Unit toUnit) throws UnitException {
         return toUnit.convert(value, this); // Do not move in superclass
@@ -611,16 +610,16 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unités.
+     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * méthode est l'inverse de la méthode {@link #convert(double[],Unit)}.
+     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(double[],Unit)}.
      *
-     * @param  values En entré, les valeur exprimées selon ces unités
-     *         (<code>this</code>). En sortie, les valeurs exprimées
-     *         selon les autres unités (<code>toUnit</code>).
-     * @param  toUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
+     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
+     *         selon les autres unitï¿½s (<code>toUnit</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     protected void inverseConvert(final double[] values, final Unit toUnit) throws UnitException {
         toUnit.convert(values, this); // Do not move in superclass
@@ -643,16 +642,16 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unités.
+     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * méthode est l'inverse de la méthode {@link #convert(float[],Unit)}.
+     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(float[],Unit)}.
      *
-     * @param  values En entré, les valeur exprimées selon ces unités
-     *         (<code>this</code>). En sortie, les valeurs exprimées
-     *         selon les autres unités (<code>toUnit</code>).
-     * @param  toUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
+     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
+     *         selon les autres unitï¿½s (<code>toUnit</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     protected void inverseConvert(final float[] values, final Unit toUnit) throws UnitException {
         toUnit.convert(values, this); // Do not move in superclass
@@ -675,15 +674,15 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Retourne un objet qui saura convertir selon d'autres unités les
-     * valeurs exprimées selon ces unités. Cette méthode est l'inverse
+     * Retourne un objet qui saura convertir selon d'autres unitï¿½s les
+     * valeurs exprimï¿½es selon ces unitï¿½s. Cette mï¿½thode est l'inverse
      * de {@link #getTransform}.
      *
-     * @param  toUnit Unités vers lesquel faire les conversions.
-     * @return Une transformation des unités <code>this</code>
-     *         vers les unités <code>toUnit</code>. Cette méthode
+     * @param  toUnit Unitï¿½s vers lesquel faire les conversions.
+     * @return Une transformation des unitï¿½s <code>this</code>
+     *         vers les unitï¿½s <code>toUnit</code>. Cette mï¿½thode
      *         ne retourne jamais <code>null</code>.
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     protected UnitTransform getInverseTransform(final Unit toUnit) throws UnitException {
         return toUnit.getTransform(this); // Do not move in superclass
@@ -706,9 +705,9 @@ final class DerivedUnit extends SimpleUnit {
     }
     
     /**
-     * Indique si deux unités sont égales, en ignorant leurs symboles. Il n'est pas nécessaire que
-     * les unités fondamentales y apparaissent dans le même ordre. Par exemple, "m²*s" sera considéré
-     * identique à "s*m²".
+     * Indique si deux unitï¿½s sont ï¿½gales, en ignorant leurs symboles. Il n'est pas nï¿½cessaire que
+     * les unitï¿½s fondamentales y apparaissent dans le mï¿½me ordre. Par exemple, "mï¿½*s" sera considï¿½rï¿½
+     * identique ï¿½ "s*mï¿½".
      */
     public boolean equalsIgnoreSymbol(final Unit unit) {
         return (unit instanceof DerivedUnit) && compareDimensionality((DerivedUnit) unit)==1;
@@ -716,7 +715,7 @@ final class DerivedUnit extends SimpleUnit {
     
     /**
      * Retourne un code
-     * pour cette unité.
+     * pour cette unitï¿½.
      */
     public int hashCode() {
         int code=92718538;

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,29 +33,34 @@
 package org.geotools.gp;
 
 // J2SE dependencies
-import java.io.*;
-import java.util.*;
-import java.awt.geom.*;
-import java.awt.image.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Level;
 
-// JAI dependencies
-import javax.media.jai.*;
+import javax.media.jai.JAI;
+import javax.media.jai.ParameterList;
 
-// Geotools dependencies
-import org.geotools.pt.*;
-import org.geotools.cs.*;
-import org.geotools.cv.*;
-import org.geotools.gc.*;
-import org.geotools.gp.*;
-import org.geotools.gp.jai.*;
-import org.geotools.resources.Arguments;
-
-// JUnit dependencies
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.geotools.cs.CompoundCoordinateSystem;
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.TemporalCoordinateSystem;
+import org.geotools.gc.GridCoverage;
+import org.geotools.gc.GridCoverageTest;
+import org.geotools.gp.jai.CombineDescriptor;
+import org.geotools.pt.Envelope;
+import org.geotools.resources.Arguments;
 
 
 /**

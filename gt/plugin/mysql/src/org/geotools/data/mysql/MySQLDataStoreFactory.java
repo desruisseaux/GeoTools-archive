@@ -20,15 +20,16 @@
  */
 package org.geotools.data.mysql;
 
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.jdbc.ConnectionPool;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.jdbc.ConnectionPool;
 
 
 /**

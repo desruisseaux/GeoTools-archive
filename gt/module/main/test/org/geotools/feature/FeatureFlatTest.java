@@ -1,16 +1,13 @@
 package org.geotools.feature;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 
-// JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;

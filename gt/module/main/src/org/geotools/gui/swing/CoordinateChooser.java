@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,77 +33,60 @@
 package org.geotools.gui.swing;
 
 // Time
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.Calendar;
-
-// Geometry and coordinates
-import java.awt.Dimension;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
-
-// User interface (Swing)
-import java.awt.Insets;
 import java.awt.Component;
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JOptionPane;
-import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
-import javax.swing.JRadioButton;
-import javax.swing.BorderFactory;
-import javax.swing.AbstractButton;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.AbstractSpinnerModel;
-import javax.swing.JFormattedTextField;
-import javax.swing.text.InternationalFormatter;
-
-// Events
-import java.awt.EventQueue;
-import java.util.EventListener;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-// Parsing and formating
-import java.text.Format;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
-
-// Miscellaneous
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EventListener;
 import java.util.Locale;
+import java.util.TimeZone;
 
-// Geotools dependencies
+import javax.swing.AbstractButton;
+import javax.swing.AbstractSpinnerModel;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.InternationalFormatter;
+
 import org.geotools.measure.Angle;
+import org.geotools.measure.AngleFormat;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.measure.AngleFormat;
-
-// Resources
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
 import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**
  * A pane of controls designed to allow a user to select spatio-temporal coordinates.
  * Current implementation use geographic coordinates (longitudes/latitudes) and dates
  * according some locale calendar. Future version may allow the use of user-specified
- * coordinate system. Latitudes are constrained in the range 90°S to 90°N inclusive.
- * Longitudes are constrained in the range 180°W to 180°E inclusive. By default, dates
+ * coordinate system. Latitudes are constrained in the range 90ï¿½S to 90ï¿½N inclusive.
+ * Longitudes are constrained in the range 180ï¿½W to 180ï¿½E inclusive. By default, dates
  * are constrained in the range January 1st, 1970 up to the date at the time the widget
  * was created.
  *
@@ -167,35 +150,35 @@ public class CoordinateChooser extends JPanel {
     private final JComboBox timezone;
 
     /**
-     * Dates de début et de fin de la plage de temps demandée par l'utilisateur.
-     * Ces dates sont gérées par un modèle {@link SpinnerDateModel}.
+     * Dates de dï¿½but et de fin de la plage de temps demandï¿½e par l'utilisateur.
+     * Ces dates sont gï¿½rï¿½es par un modï¿½le {@link SpinnerDateModel}.
      */
     private final JSpinner tmin, tmax;
 
     /**
-     * Longitudes et latitudes minimales et maximales demandées par l'utilisateur.
-     * Ces coordonnées sont gérées par un modèle {@link SpinnerNumberModel}.
+     * Longitudes et latitudes minimales et maximales demandï¿½es par l'utilisateur.
+     * Ces coordonnï¿½es sont gï¿½rï¿½es par un modï¿½le {@link SpinnerNumberModel}.
      */
     private final JSpinner xmin, xmax, ymin, ymax;
 
     /**
-     * Résolution (en minutes de longitudes et de latitudes) demandée par l'utilisateur.
-     * Ces résolution sont gérées par un modèle {@link SpinnerNumberModel}.
+     * Rï¿½solution (en minutes de longitudes et de latitudes) demandï¿½e par l'utilisateur.
+     * Ces rï¿½solution sont gï¿½rï¿½es par un modï¿½le {@link SpinnerNumberModel}.
      */
     private final JSpinner xres, yres;
 
     /**
-     * Bouton radio pour sélectioner la meilleure résolution possible.
+     * Bouton radio pour sï¿½lectioner la meilleure rï¿½solution possible.
      */
     private final AbstractButton radioBestRes;
 
     /**
-     * Bouton radio pour sélectioner la résolution spécifiée.
+     * Bouton radio pour sï¿½lectioner la rï¿½solution spï¿½cifiï¿½e.
      */
     private final AbstractButton radioPrefRes;
 
     /**
-     * Composante facultative à afficher à la droite
+     * Composante facultative ï¿½ afficher ï¿½ la droite
      * du paneau <code>CoordinateChooser</code>.
      */
     private JComponent accessory;
@@ -280,7 +263,7 @@ public class CoordinateChooser extends JPanel {
         xres = new JSpinner(new SpinnerNumberModel(1, 0, 360*60, 1));
         yres = new JSpinner(new SpinnerNumberModel(1, 0, 180*60, 1));
 
-        final AngleFormat   angleFormat = new AngleFormat("D°MM.m'", locale);
+        final AngleFormat   angleFormat = new AngleFormat("Dï¿½MM.m'", locale);
         final DateFormat     dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
         xmin.setEditor(new SpinnerAngleModel.Editor(xmin, angleFormat));
@@ -351,7 +334,7 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Retourne un panneau avec une bordure titrée.
+     * Retourne un panneau avec une bordure titrï¿½e.
      */
     private static JPanel getPanel(final String title) {
         final JPanel panel=new JPanel(new GridBagLayout());
@@ -362,8 +345,8 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Définit la largeur (en nombre de colonnes) d'un champ.
-     * Eventuellement, cette méthode peut aussi redéfinir le
+     * Dï¿½finit la largeur (en nombre de colonnes) d'un champ.
+     * Eventuellement, cette mï¿½thode peut aussi redï¿½finir le
      * format.
      */
     private static void setup(final JSpinner spinner, final int width, final Format format) {
@@ -684,12 +667,12 @@ public class CoordinateChooser extends JPanel {
     }
 
     /**
-     * Prend en compte les valeurs des champs édités par l'utilisateur.
-     * Si les entrés ne sont pas valide, affiche un message d'erreur en
-     * utilisant la fenêtre parente <code>owner</code> spécifiée.
+     * Prend en compte les valeurs des champs ï¿½ditï¿½s par l'utilisateur.
+     * Si les entrï¿½s ne sont pas valide, affiche un message d'erreur en
+     * utilisant la fenï¿½tre parente <code>owner</code> spï¿½cifiï¿½e.
      *
-     * @param  owner Fenêtre dans laquelle faire apparaître d'eventuels messages d'erreur.
-     * @return <code>true</code> si la prise en compte des paramètres à réussie.
+     * @param  owner Fenï¿½tre dans laquelle faire apparaï¿½tre d'eventuels messages d'erreur.
+     * @return <code>true</code> si la prise en compte des paramï¿½tres ï¿½ rï¿½ussie.
      */
     private boolean commitEdit(final Component owner) {
         try {

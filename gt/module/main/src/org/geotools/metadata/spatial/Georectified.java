@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,22 +23,16 @@
 package org.geotools.metadata.spatial;
 
 // J2SE direct dependencies
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.Collections;
 
-// OpenGIS direct dependencies
-import org.opengis.util.InternationalString;
-import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.metadata.spatial.PixelOrientation;
-import org.opengis.metadata.spatial.CellGeometry;
-import org.opengis.metadata.spatial.GeometricObjectType;
-
-// Geotools dependencies
-import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
 import org.geotools.util.CheckedArrayList;
+import org.opengis.metadata.spatial.CellGeometry;
+import org.opengis.metadata.spatial.PixelOrientation;
+import org.opengis.spatialschema.geometry.primitive.Point;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -49,7 +43,7 @@ import org.geotools.util.CheckedArrayList;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class Georectified extends GridSpatialRepresentation
         implements org.opengis.metadata.spatial.Georectified

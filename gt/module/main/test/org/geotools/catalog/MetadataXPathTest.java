@@ -19,11 +19,11 @@ package org.geotools.catalog;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import junit.framework.TestCase;
+
 import org.geotools.xml.XPath;
 import org.geotools.xml.XPathFactory;
 import org.opengis.catalog.MetadataEntity.Element;
-
-import junit.framework.TestCase;
 
 /**
  * TODO type description

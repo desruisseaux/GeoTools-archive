@@ -1,9 +1,14 @@
 package org.geotools.data.property;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -20,8 +25,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-
-import junit.framework.TestCase;
 
 /**
  * @author jgarnett

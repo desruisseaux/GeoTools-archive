@@ -17,10 +17,10 @@
 
 package org.geotools.demo.referencing;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.CoordinateFilter;
 import org.geotools.ct.MathTransform;
 import org.geotools.pt.CoordinatePoint;
+
+import com.vividsolutions.jts.geom.CoordinateFilter;
 
 /**
  * A coordinate filter that can be used to tranform each coordinate 

@@ -17,27 +17,22 @@
 package org.geotools.renderer.geom;
 
 // J2SE dependencies
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
-import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 
-// JTS dependencies
-import com.vividsolutions.jts.geom.Coordinate;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.MathTransform;
 import org.geotools.math.Statistics;
-import org.geotools.pt.CoordinatePoint;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**

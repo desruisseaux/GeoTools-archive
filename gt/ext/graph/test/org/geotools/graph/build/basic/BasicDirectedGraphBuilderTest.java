@@ -1,13 +1,12 @@
 package org.geotools.graph.build.basic;
 
-import org.geotools.graph.build.basic.BasicDirectedGraphBuilder;
+import junit.framework.TestCase;
+
 import org.geotools.graph.structure.DirectedEdge;
 import org.geotools.graph.structure.DirectedGraph;
 import org.geotools.graph.structure.DirectedNode;
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Node;
-
-import junit.framework.TestCase;
 
 public class BasicDirectedGraphBuilderTest extends TestCase {
 

@@ -1,7 +1,5 @@
 package org.geotools.graph.structure.basic;
 
-import org.geotools.graph.structure.basic.BasicDirectedEdge;
-import org.geotools.graph.structure.basic.BasicDirectedNode;
 import java.util.Iterator;
 
 import junit.framework.TestCase;

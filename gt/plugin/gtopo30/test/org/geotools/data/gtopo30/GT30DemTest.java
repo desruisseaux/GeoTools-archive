@@ -32,7 +32,6 @@ import org.geotools.data.Query;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
-import org.geotools.filter.Filter;
 import org.geotools.gc.GridCoverage;
 
 import com.vividsolutions.jts.geom.Envelope;

@@ -18,7 +18,6 @@ package org.geotools.renderer.event;
 // J2SE dependencies
 import java.util.Collection;
 
-// Geotools dependencies
 import org.geotools.feature.Feature;
 
 

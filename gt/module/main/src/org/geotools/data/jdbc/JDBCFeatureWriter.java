@@ -19,7 +19,11 @@
  */
 package org.geotools.data.jdbc;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureListenerManager;
@@ -31,10 +35,8 @@ import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

@@ -16,9 +16,10 @@
  */
 package org.geotools.data.memory;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiLineString;
+import java.io.IOException;
+import java.net.URI;
+import java.util.NoSuchElementException;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
@@ -48,9 +49,10 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import java.io.IOException;
-import java.net.URI;
-import java.util.NoSuchElementException;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiLineString;
 
 
 /**

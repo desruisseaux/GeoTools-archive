@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,12 +29,11 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
-import java.io.ObjectStreamException;
+// Entrï¿½s/sorties
 
 
 /**
- * Une transformation d'unités qui représente la
+ * Une transformation d'unitï¿½s qui reprï¿½sente la
  * combinaison de deux autres transformations.
  *
  * @version 1.0
@@ -49,20 +48,20 @@ final class CompoundTransform extends UnitTransform {
     private static final long serialVersionUID = 6193871497550654092L;
     
     /**
-     * Première transformation à
+     * Premiï¿½re transformation ï¿½
      * appliquer lors des conversions.
      */
     private final UnitTransform transform1;
     
     /**
-     * Deuxième transformation à
+     * Deuxiï¿½me transformation ï¿½
      * appliquer lors des conversions.
      */
     private final UnitTransform transform2;
     
     /**
-     * Construit une transformation qui représente la combinaison de <code>transform1</code> avec <code>transform2</code>.
-     * Les unités seront converties de <code>transform1.fromUnit</code> vers <code>transform2.toUnit</code> en appliquant
+     * Construit une transformation qui reprï¿½sente la combinaison de <code>transform1</code> avec <code>transform2</code>.
+     * Les unitï¿½s seront converties de <code>transform1.fromUnit</code> vers <code>transform2.toUnit</code> en appliquant
      * d'abord la transformation <code>transform1</code>, puis la transformation code>transform2</code>.
      */
     private CompoundTransform(final UnitTransform transform1, final UnitTransform transform2) {
@@ -72,14 +71,14 @@ final class CompoundTransform extends UnitTransform {
     }
     
     /**
-     * Retourne une transformation qui représente la combinaison de <code>transform1</code> avec <code>transform2</code>.
-     * Les unités seront converties de <code>transform1.fromUnit</code> vers <code>transform2.toUnit</code> en appliquant
+     * Retourne une transformation qui reprï¿½sente la combinaison de <code>transform1</code> avec <code>transform2</code>.
+     * Les unitï¿½s seront converties de <code>transform1.fromUnit</code> vers <code>transform2.toUnit</code> en appliquant
      * d'abord la transformation <code>transform1</code>, puis la transformation code>transform2</code>.
      *
-     * @param  transform1 Première transformation à appliquer.
-     * @param  transform2 Deuxième transformation à appliquer.
-     * @return Une combinaison des deux transformations spécifiées. Si un des arguments
-     *         est une transformation identitée, l'autre transformation sera retournée.
+     * @param  transform1 Premiï¿½re transformation ï¿½ appliquer.
+     * @param  transform2 Deuxiï¿½me transformation ï¿½ appliquer.
+     * @return Une combinaison des deux transformations spï¿½cifiï¿½es. Si un des arguments
+     *         est une transformation identitï¿½e, l'autre transformation sera retournï¿½e.
      */
     public static UnitTransform getInstance(final UnitTransform transform1, final UnitTransform transform2) {
         if (transform1.isIdentity()) return transform2;
@@ -88,19 +87,19 @@ final class CompoundTransform extends UnitTransform {
     }
     
     /**
-     * Effectue la conversion d'unités d'une valeur.
-     * @param value Valeur exprimée selon les unités {@link #fromUnit}.
-     * @return Valeur exprimée selon les unités {@link #toUnit}.
+     * Effectue la conversion d'unitï¿½s d'une valeur.
+     * @param value Valeur exprimï¿½e selon les unitï¿½s {@link #fromUnit}.
+     * @return Valeur exprimï¿½e selon les unitï¿½s {@link #toUnit}.
      */
     public double convert(final double value) {
         return transform2.convert(transform1.convert(value));
     }
     
     /**
-     * Effectue la conversion d'unités d'un tableaux de valeurs.
-     * @param values Valeurs exprimées selon les unités {@link #fromUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #toUnit}.
+     * Effectue la conversion d'unitï¿½s d'un tableaux de valeurs.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #fromUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #toUnit}.
      */
     public void convert(final double[] values) {
         transform1.convert(values);
@@ -108,10 +107,10 @@ final class CompoundTransform extends UnitTransform {
     }
     
     /**
-     * Effectue la conversion d'unités d'un tableaux de valeurs.
-     * @param values Valeurs exprimées selon les unités {@link #fromUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #toUnit}.
+     * Effectue la conversion d'unitï¿½s d'un tableaux de valeurs.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #fromUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #toUnit}.
      */
     public void convert(final float[] values) {
         transform1.convert(values);
@@ -119,19 +118,19 @@ final class CompoundTransform extends UnitTransform {
     }
     
     /**
-     * Effectue la conversion inverse d'unités d'une valeur.
-     * @param value Valeur exprimée selon les unités {@link #toUnit}.
-     * @return Valeur exprimée selon les unités {@link #fromUnit}.
+     * Effectue la conversion inverse d'unitï¿½s d'une valeur.
+     * @param value Valeur exprimï¿½e selon les unitï¿½s {@link #toUnit}.
+     * @return Valeur exprimï¿½e selon les unitï¿½s {@link #fromUnit}.
      */
     public double inverseConvert(final double value) {
         return transform1.inverseConvert(transform2.inverseConvert(value));
     }
     
     /**
-     * Effectue la conversion inverse d'unités d'un tableaux de valeurs.
-     * @param values Valeurs exprimées selon les unités {@link #toUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #fromUnits}.
+     * Effectue la conversion inverse d'unitï¿½s d'un tableaux de valeurs.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #toUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #fromUnits}.
      */
     public void inverseConvert(final double[] values) {
         transform2.inverseConvert(values);
@@ -139,10 +138,10 @@ final class CompoundTransform extends UnitTransform {
     }
     
     /**
-     * Effectue la conversion inverse d'unités d'un tableaux de valeurs.
-     * @param values Valeurs exprimées selon les unités {@link #toUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #fromUnit}.
+     * Effectue la conversion inverse d'unitï¿½s d'un tableaux de valeurs.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #toUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #fromUnit}.
      */
     public void inverseConvert(final float[] values) {
         transform2.inverseConvert(values);
@@ -151,7 +150,7 @@ final class CompoundTransform extends UnitTransform {
     
     /**
      * Indique si cette transformation est
-     * identique à la transformation spécifiée.
+     * identique ï¿½ la transformation spï¿½cifiï¿½e.
      */
     public boolean equals(final Object o) {
         if (super.equals(o)) {

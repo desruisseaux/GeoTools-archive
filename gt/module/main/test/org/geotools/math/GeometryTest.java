@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,12 +21,12 @@
 package org.geotools.math;
 
 // J2SE dependencies
-import java.util.Random;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.Random;
+
 import javax.vecmath.Point3d;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

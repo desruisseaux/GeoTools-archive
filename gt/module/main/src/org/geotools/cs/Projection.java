@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,25 +24,21 @@
 package org.geotools.cs;
 
 // OpenGIS dependencies
-import org.opengis.cs.CS_Projection;
-import org.opengis.cs.CS_ProjectionParameter;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.DescriptorNaming;
-import org.geotools.ct.MissingParameterException;
-import org.geotools.ct.MathTransformProvider;
-
-// Parameters
-import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListImpl;
-import javax.media.jai.ParameterListDescriptor;
-
-// J2SE dependencies
-import java.util.Locale;
 import java.awt.geom.Point2D;
 import java.rmi.RemoteException;
+import java.util.Locale;
+
+import javax.media.jai.ParameterList;
+import javax.media.jai.ParameterListDescriptor;
+import javax.media.jai.ParameterListImpl;
+
+import org.geotools.ct.MathTransformProvider;
+import org.geotools.ct.MissingParameterException;
+import org.geotools.resources.DescriptorNaming;
+import org.geotools.resources.Utilities;
+import org.geotools.units.Unit;
+import org.opengis.cs.CS_Projection;
+import org.opengis.cs.CS_ProjectionParameter;
 
 
 /**

@@ -17,7 +17,6 @@
 package org.geotools.catalog;
 
 // J2SE direct dependencies
-import java.util.Iterator;
 
 // Annotations
 ///import org.opengis.annotation.UML;

@@ -16,6 +16,14 @@
  */
 package org.geotools.data.arcsde;
 
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
+import org.geotools.filter.GeometryEncoderException;
+
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -29,19 +37,13 @@ import com.esri.sde.sdk.client.SeQueryInfo;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.DataSourceException;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
-import org.geotools.filter.GeometryEncoderException;
-import java.io.IOException;
-import java.util.logging.Logger;
 
 
 /**
  * Wrapper class extends SeQuery to hold a SeConnection until close() is
  * called.
  *
- * @author Gabriel Roldán
+ * @author Gabriel Roldï¿½n
  * @version $Id: ArcSDEQuery.java,v 1.1 2004/06/21 15:00:33 cdillard Exp $
  */
 public class ArcSDEQuery {

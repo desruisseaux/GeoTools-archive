@@ -16,10 +16,11 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Envelope;
 import java.io.IOException;
 import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

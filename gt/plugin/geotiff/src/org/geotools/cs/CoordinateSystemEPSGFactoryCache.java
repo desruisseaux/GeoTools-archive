@@ -5,8 +5,8 @@
  */
 
 package org.geotools.cs;
-import java.io.IOException ;
-import java.net.URL ; 
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * This class implements a file-system-based EPSG Coordinate System

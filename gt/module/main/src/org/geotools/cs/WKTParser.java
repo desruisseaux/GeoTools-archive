@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,29 +20,23 @@
 package org.geotools.cs;
 
 // J2SE dependencies
-import java.util.List;
+import java.text.FieldPosition;
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
-// JAI dependencies
 import javax.media.jai.ParameterList;
 
-// Parsing
-import java.util.Locale;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
-import java.text.ParseException;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.resources.WKTFormat;
-import org.geotools.resources.WKTElement;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.DescriptorNaming;
+import org.geotools.resources.WKTElement;
+import org.geotools.resources.WKTFormat;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
 
 
 /**

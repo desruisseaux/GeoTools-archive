@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,27 +21,24 @@
 package org.geotools.renderer.geom;
 
 // J2SE dependencies
-import java.util.Set;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.util.ProgressListener;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * Classe privée utilisée pour identifier les lacs à l'intérieur d'une île ou d'un continent.
- * Chaque noeud contient une référence vers un objet {@link Polygon} et une liste de références
- * vers d'autres objets <code>PolygonInclusion</code> dont les polygones sont entièrement compris
- * à l'intérieur de celui de cet objet <code>PolygonInclusion</code>.
+ * Classe privï¿½e utilisï¿½e pour identifier les lacs ï¿½ l'intï¿½rieur d'une ï¿½le ou d'un continent.
+ * Chaque noeud contient une rï¿½fï¿½rence vers un objet {@link Polygon} et une liste de rï¿½fï¿½rences
+ * vers d'autres objets <code>PolygonInclusion</code> dont les polygones sont entiï¿½rement compris
+ * ï¿½ l'intï¿½rieur de celui de cet objet <code>PolygonInclusion</code>.
  *
  * @task TODO: This class is not yet used. It should be part of <code>PolygonAssembler</code>,
  *             work, but is not yet finished neither tested.
@@ -51,18 +48,18 @@ import org.geotools.util.ProgressListener;
  */
 final class PolygonInclusion {
     /**
-     * Polygone associé à cet objet.
+     * Polygone associï¿½ ï¿½ cet objet.
      */
     private final Polyline polygon;
 
     /**
      * Liste des objets <code>PolygonInclusion</code> fils. Les polygons de chacun de
-     * ces fils sera entièrement compris dans le polygon {@link #polygon} de cet objet.
+     * ces fils sera entiï¿½rement compris dans le polygon {@link #polygon} de cet objet.
      */
     private Collection childs;
 
     /**
-     * Construit un noeud qui enveloppera le polygone spécifié.
+     * Construit un noeud qui enveloppera le polygone spï¿½cifiï¿½.
      * Ce noeud n'aura aucune branche pour l'instant.
      */
     private PolygonInclusion(Polyline polygon) {
@@ -70,26 +67,26 @@ final class PolygonInclusion {
     }
 
     /**
-     * Vérifie si deux noeuds sont identiques.
-     * Cette méthode ne doit pas être redéfinie.
+     * Vï¿½rifie si deux noeuds sont identiques.
+     * Cette mï¿½thode ne doit pas ï¿½tre redï¿½finie.
      */
     public final boolean equals(final Object other) {
         return this == other;
     }
 
     /**
-     * Retourne un code représentant ce noeud.
-     * Cette méthode ne doit pas être redéfinie.
+     * Retourne un code reprï¿½sentant ce noeud.
+     * Cette mï¿½thode ne doit pas ï¿½tre redï¿½finie.
      */
     public final int hashCode() {
         return System.identityHashCode(this);
     }
 
     /**
-     * Ajoute à la liste des polygons-fils ({@link #childs}) tous les polygones de la liste
-     * spécifiée (<code>polygons</code>) qui sont entièrement compris dans {@link #polygon}.
-     * Chaque polygone ajouté à {@link #childs} sera retiré de <code>polygons</code>, de
-     * sorte qu'après l'appel de cette méthode, <code>polygons</code> ne contiendra plus
+     * Ajoute ï¿½ la liste des polygons-fils ({@link #childs}) tous les polygones de la liste
+     * spï¿½cifiï¿½e (<code>polygons</code>) qui sont entiï¿½rement compris dans {@link #polygon}.
+     * Chaque polygone ajoutï¿½ ï¿½ {@link #childs} sera retirï¿½ de <code>polygons</code>, de
+     * sorte qu'aprï¿½s l'appel de cette mï¿½thode, <code>polygons</code> ne contiendra plus
      * que les polygones qui ne sont pas compris dans {@link #polygon}.
      */
     private void addChilds(final Collection polygons) {
@@ -107,15 +104,15 @@ final class PolygonInclusion {
     }
 
     /**
-     * Après avoir ajouté des polygones à la liste interne, on appel {@link #addChilds}
-     * de façon récursive pour chacun des polygones de {@link #childs}. On obtiendra
-     * ainsi une arborescence des polygones, chaque parent contenant entièrement 0, 1
-     * ou plusieurs enfants. Par exemple appellons "Continent" le polygone référé par
-     * {@link #polygon}. Supposons que "Continent" contient entièrement deux autres
-     * polygones, "Lac" et "Île". Le code précédent avait ajouté "Lac" et "Île" à la
-     * liste {@link #childs}. Maintenant on demandera à "Lac" d'examiner cette liste. Il
-     * trouvera qu'il contient entièrement "Île" et l'ajoutera à sa propre liste interne
-     * après l'avoir retiré de la liste {@link #child} de "Continent".
+     * Aprï¿½s avoir ajoutï¿½ des polygones ï¿½ la liste interne, on appel {@link #addChilds}
+     * de faï¿½on rï¿½cursive pour chacun des polygones de {@link #childs}. On obtiendra
+     * ainsi une arborescence des polygones, chaque parent contenant entiï¿½rement 0, 1
+     * ou plusieurs enfants. Par exemple appellons "Continent" le polygone rï¿½fï¿½rï¿½ par
+     * {@link #polygon}. Supposons que "Continent" contient entiï¿½rement deux autres
+     * polygones, "Lac" et "ï¿½le". Le code prï¿½cï¿½dent avait ajoutï¿½ "Lac" et "ï¿½le" ï¿½ la
+     * liste {@link #childs}. Maintenant on demandera ï¿½ "Lac" d'examiner cette liste. Il
+     * trouvera qu'il contient entiï¿½rement "ï¿½le" et l'ajoutera ï¿½ sa propre liste interne
+     * aprï¿½s l'avoir retirï¿½ de la liste {@link #child} de "Continent".
      */
     private static void buildTree(final Collection childs, final ProgressListener progress) {
         if (childs != null) {
@@ -168,7 +165,7 @@ final class PolygonInclusion {
     }
 
     /**
-     * Examine tous les polygones spécifiés et tente de différencier les îles des lacs.
+     * Examine tous les polygones spï¿½cifiï¿½s et tente de diffï¿½rencier les ï¿½les des lacs.
      *
      * @param  The source polylines.
      * @param  progres An optional progress listener.
@@ -196,7 +193,7 @@ final class PolygonInclusion {
     }
 
     /**
-     * Retourne une chaîne de caractères contenant le polygone
+     * Retourne une chaï¿½ne de caractï¿½res contenant le polygone
      * {@link #polygon} de ce noeud ainsi que de tous les noeuds-fils.
      */
     public String toString() {
@@ -206,8 +203,8 @@ final class PolygonInclusion {
     }
 
     /**
-     * Implémentation de la méthode {@link #toString()}.
-     * Cette méthode s'appellera elle-même de façon recursive.
+     * Implï¿½mentation de la mï¿½thode {@link #toString()}.
+     * Cette mï¿½thode s'appellera elle-mï¿½me de faï¿½on recursive.
      */
     private void toString(StringBuffer buffer, int indentation) {
         buffer.append(Utilities.spaces(indentation));

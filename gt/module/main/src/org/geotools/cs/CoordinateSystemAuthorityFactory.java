@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -36,32 +36,27 @@
 package org.geotools.cs;
 
 // J2SE dependencies
-import java.rmi.server.UnicastRemoteObject;
-import java.rmi.RemoteException;
-import java.sql.SQLException; // For JavaDoc
-import java.io.IOException;   // For JavaDoc
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLException;
 
-// OpenGIS dependencies
-import org.opengis.cs.CS_Ellipsoid;
-import org.opengis.cs.CS_LinearUnit;
+import org.geotools.units.Unit;
 import org.opengis.cs.CS_AngularUnit;
-import org.opengis.cs.CS_PrimeMeridian;
-import org.opengis.cs.CS_VerticalDatum;
-import org.opengis.cs.CS_HorizontalDatum;
-import org.opengis.cs.CS_VerticalCoordinateSystem;
-import org.opengis.cs.CS_HorizontalCoordinateSystem;
-import org.opengis.cs.CS_GeographicCoordinateSystem;
-import org.opengis.cs.CS_ProjectedCoordinateSystem;
 import org.opengis.cs.CS_CompoundCoordinateSystem;
 import org.opengis.cs.CS_CoordinateSystemAuthorityFactory;
-
-// OpenGIS dependencies
+import org.opengis.cs.CS_Ellipsoid;
+import org.opengis.cs.CS_GeographicCoordinateSystem;
+import org.opengis.cs.CS_HorizontalCoordinateSystem;
+import org.opengis.cs.CS_HorizontalDatum;
+import org.opengis.cs.CS_LinearUnit;
+import org.opengis.cs.CS_PrimeMeridian;
+import org.opengis.cs.CS_ProjectedCoordinateSystem;
+import org.opengis.cs.CS_VerticalCoordinateSystem;
+import org.opengis.cs.CS_VerticalDatum;
 import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
 
 
 /**

@@ -33,7 +33,6 @@ import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import junit.framework.Test;

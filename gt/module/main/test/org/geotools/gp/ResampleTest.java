@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,47 +20,35 @@
 package org.geotools.gp;
 
 // J2SE and JAI dependencies
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.io.ObjectInputStream;
-import java.io.InputStream;
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.RenderedImage;
-import javax.imageio.ImageIO;
+import java.awt.image.renderable.ParameterBlock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-// JAI dependencies
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
-// Geotools dependencies
-import org.geotools.pt.Envelope;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.Projection;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.FittedCoordinateSystem;
-import org.geotools.cs.ProjectedCoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.ct.MathTransformFactory;
-import org.geotools.ct.MathTransform2D;
+import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.cs.Projection;
 import org.geotools.ct.MathTransform;
-import org.geotools.cv.Category;
-import org.geotools.cv.SampleDimension;
-import org.geotools.gc.GridCoverageTest;
+import org.geotools.ct.MathTransform2D;
+import org.geotools.ct.MathTransformFactory;
 import org.geotools.gc.GridCoverage;
+import org.geotools.gc.GridCoverageTest;
 import org.geotools.gc.GridGeometry;
 import org.geotools.gc.GridRange;
 import org.geotools.gc.Viewer;
-
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 
 /**
@@ -128,10 +116,10 @@ public final class ResampleTest extends GridCoverageTest {
     }
 
     /**
-     * Projète l'image dans le systeme de coordonnées
-     * spécifié et affiche le résultat à l'écran.
+     * Projï¿½te l'image dans le systeme de coordonnï¿½es
+     * spï¿½cifiï¿½ et affiche le rï¿½sultat ï¿½ l'ï¿½cran.
      *
-     * @param  cs Le systeme de coordonées de destination.
+     * @param  cs Le systeme de coordonï¿½es de destination.
      * @return The operation name which was applied on the image, or <code>null</code> if none.
      */
     private String projectTo(final CoordinateSystem cs, final GridGeometry geometry) {
@@ -139,10 +127,10 @@ public final class ResampleTest extends GridCoverageTest {
     }
 
     /**
-     * Projète l'image dans le systeme de coordonnées
-     * spécifié et affiche le résultat à l'écran.
+     * Projï¿½te l'image dans le systeme de coordonnï¿½es
+     * spï¿½cifiï¿½ et affiche le rï¿½sultat ï¿½ l'ï¿½cran.
      *
-     * @param  cs Le systeme de coordonées de destination.
+     * @param  cs Le systeme de coordonï¿½es de destination.
      * @return The operation name which was applied on the image, or <code>null</code> if none.
      */
     private String projectTo(final CoordinateSystem   cs,

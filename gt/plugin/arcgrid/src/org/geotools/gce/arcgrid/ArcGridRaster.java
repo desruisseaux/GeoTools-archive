@@ -35,6 +35,7 @@ import java.nio.charset.CharsetDecoder;
 
 import javax.media.jai.RasterFactory;
 
+import org.geotools.data.DataSourceException;
 import org.geotools.resources.NIOUtilities;
 
 

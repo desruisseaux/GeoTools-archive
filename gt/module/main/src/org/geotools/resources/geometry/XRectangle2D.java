@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,11 @@ import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
-import java.io.Serializable;
-import java.io.ObjectStreamException;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 

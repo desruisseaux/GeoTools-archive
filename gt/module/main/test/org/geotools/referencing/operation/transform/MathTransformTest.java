@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,31 +20,27 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
-import java.util.Random;
-import java.util.Arrays;
 import java.awt.geom.AffineTransform;
+import java.util.Arrays;
+import java.util.Random;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.LinearTransform;
-import org.geotools.referencing.operation.MathTransformFactory;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.DirectPosition1D;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.geotools.geometry.DirectPosition1D;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.MathTransformFactory;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

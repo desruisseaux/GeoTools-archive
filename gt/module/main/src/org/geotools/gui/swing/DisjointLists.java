@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,42 +22,34 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // Swing dependencies
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.ImageIcon;
-import javax.swing.JScrollPane;
-import javax.swing.AbstractListModel;
-
-// Events
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-// Layout
-import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-
-// Collections
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
-
-// Miscellaneous
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-// Geotools dependencies
-import org.geotools.resources.XArray;
+import javax.swing.AbstractListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import org.geotools.resources.SwingUtilities;
+import org.geotools.resources.XArray;
 
 
 /**
@@ -251,8 +243,8 @@ public class DisjointLists extends JPanel {
          * Setup buttons
          */
         final ClassLoader loader = getClass().getClassLoader();
-        final JButton add        = getButton(loader, "StepBack",    "<",  "Ajouter les éléments sélectionnés");
-        final JButton remove     = getButton(loader, "StepForward", ">",  "Retirer les éléments sélectionnés");
+        final JButton add        = getButton(loader, "StepBack",    "<",  "Ajouter les ï¿½lï¿½ments sï¿½lectionnï¿½s");
+        final JButton remove     = getButton(loader, "StepForward", ">",  "Retirer les ï¿½lï¿½ments sï¿½lectionnï¿½s");
         final JButton addAll     = getButton(loader, "Rewind",      "<<", "Ajouter tout");
         final JButton removeAll  = getButton(loader, "FastForward", ">>", "Retirer tout");
         add      .addActionListener(new Action(right, left, false));

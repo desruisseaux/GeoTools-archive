@@ -24,8 +24,6 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.HashMap;
-
-// J2SE dependencies
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;

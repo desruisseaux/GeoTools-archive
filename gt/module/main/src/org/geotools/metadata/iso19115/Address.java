@@ -2,8 +2,8 @@ package org.geotools.metadata.iso19115;
 
 import java.util.Set;
 
-import org.opengis.util.InternationalString;
 import org.geotools.util.CheckedHashSet;
+import org.opengis.util.InternationalString;
 
 public class Address extends MetaData implements
 		org.opengis.metadata.citation.Address {

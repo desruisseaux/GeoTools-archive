@@ -10,9 +10,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
-
 import junit.framework.TestCase;
+
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 
 /**
  * @author Richard Gould

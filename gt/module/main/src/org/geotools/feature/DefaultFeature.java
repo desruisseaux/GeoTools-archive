@@ -17,12 +17,9 @@ package org.geotools.feature;
 
 // J2SE dependencies
 import java.rmi.server.UID;
-//import java.util.logging.Logger;
 
-// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 
-// JTS dependencies
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 

@@ -3,6 +3,8 @@ package org.geotools.graph.util;
 import java.util.Iterator;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.basic.BasicGraphBuilder;
@@ -11,8 +13,6 @@ import org.geotools.graph.path.Path;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.traverse.standard.DijkstraIterator;
-
-import junit.framework.TestCase;
 
 public class DijkstraShortestPathFinderTest extends TestCase {  
 

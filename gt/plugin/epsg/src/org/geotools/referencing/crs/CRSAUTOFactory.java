@@ -19,36 +19,34 @@
 package org.geotools.referencing.crs;
 
 // JAI dependencies
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Iterator;
 
-import org.opengis.referencing.crs.CRSFactory;
+import javax.units.SI;
+import javax.units.Unit;
+
+import org.geotools.cs.CoordinateSystemAUTOFactory;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.referencing.FactoryFinder;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.crs.ProjectedCRS;
-
-import org.opengis.parameter.ParameterValueGroup;
-
-import org.geotools.measure.Latitude;
-import org.geotools.measure.Longitude;
-
-import javax.units.Unit;
-import javax.units.SI;
-
-import org.geotools.referencing.FactoryFinder;
+import org.opengis.referencing.operation.MathTransformFactory;
 
 /**
  * Generate Automatic Projections (dynamic projections) based on code and location.

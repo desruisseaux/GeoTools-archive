@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,15 +27,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
-// JTS dependencies
-import com.vividsolutions.jts.geom.Envelope;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.ows.Layer;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -45,6 +39,9 @@ import org.geotools.map.event.MapLayerListListener;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.resources.XMath;
 import org.geotools.styling.Style;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

@@ -7,13 +7,6 @@
 
 package org.geotools.data.shapefile;
 
-import junit.framework.*;
-import java.net.*;
-//import cmp.LEDataStream.*;
-import com.vividsolutions.jts.geom.*;
-import java.io.*;
-import java.util.ArrayList;
-import org.geotools.data.shapefile.dbf.*;
 import org.geotools.data.shapefile.prj.PrjFileReader;
 
 

@@ -46,23 +46,21 @@
 package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
-import java.util.Collection;
 import java.awt.geom.Point2D;
+import java.util.Collection;
+
 import javax.units.NonSI;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.measure.Latitude;
-import org.geotools.referencing.Identifier;
 import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -134,7 +132,7 @@ public class AlbersEqualArea extends MapProjection {
 
         /**
          * The operation parameter descriptor for the {@link #phi1 standard parallel 1}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new Identifier[] {
@@ -146,7 +144,7 @@ public class AlbersEqualArea extends MapProjection {
                 
         /**
          * The operation parameter descriptor for the {@link #phi2 standard parallel 2}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createDescriptor(
                 new Identifier[] {

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,39 +24,32 @@
 package org.geotools.cv;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Comparator;
-import java.util.AbstractList;
-
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RasterFormatException;
-
+import java.awt.image.RenderedImage;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Locale;
 
-// JAI dependencies
 import javax.media.jai.iterator.WritableRectIter;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.CoordinatePoint;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform1D;
-
-// Resources
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.pt.Matrix;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -319,9 +312,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Compare deux valeurs de type <code>double</code>. Cette méthode
-     * est similaire à {@link Double#compare(double,double)}, excepté
-     * qu'elle ordonne aussi les différentes valeurs NaN.
+     * Compare deux valeurs de type <code>double</code>. Cette mï¿½thode
+     * est similaire ï¿½ {@link Double#compare(double,double)}, exceptï¿½
+     * qu'elle ordonne aussi les diffï¿½rentes valeurs NaN.
      */
     private static int compare(final double v1, final double v2) {
         if (Double.isNaN(v1) && Double.isNaN(v2)) {
@@ -334,9 +327,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Vérifie si le tableau de catégories spécifié est bien en ordre croissant.
+     * Vï¿½rifie si le tableau de catï¿½gories spï¿½cifiï¿½ est bien en ordre croissant.
      * La comparaison ne tient pas compte des valeurs <code>NaN</code>. Cette
-     * méthode n'est utilisée que pour les <code>assert</code>.
+     * mï¿½thode n'est utilisï¿½e que pour les <code>assert</code>.
      */
     static boolean isSorted(final Category[] categories) {
         for (int i=1; i<categories.length; i++) {
@@ -351,9 +344,9 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Effectue une recherche bi-linéaire de la valeur spécifiée. Cette
-     * méthode est semblable à {@link Arrays#binarySearch(double[],double)},
-     * excepté qu'elle peut distinguer différentes valeurs de NaN.
+     * Effectue une recherche bi-linï¿½aire de la valeur spï¿½cifiï¿½e. Cette
+     * mï¿½thode est semblable ï¿½ {@link Arrays#binarySearch(double[],double)},
+     * exceptï¿½ qu'elle peut distinguer diffï¿½rentes valeurs de NaN.
      *
      * Note: This method is not private in order to allows testing by {@link CategoryTest}.
      */
@@ -625,12 +618,12 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      */
     public final Category getCategory(final double sample) {
         /*
-         * Recherche à quelle catégorie pourrait appartenir la valeur.
-         * Note: Les valeurs 'NaN' sont à la fin du tableau 'values'. Donc:
+         * Recherche ï¿½ quelle catï¿½gorie pourrait appartenir la valeur.
+         * Note: Les valeurs 'NaN' sont ï¿½ la fin du tableau 'values'. Donc:
          *
-         * 1) Si 'value' est NaN,  alors 'i' pointera forcément sur une catégorie NaN.
-         * 2) Si 'value' est réel, alors 'i' peut pointer sur une des catégories de
-         *    valeurs réels ou sur la première catégorie de NaN.
+         * 1) Si 'value' est NaN,  alors 'i' pointera forcï¿½ment sur une catï¿½gorie NaN.
+         * 2) Si 'value' est rï¿½el, alors 'i' peut pointer sur une des catï¿½gories de
+         *    valeurs rï¿½els ou sur la premiï¿½re catï¿½gorie de NaN.
          */
         int i = binarySearch(minimums, sample); // Special 'binarySearch' for NaN
         if (i >= 0) {
@@ -756,7 +749,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         }
         buffer.append(lineSeparator);
         /*
-         * Ecrit la liste des catégories en dessous.
+         * Ecrit la liste des catï¿½gories en dessous.
          */
         for (int i=0; i<categories.length; i++) {
             buffer.append("   ");

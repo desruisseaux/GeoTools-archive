@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
@@ -21,7 +22,6 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderMySQL;
-import org.geotools.filter.SQLEncoder;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;

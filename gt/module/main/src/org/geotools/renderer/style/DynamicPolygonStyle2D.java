@@ -16,13 +16,14 @@
  */
 package org.geotools.renderer.style;
 
-import org.geotools.feature.Feature;
-import org.geotools.styling.Fill;
-import org.geotools.styling.PolygonSymbolizer;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Paint;
+
+import org.geotools.feature.Feature;
+import org.geotools.styling.Fill;
+import org.geotools.styling.PolygonSymbolizer;
 
 
 /**

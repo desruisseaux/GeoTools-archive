@@ -16,10 +16,11 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.geom.AffineTransform;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
-import java.awt.geom.AffineTransform;
 
 
 /**

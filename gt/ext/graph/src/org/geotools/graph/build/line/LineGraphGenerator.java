@@ -1,10 +1,10 @@
 package org.geotools.graph.build.line;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 //TODO: COMMENT ME!
 

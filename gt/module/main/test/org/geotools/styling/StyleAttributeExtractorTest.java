@@ -16,10 +16,12 @@
  */
 package org.geotools.styling;
 
-import com.vividsolutions.jts.geom.LineString;
+import java.util.Set;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -29,7 +31,8 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
-import java.util.Set;
+
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**

@@ -22,19 +22,13 @@ package org.geotools.renderer.j2d;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D; 
+import java.awt.geom.Point2D;
 
-// JTS dependencies
-import com.vividsolutions.jts.geom.Geometry;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.feature.Feature;
 import org.geotools.renderer.style.Java2DMark;
-import org.geotools.renderer.j2d.RenderedMarks;
-import org.geotools.renderer.j2d.MarkIterator;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

@@ -1,7 +1,5 @@
 package org.geotools.graph.traverse.standard;
 
-import org.geotools.graph.traverse.standard.DepthFirstIterator;
-import org.geotools.graph.traverse.standard.DirectedDepthFirstIterator;
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.basic.BasicDirectedGraphBuilder;

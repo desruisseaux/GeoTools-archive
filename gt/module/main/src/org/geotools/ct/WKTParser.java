@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,30 +20,23 @@
 package org.geotools.ct;
 
 // J2SE dependencies
-import java.util.Set;
-import java.util.HashSet;
-
-// Parsing
-import java.util.Locale;
 import java.text.FieldPosition;
-import java.text.ParsePosition;
 import java.text.ParseException;
+import java.text.ParsePosition;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
-// JAI dependencies
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.util.CaselessStringKey;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
-import org.geotools.resources.WKTFormat;
 import org.geotools.resources.WKTElement;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.WKTFormat;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**

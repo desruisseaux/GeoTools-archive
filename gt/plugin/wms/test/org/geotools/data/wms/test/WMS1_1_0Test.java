@@ -35,7 +35,6 @@ import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.DescribeLayerRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
 import org.geotools.data.wms.request.GetMapRequest;
-import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.response.DescribeLayerResponse;
 import org.geotools.data.wms.response.GetLegendGraphicResponse;
 import org.xml.sax.SAXException;

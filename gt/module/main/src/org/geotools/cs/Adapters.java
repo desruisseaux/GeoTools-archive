@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,57 +24,47 @@
 package org.geotools.cs;
 
 // OpenGIS dependencies
-import org.opengis.cs.CS_Info;
-import org.opengis.cs.CS_Ellipsoid;
-import org.opengis.cs.CS_PrimeMeridian;
-import org.opengis.cs.CS_CoordinateSystem;
-import org.opengis.cs.CS_LocalCoordinateSystem;
-import org.opengis.cs.CS_FittedCoordinateSystem;
-import org.opengis.cs.CS_CompoundCoordinateSystem;
-import org.opengis.cs.CS_VerticalCoordinateSystem;
-import org.opengis.cs.CS_HorizontalCoordinateSystem;
-import org.opengis.cs.CS_GeocentricCoordinateSystem;
-import org.opengis.cs.CS_GeographicCoordinateSystem;
-import org.opengis.cs.CS_ProjectedCoordinateSystem;
-import org.opengis.cs.CS_CoordinateSystemFactory;
-import org.opengis.cs.CS_CoordinateSystemAuthorityFactory;
-
-import org.opengis.cs.CS_Datum;
-import org.opengis.cs.CS_DatumType;
-import org.opengis.cs.CS_LocalDatum;
-import org.opengis.cs.CS_VerticalDatum;
-import org.opengis.cs.CS_HorizontalDatum;
-
-import org.opengis.cs.CS_AxisInfo;
-import org.opengis.cs.CS_AxisOrientationEnum;
-import org.opengis.cs.CS_WGS84ConversionInfo;
-import org.opengis.cs.CS_ProjectionParameter;
-import org.opengis.cs.CS_Projection;
-
-import org.opengis.cs.CS_Unit;
-import org.opengis.cs.CS_LinearUnit;
-import org.opengis.cs.CS_AngularUnit;
-
-// J2SE dependencies
 import java.rmi.RemoteException;
 import java.rmi.ServerException;
 
-// JAI dependencies (parameters)
 import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListImpl;
 import javax.media.jai.ParameterListDescriptorImpl;
+import javax.media.jai.ParameterListImpl;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.resources.XArray;
-import org.geotools.resources.RemoteProxy;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.ct.MathTransformFactory;
-import org.geotools.ct.MathTransform; // For javadoc
+import org.geotools.resources.RemoteProxy;
+import org.geotools.resources.XArray;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.units.Unit;
+import org.opengis.cs.CS_AngularUnit;
+import org.opengis.cs.CS_AxisInfo;
+import org.opengis.cs.CS_AxisOrientationEnum;
+import org.opengis.cs.CS_CompoundCoordinateSystem;
+import org.opengis.cs.CS_CoordinateSystem;
+import org.opengis.cs.CS_CoordinateSystemAuthorityFactory;
+import org.opengis.cs.CS_CoordinateSystemFactory;
+import org.opengis.cs.CS_Datum;
+import org.opengis.cs.CS_DatumType;
+import org.opengis.cs.CS_Ellipsoid;
+import org.opengis.cs.CS_FittedCoordinateSystem;
+import org.opengis.cs.CS_GeocentricCoordinateSystem;
+import org.opengis.cs.CS_GeographicCoordinateSystem;
+import org.opengis.cs.CS_HorizontalCoordinateSystem;
+import org.opengis.cs.CS_HorizontalDatum;
+import org.opengis.cs.CS_Info;
+import org.opengis.cs.CS_LinearUnit;
+import org.opengis.cs.CS_LocalCoordinateSystem;
+import org.opengis.cs.CS_LocalDatum;
+import org.opengis.cs.CS_PrimeMeridian;
+import org.opengis.cs.CS_ProjectedCoordinateSystem;
+import org.opengis.cs.CS_Projection;
+import org.opengis.cs.CS_ProjectionParameter;
+import org.opengis.cs.CS_Unit;
+import org.opengis.cs.CS_VerticalCoordinateSystem;
+import org.opengis.cs.CS_VerticalDatum;
+import org.opengis.cs.CS_WGS84ConversionInfo;
+import org.opengis.referencing.FactoryException;
 
 
 /**

@@ -33,7 +33,6 @@ import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.gc.GridCoverage;
 import org.geotools.pt.Envelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**

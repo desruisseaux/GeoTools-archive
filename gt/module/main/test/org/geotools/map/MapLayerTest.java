@@ -22,10 +22,12 @@
 package org.geotools.map;
 
 import java.util.ArrayList;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;

@@ -35,25 +35,23 @@
  */
 package org.geotools.data.crs;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.crs.geometry.GeometryCoordinateSequenceTransformer;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import java.io.IOException;
-import java.util.NoSuchElementException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

@@ -16,8 +16,8 @@
  */
 package org.geotools.xml.transform;
 
-import org.xml.sax.helpers.NamespaceSupport;
 import org.geotools.xml.transform.TransformerBase.SchemaLocationSupport;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * A Translator is used in an XMLEncoding process by the FeatureTransformer 

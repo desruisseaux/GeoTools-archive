@@ -21,8 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
-import javax.naming.OperationNotSupportedException;
-
 import junit.framework.TestCase;
 
 import org.geotools.feature.IllegalAttributeException;

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,31 +23,27 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.List;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
-import java.io.Serializable;
-import java.io.ObjectStreamException;
 
-// OpenGIS dependencies
-import org.opengis.util.LocalName;
-import org.opengis.util.ScopedName;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.parameter.InvalidParameterValueException;
-
-// Geotools dependencies
-import org.geotools.util.NameFactory;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.util.GrowableInternationalString;
 import org.geotools.util.WeakHashSet;
 import org.geotools.util.WeakValueHashMap;
-import org.geotools.util.GrowableInternationalString;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
+import org.opengis.util.LocalName;
+import org.opengis.util.ScopedName;
 
 
 /**

@@ -16,7 +16,11 @@
  */
 package org.geotools.demo.data;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.File;
+import java.net.URL;
+
+import javax.swing.JFileChooser;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
@@ -24,9 +28,8 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import java.io.File;
-import java.net.URL;
-import javax.swing.JFileChooser;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

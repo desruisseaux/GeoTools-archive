@@ -16,8 +16,9 @@
  */
 package org.geotools.data;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.EventObject;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

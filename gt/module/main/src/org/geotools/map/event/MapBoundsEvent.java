@@ -21,10 +21,12 @@
  */
 package org.geotools.map.event;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.util.EventObject;
+
 import org.geotools.map.MapContext;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.util.EventObject;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

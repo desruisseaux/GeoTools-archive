@@ -17,12 +17,11 @@ package org.geotools.renderer.style;
 
 // J2SE dependencies
 import java.awt.image.BufferedImage;
-import org.w3c.dom.Document;
 
-// Apache dependencies
-import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
+import org.w3c.dom.Document;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,33 +24,27 @@
 package org.geotools.gp;
 
 // J2SE dependencies
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
-// JAI dependencies
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
-import javax.media.jai.iterator.RectIter;
-import javax.media.jai.iterator.RectIterFactory;
-
-// Parameters
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
+import javax.media.jai.iterator.RectIter;
+import javax.media.jai.iterator.RectIterFactory;
 
-// OpenGIS dependencies
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
-import org.geotools.gc.GridCoverage;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.cv.PointOutsideCoverageException;
+import org.geotools.gc.GridCoverage;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

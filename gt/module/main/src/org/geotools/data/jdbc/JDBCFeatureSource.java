@@ -16,7 +16,13 @@
  */
 package org.geotools.data.jdbc;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Logger;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultFeatureResults;
@@ -31,12 +37,8 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

@@ -9,7 +9,6 @@ import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 

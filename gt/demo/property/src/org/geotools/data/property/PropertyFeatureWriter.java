@@ -1,9 +1,14 @@
 package org.geotools.data.property;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureWriter;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
 
 public class PropertyFeatureWriter implements FeatureWriter {
     PropertyDataStore store;

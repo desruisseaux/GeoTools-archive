@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,19 +21,12 @@ package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.util.Random;
-import java.util.Arrays;
-import java.awt.geom.*;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.referencing.operation.transform.LocalizationGrid;
 
 
 /**

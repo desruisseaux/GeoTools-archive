@@ -16,18 +16,17 @@
  */
 package org.geotools.validation;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Map;
+
 import org.geotools.data.DefaultRepository;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Repository;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.resources.TestData;
-import org.geotools.validation.xml.ValidationException;
 import org.geotools.validation.xml.XMLReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Map;
 
 
 /**

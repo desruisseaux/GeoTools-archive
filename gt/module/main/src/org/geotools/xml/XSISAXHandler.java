@@ -16,6 +16,11 @@
  */
 package org.geotools.xml;
 
+import java.net.URI;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.geotools.xml.handlers.xsi.IgnoreHandler;
 import org.geotools.xml.handlers.xsi.RootHandler;
 import org.geotools.xml.schema.Schema;
@@ -24,10 +29,6 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
-import java.net.URI;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**

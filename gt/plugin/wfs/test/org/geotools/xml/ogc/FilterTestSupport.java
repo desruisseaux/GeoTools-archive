@@ -16,12 +16,21 @@
  */
 package org.geotools.xml.ogc;
 
+import java.util.logging.Logger;
+
+import junit.framework.TestCase;
+
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import junit.framework.*;
-import org.geotools.feature.*;
-import java.util.logging.Logger;
 
 
 /**

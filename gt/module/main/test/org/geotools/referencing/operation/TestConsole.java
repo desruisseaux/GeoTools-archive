@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,18 +20,16 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies
-import java.io.IOException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.LineNumberReader;
 import java.text.NumberFormat;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.Console;
+import org.geotools.referencing.ScriptTest;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,16 +24,15 @@
 package org.geotools.coverage.grid;
 
 // J2SE dependencies
-import java.io.Serializable;
-import java.util.Arrays;
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.io.Serializable;
+import java.util.Arrays;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 
 
 /**
@@ -301,7 +300,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     }
     
     /**
-     * Returns a string représentation of this grid range.
+     * Returns a string reprï¿½sentation of this grid range.
      * The returned string is implementation dependent. It
      * is usually provided for debugging purposes.
      */

@@ -7,8 +7,11 @@
 
 package org.geotools.gui.swing;
 
-import junit.framework.*;
-import org.geotools.gui.swing.tables.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.gui.swing.tables.FeatureTableModelTest;
 
 
 /**

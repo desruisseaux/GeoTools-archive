@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.geotools.graph.structure.DirectedEdge;
+import org.geotools.graph.structure.DirectedGraphable;
 import org.geotools.graph.structure.DirectedNode;
 import org.geotools.graph.structure.Edge;
+import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 
 /**

@@ -24,11 +24,11 @@ import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
 import org.geotools.graph.build.GraphBuilder;
+import org.geotools.graph.io.GraphReaderWriter;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Node;

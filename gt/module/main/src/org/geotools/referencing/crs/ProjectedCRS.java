@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,30 +23,28 @@
 package org.geotools.referencing.crs;
 
 // J2SE dependencies
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
+
 import javax.units.Unit;
 
-// OpenGIS direct dependencies
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.Projection;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.referencing.wkt.Formatter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**

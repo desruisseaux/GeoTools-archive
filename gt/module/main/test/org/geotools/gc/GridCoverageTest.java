@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,31 +20,34 @@
 package org.geotools.gc;
 
 // J2SE dependencies
-import java.util.Random;
-import java.util.Arrays;
 import java.awt.Color;
-import java.awt.geom.*;
-import java.awt.image.*;
-import javax.imageio.*;
-import java.io.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Random;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
+import javax.imageio.ImageIO;
 
-// Geotools dependencies
-import org.geotools.pt.*;
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-import org.geotools.cv.*;
-import org.geotools.gc.*;
-import org.geotools.units.Unit;
-import org.geotools.util.NumberRange;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cv.Category;
+import org.geotools.cv.SampleDimension;
+import org.geotools.pt.Envelope;
 import org.geotools.resources.TestData;
+import org.geotools.units.Unit;
+import org.geotools.util.NumberRange;
 
 
 /**
@@ -123,7 +126,7 @@ public class GridCoverageTest extends TestCase {
         /*
          * Construct the grid coverage. We will assume that the grid coverage use
          * (longitude,latitude) coordinates, pixels of 0.25 degrees and a lower
-         * left corner at 10°W 30°N.
+         * left corner at 10ï¿½W 30ï¿½N.
          */
         final GridCoverage coverage;  // The grid coverage.
         final BufferedImage   image;  // The GridCoverage's data.
@@ -136,7 +139,7 @@ public class GridCoverageTest extends TestCase {
             new Category("Land",        null, 1),
             new Category("Cloud",       null, 2),
             new Category("Temperature", null, BEGIN_VALID, 256, SCALE, OFFSET)
-        }, Unit.get("°C"));
+        }, Unit.get("ï¿½C"));
         image  = new BufferedImage(120, 80, BufferedImage.TYPE_BYTE_INDEXED);
         raster = image.getRaster();
         for (int i=raster.getWidth(); --i>=0;) {
@@ -276,7 +279,7 @@ public class GridCoverageTest extends TestCase {
                 throw new IllegalArgumentException(String.valueOf(number));
             }
             case 0: {
-                //unit = "°C";
+                //unit = "ï¿½C";
                 path = "QL95209.png";
                 cs   = GeographicCoordinateSystem.WGS84;
                 categories = new Category[] {
@@ -288,12 +291,12 @@ public class GridCoverageTest extends TestCase {
                     new Category("Land",       Color.decode("#D2C8A0"), new NumberRange(240, 254)),
                     new Category("No data",    Color.decode("#FFFFFF"), new NumberRange(255, 255)),
                 };
-                // 41°S - 5°N ; 35°E - 80°E  (450 x 460 pixels)
+                // 41ï¿½S - 5ï¿½N ; 35ï¿½E - 80ï¿½E  (450 x 460 pixels)
                 bounds = new Rectangle2D.Double(35, -41, 45, 46);
                 break;
             }
             case 1: {
-                //unit = "mg/m³";
+                //unit = "mg/mï¿½";
                 path = "CHL01195.png";
                 cs   = GeographicCoordinateSystem.WGS84;
                 categories = new Category[] {
@@ -301,7 +304,7 @@ public class GridCoverageTest extends TestCase {
                     new Category("No data",    Color.decode("#FFFFFF"), new NumberRange(  0,   0)),
                     new Category("Log chl-a",  null,                    new NumberRange(  1, 254), 0.015, -1.985)
                 };
-                // 34°N - 45°N ; 07°W - 12°E  (1200 x 700 pixels)
+                // 34ï¿½N - 45ï¿½N ; 07ï¿½W - 12ï¿½E  (1200 x 700 pixels)
                 bounds = new Rectangle2D.Double(-7, 34, 19, 11);
                 break;
             }

@@ -16,9 +16,10 @@
  */
 package org.geotools.data;
 
-import org.geotools.filter.Filter;
 import java.io.IOException;
 import java.util.Set;
+
+import org.geotools.filter.Filter;
 
 
 /**

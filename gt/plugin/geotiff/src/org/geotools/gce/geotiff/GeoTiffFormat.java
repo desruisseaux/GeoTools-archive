@@ -19,15 +19,14 @@
 package org.geotools.gce.geotiff;
 
 //Geotools dependencies
-import org.geotools.cs.CoordinateSystemAuthorityFactory ; 
-import org.geotools.data.coverage.grid.AbstractGridFormat;  
-import org.geotools.data.coverage.grid.GridCoverageReader ; 
-import org.geotools.data.coverage.grid.GridCoverageWriter ; 
-
-//J2SE Dependencies
-import java.util.HashMap ; 
-import java.io.File ; 
+import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+
+import org.geotools.cs.CoordinateSystemAuthorityFactory;
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
 
 /**
  *

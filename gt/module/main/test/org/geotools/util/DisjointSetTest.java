@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,10 @@
 package org.geotools.util;
 
 // J2SE dependencies
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -70,16 +71,16 @@ public final class DisjointSetTest extends TestCase {
         assertSame(t2.getTrash(), t3.getTrash());
 
         assertTrue(t1.add("alpha"));
-        assertTrue(t2.add("bêta"));
+        assertTrue(t2.add("bï¿½ta"));
         assertTrue(t3.add("gamma"));
         assertTrue(t2.add("delta"));
         assertTrue(t1.add("epsilon"));
         assertTrue(t2.add("alpha"));
-        assertTrue(t2.remove("bêta"));
+        assertTrue(t2.remove("bï¿½ta"));
 
         assertEquals(Collections.singleton("epsilon"), t1);
         assertEquals(new HashSet(Arrays.asList(new String[] {"alpha","delta"})), t2);
         assertEquals(Collections.singleton("gamma"), t3);
-        assertEquals(Collections.singleton("bêta"),  t1.getTrash());
+        assertEquals(Collections.singleton("bï¿½ta"),  t1.getTrash());
     }
 }

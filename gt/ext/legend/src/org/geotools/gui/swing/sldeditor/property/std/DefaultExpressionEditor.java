@@ -20,6 +20,19 @@
  */
 package org.geotools.gui.swing.sldeditor.property.std;
 
+import java.awt.BorderLayout;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
@@ -31,17 +44,6 @@ import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.parser.ParseException;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;
-import java.awt.BorderLayout;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JTextField;
 
 
 /**

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,133 +33,124 @@
  */
 package org.geotools.gui.headless;
 
-// Gestion des entrés/sorties
-import java.lang.System;
-import java.io.PrintStream;
+// Gestion des entrï¿½s/sorties
 import java.io.PrintWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.UnsupportedCharsetException;
-
-// Gestion du texte
-import java.text.NumberFormat;
 import java.text.BreakIterator;
+import java.text.NumberFormat;
 
-// Divers
-import org.geotools.util.ProgressListener;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
+import org.geotools.util.ProgressListener;
 
 
 /**
- * Informe l'utilisateur des progrès d'une opération à l'aide de messages envoyé vers un
- * flot. L'avancement de l'opération sera affiché en pourcentage sur une ligne (généralement
- * le périphérique de sortie standard). Cette classe peut aussi écrire des avertissements,
- * ce qui est utile entre autre lors de la lecture d'un fichier de données durant laquelle
- * on veut signaler des anomalies mais sans arrêter la lecture pour autant.
+ * Informe l'utilisateur des progrï¿½s d'une opï¿½ration ï¿½ l'aide de messages envoyï¿½ vers un
+ * flot. L'avancement de l'opï¿½ration sera affichï¿½ en pourcentage sur une ligne (gï¿½nï¿½ralement
+ * le pï¿½riphï¿½rique de sortie standard). Cette classe peut aussi ï¿½crire des avertissements,
+ * ce qui est utile entre autre lors de la lecture d'un fichier de donnï¿½es durant laquelle
+ * on veut signaler des anomalies mais sans arrï¿½ter la lecture pour autant.
  *
  * @version $Id: ProgressPrinter.java,v 1.2 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
 public class ProgressPrinter implements ProgressListener {
     /**
-     * Nom de l'opération en cours. Le pourcentage sera écris à la droite de ce nom.
+     * Nom de l'opï¿½ration en cours. Le pourcentage sera ï¿½cris ï¿½ la droite de ce nom.
      */
     private String description;
 
     /**
-     * Flot utilisé pour l'écriture de l'état d'avancement d'un
-     * processus ainsi que pour les écritures des commentaires.
+     * Flot utilisï¿½ pour l'ï¿½criture de l'ï¿½tat d'avancement d'un
+     * processus ainsi que pour les ï¿½critures des commentaires.
      */
     private final PrintWriter out;
 
     /**
-     * Indique si le caractère '\r' ramène au début de la ligne courante sur
-     * ce système. On supposera que ce sera le cas si le système n'utilise
+     * Indique si le caractï¿½re '\r' ramï¿½ne au dï¿½but de la ligne courante sur
+     * ce systï¿½me. On supposera que ce sera le cas si le systï¿½me n'utilise
      * pas la paire "\r\n" pour changer de ligne (comme le system VAX-VMS).
      */
     private final boolean CR_supported;
 
     /**
      * Longueur maximale des lignes. L'espace utilisable sera un peu
-     * moindre car quelques espaces seront laissés en début de ligne.
+     * moindre car quelques espaces seront laissï¿½s en dï¿½but de ligne.
      */
     private final int maxLength;
 
     /**
-     * Nombre de caractères utilisés lors de l'écriture de la dernière ligne.
-     * Ce champ est mis à jour par la méthode {@link #carriageReturn} chaque
-     * fois que l'on déclare que l'on vient de terminer l'écriture d'une ligne.
+     * Nombre de caractï¿½res utilisï¿½s lors de l'ï¿½criture de la derniï¿½re ligne.
+     * Ce champ est mis ï¿½ jour par la mï¿½thode {@link #carriageReturn} chaque
+     * fois que l'on dï¿½clare que l'on vient de terminer l'ï¿½criture d'une ligne.
      */
     private int lastLength;
 
     /**
-     * Position à laquelle commencer à écrire le pourcentage. Cette information
-     * est gérée automatiquement par la méthode {@link #progress}. La valeur -1
-     * signifie que ni le pourcentage ni la description n'ont encore été écrits.
+     * Position ï¿½ laquelle commencer ï¿½ ï¿½crire le pourcentage. Cette information
+     * est gï¿½rï¿½e automatiquement par la mï¿½thode {@link #progress}. La valeur -1
+     * signifie que ni le pourcentage ni la description n'ont encore ï¿½tï¿½ ï¿½crits.
      */
     private int percentPosition = -1;
 
     /**
-     * Dernier pourcentage écrit. Cette information est utilisée
-     * afin d'éviter d'écrire deux fois le même pourcentage, ce
-     * qui ralentirait inutilement le système. La valeur -1 signifie
-     * qu'on n'a pas encore écrit de pourcentage.
+     * Dernier pourcentage ï¿½crit. Cette information est utilisï¿½e
+     * afin d'ï¿½viter d'ï¿½crire deux fois le mï¿½me pourcentage, ce
+     * qui ralentirait inutilement le systï¿½me. La valeur -1 signifie
+     * qu'on n'a pas encore ï¿½crit de pourcentage.
      */
     private float lastPercent = -1;
 
     /**
-     * Format à utiliser pour écrire les pourcentages.
+     * Format ï¿½ utiliser pour ï¿½crire les pourcentages.
      */
     private NumberFormat format;
 
     /**
-     * Objet utilisé pour couper les lignes correctements lors de l'affichage
+     * Objet utilisï¿½ pour couper les lignes correctements lors de l'affichage
      * de messages d'erreurs qui peuvent prendre plusieurs lignes.
      */
     private BreakIterator breaker;
 
     /**
-     * Indique si cet objet a déjà écrit des avertissements. Si
-     * oui, on ne réécrira pas le gros titre "avertissements".
+     * Indique si cet objet a dï¿½jï¿½ ï¿½crit des avertissements. Si
+     * oui, on ne rï¿½ï¿½crira pas le gros titre "avertissements".
      */
     private boolean hasPrintedWarning;
 
     /**
      * Source du dernier message d'avertissement. Cette information est
-     * conservée afin d'éviter de répéter la source lors d'éventuels
+     * conservï¿½e afin d'ï¿½viter de rï¿½pï¿½ter la source lors d'ï¿½ventuels
      * autres messages d'avertissements.
      */
     private String lastSource;
 
     /**
-     * Construit un objet qui écrira sur le périphérique de sortie standard
-     * ({@link java.lang.System#out}) l'état d'avancement d'une opération.
-     * La longueur par défaut des lignes sera de 80 caractères.
+     * Construit un objet qui ï¿½crira sur le pï¿½riphï¿½rique de sortie standard
+     * ({@link java.lang.System#out}) l'ï¿½tat d'avancement d'une opï¿½ration.
+     * La longueur par dï¿½faut des lignes sera de 80 caractï¿½res.
      */
     public ProgressPrinter() {
         this(new PrintWriter(Arguments.getWriter(System.out)));
     }
 
     /**
-     * Construit un objet qui écrira sur le périphérique de
-     * sortie spécifié l'état d'avancement d'une opération.
-     * La longueur par défaut des lignes sera de 80 caractères.
+     * Construit un objet qui ï¿½crira sur le pï¿½riphï¿½rique de
+     * sortie spï¿½cifiï¿½ l'ï¿½tat d'avancement d'une opï¿½ration.
+     * La longueur par dï¿½faut des lignes sera de 80 caractï¿½res.
      */
     public ProgressPrinter(final PrintWriter out) {
         this(out, 80);
     }
 
     /**
-     * Construit un objet qui écrira sur le périphérique de
-     * sortie spécifié l'état d'avancement d'une opération.
+     * Construit un objet qui ï¿½crira sur le pï¿½riphï¿½rique de
+     * sortie spï¿½cifiï¿½ l'ï¿½tat d'avancement d'une opï¿½ration.
      *
-     * @param out périphérique de sortie à utiliser pour écrire l'état d'avancement.
-     * @param maxLength Longueur maximale des lignes. Cette information est utilisée
-     *        par {@link #warningOccurred} pour répartir sur plusieurs lignes des
+     * @param out pï¿½riphï¿½rique de sortie ï¿½ utiliser pour ï¿½crire l'ï¿½tat d'avancement.
+     * @param maxLength Longueur maximale des lignes. Cette information est utilisï¿½e
+     *        par {@link #warningOccurred} pour rï¿½partir sur plusieurs lignes des
      *        messages qui ferait plus que la longueur <code>lineLength</code>.
      */
     public ProgressPrinter(final PrintWriter out, final int maxLength) {
@@ -170,15 +161,15 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Efface le reste de la ligne (si nécessaire) puis repositionne le curseur au début
-     * de la ligne. Si les retours chariot ne sont pas supportés, alors cette méthode va
-     * plutôt passer à la ligne suivante. Dans tous les cas, le curseur se trouvera au
-     * début d'une ligne et la valeur <code>length</code> sera affecté au champ
+     * Efface le reste de la ligne (si nï¿½cessaire) puis repositionne le curseur au dï¿½but
+     * de la ligne. Si les retours chariot ne sont pas supportï¿½s, alors cette mï¿½thode va
+     * plutï¿½t passer ï¿½ la ligne suivante. Dans tous les cas, le curseur se trouvera au
+     * dï¿½but d'une ligne et la valeur <code>length</code> sera affectï¿½ au champ
      * {@link #lastLength}.
      *
-     * @param length Nombre de caractères qui ont été écrit jusqu'à maintenant sur cette ligne.
-     *        Cette information est utilisée pour ne mettre que le nombre d'espaces nécessaires
-     *        à la fin de la ligne.
+     * @param length Nombre de caractï¿½res qui ont ï¿½tï¿½ ï¿½crit jusqu'ï¿½ maintenant sur cette ligne.
+     *        Cette information est utilisï¿½e pour ne mettre que le nombre d'espaces nï¿½cessaires
+     *        ï¿½ la fin de la ligne.
      */
     private void carriageReturn(final int length) {
         if (CR_supported && length<maxLength) {
@@ -194,14 +185,14 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Ajoute des points à la fin de la ligne jusqu'à représenter
-     * le pourcentage spécifié. Cette méthode est utilisée pour
-     * représenter les progrès sur un terminal qui ne supporte
+     * Ajoute des points ï¿½ la fin de la ligne jusqu'ï¿½ reprï¿½senter
+     * le pourcentage spï¿½cifiï¿½. Cette mï¿½thode est utilisï¿½e pour
+     * reprï¿½senter les progrï¿½s sur un terminal qui ne supporte
      * pas les retours chariots.
      *
-     * @param percent Pourcentage accompli de l'opération. Cette
+     * @param percent Pourcentage accompli de l'opï¿½ration. Cette
      *        valeur doit obligatoirement se trouver entre 0 et
-     *        100 (ça ne sera pas vérifié).
+     *        100 (ï¿½a ne sera pas vï¿½rifiï¿½).
      */
     private void completeBar(final float percent) {
         final int end = (int) ((percent/100)*((maxLength-2)-percentPosition)); // Round toward 0.
@@ -212,8 +203,8 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Retourne le message d'écrivant l'opération
-     * en cours. Si aucun message n'a été définie,
+     * Retourne le message d'ï¿½crivant l'opï¿½ration
+     * en cours. Si aucun message n'a ï¿½tï¿½ dï¿½finie,
      * retourne <code>null</code>.
      */
     public String getDescription() {
@@ -221,10 +212,10 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Spécifie un message qui décrit l'opération en cours.
-     * Ce message est typiquement spécifiée avant le début
-     * de l'opération. Toutefois, cette méthode peut aussi
-     * être appelée à tout moment pendant l'opération sans
+     * Spï¿½cifie un message qui dï¿½crit l'opï¿½ration en cours.
+     * Ce message est typiquement spï¿½cifiï¿½e avant le dï¿½but
+     * de l'opï¿½ration. Toutefois, cette mï¿½thode peut aussi
+     * ï¿½tre appelï¿½e ï¿½ tout moment pendant l'opï¿½ration sans
      * que cela affecte le pourcentage accompli. La valeur
      * <code>null</code> signifie qu'on ne souhaite plus
      * afficher de description.
@@ -234,7 +225,7 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Indique que l'opération a commencée.
+     * Indique que l'opï¿½ration a commencï¿½e.
      */
     public synchronized void started() {
         int length = 0;
@@ -253,18 +244,18 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Indique l'état d'avancement de l'opération. Le progrès est représenté par un
-     * pourcentage variant de 0 à 100 inclusivement. Si la valeur spécifiée est en
-     * dehors de ces limites, elle sera automatiquement ramenée entre 0 et 100.
+     * Indique l'ï¿½tat d'avancement de l'opï¿½ration. Le progrï¿½s est reprï¿½sentï¿½ par un
+     * pourcentage variant de 0 ï¿½ 100 inclusivement. Si la valeur spï¿½cifiï¿½e est en
+     * dehors de ces limites, elle sera automatiquement ramenï¿½e entre 0 et 100.
      */
     public synchronized void progress(float percent) {
         if (percent<0  ) percent=0;
         if (percent>100) percent=100;
         if (CR_supported) {
             /*
-             * Si le périphérique de sortie supporte les retours chariot,
-             * on écrira l'état d'avancement comme un pourcentage après
-             * la description, comme dans "Lecture des données (38%)".
+             * Si le pï¿½riphï¿½rique de sortie supporte les retours chariot,
+             * on ï¿½crira l'ï¿½tat d'avancement comme un pourcentage aprï¿½s
+             * la description, comme dans "Lecture des donnï¿½es (38%)".
              */
             if (percent != lastPercent) {
                 if (format == null) {
@@ -287,9 +278,9 @@ public class ProgressPrinter implements ProgressListener {
             }
         } else {
             /*
-             * Si le périphérique ne supporte par les retours chariots, on
-             * écrira l'état d'avancement comme une série de points placés
-             * après la description, comme dans "Lecture des données......"
+             * Si le pï¿½riphï¿½rique ne supporte par les retours chariots, on
+             * ï¿½crira l'ï¿½tat d'avancement comme une sï¿½rie de points placï¿½s
+             * aprï¿½s la description, comme dans "Lecture des donnï¿½es......"
              */
             completeBar(percent);
             lastPercent=percent;
@@ -298,9 +289,9 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Indique que l'opération est terminée. L'indicateur visuel informant des
-     * progrès sera ramené à 100% ou disparaîtra. Si des messages d'erreurs ou
-     * d'avertissements étaient en attente, ils seront écrits.
+     * Indique que l'opï¿½ration est terminï¿½e. L'indicateur visuel informant des
+     * progrï¿½s sera ramenï¿½ ï¿½ 100% ou disparaï¿½tra. Si des messages d'erreurs ou
+     * d'avertissements ï¿½taient en attente, ils seront ï¿½crits.
      */
     public synchronized void complete() {
         if (!CR_supported) {
@@ -311,30 +302,30 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Libère les ressources utilisées par cet objet.
-     * L'implémentation par défaut ne fait rien.
+     * Libï¿½re les ressources utilisï¿½es par cet objet.
+     * L'implï¿½mentation par dï¿½faut ne fait rien.
      */
     public void dispose() {
     }
 
     /**
-     * Envoie un message d'avertissement. La première fois que cette méthode est appellée, le mot
-     * "AVERTISSEMENTS" sera écrit en lettres majuscules au milieu d'une boîte. Si une source est
-     * spécifiée (argument <code>source</code>), elle ne sera écrite qu'à la condition qu'elle
-     * n'est pas la même que celle du dernier avertissement. Si une note de marge est spécifiée
-     * (argument <code>margin</code>), elle sera écrite entre parenthèses à la gauche de
+     * Envoie un message d'avertissement. La premiï¿½re fois que cette mï¿½thode est appellï¿½e, le mot
+     * "AVERTISSEMENTS" sera ï¿½crit en lettres majuscules au milieu d'une boï¿½te. Si une source est
+     * spï¿½cifiï¿½e (argument <code>source</code>), elle ne sera ï¿½crite qu'ï¿½ la condition qu'elle
+     * n'est pas la mï¿½me que celle du dernier avertissement. Si une note de marge est spï¿½cifiï¿½e
+     * (argument <code>margin</code>), elle sera ï¿½crite entre parenthï¿½ses ï¿½ la gauche de
      * l'avertissement <code>warning</code>.
      *
-     * @param source Chaîne de caractère décrivant la source de l'avertissement.
+     * @param source Chaï¿½ne de caractï¿½re dï¿½crivant la source de l'avertissement.
      *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
-     *        a été détectée. Peut être nul si la source n'est pas connue.
-     * @param margin Texte à placer dans la marge de l'avertissement <code>warning</code>,
-     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numéro
-     *        de ligne où s'est produite l'erreur dans le fichier <code>source</code>.
-     * @param warning Message d'avertissement à écrire. Si ce message est
-     *        plus long que la largeur de l'écran (telle que spécifiée au
+     *        a ï¿½tï¿½ dï¿½tectï¿½e. Peut ï¿½tre nul si la source n'est pas connue.
+     * @param margin Texte ï¿½ placer dans la marge de l'avertissement <code>warning</code>,
+     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numï¿½ro
+     *        de ligne oï¿½ s'est produite l'erreur dans le fichier <code>source</code>.
+     * @param warning Message d'avertissement ï¿½ ï¿½crire. Si ce message est
+     *        plus long que la largeur de l'ï¿½cran (telle que spï¿½cifiï¿½e au
      *        moment de la construction, alors il sera automatiquement
-     *        distribué sur plusieurs lignes correctements indentées.
+     *        distribuï¿½ sur plusieurs lignes correctements indentï¿½es.
      */
     public synchronized void warningOccurred(final String source, String margin,
                                              final String warning)
@@ -350,8 +341,8 @@ public class ProgressPrinter implements ProgressListener {
             lastSource=source;
         }
         /*
-         * Procède à l'écriture de l'avertissement avec (de façon optionnelle)
-         * quelque chose dans la marge (le plus souvent un numéro de ligne).
+         * Procï¿½de ï¿½ l'ï¿½criture de l'avertissement avec (de faï¿½on optionnelle)
+         * quelque chose dans la marge (le plus souvent un numï¿½ro de ligne).
          */
         String prefix="    ";
         String second=prefix;
@@ -397,9 +388,9 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Indique qu'une exception est survenue pendant le traitement de l'opération.
-     * L'implémentation par défaut écrit "Exception" dans une boîte, puis envoie
-     * la trace vers le périphérique de sortie spécifiée au constructeur.
+     * Indique qu'une exception est survenue pendant le traitement de l'opï¿½ration.
+     * L'implï¿½mentation par dï¿½faut ï¿½crit "Exception" dans une boï¿½te, puis envoie
+     * la trace vers le pï¿½riphï¿½rique de sortie spï¿½cifiï¿½e au constructeur.
      */
     public synchronized void exceptionOccurred(final Throwable exception) {
         carriageReturn(0);
@@ -410,8 +401,8 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Retourne la chaîne <code>margin</code> sans les
-     * éventuelles parenthèses qu'elle pourrait avoir
+     * Retourne la chaï¿½ne <code>margin</code> sans les
+     * ï¿½ventuelles parenthï¿½ses qu'elle pourrait avoir
      * de part et d'autre.
      */
     private static String trim(String margin) {
@@ -424,10 +415,10 @@ public class ProgressPrinter implements ProgressListener {
     }
 
     /**
-     * Écrit dans une boîte entouré d'astérix le texte spécifié en argument.
-     * Ce texte doit être sur une seule ligne et ne pas comporter de retour
-     * chariot. Les dimensions de la boîte seront automatiquement ajustées.
-     * @param text Texte à écrire (une seule ligne).
+     * ï¿½crit dans une boï¿½te entourï¿½ d'astï¿½rix le texte spï¿½cifiï¿½ en argument.
+     * Ce texte doit ï¿½tre sur une seule ligne et ne pas comporter de retour
+     * chariot. Les dimensions de la boï¿½te seront automatiquement ajustï¿½es.
+     * @param text Texte ï¿½ ï¿½crire (une seule ligne).
      */
     private void printInBox(String text) {
         int length = text.length();

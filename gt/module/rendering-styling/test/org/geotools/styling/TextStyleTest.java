@@ -37,12 +37,12 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.j2d.StyledMapRenderer;
 import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.resources.TestData;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.resources.TestData;
 
 
 /**

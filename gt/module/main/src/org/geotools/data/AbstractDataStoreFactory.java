@@ -21,16 +21,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
-
-// Geotools dependencies
-import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFactorySpi.Param;
+import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterReal;
-import org.geotools.parameter.Parameter;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 
 /**

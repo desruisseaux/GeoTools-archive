@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,33 +20,31 @@
 package org.geotools.referencing;
 
 // J2SE direct dependencies
-import java.util.Set;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
-import java.util.NoSuchElementException;
-import javax.imageio.spi.ServiceRegistry;
-import javax.imageio.spi.RegisterableService; // For javadoc
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.Factory;
-import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.datum.DatumFactory;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
+import javax.imageio.spi.RegisterableService;
+import javax.imageio.spi.ServiceRegistry;
 
-// Geotools dependencies
 import org.geotools.io.TableWriter;
+import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.Arguments;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.Factory;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransformFactory;
 
 
 /**

@@ -16,7 +16,6 @@
  */
 package org.geotools.catalog;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.opengis.catalog.CatalogEntry;

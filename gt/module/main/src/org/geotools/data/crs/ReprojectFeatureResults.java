@@ -16,12 +16,12 @@
  */
 package org.geotools.data.crs;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransformFactory;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.feature.Feature;
@@ -31,8 +31,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.util.NoSuchElementException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

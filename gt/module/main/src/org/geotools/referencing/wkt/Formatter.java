@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,36 +23,33 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies and extensions
-import java.util.Locale;
-import java.util.Iterator;
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
+import java.util.Iterator;
+import java.util.Locale;
+
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 import javax.units.UnitFormat;
 
-// OpenGIS dependencies
+import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XMath;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.util.CodeList;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
-import org.geotools.resources.XMath;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 
 
 /**

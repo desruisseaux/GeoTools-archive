@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,25 +20,22 @@
 package org.geotools.metadata.sql;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Properties;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
-// OpenGIS dependencies
+import org.geotools.util.SimpleInternationalString;
 import org.opengis.metadata.MetaData;
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotools.util.SimpleInternationalString;
 
 
 /**
@@ -59,7 +56,7 @@ import org.geotools.util.SimpleInternationalString;
  * where <code>id</code> is the primary key value for the desired record in the
  * <code>CI_Telephone</code> table.
  *
- * @author Touraïvane
+ * @author Touraï¿½vane
  * @author Olivier Kartotaroeno
  * @author Martin Desruisseaux
  */

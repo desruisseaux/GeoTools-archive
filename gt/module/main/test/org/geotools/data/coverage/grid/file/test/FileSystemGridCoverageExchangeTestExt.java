@@ -9,19 +9,11 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-
-import org.opengis.catalog.CatalogEntry;
-import org.opengis.catalog.QueryResult;
-
-import org.geotools.catalog.DefaultQueryDefinition;
 import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
-//import org.geotools.expr.Expr;
-//import org.geotools.expr.Exprs;
-import org.geotools.catalog.QueryRequest;
 import org.geotools.resources.TestData;
+import org.opengis.catalog.CatalogEntry;
 
 
 

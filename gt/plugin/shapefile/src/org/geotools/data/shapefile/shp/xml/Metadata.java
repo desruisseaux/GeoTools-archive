@@ -1,6 +1,5 @@
 package org.geotools.data.shapefile.shp.xml;
 
-import org.geotools.metadata.MetadataEntity;
 
 /**
  * Bean capturing shapefile metadata information.

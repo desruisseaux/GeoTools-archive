@@ -16,15 +16,15 @@
  */
 package org.geotools.feature;
 
-import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.factory.FactoryFinder;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.geotools.factory.Factory;
+import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryFinder;
 
 
 /**

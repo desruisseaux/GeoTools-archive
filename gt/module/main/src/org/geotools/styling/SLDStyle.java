@@ -35,14 +35,7 @@
  */
 package org.geotools.styling;
 
-import org.geotools.filter.Expression;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 
 /** A class to read and parse an SLD file based on verion 0.7.2 of the OGC

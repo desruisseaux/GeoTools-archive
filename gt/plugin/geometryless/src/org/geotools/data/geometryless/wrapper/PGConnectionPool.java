@@ -1,13 +1,11 @@
 package org.geotools.data.geometryless.wrapper;
 
-import javax.sql.ConnectionPoolDataSource;
-import javax.sql.PooledConnection;
-
 import java.sql.SQLException;
-
-import java.util.logging.Logger;
-import java.util.Properties;
 import java.util.Enumeration;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.sql.ConnectionPoolDataSource;
 
 /**
  * <p>

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,22 +20,18 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
-import java.awt.Point;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 
-// OpenGIS dependencies
+import org.geotools.coverage.grid.GridGeometry;
+import org.geotools.referencing.crs.DerivedCRS;
+import org.geotools.referencing.cs.CartesianCS;
+import org.geotools.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform2D;
-
-// Geotools dependencies
-import org.geotools.referencing.cs.CartesianCS;      // For javadoc
-import org.geotools.referencing.datum.GeodeticDatum; // For javadoc
-import org.geotools.referencing.crs.DerivedCRS;      // For javadoc
-//import org.geotools.referencing.crs.GeographicCRS;   // For javadoc (was not used in javadocs)
-import org.geotools.coverage.grid.GridGeometry;      // For javadoc
 
 
 /**
@@ -543,7 +539,7 @@ public class LocalizationGrid {
          * following identities instead:
          *
          *           1 + 2 + 3 ... + n    =    n*(n+1)/2              (arithmetic series)
-         *        1² + 2² + 3² ... + n²   =    n*(n+0.5)*(n+1)/3
+         *        1ï¿½ + 2ï¿½ + 3ï¿½ ... + nï¿½   =    n*(n+0.5)*(n+1)/3
          */
         double x,y,z, xx,yy, xy, zx,zy;
         z = zx = zy = 0; // To be computed in the loop.

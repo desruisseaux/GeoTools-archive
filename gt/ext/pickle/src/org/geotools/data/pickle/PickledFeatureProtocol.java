@@ -6,10 +6,26 @@
 
 package org.geotools.data.pickle;
 
-import com.vividsolutions.jts.geom.*;
-import java.io.*;
-import java.util.*;
-import org.geotools.feature.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.resources.NIOUtilities;
 
 /**

@@ -23,6 +23,7 @@ package org.geotools.gui.swing.legend;
 
 import java.awt.Color;
 import java.util.logging.Logger;
+
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -88,7 +89,7 @@ public class LegendTreeLayerCellRenderer extends javax.swing.JPanel
     /**
      * Subclassed to map <code>ColorUIResource</code>s to null. If
      * <code>color</code> is null, or a <code>ColorUIResource</code>, this has
-     * the effect of letting the back¤Àground color of the JTree show through.
+     * the effect of letting the backï¿½ï¿½ground color of the JTree show through.
      * On the other hand, if <code>color</code> is non-null, and not a
      * <code>ColorUIResource</code>, the background becomes
      * <code>color</code>.

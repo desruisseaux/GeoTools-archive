@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,12 +26,9 @@ package org.geotools.cs;
 // J2SE dependencies
 import java.io.Serializable;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -91,9 +88,9 @@ public class WGS84ConversionInfo implements Cloneable, Serializable {
      * <blockquote><pre>
      * S = 1 + {@link #ppm}/1000000
      *
-     * [ X’ ]    [     S   -{@link #ez}*S   +{@link #ey}*S   {@link #dx} ]  [ X ]
-     * [ Y’ ]  = [ +{@link #ez}*S       S   -{@link #ex}*S   {@link #dy} ]  [ Y }
-     * [ Z’ ]    [ -{@link #ey}*S   +{@link #ex}*S       S   {@link #dz} ]  [ Z ]
+     * [ Xï¿½ ]    [     S   -{@link #ez}*S   +{@link #ey}*S   {@link #dx} ]  [ X ]
+     * [ Yï¿½ ]  = [ +{@link #ez}*S       S   -{@link #ex}*S   {@link #dy} ]  [ Y }
+     * [ Zï¿½ ]    [ -{@link #ey}*S   +{@link #ex}*S       S   {@link #dz} ]  [ Z ]
      * [ 1  ]    [     0       0       0    1 ]  [ 1 ]
      * </pre></blockquote>
      *

@@ -16,6 +16,8 @@
  */
 package org.geotools.renderer.style;
 
+import java.awt.Graphics2D;
+
 
 /**
  * Base class for all style targeting {@link Graphics2D}.

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,24 +24,19 @@
 package org.geotools.gc;
 
 // J2SE dependencies
-import java.io.Serializable;
-import java.util.Arrays;
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
-
-// Weak references
+import java.io.Serializable;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 
-// OpenGIS dependencies
-import org.opengis.gc.GC_GridRange;
-
-// Geotools dependencies
 import org.geotools.pt.Dimensioned;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.opengis.gc.GC_GridRange;
 
 
 /**
@@ -322,7 +317,7 @@ public class GridRange implements Dimensioned, Serializable {
     }
     
     /**
-     * Returns a string représentation of this grid range.
+     * Returns a string reprï¿½sentation of this grid range.
      * The returned string is implementation dependent. It
      * is usually provided for debugging purposes.
      */

@@ -4,11 +4,11 @@
  */
 package org.geotools.validation;
 
+import java.util.HashMap;
+
 import org.geotools.data.DataTestCase;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.validation.attributes.UniqueFIDValidation;
-import org.geotools.validation.spatial.IsValidGeometryValidation;
-import java.util.HashMap;
 
 
 /**

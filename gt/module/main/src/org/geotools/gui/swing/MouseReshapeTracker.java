@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,62 +20,41 @@
 package org.geotools.gui.swing;
 
 // Geometry
-import java.awt.Shape;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.RectangularShape;
-import java.awt.geom.NoninvertibleTransformException;
-import org.geotools.resources.geometry.XAffineTransform;
-
-// Graphics
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-// User interface
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Insets;
-import java.awt.Component;
-import javax.swing.JFrame;
-import javax.swing.JSpinner;
-import javax.swing.KeyStroke;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.text.JTextComponent;
-import javax.swing.JFormattedTextField;
-
-// Events
-import java.awt.event.KeyEvent;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.event.MouseInputAdapter;
-
-// Formats
-import java.util.Date;
-import java.text.Format;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-// Miscellaneous
-import java.lang.Double;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-// Resources
-import org.geotools.resources.XMath;
-import org.geotools.resources.XArray;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.event.MouseInputAdapter;
+
 import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.XMath;
+import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**
@@ -240,7 +219,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
      * unlike {@link #adjustingSides}, it designates an edge of the shape
      * {@link #logicalShape} and not an edge of the shape in pixels appearing
      * on the screen. It is different, for example, if the affine transform
-     * {@link #transform} contains a 90° rotation.
+     * {@link #transform} contains a 90ï¿½ rotation.
      */
     private transient int adjustingLogicalSides;
 
@@ -379,7 +358,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
     private void update() {
         /*
          * Takes into account cases where the affine transform
-         * contains a rotation of 90° or any other.
+         * contains a rotation of 90ï¿½ or any other.
          */
         adjustingLogicalSides = inverseTransform(adjustingSides);
         /*
@@ -1044,7 +1023,7 @@ class MouseReshapeTracker extends MouseInputAdapter implements Shape {
                         e.consume();
                     }
                 } catch (NoninvertibleTransformException exception) {
-                    // Pas besoin de gérer cette exception.
+                    // Pas besoin de gï¿½rer cette exception.
                     // L'ignorer est correct.
                 }
             }

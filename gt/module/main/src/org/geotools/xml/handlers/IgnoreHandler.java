@@ -16,12 +16,13 @@
  */
 package org.geotools.xml.handlers;
 
+import java.net.URI;
+import java.util.Map;
+
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.net.URI;
-import java.util.Map;
 
 
 /**

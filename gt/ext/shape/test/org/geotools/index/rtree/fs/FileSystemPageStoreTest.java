@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 
 import org.geotools.index.DataDefinition;
 import org.geotools.index.TreeException;
-import org.geotools.index.rtree.fs.FileSystemPageStore;
 
 /**
  * @author Tommaso Nolli

@@ -17,13 +17,13 @@
 
 package org.geotools.gce.geotiff ; 
 
-import com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet;
-
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet;
 
 /**
  * This class provides an abstraction from the details of TIFF data

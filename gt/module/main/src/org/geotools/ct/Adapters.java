@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,29 +24,22 @@
 package org.geotools.ct;
 
 // OpenGIS dependencies
-import org.opengis.ct.CT_Parameter;
-import org.opengis.ct.CT_DomainFlags;
-import org.opengis.ct.CT_TransformType;
-import org.opengis.ct.CT_MathTransform;
-import org.opengis.ct.CT_MathTransformFactory;
-import org.opengis.ct.CT_CoordinateTransformation;
-import org.opengis.ct.CT_CoordinateTransformationFactory;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
-import org.geotools.resources.XArray;
-import org.geotools.cs.CoordinateSystem; // For javadoc
-import org.geotools.cs.CoordinateSystemFactory;
-
-// J2SE and JAI dependencies
 import java.rmi.RemoteException;
 import java.rmi.ServerException;
+
 import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListImpl;
-import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
+import javax.media.jai.ParameterListImpl;
+
+import org.geotools.resources.XArray;
+import org.opengis.ct.CT_CoordinateTransformation;
+import org.opengis.ct.CT_CoordinateTransformationFactory;
+import org.opengis.ct.CT_DomainFlags;
+import org.opengis.ct.CT_MathTransform;
+import org.opengis.ct.CT_MathTransformFactory;
+import org.opengis.ct.CT_Parameter;
+import org.opengis.ct.CT_TransformType;
+import org.opengis.referencing.FactoryException;
 
 
 /**

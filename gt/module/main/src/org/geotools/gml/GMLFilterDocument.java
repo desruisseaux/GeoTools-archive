@@ -16,9 +16,10 @@
  */
 package org.geotools.gml;
 
-import org.xml.sax.SAXException;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+
+import org.xml.sax.SAXException;
 
 
 /**

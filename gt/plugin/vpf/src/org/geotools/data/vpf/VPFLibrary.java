@@ -27,7 +27,6 @@ import java.util.Vector;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.crs.CRSService;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
 import org.geotools.data.vpf.ifc.FileConstants;

@@ -20,14 +20,14 @@
  */
 package org.geotools.data.shapefile;
 
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.FileDataStoreFactorySpi;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.FileDataStoreFactorySpi;
 
 
 /**

@@ -16,14 +16,12 @@
  */
 package org.geotools.data.wms;
 
-import org.geotools.catalog.CatalogEntry;
-import org.geotools.data.ows.Layer;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+
+import org.geotools.catalog.CatalogEntry;
+import org.geotools.data.ows.Layer;
 
 
 public class WMSLayerCatalogEntry implements CatalogEntry {

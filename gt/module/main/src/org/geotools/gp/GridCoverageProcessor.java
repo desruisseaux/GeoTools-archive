@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -36,41 +36,35 @@
 package org.geotools.gp;
 
 // Collections
-import java.util.Map;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Comparator;
-
-// Miscellaneous
-import java.io.Writer;
-import java.io.IOException;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
-import java.lang.ref.WeakReference;
 import java.awt.RenderingHints;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// JAI parameters
-import javax.media.jai.JAI;
-import javax.media.jai.TileCache;
 import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
+import javax.media.jai.TileCache;
 import javax.media.jai.util.CaselessStringKey;
 
-// Geotools dependencies
 import org.geotools.cv.Coverage;
 import org.geotools.gc.GridCoverage;
-import org.geotools.util.WeakValueHashMap;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
-
-// Extra operations
 import org.geotools.gp.jai.HysteresisDescriptor;
 import org.geotools.gp.jai.NodataFilterDescriptor;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.util.WeakValueHashMap;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,27 +24,23 @@
 package org.geotools.coverage;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.Arrays;
-
-// Images and colors
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;   // For Javadoc
 import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.RenderedImage;
+import java.util.Arrays;
+import java.util.Map;
 
-// JAI dependencies
-import javax.media.jai.RasterFactory;
 import javax.media.jai.FloatDoubleColorModel;
+import javax.media.jai.RasterFactory;
 
-// Geotools dependencies
-import org.geotools.util.WeakValueHashMap;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
+import org.geotools.util.WeakValueHashMap;
 
 
 /**
@@ -57,9 +53,9 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  */
 final class ColorModelFactory {
     /**
-     * Modèles de couleurs suggérés pour l'affichage des catégories. Ces modèles de couleurs
-     * peuvent être construits à partir des couleurs qui ont été définies dans les différentes
-     * catégories du tableau {@link #categories}.
+     * Modï¿½les de couleurs suggï¿½rï¿½s pour l'affichage des catï¿½gories. Ces modï¿½les de couleurs
+     * peuvent ï¿½tre construits ï¿½ partir des couleurs qui ont ï¿½tï¿½ dï¿½finies dans les diffï¿½rentes
+     * catï¿½gories du tableau {@link #categories}.
      */
     private static final Map colors = new WeakValueHashMap();
 
@@ -195,13 +191,13 @@ final class ColorModelFactory {
         }
         /*
          * Calcule le nombre de couleurs de la palette
-         * en cherchant l'index le plus élevé des thèmes.
+         * en cherchant l'index le plus ï¿½levï¿½ des thï¿½mes.
          */
         final int mapSize = (int)Math.round(categories[categories.length-1].maximum)+1;
         final int[]  ARGB = new int[mapSize];
         /*
          * Interpole les codes de couleurs dans la palette. Les couleurs
-         * correspondantes aux plages non-définies par un thème seront transparentes.
+         * correspondantes aux plages non-dï¿½finies par un thï¿½me seront transparentes.
          */
         for (int i=0; i<categories.length; i++) {
             final Category category = categories[i];

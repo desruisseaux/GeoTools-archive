@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,45 +33,36 @@
 package org.geotools.gui.swing;
 
 // Graphics and geometry
-import java.awt.Rectangle;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-
-// User interface
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dialog;
-import java.awt.Window;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JTextArea;
-import javax.swing.JComponent;
-import javax.swing.LookAndFeel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JDesktopPane;
-import javax.swing.BorderFactory;
-import javax.swing.JInternalFrame;
-import javax.swing.AbstractButton;
-
-// Events
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.Dimension;
 import java.awt.EventQueue;
-
-// Miscellaneous
-import java.lang.reflect.Constructor;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 
-// Resources
-import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+
 import org.geotools.resources.GraphicsUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**

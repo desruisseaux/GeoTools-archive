@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,18 +23,15 @@
 package org.geotools.metadata.distribution;
 
 // J2SE direct dependencies
-import java.util.Set;
 import java.util.Collections;
+import java.util.Set;
 
-// OpenGIS direct dependencies
-import org.opengis.util.InternationalString;
+import org.geotools.metadata.MetadataEntity;
+import org.geotools.resources.Utilities;
+import org.geotools.util.CheckedHashSet;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.distribution.Medium;
-
-// Geotools dependencies
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.util.CheckedHashSet;
-import org.geotools.resources.Utilities;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -42,7 +39,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class DigitalTransferOptions extends MetadataEntity
        implements org.opengis.metadata.distribution.DigitalTransferOptions

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,29 +23,25 @@
 package org.geotools.metadata.citation;
 
 // J2SE direct dependencies
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.Locale;
-import java.util.Iterator;
 import java.util.Collections;
-import java.io.Serializable;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Series;
-import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.citation.PresentationForm;
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
-import org.geotools.util.CheckedHashSet;
-import org.geotools.util.CheckedHashMap;
-import org.geotools.util.CheckedArrayList;
-import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.Utilities;
+import org.geotools.util.CheckedArrayList;
+import org.geotools.util.CheckedHashMap;
+import org.geotools.util.CheckedHashSet;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.citation.PresentationForm;
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.citation.Series;
+import org.opengis.util.InternationalString;
 
 
 /**

@@ -2,6 +2,7 @@ package org.geotools.graph.util;
 
 import java.io.File;
 import java.io.Serializable;
+
 import javax.swing.filechooser.FileFilter;
 
 public class SimpleFileFilter extends FileFilter implements Serializable {

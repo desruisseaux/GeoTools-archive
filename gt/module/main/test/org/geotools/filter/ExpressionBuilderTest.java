@@ -7,15 +7,6 @@
 
 package org.geotools.filter;
 
-import junit.framework.*;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
-import java.io.*;
-import java.util.EmptyStackException;
-import java.util.Stack;
-import org.geotools.filter.parser.*;
-import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.parser.ParseException;
 
 /**

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -34,18 +34,16 @@
 package org.geotools.renderer.array;
 
 // J2SE dependencies
-import java.util.Random;
-import java.util.Arrays;
 import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Random;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
-import org.geotools.resources.XArray;
 import org.geotools.renderer.geom.CompressionLevel;
+import org.geotools.resources.XArray;
 
 
 /**
@@ -87,26 +85,26 @@ public class PointArrayTest extends TestCase {
         PointArray   points = new DefaultArray(checkPoints);
         for (int i=0; i<2000; i++) {
             /*
-             * Construit un tableau (de longueur paire) qui sera inséré au milieu
-             * des points déjà existants. Ce tableau sera remplis avec des nombres
-             * aléatoires pour distinguer les différentes coordonnées.
+             * Construit un tableau (de longueur paire) qui sera insï¿½rï¿½ au milieu
+             * des points dï¿½jï¿½ existants. Ce tableau sera remplis avec des nombres
+             * alï¿½atoires pour distinguer les diffï¿½rentes coordonnï¿½es.
              */
             final float[] toMerge = new float[(int)(32*random.nextDouble()) & ~1];
             for (int j=0; j<toMerge.length; j++) {
                 toMerge[j] = (float) (2000*random.nextDouble()-1000);
             }
             /*
-             * Sélectionne au hasard une plage de valeurs à prendre en compte dans
-             * le tableau <code>toMerge</code>. Les autres valeurs seront abandonnées.
+             * Sï¿½lectionne au hasard une plage de valeurs ï¿½ prendre en compte dans
+             * le tableau <code>toMerge</code>. Les autres valeurs seront abandonnï¿½es.
              * Choisit aussi au hasard un point d'insertions pour les nouveaux points.
              */
             final int lower = (int)(toMerge.length*(0.49*random.nextDouble()    )) & ~1;
             final int upper = (int)(toMerge.length*(0.49*random.nextDouble()+0.5)) & ~1;
             final int index = (int)(checkPoints.length  *random.nextDouble()     ) & ~1;
             /*
-             * Insère les nouveaux points dans le tableau 'checkPoints'. Ce tableau est
-             * maintenu uniquement à des fins de comparaisons avec le "vrai" tableau de
-             * points. Vérifie si les deux tableaux ont un contenu identique.
+             * Insï¿½re les nouveaux points dans le tableau 'checkPoints'. Ce tableau est
+             * maintenu uniquement ï¿½ des fins de comparaisons avec le "vrai" tableau de
+             * points. Vï¿½rifie si les deux tableaux ont un contenu identique.
              */
             final boolean reverse = (random.nextDouble() > 0.5);
             points = points.insertAt(index/2, toMerge, lower, upper, reverse);
@@ -118,9 +116,9 @@ public class PointArrayTest extends TestCase {
             assertTrue(Arrays.equals(points.toArray(), checkPoints));
         }
         /*
-         * Prépare une liste d'index délimitant des plages de points à
-         * l'intérieur du tableau. Ces plages seront extraites plusieurs
-         * fois sur différentes versions du tableau de points.
+         * Prï¿½pare une liste d'index dï¿½limitant des plages de points ï¿½
+         * l'intï¿½rieur du tableau. Ces plages seront extraites plusieurs
+         * fois sur diffï¿½rentes versions du tableau de points.
          */
         final int index[]=new int[8];
         for (int i=0; i<index.length; i++) {
@@ -129,7 +127,7 @@ public class PointArrayTest extends TestCase {
         Arrays.sort(index);
         /*
          * Teste maintenant l'extraction d'un sous-tableau
-         * ainsi que la compression des données.
+         * ainsi que la compression des donnï¿½es.
          */
         for (int i=0; i<=3; i++) {
             switch (i) {
@@ -165,8 +163,8 @@ public class PointArrayTest extends TestCase {
             }
         }
         /*
-         * Recherche l'écart maximal entre les
-         * données compressées et les données réelles.
+         * Recherche l'ï¿½cart maximal entre les
+         * donnï¿½es compressï¿½es et les donnï¿½es rï¿½elles.
          */
         float dx=0, dy=0;
         final PointIterator iterator=points.iterator(0);
@@ -273,9 +271,9 @@ public class PointArrayTest extends TestCase {
     }
 
     /**
-     * Vérifie le bon fonctionnement de cette classe. Cette méthode peut être appelée
-     * sans argument.  Les assertions doivent être activées (option <code>-ea</code>)
-     * pour que la vérification soit effective. Cette méthode peut aussi être exécutée
+     * Vï¿½rifie le bon fonctionnement de cette classe. Cette mï¿½thode peut ï¿½tre appelï¿½e
+     * sans argument.  Les assertions doivent ï¿½tre activï¿½es (option <code>-ea</code>)
+     * pour que la vï¿½rification soit effective. Cette mï¿½thode peut aussi ï¿½tre exï¿½cutï¿½e
      * sans les assertions pour tester les performances.
      */
     public static void main(final String[] args) {

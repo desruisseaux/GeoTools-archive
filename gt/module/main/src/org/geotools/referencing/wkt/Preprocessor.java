@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,31 +20,29 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies
-import java.util.Set;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Iterator;
-import java.util.Collections;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.io.Writer;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.Writer;
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
-// OpenGIS dependencies
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.operation.MathTransform;       // For javadoc
-import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
-
-// Geotools dependencies
 import org.geotools.io.TableWriter;
+import org.geotools.referencing.Console;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**

@@ -16,6 +16,11 @@
  */
 package org.geotools.xml.wfs;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterSchema;
 import org.geotools.xml.schema.Attribute;
@@ -69,10 +74,6 @@ import org.geotools.xml.wfs.WFSTransactionComplexTypes.UpdateElementType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.WFS_LockFeatureResponseType;
 import org.geotools.xml.wfs.WFSTransactionComplexTypes.WFS_TransactionResponseType;
 import org.geotools.xml.xsi.XSISimpleTypes;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 /**

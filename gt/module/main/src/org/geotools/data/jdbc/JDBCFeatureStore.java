@@ -16,6 +16,13 @@
  */
 package org.geotools.data.jdbc;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
@@ -32,13 +39,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * This is a starting point for providing your own FeatureStore implementation.

@@ -20,7 +20,6 @@ package org.geotools.measure;
 
 // JUnit dependencies
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 

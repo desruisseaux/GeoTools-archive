@@ -19,14 +19,17 @@
  */
 package org.geotools.data.shapefile.shp;
 
-import com.vividsolutions.jts.geom.*;
 import java.io.IOException;
-import java.nio.channels.WritableByteChannel;
-import java.nio.channels.FileChannel;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+
 import org.geotools.resources.NIOUtilities;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 
 /**
  * ShapefileWriter allows for the storage of geometries in esris shp format.

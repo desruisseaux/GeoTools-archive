@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,6 @@
 package org.geotools.util;
 
 // Miscellaneous
-import javax.swing.ProgressMonitor; // For JavaDoc
 
 
 /**
@@ -64,17 +63,17 @@ import javax.swing.ProgressMonitor; // For JavaDoc
  */
 public interface ProgressListener {
     /**
-     * Retourne le message d'écrivant l'opération
-     * en cours. Si aucun message n'a été définie,
+     * Retourne le message d'ï¿½crivant l'opï¿½ration
+     * en cours. Si aucun message n'a ï¿½tï¿½ dï¿½finie,
      * retourne <code>null</code>.
      */
     public abstract String getDescription();
 
     /**
-     * Spécifie un message qui décrit l'opération en cours.
-     * Ce message est typiquement spécifiée avant le début
-     * de l'opération. Toutefois, cette méthode peut aussi
-     * être appelée à tout moment pendant l'opération sans
+     * Spï¿½cifie un message qui dï¿½crit l'opï¿½ration en cours.
+     * Ce message est typiquement spï¿½cifiï¿½e avant le dï¿½but
+     * de l'opï¿½ration. Toutefois, cette mï¿½thode peut aussi
+     * ï¿½tre appelï¿½e ï¿½ tout moment pendant l'opï¿½ration sans
      * que cela affecte le pourcentage accompli. La valeur
      * <code>null</code> signifie qu'on ne souhaite plus
      * afficher de description.
@@ -82,50 +81,50 @@ public interface ProgressListener {
     public abstract void setDescription(final String description);
 
     /**
-     * Indique que l'opération a commencée.
+     * Indique que l'opï¿½ration a commencï¿½e.
      */
     public abstract void started();
 
     /**
-     * Indique l'état d'avancement de l'opération. Le progrès est représenté par un
-     * pourcentage variant de 0 à 100 inclusivement. Si la valeur spécifiée est en
-     * dehors de ces limites, elle sera automatiquement ramenée entre 0 et 100.
+     * Indique l'ï¿½tat d'avancement de l'opï¿½ration. Le progrï¿½s est reprï¿½sentï¿½ par un
+     * pourcentage variant de 0 ï¿½ 100 inclusivement. Si la valeur spï¿½cifiï¿½e est en
+     * dehors de ces limites, elle sera automatiquement ramenï¿½e entre 0 et 100.
      */
     public abstract void progress(final float percent);
 
     /**
-     * Indique que l'opération est terminée. L'indicateur visuel informant des
-     * progrès sera ramené à 100% ou disparaîtra, selon l'implémentation de la
-     * classe dérivée. Si des messages d'erreurs ou d'avertissements étaient
-     * en attente, ils seront écrits.
+     * Indique que l'opï¿½ration est terminï¿½e. L'indicateur visuel informant des
+     * progrï¿½s sera ramenï¿½ ï¿½ 100% ou disparaï¿½tra, selon l'implï¿½mentation de la
+     * classe dï¿½rivï¿½e. Si des messages d'erreurs ou d'avertissements ï¿½taient
+     * en attente, ils seront ï¿½crits.
      */
     public abstract void complete();
 
     /**
-     * Libère les ressources utilisées par cet objet. Si l'état d'avancement
-     * était affiché dans une fenêtre, cette fenêtre peut être détruite.
+     * Libï¿½re les ressources utilisï¿½es par cet objet. Si l'ï¿½tat d'avancement
+     * ï¿½tait affichï¿½ dans une fenï¿½tre, cette fenï¿½tre peut ï¿½tre dï¿½truite.
      */
     public abstract void dispose();
 
     /**
-     * Envoie un message d'avertissement. Ce message pourra être envoyé vers le
-     * périphérique d'erreur standard, apparaître dans une fenêtre ou être tout
-     * simplement ignoré.
+     * Envoie un message d'avertissement. Ce message pourra ï¿½tre envoyï¿½ vers le
+     * pï¿½riphï¿½rique d'erreur standard, apparaï¿½tre dans une fenï¿½tre ou ï¿½tre tout
+     * simplement ignorï¿½.
      *
-     * @param source Chaîne de caractère décrivant la source de l'avertissement.
+     * @param source Chaï¿½ne de caractï¿½re dï¿½crivant la source de l'avertissement.
      *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
-     *        a été détectée. Peut être nul si la source n'est pas connue.
-     * @param margin Texte à placer dans la marge de l'avertissement <code>warning</code>,
-     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numéro
-     *        de ligne où s'est produite l'erreur dans le fichier <code>source</code>.
-     * @param warning Message d'avertissement à écrire.
+     *        a ï¿½tï¿½ dï¿½tectï¿½e. Peut ï¿½tre nul si la source n'est pas connue.
+     * @param margin Texte ï¿½ placer dans la marge de l'avertissement <code>warning</code>,
+     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numï¿½ro
+     *        de ligne oï¿½ s'est produite l'erreur dans le fichier <code>source</code>.
+     * @param warning Message d'avertissement ï¿½ ï¿½crire.
      */
     public abstract void warningOccurred(String source, String margin, String warning);
 
     /**
-     * Indique qu'une exception est survenue pendant le traitement de l'opération.
-     * Cette méthode peut afficher la trace de l'exception dans une fenêtre ou à
-     * la console, dépendemment de la classe dérivée.
+     * Indique qu'une exception est survenue pendant le traitement de l'opï¿½ration.
+     * Cette mï¿½thode peut afficher la trace de l'exception dans une fenï¿½tre ou ï¿½
+     * la console, dï¿½pendemment de la classe dï¿½rivï¿½e.
      */
     public abstract void exceptionOccurred(final Throwable exception);
 }

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,73 +22,61 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // User interface
-import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.GridLayout;
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
-import javax.swing.event.ListDataListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JScrollPane;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JTree;
-import javax.swing.Icon;
-
-// Input/output
-import java.net.URL;
+import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.imageio.spi.IIORegistry;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.spi.ImageReaderWriterSpi;
-
-// Manifest
-import java.util.jar.Manifest;
-import java.util.jar.Attributes;
-
-// Formatting
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-// Miscellaneous
-import java.util.Map;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Arrays;
-import java.util.TreeMap;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
-// Java Advanced Imaging
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageReaderWriterSpi;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.media.jai.JAI;
+import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.event.ListDataListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-// Geotools dependencies
-import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**
@@ -124,7 +112,7 @@ public class About extends JPanel {
     private static final String TIMESTAMP = "Implementation-Date";
 
     /**
-     * Thread qui aura la charge de faire des mises à jour en arrière-plan.
+     * Thread qui aura la charge de faire des mises ï¿½ jour en arriï¿½re-plan.
      * Ce champ sera <code>null</code> s'il n'y en a pas.
      */
     private final ThreadList updater;
@@ -428,18 +416,18 @@ public class About extends JPanel {
     }
 
     /**
-     * Modèle représentant la liste des processus actif dans un {@link ThreadGroup}.
-     * Cette liste se mettre automatiquement à jour de façon périodique.
+     * Modï¿½le reprï¿½sentant la liste des processus actif dans un {@link ThreadGroup}.
+     * Cette liste se mettre automatiquement ï¿½ jour de faï¿½on pï¿½riodique.
      *
      * @version $Id: About.java,v 1.3 2003/11/12 14:14:24 desruisseaux Exp $
      * @author Martin Desruisseaux
      */
     private static final class ThreadList extends AbstractListModel implements Runnable {
         /**
-         * Processus qui met à jour <code>ThreadList</code>,
+         * Processus qui met ï¿½ jour <code>ThreadList</code>,
          * ou <code>null</code> s'il n'y en a pas. On peut
          * tuer le processus actif en donnant la valeur
-         * <code>null</code> à cette variable.
+         * <code>null</code> ï¿½ cette variable.
          */
         public transient Thread worker;
 
@@ -450,17 +438,17 @@ public class About extends JPanel {
 
         /**
          * Liste des noms des processus en cours. Cette
-         * liste sera mises à jour périodiquement.
+         * liste sera mises ï¿½ jour pï¿½riodiquement.
          */
         private String[] names=new String[0];
 
         /**
-         * Texte dans lequel écrire la mémoire totale réservée.
+         * Texte dans lequel ï¿½crire la mï¿½moire totale rï¿½servï¿½e.
          */
         private final JLabel totalMemory;
 
         /**
-         * Texte dans lequel écrire le pourcentage de mémoire utilisée.
+         * Texte dans lequel ï¿½crire le pourcentage de mï¿½moire utilisï¿½e.
          */
         private final JLabel percentUsed;
 
@@ -471,7 +459,7 @@ public class About extends JPanel {
 
         /**
          * Construit une liste des processus actifs
-         * dans le groupe <code>tasks</code> spécifié.
+         * dans le groupe <code>tasks</code> spï¿½cifiï¿½.
          */
         public ThreadList(final ThreadGroup tasks, final JLabel totalMemory,
                           final JLabel percentUsed, final Resources resources)
@@ -483,29 +471,29 @@ public class About extends JPanel {
         }
 
         /**
-         * Retourne le nombre d'éléments dans la liste.
+         * Retourne le nombre d'ï¿½lï¿½ments dans la liste.
          */
         public int getSize() { // NO synchronized here
             return names.length;
         }
 
         /**
-         * Retourne un des éléments de la liste.
+         * Retourne un des ï¿½lï¿½ments de la liste.
          */
         public Object getElementAt(final int index) { // NO synchronized here
             return names[index];
         }
 
         /**
-         * Ajoute un objet à la liste des objets intéressés
-         * à être informé des changements apportés à la liste.
+         * Ajoute un objet ï¿½ la liste des objets intï¿½ressï¿½s
+         * ï¿½ ï¿½tre informï¿½ des changements apportï¿½s ï¿½ la liste.
          */
         public synchronized void addListDataListener(final ListDataListener listener) {
             super.addListDataListener(listener);
         }
 
         /**
-         * Démarre le thread.
+         * Dï¿½marre le thread.
          */
         public synchronized void start() {
             if (worker == null) {
@@ -517,9 +505,9 @@ public class About extends JPanel {
         }
 
         /**
-         * Met à jour le contenu de la liste à interval régulier.
-         * Cette méthode est exécutée dans une boucle jusqu'à ce
-         * qu'elle soit interrompue en donnant la valeur nulle à
+         * Met ï¿½ jour le contenu de la liste ï¿½ interval rï¿½gulier.
+         * Cette mï¿½thode est exï¿½cutï¿½e dans une boucle jusqu'ï¿½ ce
+         * qu'elle soit interrompue en donnant la valeur nulle ï¿½
          * {@link #tasks}.
          */
         public synchronized void run() {
@@ -569,15 +557,15 @@ public class About extends JPanel {
                 try {
                     wait(4000);
                 } catch (InterruptedException exception) {
-                    // Quelqu'un a réveillé ce thread. Retourne au travail.
+                    // Quelqu'un a rï¿½veillï¿½ ce thread. Retourne au travail.
                 }
             }
             worker = null;
         }
 
         /**
-         * Met à jour le contenu de la liste. Cette méthode
-         * est appelée périodiquement dans le thread de Swing.
+         * Met ï¿½ jour le contenu de la liste. Cette mï¿½thode
+         * est appelï¿½e pï¿½riodiquement dans le thread de Swing.
          */
         private synchronized void update(final String[] newNames,
                                          final String totalMemory,
@@ -632,7 +620,7 @@ public class About extends JPanel {
         if (updater != null) {
             updater.worker = null; // Stop the thread.
         }
-        // Le thread avait une référence indirecte vers 'this' via 'ListDataListener'
+        // Le thread avait une rï¿½fï¿½rence indirecte vers 'this' via 'ListDataListener'
     }
 
     /**

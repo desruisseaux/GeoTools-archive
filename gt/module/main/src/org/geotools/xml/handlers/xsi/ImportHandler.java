@@ -16,11 +16,12 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.geotools.xml.XSIElementHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 
 /**

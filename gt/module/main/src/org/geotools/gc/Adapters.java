@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,25 +20,22 @@
 package org.geotools.gc;
 
 // J2SE dependencies
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRenderedImage;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.awt.image.RenderedImage;
 
-// JAI dependencies
 import javax.media.jai.PlanarImage;
 import javax.media.jai.PropertySource;
 import javax.media.jai.RenderedImageAdapter;
 import javax.media.jai.remote.SerializableRenderedImage;
 
-// OpenGIS dependencies
-import org.opengis.gc.GC_GridRange;
-import org.opengis.gc.GC_GridGeometry;
-import org.opengis.gc.GC_GridCoverage;
-import org.opengis.cv.CV_Coverage;
-
-// Geotools dependencies
 import org.geotools.cv.Coverage;
 import org.geotools.cv.SampleDimension;
+import org.opengis.cv.CV_Coverage;
+import org.opengis.gc.GC_GridCoverage;
+import org.opengis.gc.GC_GridGeometry;
+import org.opengis.gc.GC_GridRange;
 
 
 /**

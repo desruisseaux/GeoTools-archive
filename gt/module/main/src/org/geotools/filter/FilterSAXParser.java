@@ -16,10 +16,11 @@
  */
 package org.geotools.filter;
 
-import org.xml.sax.Attributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.xml.sax.Attributes;
 
 
 /**

@@ -16,9 +16,6 @@
  */
 package org.geotools.gui.tools;
 
-import org.geotools.gui.tools.PanTool;
-import org.geotools.gui.tools.ToolList;
-import org.geotools.gui.tools.ZoomTool;
 
 
 /**

@@ -16,12 +16,13 @@
  */
 package org.geotools.data.oracle;
 
+import java.util.logging.Logger;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
-import java.util.logging.Logger;
 
 
 /**

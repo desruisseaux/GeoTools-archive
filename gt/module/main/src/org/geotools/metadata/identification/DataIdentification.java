@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,25 +24,19 @@
 package org.geotools.metadata.identification;
 
 // J2SE direct dependencies
-import java.util.Set;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
 
-// OpenGIS direct dependencies
-// OpenGIS direct dependencies
-import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.metadata.extent.GeographicDescription;
-import org.opengis.metadata.spatial.SpatialRepresentationType;
-import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.metadata.identification.Resolution;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.citation.Citation;
-
-// Geotools dependencies
-import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
 import org.geotools.util.CheckedHashSet;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.identification.Resolution;
+import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.metadata.spatial.SpatialRepresentationType;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -50,7 +44,7 @@ import org.geotools.util.CheckedHashSet;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class DataIdentification extends Identification
         implements org.opengis.metadata.identification.DataIdentification
@@ -101,7 +95,7 @@ public class DataIdentification extends Identification
     private Set geographicDescription;
 
     /**
-     * Description of the dataset in the producer’s processing environment, including items
+     * Description of the dataset in the producerï¿½s processing environment, including items
      * such as the software, the computer operating system, file name, and the dataset size
      */
     private InternationalString environmentDescription;
@@ -284,7 +278,7 @@ public class DataIdentification extends Identification
     }
 
     /**
-     * Description of the dataset in the producer’s processing environment, including items
+     * Description of the dataset in the producerï¿½s processing environment, including items
      * such as the software, the computer operating system, file name, and the dataset size.
      */
     public InternationalString getEnvironmentDescription() {
@@ -292,7 +286,7 @@ public class DataIdentification extends Identification
     }
 
     /**
-     * Set the description of the dataset in the producer’s processing environment.
+     * Set the description of the dataset in the producerï¿½s processing environment.
      */
     public synchronized void setEnvironmentDescription(final InternationalString newValue)  {
         checkWritePermission();

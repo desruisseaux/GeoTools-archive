@@ -37,10 +37,13 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.j2d.StyledMapRenderer;
 import org.geotools.renderer.lite.LiteRenderer;
+<<<<<<< .mine
+import org.geotools.resources.TestData;
+=======
 import org.geotools.renderer.lite.LiteRenderer2;
+>>>>>>> .r10795
 
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.resources.TestData;
 
 
 /**

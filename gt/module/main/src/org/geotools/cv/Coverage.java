@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,73 +24,61 @@
 package org.geotools.cv;
 
 // Images
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
-import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderContext;
 import java.awt.image.renderable.RenderableImage;
-import java.awt.image.renderable.ParameterBlock;
+import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
+import java.rmi.ServerException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.media.jai.ImageFunction;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.PropertySource;
+import javax.media.jai.PropertySourceImpl;
 import javax.media.jai.TiledImage;
 import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
+import javax.media.jai.operator.ImageFunctionDescriptor;
+import javax.media.jai.util.CaselessStringKey;
 
-// Geometry
-import java.awt.Shape;
-import java.awt.Rectangle;
-import java.awt.Dimension;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-
-// Miscellaneous
-import java.util.Map;
-import java.util.Vector;
-import java.util.Arrays;
-import java.util.Locale;
-import java.rmi.RemoteException;
-import java.rmi.ServerException; // For Javadoc
-import java.rmi.server.UnicastRemoteObject;
-import java.lang.ref.WeakReference;
-
-// JAI dependencies
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.ImageFunction;
-import javax.media.jai.PropertySource;
-import javax.media.jai.PropertySourceImpl;
-import javax.media.jai.util.CaselessStringKey; // For Javadoc
-import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
-
-// OpenGIS dependencies
-import org.opengis.coverage.CannotEvaluateException;
-
-// OpenGIS dependencies
-import org.opengis.cv.CV_Coverage;
-import org.opengis.pt.PT_Envelope;
-import org.opengis.pt.PT_CoordinatePoint;
-import org.opengis.cs.CS_CoordinateSystem;
-import org.opengis.cv.CV_SampleDimension;
-import org.opengis.gc.GC_GridCoverage;
-
-// Geotools dependencies (CTS)
-import org.geotools.pt.Matrix;
-import org.geotools.pt.Envelope;
-import org.geotools.pt.Dimensioned;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.AxisOrientation;
-
-// Resources
-import org.geotools.resources.XArray;
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.pt.Dimensioned;
+import org.geotools.pt.Envelope;
+import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.resources.image.ImageUtilities;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.cs.CS_CoordinateSystem;
+import org.opengis.cv.CV_Coverage;
+import org.opengis.cv.CV_SampleDimension;
+import org.opengis.gc.GC_GridCoverage;
+import org.opengis.pt.PT_CoordinatePoint;
+import org.opengis.pt.PT_Envelope;
 
 
 /**
@@ -926,7 +914,7 @@ public abstract class Coverage extends PropertySourceImpl implements Dimensioned
     }
     
     /**
-     * Returns a string représentation of this coverage. This string is
+     * Returns a string reprï¿½sentation of this coverage. This string is
      * for debugging purpose only and may change in future version.
      */
     public String toString() {

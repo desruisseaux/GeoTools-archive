@@ -19,30 +19,25 @@
 package org.geotools.gce.geotiff;
 
 // J2SE dependencies
-import java.io.IOException ; 
-import java.io.StreamCorruptedException ; 
-import java.util.HashMap;  
-import java.util.Map ; 
+import java.io.IOException;
+import java.io.StreamCorruptedException;
+import java.util.HashMap;
+import java.util.Map;
 
-// JAI dependencies
-import javax.media.jai.ParameterList ; 
+import javax.media.jai.ParameterList;
 
-// geotools dependencies
-import org.geotools.cs.CoordinateSystem ; 
-import org.geotools.cs.ProjectedCoordinateSystem ; 
-import org.geotools.cs.GeographicCoordinateSystem ; 
-import org.geotools.cs.CoordinateSystemAuthorityFactory ; 
-import org.geotools.cs.CoordinateSystemFactory ; 
-import org.geotools.cs.AxisInfo ; 
-import org.geotools.cs.Projection ; 
-import org.geotools.cs.Ellipsoid ; 
-import org.geotools.cs.HorizontalDatum ; 
-import org.geotools.cs.PrimeMeridian ;
-import org.geotools.units.Unit ; 
-
-
-// opengis dependencies
-import org.opengis.referencing.FactoryException ; 
+import org.geotools.cs.AxisInfo;
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemAuthorityFactory;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.Ellipsoid;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.HorizontalDatum;
+import org.geotools.cs.PrimeMeridian;
+import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.cs.Projection;
+import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
 
 
 /**

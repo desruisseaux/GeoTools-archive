@@ -22,11 +22,20 @@
  */
 package org.geotools.filter;
 
+import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
-import junit.framework.*;
-import org.geotools.feature.*;
-import java.util.logging.Logger;
 
 
 /**

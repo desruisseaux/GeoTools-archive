@@ -16,11 +16,13 @@
  */
 package org.geotools.gui.tools;
 
-import org.geotools.gui.tools.event.SelectedToolListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
+
 import javax.swing.event.EventListenerList;
+
+import org.geotools.gui.tools.event.SelectedToolListener;
 
 
 /**

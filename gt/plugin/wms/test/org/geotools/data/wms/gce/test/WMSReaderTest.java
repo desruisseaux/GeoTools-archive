@@ -22,7 +22,15 @@
  */
 package org.geotools.data.wms.gce.test;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import junit.framework.TestCase;
+
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
@@ -34,14 +42,7 @@ import org.geotools.referencing.IdentifiedObject;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**

@@ -20,19 +20,19 @@
 package org.geotools.renderer.j2d;
 
 // J2SE dependencies
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Canvas;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.HeadlessException;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.RoundRectangle2D;
 
-// JUnit dependencies
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-// Geotools dependencies
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-import org.geotools.units.Unit;
 import org.geotools.renderer.geom.GeometryCollection;
-
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 
 

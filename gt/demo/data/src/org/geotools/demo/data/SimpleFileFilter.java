@@ -17,6 +17,7 @@
 package org.geotools.demo.data;
 
 import java.io.File;
+
 import javax.swing.filechooser.FileFilter;
 
 class SimpleFileFilter extends FileFilter {

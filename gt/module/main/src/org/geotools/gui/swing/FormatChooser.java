@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,42 +20,39 @@
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import java.util.Set;
-import java.util.Map;
-import java.util.Date;
-import java.util.Locale;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.text.Format;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-
-// Swing and AWT dependencies
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JFrame;
-import javax.swing.JComboBox;
-import javax.swing.MutableComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
-// Geotools dependencies
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.MutableComboBoxModel;
+
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
 import org.geotools.measure.CoordinateFormat;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**
@@ -88,15 +85,15 @@ public class FormatChooser extends JPanel {
      * A set of default pattern for {@link AngleFormat}.
      */
     private static final String[] ANGLE_PATTERNS = new String[] {
-        "D.d°",
-        "D.dd°",
-        "D.ddd°",
-        "D°MM'",
-        "D°MM.m'",
-        "D°MM.mm'",
-        "D°MM.mmm'",
-        "D°MM'SS\"",
-        "D°MM'SS.s\""
+        "D.dï¿½",
+        "D.ddï¿½",
+        "D.dddï¿½",
+        "Dï¿½MM'",
+        "Dï¿½MM.m'",
+        "Dï¿½MM.mm'",
+        "Dï¿½MM.mmm'",
+        "Dï¿½MM'SS\"",
+        "Dï¿½MM'SS.s\""
     };
 
     /**

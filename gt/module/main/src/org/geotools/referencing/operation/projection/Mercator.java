@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -25,29 +25,23 @@
 package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
-import java.util.Map;
-import java.util.Locale;
-import java.util.HashMap;
-import java.util.Collection;
 import java.awt.geom.Point2D;
+import java.util.Collection;
+
 import javax.units.NonSI;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.measure.Latitude;
-import org.geotools.referencing.Identifier;
-import org.geotools.referencing.operation.MathTransformFactory;  // For Javadoc
-import org.geotools.referencing.operation.MathTransformProvider; // For Javadoc
 import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.MathTransformFactory;
+import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -78,7 +72,7 @@ import org.geotools.resources.cts.Resources;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
  * 
  * @version $Id$
- * @author André Gosselin
+ * @author Andrï¿½ Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -155,7 +149,7 @@ public class Mercator extends MapProjection {
     public static final class Provider2SP extends Provider {
         /**
          * The operation parameter descriptor for the {@link #standardParallel standard parallel}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new Identifier[] {

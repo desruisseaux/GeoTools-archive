@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,13 @@
 package org.geotools.io;
 
 // Standard I/O
-import java.io.Writer;
 import java.io.FilterWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
 
 
 /**

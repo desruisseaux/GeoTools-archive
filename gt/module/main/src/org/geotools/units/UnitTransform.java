@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,19 +29,18 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
-import java.io.Serializable;
+// Entrï¿½s/sorties
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 
-// Divers
-import org.geotools.util.WeakHashSet;
 import org.geotools.resources.Utilities;
+import org.geotools.util.WeakHashSet;
 
 
 /**
- * Représente une transformation entre deux unités. Par convention, tout
+ * Reprï¿½sente une transformation entre deux unitï¿½s. Par convention, tout
  * les objets <code>UnitTransform</code> sont toujours imutables. Il est
- * donc sécuritaire de partager plusieurs références vers le même objet.
+ * donc sï¿½curitaire de partager plusieurs rï¿½fï¿½rences vers le mï¿½me objet.
  *
  * @version 1.0
  * @author Martin Desruisseaux
@@ -55,26 +54,26 @@ public abstract class UnitTransform implements Serializable {
     private static final long serialVersionUID = 59496814325077015L;
 
     /**
-     * Banque des objets qui ont été précédemment créés et
-     * enregistrés par un appel à la méthode {@link #intern}.
+     * Banque des objets qui ont ï¿½tï¿½ prï¿½cï¿½demment crï¿½ï¿½s et
+     * enregistrï¿½s par un appel ï¿½ la mï¿½thode {@link #intern}.
      */
     private static final WeakHashSet pool=Prefix.pool;
 
     /**
-     * Unité selon laquelle seront
-     * exprimées les valeurs initiales.
+     * Unitï¿½ selon laquelle seront
+     * exprimï¿½es les valeurs initiales.
      */
     public final Unit fromUnit;
 
     /**
-     * Unité selon laquelle seront
-     * exprimées les valeurs finales.
+     * Unitï¿½ selon laquelle seront
+     * exprimï¿½es les valeurs finales.
      */
     public final Unit toUnit;
 
     /**
      * Construit un objet qui aura la charge de convertir
-     * des données exprimées selon les unités spécifiées.
+     * des donnï¿½es exprimï¿½es selon les unitï¿½s spï¿½cifiï¿½es.
      */
     /*protected*/ UnitTransform(final Unit fromUnit, final Unit toUnit) {
         this.fromUnit = fromUnit;
@@ -82,29 +81,29 @@ public abstract class UnitTransform implements Serializable {
     }
 
     /**
-     * Indique si cette transformation affine représente une transformation idéntitée.
-     * L'implémentation par défaut retourne <code>toUnit.equalsIgnoreSymbol(fromUnit)</code>.
+     * Indique si cette transformation affine reprï¿½sente une transformation idï¿½ntitï¿½e.
+     * L'implï¿½mentation par dï¿½faut retourne <code>toUnit.equalsIgnoreSymbol(fromUnit)</code>.
      */
     public boolean isIdentity() {
         return toUnit.equalsIgnoreSymbol(fromUnit);
     }
 
     /**
-     * Effectue la conversion d'unités d'une valeur.
-     * @param value Valeur exprimée selon les unités {@link #fromUnit}.
-     * @return Valeur exprimée selon les unités {@link #toUnit}.
+     * Effectue la conversion d'unitï¿½s d'une valeur.
+     * @param value Valeur exprimï¿½e selon les unitï¿½s {@link #fromUnit}.
+     * @return Valeur exprimï¿½e selon les unitï¿½s {@link #toUnit}.
      */
     public abstract double convert(double value);
 
     /**
-     * Effectue la conversion d'unités d'un tableaux de valeurs.
-     * L'implémentation par défaut appelle {@link #convert(double)}
-     * dans une boucle. Les classes dérivées devraient redéfinir cette
-     * méthode avec une implémentation plus efficace.
+     * Effectue la conversion d'unitï¿½s d'un tableaux de valeurs.
+     * L'implï¿½mentation par dï¿½faut appelle {@link #convert(double)}
+     * dans une boucle. Les classes dï¿½rivï¿½es devraient redï¿½finir cette
+     * mï¿½thode avec une implï¿½mentation plus efficace.
      *
-     * @param values Valeurs exprimées selon les unités {@link #fromUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #toUnit}.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #fromUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #toUnit}.
      */
     public void convert(final double[] values) {
         for (int i=0; i<values.length; i++) {
@@ -113,14 +112,14 @@ public abstract class UnitTransform implements Serializable {
     }
 
     /**
-     * Effectue la conversion d'unités d'un tableaux de valeurs.
-     * L'implémentation par défaut appelle {@link #convert(double)}
-     * dans une boucle. Les classes dérivées devraient redéfinir cette
-     * méthode avec une implémentation plus efficace.
+     * Effectue la conversion d'unitï¿½s d'un tableaux de valeurs.
+     * L'implï¿½mentation par dï¿½faut appelle {@link #convert(double)}
+     * dans une boucle. Les classes dï¿½rivï¿½es devraient redï¿½finir cette
+     * mï¿½thode avec une implï¿½mentation plus efficace.
      *
-     * @param values Valeurs exprimées selon les unités {@link #fromUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #toUnit}.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #fromUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #toUnit}.
      */
     public void convert(final float[] values) {
         for (int i=0; i<values.length; i++) {
@@ -129,21 +128,21 @@ public abstract class UnitTransform implements Serializable {
     }
 
     /**
-     * Effectue la conversion inverse d'unités d'une valeur.
-     * @param value Valeur exprimée selon les unités {@link #toUnit}.
-     * @return Valeur exprimée selon les unités {@link #fromUnit}.
+     * Effectue la conversion inverse d'unitï¿½s d'une valeur.
+     * @param value Valeur exprimï¿½e selon les unitï¿½s {@link #toUnit}.
+     * @return Valeur exprimï¿½e selon les unitï¿½s {@link #fromUnit}.
      */
     public abstract double inverseConvert(double value);
 
     /**
-     * Effectue la conversion inverse d'unités d'un tableaux de valeurs.
-     * L'implémentation par défaut appelle {@link #inverseConvert(double)}
-     * dans une boucle. Les classes dérivées devraient redéfinir cette
-     * méthode avec une implémentation plus efficace.
+     * Effectue la conversion inverse d'unitï¿½s d'un tableaux de valeurs.
+     * L'implï¿½mentation par dï¿½faut appelle {@link #inverseConvert(double)}
+     * dans une boucle. Les classes dï¿½rivï¿½es devraient redï¿½finir cette
+     * mï¿½thode avec une implï¿½mentation plus efficace.
      *
-     * @param values Valeurs exprimées selon les unités {@link #toUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #fromUnit}.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #toUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #fromUnit}.
      */
     public void inverseConvert(final double[] values) {
         for (int i=0; i<values.length; i++) {
@@ -152,14 +151,14 @@ public abstract class UnitTransform implements Serializable {
     }
 
     /**
-     * Effectue la conversion inverse d'unités d'un tableaux de valeurs.
-     * L'implémentation par défaut appelle {@link #inverseConvert(double)}
-     * dans une boucle. Les classes dérivées devraient redéfinir cette
-     * méthode avec une implémentation plus efficace.
+     * Effectue la conversion inverse d'unitï¿½s d'un tableaux de valeurs.
+     * L'implï¿½mentation par dï¿½faut appelle {@link #inverseConvert(double)}
+     * dans une boucle. Les classes dï¿½rivï¿½es devraient redï¿½finir cette
+     * mï¿½thode avec une implï¿½mentation plus efficace.
      *
-     * @param values Valeurs exprimées selon les unités {@link #toUnit}.
-     *        Elles seront converties sur place en valeurs exprimées selon
-     *        les unités {@link #fromUnit}.
+     * @param values Valeurs exprimï¿½es selon les unitï¿½s {@link #toUnit}.
+     *        Elles seront converties sur place en valeurs exprimï¿½es selon
+     *        les unitï¿½s {@link #fromUnit}.
      */
     public void inverseConvert(final float[] values) {
         for (int i=0; i<values.length; i++) {
@@ -169,15 +168,15 @@ public abstract class UnitTransform implements Serializable {
 
     /**
      * Retourne un exemplaire unique de cette transformation. Une banque de
-     * transformation, initialement vide, est maintenue de façon interne par
-     * la classe <code>UnitTransform</code>. Lorsque la méthode <code>intern</code>
-     * est appellée, elle recherchera une transformation égale à <code>this</code>
-     * au sens de la méthode {@link #equals}. Si une telle transformation fut trouvée,
-     * elle sera retournée. Sinon, la trsnsformation <code>this</code> sera ajoutée à
-     * la banque de données en utilisant une référence faible et cette méthode retournera
+     * transformation, initialement vide, est maintenue de faï¿½on interne par
+     * la classe <code>UnitTransform</code>. Lorsque la mï¿½thode <code>intern</code>
+     * est appellï¿½e, elle recherchera une transformation ï¿½gale ï¿½ <code>this</code>
+     * au sens de la mï¿½thode {@link #equals}. Si une telle transformation fut trouvï¿½e,
+     * elle sera retournï¿½e. Sinon, la trsnsformation <code>this</code> sera ajoutï¿½e ï¿½
+     * la banque de donnï¿½es en utilisant une rï¿½fï¿½rence faible et cette mï¿½thode retournera
      * <code>this</code>.
      *
-     * <p>De cette méthode il s'ensuit que pour deux transformations <var>u</var> et <var>v</var>,
+     * <p>De cette mï¿½thode il s'ensuit que pour deux transformations <var>u</var> et <var>v</var>,
      * la condition <code>u.intern()==v.intern()</code> sera vrai si et seulement si
      * <code>u.equals(v)</code> est vrai.</p>
      */
@@ -186,10 +185,10 @@ public abstract class UnitTransform implements Serializable {
     }
 
     /**
-     * Indique si cet objet est identique à l'objet spécifié.
-     * Les deux objets seront considirés identiques s'ils
-     * sont de la même classe et font les conversions à partir
-     * de et vers les mêmes unités.
+     * Indique si cet objet est identique ï¿½ l'objet spï¿½cifiï¿½.
+     * Les deux objets seront considirï¿½s identiques s'ils
+     * sont de la mï¿½me classe et font les conversions ï¿½ partir
+     * de et vers les mï¿½mes unitï¿½s.
      */
     public boolean equals(final Object o) {
         if (o!=null && getClass().equals(o.getClass())) {
@@ -200,16 +199,16 @@ public abstract class UnitTransform implements Serializable {
     }
 
     /**
-     * Retourne un code représentant
-     * cette transformation d'unités.
+     * Retourne un code reprï¿½sentant
+     * cette transformation d'unitï¿½s.
      */
     public int hashCode() {
         return fromUnit.hashCode() ^ toUnit.hashCode();
     }
 
     /**
-     * Retourne une chaîne de caractères représentant
-     * cette transformation. La chaîne sera de la forme
+     * Retourne une chaï¿½ne de caractï¿½res reprï¿½sentant
+     * cette transformation. La chaï¿½ne sera de la forme
      *
      * <code>UnitTransform[km/h&nbsp;-->&nbsp;m/s]</code>
      */
@@ -218,9 +217,9 @@ public abstract class UnitTransform implements Serializable {
     }
     
     /**
-     * Après la lecture d'une transformation, vérifie si cette transformation apparaît
-     * déjà dans la banque des unités <code>pool</code>. Si oui, l'exemplaire de la banque
-     * sera retourné plutôt que de garder inutilement la transformation courante comme
+     * Aprï¿½s la lecture d'une transformation, vï¿½rifie si cette transformation apparaï¿½t
+     * dï¿½jï¿½ dans la banque des unitï¿½s <code>pool</code>. Si oui, l'exemplaire de la banque
+     * sera retournï¿½ plutï¿½t que de garder inutilement la transformation courante comme
      * copie.
      */
     final Object readResolve() throws ObjectStreamException {

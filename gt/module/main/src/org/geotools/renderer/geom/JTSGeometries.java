@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,22 +20,18 @@
 package org.geotools.renderer.geom;
 
 // JTS dependencies
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.GeometryCollection;
-
-// OpenGIS dependencies
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.math.Statistics;
+import org.geotools.renderer.array.JTSArray;
+import org.geotools.resources.Utilities;
 import org.opengis.referencing.operation.TransformException;
 
-// Geotools dependencies
-import org.geotools.math.Statistics;
-import org.geotools.resources.Utilities;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.renderer.style.Style;  // needed for javadoc?
-import org.geotools.renderer.array.JTSArray;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -47,8 +43,8 @@ import org.geotools.renderer.array.JTSArray;
  */
 public class JTSGeometries extends org.geotools.renderer.geom.GeometryCollection {
     /**
-     * Numéro de version pour compatibilité avec des
-     * bathymétries enregistrées sous d'anciennes versions.
+     * Numï¿½ro de version pour compatibilitï¿½ avec des
+     * bathymï¿½tries enregistrï¿½es sous d'anciennes versions.
      */
     private static final long serialVersionUID = 1390543865440404086L;
 

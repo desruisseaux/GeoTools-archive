@@ -21,8 +21,8 @@
  *     UNITED KINDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -32,11 +32,14 @@
 package org.geotools.demo.gui;
 
 // Standards Java classes
-import java.awt.*;
-import java.awt.geom.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
-// Geotools classes
+import javax.swing.JFrame;
+
 import org.geotools.gui.swing.ZoomPane;
 import org.geotools.gui.swing.event.ZoomChangeEvent;
 import org.geotools.gui.swing.event.ZoomChangeListener;

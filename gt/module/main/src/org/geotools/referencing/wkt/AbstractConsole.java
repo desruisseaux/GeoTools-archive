@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,21 +20,18 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies
-import java.text.ParseException;
-import java.text.Format;
-import java.io.Writer;
-import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.text.Format;
+import java.text.ParseException;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;       // For javadoc
-import org.opengis.referencing.crs.CoordinateReferenceSystem; // For javadoc
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**

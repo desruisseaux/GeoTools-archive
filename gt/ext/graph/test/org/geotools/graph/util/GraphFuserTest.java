@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.build.basic.BasicGraphGenerator;
@@ -12,8 +14,6 @@ import org.geotools.graph.structure.GraphVisitor;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.util.graph.GraphFuser;
-
-import junit.framework.TestCase;
 
 public class GraphFuserTest extends TestCase {
   

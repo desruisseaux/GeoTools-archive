@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -21,14 +21,13 @@
 package org.geotools.measure;
 
 // J2SE dependencies
-import java.util.Locale;
-import java.text.Format;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.text.Format;
+import java.text.ParseException;
+import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.resources.ClassChanger;
 
 
@@ -86,7 +85,7 @@ public class Angle implements Comparable, Serializable {
     /**
      * Constructs a newly allocated <code>Angle</code> object that represents the angle value
      * represented by the string. The string should represents an angle in either fractional
-     * degrees (e.g. 45.5°) or degrees with minutes and seconds (e.g. 45°30').
+     * degrees (e.g. 45.5ï¿½) or degrees with minutes and seconds (e.g. 45ï¿½30').
      *
      * @param  string A string to be converted to an <code>Angle</code>.
      * @throws NumberFormatException if the string does not contain a parsable angle.
@@ -171,7 +170,7 @@ public class Angle implements Comparable, Serializable {
                 return angleFormat;
             }
         }
-        final Format newFormat = new AngleFormat("D°MM.m'", Locale.US);
+        final Format newFormat = new AngleFormat("Dï¿½MM.m'", Locale.US);
         format = new SoftReference(newFormat);
         return newFormat;
     }

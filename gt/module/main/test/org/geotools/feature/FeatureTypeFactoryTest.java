@@ -6,8 +6,11 @@
 
 package org.geotools.feature;
 
-import java.lang.reflect.*;
-import junit.framework.*;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import junit.framework.TestCase;
 
 /**
  * This simply tests and demonstrates how to make a new feature factory.

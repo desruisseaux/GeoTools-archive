@@ -18,9 +18,7 @@ import org.geotools.data.wms.request.AbstractGetLegendGraphicRequest;
 import org.geotools.data.wms.request.AbstractGetStylesRequest;
 import org.geotools.data.wms.request.AbstractPutStylesRequest;
 import org.geotools.data.wms.request.DescribeLayerRequest;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetLegendGraphicRequest;
-import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.request.GetStylesRequest;
 import org.geotools.data.wms.request.PutStylesRequest;
 

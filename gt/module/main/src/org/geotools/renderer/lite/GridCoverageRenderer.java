@@ -20,9 +20,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+
 import javax.media.jai.ImageMIPMap;
 
-// Geotools dependencies
 import org.geotools.ct.MathTransform2D;
 import org.geotools.gc.GridCoverage;
 import org.geotools.resources.geometry.XAffineTransform;

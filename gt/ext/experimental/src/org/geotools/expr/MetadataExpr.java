@@ -1,10 +1,9 @@
 package org.geotools.expr;
 
-import org.opengis.catalog.MetadataEntity;
-
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
+import org.opengis.catalog.MetadataEntity;
 
 /**
  * Retrive attribute from Feature.

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,28 +20,25 @@
 package org.geotools.resources;
 
 // Input/output
-import java.io.Reader;
-import java.io.Writer;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.UnsupportedCharsetException;
+import java.io.Writer;
 import java.lang.reflect.UndeclaredThrowableException;
-
-// Miscellaneous
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
-import java.util.regex.Pattern;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
-// Resources
-import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.resources.rsc.Resources;
 
 
 /**

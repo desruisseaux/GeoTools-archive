@@ -7,8 +7,10 @@
 
 package org.geotools.feature;
 
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import junit.framework.Test;
@@ -17,9 +19,6 @@ import junit.framework.TestSuite;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
-import java.util.Date;
 
 /**
  *

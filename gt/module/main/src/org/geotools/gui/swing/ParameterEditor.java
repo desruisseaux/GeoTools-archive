@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,63 +22,60 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-import java.util.MissingResourceException;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.text.NumberFormat;
-import java.text.DateFormat;
-import java.text.Format;
-
-import javax.swing.JList; // For javadoc
-import javax.swing.JTable;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JScrollPane;
-import javax.swing.JFormattedTextField;
-import javax.swing.table.TableModel;
-import javax.swing.table.AbstractTableModel;
-import java.awt.geom.AffineTransform;
-import java.awt.image.DataBuffer;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Container;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.geom.AffineTransform;
+import java.awt.image.DataBuffer;
+import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
 import javax.media.jai.KernelJAI;
 import javax.media.jai.LookupTableJAI;
-import javax.media.jai.OperationNode;
 import javax.media.jai.OperationDescriptor;
-import javax.media.jai.PerspectiveTransform;
+import javax.media.jai.OperationNode;
 import javax.media.jai.ParameterListDescriptor;
+import javax.media.jai.PerspectiveTransform;
 import javax.media.jai.RegistryElementDescriptor;
+import javax.media.jai.util.Range;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
-// Geotools dependencies
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
-import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
+import org.geotools.resources.XMath;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**
@@ -415,7 +412,7 @@ public class ParameterEditor extends JPanel {
         if (value instanceof Angle) {
             Singleton editor = (Singleton) getEditor(ANGLE);
             if (editor == null) {
-                editor = new Singleton(new AngleFormat("D°MM.mm'", getLocale()));
+                editor = new Singleton(new AngleFormat("Dï¿½MM.mm'", getLocale()));
                 addEditor(ANGLE, editor, false);
             }
             editor.setValue(value);

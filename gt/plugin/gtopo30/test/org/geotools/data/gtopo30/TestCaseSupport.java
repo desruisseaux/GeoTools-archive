@@ -8,9 +8,13 @@ package org.geotools.data.gtopo30;
 
 import java.io.File;
 import java.io.InputStream;
-import junit.framework.*;
-import java.net.*;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.channels.ReadableByteChannel;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  *

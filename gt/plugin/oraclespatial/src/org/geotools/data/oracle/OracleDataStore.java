@@ -7,19 +7,13 @@
 package org.geotools.data.oracle;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import oracle.jdbc.OracleConnection;
-//import oracle.sdoapi.OraSpatialManager;
-//import oracle.sdoapi.util.GeometryMetaData;
-
-import org.geotools.data.AttributeReader;
-import org.geotools.data.AttributeWriter;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Transaction;
@@ -28,10 +22,10 @@ import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
-import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.oracle.attributeio.SDOAttributeIO;
 import org.geotools.feature.AttributeType;

@@ -22,15 +22,16 @@ package org.geotools.graph.build.line;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineSegment;
-
 import org.geotools.graph.build.GraphBuilder;
+import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.build.basic.BasicGraphBuilder;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineSegment;
 
 /**
  * An implementation of GraphGenerator used to generate a graph representing a

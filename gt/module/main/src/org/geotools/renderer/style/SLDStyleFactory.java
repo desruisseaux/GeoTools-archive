@@ -16,35 +16,6 @@
  */
 package org.geotools.renderer.style;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import org.apache.batik.transcoder.SVGAbstractTranscoder;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
-import org.geotools.renderer.lite.CustomGlyphRenderer;
-import org.geotools.renderer.lite.GlyphRenderer;
-import org.geotools.renderer.lite.SVGGlyphRenderer;
-import org.geotools.styling.ExternalGraphic;
-import org.geotools.styling.Fill;
-import org.geotools.styling.Font;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.Halo;
-import org.geotools.styling.LabelPlacement;
-import org.geotools.styling.LinePlacement;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Mark;
-import org.geotools.styling.PointPlacement;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.StyleAttributeExtractor;
-import org.geotools.styling.Symbol;
-import org.geotools.styling.Symbolizer;
-import org.geotools.styling.TextMark;
-import org.geotools.styling.TextSymbolizer;
-import org.w3c.dom.Document;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Canvas;
@@ -81,8 +52,40 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
 import javax.media.jai.util.Range;
+
+import org.apache.batik.transcoder.SVGAbstractTranscoder;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.geotools.feature.Feature;
+import org.geotools.filter.Expression;
+import org.geotools.renderer.lite.CustomGlyphRenderer;
+import org.geotools.renderer.lite.GlyphRenderer;
+import org.geotools.renderer.lite.SVGGlyphRenderer;
+import org.geotools.styling.ExternalGraphic;
+import org.geotools.styling.Fill;
+import org.geotools.styling.Font;
+import org.geotools.styling.Graphic;
+import org.geotools.styling.Halo;
+import org.geotools.styling.LabelPlacement;
+import org.geotools.styling.LinePlacement;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.Mark;
+import org.geotools.styling.PointPlacement;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.StyleAttributeExtractor;
+import org.geotools.styling.Symbol;
+import org.geotools.styling.Symbolizer;
+import org.geotools.styling.TextMark;
+import org.geotools.styling.TextSymbolizer;
+import org.w3c.dom.Document;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**

@@ -18,12 +18,9 @@
  */
 package org.geotools.gce.geotiff;
 
-import java.io.IOException ; 
-import java.io.StringWriter ; 
-import java.io.PrintWriter ; 
-import java.util.HashMap ; 
-import java.util.Map ; 
-import javax.imageio.metadata.IIOMetadata ; 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * This exception is thrown when the problem with reading the GeoTiff

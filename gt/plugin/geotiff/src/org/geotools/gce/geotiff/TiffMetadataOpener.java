@@ -18,23 +18,20 @@
  */
 package org.geotools.gce.geotiff;
 
-import javax.swing.* ; 
-import javax.imageio.* ; 
-import javax.imageio.metadata.* ; 
-import javax.imageio.stream.* ; 
-import java.util.* ; 
-import java.sql.DriverManager ; 
-import java.sql.Connection ;
-import java.io.IOException ;
-import java.sql.SQLException ; 
-import org.opengis.referencing.FactoryException ; 
-import org.geotools.cs.CoordinateSystemAuthorityFactory ;
-import org.geotools.cs.CoordinateSystemModifiedEPSGFactory ; 
-import org.geotools.cs.CoordinateSystem ; 
-import org.geotools.cs.CoordinateSystemFactory ;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
+import javax.imageio.metadata.IIOMetadata;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
+import javax.swing.JFileChooser;
 
-import javax.media.jai.* ; 
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemAuthorityFactory;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.CoordinateSystemModifiedEPSGFactory;
+import org.opengis.referencing.FactoryException;
 //import com.sun.media.jai.codec.* ; 
 
 /**

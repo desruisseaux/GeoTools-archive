@@ -16,14 +16,10 @@
  */
 package org.geotools.data;
 
-import org.geotools.data.AbstractDataStore;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.Transaction;
+import java.io.IOException;
+
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
-import java.io.IOException;
 
 
 /**

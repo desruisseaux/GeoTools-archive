@@ -1,5 +1,7 @@
 package org.geotools.graph.linegraph;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.build.line.BasicLineGraphGenerator;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
@@ -9,8 +11,6 @@ import org.geotools.graph.structure.Node;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineSegment;
-
-import junit.framework.TestCase;
 
 public class LineGraphGeneratorTest extends TestCase {
   

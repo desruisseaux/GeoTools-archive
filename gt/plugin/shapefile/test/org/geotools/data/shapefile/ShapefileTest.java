@@ -7,18 +7,23 @@
 
 package org.geotools.data.shapefile;
 
-import junit.framework.*;
-import java.net.*;
-import com.vividsolutions.jts.geom.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
-import org.geotools.data.shapefile.shp.*;
-import org.geotools.feature.*;
+import org.geotools.data.shapefile.shp.IndexFile;
+import org.geotools.data.shapefile.shp.ShapefileReader;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author Ian Schneider

@@ -16,6 +16,14 @@
  */
 package org.geotools.data.postgis;
 
+import java.io.IOException;
+
+import junit.framework.TestCase;
+
+import org.geotools.data.postgis.attributeio.WKBEncoder;
+import org.wkb4j.engine.WKBParser;
+import org.wkb4j.jts.JTSFactory;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateFilter;
 import com.vividsolutions.jts.geom.Geometry;
@@ -24,11 +32,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import junit.framework.TestCase;
-import org.geotools.data.postgis.attributeio.WKBEncoder;
-import org.wkb4j.engine.WKBParser;
-import org.wkb4j.jts.JTSFactory;
-import java.io.IOException;
 
 
 /**

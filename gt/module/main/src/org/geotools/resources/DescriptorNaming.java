@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,25 +20,21 @@
 package org.geotools.resources;
 
 // Collections
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Arrays;
+import java.util.Map;
 
-// Reflection
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-
-// Parameters and JAI utilities
 import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListImpl;
 import javax.media.jai.ParameterListDescriptor;
+import javax.media.jai.ParameterListImpl;
 import javax.media.jai.util.CaselessStringKey;
 
-// Resources
-import org.geotools.units.Unit;
-import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.resources.rsc.Resources;
+import org.geotools.units.Unit;
 
 
 /**

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,49 +21,40 @@
 package org.geotools.gui.swing;
 
 // Graphics and geometry
-import java.awt.Font;
-import java.awt.Shape;
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.Stroke;
-import java.awt.Rectangle;
-import java.awt.Graphics2D;
 import java.awt.BasicStroke;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
-
-// Components and events
-import java.awt.Container;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentAdapter;
-
-// Collections
-import java.util.Set;
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.NoSuchElementException;
-
-// Logging and miscellaneous
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
 import javax.vecmath.MismatchedSizeException;
 
-// Geotools dependencies
-import org.geotools.axis.Axis2D;
-import org.geotools.axis.Graduation;
 import org.geotools.axis.AbstractGraduation;
+import org.geotools.axis.Axis2D;
 import org.geotools.renderer.array.GenericArray;
 import org.geotools.resources.XMath;
 

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,34 +33,30 @@
 package org.geotools.io.image;
 
 // Input/output
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.text.ParseException;
-import javax.imageio.ImageReader;
-import javax.imageio.IIOException;
-
-// Image
-import java.awt.image.Raster;
-import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import java.awt.image.DataBufferFloat;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.spi.ImageReaderSpi;
-
-// Miscellaneous
 import java.awt.Point;
 import java.awt.Rectangle;
-import javax.media.jai.util.Range;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferFloat;
+import java.awt.image.Raster;
+import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Locale;
 
-// Resources
+import javax.imageio.IIOException;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.media.jai.util.Range;
+
 import org.geotools.io.LineFormat;
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 
 
 /**
@@ -399,7 +395,7 @@ public class TextMatrixImageReader extends TextImageReader {
      *     public MyCustomSpi()
      *     {
      *         super("MyCustomFormat", "text/matrix");
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
+     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Dï¿½veloppement";
      *         {@link #version    version}    = "1.0";
      *         {@link #locale     locale}     = Locale.US;
      *         {@link #charset    charset}    = Charset.forName("ISO-LATIN-1");
@@ -478,10 +474,10 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         
         /**
-         * Vérifie si la ligne a un nombre de valeurs acceptable. Cette méthode est appelée
+         * Vï¿½rifie si la ligne a un nombre de valeurs acceptable. Cette mï¿½thode est appelï¿½e
          * automatiquement par {@link #canDecodeLine} avec en argument le nombre de valeurs
-         * dans une des premières lignes trouvées dans la source. Cette indication n'est
-         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de façon
+         * dans une des premiï¿½res lignes trouvï¿½es dans la source. Cette indication n'est
+         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de faï¿½on
          * conservative.
          */
         Boolean isValueCountAcceptable(final int count) {

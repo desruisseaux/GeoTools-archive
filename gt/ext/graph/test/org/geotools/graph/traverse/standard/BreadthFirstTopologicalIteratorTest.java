@@ -1,7 +1,8 @@
 package org.geotools.graph.traverse.standard;
 
-import org.geotools.graph.traverse.standard.BreadthFirstTopologicalIterator;
 import java.util.Iterator;
+
+import junit.framework.TestCase;
 
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
@@ -12,8 +13,6 @@ import org.geotools.graph.structure.Node;
 import org.geotools.graph.traverse.GraphTraversal;
 import org.geotools.graph.traverse.basic.BasicGraphTraversal;
 import org.geotools.graph.traverse.basic.CountingWalker;
-
-import junit.framework.TestCase;
 
 public class BreadthFirstTopologicalIteratorTest extends TestCase {
   private GraphBuilder m_builder;

@@ -16,16 +16,17 @@
 
 package org.geotools.data.tiger;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
 
 
 /**

@@ -26,7 +26,9 @@ import java.sql.Statement;
 import java.util.NoSuchElementException;
 import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
+
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.data.DataTestCase;

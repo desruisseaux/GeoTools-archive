@@ -20,16 +20,15 @@ package org.geotools.referencing;
 
 // J2SE dependencies and extensions
 import java.awt.Shape;
-import java.awt.geom.PathIterator;
 import java.awt.geom.IllegalPathStateException;
+import java.awt.geom.PathIterator;
+
 import javax.units.SI;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
 import org.geotools.referencing.datum.Ellipsoid;
 
 

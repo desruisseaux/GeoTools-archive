@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,21 +23,18 @@
 package org.geotools.metadata.quality;
 
 // J2SE direct dependencies
-import java.util.List;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
-// OpenGIS direct dependencies
-import org.opengis.metadata.Identifier;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.quality.EvaluationMethodType;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.quality.Result;
-
-// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
 import org.geotools.util.CheckedArrayList;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.quality.EvaluationMethodType;
+import org.opengis.metadata.quality.Result;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -45,7 +42,7 @@ import org.geotools.util.CheckedArrayList;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class Element extends MetadataEntity implements org.opengis.metadata.quality.Element {
     /**

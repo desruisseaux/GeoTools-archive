@@ -6,11 +6,9 @@
 
 package org.geotools.data.shapefile;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 
 import junit.framework.AssertionFailedError;
 
@@ -22,6 +20,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  *

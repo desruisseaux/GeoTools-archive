@@ -16,10 +16,16 @@
  */
 package org.geotools.data.oracle.sdo;
 
+import java.lang.reflect.Array;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
-
-//import com.vividsolutions.jts.geom.CoordinateList;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Envelope;
@@ -33,16 +39,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import java.lang.reflect.Array;
-import java.text.Format;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Logger;
-
-import org.geotools.data.DataSourceException;
 
 
 /**
@@ -101,7 +97,7 @@ public final class SDO {
      * </ul>
      * 
      * <p>
-     * Definition provided by Oracle Spatial User’s Guide and Reference.
+     * Definition provided by Oracle Spatial Userï¿½s Guide and Reference.
      * </p>
      *
      * @param geom

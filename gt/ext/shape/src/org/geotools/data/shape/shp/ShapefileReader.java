@@ -27,7 +27,6 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.util.logging.Logger;
 
 import org.geotools.resources.NIOUtilities;
 

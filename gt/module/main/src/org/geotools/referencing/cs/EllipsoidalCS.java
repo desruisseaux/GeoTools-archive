@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,12 @@ package org.geotools.referencing.cs;
 
 // J2SE dependencies and extensions
 import java.util.Map;
-import javax.units.SI;
-import javax.units.NonSI;
-import javax.units.Unit;
-import javax.units.Converter;
 
-// OpenGIS dependencies
+import javax.units.Converter;
+import javax.units.NonSI;
+import javax.units.SI;
+import javax.units.Unit;
+
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;

@@ -16,8 +16,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.data.jdbc.fidmapper.FIDMapper;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -25,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 
 
 /**

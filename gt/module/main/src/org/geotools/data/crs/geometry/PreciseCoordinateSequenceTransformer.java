@@ -1,15 +1,8 @@
 package org.geotools.data.crs.geometry;
 
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.util.ArrayList;
-
 import org.geotools.ct.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.DefaultCoordinateSequenceFactory;

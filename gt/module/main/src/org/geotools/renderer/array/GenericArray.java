@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,18 +35,18 @@ package org.geotools.renderer.array;
 
 // J2SE and vecmath dependencies
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.AffineTransform;
-import javax.vecmath.MismatchedSizeException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
-// Geotools dependencies
-import org.geotools.resources.XArray;
+import javax.vecmath.MismatchedSizeException;
+
 import org.geotools.renderer.geom.CompressionLevel;
+import org.geotools.resources.XArray;
 import org.geotools.resources.geometry.XRectangle2D;
 
 
@@ -304,13 +304,13 @@ public class GenericArray extends PointArray implements RandomAccess {
     }
     
     /**
-     * Retourne un tableau enveloppant les mêmes points que le tableau courant,
-     * mais des index <code>lower</code> inclusivement jusqu'à <code>upper</code>
-     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-à-dire si
-     * <code>lower==upper</code>), alors cette méthode retourne <code>null</code>.
+     * Retourne un tableau enveloppant les mï¿½mes points que le tableau courant,
+     * mais des index <code>lower</code> inclusivement jusqu'ï¿½ <code>upper</code>
+     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-ï¿½-dire si
+     * <code>lower==upper</code>), alors cette mï¿½thode retourne <code>null</code>.
      *
-     * @param lower Index du premier point à prendre en compte.
-     * @param upper Index suivant celui du dernier point à prendre en compte.
+     * @param lower Index du premier point ï¿½ prendre en compte.
+     * @param upper Index suivant celui du dernier point ï¿½ prendre en compte.
      */
     public PointArray subarray(int lower, int upper) {
         lower += this.lower;
@@ -321,7 +321,7 @@ public class GenericArray extends PointArray implements RandomAccess {
     }
 
     /**
-     * Insère les données (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spécifié.
+     * Insï¿½re les donnï¿½es (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spï¿½cifiï¿½.
      */
     public PointArray insertAt(int index, float[] toMerge, int lower, int upper, boolean reverse) {
         throw new UnsupportedOperationException();
@@ -335,7 +335,7 @@ public class GenericArray extends PointArray implements RandomAccess {
     }
 
     /**
-     * Retourne un tableau immutable qui contient les mêmes données que celui-ci.
+     * Retourne un tableau immutable qui contient les mï¿½mes donnï¿½es que celui-ci.
      */
     public PointArray getFinal(final CompressionLevel level) {
         if (level!=null && count()>=8 && Math.max(x.type(), y.type())>=2) {

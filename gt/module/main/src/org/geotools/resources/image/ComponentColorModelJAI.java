@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,15 +21,14 @@ package org.geotools.resources.image;
 
 // J2SE dependencies
 import java.awt.color.ColorSpace;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.ComponentSampleModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.SampleModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.ComponentSampleModel; // For Javadoc
 
-// JAI dependencies
-import javax.media.jai.iterator.RectIter;      // For Javadoc
-import javax.media.jai.FloatDoubleColorModel;  // For Javadoc
 import javax.media.jai.ComponentSampleModelJAI;
+import javax.media.jai.FloatDoubleColorModel;
+import javax.media.jai.iterator.RectIter;
 
 
 /**

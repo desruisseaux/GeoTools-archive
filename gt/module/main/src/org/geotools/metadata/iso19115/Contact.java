@@ -1,10 +1,9 @@
 package org.geotools.metadata.iso19115;
 
-import org.opengis.util.InternationalString;
-
 import org.opengis.metadata.citation.Address;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.citation.Telephone;
+import org.opengis.util.InternationalString;
 
 public class Contact extends MetaData implements
 	org.opengis.metadata.citation.Contact {

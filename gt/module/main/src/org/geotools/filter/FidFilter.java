@@ -16,8 +16,9 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import java.util.Collection;
+
+import org.geotools.feature.Feature;
 
 /**
  * Defines a feature ID filter, which holds a list of feature IDs. This filter

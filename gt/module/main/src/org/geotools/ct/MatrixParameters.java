@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,16 +23,14 @@ package org.geotools.ct;
 import java.awt.Point;
 import java.util.Arrays;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
+import javax.media.jai.EnumeratedParameter;
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
-import javax.media.jai.EnumeratedParameter;
+import javax.media.jai.util.Range;
 
-// Geotools dependencies and resources
 import org.geotools.pt.Matrix;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 /**
  * A matrix editable as a {@link ParameterList} object. Changes to the {@link Matrix} are

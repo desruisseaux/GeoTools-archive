@@ -1,11 +1,11 @@
 package org.geotools.graph.util;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.basic.BasicGraphBuilder;
 import org.geotools.graph.util.graph.CycleDetector;
-
-import junit.framework.TestCase;
 
 public class CycleDetectorTest extends TestCase {
   private GraphBuilder m_builder;

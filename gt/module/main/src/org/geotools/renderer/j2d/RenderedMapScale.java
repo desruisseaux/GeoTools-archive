@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,41 +21,36 @@
 package org.geotools.renderer.j2d;
 
 // J2SE dependencies
-import java.awt.Font;
-import java.awt.Paint;
 import java.awt.Color;
-import java.awt.Stroke;
-import java.awt.Insets;
-import java.awt.Rectangle;
+import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
+import java.awt.Insets;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.Ellipsoid;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.ct.MathTransform2D;
+import org.geotools.resources.CTSUtilities;
+import org.geotools.resources.XMath;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
 import org.geotools.units.Unit;
 import org.geotools.units.UnitException;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.AxisOrientation;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.ProjectedCoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.resources.XMath;
-import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -636,7 +631,7 @@ public class RenderedMapScale extends RenderedLegend {
             if ((i&1) != 0) {
                 /*
                  * Dans un rectangle sur deux, on dessinera un
-                 * rectangle noir à l'intérieur du rectangle blanc.
+                 * rectangle noir ï¿½ l'intï¿½rieur du rectangle blanc.
                  */
                 int space   = thickness-thicknessSub;
                 rect.height = thicknessSub;

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,32 +22,31 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // J2SE dependencies
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Component;
+import java.awt.Container;
+
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JComponent;
 
-// JTS dependencies
-import com.vividsolutions.jts.geom.Geometry;
-
-// Geotools dependencies
 import org.geotools.gc.GridCoverage;
 import org.geotools.renderer.geom.JTSGeometries;
-import org.geotools.renderer.j2d.RenderedLayer;
-import org.geotools.renderer.j2d.RenderedMapScale;
-import org.geotools.renderer.j2d.RenderedGridMarks;
 import org.geotools.renderer.j2d.RenderedGeometries;
 import org.geotools.renderer.j2d.RenderedGridCoverage;
+import org.geotools.renderer.j2d.RenderedGridMarks;
+import org.geotools.renderer.j2d.RenderedLayer;
+import org.geotools.renderer.j2d.RenderedMapScale;
 import org.geotools.resources.Utilities;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

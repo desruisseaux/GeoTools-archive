@@ -3,6 +3,8 @@ package org.geotools.graph.path;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.basic.BasicGraphBuilder;
@@ -13,7 +15,6 @@ import org.geotools.graph.traverse.GraphTraversal;
 import org.geotools.graph.traverse.GraphWalker;
 import org.geotools.graph.traverse.basic.BasicGraphTraversal;
 import org.geotools.graph.traverse.standard.NoBifurcationIterator;
-import junit.framework.TestCase;
 
 public class WalkTest extends TestCase {
  

@@ -16,27 +16,23 @@
  */
 package org.geotools.gce.arcgrid;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Color;
+import java.io.IOException;
+import java.io.Reader;
 
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.gc.GridCoverage;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.Parameter;
 import org.opengis.coverage.MetadataNameNotFoundException;
-import org.geotools.data.coverage.grid.Format;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.io.Reader;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * This class can read an arc grid data source and create a grid coverage from

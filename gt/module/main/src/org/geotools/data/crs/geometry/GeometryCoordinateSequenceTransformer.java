@@ -1,6 +1,5 @@
 package org.geotools.data.crs.geometry;
 
-import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 

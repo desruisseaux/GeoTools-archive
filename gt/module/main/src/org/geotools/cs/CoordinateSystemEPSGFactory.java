@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,48 +24,38 @@
 package org.geotools.cs;
 
 // Database connection
-import java.sql.Driver;
-import java.sql.ResultSet;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-
-// Preferences and reflection
-import java.util.prefs.Preferences;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-
-// Logging
-import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
-
-// Collections and iterators
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.StringTokenizer;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
-// JAI dependencies
 import javax.media.jai.ParameterList;
 import javax.media.jai.util.CaselessStringKey;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Resources
+import org.geotools.measure.AngleFormat;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.geotools.units.Unit;
 import org.geotools.util.MonolineFormatter;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.measure.AngleFormat; // For Javadoc
+import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -91,7 +81,7 @@ import org.geotools.measure.AngleFormat; // For Javadoc
  * The EPSG database express many angles in some multi-radix units. For example, a lot of EPSG's
  * angles are coded in the following format: <cite>sign - degrees - decimal point - minutes (two
  * digits) - integer seconds (two digits) - fraction of seconds (any precision)</cite>. According
- * this convention, the angle <code>40°30'N</code> would be coded as <code>40.30</code>
+ * this convention, the angle <code>40ï¿½30'N</code> would be coded as <code>40.30</code>
  * (sexagesimal degree) instead of <code>40.5</code> (fractional degree). Unfortunatly,
  * sexagesimal degrees have the following inconvenients:
  *
@@ -111,7 +101,7 @@ import org.geotools.measure.AngleFormat; // For Javadoc
  * the {@link #replaceAxisUnit} method.
  *
  * @version $Id$
- * @author Yann Cézard
+ * @author Yann Cï¿½zard
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */

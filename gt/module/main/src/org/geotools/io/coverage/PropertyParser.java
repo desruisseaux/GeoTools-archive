@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,65 +22,66 @@ package org.geotools.io.coverage;
 // Images
 import java.awt.Image;
 import java.awt.image.RenderedImage;
-import javax.imageio.IIOException;
-
-// Properties and parameters
-import javax.media.jai.DeferredData;
-import javax.media.jai.ParameterList;
-import javax.media.jai.PropertySource;
-import javax.media.jai.DeferredProperty;
-
-// Input/output
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
-
-// Formatting
-import java.util.Date;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-// Collections
-import java.util.Set;
-import java.util.Map;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
-
-// Logging
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// Miscellaneous
-import java.util.Locale;
+import javax.imageio.IIOException;
+import javax.media.jai.DeferredData;
+import javax.media.jai.DeferredProperty;
+import javax.media.jai.ParameterList;
+import javax.media.jai.PropertySource;
 
-// OpenGIS dependencies
+import org.geotools.cs.AxisInfo;
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.Ellipsoid;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.HorizontalDatum;
+import org.geotools.cs.PrimeMeridian;
+import org.geotools.cs.Projection;
+import org.geotools.cs.TemporalCoordinateSystem;
+import org.geotools.ct.CoordinateTransformation;
+import org.geotools.ct.CoordinateTransformationFactory;
+import org.geotools.ct.MissingParameterException;
+import org.geotools.cv.SampleDimension;
+import org.geotools.gc.GridCoverage;
+import org.geotools.gc.GridRange;
+import org.geotools.io.TableWriter;
+import org.geotools.measure.AngleFormat;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.pt.Envelope;
+import org.geotools.resources.CTSUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.units.Unit;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies (CTS and GCS)
-import org.geotools.pt.*;
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-import org.geotools.gc.GridRange;
-import org.geotools.gc.GridCoverage;
-import org.geotools.cv.SampleDimension;
-import org.geotools.measure.AngleFormat;
-import org.geotools.measure.Longitude;
-import org.geotools.measure.Latitude;
-
-// Resources
-import org.geotools.units.Unit;
-import org.geotools.io.TableWriter;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
 
 
 /*
@@ -150,7 +151,7 @@ public class PropertyParser {
      * @task TODO: Need a more general way to set unit symbols once the Unit API is completed.
      */
     private static final String[] DEGREES = {
-        "degree", "degrees", "deg", "°"
+        "degree", "degrees", "deg", "ï¿½"
     };
 
     /**
@@ -1997,7 +1998,7 @@ public class PropertyParser {
         }
         buffer.write(lineSeparator);
         try {
-            final String     pattern = "DD°MM'SS\"";
+            final String     pattern = "DDï¿½MM'SS\"";
             final Envelope  envelope = getGeographicEnvelope();
             final AngleFormat format = (userLocale!=null) ? new AngleFormat(pattern, userLocale) :
                                                             new AngleFormat(pattern);

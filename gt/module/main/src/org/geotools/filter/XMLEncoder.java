@@ -16,6 +16,12 @@
  */
 package org.geotools.filter;
 
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -25,13 +31,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-// J2SE dependencies
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
 
 
 /**

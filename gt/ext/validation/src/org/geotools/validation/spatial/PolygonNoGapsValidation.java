@@ -22,15 +22,11 @@
  */
 package org.geotools.validation.spatial;
 
-import java.util.Map;
-
-import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 

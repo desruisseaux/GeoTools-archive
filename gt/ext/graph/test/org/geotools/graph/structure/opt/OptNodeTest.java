@@ -2,8 +2,9 @@ package org.geotools.graph.structure.opt;
 
 import java.util.Iterator;
 
-import org.geotools.graph.structure.Edge;
 import junit.framework.TestCase;
+
+import org.geotools.graph.structure.Edge;
 
 public class OptNodeTest extends TestCase {
   private OptNode m_node;

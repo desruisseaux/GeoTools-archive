@@ -20,6 +20,8 @@
  */
 package org.geotools.validation;
 
+import java.util.logging.Logger;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 
@@ -27,8 +29,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-
-import java.util.logging.Logger;
 
 
 /**

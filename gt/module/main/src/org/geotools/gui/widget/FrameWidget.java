@@ -16,6 +16,7 @@
  */
 package org.geotools.gui.widget;
 
+import java.awt.Component;
 import java.awt.event.WindowListener;
 
 

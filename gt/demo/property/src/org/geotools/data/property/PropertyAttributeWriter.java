@@ -1,9 +1,14 @@
 package org.geotools.data.property;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.data.AttributeWriter;
+import org.geotools.data.DataUtilities;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 
 import com.vividsolutions.jts.geom.Geometry;
 /**

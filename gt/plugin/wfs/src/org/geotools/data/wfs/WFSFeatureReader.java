@@ -16,6 +16,16 @@
  */
 package org.geotools.data.wfs;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
@@ -26,15 +36,6 @@ import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.gml.FCBuffer;
 import org.geotools.xml.gml.GMLComplexTypes;
 import org.xml.sax.SAXException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 
 /**

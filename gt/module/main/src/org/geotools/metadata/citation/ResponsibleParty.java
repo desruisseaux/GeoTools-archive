@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,14 +23,12 @@
 package org.geotools.metadata.citation;
 
 // OpenGIS dependencies
-import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.citation.Contact;
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.metadata.citation.Contact;
+import org.opengis.metadata.citation.Role;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -39,7 +37,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class ResponsibleParty extends MetadataEntity
        implements org.opengis.metadata.citation.ResponsibleParty

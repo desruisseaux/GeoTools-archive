@@ -22,13 +22,17 @@
  */
 package org.geotools.data.shapefile.dbf;
 
-import java.io.*;
-import java.nio.channels.*;
-import java.nio.*;
-import java.text.*;
-import org.geotools.resources.NIOUtilities;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.WritableByteChannel;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
-import java.util.*;
+import org.geotools.resources.NIOUtilities;
 
 
 /** A DbaseFileReader is used to read a dbase III format file.

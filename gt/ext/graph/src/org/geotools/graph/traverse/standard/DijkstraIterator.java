@@ -29,7 +29,6 @@ import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.traverse.GraphTraversal;
 import org.geotools.graph.traverse.basic.SourceGraphIterator;
-
 import org.geotools.graph.util.PriorityQueue;
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,17 +20,16 @@
 package org.geotools.gc;
 
 // J2SE dependencies
-import java.awt.Point;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 
-// Geotools dependencies
+import org.geotools.cs.FittedCoordinateSystem;
+import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.cs.FittedCoordinateSystem; // For javadoc
-import org.geotools.cs.GeographicCoordinateSystem; // For javadoc
 
 
 /**
@@ -543,7 +542,7 @@ public class LocalizationGrid {
          * following identities instead:
          *
          *           1 + 2 + 3 ... + n    =    n*(n+1)/2              (arithmetic series)
-         *        1² + 2² + 3² ... + n²   =    n*(n+0.5)*(n+1)/3
+         *        1ï¿½ + 2ï¿½ + 3ï¿½ ... + nï¿½   =    n*(n+0.5)*(n+1)/3
          */
         double x,y,z, xx,yy, xy, zx,zy;
         z = zx = zy = 0; // To be computed in the loop.

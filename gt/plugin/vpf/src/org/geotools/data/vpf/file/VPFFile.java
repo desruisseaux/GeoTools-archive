@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.geotools.data.vpf.VPFColumn;
-import org.geotools.data.vpf.exc.VPFDataException;
 import org.geotools.data.vpf.exc.VPFHeaderFormatException;
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.ifc.FileConstants;

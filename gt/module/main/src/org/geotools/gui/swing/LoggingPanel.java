@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,48 +33,41 @@
 package org.geotools.gui.swing;
 
 // Swing dependencies
-import javax.swing.JTable;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JDialog;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
 import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.table.TableModel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ChangeEvent;
+import javax.swing.table.TableModel;
 
-// AWT
-import java.awt.Color;
-import java.awt.Frame;
-import java.awt.Dialog;
-import java.awt.Component;
-import java.awt.BorderLayout;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
-
-// Logging
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-
-// Collections
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-
-// Resources
-import org.geotools.resources.XArray;
-import org.geotools.resources.gui.Resources;
-import org.geotools.resources.gui.ResourceKeys;
 import org.geotools.resources.SwingUtilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**

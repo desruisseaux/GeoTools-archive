@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,45 +33,40 @@
 package org.geotools.io.image;
 
 // Input/output
-import java.io.IOException;
-import java.io.EOFException;
-import javax.imageio.IIOException;
-import javax.imageio.stream.ImageInputStream;
-
-// Images
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferShort;
-import java.awt.image.DataBufferUShort;
-import java.awt.image.DataBufferFloat;
-import java.awt.image.DataBufferDouble;
-
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.ColorModel;
-import java.awt.image.SampleModel;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import java.awt.image.ComponentColorModel;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
-
-// Miscellaneous
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Locale;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferDouble;
+import java.awt.image.DataBufferFloat;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferShort;
+import java.awt.image.DataBufferUShort;
+import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
+import java.io.EOFException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
+import javax.imageio.IIOException;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.util.Range;
 
-// Resources
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ComponentColorModelJAI;
 
 
@@ -115,9 +110,9 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  */
 public class RawBinaryImageReader extends SimpleImageReader {
     /**
-     * Valeurs minimales et maximales des données lues dans chaque
+     * Valeurs minimales et maximales des donnï¿½es lues dans chaque
      * bandes, ou <code>null</code> si ces valeurs n'ont pas encore
-     * été déterminées.
+     * ï¿½tï¿½ dï¿½terminï¿½es.
      */
     private Range[] ranges;
     
@@ -156,7 +151,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
     }
     
     /**
-     * Efface les information qui étaient conservées en mémoire.
+     * Efface les information qui ï¿½taient conservï¿½es en mï¿½moire.
      */
     private void clear() {
         ranges = null;
@@ -749,7 +744,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
      *     public CustomBinaryImageReaderSpi()
      *     {
      *         super("MyRAW", "image/raw-perso");
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
+     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Dï¿½veloppement";
      *         {@link #version    version}    = "1.0";
      *         {@link #dataType   dataType}   = {@link DataBuffer#TYPE_SHORT};
      *         {@link #imageSize  imageSize}  = new {@link Dimension}(400,600);
@@ -837,7 +832,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
             suffixes        = EXTENSIONS;
             inputTypes      = STANDARD_INPUT_TYPE;
             pluginClassName = "org.geotools.io.image.RawBinaryImageReader";
-            vendorName      = "Institut de Recherche pour le Développement";
+            vendorName      = "Institut de Recherche pour le Dï¿½veloppement";
             version         = "1.0";
         }
         

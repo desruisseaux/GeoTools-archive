@@ -16,8 +16,28 @@
  */
 package org.geotools.data.wfs;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.naming.OperationNotSupportedException;
 
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.MathTransform;
@@ -29,7 +49,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.crs.CRSService;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
@@ -57,27 +76,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import javax.naming.OperationNotSupportedException;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

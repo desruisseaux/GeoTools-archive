@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,21 +20,18 @@
 package org.geotools.resources;
 
 // Graphics and geometry
-import java.awt.Font;
-import java.awt.font.GlyphVector;
-import java.awt.font.FontRenderContext;
-import java.awt.Graphics2D;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-
-// Collections
-import java.util.List;
-import java.util.ArrayList;
-
-// Input / Output
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.geotools.io.ExpandedTabWriter;
 
 

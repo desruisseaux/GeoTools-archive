@@ -19,18 +19,22 @@
 package org.geotools.ct;
 
 // J2SE dependencies
-import java.io.*;
-import java.sql.*;
-import java.util.logging.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// Geotools dependencies
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemAuthorityFactory;
+import org.geotools.cs.CoordinateSystemEPSGFactory;
 
 
 /**

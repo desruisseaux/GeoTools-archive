@@ -1,5 +1,7 @@
 package org.geotools.graph.linegraph;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.build.line.BasicDirectedLineGraphGenerator;
 import org.geotools.graph.structure.DirectedEdge;
 import org.geotools.graph.structure.DirectedNode;
@@ -8,11 +10,8 @@ import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.GraphVisitor;
 import org.geotools.graph.structure.Graphable;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineSegment;
-
-import junit.framework.TestCase;
 
 public class DirectedLineGraphGeneratorTest extends TestCase {
   

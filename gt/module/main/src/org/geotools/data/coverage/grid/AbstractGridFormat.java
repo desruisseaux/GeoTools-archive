@@ -19,11 +19,9 @@
  */
 package org.geotools.data.coverage.grid;
 
-import org.geotools.data.coverage.grid.Format;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-
 import java.util.Map;
+
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 
 /**

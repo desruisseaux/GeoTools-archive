@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,47 +27,41 @@ package org.geotools.gp;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
-import java.util.MissingResourceException;
-import java.util.Locale;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.MissingResourceException;
 
-// Java Advanced Imaging
-import javax.media.jai.JAI;
-import javax.media.jai.util.Range;
 import javax.media.jai.ImageLayout;
-import javax.media.jai.ParameterList;
 import javax.media.jai.IntegerSequence;
-import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.JAI;
 import javax.media.jai.OperationDescriptor;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
 import javax.media.jai.registry.RenderedRegistryMode;
+import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CompoundCoordinateSystem;
+import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.CoordinateTransformationFactory;
-import org.geotools.ct.MathTransformFactory;
-import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransform;
+import org.geotools.ct.MathTransform2D;
+import org.geotools.ct.MathTransformFactory;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
-import org.geotools.gc.GridGeometry;
 import org.geotools.gc.GridCoverage;
+import org.geotools.gc.GridGeometry;
 import org.geotools.gc.InvalidGridGeometryException;
-
-// Resources
-import org.geotools.units.Unit;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.LegacyGCSUtilities;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.image.JAIUtilities;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.image.JAIUtilities;
+import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -259,8 +253,8 @@ public class OperationJAI extends Operation {
     }
     
     /**
-     * Vérifie que la classe spécifiée implémente l'interface {@link RenderedImage}.
-     * Cette méthode est utilisée pour vérifier les classes des images sources et
+     * Vï¿½rifie que la classe spï¿½cifiï¿½e implï¿½mente l'interface {@link RenderedImage}.
+     * Cette mï¿½thode est utilisï¿½e pour vï¿½rifier les classes des images sources et
      * destinations.
      */
     private static final void ensureValid(final Class classe) throws IllegalArgumentException {

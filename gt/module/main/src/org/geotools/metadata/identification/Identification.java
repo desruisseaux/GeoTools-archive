@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,27 +23,24 @@
 package org.geotools.metadata.identification;
 
 // J2SE direct dependencies
-import java.util.Set;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-// OpenGIS direct dependencies
-import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.maintenance.MaintenanceInformation;
-import org.opengis.metadata.constraint.Constraints;
-import org.opengis.metadata.distribution.Format;
-import org.opengis.metadata.identification.Usage;
-import org.opengis.metadata.identification.Keywords;
-import org.opengis.metadata.identification.Progress;
-import org.opengis.metadata.identification.BrowseGraphic;
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
 import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
-import org.geotools.util.CheckedHashSet;
 import org.geotools.util.CheckedArrayList;
+import org.geotools.util.CheckedHashSet;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.constraint.Constraints;
+import org.opengis.metadata.distribution.Format;
+import org.opengis.metadata.identification.BrowseGraphic;
+import org.opengis.metadata.identification.Keywords;
+import org.opengis.metadata.identification.Progress;
+import org.opengis.metadata.identification.Usage;
+import org.opengis.metadata.maintenance.MaintenanceInformation;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -51,7 +48,7 @@ import org.geotools.util.CheckedArrayList;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class Identification extends MetadataEntity
         implements org.opengis.metadata.identification.Identification

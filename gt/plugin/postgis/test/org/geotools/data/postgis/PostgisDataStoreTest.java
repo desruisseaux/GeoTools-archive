@@ -16,24 +16,49 @@
  */
 package org.geotools.data.postgis;
 
-import com.vividsolutions.jts.geom.*;
-import junit.framework.*;
-import org.geotools.data.*;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
+import org.geotools.data.SchemaNotFoundException;
+import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.*;
-import org.geotools.filter.*;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.data.jdbc.ConnectionPool;
-//import org.geotools.resources.Geotools;
-import java.io.IOException;
-import java.sql.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LiteralExpression;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**

@@ -22,24 +22,21 @@ package org.geotools.demo.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.net.URL;
+
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import org.geotools.data.coverage.grid.Format;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.StyleBuilder;
-
-import org.geotools.data.coverage.grid.GridCoverageExchange;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-//import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.gc.GridCoverage;
-
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**

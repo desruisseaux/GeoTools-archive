@@ -7,17 +7,35 @@
 package org.geotools.data.shapefile;
 
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
-import com.vividsolutions.jts.geom.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.File;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Date;
 
-import junit.framework.*;
-import org.geotools.data.shapefile.*;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  *

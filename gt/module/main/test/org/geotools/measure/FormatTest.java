@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,24 +20,25 @@
 package org.geotools.measure;
 
 // J2SE dependencies
+import java.text.Format;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.text.Format;
-import java.text.ParseException;
 
-// Geotools dependencies
-import org.geotools.referencing.*;
-import org.geotools.referencing.crs.*;
-import org.geotools.referencing.cs.TimeCS;
-import org.geotools.referencing.datum.TemporalDatum;
-import org.geotools.geometry.GeneralDirectPosition;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.crs.CompoundCRS;
+import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.TemporalCRS;
+import org.geotools.referencing.crs.VerticalCRS;
+import org.geotools.referencing.cs.TimeCS;
+import org.geotools.referencing.datum.TemporalDatum;
 
 
 /**
@@ -121,6 +122,6 @@ public class FormatTest extends TestCase {
         format.setCoordinateReferenceSystem(crs);
         format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
 	GeneralDirectPosition position = new GeneralDirectPosition(new double[]{23.78, -12.74, 127.9, 3.2});
-        assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003", format.format(position));
+        assertEquals("23ï¿½46,8'E 12ï¿½44,4'S 127,9 4 janv. 2003", format.format(position));
      }
 }

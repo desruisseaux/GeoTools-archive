@@ -6,9 +6,12 @@
  */
 package org.geotools.validation.attributes;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.net.URL;
+
 import junit.framework.TestCase;
-import java.beans.*;
-import java.net.*;
 /**
  * GazetteerNameValidationBeanInfoTest purpose.
  * <p>

@@ -1,15 +1,14 @@
 package org.geotools.renderer.array;
 
 // J2SE dependencies
-import java.awt.Shape;
 import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
-// Geotools dependencies
 import org.geotools.resources.geometry.XAffineTransform;
 
 

@@ -25,18 +25,15 @@ package org.geotools.referencing.operation.projection;
 // J2SE dependencies and extensions
 import java.util.Collection;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
-import org.geotools.referencing.Identifier;
 import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 
 /**
  * Orthographic Projection. This is a perspective azimuthal (planar) projection

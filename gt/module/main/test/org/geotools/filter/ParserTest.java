@@ -16,20 +16,25 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.*;
-import junit.framework.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import java.util.logging.Logger;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.parsers.*;
 import org.geotools.resources.TestData;
+import org.xml.sax.helpers.ParserAdapter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**

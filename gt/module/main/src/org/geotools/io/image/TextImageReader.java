@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,30 +33,28 @@
 package org.geotools.io.image;
 
 // Input/output
-import java.io.File;
-import java.io.Reader;
+import java.awt.image.DataBuffer;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.LineNumberReader;
-import java.io.InputStreamReader;
-import java.io.InputStream;
 import java.io.IOException;
-import javax.imageio.stream.ImageInputStream;
-import java.net.URLConnection;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.Reader;
 import java.net.URL;
-
-// Miscellaneous
-import java.util.Locale;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-import java.awt.image.DataBuffer;
-import javax.imageio.spi.ImageReaderSpi;
+import java.util.Locale;
 
-// Resources
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.stream.ImageInputStream;
+
 import org.geotools.io.LineFormat;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 
 
 /**
@@ -79,14 +77,14 @@ import org.geotools.resources.gcs.ResourceKeys;
 public abstract class TextImageReader extends SimpleImageReader {
     /**
      * Type des images les plus proches du format de l'image. Ce type
-     * devrait être une des constantes {@link DataBuffer#TYPE_FLOAT},
+     * devrait ï¿½tre une des constantes {@link DataBuffer#TYPE_FLOAT},
      * {@link DataBuffer#TYPE_DOUBLE} ou {@link DataBuffer#TYPE_INT}.
      */
     private final int rawImageType;
     
     /**
-     * Flot à utiliser pour lire les données. Ce flot sera construit à
-     * partir de {@link #input} la première fois qu'il sera demandé.
+     * Flot ï¿½ utiliser pour lire les donnï¿½es. Ce flot sera construit ï¿½
+     * partir de {@link #input} la premiï¿½re fois qu'il sera demandï¿½.
      */
     private BufferedReader reader;
     
@@ -132,16 +130,16 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne l'encodage des caractères qui seront à lire. L'implémentation
-     * par défaut retourne l'encodage spécifié dans l'objet {@link Spi} qui a
-     * créé ce décodeur. Les classes dérivées peuvent redéfinir cette méthode
-     * pour déterminer l'encodage d'une façon plus élaborée.
+     * Retourne l'encodage des caractï¿½res qui seront ï¿½ lire. L'implï¿½mentation
+     * par dï¿½faut retourne l'encodage spï¿½cifiï¿½ dans l'objet {@link Spi} qui a
+     * crï¿½ï¿½ ce dï¿½codeur. Les classes dï¿½rivï¿½es peuvent redï¿½finir cette mï¿½thode
+     * pour dï¿½terminer l'encodage d'une faï¿½on plus ï¿½laborï¿½e.
      *
-     * @param  input Flot à lire.
-     * @return Encodage du flot à lire, ou <code>null</code> pour utiliser
-     *         l'encodage par défaut de la plateforme locale.
-     * @throws IOException si une lecture du flot <code>input</code> était
-     *         nécessaire et a échoué.
+     * @param  input Flot ï¿½ lire.
+     * @return Encodage du flot ï¿½ lire, ou <code>null</code> pour utiliser
+     *         l'encodage par dï¿½faut de la plateforme locale.
+     * @throws IOException si une lecture du flot <code>input</code> ï¿½tait
+     *         nï¿½cessaire et a ï¿½chouï¿½.
      *
      * @see Spi#charset
      */
@@ -150,14 +148,14 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne l'objet à utiliser pour lire chaque ligne d'une image. L'implémentation par
-     * défaut construit un nouvel objet {@link LineFormat} en utilisant les conventions
-     * locales spécifiées par {@link Spi#locale}. Les classes dérivées peuvent redéfinir
-     * cette méthode pour construire un objet {@link LineFormat} d'une façon plus élaborée.
+     * Retourne l'objet ï¿½ utiliser pour lire chaque ligne d'une image. L'implï¿½mentation par
+     * dï¿½faut construit un nouvel objet {@link LineFormat} en utilisant les conventions
+     * locales spï¿½cifiï¿½es par {@link Spi#locale}. Les classes dï¿½rivï¿½es peuvent redï¿½finir
+     * cette mï¿½thode pour construire un objet {@link LineFormat} d'une faï¿½on plus ï¿½laborï¿½e.
      *
-     * @param  imageIndex Index de l'image à lire.
-     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
+     * @param  imageIndex Index de l'image ï¿½ lire.
+     * @throws IOException si l'opï¿½ration nï¿½cessitait une lecture du fichier (par exemple
+     *         des informations inscrites dans un en-tï¿½te) et que cette lecture a ï¿½chouï¿½e.
      */
     public LineFormat getLineFormat(final int imageIndex) throws IOException {
         if (originatingProvider instanceof Spi) {
@@ -170,35 +168,35 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne la valeur représentant les données manquantes, ou {@link Double#NaN}
-     * s'il n'y en a pas. Cette valeur s'appliquera à toutes les colonnes du fichier
-     * sauf les colonnes des <var>x</var> et des <var>y</var>.  L'implémentation par
-     * défaut retourne la valeur qui avait été spécifiée dans l'objet {@link Spi} qui
-     * a créé ce décodeur. Les classes dérivées peuvent redéfinir cette méthode pour
-     * déterminer cette valeur d'une façon plus élaborée.
+     * Retourne la valeur reprï¿½sentant les donnï¿½es manquantes, ou {@link Double#NaN}
+     * s'il n'y en a pas. Cette valeur s'appliquera ï¿½ toutes les colonnes du fichier
+     * sauf les colonnes des <var>x</var> et des <var>y</var>.  L'implï¿½mentation par
+     * dï¿½faut retourne la valeur qui avait ï¿½tï¿½ spï¿½cifiï¿½e dans l'objet {@link Spi} qui
+     * a crï¿½ï¿½ ce dï¿½codeur. Les classes dï¿½rivï¿½es peuvent redï¿½finir cette mï¿½thode pour
+     * dï¿½terminer cette valeur d'une faï¿½on plus ï¿½laborï¿½e.
      *
-     * @param  imageIndex Index de l'image à lire.
-     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
+     * @param  imageIndex Index de l'image ï¿½ lire.
+     * @throws IOException si l'opï¿½ration nï¿½cessitait une lecture du fichier (par exemple
+     *         des informations inscrites dans un en-tï¿½te) et que cette lecture a ï¿½chouï¿½e.
      */
     public double getPadValue(final int imageIndex) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).padValue : Double.NaN;
     }
     
     /**
-     * Retourne l'entré {@link #input} sous forme d'objet {@link BufferedReader}. Si possible,
-     * cette méthode tentera de retourner plus spécifiquement un objet {@link LineNumberReader}.
-     * Cette méthode convertira automatiquement les objets de classes {@link File}, {@link URL},
+     * Retourne l'entrï¿½ {@link #input} sous forme d'objet {@link BufferedReader}. Si possible,
+     * cette mï¿½thode tentera de retourner plus spï¿½cifiquement un objet {@link LineNumberReader}.
+     * Cette mï¿½thode convertira automatiquement les objets de classes {@link File}, {@link URL},
      * {@link Reader}, {@link InputStream} et {@link ImageInputStream}.
      * <br><br>
-     * Cette méthode ne construira un nouveau objet {@link Reader} que la première fois
-     * où elle sera appelée. Tous les appels subséquents retourneront le {@link Reader}
-     * ouvert. En conséquent, ce flot <strong>ne doit pas</strong> être fermé. Les méthodes
-     * <code>setInput(...)</code> et {@link #reset()} s'occuperont de le fermer si nécessaire.
+     * Cette mï¿½thode ne construira un nouveau objet {@link Reader} que la premiï¿½re fois
+     * oï¿½ elle sera appelï¿½e. Tous les appels subsï¿½quents retourneront le {@link Reader}
+     * ouvert. En consï¿½quent, ce flot <strong>ne doit pas</strong> ï¿½tre fermï¿½. Les mï¿½thodes
+     * <code>setInput(...)</code> et {@link #reset()} s'occuperont de le fermer si nï¿½cessaire.
      *
      * @return {@link #getInput} sous forme de flot {@link LineNumberReader} si possible,
      *         ou {@link BufferedReader} sinon.
-     * @throws IOException si le flot n'a pas pu être ouvert.
+     * @throws IOException si le flot n'a pas pu ï¿½tre ouvert.
      */
     protected final BufferedReader getReader() throws IOException {
         if (reader==null) {
@@ -235,8 +233,8 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Ferme le flot {@link #reader}, à la condition que
-     * c'était un flot que nous avions ouvert nous-même.
+     * Ferme le flot {@link #reader}, ï¿½ la condition que
+     * c'ï¿½tait un flot que nous avions ouvert nous-mï¿½me.
      */
     private void close() {
         if (input instanceof File || input instanceof URL) {
@@ -251,8 +249,8 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Spécifie le flot à utiliser en entré. Si un autre flot
-     * était ouvert avant l'appel de cette méthode, il sera fermé.
+     * Spï¿½cifie le flot ï¿½ utiliser en entrï¿½. Si un autre flot
+     * ï¿½tait ouvert avant l'appel de cette mï¿½thode, il sera fermï¿½.
      */
     public void setInput(final Object  input,
                          final boolean seekForwardOnly,
@@ -263,26 +261,26 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne la position du flot spécifié, ou <code>-1</code> si cette position est
-     * inconnue. Note: la position retournée est <strong>approximative</strong>.  Elle
-     * est utile pour afficher un rapport des progrès, mais sans plus.
+     * Retourne la position du flot spï¿½cifiï¿½, ou <code>-1</code> si cette position est
+     * inconnue. Note: la position retournï¿½e est <strong>approximative</strong>.  Elle
+     * est utile pour afficher un rapport des progrï¿½s, mais sans plus.
      *
-     * @param  reader Flot dont on veut connaître la position.
+     * @param  reader Flot dont on veut connaï¿½tre la position.
      * @return Position approximative du flot, ou <code>-1</code>
-     *         si cette position n'a pas pu être obtenue.
-     * @throws IOException si l'opération a échouée.
+     *         si cette position n'a pas pu ï¿½tre obtenue.
+     * @throws IOException si l'opï¿½ration a ï¿½chouï¿½e.
      */
     static long getStreamPosition(final Reader reader) throws IOException {
         return (reader instanceof LineReader) ? ((LineReader) reader).getPosition() : -1;
     }
     
     /**
-     * Retourne une chaîne de caractères donnant la position actuelle du flot. La
-     * chaîne retournée sera par exemple "Ligne 14 dans le fichier HUV18204.asc".
-     * Cette méthode retourne <code>null</code> si la position du flot n'a pas pu
-     * être déterminée.
+     * Retourne une chaï¿½ne de caractï¿½res donnant la position actuelle du flot. La
+     * chaï¿½ne retournï¿½e sera par exemple "Ligne 14 dans le fichier HUV18204.asc".
+     * Cette mï¿½thode retourne <code>null</code> si la position du flot n'a pas pu
+     * ï¿½tre dï¿½terminï¿½e.
      *
-     * @param message Un message optionel à placer après la position, ou
+     * @param message Un message optionel ï¿½ placer aprï¿½s la position, ou
      *        <code>null</code> s'il n'y en a pas.
      */
     protected String getPositionString(final String message) {
@@ -324,8 +322,8 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Remet ce décodeur dans son état initial.
-     * Si un flot avait été ouvert, il sera fermé.
+     * Remet ce dï¿½codeur dans son ï¿½tat initial.
+     * Si un flot avait ï¿½tï¿½ ouvert, il sera fermï¿½.
      */
     public void reset() {
         close();
@@ -368,21 +366,21 @@ public abstract class TextImageReader extends SimpleImageReader {
         private static final String[] EXTENSIONS = new String[] {"txt","asc","dat"};
         
         /**
-         * Encodage des caractères à lire, ou <code>null</code> pour utiliser l'encodage
-         * par défaut de la plateforme locale.  Ce champ est initialement nul et devrait
-         * être initialisé par les classes dérivées qui souhaite utiliser un encodage
-         * spécifique.
+         * Encodage des caractï¿½res ï¿½ lire, ou <code>null</code> pour utiliser l'encodage
+         * par dï¿½faut de la plateforme locale.  Ce champ est initialement nul et devrait
+         * ï¿½tre initialisï¿½ par les classes dï¿½rivï¿½es qui souhaite utiliser un encodage
+         * spï¿½cifique.
          *
          * @see TextImageReader#getCharset
          */
         protected Charset charset;
         
         /**
-         * Conventions locales à utiliser pour lire les nombres.  Par exemple
-         * la valeur {@link Locale#US} signifie que les nombres seront écrits
-         * en utilisant le point comme séparateur décimal (entre autres
+         * Conventions locales ï¿½ utiliser pour lire les nombres.  Par exemple
+         * la valeur {@link Locale#US} signifie que les nombres seront ï¿½crits
+         * en utilisant le point comme sï¿½parateur dï¿½cimal (entre autres
          * conventions). La valeur <code>null</code> signifie qu'il faudra
-         * utiliser les conventions locales par défaut au moment ou une image
+         * utiliser les conventions locales par dï¿½faut au moment ou une image
          * sera lue.
          *
          * @see TextImageReader#getLineFormat
@@ -391,10 +389,10 @@ public abstract class TextImageReader extends SimpleImageReader {
         protected Locale locale;
         
         /**
-         * Valeur par défaut représentant les données manquantes, ou
+         * Valeur par dï¿½faut reprï¿½sentant les donnï¿½es manquantes, ou
          * {@link Double#NaN} s'il n'y en a pas.  Lors de la lecture
          * d'une image, toutes les occurences de cette valeur seront
-         * remplacées par {@link Double#NaN} dans toutes les colonnes
+         * remplacï¿½es par {@link Double#NaN} dans toutes les colonnes
          * sauf les colonnes des <var>x</var> et des <var>y</var>.
          *
          * @see TextImageReader#getPadValue
@@ -440,15 +438,15 @@ public abstract class TextImageReader extends SimpleImageReader {
         }
         
         /**
-         * Vérifie si le flot spécifié semble être un fichier ASCII lisible.
-         * Cette méthode tente simplement de lire les premières lignes du fichier.
-         * La valeur retournée par cette méthode n'est qu'à titre indicative.
-         * <code>true</code> n'implique pas que la lecture va forcément réussir,
+         * Vï¿½rifie si le flot spï¿½cifiï¿½ semble ï¿½tre un fichier ASCII lisible.
+         * Cette mï¿½thode tente simplement de lire les premiï¿½res lignes du fichier.
+         * La valeur retournï¿½e par cette mï¿½thode n'est qu'ï¿½ titre indicative.
+         * <code>true</code> n'implique pas que la lecture va forcï¿½ment rï¿½ussir,
          * et <code>false</code> n'implique pas que la lecture va obligatoirement
-         * échouer.
+         * ï¿½chouer.
          *
-         * @param  source Source dont on veut tester la lisibilité.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         * @param  source Source dont on veut tester la lisibilitï¿½.
+         * @return <code>true</code> si la source <u>semble</u> ï¿½tre lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         public boolean canDecodeInput(final Object source) throws IOException {
@@ -456,19 +454,19 @@ public abstract class TextImageReader extends SimpleImageReader {
         }
         
         /**
-         * Vérifie si le flot spécifié semble être un fichier ASCII lisible.
-         * Cette méthode tente simplement de lire les premières lignes du fichier.
-         * La valeur retournée par cette méthode n'est qu'à titre indicative.
-         * <code>true</code> n'implique pas que la lecture va forcément réussir,
+         * Vï¿½rifie si le flot spï¿½cifiï¿½ semble ï¿½tre un fichier ASCII lisible.
+         * Cette mï¿½thode tente simplement de lire les premiï¿½res lignes du fichier.
+         * La valeur retournï¿½e par cette mï¿½thode n'est qu'ï¿½ titre indicative.
+         * <code>true</code> n'implique pas que la lecture va forcï¿½ment rï¿½ussir,
          * et <code>false</code> n'implique pas que la lecture va obligatoirement
-         * échouer.
+         * ï¿½chouer.
          *
-         * @param  source Source dont on veut tester la lisibilité.
-         * @param  readAheadLimit Nombre maximal de caractères à lire. Si ce
-         *         nombre est dépassé sans que cette méthode ait pu déterminer
-         *         si la source est lisible ou pas, alors cette méthode retourne
+         * @param  source Source dont on veut tester la lisibilitï¿½.
+         * @param  readAheadLimit Nombre maximal de caractï¿½res ï¿½ lire. Si ce
+         *         nombre est dï¿½passï¿½ sans que cette mï¿½thode ait pu dï¿½terminer
+         *         si la source est lisible ou pas, alors cette mï¿½thode retourne
          *         <code>false</code>.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         * @return <code>true</code> si la source <u>semble</u> ï¿½tre lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         public boolean canDecodeInput(final Object source,
@@ -503,19 +501,19 @@ public abstract class TextImageReader extends SimpleImageReader {
         }
         
         /**
-         * Vérifie si le flot spécifié semble être un fichier ASCII lisible.
-         * Cette méthode tente simplement de lire la première ligne du fichier.
+         * Vï¿½rifie si le flot spï¿½cifiï¿½ semble ï¿½tre un fichier ASCII lisible.
+         * Cette mï¿½thode tente simplement de lire la premiï¿½re ligne du fichier.
          *
-         * @param  input Source dont on veut tester la lisibilité.
-         * @param  canClose <code>true</code> si on peut fermer le flot après avoir vérifié sa
-         *         première ligne. Si cet argument est <code>false</code>, alors cette méthode
+         * @param  input Source dont on veut tester la lisibilitï¿½.
+         * @param  canClose <code>true</code> si on peut fermer le flot aprï¿½s avoir vï¿½rifiï¿½ sa
+         *         premiï¿½re ligne. Si cet argument est <code>false</code>, alors cette mï¿½thode
          *         utilisera {@link InputStream#mark} et {@link InputStream#reset} si ces
-         *         opérations sont autorisées.
-         * @param  readAheadLimit Nombre maximal de caractères à lire. Si ce
-         *         nombre est dépassé sans que cette méthode ait pu déterminer
-         *         si la source est lisible ou pas, alors cette méthode retourne
+         *         opï¿½rations sont autorisï¿½es.
+         * @param  readAheadLimit Nombre maximal de caractï¿½res ï¿½ lire. Si ce
+         *         nombre est dï¿½passï¿½ sans que cette mï¿½thode ait pu dï¿½terminer
+         *         si la source est lisible ou pas, alors cette mï¿½thode retourne
          *         <code>false</code>.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         * @return <code>true</code> si la source <u>semble</u> ï¿½tre lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         private boolean canDecodeInput(final InputStream input,
@@ -541,17 +539,17 @@ public abstract class TextImageReader extends SimpleImageReader {
         }
         
         /**
-         * Vérifie si le flot spécifié semble être un fichier ASCII lisible.
-         * Cette méthode tente simplement de lire la première ligne du fichier.
-         * Il est de la responsabilité de l'appelant d'utiliser {@link Reader#mark},
-         * {@link Reader#reset} et/ou {@link Reader#close} aux endroits appropriés.
+         * Vï¿½rifie si le flot spï¿½cifiï¿½ semble ï¿½tre un fichier ASCII lisible.
+         * Cette mï¿½thode tente simplement de lire la premiï¿½re ligne du fichier.
+         * Il est de la responsabilitï¿½ de l'appelant d'utiliser {@link Reader#mark},
+         * {@link Reader#reset} et/ou {@link Reader#close} aux endroits appropriï¿½s.
          *
-         * @param  input Source dont on veut tester la lisibilité.
-         * @param  readAheadLimit Nombre maximal de caractères à lire. Si ce
-         *         nombre est dépassé sans que cette méthode ait pu déterminer
-         *         si la source est lisible ou pas, alors cette méthode retourne
+         * @param  input Source dont on veut tester la lisibilitï¿½.
+         * @param  readAheadLimit Nombre maximal de caractï¿½res ï¿½ lire. Si ce
+         *         nombre est dï¿½passï¿½ sans que cette mï¿½thode ait pu dï¿½terminer
+         *         si la source est lisible ou pas, alors cette mï¿½thode retourne
          *         <code>false</code>.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         * @return <code>true</code> si la source <u>semble</u> ï¿½tre lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         private boolean canDecodeReader(final Reader input,
@@ -586,15 +584,15 @@ public abstract class TextImageReader extends SimpleImageReader {
         }
         
         /**
-         * Vérifie si la ligne spécifiée peut être décodée. Cette méthode est appelée
+         * Vï¿½rifie si la ligne spï¿½cifiï¿½e peut ï¿½tre dï¿½codï¿½e. Cette mï¿½thode est appelï¿½e
          * automatiquement par {@link #canDecodeInput(Object,int)} avec en argument une
-         * des premières lignes trouvées dans la source. L'implémentation par défaut
-         * vérifie si la ligne contient au moins un nombre décimal.
+         * des premiï¿½res lignes trouvï¿½es dans la source. L'implï¿½mentation par dï¿½faut
+         * vï¿½rifie si la ligne contient au moins un nombre dï¿½cimal.
          *
-         * @param  line Une des premières lignes du flot à lire.
-         * @return {@link Boolean#TRUE} si la ligne peut être décodée, {@link Boolean#FALSE}
-         *         si elle ne peut pas être décodée ou <code>null</code> si on ne sait pas
-         *         encore. Dans ce dernier cas, cette méthode sera appelée une nouvelle fois
+         * @param  line Une des premiï¿½res lignes du flot ï¿½ lire.
+         * @return {@link Boolean#TRUE} si la ligne peut ï¿½tre dï¿½codï¿½e, {@link Boolean#FALSE}
+         *         si elle ne peut pas ï¿½tre dï¿½codï¿½e ou <code>null</code> si on ne sait pas
+         *         encore. Dans ce dernier cas, cette mï¿½thode sera appelï¿½e une nouvelle fois
          *         avec la ligne suivante en argument.
          */
         protected Boolean canDecodeLine(final String line) {
@@ -612,11 +610,11 @@ public abstract class TextImageReader extends SimpleImageReader {
         }
         
         /**
-         * Vérifie si la ligne a un nombre de valeurs acceptable. Cette méthode est appelée
+         * Vï¿½rifie si la ligne a un nombre de valeurs acceptable. Cette mï¿½thode est appelï¿½e
          * automatiquement par {@link #canDecodeLine} avec en argument le nombre de valeurs
-         * dans une des premières lignes trouvées dans la source. Cette indication n'est
-         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de façon
-         * conservative. L'implémentation par défaut retourne toujours {@link Boolean#TRUE}.
+         * dans une des premiï¿½res lignes trouvï¿½es dans la source. Cette indication n'est
+         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de faï¿½on
+         * conservative. L'implï¿½mentation par dï¿½faut retourne toujours {@link Boolean#TRUE}.
          */
         Boolean isValueCountAcceptable(final int count) {
             return Boolean.TRUE;

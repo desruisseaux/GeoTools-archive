@@ -1,7 +1,6 @@
 package org.geotools.metadata.iso19115;
 
 import java.net.URL;
-import java.util.Locale;
 
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.util.InternationalString;

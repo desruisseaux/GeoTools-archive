@@ -1,13 +1,12 @@
 package org.geotools.data.wms.test;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.wms.request.AbstractRequest;
 import org.geotools.data.wms.request.Request;
-
-import junit.framework.TestCase;
 
 public class AbstractRequestTest extends TestCase {
 

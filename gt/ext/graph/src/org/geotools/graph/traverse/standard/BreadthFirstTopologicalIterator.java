@@ -26,7 +26,6 @@ import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.traverse.GraphTraversal;
 import org.geotools.graph.traverse.basic.AbstractGraphIterator;
-
 import org.geotools.graph.util.FIFOQueue;
 import org.geotools.graph.util.Queue;
 

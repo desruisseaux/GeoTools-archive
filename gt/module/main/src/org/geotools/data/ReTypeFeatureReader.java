@@ -16,12 +16,13 @@
  */
 package org.geotools.data;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import java.io.IOException;
-import java.util.NoSuchElementException;
 
 
 /**

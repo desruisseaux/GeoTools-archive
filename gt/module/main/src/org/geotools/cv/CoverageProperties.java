@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -37,18 +37,12 @@ import java.awt.Image;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-// JAI dependencies
 import javax.media.jai.PropertySource;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
-
-// OpenGIS dependencies
+import org.geotools.resources.gcs.Resources;
 import org.opengis.coverage.CannotEvaluateException;
-
-// OpenGIS dependencies
 import org.opengis.cv.CV_Coverage;
 
 

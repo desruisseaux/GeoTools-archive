@@ -19,43 +19,39 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
-import java.util.Date;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Arrays;
-import java.util.Locale;
+import java.io.FilterWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.lang.reflect.Array;
-import java.io.IOException;
-import java.io.FilterWriter;
-import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.util.GenericName;
-import org.opengis.metadata.Identifier;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.IdentifiedObject;
-
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.measure.Angle;
 import org.geotools.measure.AngleFormat;
-import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.XArray;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.opengis.metadata.Identifier;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.util.GenericName;
 
 
 /**

@@ -20,6 +20,8 @@ package org.geotools.map.event;
 // J2SE dependencies
 import java.util.EventListener;
 
+import org.geotools.map.MapLayer;
+
 
 /**
  * The listener that's notified when some {@linkPlain MapLayer layer} property changes.

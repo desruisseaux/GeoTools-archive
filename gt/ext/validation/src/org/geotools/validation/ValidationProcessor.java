@@ -16,17 +16,6 @@
  */
 package org.geotools.validation;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.resources.TestData;
-import org.geotools.validation.dto.ArgumentDTO;
-import org.geotools.validation.dto.PlugInDTO;
-import org.geotools.validation.dto.TestDTO;
-import org.geotools.validation.dto.TestSuiteDTO;
-import org.geotools.validation.xml.ValidationException;
-import org.geotools.validation.xml.XMLReader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +26,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.resources.TestData;
+import org.geotools.validation.dto.ArgumentDTO;
+import org.geotools.validation.dto.PlugInDTO;
+import org.geotools.validation.dto.TestDTO;
+import org.geotools.validation.dto.TestSuiteDTO;
+import org.geotools.validation.xml.XMLReader;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

@@ -29,15 +29,13 @@
 package org.geotools.gui.swing;
 
 // J2Se dependencies
-import java.awt.*;
-
-import javax.swing.*;
+import java.awt.HeadlessException;
 import java.util.Locale;
 
-// JUnit dependencies
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.util.ProgressListener;
 

@@ -1,10 +1,13 @@
 package org.geotools.data.property;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.data.FeatureReader;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
 
 public class PropertyFeatureReader implements FeatureReader {
     PropertyAttributeReader reader;    

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,28 +21,23 @@ package org.geotools.gc;
 ///CLOVER:USECLASS
 // J2SE dependencies
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.util.logging.Logger;
+import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
+import org.geotools.ct.AbstractMathTransform;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.AbstractMathTransform;
-
-// Resources
+import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -205,16 +200,16 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
     }
 
     /** 
-     * Transforme des coordonnées sources (généralement des index de pixels) en coordonnées
-     * destinations (généralement des degrés de longitude et latitude). Les transformations
-     * feront intervenir des interpolations linéaires si les coordonnées sources ne sont pas
-     * entières.
+     * Transforme des coordonnï¿½es sources (gï¿½nï¿½ralement des index de pixels) en coordonnï¿½es
+     * destinations (gï¿½nï¿½ralement des degrï¿½s de longitude et latitude). Les transformations
+     * feront intervenir des interpolations linï¿½aires si les coordonnï¿½es sources ne sont pas
+     * entiï¿½res.
      *
-     * @param  srcPts  Points d'entrée.
-     * @param  srcOff  Index du premier point d'entrée à transformer.
+     * @param  srcPts  Points d'entrï¿½e.
+     * @param  srcOff  Index du premier point d'entrï¿½e ï¿½ transformer.
      * @param  dstPts  Points de sortie.
      * @param  dstOff  Index du premier point de sortie.
-     * @param  numPts  Nombre de points à transformer.
+     * @param  numPts  Nombre de points ï¿½ transformer.
      */    
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
@@ -223,16 +218,16 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
     }
 
     /** 
-     * Transforme des coordonnées sources (généralement des index de pixels) en coordonnées
-     * destinations (généralement des degrés de longitude et latitude). Les transformations
-     * feront intervenir des interpolations linéaires si les coordonnées sources ne sont pas
-     * entières.
+     * Transforme des coordonnï¿½es sources (gï¿½nï¿½ralement des index de pixels) en coordonnï¿½es
+     * destinations (gï¿½nï¿½ralement des degrï¿½s de longitude et latitude). Les transformations
+     * feront intervenir des interpolations linï¿½aires si les coordonnï¿½es sources ne sont pas
+     * entiï¿½res.
      *
-     * @param  srcPts  Points d'entrée.
-     * @param  srcOff  Index du premier point d'entrée à transformer.
+     * @param  srcPts  Points d'entrï¿½e.
+     * @param  srcOff  Index du premier point d'entrï¿½e ï¿½ transformer.
      * @param  dstPts  Points de sortie.
      * @param  dstOff  Index du premier point de sortie.
-     * @param  numPts  Nombre de points à transformer.
+     * @param  numPts  Nombre de points ï¿½ transformer.
      */    
     public void transform(final double[] srcPts, int srcOff,
                           final double[] dstPts, int dstOff, int numPts)
@@ -271,15 +266,15 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
             final int row = Math.max(Math.min((int)yi, maxRow), minRow);
             final int offset00 = computeOffset(col, row);
             final int offset01 = offset00 + CP_LENGTH*width; // Une ligne plus bas
-            final int offset10 = offset00 + CP_LENGTH;  // Une colonne à droite
-            final int offset11 = offset01 + CP_LENGTH;  // Une colonne à droite, une ligne plus bas
+            final int offset10 = offset00 + CP_LENGTH;  // Une colonne ï¿½ droite
+            final int offset11 = offset01 + CP_LENGTH;  // Une colonne ï¿½ droite, une ligne plus bas
             /*
-             * Interpole les coordonnées de destination        [00]--.(x0,y0)----[10]
+             * Interpole les coordonnï¿½es de destination        [00]--.(x0,y0)----[10]
              * sur la ligne courante (x0,y0)  ainsi que         |                  |
              * sur la ligne suivante (x1,y1).   Exemple         |    .(x,y)        |
-             * ci-contre:  les coordonnées sources sont         |                  |
-             * entre crochets, et les coordonnées de la        [01]--.(x1,y1)----[11]
-             * sortie (à calculer) sont entre parenthèses.
+             * ci-contre:  les coordonnï¿½es sources sont         |                  |
+             * entre crochets, et les coordonnï¿½es de la        [01]--.(x1,y1)----[11]
+             * sortie (ï¿½ calculer) sont entre parenthï¿½ses.
              */
             final double x0 = linearInterpolation(col+0, grid[offset00 + X_OFFSET],
                                                   col+1, grid[offset10 + X_OFFSET], xi);
@@ -290,7 +285,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
             final double y1 = linearInterpolation(col+0, grid[offset01 + Y_OFFSET],
                                                   col+1, grid[offset11 + Y_OFFSET], xi);
             /*
-             * Interpole maintenant les coordonnées (x,y) entre les deux lignes.
+             * Interpole maintenant les coordonnï¿½es (x,y) entre les deux lignes.
              */
             final double xf = linearInterpolation(row, x0, row+1, x1, yi);
             final double yf = linearInterpolation(row, y0, row+1, y1, yi);
@@ -320,8 +315,8 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
      * @param   y1  Coordonnee <var>y</var> du premier point.
      * @param   x2  Coordonnee <var>x</var> du second point.
      * @param   y2  Coordonnee <var>y</var> du second point.
-     * @param   x   Position <var>x</var> à laquelle calculer la valeur de <var>y</var>.
-     * @return      La valeur <var>y</var> interpolée entre les deux points.
+     * @param   x   Position <var>x</var> ï¿½ laquelle calculer la valeur de <var>y</var>.
+     * @return      La valeur <var>y</var> interpolï¿½e entre les deux points.
      */
     private static double linearInterpolation(final double x1, final double y1,
                                               final double x2, final double y2, final double x)
@@ -330,11 +325,11 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
     }
 
     /**
-     * Retourne une approximation de la transformation affine à la position indiquée.
+     * Retourne une approximation de la transformation affine ï¿½ la position indiquï¿½e.
      *
      * @param  col  Coordonnee <var>x</var> du point.
      * @param  row  Coordonnee <var>y</var> du point.
-     * @param dest  Matrice dans laquelle écrire la transformation affine.
+     * @param dest  Matrice dans laquelle ï¿½crire la transformation affine.
      */
     private void getAffineTransform(double x, double y, final AffineTransform dest) {
         int col = (int) x;
@@ -355,9 +350,9 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
         } else sgnRow = +1;
         /*
          * Le calcul de la transformation affine  comprend 6        P00------P10
-         * inconnues. Sa solution recquiert donc 6 équations.        |        |
+         * inconnues. Sa solution recquiert donc 6 ï¿½quations.        |        |
          * Nous les obtenons en utilisant 3 points,   chaque         |        |
-         * points ayant 2 coordonnées. Voir exemple ci-contre:      P01----(ignoré)
+         * points ayant 2 coordonnï¿½es. Voir exemple ci-contre:      P01----(ignorï¿½)
          */
         final int offset00 = computeOffset(col, row);
         final int offset01 = offset00 + sgnRow*CP_LENGTH*width;
@@ -372,9 +367,9 @@ final class LocalizationGridTransform2D extends AbstractMathTransform implements
                           x - dxCol*col - dxRow*row,
                           y - dyCol*col - dyRow*row);
         /*
-         * Si l'on transforme les 3 points qui ont servit à déterminer la transformation
-         * affine, on devrait obtenir un résultat identique (aux erreurs d'arrondissement
-         * près) peu importe que l'on utilise la transformation affine ou la grille de
+         * Si l'on transforme les 3 points qui ont servit ï¿½ dï¿½terminer la transformation
+         * affine, on devrait obtenir un rï¿½sultat identique (aux erreurs d'arrondissement
+         * prï¿½s) peu importe que l'on utilise la transformation affine ou la grille de
          * localisation.
          */
         assert distance(new Point(col,        row       ), dest) < 1E-5;

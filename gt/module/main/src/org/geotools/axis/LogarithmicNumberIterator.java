@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,13 +35,14 @@ package org.geotools.axis;
 
 // Dependencies
 import java.util.Locale;
+
 import org.geotools.resources.XMath;
 
 
 /**
- * Itérateur balayant les barres et étiquettes de graduation d'un axe logarithmique.
- * Cet itérateur retourne les positions des graduations à partir de la valeur minimale
- * jusqu'à la valeur maximale.
+ * Itï¿½rateur balayant les barres et ï¿½tiquettes de graduation d'un axe logarithmique.
+ * Cet itï¿½rateur retourne les positions des graduations ï¿½ partir de la valeur minimale
+ * jusqu'ï¿½ la valeur maximale.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -53,26 +54,26 @@ final class LogarithmicNumberIterator extends NumberIterator {
     private double scale, offset;
 
     /**
-     * Construit un itérateur par défaut. La méthode {@link #init}
-     * <u>doit</u> être appelée avant que cet itérateur ne soit
+     * Construit un itï¿½rateur par dï¿½faut. La mï¿½thode {@link #init}
+     * <u>doit</u> ï¿½tre appelï¿½e avant que cet itï¿½rateur ne soit
      * utilisable.
      *
-     * @param locale Conventions à utiliser pour le formatage des nombres.
+     * @param locale Conventions ï¿½ utiliser pour le formatage des nombres.
      */
     protected LogarithmicNumberIterator(final Locale locale) {
         super(locale);
     }
 
     /**
-     * Initialise l'itérateur.
+     * Initialise l'itï¿½rateur.
      *
-     * @param minimum           Valeur minimale de la première graduation.
-     * @param maximum           Valeur limite des graduations. La dernière
-     *                          graduation n'aura pas nécessairement cette valeur.
+     * @param minimum           Valeur minimale de la premiï¿½re graduation.
+     * @param maximum           Valeur limite des graduations. La derniï¿½re
+     *                          graduation n'aura pas nï¿½cessairement cette valeur.
      * @param visualLength      Longueur visuelle de l'axe sur laquelle tracer la graduation.
-     *                          Cette longueur doit être exprimée en pixels ou en points.
-     * @param visualTickSpacing Espace à laisser visuellement entre deux marques de graduation.
-     *                          Cet espace doit être exprimé en pixels ou en points (1/72 de pouce).
+     *                          Cette longueur doit ï¿½tre exprimï¿½e en pixels ou en points.
+     * @param visualTickSpacing Espace ï¿½ laisser visuellement entre deux marques de graduation.
+     *                          Cet espace doit ï¿½tre exprimï¿½ en pixels ou en points (1/72 de pouce).
      */
     protected void init(final double minimum,
                         final double maximum,
@@ -95,8 +96,8 @@ final class LogarithmicNumberIterator extends NumberIterator {
     }
 
     /**
-     * Retourne la valeur de la graduation courante. Cette méthode
-     * peut être appelée pour une graduation majeure ou mineure.
+     * Retourne la valeur de la graduation courante. Cette mï¿½thode
+     * peut ï¿½tre appelï¿½e pour une graduation majeure ou mineure.
      */
     public double currentValue() {
         return XMath.pow10(super.currentValue());

@@ -35,11 +35,11 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.*;
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import java.util.logging.Logger;
 
 
 /**

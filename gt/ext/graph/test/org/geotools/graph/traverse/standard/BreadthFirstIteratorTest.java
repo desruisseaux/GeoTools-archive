@@ -1,6 +1,5 @@
 package org.geotools.graph.traverse.standard;
 
-import org.geotools.graph.traverse.standard.BreadthFirstIterator;
 import java.util.Iterator;
 import java.util.Map;
 

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,20 +21,20 @@
 package org.geotools.renderer.j2d;
 
 // J2SE dependencies
-import java.awt.Font;
 import java.awt.Color;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.Rectangle;
+import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.RenderedImage;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.image.RenderedImage;
+
 import javax.swing.Action;
 
-// OpenGIS dependencies
 import org.opengis.referencing.operation.TransformException;
 
 
@@ -51,11 +51,11 @@ import org.opengis.referencing.operation.TransformException;
  *   <li>{@link #position}</li>
  * </ul>
  *
- * Si, à la position de chaque marque, on souhaite dessiner une figure orientable dans l'espace
- * (par exemple une flèche de courant ou une ellipse de marée), la classe dérivée pourra redéfinir
- * une ou plusieurs des méthodes ci-dessous. Redéfinir ces méthodes permet par exemple de dessiner
- * des flèches dont la forme exacte (par exemple une, deux ou trois têtes) et la couleur varie avec
- * l'amplitude, la direction ou d'autres critères de votre choix.
+ * Si, ï¿½ la position de chaque marque, on souhaite dessiner une figure orientable dans l'espace
+ * (par exemple une flï¿½che de courant ou une ellipse de marï¿½e), la classe dï¿½rivï¿½e pourra redï¿½finir
+ * une ou plusieurs des mï¿½thodes ci-dessous. Redï¿½finir ces mï¿½thodes permet par exemple de dessiner
+ * des flï¿½ches dont la forme exacte (par exemple une, deux ou trois tï¿½tes) et la couleur varie avec
+ * l'amplitude, la direction ou d'autres critï¿½res de votre choix.
  *
  * <ul>
  *   <li>{@link #amplitude}</li>
@@ -71,11 +71,11 @@ import org.opengis.referencing.operation.TransformException;
  */
 public abstract class MarkIterator {
     /**
-     * Forme géométrique à utiliser par défaut lorsqu'aucune autre forme n'a
-     * été spécifiée. La position centrale de la station doit correspondre à
-     * la coordonnée (0,0) de cette forme. La dimension de cette forme est
-     * exprimée en pixels. La forme par défaut sera un cercle centré à
-     * (0,0) et d'un diamètre de 10 pixels.
+     * Forme gï¿½omï¿½trique ï¿½ utiliser par dï¿½faut lorsqu'aucune autre forme n'a
+     * ï¿½tï¿½ spï¿½cifiï¿½e. La position centrale de la station doit correspondre ï¿½
+     * la coordonnï¿½e (0,0) de cette forme. La dimension de cette forme est
+     * exprimï¿½e en pixels. La forme par dï¿½faut sera un cercle centrï¿½ ï¿½
+     * (0,0) et d'un diamï¿½tre de 10 pixels.
      */
     static final Shape DEFAULT_SHAPE = new Ellipse2D.Float(-5, -5, 10, 10);
 

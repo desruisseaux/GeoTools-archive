@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,32 +20,28 @@
 package org.geotools.resources;
 
 // Collections
-import java.util.Set;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Collections;
-import java.util.Arrays;
-
-// Input/output
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.DataOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.Writer;
-
-// Miscellaneous
-import java.util.Comparator;
-import java.util.StringTokenizer;
-import java.text.MessageFormat;
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 
 /**

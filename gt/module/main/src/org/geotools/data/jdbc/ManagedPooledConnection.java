@@ -18,6 +18,7 @@ package org.geotools.data.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.sql.PooledConnection;
 
 

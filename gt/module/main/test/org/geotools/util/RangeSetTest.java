@@ -23,10 +23,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
-import org.geotools.gc.GridCoverageTest;
-import org.geotools.resources.Arguments;
-
 
 /**
  * Test the {@link RangeSet} implementation.

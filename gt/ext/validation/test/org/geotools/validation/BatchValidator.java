@@ -22,20 +22,6 @@
  */
 package org.geotools.validation;
 
-import com.vividsolutions.jts.geom.Envelope;
-
-import org.geotools.data.DefaultRepository;
-import org.geotools.data.Repository;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
-import org.geotools.validation.dto.ArgumentDTO;
-import org.geotools.validation.dto.PlugInDTO;
-import org.geotools.validation.dto.TestDTO;
-import org.geotools.validation.dto.TestSuiteDTO;
-import org.geotools.validation.xml.ValidationException;
-import org.geotools.validation.xml.XMLReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -47,6 +33,20 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DefaultRepository;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.Feature;
+import org.geotools.validation.dto.ArgumentDTO;
+import org.geotools.validation.dto.PlugInDTO;
+import org.geotools.validation.dto.TestDTO;
+import org.geotools.validation.dto.TestSuiteDTO;
+import org.geotools.validation.xml.ValidationException;
+import org.geotools.validation.xml.XMLReader;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

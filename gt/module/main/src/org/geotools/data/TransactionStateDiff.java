@@ -16,10 +16,6 @@
  */
 package org.geotools.data;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.data.Transaction.State;
-import org.geotools.feature.Feature;
-import org.geotools.feature.IllegalAttributeException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +23,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.geotools.data.Transaction.State;
+import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

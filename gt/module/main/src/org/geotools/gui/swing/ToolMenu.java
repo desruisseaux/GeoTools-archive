@@ -16,14 +16,16 @@
  */
 package org.geotools.gui.swing;
 
-import org.geotools.gui.tools.Tool;
-import org.geotools.gui.tools.ToolList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
+import org.geotools.gui.tools.Tool;
+import org.geotools.gui.tools.ToolList;
 
 
 /**

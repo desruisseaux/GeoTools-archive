@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,20 +33,18 @@
 package org.geotools.gp;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.Collections;
 import java.awt.Color;
+import java.util.Collections;
+import java.util.Map;
 
-// Java Advanced Imaging
-import javax.media.jai.util.Range;
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
+import javax.media.jai.util.Range;
 
-// Geotools implementation
 import org.geotools.cv.Category;
-import org.geotools.gc.GridCoverage;
 import org.geotools.cv.SampleDimension;
+import org.geotools.gc.GridCoverage;
 import org.geotools.resources.image.ColorUtilities;
 
 

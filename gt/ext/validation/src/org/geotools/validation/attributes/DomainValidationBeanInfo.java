@@ -22,8 +22,9 @@
  */
 package org.geotools.validation.attributes;
 
-import org.geotools.validation.DefaultFeatureValidationBeanInfo;
 import java.beans.PropertyDescriptor;
+
+import org.geotools.validation.DefaultFeatureValidationBeanInfo;
 
 
 /**

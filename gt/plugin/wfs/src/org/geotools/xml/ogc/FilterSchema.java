@@ -16,6 +16,10 @@
  */
 package org.geotools.xml.ogc;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.ogc.FilterComplexTypes.BinaryOperatorType;
 import org.geotools.xml.ogc.FilterComplexTypes.Comparison_OperatorsType;
@@ -58,10 +62,6 @@ import org.geotools.xml.schema.Schema;
 import org.geotools.xml.schema.SimpleType;
 import org.geotools.xml.schema.Type;
 import org.geotools.xml.schema.impl.AttributeGT;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
 
 
 /**

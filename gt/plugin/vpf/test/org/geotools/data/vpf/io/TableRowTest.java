@@ -11,10 +11,11 @@
 package org.geotools.data.vpf.io;
 
 import java.util.HashMap;
-import junit.extensions.*;
-import junit.framework.*;
-import org.geotools.data.vpf.io.RowField;
-import org.geotools.data.vpf.io.VPFDate;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 
 /**

@@ -21,19 +21,6 @@
  */
 package org.geotools.styling;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.map.DefaultMapContext;
-import org.geotools.map.MapContext;
-import org.geotools.renderer.Renderer2D;
-import org.geotools.renderer.j2d.StyledMapRenderer;
-import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.renderer.lite.LiteRenderer2;
 
 import java.awt.Color;
@@ -46,7 +33,22 @@ import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
 import javax.media.jai.JAI;
+
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.map.DefaultMapContext;
+import org.geotools.map.MapContext;
+import org.geotools.renderer.Renderer2D;
+import org.geotools.renderer.j2d.StyledMapRenderer;
+import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.resources.TestData;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**

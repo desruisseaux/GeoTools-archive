@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -34,19 +34,18 @@
 package org.geotools.axis;
 
 // J2SE dependencies
-import java.util.Locale;
-import java.io.Serializable;
 import java.awt.RenderingHints;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.Serializable;
+import java.util.Locale;
 
-// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.geotools.units.Unit;
 import org.geotools.units.UnitException;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -125,7 +124,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     
     /**
      * Returns the axis title. If <code>includeUnits</code> is <code>true</code>,
-     * then the returned string will includes units as in "Temperature (°C)". The
+     * then the returned string will includes units as in "Temperature (ï¿½C)". The
      * exact formatting is local-dependent.
      *
      * @param  includeSymbol <code>true</code> to format unit symbol after the name.
@@ -239,9 +238,9 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Retourne l'espace approximatif (en pixels ou en points) à laisser entre les
-     * graduations principales. L'espace réel entre les graduations peut être légèrement
-     * différent, par exemple pour avoir des étiquettes qui correspondent à des valeurs
+     * Retourne l'espace approximatif (en pixels ou en points) ï¿½ laisser entre les
+     * graduations principales. L'espace rï¿½el entre les graduations peut ï¿½tre lï¿½gï¿½rement
+     * diffï¿½rent, par exemple pour avoir des ï¿½tiquettes qui correspondent ï¿½ des valeurs
      * arrondies.
      */
     static float getVisualTickSpacing(final RenderingHints hints) {
@@ -249,7 +248,7 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Retourne une valeur sous forme de nombre réel.
+     * Retourne une valeur sous forme de nombre rï¿½el.
      */
     private static float getValue(final RenderingHints   hints,
                                   final RenderingHints.Key key,
@@ -268,11 +267,11 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
     
     /**
-     * Vérifie que le nombre spécifié est non-nul. S'il
-     * est 0, NaN ou infini, une exception sera lancée.
+     * Vï¿½rifie que le nombre spï¿½cifiï¿½ est non-nul. S'il
+     * est 0, NaN ou infini, une exception sera lancï¿½e.
      *
      * @param  name Nom de l'argument.
-     * @param  n Nombre à vérifier.
+     * @param  n Nombre ï¿½ vï¿½rifier.
      * @throws IllegalArgumentException Si <var>n</var> est NaN ou infini.
      */
     static void ensureNonNull(final String name, final double n) throws IllegalArgumentException {
@@ -283,11 +282,11 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
     
     /**
-     * Vérifie que le nombre spécifié est réel. S'il
-     * est NaN ou infini, une exception sera lancée.
+     * Vï¿½rifie que le nombre spï¿½cifiï¿½ est rï¿½el. S'il
+     * est NaN ou infini, une exception sera lancï¿½e.
      *
      * @param  name Nom de l'argument.
-     * @param  n Nombre à vérifier.
+     * @param  n Nombre ï¿½ vï¿½rifier.
      * @throws IllegalArgumentException Si <var>n</var> est NaN ou infini.
      */
     static void ensureFinite(final String name, final double n) throws IllegalArgumentException {
@@ -298,11 +297,11 @@ public abstract class AbstractGraduation implements Graduation, Serializable {
     }
 
     /**
-     * Vérifie que le nombre spécifié est réel. S'il
-     * est NaN ou infini, une exception sera lancée.
+     * Vï¿½rifie que le nombre spï¿½cifiï¿½ est rï¿½el. S'il
+     * est NaN ou infini, une exception sera lancï¿½e.
      *
      * @param  name Nom de l'argument.
-     * @param  n Nombre à vérifier.
+     * @param  n Nombre ï¿½ vï¿½rifier.
      * @throws IllegalArgumentException Si <var>n</var> est NaN ou infini.
      */
     static void ensureFinite(final String name, final float n) throws IllegalArgumentException {

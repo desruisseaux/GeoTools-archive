@@ -22,9 +22,9 @@
 package org.geotools.renderer.style;
 
 // J2SE dependencies
-import java.awt.*;
+import java.awt.Composite;
+import java.awt.Paint;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 

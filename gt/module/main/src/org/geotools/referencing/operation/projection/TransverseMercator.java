@@ -2,7 +2,7 @@
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, 2004 Geotools Project Managment Committee (PMC)
  * (C) 2002, Centre for Computational Geography
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -47,25 +47,22 @@
 package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
-import java.util.Collection;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
-import org.geotools.referencing.Identifier;
 import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 
 /**
  * Transverse Mercator Projection (EPSG code 9807). This
- * is a cylindrical projection, in which the cylinder has been rotated 90°.
+ * is a cylindrical projection, in which the cylinder has been rotated 90ï¿½.
  * Instead of being tangent to the equator (or to an other standard latitude),
  * it is tangent to a central meridian. Deformation are more important as we
  * are going futher from the central meridian. The Transverse Mercator
@@ -111,14 +108,14 @@ import org.geotools.resources.cts.Resources;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">"Transverse_Mercator" on Remote Sensing</A>
  *
  * @version $Id$
- * @author André Gosselin
+ * @author Andrï¿½ Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
 public class TransverseMercator extends MapProjection {
     /**
      * A derived quantity of excentricity, computed
-     * by <code>e'² = (a²-b²)/b² = es/(1-es)</code>
+     * by <code>e'ï¿½ = (aï¿½-bï¿½)/bï¿½ = es/(1-es)</code>
      * where <var>a</var> is the semi-major axis length
      * and <var>b</bar> is the semi-minor axis length.
      */
@@ -349,7 +346,7 @@ public class TransverseMercator extends MapProjection {
      * TransverseMercator projection.
      * 
      * @version $Id$
-     * @author André Gosselin
+     * @author Andrï¿½ Gosselin
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */

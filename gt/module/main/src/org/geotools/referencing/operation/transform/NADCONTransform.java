@@ -24,25 +24,6 @@
 package org.geotools.referencing.operation.transform;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.Identifier;
-import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-
-// J2SE dependencies
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
@@ -60,6 +41,22 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
+
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.operation.MathTransformProvider;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

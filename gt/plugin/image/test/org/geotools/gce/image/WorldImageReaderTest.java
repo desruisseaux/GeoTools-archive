@@ -8,6 +8,7 @@ package org.geotools.gce.image;
 
 import java.io.File;
 import java.io.IOException;
+
 import junit.framework.TestCase;
 
 import org.geotools.gc.GridCoverage;

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,58 +21,45 @@
 package org.geotools.gui.swing;
 
 // Graphical user interface
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
+
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 
-// Graphics
-import java.awt.Font;
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.ColorModel;
-import java.awt.image.RenderedImage;
-import java.awt.image.IndexColorModel;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
-
-// Geometry
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-
-// Miscellaneous
-import java.util.List;
-import java.util.Arrays;
-import java.util.logging.Logger;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Axis
-import org.geotools.axis.Graduation;
-import org.geotools.axis.TickIterator;
-import org.geotools.axis.NumberGraduation;
 import org.geotools.axis.AbstractGraduation;
+import org.geotools.axis.Graduation;
 import org.geotools.axis.LogarithmicNumberGraduation;
-
-// Geotools dependencies
+import org.geotools.axis.NumberGraduation;
+import org.geotools.axis.TickIterator;
 import org.geotools.ct.MathTransform1D;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
 import org.geotools.gc.GridCoverage;
+import org.geotools.resources.LegacyGCSUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.LegacyGCSUtilities;
-
-// Resources (Note: CTS resources are okay for this class).
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -562,9 +549,9 @@ public class ColorBar extends JComponent {
         Rectangle2D labelBounds=null;
         if (labelVisibles && graduation!=null) {
             /*
-             * Prépare l'écriture de la graduation. On vérifie quelle longueur
-             * (en pixels) a la rampe de couleurs et on calcule les coéfficients
-             * qui permettront de convertir les valeurs logiques en coordonnées
+             * Prï¿½pare l'ï¿½criture de la graduation. On vï¿½rifie quelle longueur
+             * (en pixels) a la rampe de couleurs et on calcule les coï¿½fficients
+             * qui permettront de convertir les valeurs logiques en coordonnï¿½es
              * pixels.
              */
             double x = bounds.getCenterX();
@@ -589,7 +576,7 @@ public class ColorBar extends JComponent {
             hints.put(Graduation.VISUAL_AXIS_LENGTH, new Float((float)visualLength));
             graphics.setColor(getForeground());
             /*
-             * Procède à l'écriture de la graduation.
+             * Procï¿½de ï¿½ l'ï¿½criture de la graduation.
              */
             for (final TickIterator ticks = reuse = graduation.getTickIterator(hints, reuse);
                                                     ticks.hasNext(); ticks.nextMajor())
@@ -618,7 +605,7 @@ public class ColorBar extends JComponent {
                 }
             }
             /*
-             * Ecrit les unités.
+             * Ecrit les unitï¿½s.
              */
             if (units != null) {
                 final GlyphVector glyph = font.createGlyphVector(context, units);
@@ -758,8 +745,8 @@ public class ColorBar extends JComponent {
 
     /**
      * Classe ayant la charge de dessiner la rampe de couleurs, ainsi que
-     * de calculer l'espace qu'elle occupe. Cette classe peut aussi réagir
-     * à certains événements.
+     * de calculer l'espace qu'elle occupe. Cette classe peut aussi rï¿½agir
+     * ï¿½ certains ï¿½vï¿½nements.
      *
      * @version $Id: ColorBar.java,v 1.9 2004/02/13 14:29:37 desruisseaux Exp $
      * @author Martin Desruisseaux
@@ -774,7 +761,7 @@ public class ColorBar extends JComponent {
         }
 
         /**
-         * Retourne la dimension préférée de cette rampe de couleurs.
+         * Retourne la dimension prï¿½fï¿½rï¿½e de cette rampe de couleurs.
          */
         public Dimension getPreferredSize(final JComponent c) {
             return (((ColorBar) c).horizontal) ? new Dimension(256,16)
@@ -782,11 +769,11 @@ public class ColorBar extends JComponent {
         }
 
         /**
-         * Dessine la rampe de couleurs vers le graphique spécifié.  Cette méthode a
-         * l'avantage d'être appelée automatiquement par <i>Swing</i> avec une copie
-         * d'un objet {@link Graphics}, ce qui nous évite d'avoir à le remettre dans
-         * son état initial lorsqu'on a terminé le traçage de la rampe de couleurs.
-         * On n'a pas cet avantage lorsque l'on ne fait que redéfinir
+         * Dessine la rampe de couleurs vers le graphique spï¿½cifiï¿½.  Cette mï¿½thode a
+         * l'avantage d'ï¿½tre appelï¿½e automatiquement par <i>Swing</i> avec une copie
+         * d'un objet {@link Graphics}, ce qui nous ï¿½vite d'avoir ï¿½ le remettre dans
+         * son ï¿½tat initial lorsqu'on a terminï¿½ le traï¿½age de la rampe de couleurs.
+         * On n'a pas cet avantage lorsque l'on ne fait que redï¿½finir
          * {@link JComponent#paintComponent}.
          */
         public void paint(final Graphics graphics, final JComponent component) {
@@ -800,8 +787,8 @@ public class ColorBar extends JComponent {
         }
 
         /**
-         * Méthode appelée automatiquement chaque
-         * fois qu'une propriété de l'axe a changée.
+         * Mï¿½thode appelï¿½e automatiquement chaque
+         * fois qu'une propriï¿½tï¿½ de l'axe a changï¿½e.
          */
         public void propertyChange(final PropertyChangeEvent event) {
             repaint();

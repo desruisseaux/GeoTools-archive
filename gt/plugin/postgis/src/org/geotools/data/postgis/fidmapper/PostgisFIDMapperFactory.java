@@ -16,9 +16,10 @@
  */
 package org.geotools.data.postgis.fidmapper;
 
+import java.sql.Connection;
+
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import java.sql.Connection;
 
 /**
  * Postgis specific FIDMapperFactory that uses the {@link org.geotools.data.postgis.fidmapper.OIDFidMapper OIDFidMapper}

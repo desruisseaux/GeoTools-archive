@@ -16,15 +16,6 @@
  */
 package org.geotools.data.postgis.attributeio;
 
-import com.vividsolutions.jts.geom.Geometry;
-
-import org.geotools.data.DataSourceException;
-import org.geotools.data.jdbc.attributeio.AttributeIO;
-import org.postgresql.jdbc3.Jdbc3ResultSet;
-import org.wkb4j.engine.WKBParser;
-import org.wkb4j.jts.JTSFactory;
-
-
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,6 +23,13 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.wkb4j.engine.WKBParser;
+import org.wkb4j.jts.JTSFactory;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

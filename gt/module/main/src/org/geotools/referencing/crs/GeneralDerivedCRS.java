@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,31 +23,26 @@
 package org.geotools.referencing.crs;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-// OpenGIS direct dependencies
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.SingleCRS;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.Projection;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
-import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.cts.Resources;
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.SingleCRS;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**

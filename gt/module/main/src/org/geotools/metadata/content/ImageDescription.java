@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,17 +23,9 @@
 package org.geotools.metadata.content;
 
 // J2SE extensions
-import javax.units.Unit;
-
-// OpenGIS dependencies
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.content.CoverageContentType;
-import org.opengis.metadata.content.RangeDimension ;
-import org.opengis.metadata.content.ImagingCondition ;
-
-// Geotools dependencies
-import org.geotools.metadata.MetadataEntity;
 import org.geotools.resources.Utilities;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.content.ImagingCondition;
 
 
 /**
@@ -41,7 +33,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class ImageDescription extends CoverageDescription
        implements org.opengis.metadata.content.ImageDescription
@@ -53,7 +45,7 @@ public class ImageDescription extends CoverageDescription
     
     /**
      * Illumination elevation measured in degrees clockwise from the target plane at
-     * intersection of the optical line of sight with the Earth’s surface. For images from a
+     * intersection of the optical line of sight with the Earthï¿½s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
     private Number illuminationElevationAngle;
@@ -80,7 +72,7 @@ public class ImageDescription extends CoverageDescription
     private Number cloudCoverPercentage;
     
     /**
-     * Image distributor’s code that identifies the level of radiometric and geometric
+     * Image distributorï¿½s code that identifies the level of radiometric and geometric
      * processing that has been applied.
      */
     private Identifier processingLevelCode;
@@ -127,7 +119,7 @@ public class ImageDescription extends CoverageDescription
 
     /**
      * Returns the illumination elevation measured in degrees clockwise from the target plane at
-     * intersection of the optical line of sight with the Earth’s surface. For images from a
+     * intersection of the optical line of sight with the Earthï¿½s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
     public Number getIlluminationElevationAngle() {
@@ -136,7 +128,7 @@ public class ImageDescription extends CoverageDescription
 
     /**
      * Set the illumination elevation measured in degrees clockwise from the target plane at
-     * intersection of the optical line of sight with the Earth’s surface. For images from a
+     * intersection of the optical line of sight with the Earthï¿½s surface. For images from a
      * scanning device, refer to the centre pixel of the image.
      */
     public synchronized void setIlluminationElevationAngle(final Number newValue) {
@@ -210,7 +202,7 @@ public class ImageDescription extends CoverageDescription
     }
 
     /**
-     * Returns the image distributor’s code that identifies the level of radiometric and geometric
+     * Returns the image distributorï¿½s code that identifies the level of radiometric and geometric
      * processing that has been applied.
      */
     public Identifier getProcessingLevelCode() {
@@ -218,7 +210,7 @@ public class ImageDescription extends CoverageDescription
     }
 
     /**
-     * Set the image distributor’s code that identifies the level of radiometric and geometric
+     * Set the image distributorï¿½s code that identifies the level of radiometric and geometric
      * processing that has been applied.
      */
     public synchronized void setProcessingLevelCode(final Identifier newValue) {

@@ -11,16 +11,15 @@
 package org.geotools.data.coverage.grid;
 
 // J2SE dependencies
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.FileNotFoundException;  // For Javadoc
 
-// OpenGIS direct dependencies
 import org.geotools.gc.GridCoverage;
 import org.opengis.coverage.MetadataNameNotFoundException;
-import org.geotools.data.coverage.grid.Format;
-import org.opengis.parameter.ParameterNotFoundException;     // For javadoc
-import org.opengis.parameter.InvalidParameterNameException;  // For javadoc
-import org.opengis.parameter.InvalidParameterValueException; // For javadoc
+import org.opengis.coverage.grid.CannotCreateGridCoverageException;
+import org.opengis.parameter.InvalidParameterNameException;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 

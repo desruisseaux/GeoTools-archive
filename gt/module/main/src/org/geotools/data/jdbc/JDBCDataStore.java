@@ -40,15 +40,12 @@ import java.util.logging.Logger;
 
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.QueryRequest;
-import org.geotools.data.AbstractDataStore;
-import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTypeEntry;
 import org.geotools.data.EmptyFeatureReader;
-import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;

@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,23 +29,22 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
-import java.io.Serializable;
+// Entrï¿½s/sorties
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 
-// Divers
 import org.geotools.util.WeakHashSet;
 
 
 /**
- * Représentation d'un préfix du système métrique. Un objet <code>Prefix</code>
- * peut par exemple représenter des "centi" (symbole "c") comme dans "centimètres"
+ * Reprï¿½sentation d'un prï¿½fix du systï¿½me mï¿½trique. Un objet <code>Prefix</code>
+ * peut par exemple reprï¿½senter des "centi" (symbole "c") comme dans "centimï¿½tres"
  * (symbole "cm"). La description du paquet <code>org.geotools.units</code> donne
- * une liste des préfix standards du système SI.
+ * une liste des prï¿½fix standards du systï¿½me SI.
  *
  * <p><em>Note: this class has a natural ordering that is inconsistent with equals.</em>
- * La méthode {@link #compareTo} ne compare que le champ {@link #amount}, tandis
- * que la méthode {@link #equals} compare tous les champs ({@link #name},
+ * La mï¿½thode {@link #compareTo} ne compare que le champ {@link #amount}, tandis
+ * que la mï¿½thode {@link #equals} compare tous les champs ({@link #name},
  * {@link #symbol} et {@link #amount}).</p>
  *
  * @version 1.0
@@ -61,40 +60,40 @@ final class Prefix implements Comparable, Serializable {
     private static final long serialVersionUID = 3289659964721709283L;
     
     /**
-     * Banque des objets qui ont été précédemment créés et
-     * enregistrés par un appel à la méthode {@link #intern}.
+     * Banque des objets qui ont ï¿½tï¿½ prï¿½cï¿½demment crï¿½ï¿½s et
+     * enregistrï¿½s par un appel ï¿½ la mï¿½thode {@link #intern}.
      */
     static final WeakHashSet pool=new WeakHashSet();
     
     /**
-     * Nom neutre du préfix. Le système SI définit plusieurs noms de préfix, parmi lesquels on trouve
-     * "milli", "centi" et "kilo". Certaines unités (notamment des unités du type {@link ScaledUnit})
-     * pourront combiner leurs noms avec un nom de préfix. Par exemple le préfix "centi" (symbole "c")
-     * pourra être combiné avec les unités "mètres" (symbole "m") pour former les "centimètres" (symbole
-     * "cm"). La chaîne <code>name</code> peut être vide, mais ne sera jamais nulle. Notez enfin que
+     * Nom neutre du prï¿½fix. Le systï¿½me SI dï¿½finit plusieurs noms de prï¿½fix, parmi lesquels on trouve
+     * "milli", "centi" et "kilo". Certaines unitï¿½s (notamment des unitï¿½s du type {@link ScaledUnit})
+     * pourront combiner leurs noms avec un nom de prï¿½fix. Par exemple le prï¿½fix "centi" (symbole "c")
+     * pourra ï¿½tre combinï¿½ avec les unitï¿½s "mï¿½tres" (symbole "m") pour former les "centimï¿½tres" (symbole
+     * "cm"). La chaï¿½ne <code>name</code> peut ï¿½tre vide, mais ne sera jamais nulle. Notez enfin que
      * <code>name</code> est "language-neutral". Pour obtenir un nom dans la langue de l'utilisateur,
-     * utilisez la méthode {@link #getLocalizedName}.
+     * utilisez la mï¿½thode {@link #getLocalizedName}.
      */
     public final String name;
     
     /**
-     * Symbole du préfix. La plupart des symboles de préfix n'ont qu'une seule lettre. Il s'agit
-     * la plupart du temps de la première lettre de <code>name</code>, parfois en majuscule. Les
-     * majuscules et minuscules sont significatifs et très importants. Par exemple le symbole "m"
+     * Symbole du prï¿½fix. La plupart des symboles de prï¿½fix n'ont qu'une seule lettre. Il s'agit
+     * la plupart du temps de la premiï¿½re lettre de <code>name</code>, parfois en majuscule. Les
+     * majuscules et minuscules sont significatifs et trï¿½s importants. Par exemple le symbole "m"
      * est pour "milli" tandis que le symbole "M" est pour "mega".
      */
     public final String symbol;
     
     /**
-     * Quantité représenté par ce préfix. Pour les préfix SI, cette quantité est toujours une puissance de 10.
-     * Par exemple pour les "kilo" (symbole 'k'), la quantité <code>amount</code> est 1000. Cette quantité ne
+     * Quantitï¿½ reprï¿½sentï¿½ par ce prï¿½fix. Pour les prï¿½fix SI, cette quantitï¿½ est toujours une puissance de 10.
+     * Par exemple pour les "kilo" (symbole 'k'), la quantitï¿½ <code>amount</code> est 1000. Cette quantitï¿½ ne
      * sera jamais <code>NaN</code> ni infinie.
      */
     public final double amount;
     
     /**
-     * Construit un préfix temporaire. Ce constructeur ne sert qu'à effectuer
-     * des recherches dans une liste de préfix par {@link PrefixSet}.
+     * Construit un prï¿½fix temporaire. Ce constructeur ne sert qu'ï¿½ effectuer
+     * des recherches dans une liste de prï¿½fix par {@link PrefixSet}.
      */
     Prefix(final double amount) {
         this.name   = "";
@@ -103,11 +102,11 @@ final class Prefix implements Comparable, Serializable {
     }
     
     /**
-     * Construit un nouveau préfix.
+     * Construit un nouveau prï¿½fix.
      *
-     * @param name    Nom du préfix (par exemple "centi" comme dans "centimètres").
-     * @param symbol  Symbole du préfix (par exemple "c" pour "centimètres").
-     * @param amount  Quantité représenté par ce préfix (par exemple 0.01 pour "c").
+     * @param name    Nom du prï¿½fix (par exemple "centi" comme dans "centimï¿½tres").
+     * @param symbol  Symbole du prï¿½fix (par exemple "c" pour "centimï¿½tres").
+     * @param amount  Quantitï¿½ reprï¿½sentï¿½ par ce prï¿½fix (par exemple 0.01 pour "c").
      */
     private Prefix(final String name, final String symbol, final double amount) {
         this.name   = name.trim();
@@ -119,37 +118,37 @@ final class Prefix implements Comparable, Serializable {
     }
     
     /**
-     * Construit un nouveau préfix.
+     * Construit un nouveau prï¿½fix.
      *
-     * @param name    Nom du préfix (par exemple "centi" comme dans "centimètres").
-     * @param symbol  Symbole du préfix (par exemple "c" pour "centimètres").
-     * @param amount  Quantité représenté par ce préfix (par exemple 0.01 pour "c").
+     * @param name    Nom du prï¿½fix (par exemple "centi" comme dans "centimï¿½tres").
+     * @param symbol  Symbole du prï¿½fix (par exemple "c" pour "centimï¿½tres").
+     * @param amount  Quantitï¿½ reprï¿½sentï¿½ par ce prï¿½fix (par exemple 0.01 pour "c").
      */
     public static Prefix getPrefix(final String name, final String symbol, final double amount) {
         return new Prefix(name, symbol, amount).intern();
     }
     
     /**
-     * Retourne le nom du préfix dans la langue de l'utilisateur.
-     * Par exemple le préfix "deci" est écrit "déci" en français.
+     * Retourne le nom du prï¿½fix dans la langue de l'utilisateur.
+     * Par exemple le prï¿½fix "deci" est ï¿½crit "dï¿½ci" en franï¿½ais.
      */
     public String getLocalizedName() {
         return org.geotools.resources.units.Prefix.localize(name);
     }
     
     /**
-     * Retourne le symbole du préfix. Cette méthode retourne
-     * systématiquement le champ {@link #symbol}.
+     * Retourne le symbole du prï¿½fix. Cette mï¿½thode retourne
+     * systï¿½matiquement le champ {@link #symbol}.
      */
     public String toString() {
         return symbol;
     }
     
     /**
-     * Compare deux préfix. Cette méthode compare les quantités {@link #amount} de façon à permettre un classement
-     * des préfix en ordre croissant de quantité. Contrairement à la méthode {@link #equals}, <code>compareTo</code>
-     * ne compare pas les noms et symboles des préfix. Ainsi, deux préfix représentant la même quantité mais avec
-     * des symboles différents seront considérés égaux par <code>compareTo</code>.
+     * Compare deux prï¿½fix. Cette mï¿½thode compare les quantitï¿½s {@link #amount} de faï¿½on ï¿½ permettre un classement
+     * des prï¿½fix en ordre croissant de quantitï¿½. Contrairement ï¿½ la mï¿½thode {@link #equals}, <code>compareTo</code>
+     * ne compare pas les noms et symboles des prï¿½fix. Ainsi, deux prï¿½fix reprï¿½sentant la mï¿½me quantitï¿½ mais avec
+     * des symboles diffï¿½rents seront considï¿½rï¿½s ï¿½gaux par <code>compareTo</code>.
      */
     public int compareTo(final Object object) {
         final Prefix that = (Prefix) object;
@@ -159,10 +158,10 @@ final class Prefix implements Comparable, Serializable {
     }
     
     /**
-     * Indique si ce préfix est identique à l'objet spécifié.
-     * Cette méthode retourne <code>true</code> si <code>object</code> est aussi un
-     * objet <code>Prefix</code> et si les deux préfix ont les mêmes nom et symbole
-     * et représentent la même quantité {@link #amount}.
+     * Indique si ce prï¿½fix est identique ï¿½ l'objet spï¿½cifiï¿½.
+     * Cette mï¿½thode retourne <code>true</code> si <code>object</code> est aussi un
+     * objet <code>Prefix</code> et si les deux prï¿½fix ont les mï¿½mes nom et symbole
+     * et reprï¿½sentent la mï¿½me quantitï¿½ {@link #amount}.
      */
     public boolean equals(final Object object) {
         if (object==this) {
@@ -178,7 +177,7 @@ final class Prefix implements Comparable, Serializable {
     }
     
     /**
-     * Retourne un code représentant ce préfix.
+     * Retourne un code reprï¿½sentant ce prï¿½fix.
      */
     public int hashCode() {
         final long code=Double.doubleToLongBits(amount);
@@ -186,15 +185,15 @@ final class Prefix implements Comparable, Serializable {
     }
     
     /**
-     * Retourne un exemplaire unique de ce préfix. Une banque de préfix, initialement
-     * vide, est maintenue de façon interne par la classe <code>Prefix</code>. Lorsque
-     * la méthode <code>intern</code> est appelée, elle recherchera un préfix égale à
-     * <code>this</code> au sens de la méthode {@link #equals}. Si un tel préfix est
-     * trouvé, il sera retourné. Sinon, le préfix <code>this</code> sera ajouté à la
-     * banque de données en utilisant une référence faible et cette méthode retournera
+     * Retourne un exemplaire unique de ce prï¿½fix. Une banque de prï¿½fix, initialement
+     * vide, est maintenue de faï¿½on interne par la classe <code>Prefix</code>. Lorsque
+     * la mï¿½thode <code>intern</code> est appelï¿½e, elle recherchera un prï¿½fix ï¿½gale ï¿½
+     * <code>this</code> au sens de la mï¿½thode {@link #equals}. Si un tel prï¿½fix est
+     * trouvï¿½, il sera retournï¿½. Sinon, le prï¿½fix <code>this</code> sera ajoutï¿½ ï¿½ la
+     * banque de donnï¿½es en utilisant une rï¿½fï¿½rence faible et cette mï¿½thode retournera
      * <code>this</code>.
      * <br><br>
-     * De cette méthode il s'ensuit que pour deux préfix <var>u</var> et <var>v</var>,
+     * De cette mï¿½thode il s'ensuit que pour deux prï¿½fix <var>u</var> et <var>v</var>,
      * la condition <code>u.intern()==v.intern()</code> sera vrai si et seulement si
      * <code>u.equals(v)</code> est vrai.
      */
@@ -203,10 +202,10 @@ final class Prefix implements Comparable, Serializable {
     }
     
     /**
-     * Après la lecture d'une unité, vérifie si ce préfix
-     * apparaît déjà dans la banque des préfix. Si oui,
-     * l'exemplaire de la banque sera retourné plutôt
-     * que de garder inutilement le préfix courant comme copie.
+     * Aprï¿½s la lecture d'une unitï¿½, vï¿½rifie si ce prï¿½fix
+     * apparaï¿½t dï¿½jï¿½ dans la banque des prï¿½fix. Si oui,
+     * l'exemplaire de la banque sera retournï¿½ plutï¿½t
+     * que de garder inutilement le prï¿½fix courant comme copie.
      */
     final Object readResolve() throws ObjectStreamException {
         return intern();

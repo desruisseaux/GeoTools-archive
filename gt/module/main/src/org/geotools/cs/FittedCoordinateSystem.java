@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,19 +24,14 @@
 package org.geotools.cs;
 
 // OpenGIS dependencies
+import java.rmi.RemoteException;
+import java.util.Arrays;
+
+import org.geotools.ct.MathTransform;
+import org.geotools.units.Unit;
 import org.opengis.cs.CS_CoordinateSystem;
 import org.opengis.cs.CS_FittedCoordinateSystem;
-
-// OpenGIS dependencies
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.ct.MathTransform;
-
-// J2SE and Java3D dependencies
-import java.util.Arrays;
-import java.rmi.RemoteException;
 
 
 /**

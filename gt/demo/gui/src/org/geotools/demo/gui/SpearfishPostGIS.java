@@ -14,7 +14,6 @@ import javax.swing.WindowConstants;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;

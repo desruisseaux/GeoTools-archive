@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,28 +23,26 @@
 package org.geotools.referencing.cs;
 
 // J2SE dependencies and extensions
-import java.util.Map;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
+
+import javax.units.ConversionException;
+import javax.units.Converter;
 import javax.units.SI;
 import javax.units.Unit;
-import javax.units.Converter;
-import javax.units.ConversionException;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.Matrix;
+import org.geotools.measure.Measure;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.measure.Measure;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 
 
 /**

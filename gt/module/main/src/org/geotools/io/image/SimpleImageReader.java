@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,39 +33,31 @@
 package org.geotools.io.image;
 
 // Input/output
-import java.io.File;
-import java.io.IOException;
-import java.net.URLConnection;
-import java.net.URL;
-
-// Images
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
-import java.awt.image.DataBuffer;
+import java.awt.image.BandedSampleModel;
 import java.awt.image.ColorModel;
-import java.awt.image.SampleModel;       // For Javadoc
-import java.awt.image.BandedSampleModel; // For Javadoc
-
-// Image I/O
-import javax.imageio.ImageReader;
-import javax.imageio.ImageReadParam;     // For Javadoc
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.stream.ImageInputStream;
-
-// Collections
-import java.util.Iterator;
+import java.awt.image.DataBuffer;
+import java.awt.image.SampleModel;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
+import java.util.Iterator;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ComponentSampleModelJAI;
+import javax.media.jai.util.Range;
 
-// Resources
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ComponentColorModelJAI;
 
 
@@ -154,13 +146,13 @@ public abstract class SimpleImageReader extends ImageReader {
     }
     
     /**
-     * Vérifie si l'index de l'image est dans la plage des valeurs
-     * autorisées. L'index maximal autorisé est obtenu en appelant
+     * Vï¿½rifie si l'index de l'image est dans la plage des valeurs
+     * autorisï¿½es. L'index maximal autorisï¿½ est obtenu en appelant
      * <code>{@link #getNumImages getNumImages}(false)</code>.
      *
-     * @param  imageIndex Index dont on veut vérifier la validité.
-     * @throws IndexOutOfBoundsException si l'index spécifié n'est pas valide.
-     * @throws IOException si l'opération a échouée à cause d'une erreur d'entrés/sorties.
+     * @param  imageIndex Index dont on veut vï¿½rifier la validitï¿½.
+     * @throws IndexOutOfBoundsException si l'index spï¿½cifiï¿½ n'est pas valide.
+     * @throws IOException si l'opï¿½ration a ï¿½chouï¿½e ï¿½ cause d'une erreur d'entrï¿½s/sorties.
      */
     final void checkImageIndex(final int imageIndex) throws IOException, IndexOutOfBoundsException {
         final int numImages = getNumImages(false);
@@ -170,14 +162,14 @@ public abstract class SimpleImageReader extends ImageReader {
     }
     
     /**
-     * Vérifie si l'index de la bande est dans la plage des valeurs
-     * autorisées. L'index maximal autorisé est obtenu en appelant
-     * {@link #getNumBands}. L'index de l'image sera aussi vérifié.
+     * Vï¿½rifie si l'index de la bande est dans la plage des valeurs
+     * autorisï¿½es. L'index maximal autorisï¿½ est obtenu en appelant
+     * {@link #getNumBands}. L'index de l'image sera aussi vï¿½rifiï¿½.
      *
-     * @param  imageIndex Index de l'image dont on veut vérifier la validité.
-     * @param  bandIndex  Index de la bande dont on veut vérifier la validité.
-     * @throws IndexOutOfBoundsException si l'index spécifié n'est pas valide.
-     * @throws IOException si l'opération a échouée à cause d'une erreur d'entrés/sorties.
+     * @param  imageIndex Index de l'image dont on veut vï¿½rifier la validitï¿½.
+     * @param  bandIndex  Index de la bande dont on veut vï¿½rifier la validitï¿½.
+     * @throws IndexOutOfBoundsException si l'index spï¿½cifiï¿½ n'est pas valide.
+     * @throws IOException si l'opï¿½ration a ï¿½chouï¿½e ï¿½ cause d'une erreur d'entrï¿½s/sorties.
      */
     final void checkBandIndex(final int imageIndex, final int bandIndex) throws IOException, IndexOutOfBoundsException {
         // Call 'getNumBands' first in order to call 'checkImageIndex'.
@@ -402,10 +394,10 @@ public abstract class SimpleImageReader extends ImageReader {
     }
     
     /**
-     * Retourne la longueur (en nombre d'octets) des données à lire, ou <code>-1</code> si cette longueur
-     * n'est pas connue.  Cette méthode examine le type d'entré (@link #getInput}) et appelle une méthode
+     * Retourne la longueur (en nombre d'octets) des donnï¿½es ï¿½ lire, ou <code>-1</code> si cette longueur
+     * n'est pas connue.  Cette mï¿½thode examine le type d'entrï¿½ (@link #getInput}) et appelle une mï¿½thode
      * {@link File#length()}, {@link ImageInputStream#length()} ou {@link URLConnection#getContentLength()}
-     * en fonction du type d'entré.
+     * en fonction du type d'entrï¿½.
      *
      * @throws IOException si une erreur est survenue.
      */
@@ -431,20 +423,20 @@ public abstract class SimpleImageReader extends ImageReader {
     }
     
     /**
-     * Retourne une approximation du nombre d'octets du flot occupés par les
-     * images <code>fromImage</code> inclusivement jusqu'à <code>toImage</code>
-     * exclusivement. L'implémentation par défaut calcule cette longueur en
+     * Retourne une approximation du nombre d'octets du flot occupï¿½s par les
+     * images <code>fromImage</code> inclusivement jusqu'ï¿½ <code>toImage</code>
+     * exclusivement. L'implï¿½mentation par dï¿½faut calcule cette longueur en
      * supposant que toutes les images se divisent la longueur totale du flot
-     * en parts égales.
+     * en parts ï¿½gales.
      *
-     * @param fromImage Index de la première image à prendre en compte.
-     * @param   toImage Index suivant celui de la dernière image à prendre en
+     * @param fromImage Index de la premiï¿½re image ï¿½ prendre en compte.
+     * @param   toImage Index suivant celui de la derniï¿½re image ï¿½ prendre en
      *                  compte, ou -1 pour prendre en compte toutes les images
-     *                  restantes jusqu'à la fin du flot.
-     * @return Le nombre d'octets occupés par les images spécifiés, ou -1 si
-     *         cette longueur n'a pas pu être calculée. Si le calcul précis de
-     *         cette longueur serait prohibitif, cette méthode est autorisée à
-     *         retourner une simple approximation ou même à retourner la longueur
+     *                  restantes jusqu'ï¿½ la fin du flot.
+     * @return Le nombre d'octets occupï¿½s par les images spï¿½cifiï¿½s, ou -1 si
+     *         cette longueur n'a pas pu ï¿½tre calculï¿½e. Si le calcul prï¿½cis de
+     *         cette longueur serait prohibitif, cette mï¿½thode est autorisï¿½e ï¿½
+     *         retourner une simple approximation ou mï¿½me ï¿½ retourner la longueur
      *         totale du flot.
      * @throws IOException si une erreur est survenue lors de la lecture du flot.
      */

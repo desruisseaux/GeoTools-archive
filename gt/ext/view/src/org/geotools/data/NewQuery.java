@@ -3,7 +3,6 @@ package org.geotools.data;
 import java.net.URI;
 
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,17 +20,16 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies and extensions
-import java.util.Map;
-import java.util.Arrays;
-import java.util.Locale;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Collection;
+import java.util.Map;
+
 import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString; // For javadoc
+import org.geotools.resources.XArray;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -44,11 +43,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
-import org.geotools.resources.XArray;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.opengis.util.GenericName;
 
 
 /**

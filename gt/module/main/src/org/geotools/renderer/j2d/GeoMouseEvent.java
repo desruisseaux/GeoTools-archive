@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,22 +21,19 @@
 package org.geotools.renderer.j2d;
 
 // J2SE dependencies
-import java.awt.geom.Point2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.pt.CoordinatePoint;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
+import org.geotools.pt.CoordinatePoint;
 import org.geotools.renderer.DeformableViewer;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,19 +22,16 @@ package org.geotools.referencing.operation.transform;
 // J2SE dependencies
 import java.io.Serializable;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform1D;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.LinearTransform;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
-import org.geotools.referencing.operation.LinearTransform;
-import org.geotools.referencing.operation.GeneralMatrix;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**

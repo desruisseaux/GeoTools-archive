@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,74 +21,61 @@
 package org.geotools.renderer.geom;
 
 // Collections
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.AbstractCollection;
-import java.util.NoSuchElementException;
-import java.lang.UnsupportedOperationException;
-
-// Geometry
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.GeneralPath;
+import java.io.Serializable;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Arrays
-import org.geotools.renderer.array.ArrayData;
-import org.geotools.renderer.array.PointArray;
-import org.geotools.renderer.array.DefaultArray;
-import org.geotools.renderer.array.PointIterator;
-
-// Coordinate systems
-import org.geotools.units.Unit;
-import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CompoundCoordinateSystem;
-import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.HorizontalDatum;
+import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.CoordinateTransformation;
-
-// Miscellaneous
-import java.io.Serializable;
 import org.geotools.math.Statistics;
-import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
+import org.geotools.renderer.array.ArrayData;
+import org.geotools.renderer.array.DefaultArray;
+import org.geotools.renderer.array.PointArray;
+import org.geotools.renderer.array.PointIterator;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
 import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
+import org.geotools.units.Unit;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * Lignes tracées sans lever le crayon. Ces lignes ne représentent par forcément une forme fermée
- * (un polygone). Les objets <code>LineString</code> ont deux caractéristiques particulières:
+ * Lignes tracï¿½es sans lever le crayon. Ces lignes ne reprï¿½sentent par forcï¿½ment une forme fermï¿½e
+ * (un polygone). Les objets <code>LineString</code> ont deux caractï¿½ristiques particuliï¿½res:
  *
  * <ul>
- *   <li>Ils mémorisent séparément les points qui ne font que former une bordure. Par exemple, si
- *       seulement la moitié d'une île apparaît sur une carte, les points qui servent à joindre
- *       les deux extrémités des polylignes (en suivant la bordure de la carte là où l'île est
- *       coupée) n'ont pas de réalité géographique. Dans chaque objet <code>LineString</code>, il doit
- *       y avoir une distinction claire entre les véritable points géographique les "points de
- *       bordure". Ces points sont mémorisés séparéments dans les tableaux
+ *   <li>Ils mï¿½morisent sï¿½parï¿½ment les points qui ne font que former une bordure. Par exemple, si
+ *       seulement la moitiï¿½ d'une ï¿½le apparaï¿½t sur une carte, les points qui servent ï¿½ joindre
+ *       les deux extrï¿½mitï¿½s des polylignes (en suivant la bordure de la carte lï¿½ oï¿½ l'ï¿½le est
+ *       coupï¿½e) n'ont pas de rï¿½alitï¿½ gï¿½ographique. Dans chaque objet <code>LineString</code>, il doit
+ *       y avoir une distinction claire entre les vï¿½ritable points gï¿½ographique les "points de
+ *       bordure". Ces points sont mï¿½morisï¿½s sï¿½parï¿½ments dans les tableaux
  *       {@link #prefix}/{@link #suffix} et {@link #array} respectivement.</li>
  *
- *   <li>Ils peuvent être chaînés avec d'autres objets <code>LineString</code>. Former une chaîne
- *       d'objets <code>LineString</code> peut être utile lorsque les coordonnées d'une côte ont été
- *       obtenues à partir de la digitalisation de plusieurs cartes bathymétriques, que l'on joindra
- *       en une ligne continue au moment du traçage. Elle peut aussi se produire lorsqu'une ligne
- *       qui se trouve près du bord de la carte entre, sort, réentre et resort plusieurs fois du
+ *   <li>Ils peuvent ï¿½tre chaï¿½nï¿½s avec d'autres objets <code>LineString</code>. Former une chaï¿½ne
+ *       d'objets <code>LineString</code> peut ï¿½tre utile lorsque les coordonnï¿½es d'une cï¿½te ont ï¿½tï¿½
+ *       obtenues ï¿½ partir de la digitalisation de plusieurs cartes bathymï¿½triques, que l'on joindra
+ *       en une ligne continue au moment du traï¿½age. Elle peut aussi se produire lorsqu'une ligne
+ *       qui se trouve prï¿½s du bord de la carte entre, sort, rï¿½entre et resort plusieurs fois du
  *       cadre.</li>
  * </ul>
  *
- * Par convention, toutes les méthodes statiques de cette classe peuvent agir
- * sur une chaîne d'objets {@link LineString} plutôt que sur une seule instance.
+ * Par convention, toutes les mï¿½thodes statiques de cette classe peuvent agir
+ * sur une chaï¿½ne d'objets {@link LineString} plutï¿½t que sur une seule instance.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -126,37 +113,37 @@ final class LineString implements Serializable {
     private static final boolean MERGE_POLYLINE_DATA = false;
 
     /**
-     * Polylignes précédentes et suivantes. La classe <code>LineString</code> implémente une liste à
-     * double liens. Chaque objet <code>LineString</code> est capable d'accéder et d'agir sur les
-     * autres éléments de la liste à laquelle il appartient. En conséquent, il n'est pas nécessaire
-     * d'utiliser une classe séparée (par exemple {@link java.util.LinkedList}) comme conteneur.
-     * Il ne s'agit pas forcément d'un bon concept de programmation, mais il est pratique dans le
+     * Polylignes prï¿½cï¿½dentes et suivantes. La classe <code>LineString</code> implï¿½mente une liste ï¿½
+     * double liens. Chaque objet <code>LineString</code> est capable d'accï¿½der et d'agir sur les
+     * autres ï¿½lï¿½ments de la liste ï¿½ laquelle il appartient. En consï¿½quent, il n'est pas nï¿½cessaire
+     * d'utiliser une classe sï¿½parï¿½e (par exemple {@link java.util.LinkedList}) comme conteneur.
+     * Il ne s'agit pas forcï¿½ment d'un bon concept de programmation, mais il est pratique dans le
      * cas particulier de la classe <code>LineString</code> et offre de bonnes performances.
      */
     private LineString previous, next;
 
     /**
-     * Coordonnées formant la polyligne. Ces coordonnées doivent être celles d'un trait de côte ou
-     * de toute autre forme géométrique ayant une signification cartographique. Les points qui
-     * servent à "couper" un polygone (par exemple des points longeant la bordure de la carte)
-     * doivent être mémorisés séparément dans le tableau <code>suffix</code>.
+     * Coordonnï¿½es formant la polyligne. Ces coordonnï¿½es doivent ï¿½tre celles d'un trait de cï¿½te ou
+     * de toute autre forme gï¿½omï¿½trique ayant une signification cartographique. Les points qui
+     * servent ï¿½ "couper" un polygone (par exemple des points longeant la bordure de la carte)
+     * doivent ï¿½tre mï¿½morisï¿½s sï¿½parï¿½ment dans le tableau <code>suffix</code>.
      */
     private PointArray array;
 
     /**
-     * Coordonnées à retourner après celles de <code>array</code>. Ces coordonnées servent
-     * généralement à refermer un polygone, par exemple en suivant le cadre de la carte. Ce
-     * champ peut être nul s'il ne s'applique pas.
+     * Coordonnï¿½es ï¿½ retourner aprï¿½s celles de <code>array</code>. Ces coordonnï¿½es servent
+     * gï¿½nï¿½ralement ï¿½ refermer un polygone, par exemple en suivant le cadre de la carte. Ce
+     * champ peut ï¿½tre nul s'il ne s'applique pas.
      */
     private PointArray suffix;
 
     /**
-     * Valeur minimales et maximales autorisées comme arguments pour les méthodes {@link #getArray}
-     * et {@link #setArray}. Lorsque ces valeurs sont utilisées en ordre croissant, {@link #getArray}
+     * Valeur minimales et maximales autorisï¿½es comme arguments pour les mï¿½thodes {@link #getArray}
+     * et {@link #setArray}. Lorsque ces valeurs sont utilisï¿½es en ordre croissant, {@link #getArray}
      * retourne dans l'ordre les tableaux {@link #prefix}, {@link #array} et {@link #suffix}.
      * <br><br>
-     * Note: si les valeurs de ces constantes changent, alors il faudra revoir l'implémentation des
-     * méthodes suivantes:
+     * Note: si les valeurs de ces constantes changent, alors il faudra revoir l'implï¿½mentation des
+     * mï¿½thodes suivantes:
      *
      *    {@link #getArray},
      *    {@link #setArray},
@@ -166,7 +153,7 @@ final class LineString implements Serializable {
     private static final int FIRST_ARRAY=0, LAST_ARRAY=1;
 
     /**
-     * Construit un objet qui enveloppera les points spécifiés.
+     * Construit un objet qui enveloppera les points spï¿½cifiï¿½s.
      * Cette polyligne fera initialement partie d'aucune liste.
      */
     LineString(final PointArray array) {
@@ -174,11 +161,11 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Construit des objets mémorisant les coordonnées <code>data</code>. Les valeurs
-     * <code>NaN</code> au début et à la fin de <code>data</code> seront ignorées. Celles
-     * qui apparaissent au milieu auront pour effet de séparer le trait en plusieurs polylignes.
+     * Construit des objets mï¿½morisant les coordonnï¿½es <code>data</code>. Les valeurs
+     * <code>NaN</code> au dï¿½but et ï¿½ la fin de <code>data</code> seront ignorï¿½es. Celles
+     * qui apparaissent au milieu auront pour effet de sï¿½parer le trait en plusieurs polylignes.
      *
-     * @param data   Tableau de coordonnées (peut contenir des NaN).
+     * @param data   Tableau de coordonnï¿½es (peut contenir des NaN).
      * @return       Tableau de polylignes. Peut avoir une longueur de 0, mais ne sera jamais nul.
      */
     public static LineString[] getInstances(final float[] data) {
@@ -186,16 +173,16 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Construit des objets mémorisant les coordonnées <code>data</code> de l'index
-     * <code>lower</code> inclusivement jusqu'à <code>upper</code> exclusivement. Ces
-     * index doivent se référer à la position absolue dans le tableau <code>data</code>,
-     * c'est-à-dire être le double de l'index de la coordonnée. Les valeurs <code>NaN</code>
-     * au début et à la fin de <code>data</code> seront ignorées. Celles qui apparaissent au
-     * milieu auront pour effet de séparer le trait en plusieurs polylignes.
+     * Construit des objets mï¿½morisant les coordonnï¿½es <code>data</code> de l'index
+     * <code>lower</code> inclusivement jusqu'ï¿½ <code>upper</code> exclusivement. Ces
+     * index doivent se rï¿½fï¿½rer ï¿½ la position absolue dans le tableau <code>data</code>,
+     * c'est-ï¿½-dire ï¿½tre le double de l'index de la coordonnï¿½e. Les valeurs <code>NaN</code>
+     * au dï¿½but et ï¿½ la fin de <code>data</code> seront ignorï¿½es. Celles qui apparaissent au
+     * milieu auront pour effet de sï¿½parer le trait en plusieurs polylignes.
      *
-     * @param data   Tableau de coordonnées (peut contenir des NaN).
-     * @param lower  Index de la première donnée à considérer.
-     * @param upper  Index suivant celui de la dernière donnée.
+     * @param data   Tableau de coordonnï¿½es (peut contenir des NaN).
+     * @param lower  Index de la premiï¿½re donnï¿½e ï¿½ considï¿½rer.
+     * @param upper  Index suivant celui de la derniï¿½re donnï¿½e.
      * @return       Tableau de polylignes. Peut avoir une longueur de 0, mais ne sera jamais nul.
      */
     public static LineString[] getInstances(float[] data, int lower, int upper) {
@@ -259,8 +246,8 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Renvoie le premier élément de la liste à laquelle appartient la
-     * polyligne. Cette méthode peut retourner <code>scan</code>, mais
+     * Renvoie le premier ï¿½lï¿½ment de la liste ï¿½ laquelle appartient la
+     * polyligne. Cette mï¿½thode peut retourner <code>scan</code>, mais
      * jamais <code>null</code>  (sauf si l'argument <code>scan</code>
      * est nul).
      */
@@ -276,8 +263,8 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Renvoie le dernier élément de la liste à laquelle appartient la
-     * polyligne. Cette méthode peut retourner <code>scan</code>, mais
+     * Renvoie le dernier ï¿½lï¿½ment de la liste ï¿½ laquelle appartient la
+     * polyligne. Cette mï¿½thode peut retourner <code>scan</code>, mais
      * jamais <code>null</code>  (sauf si l'argument <code>scan</code>
      * est nul).
      */
@@ -293,25 +280,25 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Ajoute la polyligne <code>toAdd</code> à la fin de la polyligne <code>queue</code>.
-     * Les arguments <code>queue</code> et <code>toAdd</code> peuvent être n'importe
-     * quel maillon d'une chaîne, mais cette méthode sera plus rapide si <code>queue</code>
+     * Ajoute la polyligne <code>toAdd</code> ï¿½ la fin de la polyligne <code>queue</code>.
+     * Les arguments <code>queue</code> et <code>toAdd</code> peuvent ï¿½tre n'importe
+     * quel maillon d'une chaï¿½ne, mais cette mï¿½thode sera plus rapide si <code>queue</code>
      * est le dernier maillon.
      *
-     * @param  queue <code>LineString</code> à la fin duquel ajouter <code>toAdd</code>. Si cet
-     *               argument est nul, alors cette méthode retourne directement <code>toAdd</code>.
-     * @param  toAdd <code>LineString</code> à ajouter à <code>queue</code>. Cet objet sera ajouté
-     *               même s'il est vide. Si cet argument est nul, alors cette méthode retourne
+     * @param  queue <code>LineString</code> ï¿½ la fin duquel ajouter <code>toAdd</code>. Si cet
+     *               argument est nul, alors cette mï¿½thode retourne directement <code>toAdd</code>.
+     * @param  toAdd <code>LineString</code> ï¿½ ajouter ï¿½ <code>queue</code>. Cet objet sera ajoutï¿½
+     *               mï¿½me s'il est vide. Si cet argument est nul, alors cette mï¿½thode retourne
      *               <code>queue</code> sans rien faire.
-     * @return <code>LineString</code> résultant de la fusion. Les anciens objets <code>queue</code>
-     *         et <code>toAdd</code> peuvent avoir été modifiés et ne devraient plus être utilisés.
-     * @throws IllegalArgumentException si <code>toAdd</code> avait déjà été ajouté à
+     * @return <code>LineString</code> rï¿½sultant de la fusion. Les anciens objets <code>queue</code>
+     *         et <code>toAdd</code> peuvent avoir ï¿½tï¿½ modifiï¿½s et ne devraient plus ï¿½tre utilisï¿½s.
+     * @throws IllegalArgumentException si <code>toAdd</code> avait dï¿½jï¿½ ï¿½tï¿½ ajoutï¿½ ï¿½
      *         <code>queue</code>.
      */
     public static LineString append(LineString queue, LineString toAdd)
             throws IllegalArgumentException
     {
-        // On doit faire l'ajout même si 'toAdd' est vide.
+        // On doit faire l'ajout mï¿½me si 'toAdd' est vide.
         final LineString veryLast = getLast(toAdd);
         toAdd = getFirst(toAdd);
         queue = getLast (queue);
@@ -333,8 +320,8 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Supprime ce maillon de la chaîne. Ce maillon
-     * conservera toutefois ses données.
+     * Supprime ce maillon de la chaï¿½ne. Ce maillon
+     * conservera toutefois ses donnï¿½es.
      */
     private void remove() {
         if (previous != null) {
@@ -348,16 +335,16 @@ final class LineString implements Serializable {
 
     /**
      * Indique si cette polyligne est vide. Une polyligne est vide si tous
-     * ces tableaux sont nuls. Cette méthode ne vérifie pas l'état des
-     * autres maillons de la chaîne.
+     * ces tableaux sont nuls. Cette mï¿½thode ne vï¿½rifie pas l'ï¿½tat des
+     * autres maillons de la chaï¿½ne.
      */
     private boolean isEmpty() {
         return array==null && suffix==null;
     }
 
     /**
-     * Retourne un des tableaux de données de cette polyligne. Le tableau retourné
-     * peut être {@link #prefix}, {@link #array} ou {@link #suffix} selon que
+     * Retourne un des tableaux de donnï¿½es de cette polyligne. Le tableau retournï¿½
+     * peut ï¿½tre {@link #prefix}, {@link #array} ou {@link #suffix} selon que
      * l'argument est -1, 0 ou +1 respectivement. Toute autre valeur lancera
      * une exception.
      *
@@ -374,8 +361,8 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Modifie un des tableaux de données de cette polyligne. Le tableau modifié
-     * peut être {@link #prefix}, {@link #array} ou {@link #suffix} selon que
+     * Modifie un des tableaux de donnï¿½es de cette polyligne. Le tableau modifiï¿½
+     * peut ï¿½tre {@link #prefix}, {@link #array} ou {@link #suffix} selon que
      * l'argument est -1, 0 ou +1 respectivement.  Toute autre valeur lancera
      * une exception.
      *
@@ -416,11 +403,11 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Retourne le nombre de points de la polyligne spécifiée
+     * Retourne le nombre de points de la polyligne spï¿½cifiï¿½e
      * ainsi que de tous les polylignes qui le suivent.
      *
-     * @param scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *             mais cette méthode sera plus rapide si c'est le premier maillon.
+     * @param scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *             mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
      */
     public static int getPointCount(LineString scan) {
         scan = getFirst(scan);
@@ -438,10 +425,10 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Vérifie si la polyligne spécifiée est vide.
+     * Vï¿½rifie si la polyligne spï¿½cifiï¿½e est vide.
      *
-     * @param scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *             mais cette méthode sera plus rapide si c'est le premier maillon.
+     * @param scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *             mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
      */
     public static boolean isEmpty(LineString scan) {
         scan = getFirst(scan);
@@ -469,18 +456,18 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Donne à la coordonnée spécifiée la valeur du premier point. Si une bordure a été
-     * ajoutée avec la méthode {@link #prepend}, elle sera pris en compte. Si cet objet
-     * <code>LineString</code> ne contient aucun point, l'objet qui suit dans la chaîne
-     * sera automatiquement interrogé.
+     * Donne ï¿½ la coordonnï¿½e spï¿½cifiï¿½e la valeur du premier point. Si une bordure a ï¿½tï¿½
+     * ajoutï¿½e avec la mï¿½thode {@link #prepend}, elle sera pris en compte. Si cet objet
+     * <code>LineString</code> ne contient aucun point, l'objet qui suit dans la chaï¿½ne
+     * sera automatiquement interrogï¿½.
      *
-     * @param  scan  Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *               mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param  point Point dans lequel mémoriser la coordonnée.
+     * @param  scan  Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *               mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param  point Point dans lequel mï¿½moriser la coordonnï¿½e.
      * @return L'argument <code>point</code>, ou un nouveau point
-     *         si <code>point</code> était nul.
+     *         si <code>point</code> ï¿½tait nul.
      * @throws NoSuchElementException Si <code>scan</code> est nul
-     *         ou s'il ne reste plus de points dans la chaîne.
+     *         ou s'il ne reste plus de points dans la chaï¿½ne.
      *
      * @see #getFirstPoints
      * @see #getLastPoint
@@ -502,18 +489,18 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Donne à la coordonnée spécifiée la valeur du dernier point. Si une bordure a été
-     * ajoutée avec la méthode {@link #append}, elle sera pris en compte.  Si cet objet
-     * <code>LineString</code> ne contient aucun point, l'objet qui précède dans la chaîne
-     * sera automatiquement interrogé.
+     * Donne ï¿½ la coordonnï¿½e spï¿½cifiï¿½e la valeur du dernier point. Si une bordure a ï¿½tï¿½
+     * ajoutï¿½e avec la mï¿½thode {@link #append}, elle sera pris en compte.  Si cet objet
+     * <code>LineString</code> ne contient aucun point, l'objet qui prï¿½cï¿½de dans la chaï¿½ne
+     * sera automatiquement interrogï¿½.
      *
-     * @param  scan  Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *               mais cette méthode sera plus rapide si c'est le dernier maillon.
-     * @param  point Point dans lequel mémoriser la coordonnée.
+     * @param  scan  Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *               mais cette mï¿½thode sera plus rapide si c'est le dernier maillon.
+     * @param  point Point dans lequel mï¿½moriser la coordonnï¿½e.
      * @return L'argument <code>point</code>, ou un nouveau point
-     *         si <code>point</code> était nul.
+     *         si <code>point</code> ï¿½tait nul.
      * @throws NoSuchElementException Si <code>scan</code> est nul
-     *         ou s'il ne reste plus de points dans la chaîne.
+     *         ou s'il ne reste plus de points dans la chaï¿½ne.
      *
      * @see #getLastPoints
      * @see #getFirstPoint
@@ -535,17 +522,17 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Donne aux coordonnées spécifiées les valeurs des premiers points.
+     * Donne aux coordonnï¿½es spï¿½cifiï¿½es les valeurs des premiers points.
      *
-     * @param scan   Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *               mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param points Tableau dans lequel mémoriser les premières coordonnées. <code>points[0]</code>
-     *               contiendra la première coordonnée, <code>points[1]</code> la seconde, etc. Si
-     *               un élément de ce tableau est nul, un objet {@link Point2D} sera automatiquement
-     *               créé.
+     * @param scan   Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *               mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param points Tableau dans lequel mï¿½moriser les premiï¿½res coordonnï¿½es. <code>points[0]</code>
+     *               contiendra la premiï¿½re coordonnï¿½e, <code>points[1]</code> la seconde, etc. Si
+     *               un ï¿½lï¿½ment de ce tableau est nul, un objet {@link Point2D} sera automatiquement
+     *               crï¿½ï¿½.
      *
      * @throws NoSuchElementException Si <code>scan</code> est nul ou
-     *         s'il ne reste pas suffisament de points dans la chaîne.
+     *         s'il ne reste pas suffisament de points dans la chaï¿½ne.
      */
     public static void getFirstPoints(LineString scan, final Point2D points[])
             throws NoSuchElementException
@@ -587,24 +574,24 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Donne aux coordonnées spécifiées les valeurs des derniers points.
+     * Donne aux coordonnï¿½es spï¿½cifiï¿½es les valeurs des derniers points.
      *
-     * @param scan   Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *               mais cette méthode sera plus rapide si c'est le dernier maillon.
-     * @param points Tableau dans lequel mémoriser les dernières coordonnées.
-     *               <code>points[length-1]</code> contiendra la dernière coordonnée,
-     *               <code>points[length-2]</code> l'avant dernière, etc. Si un élément de
-     *               ce tableau est nul, un objet {@link Point2D} sera automatiquement créé.
+     * @param scan   Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *               mais cette mï¿½thode sera plus rapide si c'est le dernier maillon.
+     * @param points Tableau dans lequel mï¿½moriser les derniï¿½res coordonnï¿½es.
+     *               <code>points[length-1]</code> contiendra la derniï¿½re coordonnï¿½e,
+     *               <code>points[length-2]</code> l'avant derniï¿½re, etc. Si un ï¿½lï¿½ment de
+     *               ce tableau est nul, un objet {@link Point2D} sera automatiquement crï¿½ï¿½.
      *
      * @throws NoSuchElementException Si <code>scan</code> est nul ou
-     *         s'il ne reste pas suffisament de points dans la chaîne.
+     *         s'il ne reste pas suffisament de points dans la chaï¿½ne.
      */
     public static void getLastPoints(LineString scan, final Point2D points[])
             throws NoSuchElementException
     {
         scan = getLast(scan);
         if (points.length == 0) {
-            // Nécessaire pour l'implémentation ci-dessous.
+            // Nï¿½cessaire pour l'implï¿½mentation ci-dessous.
             return;
         }
         if (scan == null) {
@@ -614,8 +601,8 @@ final class LineString implements Serializable {
         int    arrayID = LAST_ARRAY+1;
         PointArray data;
         /*
-         * Recherche la position à partir d'où lire les données.  A la
-         * sortie de cette boucle, la première donnée valide sera à la
+         * Recherche la position ï¿½ partir d'oï¿½ lire les donnï¿½es.  A la
+         * sortie de cette boucle, la premiï¿½re donnï¿½e valide sera ï¿½ la
          * position <code>scan.getArray(arrayID).iterator(i)</code>.
          */
         do {
@@ -634,8 +621,8 @@ final class LineString implements Serializable {
         }
         while (startIndex < 0);
         /*
-         * Procède à la mémorisation des coordonnées.   Note: parvenu à ce stade, 'data' devrait
-         * obligatoirement être non-nul. Un {@link NullPointerException} dans le code ci-dessous
+         * Procï¿½de ï¿½ la mï¿½morisation des coordonnï¿½es.   Note: parvenu ï¿½ ce stade, 'data' devrait
+         * obligatoirement ï¿½tre non-nul. Un {@link NullPointerException} dans le code ci-dessous
          * serait une erreur de programmation.
          */
         PointIterator it = data.iterator(startIndex);
@@ -665,17 +652,17 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Retourne une polyligne qui couvrira les données de cette polyligne
-     * de l'index <code>lower</code> inclusivement jusqu'à l'index
+     * Retourne une polyligne qui couvrira les donnï¿½es de cette polyligne
+     * de l'index <code>lower</code> inclusivement jusqu'ï¿½ l'index
      * <code>upper</code> exclusivement.
      *
-     * @param scan  Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *              mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param lower Index du premier point à retenir.
-     * @param upper Index suivant celui du dernier point à retenir.
-     * @return      Une chaîne de nouvelles polylignes, ou <code>scan</code> si aucun
-     *              point n'a été ignorés. Si la polyligne obtenu ne contient aucun
-     *              point, alors cette méthode retourne <code>null</code>.
+     * @param scan  Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *              mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param lower Index du premier point ï¿½ retenir.
+     * @param upper Index suivant celui du dernier point ï¿½ retenir.
+     * @return      Une chaï¿½ne de nouvelles polylignes, ou <code>scan</code> si aucun
+     *              point n'a ï¿½tï¿½ ignorï¿½s. Si la polyligne obtenu ne contient aucun
+     *              point, alors cette mï¿½thode retourne <code>null</code>.
      */
     public static LineString subpoly(LineString scan, int lower, int upper) {
         if (lower == upper) {
@@ -694,8 +681,8 @@ final class LineString implements Serializable {
                     continue;
                 }
                 /*
-                 * Vérifie si le tableau 'data' contient au moins quelques points
-                 * à prendre en compte. Si ce n'est pas le cas, il sera ignoré en
+                 * Vï¿½rifie si le tableau 'data' contient au moins quelques points
+                 * ï¿½ prendre en compte. Si ce n'est pas le cas, il sera ignorï¿½ en
                  * bloc.
                  */
                 int count = data.count();
@@ -705,9 +692,9 @@ final class LineString implements Serializable {
                     continue;
                 }
                 /*
-                 * Prend en compte les données de 'data' de 'lower' jusqu'à 'upper',
-                 * mais sans dépasser la longueur du tableau. S'il reste encore des
-                 * points à aller chercher (upper!=0), on examinera les tableaux suivants.
+                 * Prend en compte les donnï¿½es de 'data' de 'lower' jusqu'ï¿½ 'upper',
+                 * mais sans dï¿½passer la longueur du tableau. S'il reste encore des
+                 * points ï¿½ aller chercher (upper!=0), on examinera les tableaux suivants.
                  */
                 if (count > upper) {
                     count = upper;
@@ -735,8 +722,8 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Ajoute des points à la bordure de cette polyligne. Cette méthode est réservée
-     * à un usage interne par {@link #prependBorder} et {@link #appendBorder}.
+     * Ajoute des points ï¿½ la bordure de cette polyligne. Cette mï¿½thode est rï¿½servï¿½e
+     * ï¿½ un usage interne par {@link #prependBorder} et {@link #appendBorder}.
      */
     private void addBorder(float[] data, int lower, int upper, final boolean toEnd) {
         if (REMOVE_DOUBLONS) {
@@ -755,15 +742,15 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Ajoute des points au début de cette polyligne. Ces points seront considérés comme
-     * faisant partie de la bordure de la carte, et non comme des points représentant
-     * une structure géographique.
+     * Ajoute des points au dï¿½but de cette polyligne. Ces points seront considï¿½rï¿½s comme
+     * faisant partie de la bordure de la carte, et non comme des points reprï¿½sentant
+     * une structure gï¿½ographique.
      *
-     * @param  scan  Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne.
-     * @param  data  Coordonnées à ajouter sous forme de paires de nombres (x,y).
-     * @param  lower Index du premier <var>x</var> à ajouter à la bordure.
-     * @param  upper Index suivant celui du dernier <var>y</var> à ajouter à la bordure.
-     * @return LineString résultant. Ca sera en général <code>scan</code>.
+     * @param  scan  Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne.
+     * @param  data  Coordonnï¿½es ï¿½ ajouter sous forme de paires de nombres (x,y).
+     * @param  lower Index du premier <var>x</var> ï¿½ ajouter ï¿½ la bordure.
+     * @param  upper Index suivant celui du dernier <var>y</var> ï¿½ ajouter ï¿½ la bordure.
+     * @return LineString rï¿½sultant. Ca sera en gï¿½nï¿½ral <code>scan</code>.
      */
     public static LineString prependBorder(LineString scan, final float[] data,
                                            int lower, int upper)
@@ -793,15 +780,15 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Ajoute des points à la fin de cette polyligne. Ces points seront considérés comme
-     * faisant partie de la bordure de la carte, et non comme des points représentant
-     * une structure géographique.
+     * Ajoute des points ï¿½ la fin de cette polyligne. Ces points seront considï¿½rï¿½s comme
+     * faisant partie de la bordure de la carte, et non comme des points reprï¿½sentant
+     * une structure gï¿½ographique.
      *
-     * @param  scan  Polyline. Cet argument peut être n'importe quel maillon d'une chaîne.
-     * @param  data  Coordonnées à ajouter sous forme de paires de nombres (x,y).
-     * @param  lower Index du premier <var>x</var> à ajouter à la bordure.
-     * @param  upper Index suivant celui du dernier <var>y</var> à ajouter à la bordure.
-     * @return Polyligne résultante. Ca sera en général <code>scan</code>.
+     * @param  scan  Polyline. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne.
+     * @param  data  Coordonnï¿½es ï¿½ ajouter sous forme de paires de nombres (x,y).
+     * @param  lower Index du premier <var>x</var> ï¿½ ajouter ï¿½ la bordure.
+     * @param  upper Index suivant celui du dernier <var>y</var> ï¿½ ajouter ï¿½ la bordure.
+     * @return Polyligne rï¿½sultante. Ca sera en gï¿½nï¿½ral <code>scan</code>.
      */
     public static LineString appendBorder(LineString scan, final float[] data, int lower, int upper) {
         if (REMOVE_DOUBLONS_IN_BORDER) {
@@ -828,12 +815,12 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Inverse l'ordre de tous les points.  Cette méthode retournera le
-     * premier maillon d'une nouvelle chaîne de polylignes qui contiendra
-     * les données en ordre inverse.
+     * Inverse l'ordre de tous les points.  Cette mï¿½thode retournera le
+     * premier maillon d'une nouvelle chaï¿½ne de polylignes qui contiendra
+     * les donnï¿½es en ordre inverse.
      *
-     * @param  scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *              mais cette méthode sera plus rapide si c'est le dernier maillon.
+     * @param  scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *              mais cette mï¿½thode sera plus rapide si c'est le dernier maillon.
      */
     public static LineString reverse(LineString scan) {
         LineString queue = null;
@@ -843,15 +830,15 @@ final class LineString implements Serializable {
                 if (array != null) {
                     array = array.reverse();
                     /*
-                     * Tous les tableaux sont balayés dans cette boucle,
-                     * un à un et dans l'ordre inverse. Les préfix doivent
+                     * Tous les tableaux sont balayï¿½s dans cette boucle,
+                     * un ï¿½ un et dans l'ordre inverse. Les prï¿½fix doivent
                      * devenir des suffix, et les suffix doivent devenir
-                     * des préfix.
+                     * des prï¿½fix.
                      */
                     if (arrayID == 0) {
                         queue = append(queue, new LineString(array));
                     } else {
-                        queue = getLast(queue); // Par précaution.
+                        queue = getLast(queue); // Par prï¿½caution.
                         if (queue == null) {
                             queue = new LineString(null);
                         }
@@ -865,13 +852,13 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Retourne les coordonnées d'une boîte qui englobe complètement tous
+     * Retourne les coordonnï¿½es d'une boï¿½te qui englobe complï¿½tement tous
      * les points de la polyligne. Si cette polyligne ne contient aucun point,
-     * alors cette méthode retourne <code>null</code>.
+     * alors cette mï¿½thode retourne <code>null</code>.
      *
-     * @param  scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *              mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @return Un rectangle englobeant toutes les coordonnées de cette polyligne et de
+     * @param  scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *              mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @return Un rectangle englobeant toutes les coordonnï¿½es de cette polyligne et de
      *         ceux qui la suivent, ou <code>null</code>.
      */
     public static Rectangle2D getBounds2D(LineString scan) {
@@ -895,16 +882,16 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Retourne les coordonnées d'une boîte qui englobe complètement tous
+     * Retourne les coordonnï¿½es d'une boï¿½te qui englobe complï¿½tement tous
      * les points de la polyligne. Si cette polyligne ne contient aucun point,
-     * alors cette méthode retourne <code>null</code>.
+     * alors cette mï¿½thode retourne <code>null</code>.
      *
-     * @param  scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *              mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param  transform Transformation à appliquer sur les données (nulle pour aucune).
-     * @return Un rectangle englobeant toutes les coordonnées de cette polyligne et de
+     * @param  scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *              mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param  transform Transformation ï¿½ appliquer sur les donnï¿½es (nulle pour aucune).
+     * @return Un rectangle englobeant toutes les coordonnï¿½es de cette polyligne et de
      *         ceux qui la suivent, ou <code>null</code>.
-     * @throws TransformException Si une projection cartographique a échoué.
+     * @throws TransformException Si une projection cartographique a ï¿½chouï¿½.
      */
     public static Rectangle2D getBounds2D(LineString scan, final MathTransform2D transform)
             throws TransformException
@@ -942,35 +929,35 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Renvoie des statistiques sur la résolution d'un polyligne. Cette résolution sera
+     * Renvoie des statistiques sur la rï¿½solution d'un polyligne. Cette rï¿½solution sera
      * la distance moyenne entre deux points du polyligne,  mais sans prendre en compte
      * les "points de bordure"  (par exemple les points qui suivent le bord d'une carte
-     * plutôt que de représenter une structure géographique réelle).
+     * plutï¿½t que de reprï¿½senter une structure gï¿½ographique rï¿½elle).
      * <br><br>
-     * La résolution est calculée en utilisant le système de coordonnées spécifié. Les
-     * unités du résultat seront donc  les unités des deux premiers axes de ce système
-     * de coordonnées,  <strong>sauf</strong>  si les deux premiers axes utilisent des
-     * coordonnées géographiques angulaires  (c'est le cas notamment des objets {@link
-     * GeographicCoordinateSystem}).  Dans ce dernier cas,  le calcul utilisera plutôt
-     * les distances orthodromiques sur l'ellipsoïde ({@link Ellipsoid}) du système de
-     * coordonnées.   En d'autres mots, pour les systèmes cartographiques, le résultat
-     * de cette méthode sera toujours exprimé en unités linéaires (souvent des mètres)
-     * peu importe que le système de coordonnées soit {@link ProjectedCoordinateSystem}
+     * La rï¿½solution est calculï¿½e en utilisant le systï¿½me de coordonnï¿½es spï¿½cifiï¿½. Les
+     * unitï¿½s du rï¿½sultat seront donc  les unitï¿½s des deux premiers axes de ce systï¿½me
+     * de coordonnï¿½es,  <strong>sauf</strong>  si les deux premiers axes utilisent des
+     * coordonnï¿½es gï¿½ographiques angulaires  (c'est le cas notamment des objets {@link
+     * GeographicCoordinateSystem}).  Dans ce dernier cas,  le calcul utilisera plutï¿½t
+     * les distances orthodromiques sur l'ellipsoï¿½de ({@link Ellipsoid}) du systï¿½me de
+     * coordonnï¿½es.   En d'autres mots, pour les systï¿½mes cartographiques, le rï¿½sultat
+     * de cette mï¿½thode sera toujours exprimï¿½ en unitï¿½s linï¿½aires (souvent des mï¿½tres)
+     * peu importe que le systï¿½me de coordonnï¿½es soit {@link ProjectedCoordinateSystem}
      * ou {@link GeographicCoordinateSystem}.
      *
-     * @param  scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *         mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param  transformation Systèmes de coordonnées source et destination.
-     *         <code>getSourceCS()</code> doit être le système interne des points
-     *         des polylignes, tandis que  <code>getTargetCS()</code> doit être le
-     *         système dans lequel faire le calcul. C'est <code>getTargetCS()</code>
-     *         qui déterminera les unités du résultat. Cet argument peut être nul
-     *         si aucune transformation n'est nécessaire. Dans ce cas, le système
-     *         de coordonnées <code>getTargetCS()</code> sera supposé cartésien.
-     * @return Statistiques sur la résolution. L'objet retourné ne sera jamais nul, mais les
-     *         statistiques seront tous à NaN si cette courbe de niveau ne contenait aucun
-     *         point. Voir la description de cette méthode pour les unités.
-     * @throws TransformException Si une transformation de coordonnées a échouée.
+     * @param  scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *         mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param  transformation Systï¿½mes de coordonnï¿½es source et destination.
+     *         <code>getSourceCS()</code> doit ï¿½tre le systï¿½me interne des points
+     *         des polylignes, tandis que  <code>getTargetCS()</code> doit ï¿½tre le
+     *         systï¿½me dans lequel faire le calcul. C'est <code>getTargetCS()</code>
+     *         qui dï¿½terminera les unitï¿½s du rï¿½sultat. Cet argument peut ï¿½tre nul
+     *         si aucune transformation n'est nï¿½cessaire. Dans ce cas, le systï¿½me
+     *         de coordonnï¿½es <code>getTargetCS()</code> sera supposï¿½ cartï¿½sien.
+     * @return Statistiques sur la rï¿½solution. L'objet retournï¿½ ne sera jamais nul, mais les
+     *         statistiques seront tous ï¿½ NaN si cette courbe de niveau ne contenait aucun
+     *         point. Voir la description de cette mï¿½thode pour les unitï¿½s.
+     * @throws TransformException Si une transformation de coordonnï¿½es a ï¿½chouï¿½e.
      */
     static Statistics getResolution(LineString scan, final CoordinateTransformation transformation)
             throws TransformException
@@ -1042,19 +1029,19 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Modifie la résolution de cette carte. Cette méthode procèdera en interpolant les données
-     * de façon à ce que chaque point soit séparé du précédent par la distance spécifiée.  Cela
-     * peut se traduire par des économies importante de mémoire  si  une trop grande résolution
-     * n'est pas nécessaire. Notez que cette opération est irreversible.  Appeler cette méthode
-     * une seconde fois avec une résolution plus fine gonflera la taille des tableaux internes,
-     * mais sans amélioration réelle de la précision.
+     * Modifie la rï¿½solution de cette carte. Cette mï¿½thode procï¿½dera en interpolant les donnï¿½es
+     * de faï¿½on ï¿½ ce que chaque point soit sï¿½parï¿½ du prï¿½cï¿½dent par la distance spï¿½cifiï¿½e.  Cela
+     * peut se traduire par des ï¿½conomies importante de mï¿½moire  si  une trop grande rï¿½solution
+     * n'est pas nï¿½cessaire. Notez que cette opï¿½ration est irreversible.  Appeler cette mï¿½thode
+     * une seconde fois avec une rï¿½solution plus fine gonflera la taille des tableaux internes,
+     * mais sans amï¿½lioration rï¿½elle de la prï¿½cision.
      *
-     * @param  scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *         mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param  transformation Transformation permettant de convertir les coordonnées des polylignes
-     *         vers des coordonnées cartésiennes. Cet argument peut être nul si les coordonnées de
-     *         <code>this</code> sont déjà exprimées selon un système de coordonnées cartésiennes.
-     * @param  resolution Résolution désirée, selon les mêmes unités que {@link #getResolution}.
+     * @param  scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *         mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param  transformation Transformation permettant de convertir les coordonnï¿½es des polylignes
+     *         vers des coordonnï¿½es cartï¿½siennes. Cet argument peut ï¿½tre nul si les coordonnï¿½es de
+     *         <code>this</code> sont dï¿½jï¿½ exprimï¿½es selon un systï¿½me de coordonnï¿½es cartï¿½siennes.
+     * @param  resolution Rï¿½solution dï¿½sirï¿½e, selon les mï¿½mes unitï¿½s que {@link #getResolution}.
      * @throws TransformException Si une erreur est survenue lors d'une projection cartographique.
      *
      * @see #getResolution
@@ -1103,8 +1090,8 @@ final class LineString implements Serializable {
                 continue;
             }
             /*
-             * Obtiens les coordonnées projetées. Si ces coordonnées représentent des
-             * degrés de longitudes et latitudes, alors une projection cartographique
+             * Obtiens les coordonnï¿½es projetï¿½es. Si ces coordonnï¿½es reprï¿½sentent des
+             * degrï¿½s de longitudes et latitudes, alors une projection cartographique
              * sera obligatoire afin de faire correctement les calculs de distances.
              */
             float[] array = points.toArray();
@@ -1114,14 +1101,14 @@ final class LineString implements Serializable {
             }
             if (array.length >= 2) {
                 /*
-                 * Effectue la décimation des coordonnées. La toute première
-                 * coordonnée sera conservée inchangée. Il en ira de même de
-                 * la dernière, à la fin de ce bloc.
+                 * Effectue la dï¿½cimation des coordonnï¿½es. La toute premiï¿½re
+                 * coordonnï¿½e sera conservï¿½e inchangï¿½e. Il en ira de mï¿½me de
+                 * la derniï¿½re, ï¿½ la fin de ce bloc.
                  */
                 final Point2D.Float point = new Point2D.Float(array[0], array[1]);
                 final Line2D.Float   line = new  Line2D.Float(0,0, point.x, point.y);
                 int destIndex   = 2; // Ne touche pas au premier point.
-                int sourceIndex = 2; // Le premier point est déjà lu.
+                int sourceIndex = 2; // Le premier point est dï¿½jï¿½ lu.
                 while (sourceIndex < array.length) {
                     line.x1 = line.x2;
                     line.y1 = line.y2;
@@ -1142,9 +1129,9 @@ final class LineString implements Serializable {
                     }
                 }
                 /*
-                 * La décimation est maintenant terminée. Vérifie si le dernier point
-                 * apparaît dans le tableau décimé. S'il n'apparaît pas, on l'ajoutera.
-                 * Ensuite, on libèrera la mémoire réservée en trop.
+                 * La dï¿½cimation est maintenant terminï¿½e. Vï¿½rifie si le dernier point
+                 * apparaï¿½t dans le tableau dï¿½cimï¿½. S'il n'apparaï¿½t pas, on l'ajoutera.
+                 * Ensuite, on libï¿½rera la mï¿½moire rï¿½servï¿½e en trop.
                  */
                 if (array[destIndex-2] != line.x2  ||  array[destIndex-1] != line.y2) {
                     if (destIndex == array.length) {
@@ -1158,9 +1145,9 @@ final class LineString implements Serializable {
                 }
             }
             /*
-             * Les interpolations étant terminées, reconvertit les coordonnées
-             * selon leur système de coordonnés initial et mémorise le nouveau
-             * tableau décimé à la place de l'ancien.
+             * Les interpolations ï¿½tant terminï¿½es, reconvertit les coordonnï¿½es
+             * selon leur systï¿½me de coordonnï¿½s initial et mï¿½morise le nouveau
+             * tableau dï¿½cimï¿½ ï¿½ la place de l'ancien.
              */
             if (inverseTransform != null) {
                 inverseTransform.transform(array, 0, array, 0, array.length/2);
@@ -1170,26 +1157,26 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Déclare que les données de cette polyligne ne vont plus changer. Cette
-     * méthode peut réaranger les tableaux de points d'une façon plus compacte.
+     * Dï¿½clare que les donnï¿½es de cette polyligne ne vont plus changer. Cette
+     * mï¿½thode peut rï¿½aranger les tableaux de points d'une faï¿½on plus compacte.
      *
-     * @param  scan     Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *                  mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param  close    <code>true</code> pour indiquer que ces polylignes représentent une
-     *                  forme géométrique fermée (donc un polygone).
+     * @param  scan     Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *                  mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param  close    <code>true</code> pour indiquer que ces polylignes reprï¿½sentent une
+     *                  forme gï¿½omï¿½trique fermï¿½e (donc un polygone).
      * @param  compress An optional compression level, or <code>null</code> to lets the compression
      *                  unchanged.
      *
-     * @return La polyligne compressée (habituellement <code>scan</code> lui-même),
-     *         ou <code>null</code> si la polyligne ne contenait aucune donnée.
+     * @return La polyligne compressï¿½e (habituellement <code>scan</code> lui-mï¿½me),
+     *         ou <code>null</code> si la polyligne ne contenait aucune donnï¿½e.
      */
     public static LineString freeze(LineString scan, final boolean close,
                                     final CompressionLevel compress) {
         scan = getFirst(scan);
         /*
-         * Etape 1: Si on a demandé à fermer le polygone, vérifie si le premier maillon de
-         *          la chaîne ne contenait qu'une bordure.  Si c'est le cas, on déménagera
-         *          cette bordure à la fin du dernier maillon.
+         * Etape 1: Si on a demandï¿½ ï¿½ fermer le polygone, vï¿½rifie si le premier maillon de
+         *          la chaï¿½ne ne contenait qu'une bordure.  Si c'est le cas, on dï¿½mï¿½nagera
+         *          cette bordure ï¿½ la fin du dernier maillon.
          */
         if (close && scan!=null && scan.suffix!=null && scan.array==null) {
             LineString last = getLast(scan);
@@ -1203,9 +1190,9 @@ final class LineString implements Serializable {
             }
         }
         /*
-         * Etape 2: Fusionne ensemble des polylignes qui peuvent l'être.
-         *          Deux polylignes peuvent être fusionnées ensemble si elles
-         *          ne sont séparées par aucune bordure, ou si elle sont toutes
+         * Etape 2: Fusionne ensemble des polylignes qui peuvent l'ï¿½tre.
+         *          Deux polylignes peuvent ï¿½tre fusionnï¿½es ensemble si elles
+         *          ne sont sï¿½parï¿½es par aucune bordure, ou si elle sont toutes
          *          deux des bordures.
          */
         if (scan != null) {
@@ -1214,8 +1201,8 @@ final class LineString implements Serializable {
             while ((current=current.next) != null) {
                 if (previous.suffix == null) {
                     if (previous.array != null) {
-                        // Déménage le tableau de points de 'previous' au début
-                        // de celui de 'current' si aucune bordure ne les sépare.
+                        // Dï¿½mï¿½nage le tableau de points de 'previous' au dï¿½but
+                        // de celui de 'current' si aucune bordure ne les sï¿½pare.
                         if (current.array != null) {
                             if (MERGE_POLYLINE_DATA) {
                                 current.array = current.array.insertAt(0, previous.array, false);
@@ -1228,8 +1215,8 @@ final class LineString implements Serializable {
                     }
                 } else {
                     if (current.array == null) {
-                        // Déménage le suffix de 'previous' au début de
-                        // celui de 'current' si rien ne les sépare.
+                        // Dï¿½mï¿½nage le suffix de 'previous' au dï¿½but de
+                        // celui de 'current' si rien ne les sï¿½pare.
                         if (current.suffix != null) {
                             current.suffix = current.suffix.insertAt(0, previous.suffix, false);
                         } else {
@@ -1242,15 +1229,15 @@ final class LineString implements Serializable {
             }
         }
         /*
-         * Etape 3: Gèle et compresse les tableaux de points, et
-         *          élimine les éventuels tableaux devenus inutile.
+         * Etape 3: Gï¿½le et compresse les tableaux de points, et
+         *          ï¿½limine les ï¿½ventuels tableaux devenus inutile.
          */
         LineString root = scan;
         while (scan!=null) {
             /*
-             * Comprime tous les tableaux d'un maillon de la chaîne.
+             * Comprime tous les tableaux d'un maillon de la chaï¿½ne.
              * La compression maximale ("full") ne sera toutefois pas
-             * appliquée sur les "points de bordure".
+             * appliquï¿½e sur les "points de bordure".
              */
             for (int arrayID=FIRST_ARRAY; arrayID<=LAST_ARRAY; arrayID++) {
                 final PointArray array = scan.getArray(arrayID);
@@ -1260,7 +1247,7 @@ final class LineString implements Serializable {
             }
             /*
              * Supprime les maillons devenus vides. Ca peut avoir pour effet
-             * de changer de maillon ("root") pour le début de la chaîne.
+             * de changer de maillon ("root") pour le dï¿½but de la chaï¿½ne.
              */
             LineString current=scan;
             scan = scan.next;
@@ -1299,7 +1286,7 @@ final class LineString implements Serializable {
                 final PointArray array = scan.getArray(i);
                 if (array != null) {
                     final int lower = dest.length();
-                    // On ne décime pas les points de bordure (i!=0).
+                    // On ne dï¿½cime pas les points de bordure (i!=0).
                     array.toArray(dest, (i==0) ? resolution : 0);
                     if (transform != null) {
                         if (i==0) {
@@ -1322,8 +1309,8 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Retourne une représentation de cet objet sous forme
-     * de chaîne de caractères.  Cette représentation sera
+     * Retourne une reprï¿½sentation de cet objet sous forme
+     * de chaï¿½ne de caractï¿½res.  Cette reprï¿½sentation sera
      * de la forme <code>"LineString[3 of 4; 47 pts]"</code>.
      */
     public String toString() {
@@ -1352,11 +1339,11 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Retourne un code représentant la polyligne spécifiée.
+     * Retourne un code reprï¿½sentant la polyligne spï¿½cifiï¿½e.
      *
-     * @param  scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *              mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @return Un code calculé à partir de quelques points de la polyligne spécifiée.
+     * @param  scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *              mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @return Un code calculï¿½ ï¿½ partir de quelques points de la polyligne spï¿½cifiï¿½e.
      */
     public static int hashCode(LineString scan) {
         int code = (int)serialVersionUID;
@@ -1369,13 +1356,13 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Indique si deux polylignes contiennent les mêmes points. Cette méthode
+     * Indique si deux polylignes contiennent les mï¿½mes points. Cette mï¿½thode
      * retourne aussi <code>true</code> si les deux arguments sont nuls.
      *
-     * @param poly1 Première polyligne. Cet argument peut être n'importe quel maillon d'une
-     *              chaîne, mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @param poly2 Seconde polyligne. Cet argument peut être n'importe quel maillon d'une
-     *              chaîne, mais cette méthode sera plus rapide si c'est le premier maillon.
+     * @param poly1 Premiï¿½re polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une
+     *              chaï¿½ne, mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @param poly2 Seconde polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une
+     *              chaï¿½ne, mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
      */
     public static boolean equals(LineString poly1, LineString poly2) {
         poly1 = getFirst(poly1);
@@ -1398,13 +1385,13 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Retourne une copie de la polyligne spécifiée. Cette méthode ne copie que les références
-     * vers une version immutable des tableaux de points. Les points eux-mêmes ne sont pas
-     * copiés, ce qui permet d'éviter de consommer une quantité excessive de mémoire.
+     * Retourne une copie de la polyligne spï¿½cifiï¿½e. Cette mï¿½thode ne copie que les rï¿½fï¿½rences
+     * vers une version immutable des tableaux de points. Les points eux-mï¿½mes ne sont pas
+     * copiï¿½s, ce qui permet d'ï¿½viter de consommer une quantitï¿½ excessive de mï¿½moire.
      *
-     * @param  scan Polyligne. Cet argument peut être n'importe quel maillon d'une chaîne,
-     *              mais cette méthode sera plus rapide si c'est le premier maillon.
-     * @return Copie de la chaîne <code>scan</code>.
+     * @param  scan Polyligne. Cet argument peut ï¿½tre n'importe quel maillon d'une chaï¿½ne,
+     *              mais cette mï¿½thode sera plus rapide si c'est le premier maillon.
+     * @return Copie de la chaï¿½ne <code>scan</code>.
      */
     public static LineString clone(LineString scan) {
         LineString queue=null;
@@ -1436,12 +1423,12 @@ final class LineString implements Serializable {
      */
     static final class Collection extends AbstractCollection {
         /**
-         * Première polyligne de la chaîne de points à balayer.
+         * Premiï¿½re polyligne de la chaï¿½ne de points ï¿½ balayer.
          */
         private final LineString data;
 
         /**
-         * Transformation à appliquer sur chacun des points.
+         * Transformation ï¿½ appliquer sur chacun des points.
          */
         private final MathTransform2D transform;
 
@@ -1461,7 +1448,7 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Retourne un itérateur balayant les points de cet ensemble.
+         * Retourne un itï¿½rateur balayant les points de cet ensemble.
          */
         public java.util.Iterator iterator() {
             return new Iterator(data, transform);
@@ -1472,27 +1459,27 @@ final class LineString implements Serializable {
 
 
     /**
-     * Iterateur balayant les coordonnées d'un polyligne ou d'un polygone.
+     * Iterateur balayant les coordonnï¿½es d'un polyligne ou d'un polygone.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     static final class Iterator implements java.util.Iterator {
         /**
-         * Polyligne qui sert de point de départ à cet itérateur.
-         * Cette informations est utilisée par {@link #rewind}.
+         * Polyligne qui sert de point de dï¿½part ï¿½ cet itï¿½rateur.
+         * Cette informations est utilisï¿½e par {@link #rewind}.
          */
         private final LineString start;
 
         /**
-         * Polyligne qui sera balayée par les prochains appels de {@link #next}.
-         * Ce champs sera mis à jour au fur et à mesure que l'on passera d'une
-         * polyligne à l'autre.
+         * Polyligne qui sera balayï¿½e par les prochains appels de {@link #next}.
+         * Ce champs sera mis ï¿½ jour au fur et ï¿½ mesure que l'on passera d'une
+         * polyligne ï¿½ l'autre.
          */
         private LineString current;
 
         /**
-         * Code indiquant quel champs de {@link #current} est présentement en cours d'examen:
+         * Code indiquant quel champs de {@link #current} est prï¿½sentement en cours d'examen:
          *
          *    -1 pour {@link LineString#prefix},
          *     0 pour {@link LineString#array} et
@@ -1501,29 +1488,29 @@ final class LineString implements Serializable {
         private int arrayID = FIRST_ARRAY-1;;
 
         /**
-         * Itérateur balayant les données. Cet itérateur
-         * aura été obtenu d'un tableau {@link PointArray}.
+         * Itï¿½rateur balayant les donnï¿½es. Cet itï¿½rateur
+         * aura ï¿½tï¿½ obtenu d'un tableau {@link PointArray}.
          */
         private PointIterator iterator;
 
         /**
-         * Transformation à appliquer sur les coordonnées,
+         * Transformation ï¿½ appliquer sur les coordonnï¿½es,
          * ou <code>null</code> s'il n'y en a pas.
          */
         private final MathTransform2D transform;
 
         /**
-         * Point utilisé temporairement pour les projections.
+         * Point utilisï¿½ temporairement pour les projections.
          */
         private final Point2D.Float point = new Point2D.Float();
 
         /**
-         * Initialise l'itérateur de façon à démarrer
-         * les balayages à partir de la polyligne spécifiée.
+         * Initialise l'itï¿½rateur de faï¿½on ï¿½ dï¿½marrer
+         * les balayages ï¿½ partir de la polyligne spï¿½cifiï¿½e.
          *
-         * @param start Polyligne (peut être nul).
-         * @param transform Transformation à appliquer sur les
-         *        coordonnées, ou <code>null</code> s'il n'y en a pas.
+         * @param start Polyligne (peut ï¿½tre nul).
+         * @param transform Transformation ï¿½ appliquer sur les
+         *        coordonnï¿½es, ou <code>null</code> s'il n'y en a pas.
          */
         public Iterator(final LineString start, final MathTransform2D transform) {
             this.start = current = getFirst(start);
@@ -1532,7 +1519,7 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Avance l'itérateur au prochain tableau.
+         * Avance l'itï¿½rateur au prochain tableau.
          */
         private void nextArray() {
             while (current != null) {
@@ -1552,7 +1539,7 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Indique s'il reste des données que peut retourner {@link #next}.
+         * Indique s'il reste des donnï¿½es que peut retourner {@link #next}.
          */
         public boolean hasNext() {
             while (iterator != null) {
@@ -1565,7 +1552,7 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Retourne les coordonnées du point suivant.
+         * Retourne les coordonnï¿½es du point suivant.
          *
          * @return Le point suivant comme un objet {@link Point2D}.
          */
@@ -1587,16 +1574,16 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Retourne les coordonnées du point suivant. Contrairement à la méthode {@link #next()},
+         * Retourne les coordonnï¿½es du point suivant. Contrairement ï¿½ la mï¿½thode {@link #next()},
          * celle-ci retourne <code>null</code> sans lancer d'exception s'il ne reste plus de point
-         * à balayer.
+         * ï¿½ balayer.
          *
-         * @param  dest Point dans lequel mémoriser le résultat. Si cet argument
-         *         est nul, un nouvel objet sera créé et retourné pour mémoriser
-         *         les coordonnées.
-         * @return S'il restait des coordonnées à lire, le point <code>point</code> qui avait été
-         *         spécifié en argument. Si <code>point</code> était nul, un objet {@link Point2D}
-         *         nouvellement créé. S'il ne restait plus de données à lire, cette méthode retourne
+         * @param  dest Point dans lequel mï¿½moriser le rï¿½sultat. Si cet argument
+         *         est nul, un nouvel objet sera crï¿½ï¿½ et retournï¿½ pour mï¿½moriser
+         *         les coordonnï¿½es.
+         * @return S'il restait des coordonnï¿½es ï¿½ lire, le point <code>point</code> qui avait ï¿½tï¿½
+         *         spï¿½cifiï¿½ en argument. Si <code>point</code> ï¿½tait nul, un objet {@link Point2D}
+         *         nouvellement crï¿½ï¿½. S'il ne restait plus de donnï¿½es ï¿½ lire, cette mï¿½thode retourne
          *         toujours <code>null</code>.
          */
         final Point2D.Float next(Point2D.Float dest) {
@@ -1621,15 +1608,15 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Retourne les coordonnées du prochain point dans le champs
-         * (<var>x2</var>,<var>y2</var>) de la ligne spécifiée. Les
-         * anciennes coordonnées (<var>x2</var>,<var>y2</var>) seront
-         * préalablement copiées dans (<var>x1</var>,<var>y1</var>).
-         * Si cette méthode a réussie, elle retourne <code>true</code>.
+         * Retourne les coordonnï¿½es du prochain point dans le champs
+         * (<var>x2</var>,<var>y2</var>) de la ligne spï¿½cifiï¿½e. Les
+         * anciennes coordonnï¿½es (<var>x2</var>,<var>y2</var>) seront
+         * prï¿½alablement copiï¿½es dans (<var>x1</var>,<var>y1</var>).
+         * Si cette mï¿½thode a rï¿½ussie, elle retourne <code>true</code>.
          *
-         * Si elle a échouée parce qu'il ne restait plus de points disponibles, elle
-         * aura tout de même copié les coordonnées (<var>x2</var>,<var>y2</var>) dans
-         * (<var>x1</var>,<var>y1</var>) (ce qui aura pour effet de donner à la ligne
+         * Si elle a ï¿½chouï¿½e parce qu'il ne restait plus de points disponibles, elle
+         * aura tout de mï¿½me copiï¿½ les coordonnï¿½es (<var>x2</var>,<var>y2</var>) dans
+         * (<var>x1</var>,<var>y1</var>) (ce qui aura pour effet de donner ï¿½ la ligne
          * une longueur de 0) et retournera <code>false</code>.
          */
         final boolean next(final Line2D.Float line) {
@@ -1657,7 +1644,7 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Repositionne cet itérateur à son point de départ.
+         * Repositionne cet itï¿½rateur ï¿½ son point de dï¿½part.
          */
         final void rewind() {
             current  = start;
@@ -1666,9 +1653,9 @@ final class LineString implements Serializable {
         }
 
         /**
-         * Cette opération n'est pas supportée.
+         * Cette opï¿½ration n'est pas supportï¿½e.
          *
-         * @throws UnsupportedOperationException Systématiquement lancée.
+         * @throws UnsupportedOperationException Systï¿½matiquement lancï¿½e.
          */
         public void remove() throws UnsupportedOperationException {
             throw new UnsupportedOperationException();
@@ -1676,10 +1663,10 @@ final class LineString implements Serializable {
     }
 
     /**
-     * Méthode appelée lorsqu'une erreur inatendue est survenue.
+     * Mï¿½thode appelï¿½e lorsqu'une erreur inatendue est survenue.
      *
      * @param source Nom de la classe dans laquelle est survenu l'exception.
-     * @param method Nom de la méthode dans laquelle est survenu l'exception.
+     * @param method Nom de la mï¿½thode dans laquelle est survenu l'exception.
      * @param exception L'exception survenue.
      */
     static void unexpectedException(final String classe, final String method,

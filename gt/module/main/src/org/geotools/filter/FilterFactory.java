@@ -16,11 +16,13 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

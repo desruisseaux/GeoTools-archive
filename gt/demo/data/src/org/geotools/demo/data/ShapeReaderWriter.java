@@ -16,31 +16,22 @@
  */
 package org.geotools.demo.data;
 
+import java.io.File;
+import java.net.URL;
+
+import javax.swing.JFileChooser;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.FeatureType;
-import java.io.File;
-import java.net.URL;
-import javax.swing.JFileChooser;
-
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.AttributeExpression;
-//import org.geotools.data.DefaultQuery;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.data.Transaction;
-import org.geotools.data.FeatureStore;
-
-import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureReader;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.Feature;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.geom.LineString;
 
 
 /**

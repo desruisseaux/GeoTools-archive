@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,92 +20,79 @@
 package org.geotools.gui.swing;
 
 // Events and action
-import java.util.EventListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.InputMap;
-import javax.swing.ActionMap;
-import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.geotools.gui.swing.event.ZoomChangeEvent;
-import org.geotools.gui.swing.event.ZoomChangeListener;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.EventListener;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// Geometry
-import java.awt.Shape;
-import java.awt.Point;
-import java.awt.Insets;
-import java.awt.Polygon;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import org.geotools.resources.geometry.XAffineTransform;
-import org.geotools.resources.geometry.XDimension2D;
-import org.geotools.resources.Utilities;
-
-// Graphics
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.Stroke;
-import java.awt.Window;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.BasicStroke;
-
-// User interface
-import java.awt.Toolkit;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BoundedRangeModel;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JComponent;
-import javax.swing.JViewport;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.AbstractButton;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.ScrollPaneLayout;
-import javax.swing.BoundedRangeModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ComponentUI;
 
-// Logging
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
-
-// Miscellaneous
-import java.util.Arrays;
-import java.io.Serializable;
+import org.geotools.gui.swing.event.ZoomChangeEvent;
+import org.geotools.gui.swing.event.ZoomChangeListener;
 import org.geotools.renderer.DeformableViewer;
-import org.geotools.resources.gui.Resources;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**
@@ -117,7 +104,7 @@ import org.geotools.resources.gui.ResourceKeys;
  *   <li>{@link #getArea()}, which must return a bounding box for the content
  *       to paint. This area can be expressed in arbitrary units. For example,
  *       an object wanting to display a geographic map with a content ranging
- *       from 10° to 15°E and 40° to 45°N should override this method as
+ *       from 10ï¿½ to 15ï¿½E and 40ï¿½ to 45ï¿½N should override this method as
  *       follows:
  *
  *       <pre>
@@ -1752,7 +1739,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * a contextual menu which contains magnifying glass options.
      *
      * @param  event Mouse event containing amongst others, the 
-     *         coordinates ???? pointées.
+     *         coordinates ???? pointï¿½es.
      * @return The contextual menu, or <code>null</code> to avoid displaying
      *         the menu.
      */

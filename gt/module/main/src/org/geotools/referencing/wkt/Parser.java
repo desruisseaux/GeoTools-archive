@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,47 +20,57 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.io.BufferedReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-// Parsing
-import java.util.Locale;
-import java.text.ParsePosition;
-import java.text.ParseException;
-
-// Units
-import javax.units.Unit;
-import javax.units.SI;
 import javax.units.NonSI;
+import javax.units.SI;
+import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.referencing.cs.*;
-import org.opengis.referencing.crs.*;
-import org.opengis.referencing.datum.*;
+import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CompoundCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.DerivedCRS;
+import org.opengis.referencing.crs.EngineeringCRS;
+import org.opengis.referencing.crs.GeocentricCRS;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.VerticalCRS;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.EngineeringDatum;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterValue;
-
-// Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.Identifier;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.datum.BursaWolfParameters;
-import org.geotools.metadata.citation.Citation;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.Arguments;
 
 
 /**

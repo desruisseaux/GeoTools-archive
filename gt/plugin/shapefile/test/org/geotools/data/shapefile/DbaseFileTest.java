@@ -7,13 +7,13 @@
 
 package org.geotools.data.shapefile;
 
-import junit.framework.*;
-import java.net.*;
-//import cmp.LEDataStream.*;
-import com.vividsolutions.jts.geom.*;
-import java.io.*;
-import java.util.ArrayList;
-import org.geotools.data.shapefile.dbf.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
+import org.geotools.data.shapefile.dbf.DbaseFileHeader;
+import org.geotools.data.shapefile.dbf.DbaseFileReader;
+import org.geotools.data.shapefile.dbf.DbaseFileWriter;
 
 
 /**

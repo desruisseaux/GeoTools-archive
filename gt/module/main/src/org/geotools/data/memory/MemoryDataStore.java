@@ -16,7 +16,13 @@
  */
 package org.geotools.data.memory;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
@@ -30,12 +36,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

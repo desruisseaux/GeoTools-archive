@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,32 +23,28 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Arrays;
-import java.util.Locale;  // For javadoc
-import java.util.Iterator;
-import java.util.Comparator;
-import java.util.logging.Logger;
-import java.io.Serializable;
 import java.io.ObjectStreamException;
-import javax.units.Unit;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import javax.units.SI;
+import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.citation.Citation; // For javadoc
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.util.InternationalString;
-import org.opengis.util.GenericName;
-
-// Geotools dependencies
-import org.geotools.util.NameFactory;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Formattable;
-import org.geotools.util.GrowableInternationalString;    
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.util.GrowableInternationalString;
+import org.geotools.util.NameFactory;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
 
 
 /**

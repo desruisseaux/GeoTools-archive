@@ -5,7 +5,6 @@ package org.geotools.gce.arcgrid;
 
 import java.net.URL;
 
-import org.geotools.gce.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.resources.TestData;

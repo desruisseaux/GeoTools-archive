@@ -16,6 +16,11 @@
  */
 package org.geotools.xml.handlers;
 
+import java.net.URI;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementValue;
@@ -23,10 +28,6 @@ import org.geotools.xml.schema.SimpleType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import java.net.URI;
-import java.util.Map;
-
-import javax.naming.OperationNotSupportedException;
 
 
 /**

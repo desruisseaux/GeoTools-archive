@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,37 +24,31 @@
 package org.geotools.coverage.grid;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.awt.image.Raster;
-import java.awt.image.DataBuffer;
-import java.awt.image.ColorModel;
-import java.awt.image.SampleModel;
-import java.awt.image.RenderedImage;
-import java.awt.RenderingHints;
 import java.awt.Color;
-import javax.units.Unit;
+import java.awt.RenderingHints;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.util.Arrays;
 
-// JAI dependencies
-import javax.media.jai.Histogram;
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
+import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
-import org.opengis.coverage.SampleDimensionType;
-import org.opengis.coverage.ColorInterpretation;
-import org.opengis.referencing.operation.MathTransform1D;
-
-// Geotools dependencies
-import org.geotools.gp.Hints;  // TODO
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimension;
+import org.geotools.gp.Hints;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.NumberRange;
 import org.geotools.resources.ClassChanger;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.util.NumberRange;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.coverage.ColorInterpretation;
+import org.opengis.coverage.SampleDimensionType;
+import org.opengis.util.InternationalString;
 
 
 /**

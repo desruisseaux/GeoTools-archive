@@ -16,13 +16,11 @@
  */
 package org.geotools.data.wms;
 
-import org.geotools.data.wms.WMS1_1_0.GetMapRequest;
-import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
-import org.geotools.data.wms.request.GetFeatureInfoRequest;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
+
+import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
 
 /**
  * Provides support for the Web Map Server 1.1.1 Specificaiton.

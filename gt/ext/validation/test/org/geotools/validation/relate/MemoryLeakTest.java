@@ -17,56 +17,21 @@
 package org.geotools.validation.relate;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.DataTestCase;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultTransaction;
-import org.geotools.data.EmptyFeatureReader;
-import org.geotools.data.FeatureLock;
-import org.geotools.data.FeatureLockFactory;
-import org.geotools.data.FeatureLocking;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.FilteringFeatureReader;
-import org.geotools.data.InProcessLockingManager;
-import org.geotools.data.Query;
-import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
 import org.geotools.data.postgis.PostgisConnectionFactory;
 import org.geotools.data.postgis.PostgisDataStore;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.validation.ValidationResults;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * This class tests the PostgisDataStoreAPI, against the same tests as

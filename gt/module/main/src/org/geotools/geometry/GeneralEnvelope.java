@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,21 +20,18 @@
 package org.geotools.geometry;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.io.Serializable;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
+import java.util.Arrays;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 import org.geotools.resources.geometry.XRectangle2D;
-
-// OpenGIS dependencies
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**

@@ -16,7 +16,6 @@ import junit.framework.TestSuite;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.Filter;
 import org.geotools.resources.TestData;
 
 /**

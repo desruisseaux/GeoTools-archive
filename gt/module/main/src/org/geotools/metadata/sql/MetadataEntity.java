@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,10 @@
 package org.geotools.metadata.sql;
 
 // J2SE dependencies
-import java.util.Map;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
 
 
 /**
@@ -40,7 +38,7 @@ import java.lang.reflect.InvocationTargetException;
  * Then the information is fetch in the underlying metadata database.
  *
  * @version $Id$
- * @author Touraïvane
+ * @author Touraï¿½vane
  * @author Martin Desruisseaux
  */
 final class MetadataEntity implements InvocationHandler {

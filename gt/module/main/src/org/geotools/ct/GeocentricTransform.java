@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,22 +25,16 @@ package org.geotools.ct;
 
 // J2SE dependencies
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 
-// JAI dependencies
 import javax.media.jai.ParameterList;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.cs.Ellipsoid;
-
-// Resources
-import org.geotools.units.Unit;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.units.Unit;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -91,12 +85,12 @@ final class GeocentricTransform extends AbstractMathTransform implements Seriali
     private final double b;
     
     /**
-     * Square of semi-major axis (@link #a}²).
+     * Square of semi-major axis (@link #a}ï¿½).
      */
     private final double a2;
     
     /**
-     * Square of semi-minor axis ({@link #b}²).
+     * Square of semi-minor axis ({@link #b}ï¿½).
      */
     private final double b2;
     

@@ -25,8 +25,18 @@
  */
 package org.geotools.data.shape.shp;
 
-import com.vividsolutions.jts.algorithm.*;
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.algorithm.CGAlgorithms;
+import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /** A collection of utility methods for use with JTS and the shapefile package.
  * @author aaime

@@ -21,8 +21,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -57,13 +57,10 @@ package org.geotools.ct.proj;
 // J2SE dependencies
 import java.awt.geom.Point2D;
 
-// Geotools dependencies
 import org.geotools.cs.Projection;
 import org.geotools.ct.MissingParameterException;
-
-// Resources
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**

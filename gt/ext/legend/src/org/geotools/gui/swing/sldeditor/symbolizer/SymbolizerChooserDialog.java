@@ -20,13 +20,15 @@
  */
 package org.geotools.gui.swing.sldeditor.symbolizer;
 
-import org.geotools.gui.swing.sldeditor.SLDEditor;
-import org.geotools.styling.Symbolizer;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+
 import javax.swing.JDialog;
+
+import org.geotools.gui.swing.sldeditor.SLDEditor;
+import org.geotools.styling.Symbolizer;
 
 
 /**

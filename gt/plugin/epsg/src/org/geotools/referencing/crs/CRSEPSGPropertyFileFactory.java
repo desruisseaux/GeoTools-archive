@@ -18,22 +18,21 @@
  */
 package org.geotools.referencing.crs;
 
-import java.util.Properties;
-import java.net.URL;
 import java.io.IOException;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.Properties;
 import java.util.Set;
 
-import org.opengis.referencing.crs.CRSFactory;
+import org.geotools.referencing.FactoryFinder;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.ObjectFactory;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.util.InternationalString;
-
-import org.geotools.referencing.FactoryFinder;
 
 /**
  * Default implementation for a coordinate reference system authority factory backed

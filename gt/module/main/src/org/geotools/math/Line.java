@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,10 +23,10 @@ package org.geotools.math;
 // J2SE dependencies
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import javax.vecmath.MismatchedSizeException;
 import java.io.Serializable;
 
-// OpenGIS dependencies
+import javax.vecmath.MismatchedSizeException;
+
 import org.opengis.util.Cloneable;
 
 
@@ -205,13 +205,13 @@ public class Line implements Cloneable, Serializable {
          * We have to solve two equations with two unknows:
          *
          *   1)    mean(y)  = b + m*mean(x)
-         *   2)    mean(xy) = b*mean(x) + m*mean(x²)
+         *   2)    mean(xy) = b*mean(x) + m*mean(xï¿½)
          *
          * Those formulas lead to a quadratic equation. However,
          * the formulas become very simples if we set 'mean(x)=0'.
          * We can achieve this result by computing instead of (2):
          *
-         *   2b)   mean(dx y) = m*mean(dx²)
+         *   2b)   mean(dx y) = m*mean(dxï¿½)
          *
          * where dx=x-mean(x). In this case mean(dx)==0.
          */
@@ -235,7 +235,7 @@ public class Line implements Cloneable, Serializable {
          * Assuming that 'mean(x)==0', then the correlation
          * coefficient can be approximate by:
          *
-         * R = mean(xy) / sqrt( mean(x²) * (mean(y²) - mean(y)²) )
+         * R = mean(xy) / sqrt( mean(xï¿½) * (mean(yï¿½) - mean(y)ï¿½) )
          */
         slope = mean_xy/mean_x2;
         y0 = mean_y-mean_x*slope;

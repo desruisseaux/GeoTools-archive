@@ -8,15 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import oracle.jdbc.OracleConnection;
-//import oracle.sdoapi.OraSpatialManager;
-//import oracle.sdoapi.adapter.AdapterSDO;
-//import oracle.sdoapi.adapter.GeometryInputTypeNotSupportedException;
-//import oracle.sdoapi.adapter.GeometryOutputTypeNotSupportedException;
-//import oracle.sdoapi.geom.GeometryFactory;
-//import oracle.sdoapi.geom.InvalidGeometryException;
-//import oracle.sdoapi.sref.SRException;
-//import oracle.sdoapi.sref.SRManager;
-//import oracle.sdoapi.sref.SpatialReference;
 import oracle.sql.STRUCT;
 
 import org.geotools.data.DataSourceException;

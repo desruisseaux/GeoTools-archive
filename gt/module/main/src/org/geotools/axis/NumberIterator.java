@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -34,134 +34,135 @@
 package org.geotools.axis;
 
 // Miscellaneous
-import java.util.Locale;
 import java.text.NumberFormat;
+import java.util.Locale;
+
 import org.geotools.resources.XMath;
 
 
 /**
- * Itérateur balayant les barres et étiquettes de graduation d'un axe.
- * Cet itérateur retourne les positions des graduations à partir de la
- * valeur minimale jusqu'à la valeur maximale.
+ * Itï¿½rateur balayant les barres et ï¿½tiquettes de graduation d'un axe.
+ * Cet itï¿½rateur retourne les positions des graduations ï¿½ partir de la
+ * valeur minimale jusqu'ï¿½ la valeur maximale.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 class NumberIterator implements TickIterator {
     /**
-     * Petite quantité utilisée pour éviter les
+     * Petite quantitï¿½ utilisï¿½e pour ï¿½viter les
      * erreurs d'arrondissements dans les comparaisons.
      */
     private static final double EPS = 1E-8;
 
     /**
-     * Valeur de la première graduation principale.
-     * Cette valeur est fixée par {@link #init}.
+     * Valeur de la premiï¿½re graduation principale.
+     * Cette valeur est fixï¿½e par {@link #init}.
      */
     private double minimum;
 
     /**
-     * Valeur limite des graduations. La dernière
-     * graduation n'aura pas nécessairement cette
-     * valeur. Cette valeur est fixée par {@link #init}.
+     * Valeur limite des graduations. La derniï¿½re
+     * graduation n'aura pas nï¿½cessairement cette
+     * valeur. Cette valeur est fixï¿½e par {@link #init}.
      */
     private double maximum;
 
     /**
      * Intervalle entre deux graduations principales.
-     * Cette valeur est fixée par {@link #init}.
+     * Cette valeur est fixï¿½e par {@link #init}.
      */
     private double increment;
 
     /**
      * Longueur de l'axe (en points). Cette information
-     * est conservée afin d'éviter de refaire toute la
-     * procédure {@link #init} si les paramètres n'ont
-     * pas changés.
+     * est conservï¿½e afin d'ï¿½viter de refaire toute la
+     * procï¿½dure {@link #init} si les paramï¿½tres n'ont
+     * pas changï¿½s.
      */
     private float visualLength;
 
     /**
-     * Espace à laisser (en points) entre les graduations principales.
-     * Cette information est conservée afin d'éviter de refaire toute
-     * la procédure {@link #init} si les paramètres n'ont pas changés.
+     * Espace ï¿½ laisser (en points) entre les graduations principales.
+     * Cette information est conservï¿½e afin d'ï¿½viter de refaire toute
+     * la procï¿½dure {@link #init} si les paramï¿½tres n'ont pas changï¿½s.
      */
     private float visualTickSpacing;
 
     /**
      * Nombre de sous-divisions dans une graduation principale.
-     * Cette valeur est fixée par {@link #init}.
+     * Cette valeur est fixï¿½e par {@link #init}.
      */
     private int subTickCount;
 
     /**
-     * Index de la première sous-graduation
-     * dans la première graduation principale.
-     * Cette valeur est fixée par {@link #init}.
+     * Index de la premiï¿½re sous-graduation
+     * dans la premiï¿½re graduation principale.
+     * Cette valeur est fixï¿½e par {@link #init}.
      */
     private int subTickStart;
 
     /**
-     * Index de la graduation principale en cours de traçage.
-     * Cette valeur commence à 0 et sera modifiée à chaque
-     * appel à {@link #next}.
+     * Index de la graduation principale en cours de traï¿½age.
+     * Cette valeur commence ï¿½ 0 et sera modifiï¿½e ï¿½ chaque
+     * appel ï¿½ {@link #next}.
      */
     private int tickIndex;
 
     /**
-     * Index de la graduation secondaire en cours de traçage. Cette
-     * valeur va de 0 inclusivement jusqu'à {@link #subTickCount}
-     * exclusivement. Elle sera modifiée à chaque appel à {@link #next}.
+     * Index de la graduation secondaire en cours de traï¿½age. Cette
+     * valeur va de 0 inclusivement jusqu'ï¿½ {@link #subTickCount}
+     * exclusivement. Elle sera modifiï¿½e ï¿½ chaque appel ï¿½ {@link #next}.
      */
     private int subTickIndex;
 
     /**
      * Valeur de la graduation principale ou secondaire actuelle.
-     * Cette valeur sera modifiée à chaque appel à {@link #next}.
+     * Cette valeur sera modifiï¿½e ï¿½ chaque appel ï¿½ {@link #next}.
      */
     private double value;
 
     /**
-     * Format à utiliser pour écrire les étiquettes de graduation. Ce format ne
-     * sera construit que la première fois où {@link #currentLabel} sera appelée.
+     * Format ï¿½ utiliser pour ï¿½crire les ï¿½tiquettes de graduation. Ce format ne
+     * sera construit que la premiï¿½re fois oï¿½ {@link #currentLabel} sera appelï¿½e.
      */
     private transient NumberFormat format;
 
     /**
      * Indique si {@link #format} est valide. Le format peut
-     * devenir invalide si {@link #init} a été appelée. Dans
+     * devenir invalide si {@link #init} a ï¿½tï¿½ appelï¿½e. Dans
      * ce cas, il peut falloir changer le nombre de chiffres
-     * après la virgule qu'il écrit.
+     * aprï¿½s la virgule qu'il ï¿½crit.
      */
     private transient boolean formatValid;
 
     /**
-     * Conventions à utiliser pour
+     * Conventions ï¿½ utiliser pour
      * le formatage des nombres.
      */
     private Locale locale;
 
     /**
-     * Construit un itérateur par défaut. La méthode {@link #init}
-     * <u>doit</u> être appelée avant que cet itérateur ne soit
+     * Construit un itï¿½rateur par dï¿½faut. La mï¿½thode {@link #init}
+     * <u>doit</u> ï¿½tre appelï¿½e avant que cet itï¿½rateur ne soit
      * utilisable.
      *
-     * @param locale Conventions à utiliser pour le formatage des nombres.
+     * @param locale Conventions ï¿½ utiliser pour le formatage des nombres.
      */
     protected NumberIterator(final Locale locale) {
         this.locale = locale;
     }
 
     /**
-     * Initialise l'itérateur.
+     * Initialise l'itï¿½rateur.
      *
-     * @param minimum           Valeur minimale de la première graduation.
-     * @param maximum           Valeur limite des graduations. La dernière
-     *                          graduation n'aura pas nécessairement cette valeur.
+     * @param minimum           Valeur minimale de la premiï¿½re graduation.
+     * @param maximum           Valeur limite des graduations. La derniï¿½re
+     *                          graduation n'aura pas nï¿½cessairement cette valeur.
      * @param visualLength      Longueur visuelle de l'axe sur laquelle tracer la graduation.
-     *                          Cette longueur doit être exprimée en pixels ou en points.
-     * @param visualTickSpacing Espace à laisser visuellement entre deux marques de graduation.
-     *                          Cet espace doit être exprimé en pixels ou en points (1/72 de pouce).
+     *                          Cette longueur doit ï¿½tre exprimï¿½e en pixels ou en points.
+     * @param visualTickSpacing Espace ï¿½ laisser visuellement entre deux marques de graduation.
+     *                          Cet espace doit ï¿½tre exprimï¿½ en pixels ou en points (1/72 de pouce).
      */
     protected void init(      double minimum,
                         final double maximum,
@@ -183,10 +184,10 @@ class NumberIterator implements TickIterator {
         this.visualLength      = visualLength;
         this.visualTickSpacing = visualTickSpacing;
         /*
-         * Estime le pas qui donnera au moins l'espacement spécifié entre
-         * chaque graduation.  Détermine ensuite si ce pas est de l'ordre
-         * des dizaines, centaines ou autre et on ramènera temporairement
-         * ce pas à l'ordre des unitées.
+         * Estime le pas qui donnera au moins l'espacement spï¿½cifiï¿½ entre
+         * chaque graduation.  Dï¿½termine ensuite si ce pas est de l'ordre
+         * des dizaines, centaines ou autre et on ramï¿½nera temporairement
+         * ce pas ï¿½ l'ordre des unitï¿½es.
          */
         double increment = (maximum-minimum)*(visualTickSpacing/visualLength);
         final double factor = XMath.pow10((int)Math.floor(XMath.log10(increment)));
@@ -206,7 +207,7 @@ class NumberIterator implements TickIterator {
         /*
          * Le pas se trouve maintenant entre 1 et 10. On l'ajuste maintenant
          * pour lui donner des valeurs qui ne sont habituellement pas trop
-         * difficiles à lire.
+         * difficiles ï¿½ lire.
          */
         final int subTickCount;
         if      (increment <= 1.0) {increment = 1.0; subTickCount=5;}
@@ -218,8 +219,8 @@ class NumberIterator implements TickIterator {
         increment = increment*factor;
         /*
          * Arrondie maintenant le minimum sur une des graduations principales.
-         * Détermine ensuite combien de graduations secondaires il faut sauter
-         * sur la première graduation principale.
+         * Dï¿½termine ensuite combien de graduations secondaires il faut sauter
+         * sur la premiï¿½re graduation principale.
          */
         final double tmp = minimum;
         minimum          = Math.floor(minimum/increment+EPS)*increment;
@@ -240,8 +241,8 @@ class NumberIterator implements TickIterator {
     }
 
     /**
-     * Indique s'il reste des graduations à retourner. Cette méthode retourne <code>true</code>
-     * tant que {@link #currentValue} ou {@link #currentLabel} peuvent être appelées.
+     * Indique s'il reste des graduations ï¿½ retourner. Cette mï¿½thode retourne <code>true</code>
+     * tant que {@link #currentValue} ou {@link #currentLabel} peuvent ï¿½tre appelï¿½es.
      */
     public boolean hasNext() {
         return value <= maximum;
@@ -269,18 +270,18 @@ class NumberIterator implements TickIterator {
     }
 
     /**
-     * Retourne la valeur de la graduation courante. Cette méthode
-     * peut être appelée pour une graduation majeure ou mineure.
+     * Retourne la valeur de la graduation courante. Cette mï¿½thode
+     * peut ï¿½tre appelï¿½e pour une graduation majeure ou mineure.
      */
     public double currentValue() {
         return value;
     }
 
     /**
-     * Retourne l'étiquette de la graduation courante. On n'appele généralement
-     * cette méthode que pour les graduations majeures, mais elle peut aussi
-     * être appelée pour les graduations mineures. Cette méthode retourne
-     * <code>null</code> s'il n'y a pas d'étiquette pour la graduation courante.
+     * Retourne l'ï¿½tiquette de la graduation courante. On n'appele gï¿½nï¿½ralement
+     * cette mï¿½thode que pour les graduations majeures, mais elle peut aussi
+     * ï¿½tre appelï¿½e pour les graduations mineures. Cette mï¿½thode retourne
+     * <code>null</code> s'il n'y a pas d'ï¿½tiquette pour la graduation courante.
      */
     public String currentLabel() {
         if (!formatValid) {
@@ -288,10 +289,10 @@ class NumberIterator implements TickIterator {
                 format = NumberFormat.getNumberInstance(locale);
             }
             /*
-             * Trouve le nombre de chiffres après la virgule nécessaires pour représenter les
-             * étiquettes de la graduation. Impose une limite de six chiffres, limite qui pourrait
-             * être atteinte notamment avec les nombres périodiques (par exemple des intervalles
-             * de temps exprimés en fractions de jours).
+             * Trouve le nombre de chiffres aprï¿½s la virgule nï¿½cessaires pour reprï¿½senter les
+             * ï¿½tiquettes de la graduation. Impose une limite de six chiffres, limite qui pourrait
+             * ï¿½tre atteinte notamment avec les nombres pï¿½riodiques (par exemple des intervalles
+             * de temps exprimï¿½s en fractions de jours).
              */
             int precision;
             double step = Math.abs(increment);
@@ -310,19 +311,19 @@ class NumberIterator implements TickIterator {
     }
 
     /**
-     * Passe à la graduation suivante.
+     * Passe ï¿½ la graduation suivante.
      */
     public void next() {
         if (++subTickIndex >= subTickCount) {
             subTickIndex = 0;
             tickIndex++;
         }
-        // On n'utilise pas "+=" afin d'éviter les erreurs d'arrondissements.
+        // On n'utilise pas "+=" afin d'ï¿½viter les erreurs d'arrondissements.
         value = minimum + increment * (tickIndex + subTickIndex / (double)subTickCount);
     }
 
     /**
-     * Passe directement à la graduation majeure suivante.
+     * Passe directement ï¿½ la graduation majeure suivante.
      */
     public void nextMajor() {
         subTickIndex = 0;
@@ -330,7 +331,7 @@ class NumberIterator implements TickIterator {
     }
 
     /**
-     * Replace l'itérateur sur la première graduation.
+     * Replace l'itï¿½rateur sur la premiï¿½re graduation.
      */
     public void rewind() {
         tickIndex    = 0;
@@ -339,16 +340,16 @@ class NumberIterator implements TickIterator {
     }
 
     /**
-     * Retourne les conventions à utiliser pour
-     * écrire les étiquettes de graduation.
+     * Retourne les conventions ï¿½ utiliser pour
+     * ï¿½crire les ï¿½tiquettes de graduation.
      */
     public final Locale getLocale() {
         return locale;
     }
 
     /**
-     * Modifie les conventions à utiliser pour
-     * écrire les étiquettes de graduation.
+     * Modifie les conventions ï¿½ utiliser pour
+     * ï¿½crire les ï¿½tiquettes de graduation.
      */
     public final void setLocale(final Locale locale) {
         if (!locale.equals(this.locale)) {

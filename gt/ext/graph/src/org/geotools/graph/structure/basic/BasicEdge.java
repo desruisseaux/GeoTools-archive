@@ -19,7 +19,6 @@
 package org.geotools.graph.structure.basic;
 
 import java.util.ArrayList;
-
 import java.util.Iterator;
 
 import org.geotools.graph.structure.Edge;

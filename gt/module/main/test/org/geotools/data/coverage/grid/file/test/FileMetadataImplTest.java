@@ -8,12 +8,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.opengis.catalog.MetadataEntity;
-import org.opengis.catalog.MetadataEntity.EntityType;
-
 import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.data.coverage.grid.file.FileMetadataImpl;
 import org.geotools.resources.TestData;
+import org.opengis.catalog.MetadataEntity;
+import org.opengis.catalog.MetadataEntity.EntityType;
 
 /**
  * TODO type description

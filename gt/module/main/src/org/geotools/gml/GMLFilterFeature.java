@@ -16,15 +16,19 @@
  */
 package org.geotools.gml;
 
-import com.vividsolutions.jts.geom.*;
-import org.geotools.feature.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Vector;
 import java.util.logging.Logger;
+
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureTypeFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.XMLFilterImpl;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

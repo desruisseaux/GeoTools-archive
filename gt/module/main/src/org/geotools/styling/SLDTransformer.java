@@ -6,17 +6,15 @@
 
 package org.geotools.styling;
 
-import java.io.*;
-import javax.xml.transform.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.*;
+import java.io.FileOutputStream;
+
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterTransformer;
-import org.geotools.styling.*;
 import org.geotools.xml.transform.TransformerBase;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Producers SLD to an output stream.

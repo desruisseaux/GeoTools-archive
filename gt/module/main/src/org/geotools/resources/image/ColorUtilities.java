@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,6 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.util.Arrays;
 
-// Geotools dependencies
 import org.geotools.resources.XMath;
 
 

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,32 +21,20 @@
 package org.geotools.renderer.j2d;
 
 // J2SE dependencies
-import java.util.List;
-import java.awt.Shape;
-import java.awt.Rectangle;
+import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.Component; // For Javadoc
-import java.awt.geom.Area;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.FittedCoordinateSystem;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.CoordinateTransformationFactory;
-import org.geotools.resources.Utilities;
+import org.geotools.ct.MathTransform;
+import org.geotools.ct.MathTransform2D;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.geometry.XAffineTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

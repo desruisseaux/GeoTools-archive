@@ -16,18 +16,9 @@
  */
 package org.geotools.feature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.LocalCoordinateSystem;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import java.lang.reflect.Array;
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -35,6 +26,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.LocalCoordinateSystem;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 /**

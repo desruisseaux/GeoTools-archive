@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,50 +22,39 @@ package org.geotools.renderer.geom;
 
 // Geometry and graphics
 import java.awt.Shape;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.FlatteningPathIterator;
-
-// Collections and utils
-import java.util.Set;
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.AbstractCollection;
-import java.util.NoSuchElementException;
-import java.util.Date;
-import java.util.Locale;
-import java.text.Format;
-import java.text.DateFormat;
-import java.text.NumberFormat;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.LocalCoordinateSystem; // For Javadoc
-import org.geotools.cs.ProjectedCoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.util.ProgressListener;
+import org.geotools.cs.LocalCoordinateSystem;
+import org.geotools.cs.ProjectedCoordinateSystem;
 import org.geotools.math.Statistics;
-import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.XArray;
 import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.util.ProgressListener;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

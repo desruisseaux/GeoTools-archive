@@ -7,7 +7,6 @@
 
 package org.geotools;
 
-import java.awt.DisplayMode;
 import java.util.logging.Logger;
 
 import junit.framework.Test;

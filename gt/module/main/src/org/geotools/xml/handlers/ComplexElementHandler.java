@@ -15,6 +15,14 @@
  */
 package org.geotools.xml.handlers;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.XMLElementHandler;
 import org.geotools.xml.schema.All;
@@ -29,13 +37,6 @@ import org.geotools.xml.schema.Sequence;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.OperationNotSupportedException;
 
 
 /**

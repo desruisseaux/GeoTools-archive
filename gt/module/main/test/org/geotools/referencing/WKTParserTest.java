@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,27 +20,27 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.io.*;
-import java.util.*;
-import java.text.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Collection;
+import java.util.HashSet;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
-import org.geotools.resources.TestData;
-import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.wkt.MathTransformParser;
+import org.geotools.referencing.wkt.Parser;
+import org.geotools.resources.TestData;
 
 
 /**
  * Test the WKT {@link Parser} implementation.
  *
  * @version $Id$
- * @author Yann Cézard
+ * @author Yann Cï¿½zard
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

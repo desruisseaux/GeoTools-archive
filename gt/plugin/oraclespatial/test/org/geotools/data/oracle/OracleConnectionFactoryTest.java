@@ -4,12 +4,12 @@
  */
 package org.geotools.data.oracle;
 
+import java.util.Properties;
+
 import junit.framework.TestCase;
+
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.ConnectionPoolManager;
-
-import java.io.FileInputStream;
-import java.util.Properties;
 
 
 /**

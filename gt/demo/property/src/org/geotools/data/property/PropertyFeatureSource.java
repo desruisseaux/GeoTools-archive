@@ -1,9 +1,17 @@
 package org.geotools.data.property;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.data.AbstractFeatureLocking;
+import org.geotools.data.DataStore;
+import org.geotools.data.FeatureEvent;
+import org.geotools.data.FeatureListener;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
+import org.geotools.feature.FeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
 

@@ -16,9 +16,10 @@
  */
 package org.geotools.data.crs.geometry;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import org.geotools.ct.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.CoordinateSequence;
 
 
 /**

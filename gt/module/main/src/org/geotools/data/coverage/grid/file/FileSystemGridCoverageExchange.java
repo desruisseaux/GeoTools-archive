@@ -16,15 +16,6 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import org.opengis.catalog.CatalogEntry;
-
-import org.geotools.catalog.AbstractCatalog;
-import org.geotools.data.coverage.grid.GridCoverageExchange;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridFormatFinder;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -33,6 +24,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
+
+import org.geotools.catalog.AbstractCatalog;
+import org.geotools.data.coverage.grid.Format;
+import org.geotools.data.coverage.grid.GridCoverageExchange;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.GridFormatFinder;
+import org.opengis.catalog.CatalogEntry;
 
 
 /**

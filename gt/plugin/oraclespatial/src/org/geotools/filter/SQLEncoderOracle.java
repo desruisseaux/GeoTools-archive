@@ -16,11 +16,6 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,6 +24,12 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.oracle.sdo.SDO;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Encodes Geometry filters into valid oracle SDO statements.

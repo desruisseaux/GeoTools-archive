@@ -7,12 +7,12 @@
 
 package org.geotools.styling;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.logging.Logger;
-import junit.framework.*;
-import org.geotools.resources.TestData;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  *

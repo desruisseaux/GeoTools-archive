@@ -16,6 +16,11 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
@@ -23,10 +28,6 @@ import org.geotools.xml.schema.impl.AttributeGroupGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**

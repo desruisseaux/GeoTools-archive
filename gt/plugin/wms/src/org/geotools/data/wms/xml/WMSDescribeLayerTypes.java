@@ -24,7 +24,9 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.ows.LayerDescription;
-import org.geotools.data.wms.xml.WMSSchema.*;
+import org.geotools.data.wms.xml.WMSSchema.WMSAttribute;
+import org.geotools.data.wms.xml.WMSSchema.WMSComplexType;
+import org.geotools.data.wms.xml.WMSSchema.WMSElement;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.Element;

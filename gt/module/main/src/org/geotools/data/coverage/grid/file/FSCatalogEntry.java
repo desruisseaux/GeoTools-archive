@@ -16,13 +16,13 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import org.opengis.catalog.CatalogEntry;
-import org.opengis.catalog.MetadataEntity;
+import java.io.File;
+import java.util.Iterator;
 
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.UnknownFormat;
-import java.io.File;
-import java.util.Iterator;
+import org.opengis.catalog.CatalogEntry;
+import org.opengis.catalog.MetadataEntity;
 
 
 /**

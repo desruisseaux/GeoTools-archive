@@ -1,7 +1,8 @@
 package org.geotools.graph.traverse.standard;
 
-import org.geotools.graph.traverse.standard.DepthFirstIterator;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
@@ -11,14 +12,9 @@ import org.geotools.graph.structure.GraphVisitor;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.traverse.GraphTraversal;
-
 import org.geotools.graph.traverse.basic.BasicGraphTraversal;
 import org.geotools.graph.traverse.basic.CountingWalker;
-
 import org.geotools.graph.util.FIFOQueue;
-
-
-import junit.framework.TestCase;
 
 public class DepthFirstIteratorTest extends TestCase {
   

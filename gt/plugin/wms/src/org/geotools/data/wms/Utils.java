@@ -16,11 +16,12 @@
  */
 package org.geotools.data.wms;
 
-import org.geotools.data.ows.Layer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.geotools.data.ows.Layer;
 
 
 /**

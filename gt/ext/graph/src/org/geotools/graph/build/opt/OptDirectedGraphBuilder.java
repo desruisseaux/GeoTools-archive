@@ -19,6 +19,7 @@
 
 package org.geotools.graph.build.opt;
 
+import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.basic.BasicDirectedGraphBuilder;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;

@@ -6,12 +6,11 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.logging.Logger;
 
-import org.opengis.referencing.operation.TransformException;
-
 import org.geotools.ct.Adapters;
 import org.geotools.gui.swing.event.GeoMouseEvent;
 import org.geotools.map.MapContext;
 import org.geotools.pt.CoordinatePoint;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 

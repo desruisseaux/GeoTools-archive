@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -26,27 +26,23 @@ package org.geotools.ct.proj;
 
 // J2SE and JAI dependencies
 import java.awt.geom.Point2D;
-import java.util.Locale;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.io.Serializable;
+import java.util.Locale;
+
 import javax.media.jai.ParameterListDescriptor;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.measure.Latitude;
-import org.geotools.measure.Longitude;
 import org.geotools.cs.Projection;
-
-// Resources
+import org.geotools.ct.AbstractMathTransform;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.AbstractMathTransform;
 import org.geotools.ct.MissingParameterException;
-import org.geotools.resources.cts.Resources;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -64,7 +60,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * WKT (Well Know Text) or XML (not yet implemented) are more appropriate.
  *
  * @version $Id$
- * @author André Gosselin
+ * @author Andrï¿½ Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
@@ -118,7 +114,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     protected final double e;
     
     /**
-     * The square of excentricity: e² = (a²-b²)/a² where
+     * The square of excentricity: eï¿½ = (aï¿½-bï¿½)/aï¿½ where
      * <var>a</var> is the {@linkplain #semiMajor semi major} axis length and
      * <var>b</var> is the {@linkplain #semiMinor semi minor} axis length.
      *
@@ -212,8 +208,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *         <ul>
      *           <li>"semi_major" (mandatory: no default)</li>
      *           <li>"semi_minor" (mandatory: no default)</li>
-     *           <li>"central_meridian"   (default to 0°)</li>
-     *           <li>"latitude_of_origin" (default to 0°)</li>
+     *           <li>"central_meridian"   (default to 0ï¿½)</li>
+     *           <li>"latitude_of_origin" (default to 0ï¿½)</li>
      *           <li>"scale_factor"       (default to 1 )</li>
      *           <li>"false_easting"      (default to 0 )</li>
      *           <li>"false_northing"     (default to 0 )</li>
@@ -238,12 +234,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     /**
      * Converts latitudes expressed in degrees to radians. This method
-     * verifies that the latitude is within allowed limits (&plusmn;90°).
+     * verifies that the latitude is within allowed limits (&plusmn;90ï¿½).
      * This method is useful to check the validity of projection parameters,
      * like {@link #setCentralLongitude}.
      *
      * @param  y Latitude, to check, in degrees.
-     * @param  edge <code>true</code> to accept latitudes of &plusmn;90°.
+     * @param  edge <code>true</code> to accept latitudes of &plusmn;90ï¿½.
      * @return Latitude in radians.
      * @throws IllegalArgumentException if the latitude is invalide.
      */
@@ -259,12 +255,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     /**
      * Converts longitudes expressed in degrees to radians. This method
-     * verifies that the longitue is within allowed limits (&plusmn;180°).
+     * verifies that the longitue is within allowed limits (&plusmn;180ï¿½).
      * This method is used to check the validity of projection parameters,
      * like {@link #setCentralLongitude}.
      *
      * @param  x Longitude, to verify, in degrees.
-     * @param  edge <code>true</code> for accepting longitudes of &plusmn;180°.
+     * @param  edge <code>true</code> for accepting longitudes of &plusmn;180ï¿½.
      * @return Longitude in radians.
      * @throws IllegalArgumentException if a longitude is invalide.
      */
@@ -281,16 +277,16 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Makes sure that the specified longitude stay within &plusmn;180 degrees. This methpod should
      * be invoked after {@link #centralMeridian} had been added or removed to <var>x</var>. This
-     * method may add or substract an amount of 360° to <var>x</var>.
+     * method may add or substract an amount of 360ï¿½ to <var>x</var>.
      *
      * As a special case, we do not check the range if no rotation were applied on <var>x</var>.
-     * This is because the user may have a big area ranging from -180° to +180°. With the slight
-     * rounding errors related to map projections, the 180° longitude may be slightly over the
-     * limit. Doing the check would changes its sign. For example a bounding box from 30° to +180°
-     * would become 30° to -180°, which is probably not what the user wanted.
+     * This is because the user may have a big area ranging from -180ï¿½ to +180ï¿½. With the slight
+     * rounding errors related to map projections, the 180ï¿½ longitude may be slightly over the
+     * limit. Doing the check would changes its sign. For example a bounding box from 30ï¿½ to +180ï¿½
+     * would become 30ï¿½ to -180ï¿½, which is probably not what the user wanted.
      *
      * @param  x The longitude.
-     * @return The longitude in the range +/- 180°.
+     * @return The longitude in the range +/- 180ï¿½.
      */
     final double ensureInRange(double x) {
         if (centralMeridian != 0) {
@@ -549,9 +545,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         throws ProjectionException
     {
         /*
-         * Vérifie s'il faudra parcourir le tableau en sens inverse.
+         * Vï¿½rifie s'il faudra parcourir le tableau en sens inverse.
          * Ce sera le cas si les tableaux source et destination se
-         * chevauchent et que la destination est après la source.
+         * chevauchent et que la destination est aprï¿½s la source.
          */
         final boolean reverse = (src==dest && srcOffset<dstOffset &&
                                  srcOffset+(2*numPts) > dstOffset);
@@ -709,9 +705,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                 throws TransformException
         {
             /*
-             * Vérifie s'il faudra parcourir le tableau en sens inverse.
+             * Vï¿½rifie s'il faudra parcourir le tableau en sens inverse.
              * Ce sera le cas si les tableaux source et destination se
-             * chevauchent et que la destination est après la source.
+             * chevauchent et que la destination est aprï¿½s la source.
              */
             final boolean reverse = (src==dest && srcOffset<dstOffset &&
                                      srcOffset+(2*numPts) > dstOffset);
@@ -855,9 +851,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
 
     /**
-     * Retourne une chaîne de caractères représentant cette projection cartographique.
-     * Cette chaîne de caractères contiendra entre autres le nom de la projection, les
-     * coordonnées du centre et celles de l'origine.
+     * Retourne une chaï¿½ne de caractï¿½res reprï¿½sentant cette projection cartographique.
+     * Cette chaï¿½ne de caractï¿½res contiendra entre autres le nom de la projection, les
+     * coordonnï¿½es du centre et celles de l'origine.
      *
      * @task REVISIT: part of the implementation is identical to the package-private method
      *       <code>AbstractMathTransform.paramMT(String)</code>.  We should consider moving
@@ -947,7 +943,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Compute function <code>f(s,c,es) = c/sqrt(1 - s²*es)</code>
+     * Compute function <code>f(s,c,es) = c/sqrt(1 - sï¿½*es)</code>
      * needed for the true scale latitude (Snyder 14-15), where
      * <var>s</var> and <var>c</var> are the sine and cosine of
      * the true scale latitude, and {@link #es} the eccentricity

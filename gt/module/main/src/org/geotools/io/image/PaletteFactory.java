@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,30 +35,26 @@ package org.geotools.io.image;
 // Colors
 import java.awt.Color;
 import java.awt.image.IndexColorModel;
-
-// Input/output
-import java.net.URL;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.Reader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import javax.imageio.IIOException;
+import java.io.Reader;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.ParseException;
-
-// Miscellaneous
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ArrayList;
 
-// Resources
-import org.geotools.io.LineFormat;
+import javax.imageio.IIOException;
+
 import org.geotools.io.DefaultFileFilter;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.io.LineFormat;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ColorUtilities;
 
 
@@ -247,16 +243,16 @@ public class PaletteFactory {
     }
     
     /**
-     * Procède au chargement d'un ensemble de couleurs. Les couleurs doivent
-     * être codées sur trois colonnes dans un fichier texte. Les colonnes
-     * doivent être des entiers de 0 à 255 correspondant (dans l'ordre) aux
+     * Procï¿½de au chargement d'un ensemble de couleurs. Les couleurs doivent
+     * ï¿½tre codï¿½es sur trois colonnes dans un fichier texte. Les colonnes
+     * doivent ï¿½tre des entiers de 0 ï¿½ 255 correspondant (dans l'ordre) aux
      * couleurs rouge (R), verte (G) et bleue (B). Les lignes vierges ainsi
-     * que les lignes dont le premier caractère non-blanc est # seront ignorées.
+     * que les lignes dont le premier caractï¿½re non-blanc est # seront ignorï¿½es.
      *
      * @param  input Flot contenant les codes de couleurs de la palette.
-     * @return Couleurs obtenues à partir des codes lues.
+     * @return Couleurs obtenues ï¿½ partir des codes lues.
      * @throws IOException si une erreur est survenue lors de la lecture.
-     * @throws IIOException si une erreur est survenue lors de l'interprétation des codes de couleurs.
+     * @throws IIOException si une erreur est survenue lors de l'interprï¿½tation des codes de couleurs.
      */
     private Color[] getColors(final BufferedReader input) throws IOException {
         int values[]=new int[3]; // On attend exactement 3 composantes par ligne.
@@ -356,7 +352,7 @@ public class PaletteFactory {
     }
     
     /**
-     * Vérifie que la valeur <code>value</code> spécifiée
+     * Vï¿½rifie que la valeur <code>value</code> spï¿½cifiï¿½e
      * est dans la plage [0..255] inclusivement.
      *
      * @throws ParseException si le nombre n'est pas dans la plage [0..255].

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,21 +22,21 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing.tree;
 
 // J2SE dependencies
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.DefaultTreeModel;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
 
 
@@ -48,23 +48,23 @@ import org.geotools.resources.XArray;
  */
 public final class Trees {
     /**
-     * Interdit la création d'objets de cette classe.
+     * Interdit la crï¿½ation d'objets de cette classe.
      */
     private Trees() {
     }
 
     /**
-     * Retourne les chemins vers l'objet spécifié. Cette méthode suppose que l'arborescence
-     * est constituée de noeuds {@link org.geotools.gui.swing.tree.TreeNode} et comparera
-     * <code>value</code> avec les objets retournés par la méthode
+     * Retourne les chemins vers l'objet spï¿½cifiï¿½. Cette mï¿½thode suppose que l'arborescence
+     * est constituï¿½e de noeuds {@link org.geotools.gui.swing.tree.TreeNode} et comparera
+     * <code>value</code> avec les objets retournï¿½s par la mï¿½thode
      * {@link org.geotools.gui.swing.tree.TreeNode#getUserObject}. Les noeuds qui ne sont
      * pas des objets {@link org.geotools.gui.swing.tree.TreeNode} ne seront pas
-     * comparés à <code>value</code>.
+     * comparï¿½s ï¿½ <code>value</code>.
      *
-     * @param  model Modèle dans lequel rechercher le chemin.
-     * @param  value Objet à rechercher dans
+     * @param  model Modï¿½le dans lequel rechercher le chemin.
+     * @param  value Objet ï¿½ rechercher dans
      *         {@link org.geotools.gui.swing.tree.TreeNode#getUserObject}.
-     * @return Chemins vers l'objet spécifié. Ce tableau peut avoir une
+     * @return Chemins vers l'objet spï¿½cifiï¿½. Ce tableau peut avoir une
      *         longueur de 0, mais ne sera jamais <code>null</code>.
      */
     public static TreePath[] getPathsToUserObject(final TreeModel model, final Object value) {
@@ -76,15 +76,15 @@ public final class Trees {
     }
 
     /**
-     * Implémentation de la recherche des chemins. Cette
-     * méthode s'appele elle-même d'une façon récursive.
+     * Implï¿½mentation de la recherche des chemins. Cette
+     * mï¿½thode s'appele elle-mï¿½me d'une faï¿½on rï¿½cursive.
      *
-     * @param  model  Modèle dans lequel rechercher le chemin.
-     * @param  value  Objet à rechercher dans
+     * @param  model  Modï¿½le dans lequel rechercher le chemin.
+     * @param  value  Objet ï¿½ rechercher dans
      *                {@link org.geotools.gui.swing.tree.TreeNode#getUserObject}.
-     * @param  path   Chemin parcouru jusqu'à maintenant.
+     * @param  path   Chemin parcouru jusqu'ï¿½ maintenant.
      * @param  length Longueur valide de <code>path</code>.
-     * @param  list   Liste dans laquelle ajouter les {@link TreePath} trouvés.
+     * @param  list   Liste dans laquelle ajouter les {@link TreePath} trouvï¿½s.
      * @return <code>path</code>, ou un nouveau tableau s'il a fallu l'agrandir.
      */
     private static Object[] getPathsToUserObject(final TreeModel model, final Object value,
@@ -109,17 +109,17 @@ public final class Trees {
     }
 
     /**
-     * Construit une chaîne de caractères qui contiendra le
-     * noeud spécifié ainsi que tous les noeuds enfants.
+     * Construit une chaï¿½ne de caractï¿½res qui contiendra le
+     * noeud spï¿½cifiï¿½ ainsi que tous les noeuds enfants.
      *
-     * @param model  Arborescence à écrire.
-     * @param node   Noeud de l'arborescence à écrire.
-     * @param buffer Buffer dans lequel écrire le noeud.
-     * @param level  Niveau d'indentation (à partir de 0).
-     * @param last   Indique si les niveaux précédents sont
-     *               en train d'écrire leurs derniers items.
+     * @param model  Arborescence ï¿½ ï¿½crire.
+     * @param node   Noeud de l'arborescence ï¿½ ï¿½crire.
+     * @param buffer Buffer dans lequel ï¿½crire le noeud.
+     * @param level  Niveau d'indentation (ï¿½ partir de 0).
+     * @param last   Indique si les niveaux prï¿½cï¿½dents sont
+     *               en train d'ï¿½crire leurs derniers items.
      * @return       Le tableau <code>last</code>, qui peut
-     *               éventuellement avoir été agrandit.
+     *               ï¿½ventuellement avoir ï¿½tï¿½ agrandit.
      */
     private static boolean[] toString(final TreeModel model, final Object node,
                                       final StringBuffer buffer, final int level, boolean[] last)
@@ -147,15 +147,15 @@ public final class Trees {
     }
 
     /**
-     * Retourne une chaîne de caractères qui contiendra une
-     * représentation graphique de l'arborescence spécifiée.
-     * Cette arborescence apparaître correctement si elle
-     * est écrite avec une police mono-espacée.
+     * Retourne une chaï¿½ne de caractï¿½res qui contiendra une
+     * reprï¿½sentation graphique de l'arborescence spï¿½cifiï¿½e.
+     * Cette arborescence apparaï¿½tre correctement si elle
+     * est ï¿½crite avec une police mono-espacï¿½e.
      *
-     * @param  tree Arborescence à écrire.
-     * @param  root Noeud à partir d'où commencer à tracer l'arborescence.
-     * @return Chaîne de caractères représentant l'arborescence, ou
-     *         <code>null</code> si <code>root</code> était nul.
+     * @param  tree Arborescence ï¿½ ï¿½crire.
+     * @param  root Noeud ï¿½ partir d'oï¿½ commencer ï¿½ tracer l'arborescence.
+     * @return Chaï¿½ne de caractï¿½res reprï¿½sentant l'arborescence, ou
+     *         <code>null</code> si <code>root</code> ï¿½tait nul.
      */
     private static String toString(final TreeModel tree, final Object root) {
         if (root == null) {
@@ -167,13 +167,13 @@ public final class Trees {
     }
 
     /**
-     * Retourne une chaîne de caractères qui contiendra une
-     * représentation graphique de l'arborescence spécifiée.
-     * Cette arborescence apparaître correctement si elle
-     * est écrite avec une police mono-espacée.
+     * Retourne une chaï¿½ne de caractï¿½res qui contiendra une
+     * reprï¿½sentation graphique de l'arborescence spï¿½cifiï¿½e.
+     * Cette arborescence apparaï¿½tre correctement si elle
+     * est ï¿½crite avec une police mono-espacï¿½e.
      *
-     * @param  tree Arborescence à écrire.
-     * @return Chaîne de caractères représentant l'arborescence, ou
+     * @param  tree Arborescence ï¿½ ï¿½crire.
+     * @return Chaï¿½ne de caractï¿½res reprï¿½sentant l'arborescence, ou
      *         <code>null</code> si l'arborescence ne contenait aucun noeud.
      */
     public static String toString(final TreeModel tree) {
@@ -181,13 +181,13 @@ public final class Trees {
     }
 
     /**
-     * Retourne une chaîne de caractères qui contiendra une
-     * représentation graphique de l'arborescence spécifiée.
-     * Cette arborescence apparaître correctement si elle
-     * est écrite avec une police mono-espacée.
+     * Retourne une chaï¿½ne de caractï¿½res qui contiendra une
+     * reprï¿½sentation graphique de l'arborescence spï¿½cifiï¿½e.
+     * Cette arborescence apparaï¿½tre correctement si elle
+     * est ï¿½crite avec une police mono-espacï¿½e.
      *
-     * @param  node Noeud à partir d'où écrire l'arborescence.
-     * @return Chaîne de caractères représentant l'arborescence.
+     * @param  node Noeud ï¿½ partir d'oï¿½ ï¿½crire l'arborescence.
+     * @return Chaï¿½ne de caractï¿½res reprï¿½sentant l'arborescence.
      */
     public static String toString(final TreeNode node) {
         return toString(new DefaultTreeModel(node, true));

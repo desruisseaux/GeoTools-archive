@@ -6,8 +6,8 @@
 
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.geotools.algorithms.RobustGeometryProperties;
+import org.geotools.feature.Feature;
 
 import com.vividsolutions.jts.geom.Geometry;
 

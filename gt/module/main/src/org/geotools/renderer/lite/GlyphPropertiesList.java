@@ -6,8 +6,8 @@
 
 package org.geotools.renderer.lite;
 
-import java.util.Iterator;
 import java.util.Vector;
+
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 

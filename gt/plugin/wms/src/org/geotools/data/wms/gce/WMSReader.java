@@ -18,7 +18,6 @@ package org.geotools.data.wms.gce;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -27,7 +26,6 @@ import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.crs.CRSService;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;

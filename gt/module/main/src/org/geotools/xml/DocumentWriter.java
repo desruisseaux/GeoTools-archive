@@ -16,6 +16,22 @@
  */
 package org.geotools.xml;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.xml.handlers.xsi.AttributeHandler;
 import org.geotools.xml.handlers.xsi.ComplexTypeHandler;
 import org.geotools.xml.schema.All;
@@ -35,20 +51,6 @@ import org.geotools.xml.schema.Type;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.OperationNotSupportedException;
 
 
 /**

@@ -7,7 +7,9 @@
 
 package org.geotools.algorithms;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.geotools.filter.AreaFunctionTest;
 

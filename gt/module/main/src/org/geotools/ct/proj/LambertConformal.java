@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -37,25 +37,22 @@
 package org.geotools.ct.proj;
 
 // J2SE dependencies
-import java.util.Locale;
 import java.awt.geom.Point2D;
+import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.cs.Projection;
-import org.geotools.measure.Latitude;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MissingParameterException;
-
-// Resources
-import org.geotools.resources.cts.Resources;
+import org.geotools.measure.Latitude;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
  * Lambert Conical Conformal Projection.  Areas and shapes are deformed
  * as one moves away from standard parallels.  The angles are true in
  * a limited area.  This projection is used for the charts of North America.
- * It uses a default central latitude of 40°N.
+ * It uses a default central latitude of 40ï¿½N.
  * <br><br>
  *
  * This implementation provides transforms for three cases of the lambert conic 
@@ -83,7 +80,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp_belgium.html">lambert_conic_conformal_2sp_belgium</A>
  *
  * @version $Id$
- * @author André Gosselin
+ * @author Andrï¿½ Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *

@@ -20,18 +20,17 @@
 package org.geotools.graph.build.line;
 
 import java.util.HashMap;
-import java.util.Map;
-
 import java.util.Iterator;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineSegment;
+import java.util.Map;
 
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.structure.line.OptDirectedXYNode;
 import org.geotools.graph.structure.opt.OptDirectedNode;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineSegment;
 
 /**
  * An implementation of GraphGenerator used to generate an optimized graph 

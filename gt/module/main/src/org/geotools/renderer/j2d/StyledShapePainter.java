@@ -16,12 +16,6 @@
  */
 package org.geotools.renderer.j2d;
 
-import org.geotools.renderer.style.GraphicStyle2D;
-import org.geotools.renderer.style.LineStyle2D;
-import org.geotools.renderer.style.MarkStyle2D;
-import org.geotools.renderer.style.PolygonStyle2D;
-import org.geotools.renderer.style.Style2D;
-import org.geotools.renderer.style.TextStyle2D;
 import java.awt.AlphaComposite;
 import java.awt.Canvas;
 import java.awt.Graphics2D;
@@ -37,6 +31,13 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.renderer.style.GraphicStyle2D;
+import org.geotools.renderer.style.LineStyle2D;
+import org.geotools.renderer.style.MarkStyle2D;
+import org.geotools.renderer.style.PolygonStyle2D;
+import org.geotools.renderer.style.Style2D;
+import org.geotools.renderer.style.TextStyle2D;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,20 +24,16 @@
 package org.geotools.cs;
 
 // OpenGIS dependencies
-import org.opengis.cs.CS_AxisOrientationEnum;
-
-// J2SE and JAI dependencies
-import java.util.Locale;
 import java.io.ObjectStreamException;
+import java.util.Locale;
 import java.util.NoSuchElementException;
+
 import javax.media.jai.EnumeratedParameter;
 
-// OpenGIS dependencies
-import org.opengis.referencing.cs.AxisDirection;
-
-// Geotools dependencies
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.cs.CS_AxisOrientationEnum;
+import org.opengis.referencing.cs.AxisDirection;
 
 
 /**

@@ -20,6 +20,8 @@ package org.geotools.map.event;
 // J2SE dependencies
 import java.util.EventObject;
 
+import org.geotools.data.ows.Layer;
+
 
 /**
  * Event fired when some {@linkPlain Layer layer} property changes.

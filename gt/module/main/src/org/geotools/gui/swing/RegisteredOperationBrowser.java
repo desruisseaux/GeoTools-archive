@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,60 +22,51 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import java.util.List;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Iterator;
-import java.util.Comparator;
-import java.util.Collections;
-import java.util.ResourceBundle;
-import java.util.MissingResourceException;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
-import javax.swing.Box;
-import javax.swing.JTree;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
-import javax.swing.text.JTextComponent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import java.awt.image.renderable.ParameterBlock; // For javadoc
-import java.awt.image.renderable.RenderedImageFactory;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.image.renderable.ParameterBlock;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-// JAI dependencies
 import javax.media.jai.JAI;
-import javax.media.jai.OperationRegistry;
 import javax.media.jai.OperationDescriptor;
+import javax.media.jai.OperationRegistry;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.RegistryElementDescriptor;
-import javax.media.jai.registry.RenderedRegistryMode;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
-// Geotools dependencies
+import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotools.gui.swing.tree.NamedTreeNode;
+import org.geotools.gui.swing.tree.TreeNode;
+import org.geotools.gui.swing.tree.Trees;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
-import org.geotools.gui.swing.tree.Trees;
-import org.geotools.gui.swing.tree.TreeNode;
-import org.geotools.gui.swing.tree.NamedTreeNode;
-import org.geotools.gui.swing.tree.MutableTreeNode;
-import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.resources.gui.ResourceKeys;
 import org.geotools.resources.gui.Resources;
 

@@ -18,12 +18,9 @@ package org.geotools.styling;
 
 import junit.framework.TestCase;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.opengis.util.Cloneable;
 
 
 /** Tests style cloning

@@ -16,15 +16,15 @@
  */
 package org.geotools.data.wfs;
 
-import org.geotools.data.AbstractDataStoreFactory;
-import org.geotools.data.DataStore;
-import org.geotools.data.crs.CRSService;
-import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.AbstractDataStoreFactory;
+import org.geotools.data.DataStore;
+import org.xml.sax.SAXException;
 
 
 /**

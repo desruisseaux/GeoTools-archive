@@ -10,11 +10,18 @@
  */
 package org.geotools.validation.xml;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.TestCase;
-import org.geotools.validation.dto.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+
+import org.geotools.validation.dto.PlugInDTO;
+import org.geotools.validation.dto.TestDTO;
+import org.geotools.validation.dto.TestSuiteDTO;
 
 
 /**

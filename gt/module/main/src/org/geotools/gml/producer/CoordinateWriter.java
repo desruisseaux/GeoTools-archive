@@ -16,13 +16,15 @@
  */
 package org.geotools.gml.producer;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 //import org.geotools.feature.*;

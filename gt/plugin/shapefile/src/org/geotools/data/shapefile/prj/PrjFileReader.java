@@ -20,14 +20,17 @@
 
 package org.geotools.data.shapefile.prj;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemFactory;
 import org.opengis.referencing.FactoryException;
 
 

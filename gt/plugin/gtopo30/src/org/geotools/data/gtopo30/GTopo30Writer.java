@@ -25,9 +25,6 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.InvalidParameterNameException;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterNotFoundException;
 
 /**
  * 

@@ -18,11 +18,14 @@ package org.geotools.gml;
 
 
 // Java Topology Suite dependencies
-import com.vividsolutions.jts.geom.*;
-
-// J2SE dependencies
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.TopologyException;
 
 
 /**

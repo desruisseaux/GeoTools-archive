@@ -20,15 +20,12 @@
 package org.geotools.styling;
 
 // J2SE dependencies
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 
 
 /**

@@ -21,6 +21,20 @@
  */
 package org.geotools.gml.producer;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Date;
+import java.util.logging.Logger;
+
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
+import org.geotools.xml.transform.TransformerBase;
+import org.geotools.xml.transform.Translator;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
@@ -29,18 +43,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.geotools.xml.transform.TransformerBase;
-import org.geotools.xml.transform.Translator;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Date;
-import java.util.logging.Logger;
 
 
 /**

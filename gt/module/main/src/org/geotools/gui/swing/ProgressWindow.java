@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -34,64 +34,63 @@
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Toolkit;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JDialog;
-import javax.swing.JTextArea;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.JLayeredPane;
-import javax.swing.JDesktopPane;
-import javax.swing.BorderFactory;
-import javax.swing.JInternalFrame;
-import javax.swing.BoundedRangeModel;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.Toolkit;
 
-// Geotools dependencies
-import org.geotools.util.ProgressListener;
-import org.geotools.resources.Utilities;
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
+import javax.swing.JDialog;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.geotools.resources.SwingUtilities;
-import org.geotools.resources.gui.Resources;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
+import org.geotools.util.ProgressListener;
 
 
 /**
- * Informe l'utilisateur des progrès d'une opération à l'aide de messages dans une fenêtre.
- * Cette classe peut aussi écrire des avertissements, ce qui est utile entre autre lors de la
- * lecture d'un fichier de données durant laquelle on veut signaler les erreurs mais sans arrêter
+ * Informe l'utilisateur des progrï¿½s d'une opï¿½ration ï¿½ l'aide de messages dans une fenï¿½tre.
+ * Cette classe peut aussi ï¿½crire des avertissements, ce qui est utile entre autre lors de la
+ * lecture d'un fichier de donnï¿½es durant laquelle on veut signaler les erreurs mais sans arrï¿½ter
  * la lecture pour autant.
  *
  * <p>&nbsp;</p>
  * <p align="center"><img src="doc-files/ProgressWindow.png"></p>
  * <p>&nbsp;</p>
  *
- * <p>Cette classe est conçue pour fonctionner correctement même si ses méthodes sont appellées
+ * <p>Cette classe est conï¿½ue pour fonctionner correctement mï¿½me si ses mï¿½thodes sont appellï¿½es
  * dans un autre thread que celui de <i>Swing</i>. Il est donc possible de faire la longue
- * opération en arrière plan et d'appeller les méthodes de cette classe sans se soucier des
- * problèmes de synchronisation. En général, faire l'opération en arrière plan est recommandé
- * afin de permettre le rafraichissement de l'écran par <i>Swing</i>.</p>
+ * opï¿½ration en arriï¿½re plan et d'appeller les mï¿½thodes de cette classe sans se soucier des
+ * problï¿½mes de synchronisation. En gï¿½nï¿½ral, faire l'opï¿½ration en arriï¿½re plan est recommandï¿½
+ * afin de permettre le rafraichissement de l'ï¿½cran par <i>Swing</i>.</p>
  *
  * @version $Id: ProgressWindow.java,v 1.3 2003/05/13 11:01:39 desruisseaux Exp $
  * @author Martin Desruisseaux
  */
 public class ProgressWindow implements ProgressListener {
     /**
-     * Largeur initiale de la fenêtre des progrès, en pixels.
+     * Largeur initiale de la fenï¿½tre des progrï¿½s, en pixels.
      */
     private static final int WIDTH = 360;
 
     /**
-     * Hauteur initiale de la fenêtre des progrès, en pixels.
+     * Hauteur initiale de la fenï¿½tre des progrï¿½s, en pixels.
      */
     private static final int HEIGHT = 120;
 
@@ -111,65 +110,65 @@ public class ProgressWindow implements ProgressListener {
     private static final int VMARGIN = 9;
 
     /**
-     * Nombre d'espaces à placer dans la marge de
-     * la fenêtre contenant les messages d'erreurs.
+     * Nombre d'espaces ï¿½ placer dans la marge de
+     * la fenï¿½tre contenant les messages d'erreurs.
      */
     private static final int WARNING_MARGIN = 8;
 
     /**
-     * Fenêtre affichant les progrès de la longue opération.
+     * Fenï¿½tre affichant les progrï¿½s de la longue opï¿½ration.
      * Il peut s'agir notamment d'un objet {@link JDialog} ou
-     * d'un objet {@link JInternalFrame}, dépendamment de la
+     * d'un objet {@link JInternalFrame}, dï¿½pendamment de la
      * composante parente.
      */
     private final Component window;
 
     /**
-     * Conteneur dans lequel insérer les éléments tels que
-     * la barre des progrès. Ca peut être le même objet que
-     * {@link #window}, mais pas nécessairement.
+     * Conteneur dans lequel insï¿½rer les ï¿½lï¿½ments tels que
+     * la barre des progrï¿½s. Ca peut ï¿½tre le mï¿½me objet que
+     * {@link #window}, mais pas nï¿½cessairement.
      */
     private final JComponent content;
 
     /**
-     * Barre des progrès. La plage de cette barre doit
-     * obligatoirement aller au moins de 0 à 100.
+     * Barre des progrï¿½s. La plage de cette barre doit
+     * obligatoirement aller au moins de 0 ï¿½ 100.
      */
     private final JProgressBar progressBar;
 
     /**
-     * Description de l'opération en cours. Des exemples de descriptions
-     * seraient "Lecture de l'en-tête" ou "Lecture des données".
+     * Description de l'opï¿½ration en cours. Des exemples de descriptions
+     * seraient "Lecture de l'en-tï¿½te" ou "Lecture des donnï¿½es".
      */
     private final JLabel description;
 
     /**
-     * Région dans laquelle afficher les messages d'avertissements.
-     * Cet objet doit être de la classe {@link JTextArea}. il ne sera
+     * Rï¿½gion dans laquelle afficher les messages d'avertissements.
+     * Cet objet doit ï¿½tre de la classe {@link JTextArea}. il ne sera
      * toutefois construit que si des erreurs surviennent effectivement.
      */
     private JComponent warningArea;
 
     /**
      * Source du dernier message d'avertissement. Cette information est
-     * conservée afin d'éviter de répéter la source lors d'éventuels
+     * conservï¿½e afin d'ï¿½viter de rï¿½pï¿½ter la source lors d'ï¿½ventuels
      * autres messages d'avertissements.
      */
     private String lastSource;
     
     /**
-     * Construit une fenêtre qui informera des progrès d'une opération.
-     * La fenêtre n'apparaîtra pas imédiatement. Elle n'apparaîtra que
-     * lorsque la méthode {@link #started} sera appelée.
+     * Construit une fenï¿½tre qui informera des progrï¿½s d'une opï¿½ration.
+     * La fenï¿½tre n'apparaï¿½tra pas imï¿½diatement. Elle n'apparaï¿½tra que
+     * lorsque la mï¿½thode {@link #started} sera appelï¿½e.
      *
-     * @param parent Composante parente. La fenêtre des progrès sera
-     *        construite dans le même cadre que cette composante. Ce
-     *        paramètre peut être nul s'il n'y a pas de parent.
+     * @param parent Composante parente. La fenï¿½tre des progrï¿½s sera
+     *        construite dans le mï¿½me cadre que cette composante. Ce
+     *        paramï¿½tre peut ï¿½tre nul s'il n'y a pas de parent.
      */
     public ProgressWindow(final Component parent) {
         /*
-         * Création de la fenêtre qui contiendra
-         * les composantes affichant le progrès.
+         * Crï¿½ation de la fenï¿½tre qui contiendra
+         * les composantes affichant le progrï¿½s.
          */
         Dimension       parentSize;
         final Resources  resources = Resources.getResources(parent!=null ? parent.getLocale() : null);
@@ -197,15 +196,15 @@ public class ProgressWindow implements ProgressListener {
         }
         window.setBounds((parentSize.width-WIDTH)/2, (parentSize.height-HEIGHT)/2, WIDTH, HEIGHT);
         /*
-         * Création de l'étiquette qui décrira l'opération
-         * en cours. Au départ, aucun texte ne sera placé
-         * dans cette étiquette.
+         * Crï¿½ation de l'ï¿½tiquette qui dï¿½crira l'opï¿½ration
+         * en cours. Au dï¿½part, aucun texte ne sera placï¿½
+         * dans cette ï¿½tiquette.
          */
         description = new JLabel();
         description.setHorizontalAlignment(JLabel.CENTER);
         /*
-         * Procède à la création de la barre des progrès.
-         * Le modèle de cette barre sera retenu pour être
+         * Procï¿½de ï¿½ la crï¿½ation de la barre des progrï¿½s.
+         * Le modï¿½le de cette barre sera retenu pour ï¿½tre
          */
         progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
@@ -213,9 +212,9 @@ public class ProgressWindow implements ProgressListener {
                               BorderFactory.createEmptyBorder(6,9,6,9),
                               progressBar.getBorder()));
         /*
-         * Dispose les éléments à l'intérieur de la fenêtre.
+         * Dispose les ï¿½lï¿½ments ï¿½ l'intï¿½rieur de la fenï¿½tre.
          * On leur donnera une bordure vide pour laisser un
-         * peu d'espace entre eux et les bords de la fenêtre.
+         * peu d'espace entre eux et les bords de la fenï¿½tre.
          */
         content.setLayout(new GridLayout(2,1));
         content.setBorder(BorderFactory.createCompoundBorder(
@@ -233,8 +232,8 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Retourne le titre de la fenêtre. Il s'agira en général
-     * du titre de la boîte de dialogue. Par défaut, ce titre
+     * Retourne le titre de la fenï¿½tre. Il s'agira en gï¿½nï¿½ral
+     * du titre de la boï¿½te de dialogue. Par dï¿½faut, ce titre
      * sera "Progression" dans la langue de l'utilisateur.
      */
     public String getTitle() {
@@ -242,16 +241,16 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Définit le titre de la fenêtre des progrès. Un argument
-     * nul rétablira le titre par défaut de la fenêtre.
+     * Dï¿½finit le titre de la fenï¿½tre des progrï¿½s. Un argument
+     * nul rï¿½tablira le titre par dï¿½faut de la fenï¿½tre.
      */
     public void setTitle(final String name) {
         set(Caller.TITLE, (name!=null) ? name : getString(ResourceKeys.PROGRESSION));
     }
 
     /**
-     * Retourne le message d'écrivant l'opération
-     * en cours. Si aucun message n'a été définie,
+     * Retourne le message d'ï¿½crivant l'opï¿½ration
+     * en cours. Si aucun message n'a ï¿½tï¿½ dï¿½finie,
      * retourne <code>null</code>.
      */
     public String getDescription() {
@@ -259,10 +258,10 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Spécifie un message qui décrit l'opération en cours.
-     * Ce message est typiquement spécifiée avant le début
-     * de l'opération. Toutefois, cette méthode peut aussi
-     * être appelée à tout moment pendant l'opération sans
+     * Spï¿½cifie un message qui dï¿½crit l'opï¿½ration en cours.
+     * Ce message est typiquement spï¿½cifiï¿½e avant le dï¿½but
+     * de l'opï¿½ration. Toutefois, cette mï¿½thode peut aussi
+     * ï¿½tre appelï¿½e ï¿½ tout moment pendant l'opï¿½ration sans
      * que cela affecte le pourcentage accompli. La valeur
      * <code>null</code> signifie qu'on ne souhaite plus
      * afficher de description.
@@ -272,18 +271,18 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Indique que l'opération a commencée. L'appel de cette
-     * méthode provoque l'apparition de la fenêtre si elle
-     * n'était pas déjà visible.
+     * Indique que l'opï¿½ration a commencï¿½e. L'appel de cette
+     * mï¿½thode provoque l'apparition de la fenï¿½tre si elle
+     * n'ï¿½tait pas dï¿½jï¿½ visible.
      */
     public void started() {
         call(Caller.STARTED);
     }
 
     /**
-     * Indique l'état d'avancement de l'opération. Le progrès est représenté par un
-     * pourcentage variant de 0 à 100 inclusivement. Si la valeur spécifiée est en
-     * dehors de ces limites, elle sera automatiquement ramenée entre 0 et 100.
+     * Indique l'ï¿½tat d'avancement de l'opï¿½ration. Le progrï¿½s est reprï¿½sentï¿½ par un
+     * pourcentage variant de 0 ï¿½ 100 inclusivement. Si la valeur spï¿½cifiï¿½e est en
+     * dehors de ces limites, elle sera automatiquement ramenï¿½e entre 0 et 100.
      */
     public void progress(final float percent) {
         int p=(int) percent; // round toward 0
@@ -293,36 +292,36 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Indique que l'opération est terminée. L'indicateur visuel informant des
-     * progrès disparaîtra, sauf si des messages d'erreurs ou d'avertissements
-     * ont été affichés.
+     * Indique que l'opï¿½ration est terminï¿½e. L'indicateur visuel informant des
+     * progrï¿½s disparaï¿½tra, sauf si des messages d'erreurs ou d'avertissements
+     * ont ï¿½tï¿½ affichï¿½s.
      */
     public void complete() {
         call(Caller.COMPLETE);
     }
 
     /**
-     * Libère les ressources utilisées par l'état d'avancement. Si l'état
-     * d'avancement était affichée dans une fenêtre, cette fenêtre peut être
-     * détruite.
+     * Libï¿½re les ressources utilisï¿½es par l'ï¿½tat d'avancement. Si l'ï¿½tat
+     * d'avancement ï¿½tait affichï¿½e dans une fenï¿½tre, cette fenï¿½tre peut ï¿½tre
+     * dï¿½truite.
      */
     public void dispose() {
         call(Caller.DISPOSE);
     }
 
     /**
-     * Écrit un message d'avertissement. Les messages apparaîtront dans
-     * une zone de texte sous la barre des progrès. Cette zone de texte
-     * ne deviendra visible qu'après l'écriture d'au moins un message.
+     * ï¿½crit un message d'avertissement. Les messages apparaï¿½tront dans
+     * une zone de texte sous la barre des progrï¿½s. Cette zone de texte
+     * ne deviendra visible qu'aprï¿½s l'ï¿½criture d'au moins un message.
      *
-     * @param source Chaîne de caractère décrivant la source de l'avertissement.
+     * @param source Chaï¿½ne de caractï¿½re dï¿½crivant la source de l'avertissement.
      *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
-     *        a été détectée. Peut être nul si la source n'est pas connue.
-     * @param margin Texte à placer dans la marge de l'avertissement <code>warning</code>,
-     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numéro
-     *        de ligne où s'est produite l'erreur dans le fichier <code>source</code>. Ce
-     *        texte sera automatiquement placé entre parenthèses.
-     * @param warning Message d'avertissement à écrire.
+     *        a ï¿½tï¿½ dï¿½tectï¿½e. Peut ï¿½tre nul si la source n'est pas connue.
+     * @param margin Texte ï¿½ placer dans la marge de l'avertissement <code>warning</code>,
+     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numï¿½ro
+     *        de ligne oï¿½ s'est produite l'erreur dans le fichier <code>source</code>. Ce
+     *        texte sera automatiquement placï¿½ entre parenthï¿½ses.
+     * @param warning Message d'avertissement ï¿½ ï¿½crire.
      */
     public synchronized void warningOccurred(final String source, String margin,
                                              final String warning)
@@ -357,17 +356,17 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Indique qu'une exception est survenue pendant le traitement de l'opération.
-     * L'implémentation par défaut fait apparaître le message de l'exception dans
-     * une fenêtre séparée.
+     * Indique qu'une exception est survenue pendant le traitement de l'opï¿½ration.
+     * L'implï¿½mentation par dï¿½faut fait apparaï¿½tre le message de l'exception dans
+     * une fenï¿½tre sï¿½parï¿½e.
      */
     public void exceptionOccurred(final Throwable exception) {
         ExceptionMonitor.show(window, exception);
     }
 
     /**
-     * Retourne la chaîne <code>margin</code> sans les
-     * éventuelles parenthèses qu'elle pourrait avoir
+     * Retourne la chaï¿½ne <code>margin</code> sans les
+     * ï¿½ventuelles parenthï¿½ses qu'elle pourrait avoir
      * de part et d'autre.
      */
     private static String trim(String margin) {
@@ -380,13 +379,13 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Interroge une des composantes de la boîte des progrès.
+     * Interroge une des composantes de la boï¿½te des progrï¿½s.
      * L'interrogation sera faite dans le thread de <i>Swing</i>.
      *
-     * @param  task Information désirée. Ce code doit être une
+     * @param  task Information dï¿½sirï¿½e. Ce code doit ï¿½tre une
      *         des constantes telles que {@link Caller#TITLE}
      *         ou {@link Caller#LABEL}.
-     * @return L'information demandée.
+     * @return L'information demandï¿½e.
      */
     private String get(final int task) {
         final Caller caller = new Caller(-task);
@@ -395,10 +394,10 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Modifie l'état d'une des composantes de la boîte des progrès.
+     * Modifie l'ï¿½tat d'une des composantes de la boï¿½te des progrï¿½s.
      * La modification sera faite dans le thread de <i>Swing</i>.
      *
-     * @param  task Information à modifier. Ce code doit être une
+     * @param  task Information ï¿½ modifier. Ce code doit ï¿½tre une
      *         des constantes telles que {@link Caller#TITLE}
      *         ou {@link Caller#LABEL}.
      * @param  text Le nouveau texte.
@@ -410,12 +409,12 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Modifie l'état d'une des composantes de la boîte des progrès.
+     * Modifie l'ï¿½tat d'une des composantes de la boï¿½te des progrï¿½s.
      * La modification sera faite dans le thread de <i>Swing</i>.
      *
-     * @param  task Information à modifier. Ce code doit être une
+     * @param  task Information ï¿½ modifier. Ce code doit ï¿½tre une
      *         des constantes telles que {@link Caller#PROGRESS}.
-     * @param  value Nouvelle valeur à affecter à la composante.
+     * @param  value Nouvelle valeur ï¿½ affecter ï¿½ la composante.
      */
     private void set(final int task, final int value) {
         final Caller caller = new Caller(task);
@@ -424,8 +423,8 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Appelle une méthode <i>Swing</i> sans argument.
-     * @param  task Méthode à appeler. Ce code doit être une
+     * Appelle une mï¿½thode <i>Swing</i> sans argument.
+     * @param  task Mï¿½thode ï¿½ appeler. Ce code doit ï¿½tre une
      *         des constantes telles que {@link Caller#STARTED}
      *         ou {@link Caller#DISPOSE}.
      */
@@ -434,14 +433,14 @@ public class ProgressWindow implements ProgressListener {
     }
 
     /**
-     * Tâche à exécuter dans le thread de <i>Swing</i> pour interroger
-     * ou modifier l'état d'une composante. Cette tache est destinée à être appelée par
-     * les méthodes {@link EventQueue#invokeLater} et {@link EventQueue#invokeAndWait}.
-     * Les tâches possibles sont désignées par des constantes telles que {@link #TITLE}
-     * et {@link #LABEL}. Une valeur positive signifie que l'on modifie l'état de cette
-     * composante (dans ce cas, il faut d'abord avoir affecté une valeur à {@link #text}),
-     * tandis qu'une valeur négative signifie que l'on interroge l'état de la comosante
-     * (dans ce cas, il faudra extrait l'état du champ {@link #text}).
+     * Tï¿½che ï¿½ exï¿½cuter dans le thread de <i>Swing</i> pour interroger
+     * ou modifier l'ï¿½tat d'une composante. Cette tache est destinï¿½e ï¿½ ï¿½tre appelï¿½e par
+     * les mï¿½thodes {@link EventQueue#invokeLater} et {@link EventQueue#invokeAndWait}.
+     * Les tï¿½ches possibles sont dï¿½signï¿½es par des constantes telles que {@link #TITLE}
+     * et {@link #LABEL}. Une valeur positive signifie que l'on modifie l'ï¿½tat de cette
+     * composante (dans ce cas, il faut d'abord avoir affectï¿½ une valeur ï¿½ {@link #text}),
+     * tandis qu'une valeur nï¿½gative signifie que l'on interroge l'ï¿½tat de la comosante
+     * (dans ce cas, il faudra extrait l'ï¿½tat du champ {@link #text}).
      *
      * @version $Id: ProgressWindow.java,v 1.3 2003/05/13 11:01:39 desruisseaux Exp $
      * @author Martin Desruisseaux
@@ -449,76 +448,76 @@ public class ProgressWindow implements ProgressListener {
     private class Caller implements Runnable {
         /**
          * Constante indiquant que l'on souhaite interroger
-         * ou modifier le titre de la boîte des progrès.
+         * ou modifier le titre de la boï¿½te des progrï¿½s.
          */
         public static final int TITLE=1;
 
         /**
          * Constante indiquant que l'on souhaite interroger
-         * ou modifier la description des progrès.
+         * ou modifier la description des progrï¿½s.
          */
         public static final int LABEL=2;
 
         /**
          * Constante indiquant que l'on souhaite modifier
-         * la valeur de la barre des progrès.
+         * la valeur de la barre des progrï¿½s.
          */
         public static final int PROGRESS=3;
 
         /**
          * Constante indiquant que l'on souhaite
-         * faire apparaître un avertissement.
+         * faire apparaï¿½tre un avertissement.
          */
         public static final int WARNING=4;
 
         /**
          * Constante indiquant que l'on souhaite
-         * faire apparaître la boîte des progrès.
+         * faire apparaï¿½tre la boï¿½te des progrï¿½s.
          */
         public static final int STARTED=5;
 
         /**
          * Constante indiquant que l'on souhaite
-         * faire disparaître la boîte des progrès.
+         * faire disparaï¿½tre la boï¿½te des progrï¿½s.
          */
         public static final int COMPLETE=6;
 
         /**
          * Constante indiquant que l'on souhaite
-         * faire disparaître la boîte des progrès.
+         * faire disparaï¿½tre la boï¿½te des progrï¿½s.
          */
         public static final int DISPOSE=7;
 
         /**
-         * Constante indiquant la tâche que l'on souhaite effectuer. Il doit s'agir
+         * Constante indiquant la tï¿½che que l'on souhaite effectuer. Il doit s'agir
          * d'une valeur telle que {@link #TITLE} et {@link #LABEL}, ainsi que leurs
-         * valeurs négatives.
+         * valeurs nï¿½gatives.
          */
         private final int task;
 
         /**
-         * Valeur à affecter ou valeur retournée. Pour des valeurs positives de {@link #task},
-         * il s'agit de la valeur à affecter à une composante. Pour des valeurs négatives de
-         * {@link #task}, il s'agit de la valeur retournée par une composante.
+         * Valeur ï¿½ affecter ou valeur retournï¿½e. Pour des valeurs positives de {@link #task},
+         * il s'agit de la valeur ï¿½ affecter ï¿½ une composante. Pour des valeurs nï¿½gatives de
+         * {@link #task}, il s'agit de la valeur retournï¿½e par une composante.
          */
         public String text;
 
         /**
-         * Valeur à affecter à la barre des progrès.
+         * Valeur ï¿½ affecter ï¿½ la barre des progrï¿½s.
          */
         public int value;
 
         /**
-         * Construit un objet qui effectura la tâche identifiée par la constante <code>task</code>.
-         * Cette constantes doit être une valeur telle que {@link #TITLE} et {@link #LABEL}, ou une
-         * de leurs valeurs négatives.
+         * Construit un objet qui effectura la tï¿½che identifiï¿½e par la constante <code>task</code>.
+         * Cette constantes doit ï¿½tre une valeur telle que {@link #TITLE} et {@link #LABEL}, ou une
+         * de leurs valeurs nï¿½gatives.
          */
         public Caller(final int task) {
             this.task = task;
         }
 
         /**
-         * Exécute la tâche identifiée par la constante {@link #task}.
+         * Exï¿½cute la tï¿½che identifiï¿½e par la constante {@link #task}.
          */
         public void run() {
             final BoundedRangeModel model = progressBar.getModel();
@@ -554,7 +553,7 @@ public class ProgressWindow implements ProgressListener {
                     }
                 }
                 /*
-                 * Si la tâche spécifiée n'est aucune des tâches énumérées ci-haut,
+                 * Si la tï¿½che spï¿½cifiï¿½e n'est aucune des tï¿½ches ï¿½numï¿½rï¿½es ci-haut,
                  * on supposera que l'on voulait afficher un message d'avertissement.
                  */
                 if (warningArea == null) {

@@ -1,6 +1,7 @@
 package org.geotools.graph.linegraph;
 
 import junit.framework.TestCase;
+
 import org.geotools.graph.build.line.OptLineGraphGenerator;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;

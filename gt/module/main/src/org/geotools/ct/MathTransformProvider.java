@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,25 +24,21 @@
 package org.geotools.ct;
 
 // Geotools dependencies
-import org.geotools.measure.Latitude;
-import org.geotools.measure.Longitude;
-import org.geotools.cs.Projection;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Resources
-import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-
-// J2SE and JAI dependencies
 import java.util.Locale;
-import javax.media.jai.util.Range;
+
 import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListImpl;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
+import javax.media.jai.ParameterListImpl;
+import javax.media.jai.util.Range;
+
+import org.geotools.cs.Projection;
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.cts.Resources;
+import org.opengis.referencing.FactoryException;
 
 
 
@@ -78,13 +74,13 @@ public abstract class MathTransformProvider {
     
     /**
      * Range of longitude values. Range goes
-     * from -180° to +180° inclusives.
+     * from -180ï¿½ to +180ï¿½ inclusives.
      */
     protected static final Range LONGITUDE_RANGE = new Range(Double.class, new Double(Longitude.MIN_VALUE), true, new Double(Longitude.MAX_VALUE), true);
     
     /**
      * Range of latitude values. Range goes
-     * from -90° to +90° inclusives.
+     * from -90ï¿½ to +90ï¿½ inclusives.
      */
     protected static final Range LATITUDE_RANGE = new Range(Double.class, new Double(Latitude.MIN_VALUE), true, new Double(Latitude.MAX_VALUE), true);
     

@@ -18,17 +18,17 @@
  
 package org.geotools.graph.structure.basic;
 
-import org.geotools.graph.structure.Edge;
-import org.geotools.graph.structure.Graph;
-import org.geotools.graph.structure.GraphVisitor;
-import org.geotools.graph.structure.Graphable;
-import org.geotools.graph.structure.Node;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.geotools.graph.structure.Edge;
+import org.geotools.graph.structure.Graph;
+import org.geotools.graph.structure.GraphVisitor;
+import org.geotools.graph.structure.Graphable;
+import org.geotools.graph.structure.Node;
 
 /**
  * Basic implemenation of Graph.

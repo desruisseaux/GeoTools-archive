@@ -19,9 +19,9 @@
 
 package org.geotools.graph.structure.line;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import org.geotools.graph.structure.opt.OptNode;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * Optimized implementation of XYNode extended from OptNode. Instead of 

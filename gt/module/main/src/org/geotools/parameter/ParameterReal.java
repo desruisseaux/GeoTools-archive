@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,21 +23,18 @@
 package org.geotools.parameter;
 
 // J2SE dependencies and extensions
-import java.net.URL;
-import javax.units.Unit;
 import java.io.IOException;
+import java.net.URL;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.InvalidParameterTypeException;
-import org.opengis.parameter.InvalidParameterValueException;
+import javax.units.Unit;
 
-// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.geotools.referencing.wkt.Formatter;
+import org.opengis.parameter.InvalidParameterTypeException;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterDescriptor;
 
 
 /**

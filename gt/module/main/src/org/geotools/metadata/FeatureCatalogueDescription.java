@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,19 +23,15 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.util.Set;
-import java.util.Locale;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
 
-// OpenGIS dependencies
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.citation.Citation;
-
-// Geotools dependencies
+import org.geotools.metadata.content.ContentInformation;
 import org.geotools.resources.Utilities;
 import org.geotools.util.CheckedHashSet;
-import org.geotools.metadata.content.ContentInformation;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.util.GenericName;
  
 
 /**
@@ -43,7 +39,7 @@ import org.geotools.metadata.content.ContentInformation;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class FeatureCatalogueDescription extends ContentInformation
        implements org.opengis.metadata.content.FeatureCatalogueDescription

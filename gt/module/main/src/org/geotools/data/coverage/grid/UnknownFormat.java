@@ -17,7 +17,6 @@
 package org.geotools.data.coverage.grid;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
 
 
 /**

@@ -16,15 +16,14 @@
  */
 package org.geotools.data.wms.gce;
 
+import java.net.URL;
+
+import javax.units.Unit;
+
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterDescriptor;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterValue;
-
-import java.net.URL;
-
-import javax.units.Unit;
 
 
 /**

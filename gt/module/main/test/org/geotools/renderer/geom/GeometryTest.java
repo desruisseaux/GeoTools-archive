@@ -37,17 +37,13 @@ package org.geotools.renderer.geom;
 import java.awt.HeadlessException;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.QuadCurve2D;
-import java.awt.geom.Rectangle2D;
 
-// JUnit dependencies
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-// Geotools dependencies
-//import org.geotools.resources.Geometry;
 import org.geotools.resources.geometry.ShapeUtilities;
-import org.geotools.renderer.geom.ShapePanel;
 
 
 /**

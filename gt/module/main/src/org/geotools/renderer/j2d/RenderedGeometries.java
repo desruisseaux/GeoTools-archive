@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,53 +21,46 @@
 package org.geotools.renderer.j2d;
 
 // Geometry
-import java.awt.Shape;
-import java.awt.geom.Point2D;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-
-// Graphics
-import java.awt.Paint;
 import java.awt.Color;
-import java.awt.Stroke;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.TexturePaint;
-import javax.swing.UIManager;
-import javax.media.jai.GraphicsJAI;
-
-// Utilities
-import java.util.List;
-import java.util.Locale;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
+import javax.swing.UIManager;
 
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.math.Statistics;
-import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.units.UnitException;
+import org.geotools.cs.Ellipsoid;
+import org.geotools.math.Statistics;
 import org.geotools.renderer.geom.Clipper;
-import org.geotools.renderer.geom.Polyline;
 import org.geotools.renderer.geom.Geometry;
 import org.geotools.renderer.geom.GeometryCollection;
-import org.geotools.renderer.style.Style2D;
+import org.geotools.renderer.geom.Polyline;
 import org.geotools.renderer.style.Style;
-import org.geotools.resources.XMath;
+import org.geotools.renderer.style.Style2D;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.XMath;
 import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
+import org.geotools.units.Unit;
+import org.geotools.units.UnitException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -792,7 +785,7 @@ public class RenderedGeometries extends RenderedLayer {
      * Returns a tool tip text for the specified coordinates.
      * The default implementation delegates to {@link GeometryCollection#getPolygonName}.
      *
-     * @param  event The mouve event with geographic coordinétes.
+     * @param  event The mouve event with geographic coordinï¿½tes.
      * @return The tool tip text, or <code>null</code> if there
      *         in no tool tips for this location.
      */

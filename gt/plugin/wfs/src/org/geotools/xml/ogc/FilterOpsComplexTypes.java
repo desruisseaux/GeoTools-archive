@@ -16,7 +16,12 @@
  */
 package org.geotools.xml.ogc;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
@@ -53,10 +58,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import javax.naming.OperationNotSupportedException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

@@ -1,11 +1,10 @@
 package org.geotools.data.geometryless;
 
+import java.sql.SQLException;
+import java.util.logging.Logger;
+
 import javax.sql.ConnectionPoolDataSource;
 import javax.sql.PooledConnection;
-
-import java.sql.SQLException;
-
-import java.util.logging.Logger;
 
 /**
  * Creates ConnectionPool objects for a certain JDBC database instance.

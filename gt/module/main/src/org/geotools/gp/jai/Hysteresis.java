@@ -22,20 +22,19 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gp.jai;
 
 // J2SE dependencies
-import java.util.Map;
 import java.awt.Rectangle;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+import java.util.Map;
 
-// JAI dependencies
 import javax.media.jai.ImageLayout;
 import javax.media.jai.UntiledOpImage;
 import javax.media.jai.iterator.RandomIter;
@@ -44,16 +43,16 @@ import javax.media.jai.iterator.RandomIterFactory;
 
 /**
  * Effectue un seuillage par hysteresis sur une image.
- * L'opération de seuillage s'effectue de la manière suivante&nbsp;:
+ * L'opï¿½ration de seuillage s'effectue de la maniï¿½re suivante&nbsp;:
  * <br><br>
  * On dispose d'un seuil haut, <var>sh</var>, et d'un seuil bas, <var>sb</var>.
- * Si la valeur d'un pixel est supérieur à <var>sh</var>, on la conserve, elle
- * nous interesse. Si cette valeur est inférieure à <var>sb</var>, on la supprime.
- * Si elle est entre les deux on dit le pixel indeterminé et on ne le conserve que
+ * Si la valeur d'un pixel est supï¿½rieur ï¿½ <var>sh</var>, on la conserve, elle
+ * nous interesse. Si cette valeur est infï¿½rieure ï¿½ <var>sb</var>, on la supprime.
+ * Si elle est entre les deux on dit le pixel indeterminï¿½ et on ne le conserve que
  * s'il est proche d'un pixel dont la valeur est au dessus de <var>sh</var>, ou
- * proche d'un pixel indéterminé que l'on a précédement trouvé proche d'un pixel
- * de valeur supérieure à <var>sh</var>. Cette recherche se fait de manière itérative,
- * jusqu'à ce que le point indéterminé n'est plus de voisins satisfaisants.
+ * proche d'un pixel indï¿½terminï¿½ que l'on a prï¿½cï¿½dement trouvï¿½ proche d'un pixel
+ * de valeur supï¿½rieure ï¿½ <var>sh</var>. Cette recherche se fait de maniï¿½re itï¿½rative,
+ * jusqu'ï¿½ ce que le point indï¿½terminï¿½ n'est plus de voisins satisfaisants.
  * 
  * @version $Id$
  * @author Lionel Flahaut

@@ -16,14 +16,15 @@
  */
 package org.geotools.data.geometryless;
 
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.jdbc.ConnectionPool;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataStore;
+import org.geotools.data.jdbc.ConnectionPool;
 
 /**
  * Creates a Geometryless JDBC based on the conection params.

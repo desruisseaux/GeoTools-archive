@@ -8,17 +8,31 @@
 package org.geotools.gui.swing.tables;
 
 import java.awt.HeadlessException;
-import java.io.*;
 import java.util.logging.Logger;
-import java.net.*;
-import javax.swing.*;
-import junit.framework.*;
 
-import org.geotools.DefaultCoreSuite;
-import org.geotools.data.*;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.feature.*;
-import com.vividsolutions.jts.geom.*;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.TopologyException;
 
 
 /**

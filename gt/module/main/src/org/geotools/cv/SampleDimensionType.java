@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,23 +24,19 @@
 package org.geotools.cv;
 
 // J2SE dependencies
-import java.util.Locale;
 import java.awt.image.DataBuffer;
 import java.awt.image.SampleModel;
-import java.io.ObjectStreamException;
 import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
 import javax.media.jai.EnumeratedParameter;
+import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
-import org.opengis.cv.CV_SampleDimensionType;
-
-// Resources
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.opengis.cv.CV_SampleDimensionType;
 
 
 /**
@@ -345,7 +341,7 @@ public final class SampleDimensionType extends EnumeratedParameter {
      * Returns this enum's name in the specified locale. If no name is available for
      * the specified locale, a default one will be used.  For example, the localized
      * name for {@link #SHORT} is "<cite>16 bits unsigned integer</cite>" in English
-     * and "<cite>Entier non-signé sur 16 bits</cite>" in French.
+     * and "<cite>Entier non-signï¿½ sur 16 bits</cite>" in French.
      *
      * @param  locale The locale, or <code>null</code> for the default locale.
      * @return Enum's name in the specified locale.

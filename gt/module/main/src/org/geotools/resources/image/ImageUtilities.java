@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,34 +20,30 @@
 package org.geotools.resources.image;
 
 // J2SE dependencies
-import java.util.List;
-import java.util.Iterator;
 import java.awt.Dimension;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderedImageFactory;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
-// Image I/O
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.spi.ImageReaderWriterSpi;
-
-// Java Advanced Imaging
-import javax.media.jai.JAI;
-import javax.media.jai.OpImage;  // For Javadoc
+import javax.imageio.spi.ImageWriterSpi;
 import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.OpImage;
 import javax.media.jai.OperationRegistry;
 import javax.media.jai.registry.RIFRegistry;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 
 
 /**

@@ -34,22 +34,21 @@
 package org.geotools.renderer.geom;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.io.PrintWriter;
 import java.awt.HeadlessException;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.AffineTransform;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
-import org.geotools.renderer.geom.Polyline;
 import org.geotools.resources.Arguments;
 
 

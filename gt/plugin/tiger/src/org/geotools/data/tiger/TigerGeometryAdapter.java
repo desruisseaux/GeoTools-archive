@@ -16,15 +16,16 @@
 
 package org.geotools.data.tiger;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Hashtable;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateArrays;
 import com.vividsolutions.jts.geom.CoordinateList;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.Hashtable;
 
 
 /**

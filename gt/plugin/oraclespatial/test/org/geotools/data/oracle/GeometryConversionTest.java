@@ -4,6 +4,12 @@
  */
 package org.geotools.data.oracle;
 
+import junit.framework.TestCase;
+import oracle.sdoapi.OraSpatialManager;
+import oracle.sdoapi.adapter.GeometryInputTypeNotSupportedException;
+import oracle.sdoapi.adapter.GeometryOutputTypeNotSupportedException;
+import oracle.sdoapi.geom.Geometry;
+
 import org.geotools.data.oracle.attributeio.AdapterJTS;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -13,11 +19,6 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import junit.framework.TestCase;
-import oracle.sdoapi.OraSpatialManager;
-import oracle.sdoapi.adapter.GeometryInputTypeNotSupportedException;
-import oracle.sdoapi.adapter.GeometryOutputTypeNotSupportedException;
-import oracle.sdoapi.geom.Geometry;
 
 
 /**

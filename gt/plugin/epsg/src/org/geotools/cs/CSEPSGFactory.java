@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,15 +26,10 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
 
-// OpenGIS 
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-//geotools
-import org.geotools.measure.AngleFormat;
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.crs.CRSAuthoritySpi;
 import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,26 +20,22 @@
 package org.geotools.util;
 
 // Collections
-import java.util.Arrays;
-import java.util.SortedSet;
-import java.util.AbstractSet;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-import java.util.ConcurrentModificationException;
-
-// Miscellaneous
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
+import java.util.SortedSet;
+
 import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.ClassChanger;
-import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.resources.rsc.Resources;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -106,23 +102,23 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
                               OTHER = -1;
 
     /**
-     * Le type des données de l'intervalle.  Il s'agit du type
-     * qui sera spécifié aux objets {@link Range} représentant
+     * Le type des donnï¿½es de l'intervalle.  Il s'agit du type
+     * qui sera spï¿½cifiï¿½ aux objets {@link Range} reprï¿½sentant
      * un intervalle.
      */
     private final Class type;
 
     /**
-     * Ce champ a une valeur identique à <code>type</code>, sauf
+     * Ce champ a une valeur identique ï¿½ <code>type</code>, sauf
      * si <code>elementType</code> est un type primitif. Dans ce
      * cas, il sera <code>{@link Number}.class</code>.
      */
     private final Class relaxedType;
 
     /**
-     * Le type des données utilisé dans le tableau <code>array</code>.
-     * Il s'agira souvent du même type que <code>type</code>, sauf si
-     * ce dernier était le "wrapper" d'un des types primitifs du Java.
+     * Le type des donnï¿½es utilisï¿½ dans le tableau <code>array</code>.
+     * Il s'agira souvent du mï¿½me type que <code>type</code>, sauf si
+     * ce dernier ï¿½tait le "wrapper" d'un des types primitifs du Java.
      * Dans ce cas, <code>elementType</code> sera ce type primitif.
      */
     private final Class elementType;
@@ -137,22 +133,22 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     /**
      * Tableau d'intervalles.   Il peut s'agir d'un tableau d'un des types primitifs
      * du Java   (par exemple <code>int[]</code> ou <code>float[]</code>),   ou d'un
-     * tableau de type <code>Comparable[]</code>. Les éléments de ce tableau doivent
-     * obligatoirement être en ordre strictement croissant et sans doublon.
+     * tableau de type <code>Comparable[]</code>. Les ï¿½lï¿½ments de ce tableau doivent
+     * obligatoirement ï¿½tre en ordre strictement croissant et sans doublon.
      * <br><br>
      * La longueur de ce tableau est le double du nombre d'intervalles.  Il aurait
-     * été plus efficace d'utiliser une variable séparée  (pour ne pas être obligé
-     * d'agrandir ce tableau à chaque ajout d'un intervalle), mais malheureusement
-     * le J2SE 1.4 ne nous fournit pas de méthode <code>Arrays.binarySearch</code>
-     * qui nous permettent de spécifier les limites du tableau  (voir RFE #4306897
-     * à http://developer.java.sun.com/developer/bugParade/bugs/4306897.html).
+     * ï¿½tï¿½ plus efficace d'utiliser une variable sï¿½parï¿½e  (pour ne pas ï¿½tre obligï¿½
+     * d'agrandir ce tableau ï¿½ chaque ajout d'un intervalle), mais malheureusement
+     * le J2SE 1.4 ne nous fournit pas de mï¿½thode <code>Arrays.binarySearch</code>
+     * qui nous permettent de spï¿½cifier les limites du tableau  (voir RFE #4306897
+     * ï¿½ http://developer.java.sun.com/developer/bugParade/bugs/4306897.html).
      */
     private Object array;
 
     /**
-     * Compte le nombre de modifications apportées au tableau des intervalles.
-     * Ce comptage sert à vérifier si une modification survient pendant qu'un
-     * itérateur balayait les intervalles.
+     * Compte le nombre de modifications apportï¿½es au tableau des intervalles.
+     * Ce comptage sert ï¿½ vï¿½rifier si une modification survient pendant qu'un
+     * itï¿½rateur balayait les intervalles.
      */
     private int modCount;
 
@@ -311,11 +307,11 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         int i1;
         if (i0 < 0) {
             /*
-             * Si le début de la plage ne correspond pas à une des dates en
-             * mémoire, il faudra l'insérer à quelque part dans le tableau.
-             * Si la date tombe dans une des plages déjà existantes (si son
-             * index est impair), on étend la date de début pour prendre le
-             * début de la plage. Visuellement, on fait:
+             * Si le dï¿½but de la plage ne correspond pas ï¿½ une des dates en
+             * mï¿½moire, il faudra l'insï¿½rer ï¿½ quelque part dans le tableau.
+             * Si la date tombe dans une des plages dï¿½jï¿½ existantes (si son
+             * index est impair), on ï¿½tend la date de dï¿½but pour prendre le
+             * dï¿½but de la plage. Visuellement, on fait:
              *
              *   0   1     2      3     4   5    6     7
              *   #####     ########     #####    #######
@@ -327,8 +323,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
                 i1 = binarySearch(upper);
             } else {
                 /*
-                 * Si la date de début ne tombe pas dans une plage déjà
-                 * existante, il faut étendre la valeur de début qui se
+                 * Si la date de dï¿½but ne tombe pas dans une plage dï¿½jï¿½
+                 * existante, il faut ï¿½tendre la valeur de dï¿½but qui se
                  * trouve dans le tableau. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
@@ -342,14 +338,14 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
                 } else {
                     /*
                      * Un cas particulier se produit si la nouvelle plage
-                     * est à insérer à la fin du tableau. Dans ce cas, on
-                     * n'a qu'à agrandir le tableau et écrire les valeurs
-                     * directement à la fin. Ce traitement est nécessaire
+                     * est ï¿½ insï¿½rer ï¿½ la fin du tableau. Dans ce cas, on
+                     * n'a qu'ï¿½ agrandir le tableau et ï¿½crire les valeurs
+                     * directement ï¿½ la fin. Ce traitement est nï¿½cessaire
                      * pour eviter les 'ArrayIndexOutOfBoundsException'.
                      * Un autre cas particulier se produit si la nouvelle
-                     * plage est  entièrement  comprise entre deux plages
-                     * déjà existantes.  Le même code ci-dessous insèrera
-                     * la nouvelle plage à l'index 'i0'.
+                     * plage est  entiï¿½rement  comprise entre deux plages
+                     * dï¿½jï¿½ existantes.  Le mï¿½me code ci-dessous insï¿½rera
+                     * la nouvelle plage ï¿½ l'index 'i0'.
                      */
                     modCount++;
                     final Object old = array;
@@ -367,14 +363,14 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
             i1 = binarySearch(upper);
         }
         /*
-         * A ce stade, on est certain que 'i0' est pair et pointe vers le début
+         * A ce stade, on est certain que 'i0' est pair et pointe vers le dï¿½but
          * de la plage dans le tableau. Fait maintenant le traitement pour 'i1'.
          */
         if (i1 < 0) {
             /*
-             * Si la date de fin tombe dans une des plages déjà existantes
-             * (si son index est impair), on l'étend pour pendre la fin de
-             * la plage trouvée dans le tableau. Visuellement, on fait:
+             * Si la date de fin tombe dans une des plages dï¿½jï¿½ existantes
+             * (si son index est impair), on l'ï¿½tend pour pendre la fin de
+             * la plage trouvï¿½e dans le tableau. Visuellement, on fait:
              *
              *   0   1     2      3     4   5    6     7
              *   #####     ########     #####    #######
@@ -385,8 +381,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
                 upper = (Comparable)Array.get(array, i1);
             } else {
                 /*
-                 * Si la date de fin ne tombe pas dans une plage déjà
-                 * existante, il faut étendre la valeur de fin qui se
+                 * Si la date de fin ne tombe pas dans une plage dï¿½jï¿½
+                 * existante, il faut ï¿½tendre la valeur de fin qui se
                  * trouve dans le tableau. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
@@ -403,7 +399,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         /*
          * A ce stade, on est certain que 'i1' est impair et pointe vers la fin
          * de la plage dans le tableau. On va maintenant supprimer tout ce qui
-         * se trouve entre 'i0' et 'i1', à l'exclusion de 'i0' et 'i1'.
+         * se trouve entre 'i0' et 'i1', ï¿½ l'exclusion de 'i0' et 'i1'.
          */
         assert (i0 & 1)==0 : i0;
         assert (i1 & 1)!=0 : i1;
@@ -544,9 +540,9 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         if (i0 < 0) {
             if (((i0 = ~i0) & 1) != 0) { // Attention: c'est ~ et non -
                 /*
-                 * Si le début de la plage ne correspond pas à une des dates en mémoire,
-                 * il faudra faire un trou à quelque part dans le tableau. Si la date tombe
-                 * dans une des plages déjà existantes (si son index est impair), on change
+                 * Si le dï¿½but de la plage ne correspond pas ï¿½ une des dates en mï¿½moire,
+                 * il faudra faire un trou ï¿½ quelque part dans le tableau. Si la date tombe
+                 * dans une des plages dï¿½jï¿½ existantes (si son index est impair), on change
                  * la date de fin de la plage existante. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
@@ -577,9 +573,9 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
                 }
             } else {
                 /*
-                 * Si la date de début ne tombe pas dans une plage déjà
+                 * Si la date de dï¿½but ne tombe pas dans une plage dï¿½jï¿½
                  * existante, il faut prendre la date de fin de la plage
-                 * précédente. Visuellement, on fait:
+                 * prï¿½cï¿½dente. Visuellement, on fait:
                  *
                  *   0   1     2      3     4   5    6     7
                  *   #####     ########     #####    #######
@@ -599,8 +595,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
          */
         if (i1 < 0) {
             /*
-             * Si la date de fin tombe dans une des plages déjà existantes
-             * (si son index est impair), on change la date de début de la
+             * Si la date de fin tombe dans une des plages dï¿½jï¿½ existantes
+             * (si son index est impair), on change la date de dï¿½but de la
              * plage existante. Visuellement, on fait:
              *
              *   0   1     2      3     4   5    6     7
@@ -613,8 +609,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
                 Array.set(array, --i1, upper);
             } else {
                 /*
-                 * Si la date de fin ne tombe pas dans une plage déjà existante, il
-                 * faudra (plus tard) supprimer les éventuelles plages qui le précède.
+                 * Si la date de fin ne tombe pas dans une plage dï¿½jï¿½ existante, il
+                 * faudra (plus tard) supprimer les ï¿½ventuelles plages qui le prï¿½cï¿½de.
                  *
                  *   0   1     2      3        4     5        6         7
                  *   #####     ########        #######        ###########
@@ -627,9 +623,9 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
             i1 &= ~1;
         }
         /*
-         * A ce stade, on est certain que 'i1' est pair et pointe vers la début
+         * A ce stade, on est certain que 'i1' est pair et pointe vers la dï¿½but
          * de la plage dans le tableau. On va maintenant supprimer tout ce qui
-         * se trouve entre 'i0' et 'i1', à l'exclusion de 'i0' et 'i1'.
+         * se trouve entre 'i0' et 'i1', ï¿½ l'exclusion de 'i0' et 'i1'.
          */
         assert (i0 & 1) != 0 : i0;
         assert (i1 & 1) == 0 : i1;
@@ -719,9 +715,9 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     }
 
     /**
-     * Retourne l'index de l'élément <code>value</code> dans le tableau <code>array</code>.
-     * Cette méthode interprète le tableau <code>array</code> comme un tableau d'un des types
-     * intrinsèques du Java, et appelle la méthode <code>Arrays.binarySearch</code> appropriée.
+     * Retourne l'index de l'ï¿½lï¿½ment <code>value</code> dans le tableau <code>array</code>.
+     * Cette mï¿½thode interprï¿½te le tableau <code>array</code> comme un tableau d'un des types
+     * intrinsï¿½ques du Java, et appelle la mï¿½thode <code>Arrays.binarySearch</code> appropriï¿½e.
      *
      * @param value The value to search. This value must have been converted with
      *        {@link #toNumber} prior to call this method.

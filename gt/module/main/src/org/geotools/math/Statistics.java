@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,16 +20,13 @@
 package org.geotools.math;
 
 // Miscellaneous
-import java.util.Locale;
 import java.io.Serializable;
+import java.util.Locale;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.io.TableWriter;
-import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.resources.rsc.Resources;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -66,45 +63,45 @@ public class Statistics implements Cloneable, Serializable {
     private static final long serialVersionUID = -22884277805533726L;
 
     /**
-     * Valeur minimale qui aie été transmise à la méthode
+     * Valeur minimale qui aie ï¿½tï¿½ transmise ï¿½ la mï¿½thode
      * {@link #add(double)}. Lors de la construction, ce
-     * champs est initialisé à NaN.
+     * champs est initialisï¿½ ï¿½ NaN.
      */
     private double min = Double.NaN;
 
     /**
-     * Valeur maximale qui aie été transmise à la méthode
+     * Valeur maximale qui aie ï¿½tï¿½ transmise ï¿½ la mï¿½thode
      * {@link #add(double)}. Lors de la construction, ce
-     * champs est initialisé à NaN.
+     * champs est initialisï¿½ ï¿½ NaN.
      */
     private double max = Double.NaN;
 
     /**
-     * Somme de toutes les valeurs qui ont été transmises à
-     * la méthode {@link #add(double)}. Lors de la construction,
-     * ce champs est initialisé à 0.
+     * Somme de toutes les valeurs qui ont ï¿½tï¿½ transmises ï¿½
+     * la mï¿½thode {@link #add(double)}. Lors de la construction,
+     * ce champs est initialisï¿½ ï¿½ 0.
      */
     private double sum = 0;
 
     /**
-     * Somme des carrés de toutes les valeurs qui ont été
-     * transmises à la méthode {@link #add(double)}. Lors
-     * de la construction, ce champs est initialisé à 0.
+     * Somme des carrï¿½s de toutes les valeurs qui ont ï¿½tï¿½
+     * transmises ï¿½ la mï¿½thode {@link #add(double)}. Lors
+     * de la construction, ce champs est initialisï¿½ ï¿½ 0.
      */
     private double sum2 = 0;
 
     /**
-     * Nombre de données autres que NaN qui ont été transmises
-     * à la méthode {@link #add(double)}. Lors de la construction,
-     * ce champs est initialisé à 0.
+     * Nombre de donnï¿½es autres que NaN qui ont ï¿½tï¿½ transmises
+     * ï¿½ la mï¿½thode {@link #add(double)}. Lors de la construction,
+     * ce champs est initialisï¿½ ï¿½ 0.
      */
     private int n = 0;
 
     /**
-     * Nombre de données égales à NaN qui ont été transmises à
-     * la méthode {@link #add(double)}. Les NaN sont ingorés lors
-     * du calcul des statistiques, mais on les compte quand même
-     * au passage. Lors de la construction ce champs est initialisé à 0.
+     * Nombre de donnï¿½es ï¿½gales ï¿½ NaN qui ont ï¿½tï¿½ transmises ï¿½
+     * la mï¿½thode {@link #add(double)}. Les NaN sont ingorï¿½s lors
+     * du calcul des statistiques, mais on les compte quand mï¿½me
+     * au passage. Lors de la construction ce champs est initialisï¿½ ï¿½ 0.
      */
     private int nNaN = 0;
 
@@ -180,7 +177,7 @@ public class Statistics implements Cloneable, Serializable {
      */
     public void add(final Statistics stats) {
         if (stats != null) {
-            // "if (a<b)" équivaut à "if (!isNaN(a) && a<b)".
+            // "if (a<b)" ï¿½quivaut ï¿½ "if (!isNaN(a) && a<b)".
             if (Double.isNaN(min) || stats.min<min) min=stats.min;
             if (Double.isNaN(max) || stats.max>max) max=stats.max;
             sum2 += stats.sum2;
@@ -251,12 +248,12 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Retourne l'écart type des échantillons par rapport à la moyenne. Si les données
-     * fournies aux différentes méthodes <code>add(...)</code> se distribuent selon une
-     * loi normale, alors l'écart type est la distance de part et d'autre de la moyenne
-     * dans lequel se trouveraient environ 84% des données. Le tableau ci-dessous donne
-     * le pourcentage approximatif des données que l'on trouve de part et d'autre de la
-     * moyenne à des distances telles que 2 ou 3 fois l'écart-type.
+     * Retourne l'ï¿½cart type des ï¿½chantillons par rapport ï¿½ la moyenne. Si les donnï¿½es
+     * fournies aux diffï¿½rentes mï¿½thodes <code>add(...)</code> se distribuent selon une
+     * loi normale, alors l'ï¿½cart type est la distance de part et d'autre de la moyenne
+     * dans lequel se trouveraient environ 84% des donnï¿½es. Le tableau ci-dessous donne
+     * le pourcentage approximatif des donnï¿½es que l'on trouve de part et d'autre de la
+     * moyenne ï¿½ des distances telles que 2 ou 3 fois l'ï¿½cart-type.
      *
      * <table align=center>
      *   <tr><td>&nbsp;0.5&nbsp;</td><td>&nbsp;69.1%&nbsp;</td></tr>
@@ -266,12 +263,12 @@ public class Statistics implements Cloneable, Serializable {
      *   <tr><td>&nbsp;3.0&nbsp;</td><td>&nbsp;99.9%&nbsp;</td></tr>
      * </table>
      *
-     * @param allPopulation La valeur <code>true</code> indique que les données fournies
-     *        aux différentes méthodes <code>add(...)</code> représentent l'ensemble de
-     *        la polulation. La valeur <code>false</code> indique que ces données ne
-     *        représentent qu'un échantillon de la population, ce qui est généralement le
-     *        cas. Si le nombre de données est élevé, alors les valeurs <code>true</code>
-     *        et <code>false</code> donneront sensiblement les mêmes résultats.
+     * @param allPopulation La valeur <code>true</code> indique que les donnï¿½es fournies
+     *        aux diffï¿½rentes mï¿½thodes <code>add(...)</code> reprï¿½sentent l'ensemble de
+     *        la polulation. La valeur <code>false</code> indique que ces donnï¿½es ne
+     *        reprï¿½sentent qu'un ï¿½chantillon de la population, ce qui est gï¿½nï¿½ralement le
+     *        cas. Si le nombre de donnï¿½es est ï¿½levï¿½, alors les valeurs <code>true</code>
+     *        et <code>false</code> donneront sensiblement les mï¿½mes rï¿½sultats.
      */
     public double standardDeviation(final boolean allPopulation) {
         return Math.sqrt((sum2 - sum*sum/n) / (allPopulation ? n : n-1));
@@ -334,7 +331,7 @@ public class Statistics implements Cloneable, Serializable {
      *     Maximum:    8.259
      *     Moyenne:    7.421
      *     RMS:        7.846
-     *     Écart-type: 6.489
+     *     ï¿½cart-type: 6.489
      * </pre></blockquote>
      *
      * If <code>tabulations</code> is true, then labels (e.g. "Minimum") and values

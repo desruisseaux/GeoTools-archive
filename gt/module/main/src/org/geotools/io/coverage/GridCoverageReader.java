@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,51 +33,40 @@
 package org.geotools.io.coverage;
 
 // Input/output
-import java.net.URL;
+import java.awt.Dimension;
+import java.awt.RenderingHints;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-// Image input/output
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 
-// Images and geometry
-import java.awt.Dimension;
-import java.awt.RenderingHints;
-import java.awt.image.RenderedImage;
-
-// Miscellaneous
-import java.util.Locale;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.MissingResourceException;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
-// Geotools dependencies
-import org.geotools.pt.Envelope;
-import org.geotools.gc.GridRange;
-import org.geotools.gc.GridCoverage;
-import org.geotools.cv.SampleDimension;
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.io.TableWriter;
+import org.geotools.cv.SampleDimension;
+import org.geotools.gc.GridCoverage;
+import org.geotools.gc.GridRange;
 import org.geotools.io.LineWriter;
-
-/*
- * TODO: The following class is deprecated since JAI's Image I/O tools provides the same
- *       functionality. Remove this import when we will have deleted RawBinaryImageReadParam.
- */
+import org.geotools.io.TableWriter;
 import org.geotools.io.image.RawBinaryImageReadParam;
+import org.geotools.pt.Envelope;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 
 
 /**
@@ -291,13 +280,13 @@ public abstract class GridCoverageReader {
     }
     
     /**
-     * Vérifie si l'index de l'image est dans la plage des valeurs
-     * autorisées. L'index maximal autorisé est obtenu en appelant
+     * Vï¿½rifie si l'index de l'image est dans la plage des valeurs
+     * autorisï¿½es. L'index maximal autorisï¿½ est obtenu en appelant
      * <code>{@link #getNumImages getNumImages}(false)</code>.
      *
-     * @param  imageIndex Index dont on veut vérifier la validité.
-     * @throws IndexOutOfBoundsException si l'index spécifié n'est pas valide.
-     * @throws IOException si l'opération a échouée à cause d'une erreur d'entrés/sorties.
+     * @param  imageIndex Index dont on veut vï¿½rifier la validitï¿½.
+     * @throws IndexOutOfBoundsException si l'index spï¿½cifiï¿½ n'est pas valide.
+     * @throws IOException si l'opï¿½ration a ï¿½chouï¿½e ï¿½ cause d'une erreur d'entrï¿½s/sorties.
      */
     final void checkImageIndex(final int imageIndex) throws IOException, IndexOutOfBoundsException {
         if (reader==null) {

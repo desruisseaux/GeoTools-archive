@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,12 +25,9 @@ package org.geotools.referencing.cs;
 // J2SE dependencies
 import java.util.Map;
 
-// OpenGIS dependencies
+import org.geotools.measure.Measure;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.measure.Measure;
 
 
 /**

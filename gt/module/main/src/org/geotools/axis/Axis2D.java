@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,40 +35,31 @@ package org.geotools.axis;
 
 // Graphics and geometry
 import java.awt.Font;
-import java.awt.Shape;
 import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.IllegalPathStateException;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
-import java.awt.RenderingHints;
-
-// Events
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.IllegalPathStateException;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-// Miscellaneous
-import java.util.Map;
-import java.util.Locale;
 import java.io.Serializable;
 import java.util.ConcurrentModificationException;
+import java.util.Locale;
+import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.AxisOrientation;
-
-// Resources
-import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.XMath;
 import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.resources.geometry.XDimension2D;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -105,17 +96,17 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     private static final long serialVersionUID = -8396436909942389360L;
 
     /**
-     * Coordonnées des premier et dernier points de l'axe. Ces coordonnées
-     * sont exprimées en "points" (1/72 de pouce), ce qui n'a rien à voir
-     * avec les unités de {@link Graduation#getMinimum} et {@link Graduation#getMaximum}.
+     * Coordonnï¿½es des premier et dernier points de l'axe. Ces coordonnï¿½es
+     * sont exprimï¿½es en "points" (1/72 de pouce), ce qui n'a rien ï¿½ voir
+     * avec les unitï¿½s de {@link Graduation#getMinimum} et {@link Graduation#getMaximum}.
      */
     private float x1=8, y1=8, x2=648, y2=8;
 
     /**
-     * Longueur des graduations, en points. Chaque graduations sera tracée à partir de
-     * <code>[sub]TickStart</code> (généralement 0) jusqu'à <code>[sub]TickEnd</code>.
-     * Par convention, des valeurs positives désignent l'intérieur du graphique et des
-     * valeurs négatives l'extérieur.
+     * Longueur des graduations, en points. Chaque graduations sera tracï¿½e ï¿½ partir de
+     * <code>[sub]TickStart</code> (gï¿½nï¿½ralement 0) jusqu'ï¿½ <code>[sub]TickEnd</code>.
+     * Par convention, des valeurs positives dï¿½signent l'intï¿½rieur du graphique et des
+     * valeurs nï¿½gatives l'extï¿½rieur.
      */
     private float tickStart=0, tickEnd=9, subTickStart=0, subTickEnd=5;
 
@@ -123,12 +114,12 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      * Indique dans quelle direction se trouve la graduation de l'axe. La valeur -1 indique
      * qu'il faudrait tourner l'axe dans le sens des aiguilles d'une montre pour qu'il soit
      * par-dessus sa graduation. La valeur +1 indique au contraire qu'il faudrait le tourner
-     * dans le sens inverse des aiguilles d'une montre pour le même effet.
+     * dans le sens inverse des aiguilles d'une montre pour le mï¿½me effet.
      */
     private byte relativeCCW = +1;
 
     /**
-     * Modèle qui contient les minimum, maximum et la graduation de l'axe.
+     * Modï¿½le qui contient les minimum, maximum et la graduation de l'axe.
      */
     private final Graduation graduation;
 
@@ -139,59 +130,59 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     private transient AxisInfo information;
 
     /**
-     * Compte le nombre de modifications apportées à l'axe,
-     * afin de détecter les changements faits pendant qu'un
-     * itérateur balaye la graduation.
+     * Compte le nombre de modifications apportï¿½es ï¿½ l'axe,
+     * afin de dï¿½tecter les changements faits pendant qu'un
+     * itï¿½rateur balaye la graduation.
      */
     private transient int modCount;
 
     /**
      * Indique si {@link #getPathIterator} doit retourner {@link #iterator}.
      * Ce champ prend temporairement la valeur de <code>true</code> pendant
-     * l'exécution de {@link #paint}.
+     * l'exï¿½cution de {@link #paint}.
      */
     private transient boolean isPainting;
 
     /**
-     * Itérateur utilisé pour dessiner l'axe lors du dernier appel de
-     * la méthode {@link #paint}. Cet itérateur sera réutilisé autant
-     * que possible afin de diminuer le nombre d'objets créés lors de
-     * chaque traçage.
+     * Itï¿½rateur utilisï¿½ pour dessiner l'axe lors du dernier appel de
+     * la mï¿½thode {@link #paint}. Cet itï¿½rateur sera rï¿½utilisï¿½ autant
+     * que possible afin de diminuer le nombre d'objets crï¿½ï¿½s lors de
+     * chaque traï¿½age.
      */
     private transient TickPathIterator iterator;
 
     /**
-     * Coordonnées de la boîte englobant l'axe (<u>sans</u> ses étiquettes
-     * de graduation) lors du dernier traçage par la méthode {@link #paint}.
-     * Ces coordonnées sont indépendantes de {@link #lastContext} et ont été
+     * Coordonnï¿½es de la boï¿½te englobant l'axe (<u>sans</u> ses ï¿½tiquettes
+     * de graduation) lors du dernier traï¿½age par la mï¿½thode {@link #paint}.
+     * Ces coordonnï¿½es sont indï¿½pendantes de {@link #lastContext} et ont ï¿½tï¿½
      * obtenues sans transformation affine "utilisateur".
      */
     private transient Rectangle2D axisBounds;
 
     /**
-     * Coordonnées de la boîte englobant les étiquettes de graduations (<u>sans</u>
-     * le reste de l'axe) lors du dernier traçage par la méthode {@link #paint}. Ces
-     * coordonnées ont été calculées en utilisant {@link #lastContext} mais ont été
+     * Coordonnï¿½es de la boï¿½te englobant les ï¿½tiquettes de graduations (<u>sans</u>
+     * le reste de l'axe) lors du dernier traï¿½age par la mï¿½thode {@link #paint}. Ces
+     * coordonnï¿½es ont ï¿½tï¿½ calculï¿½es en utilisant {@link #lastContext} mais ont ï¿½tï¿½
      * obtenues sans transformation affine "utilisateur".
      */
     private transient Rectangle2D labelBounds;
 
     /**
-     * Coordonnées de la boîte englobant la légende de l'axe lors du dernier traçage
-     * par la méthode {@link #paint}. Ces coordonnées ont été calculées en utilisant
-     * {@link #lastContext} mais ont été obtenues sans transformation affine "utilisateur".
+     * Coordonnï¿½es de la boï¿½te englobant la lï¿½gende de l'axe lors du dernier traï¿½age
+     * par la mï¿½thode {@link #paint}. Ces coordonnï¿½es ont ï¿½tï¿½ calculï¿½es en utilisant
+     * {@link #lastContext} mais ont ï¿½tï¿½ obtenues sans transformation affine "utilisateur".
      */
     private transient Rectangle2D legendBounds;
 
     /**
-     * Dernier objet {@link FontRenderContext} a avoir été
-     * utilisé lors du traçage par la méthode {@link #paint}.
+     * Dernier objet {@link FontRenderContext} a avoir ï¿½tï¿½
+     * utilisï¿½ lors du traï¿½age par la mï¿½thode {@link #paint}.
      */
     private transient FontRenderContext lastContext;
 
     /**
-     * Largeur et hauteur maximales des étiquettes de la graduation, ou
-     * <code>null</code> si cette dimension n'a pas encore été déterminée.
+     * Largeur et hauteur maximales des ï¿½tiquettes de la graduation, ou
+     * <code>null</code> si cette dimension n'a pas encore ï¿½tï¿½ dï¿½terminï¿½e.
      */
     private transient Dimension2D maximumSize;
 
@@ -470,8 +461,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
             return;
         }
         /*
-         * Initialise l'itérateur en appelant 'init' (contrairement à 'getPathIterator'
-         * qui n'appelle que 'rewind') pour des résultats plus rapides et plus constants.
+         * Initialise l'itï¿½rateur en appelant 'init' (contrairement ï¿½ 'getPathIterator'
+         * qui n'appelle que 'rewind') pour des rï¿½sultats plus rapides et plus constants.
          */
         if (iterator != null) {
             iterator.init(null);
@@ -494,9 +485,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
             iterator.setFontRenderContext(null);
         }
         /*
-         * Calcule (si ce n'était pas déjà fait) les coordonnées d'un rectangle qui englobe l'axe et
-         * sa graduation (mais sans les étiquettes de graduation).  Cette information nous permettra
-         * de vérifier s'il est vraiment nécessaire de redessiner l'axe en vérifiant s'il intercepte
+         * Calcule (si ce n'ï¿½tait pas dï¿½jï¿½ fait) les coordonnï¿½es d'un rectangle qui englobe l'axe et
+         * sa graduation (mais sans les ï¿½tiquettes de graduation).  Cette information nous permettra
+         * de vï¿½rifier s'il est vraiment nï¿½cessaire de redessiner l'axe en vï¿½rifiant s'il intercepte
          * avec le "clip" du graphique.
          */
         if (axisBounds == null) {
@@ -508,7 +499,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
             }
         }
         /*
-         * Dessine l'axe et ses barres de graduation (mais sans les étiquettes).
+         * Dessine l'axe et ses barres de graduation (mais sans les ï¿½tiquettes).
          */
         if (graphics != null) {
             if (clip==null || clip.intersects(axisBounds)) try {
@@ -519,9 +510,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
             }
         }
         /*
-         * Dessine les étiquettes de graduations. Ce bloc peut etre exécuté même si
-         * 'graphics' est nul.  Dans ce cas, les étiquettes ne seront pas dessinées
-         * mais le calcul de l'espace qu'elles occupent sera quand même effectué.
+         * Dessine les ï¿½tiquettes de graduations. Ce bloc peut etre exï¿½cutï¿½ mï¿½me si
+         * 'graphics' est nul.  Dans ce cas, les ï¿½tiquettes ne seront pas dessinï¿½es
+         * mais le calcul de l'espace qu'elles occupent sera quand mï¿½me effectuï¿½.
          */
         if (!sameContext || labelBounds==null || clip.intersects(labelBounds) || maximumSize==null)
         {
@@ -558,9 +549,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
             maximumSize = new XDimension2D.Float((float)maxWidth, (float)maxHeight);
         }
         /*
-         * Ecrit la légende de l'axe. Ce bloc peut etre exécuté même si
-         * 'graphics' est nul.  Dans ce cas, la légende ne sera pas écrite
-         * mais le calcul de l'espace qu'elle occupe sera quand même effectué.
+         * Ecrit la lï¿½gende de l'axe. Ce bloc peut etre exï¿½cutï¿½ mï¿½me si
+         * 'graphics' est nul.  Dans ce cas, la lï¿½gende ne sera pas ï¿½crite
+         * mais le calcul de l'espace qu'elle occupe sera quand mï¿½me effectuï¿½.
          */
         if (!sameContext || legendBounds==null || clip.intersects(legendBounds)) {
             final String title = graduation.getTitle(true);
@@ -636,8 +627,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
     }
 
     /**
-     * Efface la cache interne. Cette méthode doit être appelée
-     * chaque fois que des propriétés de l'axe ont changées.
+     * Efface la cache interne. Cette mï¿½thode doit ï¿½tre appelï¿½e
+     * chaque fois que des propriï¿½tï¿½s de l'axe ont changï¿½es.
      */
     private void clearCache() {
         axisBounds   = null;
@@ -685,24 +676,24 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          *  |\
          *  |  \ P     Soit:       X  :  l'axe des <var>x</var> du graphique.
          *  |   |                  Y  :  l'axe des <var>y</var> du graphique.
-         *   \  |                  P  :  un point à placer sur le graphique.
+         *   \  |                  P  :  un point ï¿½ placer sur le graphique.
          *     \|             (Px,Py) :  les composantes du point P selon les axes x et y.
-         *       \ y          (Pi,Pj) :  les composantes du point P en coordonnées "pixels".
+         *       \ y          (Pi,Pj) :  les composantes du point P en coordonnï¿½es "pixels".
          *
-         * Désignons par <b>ex</b> et <b>ey</b> des vecteurs unitaires dans la direction de l'axe des
-         * <var>x</var> et l'axe des <var>y</var> respectivement. Désignons par <b>i</b> et <b>j</b>
-         * des vecteurs unitaires vers le droite et vers le haut de l'écran respectivement. On peut
-         * décomposer les vecteurs unitaires <b>ex</b> et <b>ey</b> par:
+         * Dï¿½signons par <b>ex</b> et <b>ey</b> des vecteurs unitaires dans la direction de l'axe des
+         * <var>x</var> et l'axe des <var>y</var> respectivement. Dï¿½signons par <b>i</b> et <b>j</b>
+         * des vecteurs unitaires vers le droite et vers le haut de l'ï¿½cran respectivement. On peut
+         * dï¿½composer les vecteurs unitaires <b>ex</b> et <b>ey</b> par:
          *
          *          ex = exi*i + exj*j
          *          ey = eyi*i + eyj*j
          * Donc,    P  = Px*ex + Py*ey   =   (Px*exi+Py*eyi)*i + (Px*exj + Py*eyj)*j
          *
-         * Cette relation ne s'applique que si les deux systèmes de coordonnées (xy et ij) ont
-         * la même origine. En pratique, ce ne sera pas le cas. Il faut donc compliquer un peu:
+         * Cette relation ne s'applique que si les deux systï¿½mes de coordonnï¿½es (xy et ij) ont
+         * la mï¿½me origine. En pratique, ce ne sera pas le cas. Il faut donc compliquer un peu:
          *
-         *      Pi = (Px-Ox)*exi+(Py-Oy)*eyi + Oi        où (Ox,Oy) sont les minimums des axes des x et y.
-         *      Pj = (Px-Ox)*exj+(Py-Oy)*eyj + Oj           (Oi,Oj) est l'origine du système d'axe ij.
+         *      Pi = (Px-Ox)*exi+(Py-Oy)*eyi + Oi        oï¿½ (Ox,Oy) sont les minimums des axes des x et y.
+         *      Pj = (Px-Ox)*exj+(Py-Oy)*eyj + Oj           (Oi,Oj) est l'origine du systï¿½me d'axe ij.
          *
          * [ Pi ]   [ exi   eyi   Oi-(Ox*exi+Oy*eyi) ][ Px ]     [ exi*Px + eyi*Py + Oi-(Ox*exi+Oy*oyi) ]
          * [ Pj ] = [ exj   eyj   Oj-(Ox*exj+Oy*eyj) ][ Py ]  =  [ exj*Px + eyj*Py + Oj-(Ox*exj+Oy*oyj) ]
@@ -1038,9 +1029,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Retourne un rectangle centré vis-à-vis l'axe. Les coordonnées de ce rectangle seront
-         * les mêmes que celles de l'axe, habituellement des pixels ou des points (1/72 de pouce).
-         * Cette méthode s'utilise typiquement comme suit:
+         * Retourne un rectangle centrï¿½ vis-ï¿½-vis l'axe. Les coordonnï¿½es de ce rectangle seront
+         * les mï¿½mes que celles de l'axe, habituellement des pixels ou des points (1/72 de pouce).
+         * Cette mï¿½thode s'utilise typiquement comme suit:
          *
          * <pre>
          * Graphics2D           graphics = ...
@@ -1053,18 +1044,18 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
          * graphics.drawGlyphVector(glyphs, (float)bounds.getMinX(), (float)bounds.getMaxY());
          * </pre>
          *
-         * @param  bounds  Un rectangle englobant les caractères à écrire. La position
-         *                 (<var>x</var>,<var>y</var>) de ce rectangle est généralement
+         * @param  bounds  Un rectangle englobant les caractï¿½res ï¿½ ï¿½crire. La position
+         *                 (<var>x</var>,<var>y</var>) de ce rectangle est gï¿½nï¿½ralement
          *                 (mais pas obligatoirement) l'origine (0,0). Ce rectangle est
-         *                 habituellement obtenu par un appel à
+         *                 habituellement obtenu par un appel ï¿½
          *                 {@link Font#createGlyphVector(FontContext,String)}.
          * @param toRotate Si non-nul, transformation affine sur laquelle appliquer une rotation
-         *                 égale à l'angle de l'axe.  Cette méthode peut limiter la rotation aux
-         *                 quadrants 1 et 2 afin de conserver une lecture agréable du texte.
-         * @param maximumSize Largeur et hauteur maximales des étiquettes de graduation. Cette
-         *                 information est utilisée pour écarter l'étiquette de l'axe suffisament
-         *                 pour qu'elle n'écrase pas les étiquettes de graduation.
-         * @return Le rectangle <code>bounds</code>, modifié pour être centré sur l'axe.
+         *                 ï¿½gale ï¿½ l'angle de l'axe.  Cette mï¿½thode peut limiter la rotation aux
+         *                 quadrants 1 et 2 afin de conserver une lecture agrï¿½able du texte.
+         * @param maximumSize Largeur et hauteur maximales des ï¿½tiquettes de graduation. Cette
+         *                 information est utilisï¿½e pour ï¿½carter l'ï¿½tiquette de l'axe suffisament
+         *                 pour qu'elle n'ï¿½crase pas les ï¿½tiquettes de graduation.
+         * @return Le rectangle <code>bounds</code>, modifiï¿½ pour ï¿½tre centrï¿½ sur l'axe.
          */
         final Rectangle2D centerAxisLabel(final Rectangle2D     bounds,
                                           final AffineTransform toRotate,
@@ -1196,8 +1187,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Retourne le contexte utilisé pour dessiner les caractères.
-         * Cette méthode ne retourne jamais <code>null</code>.
+         * Retourne le contexte utilisï¿½ pour dessiner les caractï¿½res.
+         * Cette mï¿½thode ne retourne jamais <code>null</code>.
          */
         final FontRenderContext getFontRenderContext() {
             if (fontContext == null) {
@@ -1207,16 +1198,16 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Spécifie le contexte à utiliser pour dessiner les caractères,
-         * ou <code>null</code> pour utiliser un contexte par défaut.
+         * Spï¿½cifie le contexte ï¿½ utiliser pour dessiner les caractï¿½res,
+         * ou <code>null</code> pour utiliser un contexte par dï¿½faut.
          */
         final void setFontRenderContext(final FontRenderContext context) {
             fontContext = context;
         }
 
         /**
-         * Vérifie que l'axe n'a pas changé depuis le dernier appel de {@link #init}.
-         * Cette méthode doit être appelée <u>à la fin</u> des méthodes de cette classe
+         * Vï¿½rifie que l'axe n'a pas changï¿½ depuis le dernier appel de {@link #init}.
+         * Cette mï¿½thode doit ï¿½tre appelï¿½e <u>ï¿½ la fin</u> des mï¿½thodes de cette classe
          * qui lisent les champs de {@link Axis2D}.
          */
         final void ensureValid() {
@@ -1230,9 +1221,9 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
 
     /**
-     * Itérateur balayant l'axe et ses barres de graduations pour leur traçage.
-     * Cet itérateur ne balaye pas les étiquettes de graduations.  Puisque cet
-     * itérateur ne retourne que des droites et jamais de courbes, il ne prend
+     * Itï¿½rateur balayant l'axe et ses barres de graduations pour leur traï¿½age.
+     * Cet itï¿½rateur ne balaye pas les ï¿½tiquettes de graduations.  Puisque cet
+     * itï¿½rateur ne retourne que des droites et jamais de courbes, il ne prend
      * pas d'argument <code>flatness</code>.
      *
      * @version $Id$
@@ -1240,37 +1231,37 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
      */
     private class TickPathIterator extends TickIterator implements java.awt.geom.PathIterator {
         /**
-         * Transformation affine à appliquer sur les données. Il doit s'agir
-         * d'une transformation affine appropriée pour l'écriture de texte
-         * (généralement en pixels ou en points). Il ne s'agit <u>pas</u> de
-         * la transformation affine créée par {@link Axis2D#createAffineTransform}.
+         * Transformation affine ï¿½ appliquer sur les donnï¿½es. Il doit s'agir
+         * d'une transformation affine appropriï¿½e pour l'ï¿½criture de texte
+         * (gï¿½nï¿½ralement en pixels ou en points). Il ne s'agit <u>pas</u> de
+         * la transformation affine crï¿½ï¿½e par {@link Axis2D#createAffineTransform}.
          */
         protected AffineTransform transform;
 
         /**
-         * Coordonnées de la prochaine graduation à retourner par une des méthodes
-         * <code>currentSegment(...)</code>. Ces coordonnées n'auront <u>pas</u>
-         * été transformées selon la transformation affine {@link #transform}.
+         * Coordonnï¿½es de la prochaine graduation ï¿½ retourner par une des mï¿½thodes
+         * <code>currentSegment(...)</code>. Ces coordonnï¿½es n'auront <u>pas</u>
+         * ï¿½tï¿½ transformï¿½es selon la transformation affine {@link #transform}.
          */
         private final Line2D.Double line = new Line2D.Double();
 
         /**
-         * Coordonnées du prochain point à retourner par une des méthodes
-         * <code>currentSegment(...)</code>. Ces coordonnées auront été
-         * transformées selon la transformation affine {@link #transform}.
+         * Coordonnï¿½es du prochain point ï¿½ retourner par une des mï¿½thodes
+         * <code>currentSegment(...)</code>. Ces coordonnï¿½es auront ï¿½tï¿½
+         * transformï¿½es selon la transformation affine {@link #transform}.
          */
         private final Point2D.Double point = new Point2D.Double();
 
         /**
-         * Type du prochain segment. Ce type est retourné par les méthodes
-         * <code>currentSegment(...)</code>. Il doit s'agir en général d'une
+         * Type du prochain segment. Ce type est retournï¿½ par les mï¿½thodes
+         * <code>currentSegment(...)</code>. Il doit s'agir en gï¿½nï¿½ral d'une
          * des constantes {@link #SEG_MOVETO} ou {@link #SEG_LINETO}.
          */
         private int type = SEG_MOVETO;
 
         /**
-         * Entier indiquant quel sera le prochain item a retourner (début ou
-         * fin d'une graduation, début ou fin de l'axe, etc.). Il doit s'agir
+         * Entier indiquant quel sera le prochain item a retourner (dï¿½but ou
+         * fin d'une graduation, dï¿½but ou fin de l'axe, etc.). Il doit s'agir
          * d'une des constantes {@link #AXIS_MOVETO}, {@link #AXIS_LINETO},
          * {@link #TICK_MOVETO},  {@link #TICK_LINETO}, etc.
          */
@@ -1282,29 +1273,29 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         /** Constante pour {@link #nextType}.*/ private static final int TICK_LINETO = 3;
 
         /**
-         * Construit un itérateur.
+         * Construit un itï¿½rateur.
          *
-         * @param transform Transformation affine à appliquer sur les données. Il doit
-         *            s'agir d'une transformation affine appropriée pour l'écriture de
-         *            texte (généralement en pixels ou en points). Il ne s'agit <u>pas</u>
-         *            de la transformation affine créée par {@link Axis2D#createAffineTransform}.
+         * @param transform Transformation affine ï¿½ appliquer sur les donnï¿½es. Il doit
+         *            s'agir d'une transformation affine appropriï¿½e pour l'ï¿½criture de
+         *            texte (gï¿½nï¿½ralement en pixels ou en points). Il ne s'agit <u>pas</u>
+         *            de la transformation affine crï¿½ï¿½e par {@link Axis2D#createAffineTransform}.
          */
         public TickPathIterator(final AffineTransform transform) {
             super(null);
-            // 'refresh' est appelée par le constructeur parent.
+            // 'refresh' est appelï¿½e par le constructeur parent.
             this.transform=transform;
             next();
         }
 
         /**
-         * Initialise cet itérateur.  Cette méthode peut être appelée
-         * pour réutiliser un itérateur qui a déjà servit, plutôt que
+         * Initialise cet itï¿½rateur.  Cette mï¿½thode peut ï¿½tre appelï¿½e
+         * pour rï¿½utiliser un itï¿½rateur qui a dï¿½jï¿½ servit, plutï¿½t que
          * d'en construire un autre.
          *
-         * @param transform Transformation affine à appliquer sur les données. Il doit
-         *        s'agir d'une transformation affine appropriée pour l'écriture de
-         *        texte (généralement en pixels ou en points). Il ne s'agit <u>pas</u>
-         *        de la transformation affine créée par {@link Axis2D#createAffineTransform}.
+         * @param transform Transformation affine ï¿½ appliquer sur les donnï¿½es. Il doit
+         *        s'agir d'une transformation affine appropriï¿½e pour l'ï¿½criture de
+         *        texte (gï¿½nï¿½ralement en pixels ou en points). Il ne s'agit <u>pas</u>
+         *        de la transformation affine crï¿½ï¿½e par {@link Axis2D#createAffineTransform}.
          */
         final void init(final AffineTransform transform) {
             refresh();
@@ -1316,7 +1307,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Repositione l'itérateur au début de la graduation
+         * Repositione l'itï¿½rateur au dï¿½but de la graduation
          * avec une nouvelle transformation affine.
          */
         public void rewind(final AffineTransform transform) {
@@ -1329,7 +1320,7 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Repositione l'itérateur au début de la graduation
+         * Repositione l'itï¿½rateur au dï¿½but de la graduation
          * en conservant la transformation affine actuelle.
          */
         public final void rewind() {
@@ -1421,8 +1412,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Méthode appelée automatiquement par {@link #next} pour
-         * indiquer qu'il faudra se préparer à tracer une étiquette.
+         * Mï¿½thode appelï¿½e automatiquement par {@link #next} pour
+         * indiquer qu'il faudra se prï¿½parer ï¿½ tracer une ï¿½tiquette.
          */
         protected void prepareLabel() {
         }
@@ -1432,8 +1423,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
 
 
     /**
-     * Itérateur balayant l'axe et ses barres de graduations pour leur traçage.
-     * Cet itérateur balaye aussi les étiquettes de graduations.
+     * Itï¿½rateur balayant l'axe et ses barres de graduations pour leur traï¿½age.
+     * Cet itï¿½rateur balaye aussi les ï¿½tiquettes de graduations.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -1446,47 +1437,47 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         private final double flatness;
 
         /**
-         * Chemin de l'étiquette {@link #label}.
+         * Chemin de l'ï¿½tiquette {@link #label}.
          */
         private java.awt.geom.PathIterator path;
 
         /**
-         * Etiquette de graduation à tracer.
+         * Etiquette de graduation ï¿½ tracer.
          */
         private Shape label;
 
         /**
-         * Rectangle englobant l'étiquette {@link #label} courante.
+         * Rectangle englobant l'ï¿½tiquette {@link #label} courante.
          */
         private Rectangle2D labelBounds;
 
         /**
          * Valeur maximale de <code>labelBounds.getWidth()</code>
-         * trouvée jusqu'à maintenant.
+         * trouvï¿½e jusqu'ï¿½ maintenant.
          */
         private double maxWidth=0;
 
         /**
          * Valeur maximale de <code>labelBounds.getHeight()</code>
-         * trouvée jusqu'à maintenant.
+         * trouvï¿½e jusqu'ï¿½ maintenant.
          */
         private double maxHeight=0;
 
         /**
          * Prend la valeur <code>true</code> lorsque
-         * la légende de l'axe a été écrite.
+         * la lï¿½gende de l'axe a ï¿½tï¿½ ï¿½crite.
          */
         private boolean isDone;
 
         /**
-         * Construit un itérateur.
+         * Construit un itï¿½rateur.
          *
-         * @param transform Transformation affine à appliquer sur les données. Il doit
-         *        s'agir d'une transformation affine appropriée pour l'écriture de
-         *        texte (généralement en pixels ou en points). Il ne s'agit <u>pas</u>
-         *        de la transformation affine créée par {@link Axis2D#createAffineTransform}.
-         * @param flatness Contrôle le remplacement des courbes par des droites. La valeur
-         *        {@link Double#NaN} indique qu'un tel remplacement ne doit pas être fait.
+         * @param transform Transformation affine ï¿½ appliquer sur les donnï¿½es. Il doit
+         *        s'agir d'une transformation affine appropriï¿½e pour l'ï¿½criture de
+         *        texte (gï¿½nï¿½ralement en pixels ou en points). Il ne s'agit <u>pas</u>
+         *        de la transformation affine crï¿½ï¿½e par {@link Axis2D#createAffineTransform}.
+         * @param flatness Contrï¿½le le remplacement des courbes par des droites. La valeur
+         *        {@link Double#NaN} indique qu'un tel remplacement ne doit pas ï¿½tre fait.
          */
         public PathIterator(final AffineTransform transform, final double flatness) {
             super(transform);
@@ -1494,8 +1485,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Retourne un itérateur balayant
-         * la forme géométrique spécifiée.
+         * Retourne un itï¿½rateur balayant
+         * la forme gï¿½omï¿½trique spï¿½cifiï¿½e.
          */
         private java.awt.geom.PathIterator getPathIterator(final Shape shape) {
             return java.lang.Double.isNaN(flatness) ? shape.getPathIterator(transform)
@@ -1503,8 +1494,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Lance une exception; cet itérateur n'est conçu
-         * pour n'être utilisé qu'une seule fois.
+         * Lance une exception; cet itï¿½rateur n'est conï¿½u
+         * pour n'ï¿½tre utilisï¿½ qu'une seule fois.
          */
         public void rewind(final AffineTransform transform) {
             throw new UnsupportedOperationException();
@@ -1560,8 +1551,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
                 super.next();
                 if (isDone()) {
                     /*
-                     * Quand tout le reste est terminé, prépare
-                     * l'écriture de la légende de l'axe.
+                     * Quand tout le reste est terminï¿½, prï¿½pare
+                     * l'ï¿½criture de la lï¿½gende de l'axe.
                      */
                     isDone = true;
                     final String title = graduation.getTitle(true);
@@ -1584,8 +1575,8 @@ public class Axis2D extends Line2D implements Cloneable, Serializable {
         }
 
         /**
-         * Méthode appelée automatiquement par {@link #next} pour
-         * indiquer qu'il faudra se préparer à tracer une étiquette.
+         * Mï¿½thode appelï¿½e automatiquement par {@link #next} pour
+         * indiquer qu'il faudra se prï¿½parer ï¿½ tracer une ï¿½tiquette.
          */
         protected void prepareLabel() {
             if (isMajorTick()) {

@@ -16,8 +16,16 @@
  */
 package org.geotools.xml.gml;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.xml.PrintHandler;
-import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
@@ -35,13 +43,6 @@ import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.logging.Level;
-import javax.naming.OperationNotSupportedException;
 
 
 /**

@@ -16,9 +16,10 @@
  */
 package org.geotools.data.coverage.grid.file;
 
+import java.io.File;
+
 import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.data.coverage.grid.Format;
-import java.io.File;
 
 
 /**

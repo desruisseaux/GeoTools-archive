@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,76 +24,60 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies and extensions
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
-import javax.units.Unit;
-import javax.units.SI;
-import javax.units.NonSI;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.units.ConversionException;
+import javax.units.NonSI;
+import javax.units.SI;
+import javax.units.Unit;
 import javax.vecmath.GMatrix;
 import javax.vecmath.SingularMatrixException;
 
-// OpenGIS dependencies: general
-import org.opengis.metadata.Identifier;
-import org.opengis.util.InternationalString;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.FactoryException;
-
-// OpenGIS dependencies: datum
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.Ellipsoid;
-import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.datum.TemporalDatum;
-import org.opengis.referencing.datum.VerticalDatum;
-
-// OpenGIS dependencies: coordinate systems
-import org.opengis.referencing.cs.TimeCS;
-import org.opengis.referencing.cs.VerticalCS;
-import org.opengis.referencing.cs.CartesianCS;
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-
-// OpenGIS dependencies: coordinate reference systems
-import org.opengis.referencing.crs.SingleCRS;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.GeneralDerivedCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// OpenGIS dependencies: operations
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.Transformation;
-import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.OperationNotFoundException;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
 import org.geotools.referencing.Factory;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.referencing.datum.BursaWolfParameters;
-
-// Resources
-import org.geotools.util.WeakHashSet;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.cts.Resources;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.util.WeakHashSet;
+import org.opengis.metadata.Identifier;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.CompoundCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeneralDerivedCRS;
+import org.opengis.referencing.crs.GeocentricCRS;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.SingleCRS;
+import org.opengis.referencing.crs.TemporalCRS;
+import org.opengis.referencing.crs.VerticalCRS;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.TimeCS;
+import org.opengis.referencing.cs.VerticalCS;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.datum.TemporalDatum;
+import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.Transformation;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -718,7 +702,7 @@ public class CoordinateOperationFactory extends Factory
                  * WEST). Compute the amount of angle to add to the source longitude in order to
                  * get the destination longitude. This amount is measured in units of the target
                  * axis.  The affine transform is then updated in order to take this rotation in
-                 * account. Note that the resulting longitude may be outside the usual [-180..180°]
+                 * account. Note that the resulting longitude may be outside the usual [-180..180ï¿½]
                  * range.
                  */
                 final Unit              unit = axis.getUnit();
@@ -879,7 +863,7 @@ public class CoordinateOperationFactory extends Factory
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo When rotating the prime meridian, we should ensure that
-     *       transformed longitudes stay in the range [-180..+180°].
+     *       transformed longitudes stay in the range [-180..+180ï¿½].
      *
      * @todo We should use Molodenski transforms when applicable.
      */
@@ -897,7 +881,7 @@ public class CoordinateOperationFactory extends Factory
              * different. Note: this special block is mandatory for avoiding never-ending loop,
              * since it is invoked by 'createOperationStep(GeocentricCRS...)'.
              *
-             * TODO: We should ensure that longitude is in range [-180..+180°].
+             * TODO: We should ensure that longitude is in range [-180..+180ï¿½].
              */
             // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
             final EllipsoidalCS sourceCS = (EllipsoidalCS) sourceCRS.getCoordinateSystem();

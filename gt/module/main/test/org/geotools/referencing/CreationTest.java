@@ -19,29 +19,36 @@
 package org.geotools.referencing;
 
 // J2SE dependencies and extensions
-import java.io.*;
-import java.util.Map;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
+import java.util.Map;
+
+import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
-import javax.units.NonSI;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
-import org.opengis.parameter.*;
-import org.opengis.referencing.cs.*;
-import org.opengis.referencing.crs.*;
-import org.opengis.referencing.datum.*;
-import org.opengis.referencing.operation.*;
-import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
 import org.geotools.resources.Arguments;
-import org.geotools.referencing.FactoryFinder;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
 
 
 /**

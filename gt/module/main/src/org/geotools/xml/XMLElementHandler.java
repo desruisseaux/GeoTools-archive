@@ -16,11 +16,6 @@
  */
 package org.geotools.xml;
 
-import org.geotools.xml.schema.Element;
-import org.geotools.xml.schema.Type;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotSupportedException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Map;
@@ -28,6 +23,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
+
+import org.geotools.xml.schema.Element;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotSupportedException;
 
 
 /**

@@ -19,11 +19,15 @@
 
 package org.geotools.data.shapefile.shp;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.ReadableByteChannel;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.*;
+import java.nio.channels.ReadableByteChannel;
+
 import org.geotools.resources.NIOUtilities;
 
 /**

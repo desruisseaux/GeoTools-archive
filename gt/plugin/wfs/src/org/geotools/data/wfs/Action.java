@@ -22,11 +22,12 @@
  */
 package org.geotools.data.wfs;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.geotools.feature.Feature;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

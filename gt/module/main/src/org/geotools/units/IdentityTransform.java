@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,12 +29,11 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
-import java.io.ObjectStreamException;
+// Entrï¿½s/sorties
 
 
 /**
- * Représente une transformation entre deux unités
+ * Reprï¿½sente une transformation entre deux unitï¿½s
  * identiques. Cette transformation ne fait rien.
  *
  * @version 1.0
@@ -50,18 +49,18 @@ final class IdentityTransform extends UnitTransform {
     
     /**
      * Construit un objet qui aura la charge de convertir
-     * des données exprimées selon les unités spécifiées.
+     * des donnï¿½es exprimï¿½es selon les unitï¿½s spï¿½cifiï¿½es.
      */
     private IdentityTransform(final Unit fromUnit, final Unit toUnit) {
         super(fromUnit, toUnit);
     }
     
     /**
-     * Retourne une transformation identitée si <code>fromUnit</code> est identique
-     * à <code>this</code>. Cette méthode sert à faciliter les implémentations des
-     * méthodes <code>get[Inverse]Transform(Unit)</code>.
+     * Retourne une transformation identitï¿½e si <code>fromUnit</code> est identique
+     * ï¿½ <code>this</code>. Cette mï¿½thode sert ï¿½ faciliter les implï¿½mentations des
+     * mï¿½thodes <code>get[Inverse]Transform(Unit)</code>.
      *
-     * @throws UnitException Si <code>fromUnit</code> n'est pas identique à <code>this</code>.
+     * @throws UnitException Si <code>fromUnit</code> n'est pas identique ï¿½ <code>this</code>.
      */
     public static UnitTransform getInstance(final Unit fromUnit, final Unit toUnit) throws UnitException {
         if (toUnit.equalsIgnoreSymbol(fromUnit)) {

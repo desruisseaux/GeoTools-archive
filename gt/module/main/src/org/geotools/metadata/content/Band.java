@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,6 @@ package org.geotools.metadata.content;
 // J2SE extensions
 import javax.units.Unit;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -34,7 +33,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class Band extends RangeDimension
        implements org.opengis.metadata.content.Band

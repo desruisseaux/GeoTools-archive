@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,26 +29,21 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
-import java.io.PrintStream;
+// Entrï¿½s/sorties
 import java.io.InputStream;
-import java.io.Serializable;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
-
-// Collections
+import java.io.Serializable;
 import java.util.Iterator;
 
-// Divers
-import org.geotools.util.WeakHashSet;
+import javax.units.NonSI;
+import javax.units.SI;
+
 import org.geotools.resources.rsc.ResourceKeys;
 import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.units.Quantities;
 import org.geotools.resources.units.Units;
-
-// JSR-108 to replace this package
-import javax.units.SI;
-import javax.units.NonSI;
+import org.geotools.util.WeakHashSet;
 
 
 /**
@@ -74,8 +69,8 @@ public abstract class Unit implements Serializable {
     private static final long serialVersionUID = 8745958719541785628L;
     
     /**
-     * Banque des objets qui ont été précédemment créés et
-     * enregistrés par un appel à la méthode {@link #intern}.
+     * Banque des objets qui ont ï¿½tï¿½ prï¿½cï¿½demment crï¿½ï¿½s et
+     * enregistrï¿½s par un appel ï¿½ la mï¿½thode {@link #intern}.
      */
     private static final WeakHashSet pool=Prefix.pool; // Must be first!
     
@@ -153,8 +148,8 @@ public abstract class Unit implements Serializable {
     
     /**
      * Convenience constant for "Degrees Minutes Secondes" unit.
-     * For example, this "unit" convert 12.5° into 123000 (i.e.
-     * the concatenation of 12°30'00"). In a strict sence, this
+     * For example, this "unit" convert 12.5ï¿½ into 123000 (i.e.
+     * the concatenation of 12ï¿½30'00"). In a strict sence, this
      * is a formatting issue rather than an unit transformation
      * issue. Such transformation would be better handle by the
      * {@link org.geotools.measure.AngleFormat} class. However, this
@@ -165,8 +160,8 @@ public abstract class Unit implements Serializable {
     
     /**
      * Convenience constant for "Degrees dot Minutes Secondes" unit.
-     * For example, this "unit" convert 12.5° into 12.3 (i.e.
-     * the concatenation of 12°30'00"). In a strict sence, this
+     * For example, this "unit" convert 12.5ï¿½ into 12.3 (i.e.
+     * the concatenation of 12ï¿½30'00"). In a strict sence, this
      * is a formatting issue rather than an unit transformation
      * issue. Such transformation would be better handle by the
      * {@link org.geotools.measure.AngleFormat} class. However, this
@@ -192,31 +187,31 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Symbole des unités de cet objet <code>Unit</code> (par exemple "kg").
-     * Ce champs sera initialisé lors de la construction de chaque objet
+     * Symbole des unitï¿½s de cet objet <code>Unit</code> (par exemple "kg").
+     * Ce champs sera initialisï¿½ lors de la construction de chaque objet
      * <code>Unit</code> et ne sera jamais nul. Ce symbole peut commencer
-     * par un des préfix énumérés dans le champ <code>prefix</code>. C'est
-     * le cas par exemple des symboles "kg" (kilogramme) et "km" (kilomètre).
+     * par un des prï¿½fix ï¿½numï¿½rï¿½s dans le champ <code>prefix</code>. C'est
+     * le cas par exemple des symboles "kg" (kilogramme) et "km" (kilomï¿½tre).
      */
     /*public*/ final String symbol;
     
     /**
-     * Ensemble des préfix qui peuvent être combinés avec le symbole de l'unité.
-     * Cet ensemble peut contenir par exemple les préfix "milli" (m), "centi" (c) et
-     * "kilo" (k) qui, combinés avec les mètres (m), donneront les millimètres (mm),
-     * centimètres (cm) ou kilomètre (km). Ce champ intervient lors des appels à la
-     * méthode {@link #scale}. Il peut être nul si aucun préfix n'est autorisé pour
+     * Ensemble des prï¿½fix qui peuvent ï¿½tre combinï¿½s avec le symbole de l'unitï¿½.
+     * Cet ensemble peut contenir par exemple les prï¿½fix "milli" (m), "centi" (c) et
+     * "kilo" (k) qui, combinï¿½s avec les mï¿½tres (m), donneront les millimï¿½tres (mm),
+     * centimï¿½tres (cm) ou kilomï¿½tre (km). Ce champ intervient lors des appels ï¿½ la
+     * mï¿½thode {@link #scale}. Il peut ï¿½tre nul si aucun prï¿½fix n'est autorisï¿½ pour
      * le symbole.
      */
     /*public*/ final PrefixSet prefix;
     
     /**
-     * Construit une unité qui aura le symbole spécifié.
-     * @param  symbol Symbole de ces unités (ne doit pas être nul).
-     * @param  prefix Ensemble des préfix utilisables avec {@link #symbol},
+     * Construit une unitï¿½ qui aura le symbole spï¿½cifiï¿½.
+     * @param  symbol Symbole de ces unitï¿½s (ne doit pas ï¿½tre nul).
+     * @param  prefix Ensemble des prï¿½fix utilisables avec {@link #symbol},
      *         ou <code>null</code> s'il n'y en a aucun. Cet ensemble sera
-     *         affecté au champ {@link #prefix} et interviendra lors des
-     *         appels à la méthode {@link #scale}.
+     *         affectï¿½ au champ {@link #prefix} et interviendra lors des
+     *         appels ï¿½ la mï¿½thode {@link #scale}.
      * @throws NullPointerException Si <code>symbol</code> est nul.
      */
     /*protected*/ Unit(final String symbol, final PrefixSet prefix) throws NullPointerException {
@@ -225,12 +220,12 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Retourne les unités qui correspondent au symbole spécifié. Si plus d'une
-     * unité correspond au symbole spécifié, une unité arbitraire sera choisie.
-     * Si aucune unité n'a été trouvée, alors cette méthode retourne <code>null</code>.
+     * Retourne les unitï¿½s qui correspondent au symbole spï¿½cifiï¿½. Si plus d'une
+     * unitï¿½ correspond au symbole spï¿½cifiï¿½, une unitï¿½ arbitraire sera choisie.
+     * Si aucune unitï¿½ n'a ï¿½tï¿½ trouvï¿½e, alors cette mï¿½thode retourne <code>null</code>.
      *
-     * @param  symbol Symbole des unités recherchées. Cet argument ne doit pas être nul.
-     * @return Les unités demandées.
+     * @param  symbol Symbole des unitï¿½s recherchï¿½es. Cet argument ne doit pas ï¿½tre nul.
+     * @return Les unitï¿½s demandï¿½es.
      */
     public static Unit get(final String symbol) {
         Object unit=null;
@@ -249,9 +244,9 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Retourne l'ensemble des unités prédéfinies par défaut. Les unités seront
-     * retournées sans ordre particulier. Si les unités par défaut n'ont pas pu
-     * être obtenues, cette méthode retourne <code>null</code>.
+     * Retourne l'ensemble des unitï¿½s prï¿½dï¿½finies par dï¿½faut. Les unitï¿½s seront
+     * retournï¿½es sans ordre particulier. Si les unitï¿½s par dï¿½faut n'ont pas pu
+     * ï¿½tre obtenues, cette mï¿½thode retourne <code>null</code>.
      */
     private static Unit[] getDefaultUnits() {
         final InputStream in=Unit.class.getClassLoader().getResourceAsStream(UnitSet.PATHNAME);
@@ -260,8 +255,8 @@ public abstract class Unit implements Serializable {
             final Unit[] units=(Unit[]) oin.readObject();
             oin.close();
             /*
-             * Appelle 'intern()' simplement par précaution.
-             * En principe, ce n'est pas nécessaire.
+             * Appelle 'intern()' simplement par prï¿½caution.
+             * En principe, ce n'est pas nï¿½cessaire.
              */
             for (int i=0; i<units.length; i++) {
                 units[i]=units[i].intern();
@@ -274,9 +269,9 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Recherche une unité correspondant au symbole spécifié. Cette méthode est temporaire.
+     * Recherche une unitï¿½ correspondant au symbole spï¿½cifiï¿½. Cette mï¿½thode est temporaire.
      * Il serait plus efficace d'utiliser un objet {@link java.util.HashMap} qui ferait
-     * correspondre les symboles avec des unités.
+     * correspondre les symboles avec des unitï¿½s.
      */
     static Unit getCached(final String symbol) {
         for (final Iterator it=pool.iterator(); it.hasNext();) {
@@ -290,21 +285,21 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Renvoie une unité identique à celle-ci, mais
-     * avec un nouveau symbole et de nouveaux préfix.
+     * Renvoie une unitï¿½ identique ï¿½ celle-ci, mais
+     * avec un nouveau symbole et de nouveaux prï¿½fix.
      *
-     * @param  symbol Nouveau symbole représentant cette unité. Si ce
-     *         paramètre est nul, un symbole par défaut sera créé.
-     * @param  prefix Liste des préfix autorisés pour le symbole.
-     * @return La même unité, mais avec le nouveau symbole. Peut être
+     * @param  symbol Nouveau symbole reprï¿½sentant cette unitï¿½. Si ce
+     *         paramï¿½tre est nul, un symbole par dï¿½faut sera crï¿½ï¿½.
+     * @param  prefix Liste des prï¿½fix autorisï¿½s pour le symbole.
+     * @return La mï¿½me unitï¿½, mais avec le nouveau symbole. Peut ï¿½tre
      *         <code>this</code>, mais ne sera jamais <code>null</code>.
      */
     public abstract Unit rename(final String symbol, final PrefixSet prefix);
     
     /**
-     * Retourne le nom de l'unité dans la langue de l'utilisateur.
-     * Par exemple le symbole "m" sera traduit par "mètre" dans la
-     * langue française. Si aucun nom n'est disponible pour l'unité
+     * Retourne le nom de l'unitï¿½ dans la langue de l'utilisateur.
+     * Par exemple le symbole "m" sera traduit par "mï¿½tre" dans la
+     * langue franï¿½aise. Si aucun nom n'est disponible pour l'unitï¿½
      * courante, retourne simplement son symbole.
      */
     public String getLocalizedName() {
@@ -312,38 +307,38 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Retourne la quantité que représente cette unité. Les quantités sont des chaînes de
-     * caractères qui décrivent le paramètre physique mesuré, comme "mass" ou "speed". Si
-     * aucune quantité n'est définie pour cette unité, retourne <code>null</code>.
+     * Retourne la quantitï¿½ que reprï¿½sente cette unitï¿½. Les quantitï¿½s sont des chaï¿½nes de
+     * caractï¿½res qui dï¿½crivent le paramï¿½tre physique mesurï¿½, comme "mass" ou "speed". Si
+     * aucune quantitï¿½ n'est dï¿½finie pour cette unitï¿½, retourne <code>null</code>.
      */
     public abstract String getQuantityName();
     
     /**
-     * Retourne la quantité que représente cette unité dans la langue de l'utilisateur.
-     * Les quantités sont des chaînes de caractères qui décrivent le paramètre physique
-     * mesuré, comme "masse" ou "vitesse". Si aucune quantité n'est définie pour cette
-     * unité, retourne <code>null</code>.
+     * Retourne la quantitï¿½ que reprï¿½sente cette unitï¿½ dans la langue de l'utilisateur.
+     * Les quantitï¿½s sont des chaï¿½nes de caractï¿½res qui dï¿½crivent le paramï¿½tre physique
+     * mesurï¿½, comme "masse" ou "vitesse". Si aucune quantitï¿½ n'est dï¿½finie pour cette
+     * unitï¿½, retourne <code>null</code>.
      */
     public String getLocalizedQuantityName() {
         return Quantities.localize(getQuantityName());
     }
     
     /**
-     * Élève ces unités à une puissance entière. Notez que ce ne sont pas toutes les
-     * unités qui peuvent être élevées à une puissance. Par exemple les unités de
-     * température en degrés Celcius (°C), en Fahrenheit (°F) et la densité sigma-T
-     * ne peuvent pas être élevées à une puissance autre que 0 et 1.
+     * ï¿½lï¿½ve ces unitï¿½s ï¿½ une puissance entiï¿½re. Notez que ce ne sont pas toutes les
+     * unitï¿½s qui peuvent ï¿½tre ï¿½levï¿½es ï¿½ une puissance. Par exemple les unitï¿½s de
+     * tempï¿½rature en degrï¿½s Celcius (ï¿½C), en Fahrenheit (ï¿½F) et la densitï¿½ sigma-T
+     * ne peuvent pas ï¿½tre ï¿½levï¿½es ï¿½ une puissance autre que 0 et 1.
      *
      *
-     * L'implémentation par défaut retourne une unité sans dimension ou <code>this</code>
+     * L'implï¿½mentation par dï¿½faut retourne une unitï¿½ sans dimension ou <code>this</code>
      * selon que <code>power</code> ait la valeur 0 ou 1 respectivement, et lance une exception
      * dans tous les autres cas.
      *
-     * @param power La puissance à laquelle élever cette unité.
-     * @return Les unités résultant de l'élévation des unités
-     *         <code>this</code> à la puissance <code>power</code>.
-     * @throws UnitException Si ces unités ne peuvent être
-     *         élevées à une puissance autre que 0 et 1.
+     * @param power La puissance ï¿½ laquelle ï¿½lever cette unitï¿½.
+     * @return Les unitï¿½s rï¿½sultant de l'ï¿½lï¿½vation des unitï¿½s
+     *         <code>this</code> ï¿½ la puissance <code>power</code>.
+     * @throws UnitException Si ces unitï¿½s ne peuvent ï¿½tre
+     *         ï¿½levï¿½es ï¿½ une puissance autre que 0 et 1.
      *
      * @see #multiply
      * @see #divide
@@ -361,16 +356,16 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Élève ces unités à une puissance fractionnaire. Cette méthode est utile entre
-     * autre pour prendre la racine carrée d'un nombre, ce qui revient à l'élever à la
-     * puissance ½. L'implémentation par défaut appele la méthode {@link #pow(int)}
-     * pour les puissances entières, et lance une exception dans tous les autres cas.
+     * ï¿½lï¿½ve ces unitï¿½s ï¿½ une puissance fractionnaire. Cette mï¿½thode est utile entre
+     * autre pour prendre la racine carrï¿½e d'un nombre, ce qui revient ï¿½ l'ï¿½lever ï¿½ la
+     * puissance ï¿½. L'implï¿½mentation par dï¿½faut appele la mï¿½thode {@link #pow(int)}
+     * pour les puissances entiï¿½res, et lance une exception dans tous les autres cas.
      *
-     * @param power La puissance à laquelle élever cette unité.
-     * @return Les unités résultant de l'élévation des unités
-     *         <code>this</code> à la puissance <code>power</code>.
-     * @throws UnitException Si ces unités ne peuvent être
-     *         élevées à une puissance autre que 0 et 1.
+     * @param power La puissance ï¿½ laquelle ï¿½lever cette unitï¿½.
+     * @return Les unitï¿½s rï¿½sultant de l'ï¿½lï¿½vation des unitï¿½s
+     *         <code>this</code> ï¿½ la puissance <code>power</code>.
+     * @throws UnitException Si ces unitï¿½s ne peuvent ï¿½tre
+     *         ï¿½levï¿½es ï¿½ une puissance autre que 0 et 1.
      */
     public Unit pow(final double power) throws UnitException {
         final int integer=(int) power;
@@ -383,14 +378,14 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Multiplie cette unité par une autre unité.
-     * L'implémentation par défaut retourne <code>this</code> si <code>that</code> est
-     * égal à une unité sans dimension, et lance une exception dams tous les autres cas.
+     * Multiplie cette unitï¿½ par une autre unitï¿½.
+     * L'implï¿½mentation par dï¿½faut retourne <code>this</code> si <code>that</code> est
+     * ï¿½gal ï¿½ une unitï¿½ sans dimension, et lance une exception dams tous les autres cas.
      *
-     * @param that L'unité par laquelle multiplier cette unité.
+     * @param that L'unitï¿½ par laquelle multiplier cette unitï¿½.
      * @return Le produit de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si les unités <code>this</code>
-     *         <code>that</code> ne peuvent pas être multipliées.
+     * @throws UnitException Si les unitï¿½s <code>this</code>
+     *         <code>that</code> ne peuvent pas ï¿½tre multipliï¿½es.
      *
      * @see #pow
      * @see #divide
@@ -408,14 +403,14 @@ public abstract class Unit implements Serializable {
     /** Overrided by {@link SimpleUnit}.*/ Unit inverseMultiply(ScaledUnit  that) throws UnitException {throw that.illegalUnitOperationException(this);}
     
     /**
-     * Divise cette unité par une autre unité.
-     * L'implémentation par défaut retourne <code>this</code> si <code>that</code> est
-     * égal à une unité sans dimension, et lance une exception dams tous les autres cas.
+     * Divise cette unitï¿½ par une autre unitï¿½.
+     * L'implï¿½mentation par dï¿½faut retourne <code>this</code> si <code>that</code> est
+     * ï¿½gal ï¿½ une unitï¿½ sans dimension, et lance une exception dams tous les autres cas.
      *
-     * @param that L'unité par laquelle diviser cette unité.
+     * @param that L'unitï¿½ par laquelle diviser cette unitï¿½.
      * @return Le quotient de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si les unités <code>this</code>
-     *         <code>that</code> ne peuvent pas être divisées.
+     * @throws UnitException Si les unitï¿½s <code>this</code>
+     *         <code>that</code> ne peuvent pas ï¿½tre divisï¿½es.
      *
      * @see #pow
      * @see #multiply
@@ -433,15 +428,15 @@ public abstract class Unit implements Serializable {
     /** Overrided by {@link SimpleUnit}.*/ Unit inverseDivide(ScaledUnit  that) throws UnitException {throw that.illegalUnitOperationException(this);}
     
     /**
-     * Crée une nouvelle unité proportionnelle à cette unité. Par exemple
-     * pour convertir en kilomètres des mesures exprimées en mètres, il
+     * Crï¿½e une nouvelle unitï¿½ proportionnelle ï¿½ cette unitï¿½. Par exemple
+     * pour convertir en kilomï¿½tres des mesures exprimï¿½es en mï¿½tres, il
      * faut les diviser par 1000. On peut exprimer cette relation par le
      * code <code>Unit&nbsp;KILOMETRE=METRE.scale(1000)</code>.
      *
      * @param  amount Facteur par lequel il faudra diviser les valeurs
-     *         exprimées selon ces unités pour obtenir des valeurs
-     *         exprimées selon les nouvelles unités.
-     * @return Les nouvelles unités.
+     *         exprimï¿½es selon ces unitï¿½s pour obtenir des valeurs
+     *         exprimï¿½es selon les nouvelles unitï¿½s.
+     * @return Les nouvelles unitï¿½s.
      *
      * @see #pow
      * @see #multiply
@@ -451,15 +446,15 @@ public abstract class Unit implements Serializable {
     public abstract Unit scale(double amount);
     
     /**
-     * Crée une nouvelle unité décalée par rapport à cette unité. Par exemple
-     * pour convertir des degrés Kelvin en degrés Celsius, il faut soustraire
-     * 273.15 aux degrés Kelvin. On peut exprimer cette relation par le code
+     * Crï¿½e une nouvelle unitï¿½ dï¿½calï¿½e par rapport ï¿½ cette unitï¿½. Par exemple
+     * pour convertir des degrï¿½s Kelvin en degrï¿½s Celsius, il faut soustraire
+     * 273.15 aux degrï¿½s Kelvin. On peut exprimer cette relation par le code
      * <code>Unit&nbsp;CELCIUS=KELVIN.shift(273.15)</code>.
      *
-     * @param  offset Constante à soustraire aux valeurs exprimées selon ces
-     *         unités pour obtenir des valeurs exprimées selon les nouvelles
-     *         unités.
-     * @return Les nouvelles unités.
+     * @param  offset Constante ï¿½ soustraire aux valeurs exprimï¿½es selon ces
+     *         unitï¿½s pour obtenir des valeurs exprimï¿½es selon les nouvelles
+     *         unitï¿½s.
+     * @return Les nouvelles unitï¿½s.
      *
      * @see #pow
      * @see #multiply
@@ -469,18 +464,18 @@ public abstract class Unit implements Serializable {
     public abstract Unit shift(double offset);
     
     /**
-     * Indique si les unités <code>this</code> et <code>that</code> sont compatibles.
-     * Si elles le sont, alors les méthodes <code>convert</code> ne lanceront jamais
-     * d'exception pour ces unités. Toutes les classes du paquet <code>org.geotools.units</code>
-     * garantissent que <code>this.canConvert(that)</code> donnera toujours le même
-     * résultat que <code>that.canConvert(this)</code>. Si vous écrivez vos propres
-     * classes dérivées de <code>Unit</code>, vous devrez vous assurer que cette
-     * condition reste respectée. Mais évitez d'appeller <code>that.canConvert(this)</code>
-     * à l'intérieur de cette méthode sous peine de tomber dans une boucle sans fin.
+     * Indique si les unitï¿½s <code>this</code> et <code>that</code> sont compatibles.
+     * Si elles le sont, alors les mï¿½thodes <code>convert</code> ne lanceront jamais
+     * d'exception pour ces unitï¿½s. Toutes les classes du paquet <code>org.geotools.units</code>
+     * garantissent que <code>this.canConvert(that)</code> donnera toujours le mï¿½me
+     * rï¿½sultat que <code>that.canConvert(this)</code>. Si vous ï¿½crivez vos propres
+     * classes dï¿½rivï¿½es de <code>Unit</code>, vous devrez vous assurer que cette
+     * condition reste respectï¿½e. Mais ï¿½vitez d'appeller <code>that.canConvert(this)</code>
+     * ï¿½ l'intï¿½rieur de cette mï¿½thode sous peine de tomber dans une boucle sans fin.
      *
-     * @param that Autre unités avec laquelle on veut
-     *        vérifier si ces unités sont compatibles.
-     * @return <code>true</code> Si l'on garantie que les méthodes
+     * @param that Autre unitï¿½s avec laquelle on veut
+     *        vï¿½rifier si ces unitï¿½s sont compatibles.
+     * @return <code>true</code> Si l'on garantie que les mï¿½thodes
      *         <code>convert</code> ne lanceront pas d'exceptions.
      */
     public abstract boolean canConvert(Unit        that);
@@ -488,135 +483,135 @@ public abstract class Unit implements Serializable {
     /**SimpleUnit*/ boolean canConvert(DerivedUnit that) {return canConvert((Unit) that);}
     
     /**
-     * Effectue la conversion d'une mesure exprimée selon d'autres unités. Par
+     * Effectue la conversion d'une mesure exprimï¿½e selon d'autres unitï¿½s. Par
      * exemple <code>METRE.convert(1,&nbsp;FOOT)</code> retournera <code>0.3048</code>.
      *
-     * @param value La valeur exprimée selon les autres unités (<code>fromUnit</code>).
-     * @param fromUnit Les autres unités.
-     * @return La valeur convertie selon ces unités (<code>this</code>).
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @param value La valeur exprimï¿½e selon les autres unitï¿½s (<code>fromUnit</code>).
+     * @param fromUnit Les autres unitï¿½s.
+     * @return La valeur convertie selon ces unitï¿½s (<code>this</code>).
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     public abstract double convert(double value, Unit        fromUnit) throws UnitException;
     /**SimpleUnit*/ double convert(double value, BaseUnit    fromUnit) throws UnitException {return convert(value, (Unit) fromUnit);}
     /**SimpleUnit*/ double convert(double value, DerivedUnit fromUnit) throws UnitException {return convert(value, (Unit) fromUnit);}
     
     /**
-     * Effectue sur-place la conversion de mesures exprimées selon d'autres
-     * unités. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
+     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
      *
-     * @param  values En entré, les valeurs exprimées selon les autres unités
-     *         (<code>fromUnit</code>). En sortie, les valeurs exprimées selon ces
-     *         unités (<code>this</code>).
-     * @param  fromUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres unitï¿½s
+     *         (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es selon ces
+     *         unitï¿½s (<code>this</code>).
+     * @param  fromUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     public abstract void convert(double[] values, Unit        fromUnit) throws UnitException;
     /**SimpleUnit*/ void convert(double[] values, BaseUnit    fromUnit) throws UnitException {convert(values, (Unit) fromUnit);}
     /**SimpleUnit*/ void convert(double[] values, DerivedUnit fromUnit) throws UnitException {convert(values, (Unit) fromUnit);}
     
     /**
-     * Effectue sur-place la conversion de mesures exprimées selon d'autres
-     * unités. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
+     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
      *
-     * @param  values En entré, les valeurs exprimées selon les autres
-     *         unités (<code>fromUnit</code>). En sortie, les valeurs exprimées
-     *         selon ces unités (<code>this</code>).
-     * @param  fromUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres
+     *         unitï¿½s (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es
+     *         selon ces unitï¿½s (<code>this</code>).
+     * @param  fromUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     public abstract void convert(float[] values, Unit        fromUnit) throws UnitException;
     /**SimpleUnit*/ void convert(float[] values, BaseUnit    fromUnit) throws UnitException {convert(values, (Unit) fromUnit);}
     /**SimpleUnit*/ void convert(float[] values, DerivedUnit fromUnit) throws UnitException {convert(values, (Unit) fromUnit);}
     
     /**
-     * Retourne un objet qui saura convertir selon ces unités les valeurs exprimées
-     * selon d'autres unités. Cette méthode est avantageuse si on prévoie faîre
-     * plusieurs conversions, car la transformation à utiliser est déterminée une
+     * Retourne un objet qui saura convertir selon ces unitï¿½s les valeurs exprimï¿½es
+     * selon d'autres unitï¿½s. Cette mï¿½thode est avantageuse si on prï¿½voie faï¿½re
+     * plusieurs conversions, car la transformation ï¿½ utiliser est dï¿½terminï¿½e une
      * fois pour toute.
      *
-     * @param  fromUnit Unités à partir de lesquel faire les conversions.
-     * @return Une transformation des unités <code>fromUnit</code>
-     *         vers les unités <code>this</code>. Cette méthode ne
+     * @param  fromUnit Unitï¿½s ï¿½ partir de lesquel faire les conversions.
+     * @return Une transformation des unitï¿½s <code>fromUnit</code>
+     *         vers les unitï¿½s <code>this</code>. Cette mï¿½thode ne
      *         retourne jamais <code>null</code>.
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     public abstract UnitTransform getTransform(Unit        fromUnit) throws UnitException;
     /**SimpleUnit*/ UnitTransform getTransform(BaseUnit    fromUnit) throws UnitException {return getTransform((Unit) fromUnit);}
     /**SimpleUnit*/ UnitTransform getTransform(DerivedUnit fromUnit) throws UnitException {return getTransform((Unit) fromUnit);}
     
     /**
-     * Convertit une mesure vers d'autre unités. Par exemple
+     * Convertit une mesure vers d'autre unitï¿½s. Par exemple
      * <code>METRE.inverseConvert(1,&nbsp;FOOT)</code> retournera
-     * <code>3.2808</code>. Cette méthode est l'inverse de la méthode
-     * {@link #convert(double,Unit)}. Bien que n'étant pas destinée à
-     * être appellée directement, les classes dérivées devront quand
-     * même la définir pour un fonctionnement correcte.
+     * <code>3.2808</code>. Cette mï¿½thode est l'inverse de la mï¿½thode
+     * {@link #convert(double,Unit)}. Bien que n'ï¿½tant pas destinï¿½e ï¿½
+     * ï¿½tre appellï¿½e directement, les classes dï¿½rivï¿½es devront quand
+     * mï¿½me la dï¿½finir pour un fonctionnement correcte.
      *
-     * @param  value La valeur exprimée selon ces unités (<code>this</code>).
-     * @param  toUnit Les autres unités.
-     * @return La valeur convertie selon les autres unités (<code>toUnit</code>).
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @param  value La valeur exprimï¿½e selon ces unitï¿½s (<code>this</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @return La valeur convertie selon les autres unitï¿½s (<code>toUnit</code>).
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     /*protected*/ abstract double inverseConvert(double value, Unit        toUnit) throws UnitException;
     /**SimpleUnit*/        double inverseConvert(double value, BaseUnit    toUnit) throws UnitException {return inverseConvert(value, (Unit) toUnit);}
     /**SimpleUnit*/        double inverseConvert(double value, DerivedUnit toUnit) throws UnitException {return inverseConvert(value, (Unit) toUnit);}
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unités.
+     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * méthode est l'inverse de la méthode {@link #convert(double[],Unit)}.
-     * Bien que n'étant pas destinée à être appellée directement, les classes
-     * dérivées devront quand même la définir pour un fonctionnement correcte.
+     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(double[],Unit)}.
+     * Bien que n'ï¿½tant pas destinï¿½e ï¿½ ï¿½tre appellï¿½e directement, les classes
+     * dï¿½rivï¿½es devront quand mï¿½me la dï¿½finir pour un fonctionnement correcte.
      *
-     * @param  values En entré, les valeur exprimées selon ces unités
-     *         (<code>this</code>). En sortie, les valeurs exprimées
-     *         selon les autres unités (<code>toUnit</code>).
-     * @param  toUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
+     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
+     *         selon les autres unitï¿½s (<code>toUnit</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     /*protected*/ abstract void inverseConvert(double[] values, Unit        toUnit) throws UnitException;
     /**SimpleUnit*/        void inverseConvert(double[] values, BaseUnit    toUnit) throws UnitException {inverseConvert(values, (Unit) toUnit);}
     /**SimpleUnit*/        void inverseConvert(double[] values, DerivedUnit toUnit) throws UnitException {inverseConvert(values, (Unit) toUnit);}
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unités.
+     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * méthode est l'inverse de la méthode {@link #convert(float[],Unit)}.
-     * Bien que n'étant pas destinée à être appellée directement, les classes
-     * dérivées devront quand même la définir pour un fonctionnement correcte.
+     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(float[],Unit)}.
+     * Bien que n'ï¿½tant pas destinï¿½e ï¿½ ï¿½tre appellï¿½e directement, les classes
+     * dï¿½rivï¿½es devront quand mï¿½me la dï¿½finir pour un fonctionnement correcte.
      *
-     * @param  values En entré, les valeur exprimées selon ces unités
-     *         (<code>this</code>). En sortie, les valeurs exprimées
-     *         selon les autres unités (<code>toUnit</code>).
-     * @param  toUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
+     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
+     *         selon les autres unitï¿½s (<code>toUnit</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     /*protected*/ abstract void inverseConvert(float[] values, Unit        toUnit) throws UnitException;
     /**SimpleUnit*/        void inverseConvert(float[] values, BaseUnit    toUnit) throws UnitException {inverseConvert(values, (Unit) toUnit);}
     /**SimpleUnit*/        void inverseConvert(float[] values, DerivedUnit toUnit) throws UnitException {inverseConvert(values, (Unit) toUnit);}
     
     /**
-     * Retourne un objet qui saura convertir selon d'autres unités les
-     * valeurs exprimées selon ces unités. Cette méthode est l'inverse
+     * Retourne un objet qui saura convertir selon d'autres unitï¿½s les
+     * valeurs exprimï¿½es selon ces unitï¿½s. Cette mï¿½thode est l'inverse
      * de {@link #getTransform}.
      *
-     * @param  toUnit Unités vers lesquel faire les conversions.
-     * @return Une transformation des unités <code>this</code>
-     *         vers les unités <code>toUnit</code>. Cette méthode
+     * @param  toUnit Unitï¿½s vers lesquel faire les conversions.
+     * @return Une transformation des unitï¿½s <code>this</code>
+     *         vers les unitï¿½s <code>toUnit</code>. Cette mï¿½thode
      *         ne retourne jamais <code>null</code>.
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     /*protected*/ abstract UnitTransform getInverseTransform(Unit        toUnit) throws UnitException;
     /**SimpleUnit*/        UnitTransform getInverseTransform(BaseUnit    toUnit) throws UnitException {return getInverseTransform((Unit) toUnit);}
     /**SimpleUnit*/        UnitTransform getInverseTransform(DerivedUnit toUnit) throws UnitException {return getInverseTransform((Unit) toUnit);}
     
     /**
-     * Retourne une exception à lancer lorsque
-     * l'opération demandée n'est pas permise.
+     * Retourne une exception ï¿½ lancer lorsque
+     * l'opï¿½ration demandï¿½e n'est pas permise.
      */
     final UnitException illegalUnitOperationException(Unit that) {
         return new UnitException(Resources.format(
@@ -624,8 +619,8 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Retourne une exception à lancer lorsque
-     * les unités ne sont pas compatibles.
+     * Retourne une exception ï¿½ lancer lorsque
+     * les unitï¿½s ne sont pas compatibles.
      */
     final UnitException incompatibleUnitsException(Unit that) {
         return new UnitException(Resources.format(
@@ -633,23 +628,23 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Après la lecture binaire, vérifie si les
-     * unitées lues existaient déjà en mémoire.
+     * Aprï¿½s la lecture binaire, vï¿½rifie si les
+     * unitï¿½es lues existaient dï¿½jï¿½ en mï¿½moire.
      */
     final Object readResolve() throws ObjectStreamException {
         return intern();
     }
     
     /**
-     * Retourne un exemplaire unique de cette unité. Une banque d'unités, initialement
-     * vide, est maintenue de façon interne par la classe <code>Unit</code>. Lorsque la
-     * méthode <code>intern</code> est appelée, elle recherchera des unités égales à
-     * <code>this</code> au sens de la méthode {@link #equals}. Si de telles unités
-     * sont trouvées, elles seront retournées. Sinon, les unités <code>this</code>
-     * seront ajoutées à la banque de données en utilisant une référence faible
-     * et cette méthode retournera <code>this</code>.
+     * Retourne un exemplaire unique de cette unitï¿½. Une banque d'unitï¿½s, initialement
+     * vide, est maintenue de faï¿½on interne par la classe <code>Unit</code>. Lorsque la
+     * mï¿½thode <code>intern</code> est appelï¿½e, elle recherchera des unitï¿½s ï¿½gales ï¿½
+     * <code>this</code> au sens de la mï¿½thode {@link #equals}. Si de telles unitï¿½s
+     * sont trouvï¿½es, elles seront retournï¿½es. Sinon, les unitï¿½s <code>this</code>
+     * seront ajoutï¿½es ï¿½ la banque de donnï¿½es en utilisant une rï¿½fï¿½rence faible
+     * et cette mï¿½thode retournera <code>this</code>.
      * <br><br>
-     * De cette méthode il s'ensuit que pour deux unités <var>u</var> et <var>v</var>,
+     * De cette mï¿½thode il s'ensuit que pour deux unitï¿½s <var>u</var> et <var>v</var>,
      * la condition <code>u.intern()==v.intern()</code> sera vrai si et seulement si
      * <code>u.equals(v)</code> est vrai.
      */
@@ -658,19 +653,19 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Retourne un exemplaire unique de cette unité, quel que soit son symbole. Une banque d'unités,
-     * initialement vide, est maintenue de façon interne par la classe <code>Unit</code>. Lorsque la
-     * méthode <code>internIgnoreSymbol</code> est appelée, elle recherchera des unités égales à
-     * <code>this</code> au sens de la méthode {@link #equalsIgnoreSymbol}. Si de telles unités
-     * sont trouvées, elles seront retournées. Sinon, les unités <code>this</code> seront ajoutées
-     * à la banque de données en utilisant une référence faible et cette méthode retournera <code>this</code>.
+     * Retourne un exemplaire unique de cette unitï¿½, quel que soit son symbole. Une banque d'unitï¿½s,
+     * initialement vide, est maintenue de faï¿½on interne par la classe <code>Unit</code>. Lorsque la
+     * mï¿½thode <code>internIgnoreSymbol</code> est appelï¿½e, elle recherchera des unitï¿½s ï¿½gales ï¿½
+     * <code>this</code> au sens de la mï¿½thode {@link #equalsIgnoreSymbol}. Si de telles unitï¿½s
+     * sont trouvï¿½es, elles seront retournï¿½es. Sinon, les unitï¿½s <code>this</code> seront ajoutï¿½es
+     * ï¿½ la banque de donnï¿½es en utilisant une rï¿½fï¿½rence faible et cette mï¿½thode retournera <code>this</code>.
      * <br><br>
-     * De cette méthode il s'ensuit que pour deux unités <var>u</var> et <var>v</var>,
+     * De cette mï¿½thode il s'ensuit que pour deux unitï¿½s <var>u</var> et <var>v</var>,
      * la condition <code>u.internIgnoreSymbol()==v.internIgnoreSymbol()</code> sera
-     * généralement vrai si <code>u.equalsIgnoreSymbol(v)</code> est vrai. Toutefois,
-     * si la banque de données contient plusieurs unités identiques en tout sauf leurs
-     * symboles, alors il n'y a aucune garantie de quelle unité sera choisie par cette
-     * méthode.
+     * gï¿½nï¿½ralement vrai si <code>u.equalsIgnoreSymbol(v)</code> est vrai. Toutefois,
+     * si la banque de donnï¿½es contient plusieurs unitï¿½s identiques en tout sauf leurs
+     * symboles, alors il n'y a aucune garantie de quelle unitï¿½ sera choisie par cette
+     * mï¿½thode.
      */
     /*protected*/ final Unit internIgnoreSymbol() {
         synchronized (pool) {
@@ -684,7 +679,7 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Indique si deux unités sont égales et utilisent le même symbole.
+     * Indique si deux unitï¿½s sont ï¿½gales et utilisent le mï¿½me symbole.
      */
     public boolean equals(final Object unit) {
         if (unit!=null) {
@@ -706,23 +701,23 @@ public abstract class Unit implements Serializable {
     }
     
     /**
-     * Indique si deux unités sont égales, en ignorant leurs symboles. Le
-     * champs {@link #symbol} de chacune des deux unités ne sera pas pris
+     * Indique si deux unitï¿½s sont ï¿½gales, en ignorant leurs symboles. Le
+     * champs {@link #symbol} de chacune des deux unitï¿½s ne sera pas pris
      * en compte.
      */
     /*public*/ abstract boolean equalsIgnoreSymbol(Unit unit);
     
     /**
-     * Retourne un code propre à cette unité. Le calcul de
+     * Retourne un code propre ï¿½ cette unitï¿½. Le calcul de
      * ce code ne devrait pas prendre en compte le symbole
-     * de l'unité.
+     * de l'unitï¿½.
      */
     public abstract int hashCode();
     
     /**
-     * Retourne les symboles de ces unités, par exemple "m/s".
+     * Retourne les symboles de ces unitï¿½s, par exemple "m/s".
      * S'il existe un symbole particulier pour la langue de
-     * l'utilisateur, ce symbole sera retourné.
+     * l'utilisateur, ce symbole sera retournï¿½.
      */
     public String toString() {
         return symbol;
@@ -732,10 +727,10 @@ public abstract class Unit implements Serializable {
     
     
     /**
-     * Enveloppe des unités qui seront comparées sans tenir compte des symboles.
-     * Cette classe est utilisée par {@link #internIgnoreSymbol} afin de puiser
-     * dans la banque d'unités {@link #pool} n'importe quel unité de dimensions
-     * appropriées, quel que soit son symbole.
+     * Enveloppe des unitï¿½s qui seront comparï¿½es sans tenir compte des symboles.
+     * Cette classe est utilisï¿½e par {@link #internIgnoreSymbol} afin de puiser
+     * dans la banque d'unitï¿½s {@link #pool} n'importe quel unitï¿½ de dimensions
+     * appropriï¿½es, quel que soit son symbole.
      *
      * @version 1.0
      * @author Martin Desruisseaux
@@ -743,15 +738,15 @@ public abstract class Unit implements Serializable {
     private final class Unamed {
         /**
          * Renvoie le code des
-         * unités enveloppées.
+         * unitï¿½s enveloppï¿½es.
          */
         public int hashCode() {
             return Unit.this.hashCode();
         }
         
         /**
-         * Vérifie si les unités enveloppées sont
-         * égales aux unités spécifiées, sans tenir
+         * Vï¿½rifie si les unitï¿½s enveloppï¿½es sont
+         * ï¿½gales aux unitï¿½s spï¿½cifiï¿½es, sans tenir
          * compte de leurs symboles respectifs.
          */
         public boolean equals(final Object obj) {

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,20 +23,15 @@ package org.geotools.renderer.j2d;
 // J2SE dependencies
 import java.util.Locale;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.pt.CoordinateFormat;
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.GeographicCoordinateSystem;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * Formateurs des coordonnées pointées par le curseur de la souris. Les instances de cette classe
- * pourront écrire les coordonnées pointées ainsi qu'une éventuelle valeurs sous cette coordonnées
- * (par exemple la température sur une image satellitaire de température).
+ * Formateurs des coordonnï¿½es pointï¿½es par le curseur de la souris. Les instances de cette classe
+ * pourront ï¿½crire les coordonnï¿½es pointï¿½es ainsi qu'une ï¿½ventuelle valeurs sous cette coordonnï¿½es
+ * (par exemple la tempï¿½rature sur une image satellitaire de tempï¿½rature).
  *
  * The {@linkplain #getCoordinateSystem output coordinate system} may have an arbitrary
  * number of dimensions (as long as a transform exists from the two-dimensional
@@ -53,14 +48,14 @@ public class MouseCoordinateFormat extends CoordinateFormat {
     private CoordinatePoint point;
 
     /**
-     * Buffer pour l'écriture des coordonnées.
+     * Buffer pour l'ï¿½criture des coordonnï¿½es.
      */
     private final StringBuffer buffer = new StringBuffer();
 
     /**
-     * Indique si la méthode {@link #format} doit écrire la valeur après la coordonnée. Les
-     * valeurs sont obtenues en appelant la méthode <code>RenderedLayer.formatValue(...)</code>.
-     * Par défaut, les valeurs (si elles sont disponibles) sont écrites.
+     * Indique si la mï¿½thode {@link #format} doit ï¿½crire la valeur aprï¿½s la coordonnï¿½e. Les
+     * valeurs sont obtenues en appelant la mï¿½thode <code>RenderedLayer.formatValue(...)</code>.
+     * Par dï¿½faut, les valeurs (si elles sont disponibles) sont ï¿½crites.
      */
     private boolean valueVisible = true;
 
@@ -73,9 +68,9 @@ public class MouseCoordinateFormat extends CoordinateFormat {
     
 
     /**
-     * Construit un objet qui écrira les coordonnées pointées par le
-     * curseur de la souris. Les coordonnées seront écrites selon le
-     * système de coordonnées par défaut "WGS 1984".
+     * Construit un objet qui ï¿½crira les coordonnï¿½es pointï¿½es par le
+     * curseur de la souris. Les coordonnï¿½es seront ï¿½crites selon le
+     * systï¿½me de coordonnï¿½es par dï¿½faut "WGS 1984".
      *
      * @param locale The locale for formatting coordinates and numbers.
      */
@@ -84,31 +79,31 @@ public class MouseCoordinateFormat extends CoordinateFormat {
     }
 
     /**
-     * Indique si la méthode {@link #format} doit écrire la valeur après la coordonnée.
-     * Par défaut, les valeurs (si elles sont disponibles) sont écrites.
+     * Indique si la mï¿½thode {@link #format} doit ï¿½crire la valeur aprï¿½s la coordonnï¿½e.
+     * Par dï¿½faut, les valeurs (si elles sont disponibles) sont ï¿½crites.
      */
     public boolean isValueVisible() {
         return valueVisible;
     }
 
     /**
-     * Spécifie si la méthode {@link #format} doit aussi écrire la valeur après la
-     * coordonnée.
+     * Spï¿½cifie si la mï¿½thode {@link #format} doit aussi ï¿½crire la valeur aprï¿½s la
+     * coordonnï¿½e.
      */
     public void setValueVisible(final boolean valueVisible) {
         this.valueVisible = valueVisible;
     }
 
     /**
-     * Retourne une chaîne de caractères représentant les coordonnées pointées par le curseur
-     * de la souris.  Les coordonnées seront écrites selon le système de coordonnées spécifié
+     * Retourne une chaï¿½ne de caractï¿½res reprï¿½sentant les coordonnï¿½es pointï¿½es par le curseur
+     * de la souris.  Les coordonnï¿½es seront ï¿½crites selon le systï¿½me de coordonnï¿½es spï¿½cifiï¿½
      * lors du dernier appel de {@link #setCoordinateSystem}. Si une des couches peut ajouter
-     * une valeur à la coordonnée (par exemple une couche qui représente une image satellitaire
-     * de température) et que l'écriture des valeurs est autorisée (voir {@link #isValueVisible}),
-     * alors la valeur sera écrite après les coordonnées.
+     * une valeur ï¿½ la coordonnï¿½e (par exemple une couche qui reprï¿½sente une image satellitaire
+     * de tempï¿½rature) et que l'ï¿½criture des valeurs est autorisï¿½e (voir {@link #isValueVisible}),
+     * alors la valeur sera ï¿½crite aprï¿½s les coordonnï¿½es.
      *
-     * @param  event Evénements contenant les coordonnées de la souris.
-     * @return Chaîne de caractères représentant les coordonnées pointées
+     * @param  event Evï¿½nements contenant les coordonnï¿½es de la souris.
+     * @return Chaï¿½ne de caractï¿½res reprï¿½sentant les coordonnï¿½es pointï¿½es
      *         par le curseur de la souris.
      */
     public String format(final GeoMouseEvent event) {

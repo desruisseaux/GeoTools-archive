@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,43 +25,39 @@ package org.geotools.coverage;
 
 // J2SE dependencies
 import java.awt.Color;
-import java.util.List;
-import java.util.Locale;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.io.Serializable;
 import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
-import java.awt.image.RenderedImage;   // For Javadoc
 import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
-// J2SE extensions
-import javax.units.Unit;
 import javax.media.jai.JAI;
 import javax.media.jai.util.Range;
+import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
-import org.opengis.coverage.SampleDimensionType;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.resources.ClassChanger;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.XMath;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.image.ColorUtilities;
+import org.geotools.util.NumberRange;
+import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.ColorInterpretation;
-import org.opengis.coverage.PaletteInterpretation;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.PaletteInterpretation;
+import org.opengis.coverage.SampleDimensionType;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.util.SimpleInternationalString;
-import org.geotools.util.NumberRange;
-import org.geotools.resources.XMath;
-import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.ClassChanger;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.image.ColorUtilities;
-import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.opengis.util.InternationalString;
 
 
 /**

@@ -16,16 +16,6 @@
  */
 package org.geotools.data.geometryless;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
-import org.geotools.data.DataSourceException;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.SchemaException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -34,6 +24,18 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.SchemaException;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 
 
 /**

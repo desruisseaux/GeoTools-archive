@@ -16,28 +16,27 @@
  */
 package org.geotools.validation;
 
-import junit.framework.TestCase;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultRepository;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
-
-import com.vividsolutions.jts.geom.*;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**

@@ -1,7 +1,8 @@
 package org.geotools.data.shapefile.shp.xml;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+
+import junit.framework.TestCase;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -10,8 +11,6 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.resources.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;
-
-import junit.framework.TestCase;
 
 public class ShpXmlFileReaderTest extends TestCase {
      ShpXmlFileReader reader;

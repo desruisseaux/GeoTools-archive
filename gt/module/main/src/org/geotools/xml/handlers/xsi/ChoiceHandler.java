@@ -16,14 +16,15 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**

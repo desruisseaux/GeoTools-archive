@@ -15,16 +15,25 @@
 package org.geotools.demo.referencing;
 
 // J2SE and JAI dependencies
-import java.io.*;
-import org.geotools.units.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import javax.media.jai.ParameterList;
 
-// Geotools dependencies
-import org.geotools.pt.*;
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-
-// OpenGIS dependencies
+import org.geotools.cs.AxisInfo;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.Ellipsoid;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.HorizontalDatum;
+import org.geotools.cs.PrimeMeridian;
+import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.cs.Projection;
+import org.geotools.ct.CoordinateTransformation;
+import org.geotools.ct.CoordinateTransformationFactory;
+import org.geotools.ct.MathTransform;
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.units.Unit;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,9 @@ package org.geotools.ct;
 // J2SE dependencies
 import java.io.Serializable;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
 import javax.media.jai.ParameterList;
+import javax.media.jai.util.Range;
 
-// Geotools dependencies
 import org.geotools.resources.cts.ResourceKeys;
 
 

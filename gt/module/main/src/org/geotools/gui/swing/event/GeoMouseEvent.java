@@ -19,14 +19,14 @@
 package org.geotools.gui.swing.event;
 
 // OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-//import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
+
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.MathTransform;
 import org.geotools.pt.CoordinatePoint;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

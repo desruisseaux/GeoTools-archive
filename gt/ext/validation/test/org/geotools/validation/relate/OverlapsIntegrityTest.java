@@ -33,7 +33,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Filter;
 
-
 import com.vividsolutions.jts.geom.Envelope;
 
 

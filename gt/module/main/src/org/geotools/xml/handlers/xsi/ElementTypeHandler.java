@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
+
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
@@ -23,7 +25,6 @@ import org.geotools.xml.schema.Type;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
-import java.net.URI;
 
 
 /**

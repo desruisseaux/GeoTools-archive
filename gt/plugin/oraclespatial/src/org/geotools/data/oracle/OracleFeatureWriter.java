@@ -16,12 +16,14 @@
  */
 package org.geotools.data.oracle;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.filter.SQLEncoderOracle;
-import java.io.IOException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

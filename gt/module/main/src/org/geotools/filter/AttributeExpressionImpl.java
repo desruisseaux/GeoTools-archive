@@ -16,13 +16,10 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
-
-// Geotools dependencies
-import org.geotools.feature.FeatureType;
-
-// J2SE dependencies
 import java.util.logging.Logger;
+
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,19 +20,15 @@
 package org.geotools.gc;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.Arrays;
 import java.awt.image.DataBuffer;
+import java.util.Arrays;
+import java.util.Map;
 
-// JAI dependencies
 import javax.media.jai.LookupTableJAI;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.ct.MathTransform1D;
 import org.geotools.util.WeakValueHashMap;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

@@ -16,11 +16,7 @@
  */
 package org.geotools.filter;
 
-import junit.framework.*;
-import org.w3c.dom.*;
 import java.io.StringWriter;
-import java.util.logging.Logger;
-import javax.xml.parsers.*;
 
 
 /**

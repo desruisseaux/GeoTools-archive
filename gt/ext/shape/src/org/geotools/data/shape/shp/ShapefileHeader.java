@@ -19,7 +19,9 @@
  */
 package org.geotools.data.shape.shp;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

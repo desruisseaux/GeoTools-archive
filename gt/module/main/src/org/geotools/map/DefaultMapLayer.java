@@ -22,18 +22,14 @@
 package org.geotools.map;
 
 import org.geotools.data.DataUtilities;
-
-// import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.map.MapLayer;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.styling.Style;
-import java.io.IOException;
 
 
 /**

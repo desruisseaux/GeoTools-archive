@@ -25,7 +25,6 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 

@@ -16,14 +16,15 @@
  */
 package org.geotools.data.crs;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.io.IOException;
-import java.util.NoSuchElementException;
 
 
 /**

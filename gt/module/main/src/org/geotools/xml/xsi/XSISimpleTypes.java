@@ -16,6 +16,17 @@
  */
 package org.geotools.xml.xsi;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeValue;
@@ -30,15 +41,6 @@ import org.geotools.xml.schema.Type;
 import org.geotools.xml.schema.impl.AttributeValueGT;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import javax.naming.OperationNotSupportedException;
 
 
 /**

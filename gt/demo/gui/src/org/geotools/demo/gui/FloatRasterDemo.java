@@ -20,14 +20,12 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 
-// JAI dependencies
 import javax.media.jai.RasterFactory;
 
-// Geotools dependencies
-import org.geotools.pt.Envelope;
-import org.geotools.gc.GridCoverage;
 import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.FrameFactory;
+import org.geotools.pt.Envelope;
 
 
 /**

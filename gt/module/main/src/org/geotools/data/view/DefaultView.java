@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -35,7 +34,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
-import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
@@ -65,7 +63,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * impement FeatureSource.
  * </p>
  * 
- * @author Gabriel Roldán
+ * @author Gabriel Roldï¿½n
  */
 public class DefaultView implements FeatureSource {
 

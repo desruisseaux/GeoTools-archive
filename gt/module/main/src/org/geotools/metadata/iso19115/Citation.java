@@ -1,19 +1,18 @@
 package org.geotools.metadata.iso19115;
 
 import java.util.Date;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.geotools.util.CheckedArrayList;
 import org.geotools.util.CheckedHashMap;
 import org.geotools.util.CheckedHashSet;
-import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.PresentationForm;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Series;
+import org.opengis.util.InternationalString;
 
 public class Citation extends MetaData implements
 		org.opengis.metadata.citation.Citation {

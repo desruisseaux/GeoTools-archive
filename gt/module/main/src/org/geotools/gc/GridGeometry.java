@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,48 +24,38 @@
 package org.geotools.gc;
 
 // J2SE dependencies
-import java.io.Serializable;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.RenderedImage;  // For Javadoc
-import java.awt.image.BufferedImage;  // For Javadoc
-
-// RMI and weak references
-import java.rmi.RemoteException;
-import java.lang.ref.WeakReference;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.Serializable;
 import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
 
-// JAI dependencies
 import javax.media.jai.IntegerSequence;
 
-// OpenGIS dependencies
-import org.opengis.gc.GC_GridRange;
-import org.opengis.gc.GC_GridGeometry;
-import org.opengis.ct.CT_MathTransform;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.coverage.CannotEvaluateException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.Envelope;
-import org.geotools.pt.Dimensioned;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;
-
-// Resources
-import org.geotools.resources.Utilities;
+import org.geotools.pt.Dimensioned;
+import org.geotools.pt.Envelope;
+import org.geotools.pt.Matrix;
 import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.JAIUtilities;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.ct.CT_MathTransform;
+import org.opengis.gc.GC_GridGeometry;
+import org.opengis.gc.GC_GridRange;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -557,7 +547,7 @@ public class GridGeometry implements Dimensioned, Serializable {
     }
     
     /**
-     * Returns a string représentation of this grid range.
+     * Returns a string reprï¿½sentation of this grid range.
      * The returned string is implementation dependent. It
      * is usually provided for debugging purposes.
      */

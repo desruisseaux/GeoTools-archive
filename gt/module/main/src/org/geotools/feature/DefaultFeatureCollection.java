@@ -17,17 +17,15 @@
 package org.geotools.feature;
 
 // J2SE interfaces
-import java.util.Set;
-import java.util.List;
-import java.util.Iterator;
-import java.util.Collection;
-
-// J2SE implementations
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
-// JTS dependencies
 import com.vividsolutions.jts.geom.Envelope;
 
 

@@ -16,10 +16,11 @@
  */
 package org.geotools.xml;
 
+import java.util.List;
+
 import org.geotools.catalog.MetadataXPath;
 import org.opengis.catalog.MetadataEntity;
 import org.w3c.dom.Node;
-import java.util.List;
 
 /**
  * A factory to simplify the use of XPaths

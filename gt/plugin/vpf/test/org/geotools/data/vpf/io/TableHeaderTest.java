@@ -12,9 +12,11 @@ package org.geotools.data.vpf.io;
 
 import java.io.File;
 import java.io.IOException;
-import junit.extensions.*;
-import junit.framework.*;
-import org.geotools.data.vpf.io.TableInputStream;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.resources.TestData;
 
 /**

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,67 +22,49 @@ package org.geotools.renderer.geom;
 
 // Geometry and graphics
 import java.awt.Shape;
-import java.awt.Rectangle;
-import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.IllegalPathStateException;
-
-// Collections
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.NoSuchElementException;
-
-// Input/Output
-import java.io.Writer;
-import java.io.PrintWriter;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.OutputStreamWriter;
-
-// Formatting
-import java.util.Locale;
-import java.text.NumberFormat;
+import java.io.Writer;
 import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.NoSuchElementException;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.Projection;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.ProjectedCoordinateSystem;
+import org.geotools.cs.Projection;
 import org.geotools.ct.CannotCreateTransformException;
 import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransform;
-
-// Miscellaneous
-import org.geotools.util.WeakHashSet;
+import org.geotools.ct.MathTransform2D;
 import org.geotools.math.Statistics;
-import org.geotools.resources.XMath;
-import org.geotools.resources.XArray;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.resources.geometry.ShapeUtilities;
-import org.geotools.renderer.array.PointArray;
 import org.geotools.renderer.array.ArrayData;
+import org.geotools.renderer.array.PointArray;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.CTSUtilities;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.XMath;
+import org.geotools.resources.geometry.ShapeUtilities;
+import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
+import org.geotools.units.Unit;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -138,9 +120,9 @@ public class Polyline extends Geometry {
                     getIdentityTransform(DEFAULT_COORDINATE_SYSTEM);
 
     /**
-     * Un des maillons de la chaîne de polylignes, ou
-     * <code>null</code> s'il n'y a aucune donnée de
-     * mémorisée.
+     * Un des maillons de la chaï¿½ne de polylignes, ou
+     * <code>null</code> s'il n'y a aucune donnï¿½e de
+     * mï¿½morisï¿½e.
      */
     private LineString data;
 
@@ -389,8 +371,8 @@ public class Polyline extends Geometry {
                 }
             }
             /*
-             * Construit les polylignes qui correspondent à
-             * la forme géométrique qui vient d'être balayée.
+             * Construit les polylignes qui correspondent ï¿½
+             * la forme gï¿½omï¿½trique qui vient d'ï¿½tre balayï¿½e.
              */
             final LineString[] strings = LineString.getInstances(array, 0, index);
             for (int i=0; i<strings.length; i++) {
@@ -1180,7 +1162,7 @@ public class Polyline extends Geometry {
      *         (<var>x</var>,<var>y</var>) and to specify <code>null</code> for this argument.
      * @return <code>true</code> if the point is inside this polyline.
      *
-     * @author André Gosselin (original C version)
+     * @author Andrï¿½ Gosselin (original C version)
      * @author Martin Desruisseaux (Java adaptation)
      */
     private boolean contains(final float x, final float y,
@@ -1536,7 +1518,7 @@ public class Polyline extends Geometry {
     }
 
     /**
-     * Implémentation of the <code>intersects[Polyline|Edge](Polyline)</code> methods.
+     * Implï¿½mentation of the <code>intersects[Polyline|Edge](Polyline)</code> methods.
      *
      * @param  shape polylines to check.
      * @param  checkEdgeOnly <code>true</code> to only check edges, without bothering with

@@ -2,9 +2,9 @@ package org.geotools.metadata.iso19115;
 
 import java.util.List;
 
-import org.opengis.catalog.MetadataEntity.EntityType;
-
 import junit.framework.TestCase;
+
+import org.opengis.catalog.MetadataEntity.EntityType;
 
 
 public class MetaDataTest extends TestCase {

@@ -43,7 +43,6 @@ import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.handlers.DocumentHandler;
-import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.xml.sax.SAXException;
 
 /**

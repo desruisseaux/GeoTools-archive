@@ -18,17 +18,15 @@ package org.geotools.filter;
 
 
 // Java Topology Suite dependencies
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.logging.Logger;
 
-// Geotools dependencies
 import org.geotools.feature.FeatureType;
 import org.geotools.gml.GMLHandlerJTS;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
 
-// J2SE dependencies
-import java.util.logging.Logger;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

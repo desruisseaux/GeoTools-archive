@@ -16,21 +16,22 @@
  */
 package org.geotools.xml.ogc;
 
-import com.vividsolutions.jts.geom.*;
-import junit.framework.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import java.io.StringWriter;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterDOMParser;
-import org.geotools.gml.GMLFilterDocument;
-import org.geotools.gml.GMLFilterGeometry;
 import org.geotools.resources.TestData;
 import org.geotools.xml.DocumentWriter;
-import org.w3c.dom.*;
-import java.io.*;
-import java.util.*;
-import java.util.logging.Logger;
-import javax.xml.parsers.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**

@@ -1,12 +1,10 @@
 package org.geotools.graph.structure.basic;
 
-import org.geotools.graph.structure.basic.BasicEdge;
-import org.geotools.graph.structure.basic.BasicNode;
 import java.util.Iterator;
 
-import org.geotools.graph.structure.Edge;
-
 import junit.framework.TestCase;
+
+import org.geotools.graph.structure.Edge;
 
 public class BasicNodeTest extends TestCase {
 

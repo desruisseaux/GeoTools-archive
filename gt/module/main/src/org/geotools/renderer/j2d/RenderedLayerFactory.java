@@ -29,10 +29,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// J2SE dependencies
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
@@ -62,8 +58,8 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.geotools.util.RangeSet;
+import org.opengis.referencing.operation.TransformException;
 
-// JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;

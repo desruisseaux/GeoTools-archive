@@ -17,13 +17,8 @@
  package org.geotools.expr;
 
  import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
-import org.opengis.catalog.MetadataEntity;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -32,6 +27,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.catalog.MetadataEntity;
 
 import com.vividsolutions.jts.geom.Envelope;
 

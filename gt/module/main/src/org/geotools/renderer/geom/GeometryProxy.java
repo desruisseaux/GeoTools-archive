@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,26 +20,21 @@
 package org.geotools.renderer.geom;
 
 // Java2D Geometry
-import java.awt.Shape;
 import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.AffineTransform;
-
-// Miscellaneous
-import java.util.Map;
-import java.util.Locale;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.Locale;
+import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.renderer.style.Style;  // for javadoc
 import org.geotools.math.Statistics;
+import org.geotools.renderer.style.Style;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

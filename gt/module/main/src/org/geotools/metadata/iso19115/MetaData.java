@@ -3,19 +3,19 @@ package org.geotools.metadata.iso19115;
 import java.util.Date;
 import java.util.Set;
 
+import org.geotools.util.CheckedHashSet;
 import org.opengis.metadata.MetadataExtensionInformation;
 import org.opengis.metadata.PortrayalCatalogueReference;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
+import org.opengis.metadata.content.ContentInformation;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.maintenance.MaintenanceInformation;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.spatial.SpatialRepresentation;
-import org.opengis.metadata.content.ContentInformation;
 import org.opengis.referencing.ReferenceSystem;
-import org.geotools.util.CheckedHashSet;
 
 public class MetaData extends AbstractMetaData implements
 		org.opengis.metadata.MetaData {

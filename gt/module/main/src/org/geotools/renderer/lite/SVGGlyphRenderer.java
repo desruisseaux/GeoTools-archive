@@ -9,6 +9,7 @@ package org.geotools.renderer.lite;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.logging.Logger;
+
 import org.apache.batik.transcoder.TranscoderInput;
 
 /**

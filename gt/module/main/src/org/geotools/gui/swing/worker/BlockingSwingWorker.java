@@ -16,8 +16,9 @@
  */
 package org.geotools.gui.swing.worker;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Component;
+
+import javax.swing.SwingUtilities;
 
 
 /**

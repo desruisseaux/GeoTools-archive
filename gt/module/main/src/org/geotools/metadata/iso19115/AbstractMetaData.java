@@ -32,7 +32,6 @@ import java.util.TreeMap;
 
 import org.geotools.xml.XPathFactory;
 import org.opengis.catalog.MetadataEntity;
-
 import org.opengis.metadata.MetaData;
 
 /**

@@ -6,27 +6,15 @@
  */
 package org.geotools.data;
 
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.cs.AxisInfo;
-import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.HorizontalDatum;
-import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.CoordinateTransformationFactory;
-import org.geotools.ct.MathTransform;
-import org.geotools.data.crs.CRSService;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.units.Unit;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Envelope;

@@ -1,13 +1,12 @@
 package org.geotools.graph.traverse.basic;
 
-import org.geotools.graph.traverse.basic.SimpleGraphWalker;
+import junit.framework.TestCase;
+
 import org.geotools.graph.structure.GraphVisitor;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.structure.basic.BasicNode;
 import org.geotools.graph.traverse.GraphTraversal;
-
-import junit.framework.TestCase;
 
 public class SimpleGraphWalkerTest extends TestCase {
   private boolean m_visited;

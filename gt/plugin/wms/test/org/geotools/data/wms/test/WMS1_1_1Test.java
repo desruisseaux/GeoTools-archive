@@ -26,9 +26,7 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.Specification;
 import org.geotools.data.wms.WMS1_1_1;
-import org.geotools.data.wms.WMS1_3_0;
 import org.geotools.data.wms.WebMapServer;
-import org.geotools.data.wms.request.GetStylesRequest;
 import org.xml.sax.SAXException;
 
 /**

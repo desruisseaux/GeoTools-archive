@@ -19,17 +19,14 @@
 package org.geotools.styling;
 
 // J2SE dependencies
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.opengis.util.Cloneable;
 
 
 /**

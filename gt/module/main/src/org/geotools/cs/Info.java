@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,35 +24,28 @@
 package org.geotools.cs;
 
 // OpenGIS legacy dependencies
-import org.opengis.cs.CS_Info;
-import org.opengis.cs.CS_Unit;
-import org.opengis.cs.CS_LinearUnit;
-import org.opengis.cs.CS_AngularUnit;
-
-// OpenGIS dependencies (GeoAPI)
-import org.opengis.metadata.Identifier;
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.util.WeakHashSet;
-import org.geotools.util.SimpleInternationalString;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.RemoteProxy;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-
-// J2SE utilities
-import java.util.Map;
-import java.util.Locale;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-
-// Remote Method Invocation
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Locale;
+import java.util.Map;
+
+import org.geotools.resources.RemoteProxy;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.units.Unit;
+import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.WeakHashSet;
+import org.opengis.cs.CS_AngularUnit;
+import org.opengis.cs.CS_Info;
+import org.opengis.cs.CS_LinearUnit;
+import org.opengis.cs.CS_Unit;
+import org.opengis.metadata.Identifier;
+import org.opengis.util.InternationalString;
 
 
 /**

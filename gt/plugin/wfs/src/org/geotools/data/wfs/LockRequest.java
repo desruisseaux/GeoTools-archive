@@ -16,9 +16,10 @@
  */
 package org.geotools.data.wfs;
 
+import java.util.Map;
+
 import org.geotools.data.FeatureLock;
 import org.geotools.filter.Filter;
-import java.util.Map;
 
 
 /**

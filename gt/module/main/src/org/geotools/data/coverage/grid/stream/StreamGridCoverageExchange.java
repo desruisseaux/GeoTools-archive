@@ -19,12 +19,6 @@
  */
 package org.geotools.data.coverage.grid.stream;
 
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageExchange;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.geotools.data.coverage.grid.GridFormatFinder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +28,13 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.geotools.data.coverage.grid.Format;
+import org.geotools.data.coverage.grid.GridCoverageExchange;
+import org.geotools.data.coverage.grid.GridCoverageReader;
+import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.geotools.data.coverage.grid.GridFormatFinder;
 
 
 /**

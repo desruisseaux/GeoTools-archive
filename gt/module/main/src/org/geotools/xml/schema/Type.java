@@ -11,6 +11,7 @@
 package org.geotools.xml.schema;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.net.URI;
 import java.util.Map;
 
@@ -19,7 +20,6 @@ import javax.naming.OperationNotSupportedException;
 import org.geotools.xml.PrintHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotSupportedException;
 
 /**
  * <p>

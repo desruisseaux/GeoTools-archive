@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -34,8 +34,8 @@
 package org.geotools.renderer.array;
 
 // Divers
-import org.geotools.resources.renderer.Resources;
 import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
 
 
 /**
@@ -46,24 +46,24 @@ import org.geotools.resources.renderer.ResourceKeys;
  */
 final class SubCompressedArray extends CompressedArray {
     /**
-     * Numéro de série (pour compatibilité avec des versions antérieures).
+     * Numï¿½ro de sï¿½rie (pour compatibilitï¿½ avec des versions antï¿½rieures).
      */
     private static final long serialVersionUID = 4702506646824251468L;
 
     /**
-     * Plage des données valides du tableau {@link #array}.
+     * Plage des donnï¿½es valides du tableau {@link #array}.
      */
     protected final int lower, upper;
 
     /**
-     * Construit un sous-tableau à partir d'un autre tableau compressé.
+     * Construit un sous-tableau ï¿½ partir d'un autre tableau compressï¿½.
      *
      * @param  other Tableau source.
-     * @param  lower Index de la première coordonnées <var>x</var> à
+     * @param  lower Index de la premiï¿½re coordonnï¿½es <var>x</var> ï¿½
      *         prendre en compte dans le tableau <code>other</code>.
-     * @param  upper Index suivant celui de la dernière coordonnée <var>y</var> à
-     *         prendre en compte dans le tableau <code>other</code>. La différence
-     *         <code>upper-lower</code> doit obligatoirement être paire.
+     * @param  upper Index suivant celui de la derniï¿½re coordonnï¿½e <var>y</var> ï¿½
+     *         prendre en compte dans le tableau <code>other</code>. La diffï¿½rence
+     *         <code>upper-lower</code> doit obligatoirement ï¿½tre paire.
      */
     SubCompressedArray(final CompressedArray other, final int lower, final int upper) {
         super(other, lower);
@@ -86,14 +86,14 @@ final class SubCompressedArray extends CompressedArray {
     }
 
     /**
-     * Retourne l'index de la première coordonnée valide.
+     * Retourne l'index de la premiï¿½re coordonnï¿½e valide.
      */
     protected final int lower() {
         return lower;
     }
 
     /**
-     * Retourne l'index suivant celui de la dernière coordonnée valide.
+     * Retourne l'index suivant celui de la derniï¿½re coordonnï¿½e valide.
      */
     protected final int upper() {
         return upper;

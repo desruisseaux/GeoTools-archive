@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,28 +33,24 @@
 package org.geotools.gui.swing;
 
 // Swing (for JSpinner)
-import javax.swing.JSpinner;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.JFormattedTextField;
-import javax.swing.AbstractSpinnerModel;
-import javax.swing.text.InternationalFormatter;
-import javax.swing.text.DefaultFormatterFactory;
-
-// Other J2SE dependencies
 import java.io.Serializable;
 import java.text.ParseException;
 
-// Geotools dependencies
+import javax.swing.AbstractSpinnerModel;
+import javax.swing.JFormattedTextField;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.InternationalFormatter;
+
 import org.geotools.measure.Angle;
+import org.geotools.measure.AngleFormat;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.measure.AngleFormat;
-
-// Resources
 import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -90,9 +86,9 @@ final class SpinnerAngleModel extends AbstractSpinnerModel implements Serializab
      * <code>value</code> type:
      *
      * <table>
-     *   <tr><td>{@link Longitude}&nbsp;</td> <td>-180° to 180°</td></tr>
-     *   <tr><td>{@link Latitude}&nbsp;</td>  <td>-90° to 90°</td>  </tr>
-     *   <tr><td>{@link Angle}&nbsp;</td>     <td>0° to 360°</td>   </tr>
+     *   <tr><td>{@link Longitude}&nbsp;</td> <td>-180ï¿½ to 180ï¿½</td></tr>
+     *   <tr><td>{@link Latitude}&nbsp;</td>  <td>-90ï¿½ to 90ï¿½</td>  </tr>
+     *   <tr><td>{@link Angle}&nbsp;</td>     <td>0ï¿½ to 360ï¿½</td>   </tr>
      * </table>
      *
      * @param  value the current (non <code>null</code>) value of the model

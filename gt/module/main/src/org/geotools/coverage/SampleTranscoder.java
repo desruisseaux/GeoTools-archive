@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,29 +26,28 @@ package org.geotools.coverage;
 // J2SE dependencies
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.image.RasterFormatException;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import java.awt.image.RasterFormatException;
 import java.awt.image.renderable.ParameterBlock;
+import java.awt.image.renderable.RenderedImageFactory;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
-// JAI dependencies
-import javax.media.jai.JAI;
 import javax.media.jai.CRIFImpl;
 import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptorImpl;
+import javax.media.jai.OperationRegistry;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.PointOpImage;
-import javax.media.jai.OperationRegistry;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.iterator.RectIterFactory;
+import javax.media.jai.iterator.WritableRectIter;
 import javax.media.jai.registry.RenderedRegistryMode;
 
-// Geotools dependencies
-import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.DualRectIter;
 
 
@@ -70,7 +69,7 @@ final class SampleTranscoder extends PointOpImage {
     public static final String OPERATION_NAME = "org.geotools.SampleTranscode";
 
     /**
-     * Ensemble des catégories qui donnent une signification aux pixels de l'image. La
+     * Ensemble des catï¿½gories qui donnent une signification aux pixels de l'image. La
      * longueur de ce tableau doit correspondre au nombre de bandes de l'image source.
      */
     private final CategoryList[] categories;

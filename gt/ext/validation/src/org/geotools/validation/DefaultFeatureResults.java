@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.geotools.feature.Feature;
-import org.geotools.validation.Validation;
-import org.geotools.validation.ValidationResults;
 
 
 public final class DefaultFeatureResults implements ValidationResults {

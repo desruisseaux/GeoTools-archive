@@ -17,12 +17,6 @@
 
 package org.geotools.data.wfs;
 
-import org.geotools.data.Transaction;
-import org.geotools.data.Transaction.State;
-import org.geotools.xml.DocumentFactory;
-import org.geotools.xml.DocumentWriter;
-import org.geotools.xml.wfs.WFSSchema;
-import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,7 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
 import javax.naming.OperationNotSupportedException;
+
+import org.geotools.data.Transaction;
+import org.geotools.data.Transaction.State;
+import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.DocumentWriter;
+import org.geotools.xml.wfs.WFSSchema;
+import org.xml.sax.SAXException;
 
 
 /**

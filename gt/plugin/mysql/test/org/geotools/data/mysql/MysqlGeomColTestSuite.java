@@ -1,13 +1,20 @@
 package org.geotools.data.mysql;
 
-import junit.framework.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.geom.*;
-import java.util.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.SchemaException;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 
 
 public class MysqlGeomColTestSuite extends TestCase {

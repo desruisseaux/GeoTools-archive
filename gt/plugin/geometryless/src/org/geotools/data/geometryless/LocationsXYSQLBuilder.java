@@ -16,11 +16,12 @@
  */
 package org.geotools.data.geometryless;
 
+import java.util.logging.Logger;
+
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.SQLEncoder;
-import java.util.logging.Logger;
 
 
 /**

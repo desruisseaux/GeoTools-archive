@@ -16,9 +16,10 @@
  */
 package org.geotools.map.event;
 
+import java.util.EventObject;
+
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import java.util.EventObject;
 
 
 /**

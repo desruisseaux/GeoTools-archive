@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,94 +25,82 @@ package org.geotools.gc;
 
 // Images
 import java.awt.Color;
-import java.awt.RenderingHints;
-import java.awt.image.Raster;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.SampleModel;
-import java.awt.image.RenderedImage;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import java.awt.image.WritableRenderedImage;
-import java.awt.image.RasterFormatException;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.PixelInterleavedSampleModel;
-import java.awt.image.ComponentSampleModel;
-import java.awt.image.IndexColorModel;
-
-// Java Advanced Imaging
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;   // For Javadoc
-import javax.media.jai.NullOpImage;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.ImageFunction;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.Interpolation;
-import javax.media.jai.InterpolationNearest;         // For Javadoc
-import javax.media.jai.util.CaselessStringKey;       // For Javadoc
-import javax.media.jai.operator.LookupDescriptor;    // For Javadoc
-import javax.media.jai.operator.RescaleDescriptor;   // For Javadoc
-import javax.media.jai.operator.PiecewiseDescriptor; // For Javadoc
-import javax.media.jai.remote.SerializableRenderedImage;
-
-// Geometry
 import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-
-// Miscellaneous
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
-import java.rmi.RemoteException;
-import java.rmi.ServerException;  // For Javadoc
-import java.io.NotSerializableException; // For Javadoc
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.StringWriter;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentSampleModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
+import java.awt.image.PixelInterleavedSampleModel;
+import java.awt.image.Raster;
+import java.awt.image.RasterFormatException;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
+import java.awt.image.WritableRenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StringWriter;
+import java.rmi.RemoteException;
+import java.rmi.ServerException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// OpenGIS dependencies
-import org.opengis.gc.GC_GridRange;
-import org.opengis.gc.GC_GridPacking;
-import org.opengis.gc.GC_GridGeometry;
-import org.opengis.gc.GC_GridCoverage;
+import javax.media.jai.ImageFunction;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationNearest;
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.NullOpImage;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.LookupDescriptor;
+import javax.media.jai.operator.PiecewiseDescriptor;
+import javax.media.jai.operator.RescaleDescriptor;
+import javax.media.jai.remote.SerializableRenderedImage;
+import javax.media.jai.util.CaselessStringKey;
 
-// OpenGIS dependencies
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.pt.Envelope;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.cs.GeographicCoordinateSystem;
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.AxisOrientation;
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform1D;
-import org.geotools.cv.Coverage;
 import org.geotools.cv.Category;
-import org.geotools.cv.SampleDimension;
-import org.geotools.cv.SampleDimensionType;  // For Javadoc
+import org.geotools.cv.Coverage;
 import org.geotools.cv.PointOutsideCoverageException;
-
-// Resources
-import org.geotools.units.Unit;
+import org.geotools.cv.SampleDimension;
+import org.geotools.cv.SampleDimensionType;
 import org.geotools.io.LineWriter;
-import org.geotools.util.WeakHashSet;
-import org.geotools.util.NumberRange;
-import org.geotools.resources.XArray;
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.pt.Envelope;
 import org.geotools.resources.LegacyGCSUtilities;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.XArray;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.units.Unit;
+import org.geotools.util.NumberRange;
+import org.geotools.util.WeakHashSet;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.gc.GC_GridCoverage;
+import org.opengis.gc.GC_GridGeometry;
+import org.opengis.gc.GC_GridPacking;
+import org.opengis.gc.GC_GridRange;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -891,7 +879,7 @@ public class GridCoverage extends Coverage {
      * string with pixel coordinates and pixel values for all bands (with geophysics
      * values or category name in parenthesis). Example for a 1-banded image:
      *
-     * <blockquote><pre>(1171,1566)=[196 (29.6 °C)]</pre></blockquote>
+     * <blockquote><pre>(1171,1566)=[196 (29.6 ï¿½C)]</pre></blockquote>
      *
      * @param  coord The coordinate point where to evaluate.
      * @return A string with pixel coordinates and pixel values at the specified location,
@@ -1347,7 +1335,7 @@ testLinear: for (int i=0; i<numBands; i++) {
     }
 
     /**
-     * Returns a string représentation of this coverage. This string is
+     * Returns a string reprï¿½sentation of this coverage. This string is
      * for debugging purpose only and may change in future version.
      */
     public String toString() {

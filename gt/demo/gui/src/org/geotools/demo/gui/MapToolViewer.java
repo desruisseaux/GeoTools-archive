@@ -22,8 +22,8 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.logging.Logger;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;

@@ -16,8 +16,9 @@
  */
 package org.geotools.gui.swing.tables;
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
 
 
 /**

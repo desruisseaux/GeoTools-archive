@@ -1,17 +1,32 @@
 package org.geotools.data.mysql;
 
-import junit.framework.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.geom.*;
-import java.util.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
-
 import java.io.IOException;
-import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
-import org.geotools.filter.*;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureStore;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.IllegalFilterException;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.io.WKTWriter;
 
 //import org.geotools.data.mysql;
 

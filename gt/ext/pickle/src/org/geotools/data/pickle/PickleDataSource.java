@@ -6,10 +6,16 @@
 
 package org.geotools.data.pickle;
 
-import java.io.*;
-import java.util.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.Query;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
 
 /**
  *

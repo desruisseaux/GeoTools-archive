@@ -6,10 +6,20 @@
 
 package org.geotools.data.pickle;
 
-import com.vividsolutions.jts.geom.*;
-import java.io.*;
-import org.geotools.feature.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Set;
+
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * FeaturePickler provides a mechanism for Feature implementation independant

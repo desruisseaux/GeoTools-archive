@@ -68,14 +68,17 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.j2d.StyledMapRenderer;
 import org.geotools.renderer.lite.LiteRenderer;
+<<<<<<< .mine
+import org.geotools.resources.TestData;
+=======
 import org.geotools.renderer.lite.LiteRenderer2;
+>>>>>>> .r10795
 import org.geotools.units.Unit;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.resources.TestData;
 
 
 /**

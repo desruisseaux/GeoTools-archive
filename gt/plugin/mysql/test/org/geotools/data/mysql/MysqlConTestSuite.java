@@ -1,13 +1,18 @@
 package org.geotools.data.mysql;
 
-import junit.framework.*;
-import com.vividsolutions.jts.io.*;
-import com.vividsolutions.jts.geom.*;
-import java.util.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.WKTReader;
 
 //import org.geotools.data.mysql;
 

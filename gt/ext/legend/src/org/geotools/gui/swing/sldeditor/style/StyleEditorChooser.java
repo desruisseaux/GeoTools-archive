@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureType;
-import org.geotools.gui.swing.sldeditor.style.full.*;
+import org.geotools.gui.swing.sldeditor.style.full.FullStyleEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;
 import org.geotools.styling.Style;
 

@@ -16,6 +16,9 @@
  */
 package org.geotools.styling;
 
+import java.awt.Color;
+import java.util.Iterator;
+
 import org.geotools.algorithms.classification.EqualClasses;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -27,8 +30,6 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
-import java.awt.Color;
-import java.util.Iterator;
 
 /**
  * An utility class designed to ease style building by convinience methods.

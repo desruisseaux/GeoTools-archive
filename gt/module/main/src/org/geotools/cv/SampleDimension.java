@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,49 +25,40 @@ package org.geotools.cv;
 
 // J2SE dependencies
 import java.awt.Color;
-import java.util.List;
-import java.util.Locale;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.io.Serializable;
-import java.awt.image.DataBuffer; // For JavaDoc
 import java.awt.image.ColorModel;
-import java.awt.image.RenderedImage;   // For Javadoc
+import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
-
-// RMI and weak references
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.io.Serializable;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.lang.ref.WeakReference;
-import java.lang.ref.Reference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
-// JAI dependencies
 import javax.media.jai.JAI;
 
-// OpenGIS dependencies
-import org.opengis.cs.CS_Unit;
-import org.opengis.cv.CV_SampleDimension;
-import org.opengis.cv.CV_SampleDimensionType;
-import org.opengis.cv.CV_ColorInterpretation;
-import org.opengis.cv.CV_PaletteInterpretation;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.ct.MathTransform1D;
-
-// Resources
+import org.geotools.resources.ClassChanger;
+import org.geotools.resources.RemoteProxy;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.XMath;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.image.ColorUtilities;
 import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
-import org.geotools.resources.XMath;
-import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.RemoteProxy;
-import org.geotools.resources.ClassChanger;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.image.ColorUtilities;
+import org.opengis.cs.CS_Unit;
+import org.opengis.cv.CV_ColorInterpretation;
+import org.opengis.cv.CV_PaletteInterpretation;
+import org.opengis.cv.CV_SampleDimension;
+import org.opengis.cv.CV_SampleDimensionType;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

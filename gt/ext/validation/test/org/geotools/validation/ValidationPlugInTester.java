@@ -5,16 +5,12 @@
 package org.geotools.validation;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.validation.spatial.LineMustBeASinglePartValidation;
-import org.geotools.validation.spatial.LineNoSelfIntersectValidation;
 import org.geotools.validation.spatial.LineNoSelfOverlappingValidation;
 import org.geotools.validation.spatial.LinesNotIntersectValidation;
 

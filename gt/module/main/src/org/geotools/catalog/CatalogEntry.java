@@ -1,7 +1,6 @@
 package org.geotools.catalog;
 
 // J2SE direct dependencies
-import java.util.Iterator;
 import java.util.Map;
 
 // Annotations

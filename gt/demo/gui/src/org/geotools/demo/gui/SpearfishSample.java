@@ -12,11 +12,11 @@ import javax.swing.WindowConstants;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageExchange;
+import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.stream.StreamGridCoverageExchange;
-import org.geotools.gc.GridCoverage;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
@@ -34,7 +34,6 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
-
 import org.opengis.parameter.ParameterDescriptorGroup;
 
 /**

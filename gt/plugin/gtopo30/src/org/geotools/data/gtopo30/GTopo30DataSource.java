@@ -41,8 +41,6 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.RenderedOp;
 
-import org.opengis.referencing.FactoryException;
-
 import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystemFactory;
 import org.geotools.cs.GeographicCoordinateSystem;
@@ -57,16 +55,16 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
 import org.geotools.gc.GridCoverage;
 import org.geotools.gc.GridGeometry;
 import org.geotools.gc.GridRange;
 import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
+
 import com.sun.media.imageio.stream.FileChannelImageInputStream;
 import com.sun.media.imageio.stream.RawImageInputStream;
 import com.vividsolutions.jts.geom.Coordinate;

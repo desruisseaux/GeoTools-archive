@@ -16,8 +16,9 @@
  */
 package org.geotools.data;
 
-import org.geotools.feature.AttributeType;
 import java.io.IOException;
+
+import org.geotools.feature.AttributeType;
 
 
 /**

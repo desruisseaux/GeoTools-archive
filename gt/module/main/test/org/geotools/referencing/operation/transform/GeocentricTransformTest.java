@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,23 +22,19 @@ package org.geotools.referencing.operation.transform;
 // J2SE dependencies and extensions
 import javax.vecmath.Point3d;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
+import org.geotools.referencing.crs.GeocentricCRS;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.datum.Ellipsoid;
+import org.geotools.referencing.operation.TransformationTest;
+import org.geotools.resources.XMath;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
-import org.geotools.resources.XMath;
-import org.geotools.referencing.datum.Ellipsoid;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.crs.GeocentricCRS;
-import org.geotools.referencing.operation.TransformationTest;
 
 
 /**
@@ -84,13 +80,13 @@ public class GeocentricTransformTest extends TransformationTest {
      *
      * Note about nautical mile:
      *
-     *    "Le mille marin était, en principe, la longueur de la minute sexagésimale du méridien
-     *     à la latitude de 45°. Cette longueur dépendait donc des valeurs adoptées pour le rayon
-     *     équatorial de la terre et son aplatissement. En France, le décret du 3 mai 1961 sur les
-     *     unités de mesure, fixe à 1852 mètres la longueur du mille marin qui est également la
-     *     valeur adoptée pour le mille marin international."
+     *    "Le mille marin ï¿½tait, en principe, la longueur de la minute sexagï¿½simale du mï¿½ridien
+     *     ï¿½ la latitude de 45ï¿½. Cette longueur dï¿½pendait donc des valeurs adoptï¿½es pour le rayon
+     *     ï¿½quatorial de la terre et son aplatissement. En France, le dï¿½cret du 3 mai 1961 sur les
+     *     unitï¿½s de mesure, fixe ï¿½ 1852 mï¿½tres la longueur du mille marin qui est ï¿½galement la
+     *     valeur adoptï¿½e pour le mille marin international."
      *
-     *                                   Source: Office de la langue française, 1996
+     *                                   Source: Office de la langue franï¿½aise, 1996
      *                                           http://www.granddictionnaire.com
      */
     public void testEllipsoid() throws FactoryException {
@@ -105,7 +101,7 @@ public class GeocentricTransformTest extends TransformationTest {
         assertEquals("International nautical mile", 1852.00, e.orthodromicDistance(0, 45-hm, 0, 45+hm), 0.2);
         for (double i=0.01; i<180; i+=1) {
             final double base = 180*random.nextDouble()-90;
-            assertEquals(i+"° rotation", e.getSemiMajorAxis()*Math.toRadians(i),
+            assertEquals(i+"ï¿½ rotation", e.getSemiMajorAxis()*Math.toRadians(i),
                                          e.orthodromicDistance(base, 0, base+i, 0), 0.2);
         }
         /*
@@ -118,12 +114,12 @@ public class GeocentricTransformTest extends TransformationTest {
         assertTrue("Spheroid class", !Ellipsoid.class.equals(s.getClass()));
         for (double i=0; i<=180; i+=1) {
             final double base = 360*random.nextDouble()-180;
-            assertEquals(i+"° rotation", s.getSemiMajorAxis()*Math.toRadians(i),
+            assertEquals(i+"ï¿½ rotation", s.getSemiMajorAxis()*Math.toRadians(i),
                                          s.orthodromicDistance(base, 0, base+i, 0), 0.001);
         }
         for (double i=-90; i<=+90; i+=1) {
             final double meridian = 360*random.nextDouble()-180;
-            assertEquals(i+"° rotation", s.getSemiMajorAxis()*Math.toRadians(Math.abs(i)),
+            assertEquals(i+"ï¿½ rotation", s.getSemiMajorAxis()*Math.toRadians(Math.abs(i)),
                                          s.orthodromicDistance(meridian, 0, meridian, i), 0.001);
         }
         for (int i=0; i<100; i++) {
@@ -170,7 +166,7 @@ public class GeocentricTransformTest extends TransformationTest {
             }
             array0[i] = range*random.nextDouble()-(range/2);
         }
-        array0[0]=35.0; array0[1]=24.0; array0[2]=8000; // 24°N 35°E 8km
+        array0[0]=35.0; array0[1]=24.0; array0[2]=8000; // 24ï¿½N 35ï¿½E 8km
         array0[3]=34.8; array0[4]=24.7; array0[5]=5000; // ... about 80 km away
         cartesianDistance  [0] = 80284.00;
         orthodromicDistance[0] = 80302.99; // Not really exact.

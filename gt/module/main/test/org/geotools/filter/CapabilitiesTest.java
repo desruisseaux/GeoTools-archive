@@ -16,16 +16,11 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.*;
-import junit.framework.*;
-import org.geotools.data.*;
-import org.geotools.feature.*;
-
-import org.w3c.dom.*;
-import java.io.*;
-import java.util.*;
 import java.util.logging.Logger;
-import javax.xml.parsers.*;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 
 /**

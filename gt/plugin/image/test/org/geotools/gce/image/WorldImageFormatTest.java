@@ -9,6 +9,7 @@ package org.geotools.gce.image;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import junit.framework.TestCase;
 
 

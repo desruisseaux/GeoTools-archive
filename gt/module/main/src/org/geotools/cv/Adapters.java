@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,30 +21,24 @@ package org.geotools.cv;
 
 // J2SE dependencies
 import java.awt.Color;
-import java.util.Locale;
 import java.lang.ref.Reference;
 import java.rmi.RemoteException;
+import java.util.Locale;
 
-// JAI dependencies
 import javax.media.jai.PropertySource;
 
-// OpenGIS dependencies
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.pt.Envelope;
+import org.geotools.resources.RemoteProxy;
+import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.units.Unit;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.cv.CV_ColorInterpretation;
 import org.opengis.cv.CV_Coverage;
+import org.opengis.cv.CV_PaletteInterpretation;
 import org.opengis.cv.CV_SampleDimension;
 import org.opengis.cv.CV_SampleDimensionType;
-import org.opengis.cv.CV_ColorInterpretation;
-import org.opengis.cv.CV_PaletteInterpretation;
-
-// OpenGIS dependencies
-import org.opengis.coverage.CannotEvaluateException;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.pt.Envelope;
-import org.geotools.pt.CoordinatePoint;
-import org.geotools.resources.RemoteProxy;
-import org.geotools.resources.gcs.Resources;
-import org.geotools.resources.gcs.ResourceKeys;
 
 
 /**

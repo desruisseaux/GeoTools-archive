@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,20 +29,18 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
-import java.io.Serializable;
-import java.io.IOException;
+// Entrï¿½s/sorties
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 
-// Divers
 import org.geotools.util.WeakHashSet;
 
 
 /**
- * Classe représentant une unité de base et la valeur de son exposant.
- * Cette classe est utilisée en argument par la méthode {@link DerivedUnit#getInstance}.
- * Elle n'a pas de constructeur publique; il n'existe pas d'autres moyen de créer de
- * nouveaux objets <code>Factor</code> que d'utiliser la méthode statique
+ * Classe reprï¿½sentant une unitï¿½ de base et la valeur de son exposant.
+ * Cette classe est utilisï¿½e en argument par la mï¿½thode {@link DerivedUnit#getInstance}.
+ * Elle n'a pas de constructeur publique; il n'existe pas d'autres moyen de crï¿½er de
+ * nouveaux objets <code>Factor</code> que d'utiliser la mï¿½thode statique
  * {@link #getFactor}.
  *
  * @version 1.0
@@ -60,28 +58,28 @@ final class Factor implements Serializable {
     private static final long serialVersionUID = -7448171508684390207L;
     
     /**
-     * Banque des objets qui ont été précédemment créés et
-     * enregistrés par un appel à la méthode {@link #intern}.
+     * Banque des objets qui ont ï¿½tï¿½ prï¿½cï¿½demment crï¿½ï¿½s et
+     * enregistrï¿½s par un appel ï¿½ la mï¿½thode {@link #intern}.
      */
     private static final WeakHashSet pool=Prefix.pool;
     
     /**
-     * L'unité de base de ce facteur.
+     * L'unitï¿½ de base de ce facteur.
      */
     public final BaseUnit baseUnit;
     
     /**
-     * La valeur de l'exposant associée
-     * à l'unité de base de ce facteur.
+     * La valeur de l'exposant associï¿½e
+     * ï¿½ l'unitï¿½ de base de ce facteur.
      */
     public final int power;
     
     /**
-     * Construit un facteur qui représentera une
-     * unité de base élevée à la puissance spécifiée.
+     * Construit un facteur qui reprï¿½sentera une
+     * unitï¿½ de base ï¿½levï¿½e ï¿½ la puissance spï¿½cifiï¿½e.
      *
-     * @param baseUnit L'unité de base.
-     * @param power La puissance à laquelle élever l'unité de base.
+     * @param baseUnit L'unitï¿½ de base.
+     * @param power La puissance ï¿½ laquelle ï¿½lever l'unitï¿½ de base.
      */
     private Factor(final BaseUnit baseUnit, final int power) {
         if (baseUnit!=null) {
@@ -93,18 +91,18 @@ final class Factor implements Serializable {
     }
     
     /**
-     * Retourne un facteur qui représentera une
-     * unité de base élevée à la puissance spécifiée.
+     * Retourne un facteur qui reprï¿½sentera une
+     * unitï¿½ de base ï¿½levï¿½e ï¿½ la puissance spï¿½cifiï¿½e.
      *
-     * @param baseUnit L'unité de base.
-     * @param power La puissance à laquelle élever l'unité de base.
+     * @param baseUnit L'unitï¿½ de base.
+     * @param power La puissance ï¿½ laquelle ï¿½lever l'unitï¿½ de base.
      */
     public static Factor getFactor(final BaseUnit baseUnit, final int power) {
         return new Factor(baseUnit, power).intern();
     }
     
     /**
-     * Retourne un facteur dont l'exposant de l'unité
+     * Retourne un facteur dont l'exposant de l'unitï¿½
      * est de signe inverse de celui de ce facteur.
      */
     public final Factor inverse() {
@@ -113,20 +111,20 @@ final class Factor implements Serializable {
     
     /**
      * Retourne le symbole de ce facteur. Ce sera le
-     * symbole de l'unité de base avec son exposant.
-     * Par exemple "m", "m²" ou "kg^-1".
+     * symbole de l'unitï¿½ de base avec son exposant.
+     * Par exemple "m", "mï¿½" ou "kg^-1".
      */
     public String toString() {
         return UnitFormat.DEFAULT.format(this, new StringBuffer()).toString();
     }
     
     /**
-     * Indique si ce facteur est identique ou réciproque au facteur spécifié.
+     * Indique si ce facteur est identique ou rï¿½ciproque au facteur spï¿½cifiï¿½.
      *
-     * @param  that L'autre facteur (peut être nul).
+     * @param  that L'autre facteur (peut ï¿½tre nul).
      * @return <code>+1</code> Si les deux facteurs sont identiques.<br>
-     *         <code>-1</code> Si les deux facteurs sont réciproques (par exemple <i>s</i> et 1/<i>s</i>).<br>
-     *         <code> 0</code> Si les deux facteurs ne sont ni identiques ni réciproques, ou si <code>that</code> est nul.
+     *         <code>-1</code> Si les deux facteurs sont rï¿½ciproques (par exemple <i>s</i> et 1/<i>s</i>).<br>
+     *         <code> 0</code> Si les deux facteurs ne sont ni identiques ni rï¿½ciproques, ou si <code>that</code> est nul.
      */
     final int compareDimensionality(final Factor that) {
         if (that!=null && baseUnit.equals(that.baseUnit)) {
@@ -137,8 +135,8 @@ final class Factor implements Serializable {
     }
     
     /**
-     * Vérifie si ce facteur est identique au facteur spécifié. Cette méthode retourne <code>true</code>
-     * si les deux facteurs utilisent les mêmes unités {@link #baseUnits} avec la même puissance {@link
+     * Vï¿½rifie si ce facteur est identique au facteur spï¿½cifiï¿½. Cette mï¿½thode retourne <code>true</code>
+     * si les deux facteurs utilisent les mï¿½mes unitï¿½s {@link #baseUnits} avec la mï¿½me puissance {@link
      * #power}.
      */
     final boolean equals(final Factor factor) {
@@ -146,9 +144,9 @@ final class Factor implements Serializable {
     }
     
     /**
-     * Vérifie si ce facteur est identique à l'objet spécifié. Cette méthode retourne <code>true</code>
+     * Vï¿½rifie si ce facteur est identique ï¿½ l'objet spï¿½cifiï¿½. Cette mï¿½thode retourne <code>true</code>
      * si <code>object</code> est aussi un objet <code>Factor</code> et si les deux facteurs utilisent
-     * les mêmes unités {@link #baseUnit} avec la même puissance {@link #power}.
+     * les mï¿½mes unitï¿½s {@link #baseUnit} avec la mï¿½me puissance {@link #power}.
      */
     public boolean equals(final Object object) {
         return (object==this) || // slight optimisation
@@ -156,7 +154,7 @@ final class Factor implements Serializable {
     }
     
     /**
-     * Retourne un code à peu près
+     * Retourne un code ï¿½ peu prï¿½s
      * unique pour ce facteur.
      */
     public int hashCode() {
@@ -165,14 +163,14 @@ final class Factor implements Serializable {
     
     /**
      * Retourne un exemplaire unique de ce facteur. Une banque de facteurs, initialement
-     * vide, est maintenue de façon interne par la classe <code>Unit</code>. Lorsque la
-     * méthode <code>intern</code> est appelée, elle recherchera un facteur égale à
-     * <code>this</code> au sens de la méthode {@link #equals}. Si un tel facteur est
-     * trouvé, il sera retourné. Sinon, le facteur <code>this</code> sera ajouté à la
-     * banque de données en utilisant une référence faible et cette méthode retournera
+     * vide, est maintenue de faï¿½on interne par la classe <code>Unit</code>. Lorsque la
+     * mï¿½thode <code>intern</code> est appelï¿½e, elle recherchera un facteur ï¿½gale ï¿½
+     * <code>this</code> au sens de la mï¿½thode {@link #equals}. Si un tel facteur est
+     * trouvï¿½, il sera retournï¿½. Sinon, le facteur <code>this</code> sera ajoutï¿½ ï¿½ la
+     * banque de donnï¿½es en utilisant une rï¿½fï¿½rence faible et cette mï¿½thode retournera
      * <code>this</code>.
      * <br><br>
-     * De cette méthode il s'ensuit que pour deux facteurs <var>u</var> et <var>v</var>,
+     * De cette mï¿½thode il s'ensuit que pour deux facteurs <var>u</var> et <var>v</var>,
      * la condition <code>u.intern()==v.intern()</code> sera vrai si et seulement si
      * <code>u.equals(v)</code> est vrai.
      */
@@ -181,9 +179,9 @@ final class Factor implements Serializable {
     }
     
     /**
-     * Après la lecture d'un facteur, vérifie si ce facteur
-     * apparaît déjà dans la banque {@link Unit#pool}.
-     * Si oui, l'exemplaire de la banque sera retourné plutôt
+     * Aprï¿½s la lecture d'un facteur, vï¿½rifie si ce facteur
+     * apparaï¿½t dï¿½jï¿½ dans la banque {@link Unit#pool}.
+     * Si oui, l'exemplaire de la banque sera retournï¿½ plutï¿½t
      * que de garder inutilement le facteur courant comme copie.
      */
     final Object readResolve() throws ObjectStreamException {

@@ -1,17 +1,14 @@
 package org.geotools.graph.structure.basic;
 
-import org.geotools.graph.structure.basic.BasicGraph;
-import org.geotools.graph.structure.basic.BasicEdge;
-import org.geotools.graph.structure.basic.BasicNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.structure.GraphVisitor;
 import org.geotools.graph.structure.Graphable;
-
-import junit.framework.TestCase;
 
 public class BasicGraphTest extends TestCase {
 

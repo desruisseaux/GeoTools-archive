@@ -16,12 +16,10 @@
  */
 package org.geotools.feature.type;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 

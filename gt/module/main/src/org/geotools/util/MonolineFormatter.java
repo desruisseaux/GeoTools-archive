@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,28 +20,23 @@
 package org.geotools.util;
 
 // Logging
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-import java.util.logging.Formatter;
-import java.util.logging.LogManager;
-import java.util.logging.StreamHandler;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.SimpleFormatter;
-
-// Formatting
-import java.util.Date;
-import java.util.TimeZone;
-import java.text.FieldPosition;
-import java.text.SimpleDateFormat;
-
-// Writer
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
-// Geotools dependencies
 import org.geotools.io.LineWriter;
 import org.geotools.resources.Utilities;
 

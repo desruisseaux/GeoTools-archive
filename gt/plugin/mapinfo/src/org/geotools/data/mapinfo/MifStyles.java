@@ -6,8 +6,9 @@
 
 package org.geotools.data.mapinfo;
 
-import java.util.*;
-import org.geotools.styling.*;
+import java.util.HashMap;
+
+import org.geotools.styling.ExternalGraphic;
 /**
  *
  * @author  iant

@@ -16,10 +16,11 @@
  */
 package org.geotools.catalog;
 
-import org.geotools.xml.XPath;
-import org.opengis.catalog.MetadataEntity;
 import java.util.Iterator;
 import java.util.List;
+
+import org.geotools.xml.XPath;
+import org.opengis.catalog.MetadataEntity;
 
 /**
  * An XPath implementation that searches

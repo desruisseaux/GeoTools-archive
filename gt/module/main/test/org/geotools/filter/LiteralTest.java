@@ -22,9 +22,11 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.Geometry;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import com.vividsolutions.jts.geom.GeometryCollection;
-import junit.framework.*;
 
 
 /**

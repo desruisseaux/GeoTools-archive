@@ -8,7 +8,6 @@
 package org.geotools.data.gtopo30;
 
 import java.net.URL;
-import junit.framework.*;
 
 
 /**

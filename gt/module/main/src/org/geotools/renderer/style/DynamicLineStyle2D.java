@@ -16,15 +16,16 @@
  */
 package org.geotools.renderer.style;
 
-import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Stroke;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Paint;
+
+import org.geotools.feature.Feature;
+import org.geotools.filter.Expression;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.Stroke;
 
 
 /**

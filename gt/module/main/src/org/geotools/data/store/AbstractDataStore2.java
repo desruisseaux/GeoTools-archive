@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
-import org.geotools.catalog.QueryDefinition;
 import org.geotools.catalog.QueryRequest;
 import org.geotools.data.DataStore;
 import org.geotools.data.EmptyFeatureWriter;
@@ -41,8 +40,6 @@ import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

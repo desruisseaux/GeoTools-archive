@@ -2,9 +2,10 @@ package org.geotools.graph.io.standard;
 
 import java.io.File;
 import java.util.HashSet;
-
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import junit.framework.TestCase;
 
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
@@ -14,8 +15,6 @@ import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.GraphVisitor;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
-
-import junit.framework.TestCase;
 
 public class BasicGraphSerializerTest extends TestCase {
 

@@ -7,9 +7,7 @@
 package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Iterator;
 
 import junit.framework.TestCase;

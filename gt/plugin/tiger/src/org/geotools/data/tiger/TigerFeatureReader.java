@@ -16,13 +16,14 @@
 
 package org.geotools.data.tiger;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import java.io.File;
-import java.io.IOException;
-import java.util.NoSuchElementException;
 
 
 /**

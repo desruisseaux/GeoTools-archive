@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,58 +22,49 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // JAI dependencies
-import javax.media.jai.KernelJAI;
-import javax.media.jai.operator.ConvolveDescriptor; // For Javadoc
-
-// Graphical user interface
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.IllegalComponentStateException;
-
-// Graphical user interface (Swing)
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.JSpinner;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.AbstractTableModel;
-
-// Events
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListDataListener;
-
-// Utilities
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Arrays;
-import java.util.Locale;
 
-// Geotools dependencies
+import javax.media.jai.KernelJAI;
+import javax.media.jai.operator.ConvolveDescriptor;
+import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+
 import org.geotools.resources.XArray;
-import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**

@@ -16,8 +16,10 @@
  */
 package org.geotools.renderer.style;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
 

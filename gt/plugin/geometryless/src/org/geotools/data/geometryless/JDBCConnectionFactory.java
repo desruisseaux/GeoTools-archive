@@ -1,8 +1,6 @@
 package org.geotools.data.geometryless;
 
 //import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
-import javax.sql.ConnectionPoolDataSource;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

@@ -44,16 +44,13 @@
 package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
-import java.util.Collection;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-
-// Geotools dependencies
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * The equatorial case of the {@link Orthographic} projection. This is a 

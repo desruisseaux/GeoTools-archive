@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.graph.build.GraphBuilder;
-import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.GraphVisitor;

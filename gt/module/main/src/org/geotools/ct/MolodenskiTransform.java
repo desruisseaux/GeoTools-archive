@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,20 +25,15 @@ package org.geotools.ct;
 
 // J2SE and JAI dependencies
 import java.io.Serializable;
-import javax.media.jai.util.Range;
+
 import javax.media.jai.ParameterList;
+import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.cs.Ellipsoid;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.WGS84ConversionInfo;
-
-// Resources
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -115,7 +110,7 @@ class MolodenskiTransform extends AbstractMathTransform implements Serializable 
     private final double daa, da_a;
     
     /**
-     * The square of excentricity of the ellipsoid: e² = (a²-b²)/a² where
+     * The square of excentricity of the ellipsoid: eï¿½ = (aï¿½-bï¿½)/aï¿½ where
      * <var>a</var> is the semi-major axis length and
      * <var>b</var> is the semi-minor axis length.
      */
@@ -278,12 +273,12 @@ class MolodenskiTransform extends AbstractMathTransform implements Serializable 
     }
     
     /**
-     * Makes sure that the specified longitude stay within ±180 degrees. This methpod should be
+     * Makes sure that the specified longitude stay within ï¿½180 degrees. This methpod should be
      * invoked after coordinates are transformed. This
-     * method may add or substract an amount of 360° to <var>x</var>.
+     * method may add or substract an amount of 360ï¿½ to <var>x</var>.
      *
      * @param  x The longitude.
-     * @return The longitude in the range +/- 180°.
+     * @return The longitude in the range +/- 180ï¿½.
      *
      * @task REVISIT: could be moved to AbstractMathTransform
      */

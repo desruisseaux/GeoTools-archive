@@ -16,12 +16,13 @@
  */
 package org.geotools.xml;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotSupportedException;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotSupportedException;
 
 
 /**

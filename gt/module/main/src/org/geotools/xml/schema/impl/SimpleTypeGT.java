@@ -16,16 +16,6 @@
  */
 package org.geotools.xml.schema.impl;
 
-import org.geotools.xml.PrintHandler;
-import org.geotools.xml.schema.Attribute;
-import org.geotools.xml.schema.AttributeValue;
-import org.geotools.xml.schema.Element;
-import org.geotools.xml.schema.ElementValue;
-import org.geotools.xml.schema.Facet;
-import org.geotools.xml.schema.SimpleType;
-import org.geotools.xml.schema.Type;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URI;
 import java.text.DateFormat;
@@ -35,7 +25,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import javax.naming.OperationNotSupportedException;
+
+import org.geotools.xml.PrintHandler;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.AttributeValue;
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementValue;
+import org.geotools.xml.schema.Facet;
+import org.geotools.xml.schema.SimpleType;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 
 /**

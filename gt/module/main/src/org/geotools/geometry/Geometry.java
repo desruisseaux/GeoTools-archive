@@ -22,16 +22,12 @@ package org.geotools.geometry;
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable; // For javadoc
+import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.opengis.util.Cloneable;
 
 
 /**

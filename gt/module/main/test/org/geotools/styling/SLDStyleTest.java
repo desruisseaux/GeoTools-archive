@@ -7,14 +7,10 @@
 
 package org.geotools.styling;
 
-import junit.framework.*;
-import org.geotools.filter.Expression;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.logging.Level;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.resources.TestData;
 
 /**

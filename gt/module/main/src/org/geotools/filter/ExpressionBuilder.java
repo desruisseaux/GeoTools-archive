@@ -17,15 +17,24 @@
 
 package org.geotools.filter;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.util.EmptyStackException;
+import java.util.Stack;
+
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.parser.ExpressionException;
+import org.geotools.filter.parser.ExpressionParser;
+import org.geotools.filter.parser.ExpressionParserTreeConstants;
+import org.geotools.filter.parser.Node;
+import org.geotools.filter.parser.ParseException;
+import org.geotools.filter.parser.Token;
+import org.geotools.filter.parser.TokenMgrError;
+
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
-import java.io.*;
-import java.util.EmptyStackException;
-import java.util.Stack;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.parser.*;
-import org.geotools.filter.FilterTransformer;
 
 
 /**

@@ -16,8 +16,9 @@
  */
 package org.geotools.xml.schema;
 
-import org.geotools.factory.Factory;
 import java.net.URI;
+
+import org.geotools.factory.Factory;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,18 +23,15 @@
 package org.geotools.referencing.datum;
 
 // J2SE direct dependencies
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.cs.CoordinateSystemAxis; // For javadoc
-import org.opengis.referencing.crs.VerticalCRS;         // For javadoc
-
-// Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
+import org.opengis.referencing.crs.VerticalCRS;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.datum.VerticalDatumType;
 
 
 /**
@@ -74,7 +71,7 @@ public class VerticalDatum extends Datum implements org.opengis.referencing.datu
     }
 
     /**
-     * The type of this vertical datum. Default is “geoidal”.
+     * The type of this vertical datum. Default is ï¿½geoidalï¿½.
      */
     private final VerticalDatumType type;
     
@@ -116,7 +113,7 @@ public class VerticalDatum extends Datum implements org.opengis.referencing.datu
     }
     
     /**
-     * The type of this vertical datum. Default is “geoidal”.
+     * The type of this vertical datum. Default is ï¿½geoidalï¿½.
      *
      * @return The type of this vertical datum.
      */

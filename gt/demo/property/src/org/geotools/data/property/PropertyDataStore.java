@@ -1,9 +1,21 @@
 package org.geotools.data.property;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.data.AbstractDataStore;
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureWriter;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 
 public class PropertyDataStore extends AbstractDataStore {
     protected File directory;

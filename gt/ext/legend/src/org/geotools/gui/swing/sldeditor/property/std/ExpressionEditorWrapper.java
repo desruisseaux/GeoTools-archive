@@ -16,17 +16,18 @@
  */
 package org.geotools.gui.swing.sldeditor.property.std;
 
+import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
+
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.geotools.gui.swing.sldeditor.property.ExpressionEditor;
 import org.geotools.gui.swing.sldeditor.util.FormUtils;
-
-import java.awt.BorderLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.JToggleButton;
 
 
 /**

@@ -16,9 +16,8 @@
  */
 package org.geotools.data.coverage.grid.file;
 
-import org.opengis.catalog.MetadataEntity;
-
 import org.geotools.data.coverage.grid.Format;
+import org.opengis.catalog.MetadataEntity;
 
 
 /**

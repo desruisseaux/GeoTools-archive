@@ -16,6 +16,17 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XSIElementHandler;
 import org.geotools.xml.schema.All;
@@ -35,15 +46,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import javax.naming.OperationNotSupportedException;
 
 
 /**

@@ -20,15 +20,17 @@
  */
 package org.geotools.validation.attributes;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.validation.DefaultIntegrityValidation;
 import org.geotools.validation.ValidationResults;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

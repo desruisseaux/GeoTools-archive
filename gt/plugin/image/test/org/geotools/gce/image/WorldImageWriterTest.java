@@ -7,7 +7,9 @@
 package org.geotools.gce.image;
 
 import java.io.File;
+
 import junit.framework.TestCase;
+
 import org.geotools.resources.TestData;
 
 /**

@@ -19,8 +19,8 @@
 package org.geotools.resources;
 
 // J2SE dependencies
-import java.nio.ByteBuffer;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Level;

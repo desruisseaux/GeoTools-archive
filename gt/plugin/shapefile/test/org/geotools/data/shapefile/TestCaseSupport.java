@@ -6,16 +6,29 @@
 
 package org.geotools.data.shapefile;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.io.*;
-import java.io.*;
-import junit.framework.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 
 /**
  *

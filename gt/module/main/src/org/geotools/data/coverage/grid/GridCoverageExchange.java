@@ -14,7 +14,6 @@ package org.geotools.data.coverage.grid;
 import java.io.IOException;
 
 import org.geotools.factory.Factory;
-import org.geotools.data.coverage.grid.Format;
 
 
 /**

@@ -20,7 +20,6 @@ package org.geotools.cs;
 
 // JAI dependencies
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,15 +27,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.media.jai.ParameterList;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
-import org.geotools.units.Unit;
 import org.geotools.data.crs.CRSAuthoritySpi;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.pt.CoordinatePoint;
+import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**

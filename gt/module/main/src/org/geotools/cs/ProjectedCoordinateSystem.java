@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,20 +24,18 @@
 package org.geotools.cs;
 
 // OpenGIS dependencies
-import org.opengis.cs.CS_LinearUnit;
-import org.opengis.cs.CS_Projection;
-import org.opengis.cs.CS_ProjectedCoordinateSystem;
-import org.opengis.cs.CS_GeographicCoordinateSystem;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.ct.MissingParameterException;
-
-// J2SE and JAI dependencies
 import java.rmi.RemoteException;
+
 import javax.media.jai.ParameterList;
+
+import org.geotools.ct.MissingParameterException;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.units.Unit;
+import org.opengis.cs.CS_GeographicCoordinateSystem;
+import org.opengis.cs.CS_LinearUnit;
+import org.opengis.cs.CS_ProjectedCoordinateSystem;
+import org.opengis.cs.CS_Projection;
 
 
 /**

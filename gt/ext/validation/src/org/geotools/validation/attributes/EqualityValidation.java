@@ -20,12 +20,13 @@
  */
 package org.geotools.validation.attributes;
 
+import java.util.logging.Logger;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
-import java.util.logging.Logger;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, 2004 Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,19 +20,20 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.net.URL;
-import java.io.LineNumberReader;
-import java.io.InputStreamReader;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.net.URL;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// Geotools dependencies
-import org.geotools.resources.TestData;
 import org.geotools.referencing.operation.TestConsole;
+import org.geotools.resources.TestData;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -44,7 +45,7 @@ import org.geotools.referencing.operation.TestConsole;
  * This is probably the most important test case for the whole CRS module.
  *
  * @version $Id$
- * @author Yann Cézard
+ * @author Yann Cï¿½zard
  * @author Remi Eve
  * @author Martin Desruisseaux
  */

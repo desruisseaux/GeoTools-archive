@@ -19,7 +19,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.shape.ShapefileDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;

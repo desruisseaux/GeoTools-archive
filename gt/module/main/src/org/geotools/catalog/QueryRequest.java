@@ -1,9 +1,7 @@
 package org.geotools.catalog;
 
-import java.io.IOException;
 import java.net.URI;
 
-//import org.geotools.expr.Expr;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;

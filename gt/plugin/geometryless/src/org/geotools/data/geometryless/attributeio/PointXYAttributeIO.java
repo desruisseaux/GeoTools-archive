@@ -16,17 +16,17 @@
  */
 package org.geotools.data.geometryless.attributeio;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.jdbc.attributeio.AttributeIO;
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.jdbc.attributeio.AttributeIO;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,22 +20,20 @@
 package org.geotools.io;
 
 // Input/output
-import java.io.Writer;
 import java.io.FilterWriter;
-import java.io.StringWriter;
 import java.io.IOException;
-
-// Miscellaneous
-import java.util.List;
-import java.util.Arrays;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
+
 import javax.swing.text.StyleConstants;
 
-// Geotools dependencies
-import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
 
 
 /**
@@ -52,18 +50,18 @@ import org.geotools.resources.Utilities;
  *
  * <blockquote><pre>
  *     TableWriter out = new TableWriter(new OutputStreamWriter(System.out), 3);
- *     out.write("Prénom\tNom\n");
+ *     out.write("Prï¿½nom\tNom\n");
  *     out.nextLine('-');
- *     out.write("Idéphonse\tLaporte\nSarah\tCoursi\nYvan\tDubois");
+ *     out.write("Idï¿½phonse\tLaporte\nSarah\tCoursi\nYvan\tDubois");
  *     out.flush();
  * </pre></blockquote>
  *
  * ...produces the following output:
  *
  * <blockquote><pre>
- *      Prénom      Nom
+ *      Prï¿½nom      Nom
  *      ---------   -------
- *      Idéphonse   Laporte
+ *      Idï¿½phonse   Laporte
  *      Sarah       Coursi
  *      Yvan        Dubois
  * </pre></blockquote>
@@ -283,7 +281,7 @@ public class TableWriter extends FilterWriter {
                              final char horizontalChar) throws IOException
     {
         /*
-         * Obtiens les ensembles de caractères qui
+         * Obtiens les ensembles de caractï¿½res qui
          * conviennent pour la ligne horizontale.
          */
         int boxCount = 0;
@@ -294,8 +292,8 @@ public class TableWriter extends FilterWriter {
             }
         }
         /*
-         * Obtient une chaŽne contenant les lignes verticales à
-         * dessiner à gauche, à droite ou au centre de la table.
+         * Obtient une chaï¿½ne contenant les lignes verticales ï¿½
+         * dessiner ï¿½ gauche, ï¿½ droite ou au centre de la table.
          */
         final String border;
         switch (horizontalBorder) {
@@ -740,13 +738,13 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Ecrit vers le flot spécifié toutes les cellules qui avaient été disposées
-     * dans le tableau. Ces cellules seront automatiquement alignées en colonnes.
-     * Cette méthode peut Štre appelée plusieurs fois pour écrire le mŠme tableau
+     * Ecrit vers le flot spï¿½cifiï¿½ toutes les cellules qui avaient ï¿½tï¿½ disposï¿½es
+     * dans le tableau. Ces cellules seront automatiquement alignï¿½es en colonnes.
+     * Cette mï¿½thode peut ï¿½tre appelï¿½e plusieurs fois pour ï¿½crire le mï¿½me tableau
      * par exemple vers plusieurs flots.
      *
-     * @param  out Flot vers où écrire les données.
-     * @throws IOException si une erreur est survenue lors de l'écriture dans
+     * @param  out Flot vers oï¿½ ï¿½crire les donnï¿½es.
+     * @throws IOException si une erreur est survenue lors de l'ï¿½criture dans
      *         <code>out</code>.
      */
     private void flushTo(final Writer out) throws IOException {
@@ -756,11 +754,11 @@ public class TableWriter extends FilterWriter {
         final int          cellCount = cells.size();
         for (int cellIndex=0; cellIndex<cellCount; cellIndex++) {
             /*
-             * Copie dans  <code>currentLine</code>  toutes les données qui seront à écrire
-             * sur la ligne courante de la table. Ces données excluent le <code>null</code>
+             * Copie dans  <code>currentLine</code>  toutes les donnï¿½es qui seront ï¿½ ï¿½crire
+             * sur la ligne courante de la table. Ces donnï¿½es excluent le <code>null</code>
              * terminal.  La liste <code>currentLine</code> ne contiendra donc initialement
-             * aucun élément nul, mais ses éléments seront progressivement modifiés (et mis
-             * à <code>null</code>) pendant l'écriture de la ligne dans la boucle qui suit.
+             * aucun ï¿½lï¿½ment nul, mais ses ï¿½lï¿½ments seront progressivement modifiï¿½s (et mis
+             * ï¿½ <code>null</code>) pendant l'ï¿½criture de la ligne dans la boucle qui suit.
              */
             Cell lineFill = null;
             int currentCount = 0;
@@ -778,10 +776,10 @@ public class TableWriter extends FilterWriter {
             while (++cellIndex < cellCount);
             Arrays.fill(currentLine, currentCount, currentLine.length, lineFill);
             /*
-             * La boucle suivante sera exécutée tant qu'il reste des lignes à écrire
-             * (c'est-à-dire tant qu'au moins un élément de <code>currentLine</code>
-             * est non-nul). Si une cellule contient un texte avec des caractères EOL,
-             * alors cette cellule devra s'écrire sur plusieurs lignes dans la cellule
+             * La boucle suivante sera exï¿½cutï¿½e tant qu'il reste des lignes ï¿½ ï¿½crire
+             * (c'est-ï¿½-dire tant qu'au moins un ï¿½lï¿½ment de <code>currentLine</code>
+             * est non-nul). Si une cellule contient un texte avec des caractï¿½res EOL,
+             * alors cette cellule devra s'ï¿½crire sur plusieurs lignes dans la cellule
              * courante.
              */
             while (!isEmpty(currentLine)) {
@@ -804,10 +802,10 @@ public class TableWriter extends FilterWriter {
                     int end   = (endCR<0) ? endLF : (endLF<0) ? endCR : Math.min(endCR,endLF);
                     if (end >= 0) {
                         /*
-                         * Si un retour chariot a été trouvé, n'écrit que la première
-                         * ligne de la cellule. L'élément <code>currentLine[j]</code>
-                         * sera modifié pour ne contenir que les lignes restantes qui
-                         * seront écrites lors d'un prochain passage dans la boucle.
+                         * Si un retour chariot a ï¿½tï¿½ trouvï¿½, n'ï¿½crit que la premiï¿½re
+                         * ligne de la cellule. L'ï¿½lï¿½ment <code>currentLine[j]</code>
+                         * sera modifiï¿½ pour ne contenir que les lignes restantes qui
+                         * seront ï¿½crites lors d'un prochain passage dans la boucle.
                          */
                         int top = end+1;
                         if (endCR>=0 && endCR+1==endLF) top++;
@@ -822,9 +820,9 @@ public class TableWriter extends FilterWriter {
                     else currentLine[j] = null;
                     final int textLength = cellText.length();
                     /*
-                     * Si la cellule à écrire est en fait une bordure,
-                     * on fera un traitement spécial pour utiliser les
-                     * caractˆres de jointures {@link #BOX}.
+                     * Si la cellule ï¿½ ï¿½crire est en fait une bordure,
+                     * on fera un traitement spï¿½cial pour utiliser les
+                     * caractï¿½res de jointures {@link #BOX}.
                      */
                     if (currentCount == 0) {
                         assert textLength == 0;
@@ -841,8 +839,8 @@ public class TableWriter extends FilterWriter {
                     }
                     /*
                      * Si la cellule n'est pas une bordure, il s'agit
-                     * d'une cellule "normale".  Procˆde maintenant à
-                     * l'écriture d'une ligne de la cellule.
+                     * d'une cellule "normale".  Procï¿½de maintenant ï¿½
+                     * l'ï¿½criture d'une ligne de la cellule.
                      */
                     if (isFirstColumn) {
                         out.write(leftBorder);

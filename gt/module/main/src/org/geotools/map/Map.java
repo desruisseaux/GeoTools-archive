@@ -16,11 +16,12 @@
  */
 package org.geotools.map;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.renderer.Renderer;
 import org.geotools.styling.Style;
 import org.opengis.cs.CS_CoordinateSystem;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

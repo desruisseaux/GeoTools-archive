@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,53 +29,45 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.Level;
-import java.util.Locale;
-import java.util.List;
 
-// Java Advanced Imaging
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.PlanarImage;
 import javax.media.jai.ImageLayout;
+import javax.media.jai.IntegerSequence;
 import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationNearest;
+import javax.media.jai.JAI;
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
-import javax.media.jai.InterpolationNearest;
-import javax.media.jai.IntegerSequence;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools (GCS) dependencies
-import org.geotools.gc.GridRange;
-import org.geotools.gc.GridCoverage;
-import org.geotools.gc.GridGeometry;
-import org.geotools.cv.SampleDimension;
-import org.geotools.gc.InvalidGridGeometryException;
-
-// Geotools (CTS) dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.pt.Envelope;
 import org.geotools.cs.CoordinateSystem;
+import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform2D;
 import org.geotools.ct.MathTransformFactory;
-import org.geotools.ct.CoordinateTransformationFactory;
-
-// Resources
-import org.geotools.util.NumberRange;
-import org.geotools.resources.XArray;
+import org.geotools.cv.SampleDimension;
+import org.geotools.gc.GridCoverage;
+import org.geotools.gc.GridGeometry;
+import org.geotools.gc.GridRange;
+import org.geotools.gc.InvalidGridGeometryException;
+import org.geotools.pt.Envelope;
+import org.geotools.pt.Matrix;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.LegacyGCSUtilities;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.XArray;
 import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.resources.image.JAIUtilities;
+import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.image.JAIUtilities;
+import org.geotools.util.NumberRange;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**

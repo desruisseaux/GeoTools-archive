@@ -10,11 +10,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.data.wms.WMS1_1_1.GetFeatureInfoRequest;
-import org.geotools.data.wms.WMS1_1_1.GetMapRequest;
 import org.geotools.data.wms.request.AbstractGetCapabilitiesRequest;
-import org.jdom.Element;
-import org.jdom.Namespace;
 
 /**
  * @author Kefka

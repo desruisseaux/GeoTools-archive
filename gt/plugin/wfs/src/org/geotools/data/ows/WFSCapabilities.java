@@ -16,9 +16,6 @@
  */
 package org.geotools.data.ows;
 
-import org.geotools.data.ows.OperationType;
-import org.geotools.data.ows.Service;
-
 import java.util.Iterator;
 import java.util.List;
 

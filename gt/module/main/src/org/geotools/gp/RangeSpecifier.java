@@ -1,7 +1,7 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,19 +21,16 @@ package org.geotools.gp;
 
 // J2SE dependencies
 import java.awt.Color;
-import java.util.Arrays;
 import java.io.Serializable;
+import java.util.Arrays;
 
-// OpenGIS dependencies
-import org.opengis.util.Cloneable;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
-import org.geotools.cv.Category;     // For Javadoc
-import org.geotools.gc.GridCoverage; // For Javadoc
-import org.geotools.util.NumberRange;
 import org.geotools.ct.MathTransform1D;
+import org.geotools.cv.Category;
+import org.geotools.gc.GridCoverage;
 import org.geotools.resources.Utilities;
+import org.geotools.units.Unit;
+import org.geotools.util.NumberRange;
+import org.opengis.util.Cloneable;
 
 
 /**
@@ -90,7 +87,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     }
 
     /**
-     * Construct a <code>RangeSpecifier</code> initialised to the spécified range.
+     * Construct a <code>RangeSpecifier</code> initialised to the spï¿½cified range.
      */
     public RangeSpecifier(final NumberRange range) {
         this.range = range;

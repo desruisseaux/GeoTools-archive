@@ -18,32 +18,25 @@
 package org.geotools.demo.referencing;
 
 //java dependancies
-import java.net.URL;
-import java.util.Locale;
 import java.io.File;
+import java.net.URL;
 
-//geotool2 dependencies
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.ct.CoordinateTransformation;
+import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.data.DataStore;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.ct.CoordinateTransformation;
-import org.geotools.ct.CoordinateTransformationFactory;
 
-//opengis dependancies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
-
-//JTS dependancy
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.CoordinateFilter;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A simple demo to transform the geometries in a shapefile from the source

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,24 +21,20 @@
 package org.geotools.renderer.geom;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.IdentityHashMap;
+import java.awt.geom.IllegalPathStateException;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.IllegalPathStateException;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
 import org.geotools.cs.CoordinateSystem;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.CannotCreateTransformException;
-import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.ct.MathTransform2D;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
+import org.geotools.resources.geometry.XRectangle2D;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -458,7 +454,7 @@ public final class Clipper {
                         if (v>=cymin && v<=cymax) addIntersect(xmin, v);
                     }
                     /*
-                     * Classifies intersection points using a 'classement à bulles'.
+                     * Classifies intersection points using a 'classement ï¿½ bulles'.
                      * This method is in theory extremely counter-productive when there is
                      * a lot of data to classify.  But in our case, there will never normally
                      * be more than 2 points to classify, which makes this technique very

@@ -1,12 +1,17 @@
 package org.geotools.data.property;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-
-import java.io.*;
 import java.util.NoSuchElementException;
 
-import org.geotools.data.*;
-import org.geotools.feature.*;
+import org.geotools.data.AttributeReader;
+import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 /**
  * Simple AttributeReader that works against Java properties files.
  * <p>

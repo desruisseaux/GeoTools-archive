@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,25 +20,39 @@
 package org.geotools.referencing;
 
 // J2SE and JUnit dependencies
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import javax.units.SI;
-import junit.framework.*;
 
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.parameter.InvalidParameterValueException;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-// Geotools dependencies
-import org.geotools.referencing.*;
-import org.geotools.referencing.cs.*;
-import org.geotools.referencing.crs.*;
-import org.geotools.referencing.datum.*;
-import org.geotools.referencing.operation.*;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.util.SimpleInternationalString;
 import org.geotools.metadata.citation.Citation;
+import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.cs.CartesianCS;
+import org.geotools.referencing.cs.CoordinateSystem;
+import org.geotools.referencing.cs.CoordinateSystemAxis;
+import org.geotools.referencing.cs.EllipsoidalCS;
+import org.geotools.referencing.cs.TimeCS;
+import org.geotools.referencing.cs.VerticalCS;
+import org.geotools.referencing.datum.Datum;
+import org.geotools.referencing.datum.Ellipsoid;
+import org.geotools.referencing.datum.GeodeticDatum;
+import org.geotools.referencing.datum.PrimeMeridian;
+import org.geotools.referencing.datum.VerticalDatum;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -126,9 +140,9 @@ public class BasicTest extends TestCase {
         assertNull(properties.put("remarks",          "There is remarks"));
         assertNull(properties.put("remarks_fr",       "Voici des remarques"));
         assertNull(properties.put("dummy",            "Doesn't matter"));
-        assertNull(properties.put("dummy_fr",         "Rien d'intéressant"));
+        assertNull(properties.put("dummy_fr",         "Rien d'intï¿½ressant"));
         assertNull(properties.put("local",            "A custom localized string"));
-        assertNull(properties.put("local_fr",         "Une chaîne personalisée"));
+        assertNull(properties.put("local_fr",         "Une chaï¿½ne personalisï¿½e"));
         assertNull(properties.put("anchorPoint",      "Anchor point"));
         assertNull(properties.put("realizationEpoch", "Realization epoch"));
         assertNull(properties.put("validArea",        "Valid area"));
@@ -142,9 +156,9 @@ public class BasicTest extends TestCase {
         // Check extra properties
         assertEquals("Size:",    6,                    remaining.size());
         assertEquals("dummy",    "Doesn't matter",     remaining.get("dummy"));
-        assertEquals("dummy_fr", "Rien d'intéressant", remaining.get("dummy_fr"));
+        assertEquals("dummy_fr", "Rien d'intï¿½ressant", remaining.get("dummy_fr"));
         assertEquals("local",    "A custom localized string", ((InternationalString) remaining.get("local")).toString(null));
-        assertEquals("local_fr", "Une chaîne personalisée",   ((InternationalString) remaining.get("local")).toString(Locale.FRENCH));
+        assertEquals("local_fr", "Une chaï¿½ne personalisï¿½e",   ((InternationalString) remaining.get("local")).toString(Locale.FRENCH));
         assertFalse ("local_fr", remaining.containsKey("local_fr"));
 
         // Check the case of some special property keys

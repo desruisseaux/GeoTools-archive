@@ -16,12 +16,14 @@
  */
 package org.geotools.data.oracle;
 
-import oracle.jdbc.pool.OracleConnectionPoolDataSource;
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.ConnectionPoolManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+
+import oracle.jdbc.pool.OracleConnectionPoolDataSource;
+
+import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.data.jdbc.ConnectionPoolManager;
 
 
 /**

@@ -16,11 +16,11 @@
  */
 package org.geotools.data.ows;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

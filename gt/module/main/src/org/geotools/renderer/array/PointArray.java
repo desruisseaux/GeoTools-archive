@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,32 +35,31 @@ package org.geotools.renderer.array;
 
 // J2SE dependencies
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
 import org.geotools.renderer.geom.CompressionLevel;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
 
 
 /**
  * Classe de base des classes enveloppant un tableau de points (<var>x</var>,<var>y</var>).
- * Les accès aux éléments de ce tableaux ne peuvent pas être fait de façon aléatoires. Ils
- * doivent obligatoirement passer par un itérateur retourné par {@link #iterator}. Cette
- * limitation est nécessaire pour faciliter l'implémentation de certains algorithmes de
- * compression des données.
+ * Les accï¿½s aux ï¿½lï¿½ments de ce tableaux ne peuvent pas ï¿½tre fait de faï¿½on alï¿½atoires. Ils
+ * doivent obligatoirement passer par un itï¿½rateur retournï¿½ par {@link #iterator}. Cette
+ * limitation est nï¿½cessaire pour faciliter l'implï¿½mentation de certains algorithmes de
+ * compression des donnï¿½es.
  * <br><br>
- * <strong>Note sur le vocabulaire employé:</strong> Dans la documentation de cette classe,
- * le terme <em>point</em> se réfère à une paire de coordonnées (<var>x</var>,<var>y</var>)
- * tandis que le terme  <em>coordonnée</em>  se réfère à une seule valeur  <var>x</var> ou
- * <var>y</var>  (en français, "ordonnée" est plutôt utilisé pour la coordonnée le long de
- * l'axe des <var>y</var>, la coordonnée le long de l'axe des <var>x</var> étant l'abscisse).
- * Pour un point situé à l'index <code>i</code>, les coordonnées <var>x</var> et <var>y</var>
+ * <strong>Note sur le vocabulaire employï¿½:</strong> Dans la documentation de cette classe,
+ * le terme <em>point</em> se rï¿½fï¿½re ï¿½ une paire de coordonnï¿½es (<var>x</var>,<var>y</var>)
+ * tandis que le terme  <em>coordonnï¿½e</em>  se rï¿½fï¿½re ï¿½ une seule valeur  <var>x</var> ou
+ * <var>y</var>  (en franï¿½ais, "ordonnï¿½e" est plutï¿½t utilisï¿½ pour la coordonnï¿½e le long de
+ * l'axe des <var>y</var>, la coordonnï¿½e le long de l'axe des <var>x</var> ï¿½tant l'abscisse).
+ * Pour un point situï¿½ ï¿½ l'index <code>i</code>, les coordonnï¿½es <var>x</var> et <var>y</var>
  * correspondantes se trouvent aux index <code>2*i</code> et <code>2*i+1</code> respectivement.
  *
  * @version $Id$
@@ -80,14 +79,14 @@ public abstract class PointArray implements Serializable {
     private static final long serialVersionUID = 1281113806110831086L;
 
     /**
-     * Vérifie la validité des arguments spécifiés.
+     * Vï¿½rifie la validitï¿½ des arguments spï¿½cifiï¿½s.
      *
-     * @param  array Tableau de coordonnées (<var>x</var>,<var>y</var>).
-     * @param  lower Index de la première coordonnées <var>x</var> à
+     * @param  array Tableau de coordonnï¿½es (<var>x</var>,<var>y</var>).
+     * @param  lower Index de la premiï¿½re coordonnï¿½es <var>x</var> ï¿½
      *         prendre en compte dans le tableau <code>array</code>.
-     * @param  upper Index suivant celui de la dernière coordonnée <var>y</var> à
-     *         prendre en compte dans le tableau <code>array</code>. La différence
-     *         <code>upper-lower</code> doit obligatoirement être paire.
+     * @param  upper Index suivant celui de la derniï¿½re coordonnï¿½e <var>y</var> ï¿½
+     *         prendre en compte dans le tableau <code>array</code>. La diffï¿½rence
+     *         <code>upper-lower</code> doit obligatoirement ï¿½tre paire.
      * @throws IllegalArgumentException si la plage <code>[lower..upper]</code>
      *         n'est pas valide ou est en dehors des limites du tableau.
      */
@@ -229,34 +228,34 @@ public abstract class PointArray implements Serializable {
     }
 
     /**
-     * Retourne un tableau enveloppant les mêmes points que le tableau courant,
-     * mais des index <code>lower</code> inclusivement jusqu'à <code>upper</code>
-     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-à-dire si
-     * <code>lower==upper</code>), alors cette méthode retourne <code>null</code>.
+     * Retourne un tableau enveloppant les mï¿½mes points que le tableau courant,
+     * mais des index <code>lower</code> inclusivement jusqu'ï¿½ <code>upper</code>
+     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-ï¿½-dire si
+     * <code>lower==upper</code>), alors cette mï¿½thode retourne <code>null</code>.
      *
-     * @param lower Index du premier point à prendre en compte.
-     * @param upper Index suivant celui du dernier point à prendre en compte.
+     * @param lower Index du premier point ï¿½ prendre en compte.
+     * @param upper Index suivant celui du dernier point ï¿½ prendre en compte.
      */
     public abstract PointArray subarray(final int lower, final int upper);
 
     /**
-     * Insère tous les points de <code>toMerge</code> dans le tableau <code>this</code>.
-     * Si le drapeau <code>reverse</code> à la valeur <code>true</code>, alors les points
-     * de <code>toMerge</code> seront copiées en ordre inverse.
+     * Insï¿½re tous les points de <code>toMerge</code> dans le tableau <code>this</code>.
+     * Si le drapeau <code>reverse</code> ï¿½ la valeur <code>true</code>, alors les points
+     * de <code>toMerge</code> seront copiï¿½es en ordre inverse.
      *
-     * @param  index Index à partir d'où insérer les points dans ce tableau. Le point à cet
-     *         index ainsi que tous ceux qui le suivent seront décalés vers des index plus élevés.
-     * @param  toMerge Tableau de points à insérer. Ses valeurs seront copiées.
+     * @param  index Index ï¿½ partir d'oï¿½ insï¿½rer les points dans ce tableau. Le point ï¿½ cet
+     *         index ainsi que tous ceux qui le suivent seront dï¿½calï¿½s vers des index plus ï¿½levï¿½s.
+     * @param  toMerge Tableau de points ï¿½ insï¿½rer. Ses valeurs seront copiï¿½es.
      */
     public final PointArray insertAt(final int index, final PointArray toMerge, final boolean reverse) {
         return toMerge.insertTo(this, index, reverse);
     }
 
     /**
-     * Insère les données de <code>this</code> dans le tableau spécifié. Cette méthode est
-     * strictement réservée à l'implémentation de {@link #insertAt(int,PointArray,boolean)}.
-     * La classe {@link DefaultArray} remplace l'implémentation par défaut par une nouvelle
-     * implémentation qui évite de copier les données avec {@link #toArray()}.
+     * Insï¿½re les donnï¿½es de <code>this</code> dans le tableau spï¿½cifiï¿½. Cette mï¿½thode est
+     * strictement rï¿½servï¿½e ï¿½ l'implï¿½mentation de {@link #insertAt(int,PointArray,boolean)}.
+     * La classe {@link DefaultArray} remplace l'implï¿½mentation par dï¿½faut par une nouvelle
+     * implï¿½mentation qui ï¿½vite de copier les donnï¿½es avec {@link #toArray()}.
      */
     PointArray insertTo(final PointArray dest, final int index, final boolean reverse) {
         final float[] array = toArray();
@@ -264,22 +263,22 @@ public abstract class PointArray implements Serializable {
     }
 
     /**
-     * Insère les données (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spécifié.
-     * Si le drapeau <code>reverse</code> à la valeur <code>true</code>, alors les points de
-     * <code>toMerge</code> seront copiées en ordre inverse.
+     * Insï¿½re les donnï¿½es (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spï¿½cifiï¿½.
+     * Si le drapeau <code>reverse</code> ï¿½ la valeur <code>true</code>, alors les points de
+     * <code>toMerge</code> seront copiï¿½es en ordre inverse.
      *
-     * @param  index Index à partir d'où insérer les points dans ce tableau. Le point à cet
-     *         index ainsi que tous ceux qui le suivent seront décalés vers des index plus élevés.
-     * @param  toMerge Tableau de coordonnées (<var>x</var>,<var>y</var>) à insérer dans ce
-     *         tableau de points. Ses valeurs seront copiées.
-     * @param  lower Index de la première coordonnée de <code>toMerge</code> à copier dans ce tableau.
-     * @param  upper Index suivant celui de la dernière coordonnée de <code>toMerge</code> à copier.
+     * @param  index Index ï¿½ partir d'oï¿½ insï¿½rer les points dans ce tableau. Le point ï¿½ cet
+     *         index ainsi que tous ceux qui le suivent seront dï¿½calï¿½s vers des index plus ï¿½levï¿½s.
+     * @param  toMerge Tableau de coordonnï¿½es (<var>x</var>,<var>y</var>) ï¿½ insï¿½rer dans ce
+     *         tableau de points. Ses valeurs seront copiï¿½es.
+     * @param  lower Index de la premiï¿½re coordonnï¿½e de <code>toMerge</code> ï¿½ copier dans ce tableau.
+     * @param  upper Index suivant celui de la derniï¿½re coordonnï¿½e de <code>toMerge</code> ï¿½ copier.
      * @param  reverse <code>true</code> s'il faut inverser l'ordre des points de <code>toMerge</code>
      *         lors de la copie. Cette inversion ne change pas l'ordre (<var>x</var>,<var>y</var>) des
-     *         coordonnées de chaque points.
+     *         coordonnï¿½es de chaque points.
      *
-     * @return <code>this</code> si l'insertion à pu être faite sur
-     *         place, ou un autre tableau si ça n'a pas été possible.
+     * @return <code>this</code> si l'insertion ï¿½ pu ï¿½tre faite sur
+     *         place, ou un autre tableau si ï¿½a n'a pas ï¿½tï¿½ possible.
      */
     public abstract PointArray insertAt(final int index, final float toMerge[],
                                         final int lower, final int upper, final boolean reverse);
@@ -287,21 +286,21 @@ public abstract class PointArray implements Serializable {
     /**
      * Renverse l'ordre de tous les points compris dans ce tableau.
      *
-     * @return <code>this</code> si l'inversion a pu être faite sur-place,
-     *         ou un autre tableau si ça n'a pas été possible.
+     * @return <code>this</code> si l'inversion a pu ï¿½tre faite sur-place,
+     *         ou un autre tableau si ï¿½a n'a pas ï¿½tï¿½ possible.
      */
     public abstract PointArray reverse();
 
     /**
-     * Retourne un tableau immutable qui contient les mêmes données que celui-ci.
-     * Après l'appel de cette méthode, toute tentative de modification (avec les
-     * méthodes {@link #insertAt} ou {@link #reverse}) vont retourner un autre
-     * tableau de façon à ne pas modifier le tableau immutable.
+     * Retourne un tableau immutable qui contient les mï¿½mes donnï¿½es que celui-ci.
+     * Aprï¿½s l'appel de cette mï¿½thode, toute tentative de modification (avec les
+     * mï¿½thodes {@link #insertAt} ou {@link #reverse}) vont retourner un autre
+     * tableau de faï¿½on ï¿½ ne pas modifier le tableau immutable.
      *
      * @param  level The compression level, or <code>null</code> if no compression is wanted.
-     * @return Tableau immutable et éventuellement compressé, <code>this</code>
-     *         si ce tableau répondait déjà aux conditions ou <code>null</code>
-     *         si ce tableau ne contient aucune donnée.
+     * @return Tableau immutable et ï¿½ventuellement compressï¿½, <code>this</code>
+     *         si ce tableau rï¿½pondait dï¿½jï¿½ aux conditions ou <code>null</code>
+     *         si ce tableau ne contient aucune donnï¿½e.
      */
     public PointArray getFinal(final CompressionLevel level) {
         return count()>0 ? this : null;
@@ -332,7 +331,7 @@ public abstract class PointArray implements Serializable {
     public abstract void toArray(ArrayData dest, float resolution2);
 
     /**
-     * Retourne une copie de toutes les coordonnées (<var>x</var>,<var>y</var>) de ce tableau.
+     * Retourne une copie de toutes les coordonnï¿½es (<var>x</var>,<var>y</var>) de ce tableau.
      */
     public final float[] toArray() {
         final ArrayData data = new ArrayData(2*count());
@@ -386,9 +385,9 @@ public abstract class PointArray implements Serializable {
     }
 
     /**
-     * Retourne une chaîne de caractères représentant ce tableau. Cette chaîne
-     * contiendra le nom de la classe utilisée, le nombre de points ainsi que
-     * les points de départ et d'arrivé.
+     * Retourne une chaï¿½ne de caractï¿½res reprï¿½sentant ce tableau. Cette chaï¿½ne
+     * contiendra le nom de la classe utilisï¿½e, le nombre de points ainsi que
+     * les points de dï¿½part et d'arrivï¿½.
      */
     public final String toString() {
         final Point2D.Float point = new Point2D.Float();
@@ -416,9 +415,9 @@ public abstract class PointArray implements Serializable {
     }
 
     /**
-     * Indique si ce tableau est identique au tableau spécifié. Deux
-     * tableaux seront considérés identiques s'ils contiennent les
-     * mêmes points dans le même ordre.
+     * Indique si ce tableau est identique au tableau spï¿½cifiï¿½. Deux
+     * tableaux seront considï¿½rï¿½s identiques s'ils contiennent les
+     * mï¿½mes points dans le mï¿½me ordre.
      */
     public final boolean equals(final PointArray that) {
         if (that==this) return true;
@@ -437,16 +436,16 @@ public abstract class PointArray implements Serializable {
     }
 
     /**
-     * Indique si cet objet est identique à l'objet spécifié.   Cette méthode considère deux
-     * objets identiques si <code>that</code> est d'une classe dérivée de {@link PointArray}
-     * et si les deux tableaux contiennent les mêmes points dans le même ordre.
+     * Indique si cet objet est identique ï¿½ l'objet spï¿½cifiï¿½.   Cette mï¿½thode considï¿½re deux
+     * objets identiques si <code>that</code> est d'une classe dï¿½rivï¿½e de {@link PointArray}
+     * et si les deux tableaux contiennent les mï¿½mes points dans le mï¿½me ordre.
      */
     public final boolean equals(final Object that) {
         return (that instanceof PointArray) && equals((PointArray) that);
     }
 
     /**
-     * Retourne un code représentant cet objet.
+     * Retourne un code reprï¿½sentant cet objet.
      */
     public final int hashCode() {
         final Point2D point = getFirstPoint(null);

@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,42 +21,35 @@
 package org.geotools.renderer.geom;
 
 // Geometry
-import java.awt.Shape;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.QuadCurve2D;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-
-// Rendering
-import java.awt.Paint;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.BasicStroke;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 
-// User interface
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.ButtonGroup;
-
-// Events
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 
 /**
@@ -72,45 +65,45 @@ import java.awt.event.ActionEvent;
  */
 public class ShapePanel extends JPanel {
     /**
-     * Interface des objets capables de produire des formes géométriques.
-     * Ces formes sont généralement calculées au hasard à des fins de test.
+     * Interface des objets capables de produire des formes gï¿½omï¿½triques.
+     * Ces formes sont gï¿½nï¿½ralement calculï¿½es au hasard ï¿½ des fins de test.
      */
     public static interface Producer {
         /**
-         * Retourne un tableau de formes géométriques.
+         * Retourne un tableau de formes gï¿½omï¿½triques.
          */
         public abstract Object[] getShapes();
     }
 
     /**
-     * Nombre de pixels à laisser entre le bord
-     * de la forme géométrique et le bord de la
-     * fenêtre.
+     * Nombre de pixels ï¿½ laisser entre le bord
+     * de la forme gï¿½omï¿½trique et le bord de la
+     * fenï¿½tre.
      */
     private static final int MARGIN = 32;
 
     /**
-     * Diamètre des cercles, en pixels. Ces cercles
-     * servent à vérifier si les formes géométriques
+     * Diamï¿½tre des cercles, en pixels. Ces cercles
+     * servent ï¿½ vï¿½rifier si les formes gï¿½omï¿½triques
      * fonctionnent correctement.
      */
     private static final int CIRCLE_SIZE = 6;
 
     /**
-     * Largeur et hauteur par défaut de la fenêtre
-     * qui affichera les formes géométriques.
+     * Largeur et hauteur par dï¿½faut de la fenï¿½tre
+     * qui affichera les formes gï¿½omï¿½triques.
      */
     private static final int DEFAULT_SIZE = 400;
 
     /**
      * Couleur des lignes ainsi que du
-     * contour des formes géométriques.
+     * contour des formes gï¿½omï¿½triques.
      */
     private static final Paint DRAW_COLOR = Color.white;
 
     /**
      * Couleur de remplissage
-     * des formes géométriques.
+     * des formes gï¿½omï¿½triques.
      */
     private static final Paint FILL_COLOR = Color.blue;
 
@@ -120,49 +113,49 @@ public class ShapePanel extends JPanel {
     private static final Paint POINT_COLOR = Color.yellow;
 
     /**
-     * Couleur des points désactivés. Les points
-     * en dehors de la forme géométrique auront
+     * Couleur des points dï¿½sactivï¿½s. Les points
+     * en dehors de la forme gï¿½omï¿½trique auront
      * typiquement cette couleur.
      */
     private static final Paint DISABLED_COLOR = Color.gray;
 
     /**
-     * Couleur des points de contrôles de
+     * Couleur des points de contrï¿½les de
      * {@link Line2D}, {@link QuadCurve2D}
      * et {@link CubicCurve2D}.
      */
     private static final Paint CONTROL_COLOR = Color.red;
 
     /**
-     * Couleur des boîtes englobant
-     * les formes géométriques.
+     * Couleur des boï¿½tes englobant
+     * les formes gï¿½omï¿½triques.
      */
     private static final Paint BOUNDS_COLOR = Color.pink;
 
     /**
      * Constante indiquant qu'on ne testera pas
-     * l'intérieur des formes géométriques tracées.
+     * l'intï¿½rieur des formes gï¿½omï¿½triques tracï¿½es.
      */
     private static final int TEST_NONE = 0;
 
     /**
-     * Constante indiquant qu'on testera la méthode
+     * Constante indiquant qu'on testera la mï¿½thode
      * {@link Shape#contains(Point2D)} des formes
-     * géométriques.
+     * gï¿½omï¿½triques.
      */
     private static final int TEST_CONTAINS_POINT = 1;
 
     /**
-     * Constante indiquant qu'on testera la méthode
+     * Constante indiquant qu'on testera la mï¿½thode
      * {@link Shape#contains(Rectangle2D)} des formes
-     * géométriques.
+     * gï¿½omï¿½triques.
      */
     private static final int TEST_CONTAINS_SHAPE = 2;
 
     /**
-     * Constante indiquant qu'on testera la méthode
+     * Constante indiquant qu'on testera la mï¿½thode
      * {@link Shape#intersects(Rectangle2D)} des
-     * formes géométriques.
+     * formes gï¿½omï¿½triques.
      */
     private static final int TEST_INTERSECTS_SHAPE = 3;
 
@@ -172,72 +165,72 @@ public class ShapePanel extends JPanel {
     private static int nextFramePosition = 0;
 
     /**
-     * Forme à utiliser pour tracer des cercles représentant un point.
-     * Cette forme est utilisée pour convertir un forme dessinable des
+     * Forme ï¿½ utiliser pour tracer des cercles reprï¿½sentant un point.
+     * Cette forme est utilisï¿½e pour convertir un forme dessinable des
      * points sans dimensions.
      */
     private transient Ellipse2D.Double circle;
 
     /**
-     * Indique si les points de contrôles des formes {@link Line2D},
-     * {@link QuadCurve2D} et {@link CubicCurve2D} doivent être tracés.
+     * Indique si les points de contrï¿½les des formes {@link Line2D},
+     * {@link QuadCurve2D} et {@link CubicCurve2D} doivent ï¿½tre tracï¿½s.
      */
     private boolean controlPointVisible;
 
     /**
-     * Indique si les boîtes englobant les formes
-     * géométriques ("bounds") doivent être affichées.
+     * Indique si les boï¿½tes englobant les formes
+     * gï¿½omï¿½triques ("bounds") doivent ï¿½tre affichï¿½es.
      */
     private boolean boundsVisible;
 
     /**
-     * Indique si les formes géométriques doivent être
-     * modifiées de façon à entrer entièrement dans la
-     * fenêtre.
+     * Indique si les formes gï¿½omï¿½triques doivent ï¿½tre
+     * modifiï¿½es de faï¿½on ï¿½ entrer entiï¿½rement dans la
+     * fenï¿½tre.
      */
     private boolean packShapes;
 
     /**
-     * Constante indiquant si on doit tester les méthodes {@link Shape#contains(Point2D)},
+     * Constante indiquant si on doit tester les mï¿½thodes {@link Shape#contains(Point2D)},
      * {@link Shape#contains(Rectangle2D)} ou {@link Shape#intersects(Rectangle2D)} des
-     * formes géométriques.
+     * formes gï¿½omï¿½triques.
      */
     private int test = TEST_NONE;
 
     /**
      * Objet ayant la charge de produire
-     * des formes géométriques.
+     * des formes gï¿½omï¿½triques.
      */
     private final Producer producer;
 
     /**
-     * Liste des formes géométriques à afficher. En plus des
+     * Liste des formes gï¿½omï¿½triques ï¿½ afficher. En plus des
      * objets {@link Shape}, cette liste peut aussi contenir
      * des objets {@link Point2D}.
      */
     private Object[] shapes;
 
     /**
-     * Formes géométriques qui n'ont pas été
-     * transformées par <code>packShapes()</code>.
+     * Formes gï¿½omï¿½triques qui n'ont pas ï¿½tï¿½
+     * transformï¿½es par <code>packShapes()</code>.
      */
     private Object[] unpackShapes;
 
     /**
-     * Construit un afficheur qui tracera la forme géométrique spécifiée.
-     * Si la forme géométrique est un {@link RectangularShape} vide, alors
-     * une copie de la forme avec une dimension par défaut sera utilisée.
+     * Construit un afficheur qui tracera la forme gï¿½omï¿½trique spï¿½cifiï¿½e.
+     * Si la forme gï¿½omï¿½trique est un {@link RectangularShape} vide, alors
+     * une copie de la forme avec une dimension par dï¿½faut sera utilisï¿½e.
      */
     public ShapePanel(final Shape shape) {
         this(new Shape[] {shape});
     }
 
     /**
-     * Construit un afficheur qui tracera les formes géométriques spécifiées. Si des
-     * formes géométriques sont des {@link RectangularShape} vides, alors des copies
-     * des formes avec une dimension par défaut seront utilisées. Si des objets sont
-     * des points {@link Point2D}, alors ces points seront remplacés par des cercles
-     * au moment du traçage.
+     * Construit un afficheur qui tracera les formes gï¿½omï¿½triques spï¿½cifiï¿½es. Si des
+     * formes gï¿½omï¿½triques sont des {@link RectangularShape} vides, alors des copies
+     * des formes avec une dimension par dï¿½faut seront utilisï¿½es. Si des objets sont
+     * des points {@link Point2D}, alors ces points seront remplacï¿½s par des cercles
+     * au moment du traï¿½age.
      */
     public ShapePanel(final Object[] shapes) {
         this((Producer) null);
@@ -245,9 +238,9 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Construit un afficheur qui tracera les formes géométriques
-     * spécifiés par l'objet <code>producer</code>. De nouvelles
-     * formes géométriques seront produites à chaque fois que
+     * Construit un afficheur qui tracera les formes gï¿½omï¿½triques
+     * spï¿½cifiï¿½s par l'objet <code>producer</code>. De nouvelles
+     * formes gï¿½omï¿½triques seront produites ï¿½ chaque fois que
      * l'utilisateur clique sur le bouton "nouveau".
      */
     ShapePanel(final Producer producer) {
@@ -266,10 +259,10 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Spécifie les formes géométriques à afficher. Si des formes géométriques sont des
+     * Spï¿½cifie les formes gï¿½omï¿½triques ï¿½ afficher. Si des formes gï¿½omï¿½triques sont des
      * {@link RectangularShape} vides, alors des copies des formes avec une dimension par
-     * défaut seront utilisées. Si des objets sont des points {@link Point2D}, alors ces
-     * points seront remplacés par des cercles au moment du traçage.
+     * dï¿½faut seront utilisï¿½es. Si des objets sont des points {@link Point2D}, alors ces
+     * points seront remplacï¿½s par des cercles au moment du traï¿½age.
      */
     private void setShapes(final Object[] shapes) {
         this.shapes = unpackShapes = new Object[shapes.length];
@@ -292,15 +285,15 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Modifie les positions et dimensions des formes géométriques
-     * de façon à ce qu'elles entrent complètement dans la fenêtre.
+     * Modifie les positions et dimensions des formes gï¿½omï¿½triques
+     * de faï¿½on ï¿½ ce qu'elles entrent complï¿½tement dans la fenï¿½tre.
      */
     private void packShapes() {
         if (shapes == unpackShapes) {
             shapes = new Object[unpackShapes.length];
         }
         /*
-         * Obtient les coordonnées d'un rectangle
+         * Obtient les coordonnï¿½es d'un rectangle
          * qui engloberait toutes les formes.
          */
         Rectangle2D bounds=null;
@@ -323,7 +316,7 @@ public class ShapePanel extends JPanel {
             }
         }
         /*
-         * Crée une transformation affine, puis applique cette
+         * Crï¿½e une transformation affine, puis applique cette
          * transformation affine sur toutes les formes et points.
          */
         final double scale = Math.min(( getWidth()-2*MARGIN)/bounds.getWidth(),
@@ -343,7 +336,7 @@ public class ShapePanel extends JPanel {
 
     /**
      * Indique si au moins une des formes en
-     * mémoire intersepte le rectangle spécifiée.
+     * mï¿½moire intersepte le rectangle spï¿½cifiï¿½e.
      */
     private boolean intersects(final Rectangle2D bounds) {
         for (int i=0; i<shapes.length; i++) {
@@ -365,9 +358,9 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Construit une barre des menus pour cette fenêtre. La barre des menus
-     * permettra par exemple d'activer ou de désactiver l'affichage des points
-     * de contrôles.
+     * Construit une barre des menus pour cette fenï¿½tre. La barre des menus
+     * permettra par exemple d'activer ou de dï¿½sactiver l'affichage des points
+     * de contrï¿½les.
      */
     private JMenuBar createMenuBar() {
         final JMenuBar menubar=new JMenuBar();
@@ -377,7 +370,7 @@ public class ShapePanel extends JPanel {
          */
         menu = menubar.add(new JMenu("View"));
         /*
-         * Menu AFFICHAGE - Points à l'intérieur
+         * Menu AFFICHAGE - Points ï¿½ l'intï¿½rieur
          */
         if (true) {
             final ButtonGroup group = new ButtonGroup();
@@ -407,7 +400,7 @@ public class ShapePanel extends JPanel {
             }
         }
         /*
-         * Menu AFFICHAGE - Points de contrôles
+         * Menu AFFICHAGE - Points de contrï¿½les
          */
         if (true) {
             final JCheckBoxMenuItem item = new JCheckBoxMenuItem("Control points", controlPointVisible);
@@ -421,7 +414,7 @@ public class ShapePanel extends JPanel {
             menu.add(item);
         }
         /*
-         * Menu AFFICHAGE - Boîtes cadres
+         * Menu AFFICHAGE - Boï¿½tes cadres
          */
         if (true) {
             final JCheckBoxMenuItem item = new JCheckBoxMenuItem("Bounding box", boundsVisible);
@@ -434,7 +427,7 @@ public class ShapePanel extends JPanel {
             menu.add(item);
         }
         /*
-         * Menu AFFICHAGE - Pleine fenêtre
+         * Menu AFFICHAGE - Pleine fenï¿½tre
          */
         if (true) {
             final JCheckBoxMenuItem item = new JCheckBoxMenuItem("Full window", packShapes);
@@ -470,8 +463,8 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Retourne une forme géométrique représentant le point spécifié.
-     * Cette méthode est utilisée pour convertir en forme dessinable
+     * Retourne une forme gï¿½omï¿½trique reprï¿½sentant le point spï¿½cifiï¿½.
+     * Cette mï¿½thode est utilisï¿½e pour convertir en forme dessinable
      * un point sans dimension.
      */
     private Shape toShape(final Point2D point) {
@@ -487,9 +480,9 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Procède au traçage des formes géométriques. Des traitements particuliers seront
+     * Procï¿½de au traï¿½age des formes gï¿½omï¿½triques. Des traitements particuliers seront
      * fait pour les formes {@link Line2D}, {@link QuadCurve2D} et {@link CubicCurve2D},
-     * pour éventuellement afficher leurs points de contrôles.
+     * pour ï¿½ventuellement afficher leurs points de contrï¿½les.
      */
     protected void paintComponent(final Graphics g) {
         super.paintComponent(g);
@@ -497,14 +490,14 @@ public class ShapePanel extends JPanel {
         final double buffer[]=new double[6];
         final Point2D.Double point=new Point2D.Double();
         /*
-         * Place l'origine (0,0) en bas à gauche,
-         * selon la convention géométrique.
+         * Place l'origine (0,0) en bas ï¿½ gauche,
+         * selon la convention gï¿½omï¿½trique.
          */
         gr.translate(0, getHeight());
         gr.scale(1,-1);
         /*
-         * Dessine les bordures des formes géométriques,
-         * si cette option a été demandée.
+         * Dessine les bordures des formes gï¿½omï¿½triques,
+         * si cette option a ï¿½tï¿½ demandï¿½e.
          */
         if (boundsVisible) {
             gr.setPaint(BOUNDS_COLOR);
@@ -516,7 +509,7 @@ public class ShapePanel extends JPanel {
             }
         }
         /*
-         * Dessine les formes géométriques. Ce code
+         * Dessine les formes gï¿½omï¿½triques. Ce code
          * tiendra compte de certains cas particuliers.
          */
         for (int i=0; i<shapes.length; i++) {
@@ -528,8 +521,8 @@ public class ShapePanel extends JPanel {
                 continue;
             }
             /*
-             * Après les cas particulier, prend maintenant en
-             * compte le cas général de n'importe quelle forme.
+             * Aprï¿½s les cas particulier, prend maintenant en
+             * compte le cas gï¿½nï¿½ral de n'importe quelle forme.
              */
             if (object instanceof Shape) {
                 final Shape shape=(Shape) object;
@@ -543,7 +536,7 @@ public class ShapePanel extends JPanel {
                 gr.setPaint(DRAW_COLOR);
                 gr.draw(shape);
                 /*
-                 * Affiche les points de contrôles.
+                 * Affiche les points de contrï¿½les.
                  */
                 if (controlPointVisible) {
                     gr.setPaint(CONTROL_COLOR);
@@ -566,8 +559,8 @@ public class ShapePanel extends JPanel {
             }
         }
         /*
-         * Effectue maintenant des tests pour vérifier si des points
-         * tombent à l'intérieur ou à l'extérieur de la forme géométrique.
+         * Effectue maintenant des tests pour vï¿½rifier si des points
+         * tombent ï¿½ l'intï¿½rieur ou ï¿½ l'extï¿½rieur de la forme gï¿½omï¿½trique.
          */
         if (test != TEST_NONE) {
             for (point.x=0; point.x<(DEFAULT_SIZE+2*MARGIN); point.x+=(CIRCLE_SIZE+CIRCLE_SIZE/2)) {
@@ -614,10 +607,10 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Retourne un point dont les coordonnées
-     * auront été déterminées au hasard. Les
-     * coordonnées de ces points seront comprises
-     * dans la dimension typique de la fenêtre
+     * Retourne un point dont les coordonnï¿½es
+     * auront ï¿½tï¿½ dï¿½terminï¿½es au hasard. Les
+     * coordonnï¿½es de ces points seront comprises
+     * dans la dimension typique de la fenï¿½tre
      * de <code>ShapePanel</code>.
      */
     private static Point2D getRandomPoint() {
@@ -627,17 +620,17 @@ public class ShapePanel extends JPanel {
 
     /**
      * Retourne un tableau de points. Les points seront soit choisis au hasard, ou soit construit
-     * avec les coordonnées spécifiées. Ils seront choisis au hasard si aucune coordonnée n'a été
-     * spécifiée, c'est-à-dire si le tableau <code>args</code> a une longueur de <code>0</code>.
+     * avec les coordonnï¿½es spï¿½cifiï¿½es. Ils seront choisis au hasard si aucune coordonnï¿½e n'a ï¿½tï¿½
+     * spï¿½cifiï¿½e, c'est-ï¿½-dire si le tableau <code>args</code> a une longueur de <code>0</code>.
      * Sinon (si le tableau <code>args</code> a une longueur non-nulle), alors
-     * on exigera qu'il y ait tout juste le nombre d'arguments suffisants pour représenter
+     * on exigera qu'il y ait tout juste le nombre d'arguments suffisants pour reprï¿½senter
      * <code>count</code> points. C'est points seront alors construits en supposant que les
      * arguments apparaissent dans l'ordre (x,y).
      *
-     * @param  count Nombre de points demandés.
+     * @param  count Nombre de points demandï¿½s.
      * @param  args  Tableau de points dans l'ordre (x,y). Si ce tableau est nul ou a une
-     *               longueur nulle, alors les coordonnées des points seront choisits au hasard.
-     * @param  i     Index à partir d'où interpréter les arguments dans <code>args</code>.
+     *               longueur nulle, alors les coordonnï¿½es des points seront choisits au hasard.
+     * @param  i     Index ï¿½ partir d'oï¿½ interprï¿½ter les arguments dans <code>args</code>.
      * @return       Tableau de points.
      * @throws IllegalArgumentException si <code>args</code> n'a pas la longueur requise.
      */
@@ -649,18 +642,18 @@ public class ShapePanel extends JPanel {
 
     /**
      * Retourne un tableau de points. Les points seront soit choisis au hasard, ou soit construit
-     * avec les coordonnées spécifiées. Ils seront choisis au hasard si aucune coordonnée n'a été
-     * spécifiée, c'est-à-dire si le tableau <code>args</code> a une longueur de <code>i</code>.
-     * Sinon (si le tableau <code>args</code> a une longueur supérieure à <code>i</code>), alors
-     * on exigera qu'il y ait tout juste le nombre d'arguments suffisants pour représenter
+     * avec les coordonnï¿½es spï¿½cifiï¿½es. Ils seront choisis au hasard si aucune coordonnï¿½e n'a ï¿½tï¿½
+     * spï¿½cifiï¿½e, c'est-ï¿½-dire si le tableau <code>args</code> a une longueur de <code>i</code>.
+     * Sinon (si le tableau <code>args</code> a une longueur supï¿½rieure ï¿½ <code>i</code>), alors
+     * on exigera qu'il y ait tout juste le nombre d'arguments suffisants pour reprï¿½senter
      * <code>count</code> points. C'est points seront alors construits en supposant que les
      * arguments apparaissent dans l'ordre (x,y).
      *
-     * @param  count Nombre de points demandés.
+     * @param  count Nombre de points demandï¿½s.
      * @param  args  Tableau de points dans l'ordre (x,y). Si ce tableau est nul ou a une
-     *               longueur égale ou inférieure à <code>i</code>, alors les coordonnées
+     *               longueur ï¿½gale ou infï¿½rieure ï¿½ <code>i</code>, alors les coordonnï¿½es
      *               des points seront choisis au hasard.
-     * @param  i     Index à partir d'où interpréter les arguments dans <code>args</code>.
+     * @param  i     Index ï¿½ partir d'oï¿½ interprï¿½ter les arguments dans <code>args</code>.
      * @return       Tableau de points.
      * @throws IllegalArgumentException si <code>args</code> n'a pas la longueur requise.
      */
@@ -684,9 +677,9 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Affiche la forme géométrique spécifiée
-     * dans une fenêtre. Cette méthode sert à
-     * vérifier si une forme est dessinée
+     * Affiche la forme gï¿½omï¿½trique spï¿½cifiï¿½e
+     * dans une fenï¿½tre. Cette mï¿½thode sert ï¿½
+     * vï¿½rifier si une forme est dessinï¿½e
      * correctement.
      */
     public static JFrame show(final Shape shape) {
@@ -694,9 +687,9 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Affiche les formes géométriques spécifiées
-     * dans une fenêtre. Cette méthode sert à
-     * vérifier si des formes sont dessinées
+     * Affiche les formes gï¿½omï¿½triques spï¿½cifiï¿½es
+     * dans une fenï¿½tre. Cette mï¿½thode sert ï¿½
+     * vï¿½rifier si des formes sont dessinï¿½es
      * correctement.
      */
     public static JFrame show(final Object[] shapes) {
@@ -704,9 +697,9 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Affiche les formes géométriques spécifiées
-     * dans une fenêtre. Cette méthode sert à
-     * vérifier si des formes sont dessinées
+     * Affiche les formes gï¿½omï¿½triques spï¿½cifiï¿½es
+     * dans une fenï¿½tre. Cette mï¿½thode sert ï¿½
+     * vï¿½rifier si des formes sont dessinï¿½es
      * correctement.
      */
     public static JFrame show(final Producer producer) {
@@ -714,9 +707,9 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Affiche les formes géométriques spécifiées
-     * dans une fenêtre. Cette méthode sert à
-     * vérifier si des formes sont dessinées
+     * Affiche les formes gï¿½omï¿½triques spï¿½cifiï¿½es
+     * dans une fenï¿½tre. Cette mï¿½thode sert ï¿½
+     * vï¿½rifier si des formes sont dessinï¿½es
      * correctement.
      */
     private static JFrame show(final ShapePanel panel) {
@@ -739,14 +732,14 @@ public class ShapePanel extends JPanel {
     }
 
     /**
-     * Affiche la forme géométrique spécifiée. Le nom de la classe de la forme doit
-     * être spécifiée en argument. Un exemple de nom de classe valide serait
+     * Affiche la forme gï¿½omï¿½trique spï¿½cifiï¿½e. Le nom de la classe de la forme doit
+     * ï¿½tre spï¿½cifiï¿½e en argument. Un exemple de nom de classe valide serait
      * <code>java.awt.geom.RoundRectangle2D$Float</code>.
      *
-     * @throws ClassNotFoundException si la classe spécifiée n'a pas été trouvée.
-     * @throws IllegalAccessException si la classe spécifiée n'est pas accessible.
-     * @throws InstantiationException si la classe spécifiée ne peut pas créer d'objet sans argument.
-     * @throws ClassCastException     si la classe spécifiée n'implémente pas l'interface {@link Shape}.
+     * @throws ClassNotFoundException si la classe spï¿½cifiï¿½e n'a pas ï¿½tï¿½ trouvï¿½e.
+     * @throws IllegalAccessException si la classe spï¿½cifiï¿½e n'est pas accessible.
+     * @throws InstantiationException si la classe spï¿½cifiï¿½e ne peut pas crï¿½er d'objet sans argument.
+     * @throws ClassCastException     si la classe spï¿½cifiï¿½e n'implï¿½mente pas l'interface {@link Shape}.
      */
     public static void main(final String[] args) throws ClassNotFoundException,
                                                         IllegalAccessException,

@@ -6,16 +6,15 @@
 
 package org.geotools.gce.arcgrid;
 
-import java.io.File;
 import java.awt.image.Raster;
+import java.io.File;
 
-import org.geotools.gc.GridCoverage;
-import org.geotools.pt.Envelope;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
+import org.geotools.gc.GridCoverage;
+import org.geotools.pt.Envelope;
 import org.geotools.resources.TestData;
-
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 

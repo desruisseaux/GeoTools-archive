@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,30 +20,24 @@
 package org.geotools.parameter;
 
 // OpenGIS dependencies
-import java.util.List;
-import java.util.ArrayList;
 import java.io.IOException;
+import java.util.List;
 
-// OpenGIS dependencies
+import org.geotools.io.TableWriter;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.resources.UnmodifiableArrayList;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
 import org.opengis.metadata.Identifier;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterNotFoundException;
-
-// Geotools dependencies
-import org.geotools.io.TableWriter;
-import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.UnmodifiableArrayList;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.wkt.UnformattableObjectException;
 
 
 /**

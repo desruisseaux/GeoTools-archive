@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,40 +20,32 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.util.Locale;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.text.ParseException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.Format;
-import java.io.Writer;
-import java.io.FileReader;
-import java.io.PrintWriter;
-import java.io.LineNumberReader;
-import java.io.IOException;
+import java.text.ParseException;
+import java.util.Locale;
+import java.util.StringTokenizer;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.io.TableWriter;
 import org.geotools.measure.Measure;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.referencing.wkt.AbstractConsole;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Preprocessor;
-import org.geotools.referencing.wkt.AbstractConsole;
-import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**

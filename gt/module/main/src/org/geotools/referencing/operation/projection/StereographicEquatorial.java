@@ -1,7 +1,7 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, 2004, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -46,16 +46,13 @@
 package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
-import java.util.Collection;
 import java.awt.geom.Point2D;
+import java.util.Collection;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-
-// Geotools dependencies
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * The USGS equatorial case of the {@linkplain Stereographic stereographic} projection.
@@ -63,7 +60,7 @@ import org.geotools.resources.cts.Resources;
  * {@link #latitudeOfOrigin} == 0.0.
  *
  * @version $Id$
- * @author André Gosselin
+ * @author Andrï¿½ Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */

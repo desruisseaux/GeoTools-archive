@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,14 +35,15 @@ package org.geotools.renderer.array;
 
 // Divers
 import java.awt.geom.Point2D;
-import org.geotools.resources.XArray;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
+
 import org.geotools.renderer.geom.CompressionLevel;
+import org.geotools.resources.XArray;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
 
 
 /**
- * Tableaux de points compressés. Les objets de cette classe sont immutables.
+ * Tableaux de points compressï¿½s. Les objets de cette classe sont immutables.
  *
  * @task TODO: The compression algorithm (as computed in the constructor) should be improved.
  *             The {@link #scaleX} and {@link #scaleY} values doesn't need to macth the widest
@@ -51,7 +52,7 @@ import org.geotools.renderer.geom.CompressionLevel;
  *
  * @task TODO: An other algorithm should be implemented in a new class: <code>ClockArray</code>
  *             or something like that. Instead of storing (dx,dy) value for each point, we should
- *             store only the angle (theta) in a 0-255 range (resolution of 1.41°). It should
+ *             store only the angle (theta) in a 0-255 range (resolution of 1.41ï¿½). It should
  *             work providing that each points are approximatively equidistant. The current
  *             {@link org.geotools.renderer.geom.Polyline#setResolution} method ensure exactly that.
  *
@@ -60,21 +61,21 @@ import org.geotools.renderer.geom.CompressionLevel;
  */
 class CompressedArray extends PointArray {
     /**
-     * Numéro de série (pour compatibilité avec des versions antérieures).
+     * Numï¿½ro de sï¿½rie (pour compatibilitï¿½ avec des versions antï¿½rieures).
      */
     private static final long serialVersionUID = 7412677491468764036L;
 
     /**
-     * Tableaux des coordonnées <u>relatives</u>. Ces coordonnées
-     * sont normalement mémorisées sous forme de paires (dx,dy).
-     * Chaque paire (dx,dy) représente le déplacement par rapport
-     * au point précédent.
+     * Tableaux des coordonnï¿½es <u>relatives</u>. Ces coordonnï¿½es
+     * sont normalement mï¿½morisï¿½es sous forme de paires (dx,dy).
+     * Chaque paire (dx,dy) reprï¿½sente le dï¿½placement par rapport
+     * au point prï¿½cï¿½dent.
      */
     protected final byte[] array;
 
     /**
-     * Coordonnées du point qui précède le premier point.
-     * Les coordonnées du "vrai" premier point seront obtenues par:
+     * Coordonnï¿½es du point qui prï¿½cï¿½de le premier point.
+     * Les coordonnï¿½es du "vrai" premier point seront obtenues par:
      *
      * <pre>
      *     x = x0 + array[lower+0]*scaleX;
@@ -84,16 +85,16 @@ class CompressedArray extends PointArray {
     protected final float x0, y0;
 
     /**
-     * Constantes servant à transformer linéairement les
+     * Constantes servant ï¿½ transformer linï¿½airement les
      * valeurs {@link #array} vers des <code>float</code>.
      */
     protected final float scaleX, scaleY;
 
     /**
-     * Construit un sous-tableau à partir d'un autre tableau compressé.
+     * Construit un sous-tableau ï¿½ partir d'un autre tableau compressï¿½.
      *
      * @param  other Tableau source.
-     * @param  lower Index de la première coordonnées <var>x</var> à
+     * @param  lower Index de la premiï¿½re coordonnï¿½es <var>x</var> ï¿½
      *         prendre en compte dans le tableau <code>other</code>.
      */
     protected CompressedArray(final CompressedArray other, final int lower) {
@@ -114,16 +115,16 @@ class CompressedArray extends PointArray {
     }
 
     /**
-     * Construit un tableau compressé.
+     * Construit un tableau compressï¿½.
      *
-     * @param  coord Tableau de coordonnées (<var>x</var>,<var>y</var>).
-     * @param  lower Index de la première coordonnées <var>x</var> à
+     * @param  coord Tableau de coordonnï¿½es (<var>x</var>,<var>y</var>).
+     * @param  lower Index de la premiï¿½re coordonnï¿½es <var>x</var> ï¿½
      *         prendre en compte dans le tableau <code>coord</code>.
-     * @param  upper Index suivant celui de la dernière coordonnée <var>y</var> à
-     *         prendre en compte dans le tableau <code>coord</code>. La différence
-     *         <code>upper-lower</code> doit obligatoirement être paire.
-     * @throws ArithmeticException Si la compression a échouée à
-     *         cause d'une erreur arithmétique dans l'algorithme.
+     * @param  upper Index suivant celui de la derniï¿½re coordonnï¿½e <var>y</var> ï¿½
+     *         prendre en compte dans le tableau <code>coord</code>. La diffï¿½rence
+     *         <code>upper-lower</code> doit obligatoirement ï¿½tre paire.
+     * @throws ArithmeticException Si la compression a ï¿½chouï¿½e ï¿½
+     *         cause d'une erreur arithmï¿½tique dans l'algorithme.
      */
     public CompressedArray(final float[] coord, final int lower, final int upper)
             throws ArithmeticException
@@ -134,7 +135,7 @@ class CompressedArray extends PointArray {
                                                new Integer(lower), new Integer(upper)));
         }
         /*
-         * Calcule les plus grands écarts de longitude (<var>dx</var>)
+         * Calcule les plus grands ï¿½carts de longitude (<var>dx</var>)
          * et de latitude (<var>dy</var>) entre deux points.
          */
         float dxMin = Float.POSITIVE_INFINITY;
@@ -152,7 +153,7 @@ class CompressedArray extends PointArray {
             if (delta>dyMax) dyMax=delta;
         }
         /*
-         * Construit le tableau de coordonnées compressées.
+         * Construit le tableau de coordonnï¿½es compressï¿½es.
          */
         this.x0 = coord[lower+0];
         this.y0 = coord[lower+1];
@@ -200,14 +201,14 @@ class CompressedArray extends PointArray {
     }
 
     /**
-     * Retourne l'index de la première coordonnée valide.
+     * Retourne l'index de la premiï¿½re coordonnï¿½e valide.
      */
     protected int lower() {
         return 0;
     }
 
     /**
-     * Retourne l'index suivant celui de la dernière coordonnée valide.
+     * Retourne l'index suivant celui de la derniï¿½re coordonnï¿½e valide.
      */
     protected int upper() {
         return array.length;
@@ -230,11 +231,11 @@ class CompressedArray extends PointArray {
     }
 
     /**
-     * Mémorise dans l'objet spécifié les coordonnées du premier point.
+     * Mï¿½morise dans l'objet spï¿½cifiï¿½ les coordonnï¿½es du premier point.
      *
-     * @param  point Point dans lequel mémoriser la coordonnée.
+     * @param  point Point dans lequel mï¿½moriser la coordonnï¿½e.
      * @return L'argument <code>point</code>, ou un nouveau point
-     *         si <code>point</code> était nul.
+     *         si <code>point</code> ï¿½tait nul.
      */
     public final Point2D getFirstPoint(final Point2D point) {
         final int lower = lower();
@@ -249,11 +250,11 @@ class CompressedArray extends PointArray {
     }
 
     /**
-     * Mémorise dans l'objet spécifié les coordonnées du dernier point.
+     * Mï¿½morise dans l'objet spï¿½cifiï¿½ les coordonnï¿½es du dernier point.
      *
-     * @param  point Point dans lequel mémoriser la coordonnée.
+     * @param  point Point dans lequel mï¿½moriser la coordonnï¿½e.
      * @return L'argument <code>point</code>, ou un nouveau point
-     *         si <code>point</code> était nul.
+     *         si <code>point</code> ï¿½tait nul.
      */
     public final Point2D getLastPoint(final Point2D point) {
         int dx=0;
@@ -274,20 +275,20 @@ class CompressedArray extends PointArray {
     }
 
     /**
-     * Retourne un itérateur qui balaiera les points partir de l'index spécifié.
+     * Retourne un itï¿½rateur qui balaiera les points partir de l'index spï¿½cifiï¿½.
      */
     public final PointIterator iterator(final int index) {
         return new CompressedIterator(this, index);
     }
 
     /**
-     * Retourne un tableau enveloppant les mêmes points que le tableau courant,
-     * mais des index <code>lower</code> inclusivement jusqu'à <code>upper</code>
-     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-à-dire si
-     * <code>lower==upper</code>), alors cette méthode retourne <code>null</code>.
+     * Retourne un tableau enveloppant les mï¿½mes points que le tableau courant,
+     * mais des index <code>lower</code> inclusivement jusqu'ï¿½ <code>upper</code>
+     * exclusivement. Si le sous-tableau ne contient aucun point (c'est-ï¿½-dire si
+     * <code>lower==upper</code>), alors cette mï¿½thode retourne <code>null</code>.
      *
-     * @param lower Index du premier point à prendre en compte.
-     * @param upper Index suivant celui du dernier point à prendre en compte.
+     * @param lower Index du premier point ï¿½ prendre en compte.
+     * @param upper Index suivant celui du dernier point ï¿½ prendre en compte.
      */
     public final PointArray subarray(int lower, int upper) {
         final int thisLower=lower();
@@ -300,21 +301,21 @@ class CompressedArray extends PointArray {
     }
 
     /**
-     * Insère les données (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spécifié.
-     * Si le drapeau <code>reverse</code> à la valeur <code>true</code>, alors les points de
-     * <code>toMerge</code> seront copiées en ordre inverse.
+     * Insï¿½re les donnï¿½es (<var>x</var>,<var>y</var>) du tableau <code>toMerge</code> spï¿½cifiï¿½.
+     * Si le drapeau <code>reverse</code> ï¿½ la valeur <code>true</code>, alors les points de
+     * <code>toMerge</code> seront copiï¿½es en ordre inverse.
      *
-     * @param  index Index à partir d'où insérer les points dans ce tableau. Le point à cet
-     *         index ainsi que tous ceux qui le suivent seront décalés vers des index plus élevés.
-     * @param  toMerge Tableau de coordonnées (<var>x</var>,<var>y</var>) à insérer dans ce
-     *         tableau de points. Ses valeurs seront copiées.
-     * @param  lower Index de la première coordonnée de <code>toMerge</code> à copier dans ce tableau.
-     * @param  upper Index suivant celui de la dernière coordonnée de <code>toMerge</code> à copier.
+     * @param  index Index ï¿½ partir d'oï¿½ insï¿½rer les points dans ce tableau. Le point ï¿½ cet
+     *         index ainsi que tous ceux qui le suivent seront dï¿½calï¿½s vers des index plus ï¿½levï¿½s.
+     * @param  toMerge Tableau de coordonnï¿½es (<var>x</var>,<var>y</var>) ï¿½ insï¿½rer dans ce
+     *         tableau de points. Ses valeurs seront copiï¿½es.
+     * @param  lower Index de la premiï¿½re coordonnï¿½e de <code>toMerge</code> ï¿½ copier dans ce tableau.
+     * @param  upper Index suivant celui de la derniï¿½re coordonnï¿½e de <code>toMerge</code> ï¿½ copier.
      * @param  reverse <code>true</code> s'il faut inverser l'ordre des points de <code>toMerge</code>
      *         lors de la copie. Cette inversion ne change pas l'ordre (<var>x</var>,<var>y</var>) des
-     *         coordonnées de chaque points.
+     *         coordonnï¿½es de chaque points.
      *
-     * @return Un nouveau tableau non-compressé.
+     * @return Un nouveau tableau non-compressï¿½.
      */
     public final PointArray insertAt(final int index, final float toMerge[],
                                      final int lower, final int upper, final boolean reverse)
@@ -328,7 +329,7 @@ class CompressedArray extends PointArray {
     /**
      * Renverse l'ordre de tous les points compris dans ce tableau.
      *
-     * @return Un nouveau tableau non-compressé qui
+     * @return Un nouveau tableau non-compressï¿½ qui
      *         contiendra les points en ordre inverse.
      */
     public final PointArray reverse() {
@@ -336,9 +337,9 @@ class CompressedArray extends PointArray {
     }
 
     /**
-     * Retourne un tableau immutable qui contient les mêmes données que celui-ci.
-     * Cette méthode retourne toujours <code>this</code> puisque ce tableau est
-     * déjà immutable et compressé.
+     * Retourne un tableau immutable qui contient les mï¿½mes donnï¿½es que celui-ci.
+     * Cette mï¿½thode retourne toujours <code>this</code> puisque ce tableau est
+     * dï¿½jï¿½ immutable et compressï¿½.
      */
     public final PointArray getFinal(final CompressionLevel level) {
         return this;

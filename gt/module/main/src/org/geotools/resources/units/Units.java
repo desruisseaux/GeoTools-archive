@@ -1,8 +1,8 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2002, Center for Computational Geography
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,33 +28,32 @@
 package org.geotools.resources.units;
 
 // Ressources
-import java.util.MissingResourceException;
 
 
 /**
- * Liste de noms d'unités qui dépendront de la langue de l'utilisateur. L'usager
- * ne devrait pas créer lui-même des instances de cette classe. Une instance
- * statique sera créée une fois pour toute lors du chargement de cette classe,
- * et les divers resources seront mises à la disposition du développeur
- * via les méthodes statiques.
+ * Liste de noms d'unitï¿½s qui dï¿½pendront de la langue de l'utilisateur. L'usager
+ * ne devrait pas crï¿½er lui-mï¿½me des instances de cette classe. Une instance
+ * statique sera crï¿½ï¿½e une fois pour toute lors du chargement de cette classe,
+ * et les divers resources seront mises ï¿½ la disposition du dï¿½veloppeur
+ * via les mï¿½thodes statiques.
  *
  * @version 1.0
  * @author Martin Desruisseaux
  */
 public class Units extends SymbolResources {
     /**
-     * Instance statique crée une fois pour toute.
-     * Tous les messages seront construits à partir
+     * Instance statique crï¿½e une fois pour toute.
+     * Tous les messages seront construits ï¿½ partir
      * de cette instance.
      */
     private final static Units resources =
         (Units) getBundle("org.geotools.resources.units.Units");
 
     /**
-     * Initialise les ressources par défaut. Ces ressources ne seront pas forcément dans
-     * la langue de l'utilisateur. Il s'agit plutôt de ressources à utiliser par défaut
+     * Initialise les ressources par dï¿½faut. Ces ressources ne seront pas forcï¿½ment dans
+     * la langue de l'utilisateur. Il s'agit plutï¿½t de ressources ï¿½ utiliser par dï¿½faut
      * si aucune n'est disponible dans la langue de l'utilisateur. Ce constructeur est
-     * réservé à un usage interne et ne devrait pas être appellé directement.
+     * rï¿½servï¿½ ï¿½ un usage interne et ne devrait pas ï¿½tre appellï¿½ directement.
      */
     public Units() {
         super(true ? Units_en.contents : Units_fr.contents);
@@ -62,16 +61,16 @@ public class Units extends SymbolResources {
 
     /**
      * Initialise les ressources en
-     * utilisant la liste spécifiée.
+     * utilisant la liste spï¿½cifiï¿½e.
      */
     Units(final Object[] contents) {
         super(contents);
     }
 
     /**
-     * Retourne la valeur associée à la clée spécifiée, ou <code>key</code> s'il
-     * n'y en a pas. A la différence de <code>format(String)</code>, cette méthode
-     * ne lance pas d'exception si la resource n'est pas trouvée.
+     * Retourne la valeur associï¿½e ï¿½ la clï¿½e spï¿½cifiï¿½e, ou <code>key</code> s'il
+     * n'y en a pas. A la diffï¿½rence de <code>format(String)</code>, cette mï¿½thode
+     * ne lance pas d'exception si la resource n'est pas trouvï¿½e.
      */
     public static String localize(final String key) {
         if (key==null) {

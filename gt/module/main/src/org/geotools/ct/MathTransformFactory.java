@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,40 +24,32 @@
 package org.geotools.ct;
 
 // J2SE dependencies
-import java.util.Locale;
-import java.text.ParseException;
 import java.awt.geom.AffineTransform;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.text.ParseException;
+import java.util.Locale;
 
-// JAI dependencies
-import javax.media.jai.ParameterList;
 import javax.media.jai.IntegerSequence;
+import javax.media.jai.ParameterList;
 
-// OpenGIS dependencies
-import org.opengis.pt.PT_Matrix;
-import org.opengis.ct.CT_Parameter;
-import org.opengis.ct.CT_MathTransform;
-import org.opengis.ct.CT_MathTransformFactory;
-
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
 import org.geotools.cs.Projection;
 import org.geotools.ct.proj.Provider;
-
-// Resources
+import org.geotools.pt.Matrix;
+import org.geotools.resources.DescriptorNaming;
+import org.geotools.resources.XArray;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.image.JAIUtilities;
 import org.geotools.units.Unit;
 import org.geotools.util.WeakHashSet;
-import org.geotools.resources.XArray;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.DescriptorNaming;
-import org.geotools.resources.image.JAIUtilities;
+import org.opengis.ct.CT_MathTransform;
+import org.opengis.ct.CT_MathTransformFactory;
+import org.opengis.ct.CT_Parameter;
+import org.opengis.pt.PT_Matrix;
+import org.opengis.referencing.FactoryException;
 
 
 /**

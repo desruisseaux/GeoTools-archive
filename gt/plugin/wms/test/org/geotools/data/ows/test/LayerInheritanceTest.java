@@ -1,19 +1,13 @@
 package org.geotools.data.ows.test;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.ows.BoundingBox;
-import org.geotools.data.ows.LatLonBoundingBox;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.xml.WMSSchema;

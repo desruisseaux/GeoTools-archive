@@ -19,7 +19,6 @@
 package org.geotools.graph.traverse.standard;
 
 import org.geotools.graph.structure.Graph;
-
 import org.geotools.graph.util.Queue;
 import org.geotools.graph.util.Stack;
 

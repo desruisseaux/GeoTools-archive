@@ -19,8 +19,12 @@
  */
 package org.geotools.data.shape.shp;
 
-import com.vividsolutions.jts.geom.*;
 import java.nio.ByteBuffer;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPoint;
 
 
 

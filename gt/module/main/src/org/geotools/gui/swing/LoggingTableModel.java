@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -33,35 +33,24 @@
 package org.geotools.gui.swing;
 
 // Logging
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.EventQueue;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
-// Table model
-import javax.swing.table.TableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.event.EventListenerList;
-import java.awt.EventQueue;
+import javax.swing.table.TableModel;
 
-// Collections
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-
-// Formatting
-import java.util.Date;
-import java.text.DateFormat;
-
-// Resources
 import org.geotools.resources.XArray;
-import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**

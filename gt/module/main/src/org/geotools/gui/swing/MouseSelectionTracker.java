@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,24 +20,21 @@
 package org.geotools.gui.swing;
 
 // Geometry
-import java.awt.Shape;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.geom.RectangularShape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-
-// Graphics
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-
-// Events
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
+import java.awt.geom.RoundRectangle2D;
+
 import javax.swing.event.MouseInputAdapter;
 
 

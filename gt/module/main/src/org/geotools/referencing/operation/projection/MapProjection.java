@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -28,32 +28,29 @@ package org.geotools.referencing.operation.projection;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Collection;
-import javax.units.Unit;
-import javax.units.SI;
+
 import javax.units.NonSI;
+import javax.units.SI;
+import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.InvalidParameterNameException;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterValue;
-
-// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
+import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
-import org.geotools.metadata.citation.Citation;
+import org.geotools.resources.XMath;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.geotools.resources.XMath;
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -71,7 +68,7 @@ import org.geotools.resources.XMath;
  * WKT (Well Know Text) or XML (not yet implemented) are more appropriate.
  *
  * @version $Id$
- * @author André Gosselin
+ * @author Andrï¿½ Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
@@ -113,7 +110,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     protected final double excentricity;
     
     /**
-     * The square of excentricity: e² = (a²-b²)/a² where
+     * The square of excentricity: eï¿½ = (aï¿½-bï¿½)/aï¿½ where
      * <var>e</var> is the {@linkplain #excentricity excentricity},
      * <var>a</var> is the {@linkplain #semiMajor semi major} axis length and
      * <var>b</var> is the {@linkplain #semiMinor semi minor} axis length.
@@ -211,8 +208,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      *         <ul>
      *           <li>"semi_major" (mandatory: no default)</li>
      *           <li>"semi_minor" (mandatory: no default)</li>
-     *           <li>"central_meridian"   (default to 0°)</li>
-     *           <li>"latitude_of_origin" (default to 0°)</li>
+     *           <li>"central_meridian"   (default to 0ï¿½)</li>
+     *           <li>"latitude_of_origin" (default to 0ï¿½)</li>
      *           <li>"scale_factor"       (default to 1 )</li>
      *           <li>"false_easting"      (default to 0 )</li>
      *           <li>"false_northing"     (default to 0 )</li>
@@ -619,10 +616,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         /*
          * Makes sure that the longitude before conversion stay within +/- PI radians. As a
          * special case, we do not check the range if no rotation were applied on the longitude.
-         * This is because the user may have a big area ranging from -180° to +180°. With the
-         * slight rounding errors related to map projections, the 180° longitude may be slightly
+         * This is because the user may have a big area ranging from -180ï¿½ to +180ï¿½. With the
+         * slight rounding errors related to map projections, the 180ï¿½ longitude may be slightly
          * over the limit. Rolling the longitude would changes its sign. For example a bounding
-         * box from 30° to +180° would become 30° to -180°, which is probably not what the user
+         * box from 30ï¿½ to +180ï¿½ would become 30ï¿½ to -180ï¿½, which is probably not what the user
          * wanted.
          */
         ptDst = transformNormalized(centralMeridian!=0 ?
@@ -650,9 +647,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         throws ProjectionException
     {
         /*
-         * Vérifie s'il faudra parcourir le tableau en sens inverse.
+         * Vï¿½rifie s'il faudra parcourir le tableau en sens inverse.
          * Ce sera le cas si les tableaux source et destination se
-         * chevauchent et que la destination est après la source.
+         * chevauchent et que la destination est aprï¿½s la source.
          */
         final boolean reverse = (src==dest && srcOffset<dstOffset &&
                                  srcOffset+(2*numPts) > dstOffset);
@@ -781,10 +778,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             /*
              * Makes sure that the longitude after conversion stay within +/- PI radians. As a
              * special case, we do not check the range if no rotation were applied on the longitude.
-             * This is because the user may have a big area ranging from -180° to +180°. With the
-             * slight rounding errors related to map projections, the 180° longitude may be slightly
+             * This is because the user may have a big area ranging from -180ï¿½ to +180ï¿½. With the
+             * slight rounding errors related to map projections, the 180ï¿½ longitude may be slightly
              * over the limit. Rolling the longitude would changes its sign. For example a bounding
-             * box from 30° to +180° would become 30° to -180°, which is probably not what the user
+             * box from 30ï¿½ to +180ï¿½ would become 30ï¿½ to -180ï¿½, which is probably not what the user
              * wanted.
              */
             final double x = Math.toDegrees(centralMeridian!=0 ?
@@ -819,9 +816,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
                 throws TransformException
         {
             /*
-             * Vérifie s'il faudra parcourir le tableau en sens inverse.
+             * Vï¿½rifie s'il faudra parcourir le tableau en sens inverse.
              * Ce sera le cas si les tableaux source et destination se
-             * chevauchent et que la destination est après la source.
+             * chevauchent et que la destination est aprï¿½s la source.
              */
             final boolean reverse = (src==dest && srcOffset<dstOffset &&
                                      srcOffset+(2*numPts) > dstOffset);
@@ -988,9 +985,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Compute function <code>f(s,c,e²) = c/sqrt(1 - s²&times;e²)</code> needed for the true scale
+     * Compute function <code>f(s,c,eï¿½) = c/sqrt(1 - sï¿½&times;eï¿½)</code> needed for the true scale
      * latitude (Snyder 14-15), where <var>s</var> and <var>c</var> are the sine and cosine of
-     * the true scale latitude, and <var>e²</var> is the {@linkplain #excentricitySquared
+     * the true scale latitude, and <var>eï¿½</var> is the {@linkplain #excentricitySquared
      * eccentricity squared}.
      */
     final double msfn(final double s, final double c) {
@@ -1059,7 +1056,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
 
         /**
          * The operation parameter descriptor for the {@link #centralMeridian centralMeridian}
-         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180ï¿½. Default value is 0.
          */
         public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
                 new Identifier[] {
@@ -1074,7 +1071,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
 
         /**
          * The operation parameter descriptor for the {@link #latitudeOfOrigin latitudeOfOrigin}
-         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
          */
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
                 new Identifier[] {

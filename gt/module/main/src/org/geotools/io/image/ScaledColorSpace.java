@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,7 +35,6 @@ package org.geotools.io.image;
 // J2SE dependencies
 import java.awt.color.ColorSpace;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -62,17 +61,17 @@ final class ScaledColorSpace extends ColorSpace {
     private final float scale;
     
     /**
-     * Nombre à aditionner aux pixels après
+     * Nombre ï¿½ aditionner aux pixels aprï¿½s
      * les avoir multiplier par {@link #scale}.
      */
     private final float offset;
     
     /**
-     * Construit un modèle de couleurs.
+     * Construit un modï¿½le de couleurs.
      *
-     * @param numComponents Nombre de composante (seule la première sera prise en compte).
-     * @param minimum Valeur minimale des nombres réels à décoder.
-     * @param maximum Valeur maximale des nombres réels à décoder.
+     * @param numComponents Nombre de composante (seule la premiï¿½re sera prise en compte).
+     * @param minimum Valeur minimale des nombres rï¿½els ï¿½ dï¿½coder.
+     * @param maximum Valeur maximale des nombres rï¿½els ï¿½ dï¿½coder.
      */
     public ScaledColorSpace(final int numComponents, final float minimum, final float maximum) {
         super(TYPE_GRAY, numComponents);

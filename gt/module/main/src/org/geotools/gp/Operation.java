@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -36,37 +36,31 @@
 package org.geotools.gp;
 
 // J2SE dependencies
-import java.io.Writer;
+import java.awt.Color;
+import java.awt.RenderingHints;
 import java.io.IOException;
 import java.io.Serializable;
-import java.awt.RenderingHints;
-import java.awt.Color;
-import java.util.Locale;
+import java.io.Writer;
 import java.lang.reflect.Array;
+import java.util.Locale;
 
-// JAI dependencies
-import javax.media.jai.KernelJAI;
-import javax.media.jai.util.Range;
+import javax.media.jai.EnumeratedParameter;
 import javax.media.jai.Interpolation;
+import javax.media.jai.KernelJAI;
 import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListImpl;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
-import javax.media.jai.EnumeratedParameter;
+import javax.media.jai.ParameterListImpl;
+import javax.media.jai.util.Range;
 
-// OpenGIS dependencies
-import org.opengis.gp.GP_Operation; // For Javadoc
-
-// Geotools Dependencies
 import org.geotools.gc.GridCoverage;
 import org.geotools.gc.ParameterInfo;
-
-// Resources
 import org.geotools.io.TableWriter;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.DescriptorNaming;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
+import org.opengis.gp.GP_Operation;
 
 
 /**
@@ -338,7 +332,7 @@ public abstract class Operation implements Serializable {
     }
     
     /**
-     * Returns a string représentation of this operation.
+     * Returns a string reprï¿½sentation of this operation.
      * The returned string is implementation dependent. It
      * is usually provided for debugging purposes only.
      */

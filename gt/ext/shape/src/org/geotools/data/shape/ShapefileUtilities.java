@@ -6,12 +6,6 @@
 
 package org.geotools.data.shape;
 
-import com.vividsolutions.jts.geom.Geometry;
-import java.util.Date;
-import org.geotools.data.shape.dbf.DbaseFileException;
-import org.geotools.data.shape.dbf.DbaseFileHeader;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 
 /**
  *

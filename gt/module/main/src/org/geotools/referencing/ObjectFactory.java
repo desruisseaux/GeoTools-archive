@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,25 +23,55 @@
 package org.geotools.referencing;
 
 // J2SE dependencies and extensions
-import java.util.Map;
-import java.util.Date;
 import java.text.ParseException;
+import java.util.Date;
+import java.util.Map;
+
 import javax.units.Unit;
 
-// OpenGIS dependencies
-import org.opengis.referencing.cs.*;
-import org.opengis.referencing.crs.*;
-import org.opengis.referencing.datum.*;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.Identifier;
-
-// Geotools dependencies
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CompoundCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.DerivedCRS;
+import org.opengis.referencing.crs.EngineeringCRS;
+import org.opengis.referencing.crs.GeocentricCRS;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ImageCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.crs.TemporalCRS;
+import org.opengis.referencing.crs.VerticalCRS;
+import org.opengis.referencing.cs.AffineCS;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.CylindricalCS;
+import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.LinearCS;
+import org.opengis.referencing.cs.PolarCS;
+import org.opengis.referencing.cs.SphericalCS;
+import org.opengis.referencing.cs.TimeCS;
+import org.opengis.referencing.cs.UserDefinedCS;
+import org.opengis.referencing.cs.VerticalCS;
+import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.datum.Ellipsoid;
+import org.opengis.referencing.datum.EngineeringDatum;
+import org.opengis.referencing.datum.GeodeticDatum;
+import org.opengis.referencing.datum.ImageDatum;
+import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.referencing.datum.PrimeMeridian;
+import org.opengis.referencing.datum.TemporalDatum;
+import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -242,7 +272,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * Creates a vertical datum from an enumerated type value.
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  type The type of this vertical datum (often “geoidal”).
+     * @param  type The type of this vertical datum (often ï¿½geoidalï¿½).
      * @throws FactoryException if the object creation failed.
      */
     public VerticalDatum createVerticalDatum(Map         properties,

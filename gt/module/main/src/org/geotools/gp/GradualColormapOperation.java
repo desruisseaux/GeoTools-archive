@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -35,11 +35,9 @@ package org.geotools.gp;
 // Collections
 import java.util.List;
 
-// Java Advanced Imaging
-import javax.media.jai.util.Range;
 import javax.media.jai.ParameterList;
+import javax.media.jai.util.Range;
 
-// Geotools dependencies
 import org.geotools.cv.Category;
 import org.geotools.cv.SampleDimension;
 
@@ -75,20 +73,20 @@ import org.geotools.cv.SampleDimension;
  */
 final class GradualColormapOperation extends IndexColorOperation {
     /**
-     * Constante indiquant qu'il faut garder la première couleur
-     * lorsqu'une plage de couleurs constantes est rencontrée.
+     * Constante indiquant qu'il faut garder la premiï¿½re couleur
+     * lorsqu'une plage de couleurs constantes est rencontrï¿½e.
      */
     private static final int KEEP_LOWER_COLOR = +1;
 
     /**
-     * Constante indiquant qu'il faut garder la dernière couleur
-     * lorsqu'une plage de couleurs constantes est rencontrée.
+     * Constante indiquant qu'il faut garder la derniï¿½re couleur
+     * lorsqu'une plage de couleurs constantes est rencontrï¿½e.
      */
     private static final int KEEP_UPPER_COLOR = -1;
 
     /**
      * Constante indiquant quelle couleur il faut garder
-     * lorsque l'opérateur trouve une plage de couleurs
+     * lorsque l'opï¿½rateur trouve une plage de couleurs
      * identiques.
      *
      * @task TODO: Allow setting this parameter from the ParameterList.
@@ -96,15 +94,15 @@ final class GradualColormapOperation extends IndexColorOperation {
     private final int mode = KEEP_LOWER_COLOR;
 
     /**
-     * Construit une opération qui interpolera les couleurs.
+     * Construit une opï¿½ration qui interpolera les couleurs.
      *
-     * @param mode Indique quelle couleur il faut garder lorsque l'opérateur trouve une plage de
+     * @param mode Indique quelle couleur il faut garder lorsque l'opï¿½rateur trouve une plage de
      *             couleurs identiques. La valeur {@link #KEEP_LOWER_COLOR} indique qu'il faut
-     *             laisser inchangée la première couleur de la plage et interpoler les autres
-     *             (la dernière couleur de la plage sera donc la plus affectée). La valeur
-     *             {@link #KEEP_UPPER_COLOR} indique au contraire qu'il faut laisser inchangée
-     *             la dernière couleur de la plage et interpoler les autres (la première couleur
-     *             sera donc la plus affectée).
+     *             laisser inchangï¿½e la premiï¿½re couleur de la plage et interpoler les autres
+     *             (la derniï¿½re couleur de la plage sera donc la plus affectï¿½e). La valeur
+     *             {@link #KEEP_UPPER_COLOR} indique au contraire qu'il faut laisser inchangï¿½e
+     *             la derniï¿½re couleur de la plage et interpoler les autres (la premiï¿½re couleur
+     *             sera donc la plus affectï¿½e).
      */
     public GradualColormapOperation() {
         super("GradualColormap", MONADIC);

@@ -20,9 +20,10 @@
  */
 package org.geotools.validation;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

@@ -21,7 +21,6 @@ package org.geotools.graph.path;
 
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Graphable;
-
 import org.geotools.graph.traverse.GraphTraversal;
 import org.geotools.graph.traverse.GraphWalker;
 import org.geotools.graph.traverse.basic.BasicGraphTraversal;

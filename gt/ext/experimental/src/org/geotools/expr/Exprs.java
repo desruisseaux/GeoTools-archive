@@ -22,17 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.Extent;
-import org.geotools.feature.FeatureType;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.LogicFilter;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

@@ -31,7 +31,6 @@ import org.geotools.data.coverage.grid.GridCoverageWriter;
 import org.geotools.gc.GridCoverage;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.FileFormatNotCompatibleWithGridCoverageException;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**

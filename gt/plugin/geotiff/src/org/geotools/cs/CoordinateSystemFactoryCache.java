@@ -6,20 +6,19 @@
 
 package org.geotools.cs;
 
-import java.io.IOException ; 
-import java.io.FileReader ; 
-import java.io.InputStream ; 
-import java.io.InputStreamReader ; 
-import java.io.BufferedReader ; 
-import java.util.Map ; 
-import java.util.HashMap ; 
-import java.util.zip.ZipFile; 
-import java.util.zip.ZipEntry ; 
-import java.util.zip.ZipException ; 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
-// Geotools dependencies
-import org.geotools.units.Unit ; 
-import org.opengis.referencing.FactoryException ; 
+import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
 
 /**
  * This class provides a default implementation of a

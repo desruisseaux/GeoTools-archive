@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2000, Institut de Recherche pour le Développement
- * (C) 1999, Pêches et Océans Canada
+ * (C) 2000, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1999, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,35 +29,33 @@ package org.geotools.resources.units;
 
 // Utilitaires
 import java.util.Enumeration;
-import java.util.ListResourceBundle;
 import java.util.NoSuchElementException;
-import java.util.MissingResourceException;
 
 
 /**
- * Liste de ressources s'adaptant à la langue de l'utilisateur. Cette classe
- * s'apparente à la classe {@link java.util.ListResourceBundle} standard du
- * Java, excepté qu'elle est légèrement plus économe en mémoire.
+ * Liste de ressources s'adaptant ï¿½ la langue de l'utilisateur. Cette classe
+ * s'apparente ï¿½ la classe {@link java.util.ListResourceBundle} standard du
+ * Java, exceptï¿½ qu'elle est lï¿½gï¿½rement plus ï¿½conome en mï¿½moire.
  *
  * @version 1.0
  * @author Martin Desruisseaux
  */
 public class SymbolResources extends java.util.ResourceBundle {
     /**
-     * Table des ressources adaptées
-     * à la langue de l'utilisateur.
+     * Table des ressources adaptï¿½es
+     * ï¿½ la langue de l'utilisateur.
      */
     private final Object[] map;
 
     /**
      * Construit la table des ressources.
      *
-     * @param contents Liste des clés et des valeurs qui y sont associées.
+     * @param contents Liste des clï¿½s et des valeurs qui y sont associï¿½es.
      *        Les objets se trouvant aux index pairs (0, 2, 4...) sont les
-     *        clés, et les objets se trouvant aux index impairs sont les
+     *        clï¿½s, et les objets se trouvant aux index impairs sont les
      *        valeurs.
      *
-     * @throws IllegalArgumentException Si une clé a été répétée deux fois.
+     * @throws IllegalArgumentException Si une clï¿½ a ï¿½tï¿½ rï¿½pï¿½tï¿½e deux fois.
      */
     protected SymbolResources(final Object[] contents) throws IllegalArgumentException {
         map=contents;
@@ -72,8 +70,8 @@ public class SymbolResources extends java.util.ResourceBundle {
     }
 
     /**
-     * Renvoie un énumérateur qui balayera toutes
-     * les clés que possède cette liste de ressources.
+     * Renvoie un ï¿½numï¿½rateur qui balayera toutes
+     * les clï¿½s que possï¿½de cette liste de ressources.
      */
     public final Enumeration getKeys() {
         return new Enumeration() {
@@ -96,13 +94,13 @@ public class SymbolResources extends java.util.ResourceBundle {
     }
 
     /**
-     * Renvoie la ressource associée à une clé donnée. Cette méthode est définie
-     * pour répondre aux exigences de la classe {@link java.util.ResourceBundle}
-     * et n'a généralement pas besoin d'être appellée directement.
+     * Renvoie la ressource associï¿½e ï¿½ une clï¿½ donnï¿½e. Cette mï¿½thode est dï¿½finie
+     * pour rï¿½pondre aux exigences de la classe {@link java.util.ResourceBundle}
+     * et n'a gï¿½nï¿½ralement pas besoin d'ï¿½tre appellï¿½e directement.
      *
-     * @param  key Clé désignant la ressouce désirée (ne doit pas être <code>null</code>).
-     * @return La ressource demandée, ou <code>null</code> si aucune ressource n'est
-     *         définie pour cette clé.
+     * @param  key Clï¿½ dï¿½signant la ressouce dï¿½sirï¿½e (ne doit pas ï¿½tre <code>null</code>).
+     * @return La ressource demandï¿½e, ou <code>null</code> si aucune ressource n'est
+     *         dï¿½finie pour cette clï¿½.
      */
     protected final Object handleGetObject(final String key) {
         for (int i=0; i<map.length; i+=2) {

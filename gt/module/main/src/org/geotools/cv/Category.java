@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,34 +25,25 @@ package org.geotools.cv;
 
 // J2SE dependencies
 import java.awt.Color;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
-import java.io.Serializable;
-import java.io.ObjectStreamException;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
-import javax.media.jai.operator.PiecewiseDescriptor; // For Javadoc
+import javax.media.jai.operator.PiecewiseDescriptor;
 
-// OpenGIS dependencies
-import org.opengis.cv.CV_SampleDimension; // For Javadoc
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
-import org.geotools.ct.MathTransform; // For Javadoc
+import org.geotools.ct.MathTransform;
 import org.geotools.ct.MathTransform1D;
 import org.geotools.ct.MathTransformFactory;
-
-// Resources
-import org.geotools.util.WeakHashSet;
-import org.geotools.util.NumberRange;
-import org.geotools.resources.XMath;
+import org.geotools.pt.Matrix;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.XMath;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.util.NumberRange;
+import org.geotools.util.WeakHashSet;
+import org.opengis.cv.CV_SampleDimension;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -70,7 +61,7 @@ import org.geotools.resources.gcs.ResourceKeys;
  * 
  * Some image mixes both qualitative and quantitative categories. For example,
  * images of Sea Surface Temperature  (SST)  may have a quantitative category
- * for temperature with values ranging from –2 to 35°C,  and three qualitative
+ * for temperature with values ranging from ï¿½2 to 35ï¿½C,  and three qualitative
  * categories for cloud, land and ice.
  * <br><br>
  * All categories must have a human readable name. In addition, quantitative
@@ -190,14 +181,14 @@ public class Category implements Serializable {
     final Category inverse;
     
     /**
-     * Codes ARGB des couleurs de la catégorie. Les couleurs par
-     * défaut seront un gradient allant du noir au blanc opaque.
+     * Codes ARGB des couleurs de la catï¿½gorie. Les couleurs par
+     * dï¿½faut seront un gradient allant du noir au blanc opaque.
      */
     private final int[] ARGB;
     
     /**
-     * Codes ARGB par défaut. On utilise un exemplaire unique
-     * pour toutes les création d'objets {@link Category}.
+     * Codes ARGB par dï¿½faut. On utilise un exemplaire unique
+     * pour toutes les crï¿½ation d'objets {@link Category}.
      */
     private static final int[] DEFAULT = {0xFF000000, 0xFFFFFFFF};
     

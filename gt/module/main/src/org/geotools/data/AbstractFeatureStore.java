@@ -16,13 +16,14 @@
  */
 package org.geotools.data;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**

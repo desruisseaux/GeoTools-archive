@@ -2,7 +2,7 @@
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
  * (C) 2002, Centre for Computational Geography
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -46,22 +46,19 @@
 package org.geotools.ct.proj;
 
 // J2SE dependencies
-import java.util.Locale;
 import java.awt.geom.Point2D;
+import java.util.Locale;
 
-// Geotools dependencies
 import org.geotools.cs.Projection;
 import org.geotools.ct.MathTransform;
 import org.geotools.ct.MissingParameterException;
-
-// Resources
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
  * Transverse Mercator Projection (EPSG code 9807). This
- * is a cylindrical projection, in which the cylinder has been rotated 90°.
+ * is a cylindrical projection, in which the cylinder has been rotated 90ï¿½.
  * Instead of being tangent to the equator (or to an other standard latitude),
  * it is tangent to a central meridian. Deformation are more important as we
  * are going futher from the central meridian. The Transverse Mercator
@@ -107,7 +104,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html">"Transverse_Mercator" on Remote Sensing</A>
  *
  * @version $Id$
- * @author André Gosselin
+ * @author Andrï¿½ Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
@@ -116,7 +113,7 @@ import org.geotools.resources.cts.ResourceKeys;
 public class TransverseMercator extends CylindricalProjection {
     /*
      * A derived quantity of excentricity, computed
-     * by <code>e'² = (a²-b²)/b² = es/(1-es)</code>
+     * by <code>e'ï¿½ = (aï¿½-bï¿½)/bï¿½ = es/(1-es)</code>
      * where <var>a</var> is the semi-major axis length
      * and <var>b</bar> is the semi-minor axis length.
      */
@@ -343,7 +340,7 @@ public class TransverseMercator extends CylindricalProjection {
      * Provides the transform equations for the spherical case of the
      * TransverseMercator projection.
      *
-     * @author André Gosselin
+     * @author Andrï¿½ Gosselin
      * @author Martin Desruisseaux
      * @author Rueben Schulz
      */

@@ -16,11 +16,12 @@
  */
 package org.geotools.xml;
 
+import java.io.IOException;
+import java.net.URI;
+
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
-import java.io.IOException;
-import java.net.URI;
 
 
 /**

@@ -3,6 +3,8 @@ package org.geotools.graph.util;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.GraphTestUtil;
 import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.basic.BasicGraphBuilder;
@@ -11,8 +13,6 @@ import org.geotools.graph.structure.GraphVisitor;
 import org.geotools.graph.structure.Graphable;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.util.graph.GraphPartitioner;
-
-import junit.framework.TestCase;
 
 public class GraphPartitionerTest extends TestCase {
  

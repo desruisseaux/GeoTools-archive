@@ -24,14 +24,10 @@ import java.util.Map;
 
 import javax.media.jai.ParameterList;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-
-// Geotools dependencies
-import org.geotools.units.Unit;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.pt.CoordinatePoint;
+import org.geotools.units.Unit;
+import org.opengis.referencing.FactoryException;
 
 
 /**

@@ -13,7 +13,6 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;

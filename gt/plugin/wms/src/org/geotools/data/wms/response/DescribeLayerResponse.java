@@ -17,7 +17,6 @@
 package org.geotools.data.wms.response;
 
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;

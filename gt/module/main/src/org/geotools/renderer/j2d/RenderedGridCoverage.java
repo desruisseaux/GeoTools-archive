@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,62 +21,53 @@
 package org.geotools.renderer.j2d;
 
 // J2SE dependencies
-import java.awt.Shape;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.WritableRenderedImage;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.TileObserver;
-import java.awt.image.ColorModel;
-import java.awt.image.Raster;
-import java.util.Map;
+import java.awt.image.WritableRenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.util.Locale;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// JAI dependencies
+import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.TileRequest;
 
-// OpenGIS dependencies
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.referencing.operation.TransformException;
-
-// Geotools dependencies
-import org.geotools.pt.Envelope;
-import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CompoundCoordinateSystem;
-import org.geotools.ct.MathTransform2D;
-import org.geotools.cv.SampleDimension;
+import org.geotools.cs.CoordinateSystem;
 import org.geotools.cv.PointOutsideCoverageException;
-import org.geotools.gc.GridRange;
+import org.geotools.cv.SampleDimension;
 import org.geotools.gc.GridCoverage;
-import org.geotools.gp.GridCoverageProcessor;
+import org.geotools.gc.GridRange;
 import org.geotools.gp.CannotReprojectException;
-
-// Miscellaneous resources
-import org.geotools.resources.Utilities;
+import org.geotools.gp.GridCoverageProcessor;
+import org.geotools.pt.Envelope;
 import org.geotools.resources.CTSUtilities;
 import org.geotools.resources.LegacyGCSUtilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
-import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XAffineTransform;
-import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.image.DeferredPlanarImage;
+import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -207,25 +198,25 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
     private Dimension2D preferredPixelSize;
 
     /**
-     * Point dans lequel mémoriser les coordonnées logiques d'un pixel
-     * de l'image. Cet objet est utilisé temporairement pour obtenir la
-     * valeur du paramètre géophysique d'un pixel.
+     * Point dans lequel mï¿½moriser les coordonnï¿½es logiques d'un pixel
+     * de l'image. Cet objet est utilisï¿½ temporairement pour obtenir la
+     * valeur du paramï¿½tre gï¿½ophysique d'un pixel.
      *
      * @see #formatValue
      */
     private transient Point2D point;
 
     /**
-     * Valeurs sous le curseur de la souris. Ce tableau sera créé
-     * une fois pour toute la première fois où il sera nécessaire.
+     * Valeurs sous le curseur de la souris. Ce tableau sera crï¿½ï¿½
+     * une fois pour toute la premiï¿½re fois oï¿½ il sera nï¿½cessaire.
      *
      * @see #formatValue
      */
     private transient double[] values;
 
     /**
-     * Liste des bandes. Cette liste ne sera créée
-     * que la première fois où elle sera nécessaire.
+     * Liste des bandes. Cette liste ne sera crï¿½ï¿½e
+     * que la premiï¿½re fois oï¿½ elle sera nï¿½cessaire.
      *
      * @see #formatValue
      */
@@ -831,7 +822,7 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
      * <code>toAppendTo</code> the value in each bands for the pixel at the
      * mouse position. For example if the current image show Sea Surface
      * Temperature (SST), then this method will format the temperature in
-     * geophysical units (e.g. "12°C").
+     * geophysical units (e.g. "12ï¿½C").
      *
      * @param  event The mouse event.
      * @param  toAppendTo The destination buffer for formatting a value.
@@ -884,8 +875,8 @@ public class RenderedGridCoverage extends RenderedLayer implements TileObserver 
     }
 
     /**
-     * Efface les informations qui avaient été
-     * sauvegardées dans la cache interne.
+     * Efface les informations qui avaient ï¿½tï¿½
+     * sauvegardï¿½es dans la cache interne.
      */
     void clearCache() {
         point  = null;

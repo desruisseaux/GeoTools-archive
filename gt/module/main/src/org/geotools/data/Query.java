@@ -16,11 +16,11 @@
  */
 package org.geotools.data;
 
-import org.geotools.filter.Filter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import java.net.URI;
 import java.util.Arrays;
+
+import org.geotools.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**

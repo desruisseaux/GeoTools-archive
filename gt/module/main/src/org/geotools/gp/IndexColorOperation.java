@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,22 +24,20 @@
 package org.geotools.gp;
 
 // J2SE dependencies
-import java.util.Arrays;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
-import java.awt.image.RenderedImage;
 import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.util.Arrays;
 
-// Java Advanced Imaging
-import javax.media.jai.OpImage;
-import javax.media.jai.NullOpImage;
 import javax.media.jai.ImageLayout;
-import javax.media.jai.ParameterListDescriptor;
+import javax.media.jai.NullOpImage;
+import javax.media.jai.OpImage;
 import javax.media.jai.ParameterList;
+import javax.media.jai.ParameterListDescriptor;
 
-// Geotools implementation
-import org.geotools.gc.GridCoverage;
 import org.geotools.cv.SampleDimension;
+import org.geotools.gc.GridCoverage;
 import org.geotools.resources.LegacyGCSUtilities;
 import org.geotools.resources.image.ColorUtilities;
 

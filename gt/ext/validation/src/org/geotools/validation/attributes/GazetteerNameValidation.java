@@ -22,6 +22,16 @@
  */
 package org.geotools.validation.attributes;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.validation.DefaultFeatureValidation;
@@ -31,14 +41,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,19 +20,16 @@
 package org.geotools.util;
 
 // Collections and references
-import java.util.Set;   // For JavaDoc
+import java.lang.ref.WeakReference;
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.AbstractSet;
-import java.util.WeakHashMap; // For JavaDoc
-import java.lang.ref.WeakReference;
-
-// Logging
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// Geotools dependencies
 import org.geotools.resources.XArray;
 
 

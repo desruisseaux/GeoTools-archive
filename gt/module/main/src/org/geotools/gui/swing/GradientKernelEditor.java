@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,21 +20,18 @@
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import javax.swing.JLabel;
-import javax.swing.JComponent;
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Color;
 
-// JAI dependencies
 import javax.media.jai.KernelJAI;
-import javax.media.jai.operator.GradientMagnitudeDescriptor; // For Javadoc
+import javax.media.jai.operator.GradientMagnitudeDescriptor;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.border.Border;
 
-// Seagis dependencies
-import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**
@@ -246,23 +243,23 @@ public class GradientKernelEditor extends JComponent {
         }
 
         /**
-         * Retourne une extension de l'opérateur de Sobel. Pour chaque élément dont la position
-         * par rapport à l'élément central est (x,y), on calcule la composante horizontale avec
-         * le cosinus de l'angle divisé par la distance. On peut l'écrire comme suit:
+         * Retourne une extension de l'opï¿½rateur de Sobel. Pour chaque ï¿½lï¿½ment dont la position
+         * par rapport ï¿½ l'ï¿½lï¿½ment central est (x,y), on calcule la composante horizontale avec
+         * le cosinus de l'angle divisï¿½ par la distance. On peut l'ï¿½crire comme suit:
          *
          * <blockquote><pre>
-         *     cos(atan(y/x)) / sqrt(x²+y²)
+         *     cos(atan(y/x)) / sqrt(xï¿½+yï¿½)
          * </pre></blockquote>
          *
-         * En utilisant l'identité 1/cos² = (1+tan²), on peut réécrire l'équation comme suit:
+         * En utilisant l'identitï¿½ 1/cosï¿½ = (1+tanï¿½), on peut rï¿½ï¿½crire l'ï¿½quation comme suit:
          *
          * <blockquote><pre>
-         *     x / (x²+y²)
+         *     x / (xï¿½+yï¿½)
          * </pre></blockquote>
          *
-         * @param size Taille de la matrice. Doit être un nombre positif et impair.
-         * @param horizontal <code>true</code> pour l'opérateur horizontal,
-         *        or <code>false</code> pour l'opérateur vertical.
+         * @param size Taille de la matrice. Doit ï¿½tre un nombre positif et impair.
+         * @param horizontal <code>true</code> pour l'opï¿½rateur horizontal,
+         *        or <code>false</code> pour l'opï¿½rateur vertical.
          */
         private static KernelJAI getSobel(final int size, final boolean horizontal) {
             final int key = size/2;

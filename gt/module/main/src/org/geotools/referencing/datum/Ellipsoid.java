@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,21 +23,21 @@
 package org.geotools.referencing.datum;
 
 // J2SE extensions
-import java.util.Map;
-import java.util.Collections;
 import java.awt.geom.Point2D;
+import java.util.Collections;
+import java.util.Map;
+
 import javax.units.SI;
 import javax.units.Unit;
 
-// Geotools dependencies
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.XMath;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XMath;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -270,7 +270,7 @@ public class Ellipsoid extends IdentifiedObject implements org.opengis.referenci
     /**
      * The ratio of the distance between the center and a focus of the ellipse
      * to the length of its semimajor axis. The eccentricity can alternately be
-     * computed from the equation: <code>e=sqrt(2f-f²)</code>.
+     * computed from the equation: <code>e=sqrt(2f-fï¿½)</code>.
      */
     public double getEccentricity() {
         final double f = 1-getSemiMinorAxis()/getSemiMajorAxis();

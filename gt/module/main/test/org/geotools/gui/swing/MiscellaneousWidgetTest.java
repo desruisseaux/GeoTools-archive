@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,29 +22,37 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import javax.swing.*;
-import java.util.Random;
-import java.util.Locale;
-import java.util.List;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics2D;
+import java.awt.HeadlessException;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.RenderedImage;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 
-// JAI dependencies
-import javax.media.jai.operator.*;
+import javax.media.jai.operator.AddConstDescriptor;
+import javax.media.jai.operator.ConstantDescriptor;
+import javax.media.jai.operator.GradientMagnitudeDescriptor;
+import javax.media.jai.operator.MultiplyConstDescriptor;
+import javax.swing.JFrame;
 
-// JUnit dependencies
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.image.ColorUtilities;
 

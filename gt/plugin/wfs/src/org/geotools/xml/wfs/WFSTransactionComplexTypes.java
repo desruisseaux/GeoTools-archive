@@ -16,15 +16,25 @@
  */
 package org.geotools.xml.wfs;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.data.Query;
 import org.geotools.data.wfs.Action;
-import org.geotools.data.wfs.Action.DeleteAction;
-import org.geotools.data.wfs.Action.InsertAction;
-import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.data.wfs.LockRequest;
 import org.geotools.data.wfs.LockResult;
 import org.geotools.data.wfs.TransactionResult;
 import org.geotools.data.wfs.WFSTransactionState;
+import org.geotools.data.wfs.Action.DeleteAction;
+import org.geotools.data.wfs.Action.InsertAction;
+import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.Feature;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
@@ -58,15 +68,6 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import javax.naming.OperationNotSupportedException;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -36,24 +36,20 @@ package org.geotools.gp;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 
-// Java Advanced Imaging
 import javax.media.jai.KernelJAI;
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListDescriptor;
 import javax.media.jai.ParameterListDescriptorImpl;
 
-// OpenGIS dependencies
-import org.geotools.cv.Category;
-import org.geotools.gc.GridCoverage;
+import org.geotools.cs.CoordinateSystem;
 import org.geotools.ct.MathTransform1D;
 import org.geotools.ct.MathTransform2D;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.util.NumberRange;
-
-// Resources
+import org.geotools.cv.Category;
+import org.geotools.gc.GridCoverage;
+import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.units.Unit;
 import org.geotools.units.UnitException;
-import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.util.NumberRange;
 
 
 /**
@@ -75,7 +71,7 @@ final class GradientMagnitudeOperation extends OperationJAI {
     /**
      * Set to <code>true</code> to enable automatic kernel normalization. Normalization modifies
      * kernel coefficients according the "grid to coordinate system" transform in order to get
-     * some meaningful engineering units (e.g. °C/km). The normalization factor is computed by
+     * some meaningful engineering units (e.g. ï¿½C/km). The normalization factor is computed by
      * testing the original kernels against synthetic horizontal and vertical gradients of
      * 1 sampleUnit/csUnit.
      */

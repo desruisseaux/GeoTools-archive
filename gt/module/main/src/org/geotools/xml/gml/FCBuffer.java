@@ -16,12 +16,6 @@
  */
 package org.geotools.xml.gml;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.xml.DocumentFactory;
-import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Calendar;
@@ -30,6 +24,13 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.data.FeatureReader;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.xml.DocumentFactory;
+import org.xml.sax.SAXException;
 
 
 /**

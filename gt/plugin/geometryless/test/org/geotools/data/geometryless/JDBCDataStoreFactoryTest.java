@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.DataSourceException;

@@ -1,5 +1,7 @@
 package org.geotools.graph.build.opt;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.structure.DirectedEdge;
 import org.geotools.graph.structure.DirectedGraph;
 import org.geotools.graph.structure.DirectedNode;
@@ -7,8 +9,6 @@ import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.structure.opt.OptDirectedEdge;
 import org.geotools.graph.structure.opt.OptDirectedNode;
-
-import junit.framework.TestCase;
 
 public class OptDirectedGraphBuilderTest extends TestCase {
 

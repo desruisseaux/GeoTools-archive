@@ -18,12 +18,11 @@ package org.geotools.filter;
 
 
 // Geotools dependencies
-import org.geotools.feature.Feature;
 import java.util.logging.Logger;
-
-// J2SE dependencies
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.geotools.feature.Feature;
 
 
 /**

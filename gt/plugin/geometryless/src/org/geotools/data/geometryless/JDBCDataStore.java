@@ -6,11 +6,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
-// import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
@@ -18,18 +18,8 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * An implementation of the GeoTools Data Store API for a generic non-spatial database platform.

@@ -16,6 +16,9 @@
  */
 package org.geotools.data.jdbc;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureLock;
@@ -28,8 +31,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import java.io.IOException;
-import java.util.NoSuchElementException;
 
 
 /**

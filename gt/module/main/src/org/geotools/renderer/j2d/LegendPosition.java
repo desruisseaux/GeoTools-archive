@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -37,11 +37,11 @@ package org.geotools.renderer.j2d;
 
 // J2SE and JAI dependencies
 import java.awt.geom.Rectangle2D;
-import java.awt.font.GlyphVector;
-import javax.swing.SwingConstants;
 import java.io.ObjectStreamException;
 import java.util.NoSuchElementException;
+
 import javax.media.jai.EnumeratedParameter;
+import javax.swing.SwingConstants;
 
 
 /**
@@ -163,10 +163,10 @@ public final class LegendPosition extends EnumeratedParameter {
     }
 
     /**
-     * Retourne la position horizontale correspondant au quadran spécifié. Cette position sera
+     * Retourne la position horizontale correspondant au quadran spï¿½cifiï¿½. Cette position sera
      * {@link SwingConstants#LEFT}, {@link SwingConstants#CENTER} ou {@link SwingConstants#RIGHT}.
      *
-     * @return Alignement horizontal du quadrant spécifié.
+     * @return Alignement horizontal du quadrant spï¿½cifiï¿½.
      */
     final int getHorizontalAlignment() {
         switch (getValue()) {
@@ -184,10 +184,10 @@ public final class LegendPosition extends EnumeratedParameter {
     }
 
     /**
-     * Retourne la position verticale correspondant au quadran spécifié. Cette position sera
+     * Retourne la position verticale correspondant au quadran spï¿½cifiï¿½. Cette position sera
      * {@link SwingConstants#TOP}, {@link SwingConstants#CENTER} ou {@link SwingConstants#BOTTOM}.
      *
-     * @return Alignement vertical du quadrant spécifié.
+     * @return Alignement vertical du quadrant spï¿½cifiï¿½.
      */
     final int getVerticalAlignment() {
         switch (getValue()) {

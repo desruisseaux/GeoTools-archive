@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gp;
@@ -32,12 +32,9 @@ package org.geotools.gp;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 
-// JAI dependencies
-import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.operator.BandCombineDescriptor; // For Javadoc
+import javax.media.jai.operator.BandCombineDescriptor;
 
-// Geotools dependencies
 import org.geotools.cv.SampleDimension;
 import org.geotools.gp.jai.CombineDescriptor;
 

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,29 +20,45 @@
 package org.geotools.referencing;
 
 // J2SE dependencies and extensions
-import java.io.*;
-import java.util.*;
-import javax.units.Unit;
-import javax.units.SI;
-import javax.units.NonSI;
-import junit.framework.*;
 import java.awt.geom.AffineTransform;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
-// OpenGIS dependencies
-import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.datum.VerticalDatumType;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.parameter.ParameterNotFoundException;
+import javax.units.NonSI;
+import javax.units.SI;
+import javax.units.Unit;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.geotools.parameter.MatrixParameterDescriptors;
+import org.geotools.parameter.MatrixParameterValues;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterDescriptor;
+import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.wkt.Formatter;
+import org.opengis.parameter.InvalidParameterCardinalityException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.InvalidParameterCardinalityException;
-
-// Geotools dependencies
-import org.geotools.parameter.*;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**

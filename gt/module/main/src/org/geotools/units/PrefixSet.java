@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -29,19 +29,18 @@
  */
 package org.geotools.units;
 
-// Entrés/sorties
-import java.io.Serializable;
+// Entrï¿½s/sorties
 import java.io.ObjectStreamException;
-
-// Divers
+import java.io.Serializable;
 import java.util.Arrays;
+
 import org.geotools.util.WeakHashSet;
 
 
 /**
- * Ensemble de préfix. Cette classe maintient une liste d'objets
- * {@link Prefix} en ordre croissant et sans doublons, c'est-à-dire qu'elle garanti
- * qu'il n'y aura pas deux préfix représentant la même quantité {@link Prefix#amount}.
+ * Ensemble de prï¿½fix. Cette classe maintient une liste d'objets
+ * {@link Prefix} en ordre croissant et sans doublons, c'est-ï¿½-dire qu'elle garanti
+ * qu'il n'y aura pas deux prï¿½fix reprï¿½sentant la mï¿½me quantitï¿½ {@link Prefix#amount}.
  *
  * @version 1.0
  * @author Martin Desruisseaux
@@ -56,21 +55,21 @@ final class PrefixSet implements Serializable {
     private static final long serialVersionUID = -8301096197856692402L;
     
     /**
-     * Banque des objets qui ont été précédemment créés et
-     * enregistrés par un appel à la méthode {@link #intern}.
+     * Banque des objets qui ont ï¿½tï¿½ prï¿½cï¿½demment crï¿½ï¿½s et
+     * enregistrï¿½s par un appel ï¿½ la mï¿½thode {@link #intern}.
      */
     private static final WeakHashSet pool=Prefix.pool;
     
     /**
-     * Ensemble de préfix. Les préfix de cet ensemble doivent
-     * obligatoirement être un ordre croissant et sans doublons.
+     * Ensemble de prï¿½fix. Les prï¿½fix de cet ensemble doivent
+     * obligatoirement ï¿½tre un ordre croissant et sans doublons.
      */
     private final Prefix[] prefix;
     
     /**
-     * Construit un ensemble de préfix. Le tableau <code>p</code>
-     * sera copié, puis classé. Les éventuels doublons seront éliminés.
-     * Le tableau <code>p</code> original ne sera pas affecté par ces
+     * Construit un ensemble de prï¿½fix. Le tableau <code>p</code>
+     * sera copiï¿½, puis classï¿½. Les ï¿½ventuels doublons seront ï¿½liminï¿½s.
+     * Le tableau <code>p</code> original ne sera pas affectï¿½ par ces
      * traitements.
      */
     private PrefixSet(final Prefix[] p) {
@@ -95,9 +94,9 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Construit un ensemble de préfix. Le tableau <code>p</code>
-     * sera copié, puis classé. Les éventuels doublons seront éliminés.
-     * Le tableau <code>p</code> original ne sera pas affecté par ces
+     * Construit un ensemble de prï¿½fix. Le tableau <code>p</code>
+     * sera copiï¿½, puis classï¿½. Les ï¿½ventuels doublons seront ï¿½liminï¿½s.
+     * Le tableau <code>p</code> original ne sera pas affectï¿½ par ces
      * traitements.
      */
     public static PrefixSet getPrefixSet(final Prefix[] p) {
@@ -105,12 +104,12 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Retourne le préfix représenté par le symbole spéfifié.
-     * Si aucun préfix ne correspond à ce symbole, retourne
+     * Retourne le prï¿½fix reprï¿½sentï¿½ par le symbole spï¿½fifiï¿½.
+     * Si aucun prï¿½fix ne correspond ï¿½ ce symbole, retourne
      * <code>null</code>.
      *
-     * @param  symbol Symbole du préfix recherché.
-     * @return Préfix désigné par le symbole <code>symbol</code>.
+     * @param  symbol Symbole du prï¿½fix recherchï¿½.
+     * @return Prï¿½fix dï¿½signï¿½ par le symbole <code>symbol</code>.
      */
     public Prefix getPrefix(final String symbol) {
         for (int i=0; i<prefix.length; i++) {
@@ -123,12 +122,12 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Retourne le préfix représentant une quantité égale ou inférieure à la quantité spécifiée.
-     * Si <code>amount</code> est inférieur à la plus petite quantité pouvant être représenté
-     * par un préfix, alors cette méthode retourne <code>null</code>.
+     * Retourne le prï¿½fix reprï¿½sentant une quantitï¿½ ï¿½gale ou infï¿½rieure ï¿½ la quantitï¿½ spï¿½cifiï¿½e.
+     * Si <code>amount</code> est infï¿½rieur ï¿½ la plus petite quantitï¿½ pouvant ï¿½tre reprï¿½sentï¿½
+     * par un prï¿½fix, alors cette mï¿½thode retourne <code>null</code>.
      */
     public Prefix getPrefix(double amount) {
-        amount += 1E-8*Math.abs(amount); // Pour éviter d'éventuelles erreurs d'arrondissements.
+        amount += 1E-8*Math.abs(amount); // Pour ï¿½viter d'ï¿½ventuelles erreurs d'arrondissements.
         int index=Arrays.binarySearch(prefix, new Prefix(amount));
         if (index<0) {
             index = ~index;
@@ -144,8 +143,8 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Retourne une chaîne de caractères qui énumère tous les préfix contenu dans
-     * cet ensemble. La chaîne sera de la forme "milli(m),centi(c),déci(d),kilo(k)"
+     * Retourne une chaï¿½ne de caractï¿½res qui ï¿½numï¿½re tous les prï¿½fix contenu dans
+     * cet ensemble. La chaï¿½ne sera de la forme "milli(m),centi(c),dï¿½ci(d),kilo(k)"
      * par exemple.
      */
     public String toString() {
@@ -170,9 +169,9 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Vérifie si cet ensemble est identique à l'objet <code>other</code>
-     * spécifié. Deux ensembles sont considérés identiques s'ils contienent
-     * les mêmes préfix.
+     * Vï¿½rifie si cet ensemble est identique ï¿½ l'objet <code>other</code>
+     * spï¿½cifiï¿½. Deux ensembles sont considï¿½rï¿½s identiques s'ils contienent
+     * les mï¿½mes prï¿½fix.
      */
     public boolean equals(final Object other) {
         if (other==this) return true; // slight optimisation
@@ -191,7 +190,7 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Retourne un code représentant cet ensemble de préfix.
+     * Retourne un code reprï¿½sentant cet ensemble de prï¿½fix.
      */
     public int hashCode() {
         int code=prefix.length << 1;
@@ -202,14 +201,14 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Retourne un exemplaire unique de cet ensemble de préfix. Une banque de préfix, initialement
-     * vide, est maintenue de façon interne par la classe <code>PrefixSet</code>. Lorsque la méthode
-     * <code>intern</code> est appelée, elle recherchera des préfix égaux à <code>this</code> au
-     * sens de la méthode {@link #equals}. Si de tels préfix sont trouvés, ils seront retournés.
-     * Sinon, les préfix <code>this</code> seront ajoutés à la banque de données en utilisant une
-     * {@link java.lang.ref.WeakReference référence faible} et cette méthode retournera <code>this</code>.
+     * Retourne un exemplaire unique de cet ensemble de prï¿½fix. Une banque de prï¿½fix, initialement
+     * vide, est maintenue de faï¿½on interne par la classe <code>PrefixSet</code>. Lorsque la mï¿½thode
+     * <code>intern</code> est appelï¿½e, elle recherchera des prï¿½fix ï¿½gaux ï¿½ <code>this</code> au
+     * sens de la mï¿½thode {@link #equals}. Si de tels prï¿½fix sont trouvï¿½s, ils seront retournï¿½s.
+     * Sinon, les prï¿½fix <code>this</code> seront ajoutï¿½s ï¿½ la banque de donnï¿½es en utilisant une
+     * {@link java.lang.ref.WeakReference rï¿½fï¿½rence faible} et cette mï¿½thode retournera <code>this</code>.
      * <br><br>
-     * De cette méthode il s'ensuit que pour deux ensembles de préfix <var>u</var> et <var>v</var>,
+     * De cette mï¿½thode il s'ensuit que pour deux ensembles de prï¿½fix <var>u</var> et <var>v</var>,
      * la condition <code>u.intern()==v.intern()</code> sera vrai si et seulement si
      * <code>u.equals(v)</code> est vrai.
      */
@@ -218,10 +217,10 @@ final class PrefixSet implements Serializable {
     }
     
     /**
-     * Après la lecture d'une unité, vérifie si ce préfix
-     * apparaît déjà dans la banque des préfix {@link #PREFIX}.
-     * Si oui, l'exemplaire de la banque sera retourné plutôt
-     * que de garder inutilement le préfix courant comme copie.
+     * Aprï¿½s la lecture d'une unitï¿½, vï¿½rifie si ce prï¿½fix
+     * apparaï¿½t dï¿½jï¿½ dans la banque des prï¿½fix {@link #PREFIX}.
+     * Si oui, l'exemplaire de la banque sera retournï¿½ plutï¿½t
+     * que de garder inutilement le prï¿½fix courant comme copie.
      */
     final Object readResolve() throws ObjectStreamException {
         return intern();

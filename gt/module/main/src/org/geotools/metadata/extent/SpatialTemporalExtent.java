@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,16 +23,13 @@
 package org.geotools.metadata.extent;
 
 // J2SE direct dependencies
-import java.util.Set;
-import java.util.Date;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
 
-// OpenGIS dependencies
-import org.opengis.metadata.extent.GeographicExtent;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.util.CheckedHashSet;
+import org.opengis.metadata.extent.GeographicExtent;
 
 
 /**
@@ -42,7 +39,7 @@ import org.geotools.util.CheckedHashSet;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class SpatialTemporalExtent extends TemporalExtent
        implements org.opengis.metadata.extent.SpatialTemporalExtent

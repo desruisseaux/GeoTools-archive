@@ -1,6 +1,5 @@
 package org.geotools.graph.structure.basic;
 
-import org.geotools.graph.structure.basic.BasicGraphable;
 import java.util.Iterator;
 
 import junit.framework.TestCase;

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,27 +22,22 @@ package org.geotools.referencing.operation;
 // J2SE dependencies
 import java.util.Random;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// OpenGIS dependencies
-import org.opengis.referencing.crs.CRSFactory;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.EngineeringCRS;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.datum.DatumFactory;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
-
-// Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.crs.EngineeringCRS;
-import org.geotools.referencing.operation.LinearTransform;
 
 
 /**

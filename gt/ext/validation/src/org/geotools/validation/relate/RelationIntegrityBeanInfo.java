@@ -24,7 +24,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.util.ResourceBundle;
 
-
 import org.geotools.validation.DefaultIntegrityValidationBeanInfo;
 
 /**

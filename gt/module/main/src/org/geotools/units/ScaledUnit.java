@@ -2,8 +2,8 @@
  * Units - Temporary implementation for Geotools 2
  * Copyright (C) 1998 University Corporation for Atmospheric Research (Unidata)
  *               1998 Bill Hibbard & al. (VisAD)
- *               1999 Pêches et Océans Canada
- *               2000 Institut de Recherche pour le Développement
+ *               1999 Pï¿½ches et Ocï¿½ans Canada
+ *               2000 Institut de Recherche pour le Dï¿½veloppement
  *               2002 Centre for Computational Geography
  *
  *
@@ -30,27 +30,26 @@
 package org.geotools.units;
 
 // Divers
-import java.util.Arrays;
 import org.geotools.resources.XMath;
-import org.geotools.resources.units.Units;
-import org.geotools.resources.rsc.Resources;
 import org.geotools.resources.rsc.ResourceKeys;
+import org.geotools.resources.rsc.Resources;
+import org.geotools.resources.units.Units;
 
 
 /**
- * Classe représentant des unités proportionnelles à d'autres unités.
- * Les valeurs exprimées selon les unités d'un objet <code>ScaledUnit</code>
- * peuvent être converties vers le système d'unités {@link #unit} à l'aide de
- * l'équation suivante:
+ * Classe reprï¿½sentant des unitï¿½s proportionnelles ï¿½ d'autres unitï¿½s.
+ * Les valeurs exprimï¿½es selon les unitï¿½s d'un objet <code>ScaledUnit</code>
+ * peuvent ï¿½tre converties vers le systï¿½me d'unitï¿½s {@link #unit} ï¿½ l'aide de
+ * l'ï¿½quation suivante:
  *
  * <blockquote><pre>
  * <var>x</var><sub>{@link #unit}</sub>&nbsp;=&nbsp;<var>x</var><sub><code>this</code></sub>&nbsp;*&nbsp;{@link #amount}
  * </pre></blockquote>
  *
  * Les objets <code>ScaledUnit</code> permettent de faire des conversions
- * entre différentes unités, par exemple des pieds en mètres. Cette classe
- * n'ayant pas de constructeur publique, la seule façon d'obtenir des unités
- * proportionnelles est d'utiliser les méthodes {@link #getInstance} ou
+ * entre diffï¿½rentes unitï¿½s, par exemple des pieds en mï¿½tres. Cette classe
+ * n'ayant pas de constructeur publique, la seule faï¿½on d'obtenir des unitï¿½s
+ * proportionnelles est d'utiliser les mï¿½thodes {@link #getInstance} ou
  * {@link #scale}.
  *
  * @version 1.0
@@ -68,35 +67,35 @@ final class ScaledUnit extends Unit {
     private static final long serialVersionUID = -5387831470112872874L;
     
     /**
-     * Inverse d'une petite valeur servant à éviter des erreurs d'arrondissements.
-     * Cette valeur est définie arbitrairement à 2^24, soit environ 1.678E+7.
+     * Inverse d'une petite valeur servant ï¿½ ï¿½viter des erreurs d'arrondissements.
+     * Cette valeur est dï¿½finie arbitrairement ï¿½ 2^24, soit environ 1.678E+7.
      */
     private static final double INV_EPS = 16777216;
     
     /**
-     * Le facteur par lequel multiplier les mesures exprimées
-     * selon ces unités pour obtenir des mesures exprimées
-     * selon les unités {@link #unit}.
+     * Le facteur par lequel multiplier les mesures exprimï¿½es
+     * selon ces unitï¿½s pour obtenir des mesures exprimï¿½es
+     * selon les unitï¿½s {@link #unit}.
      */
     public final double amount;
     
     /**
-     * Les unités vers lesquelles se feront les conversions.
-     * Il ne peut s'agir que d'unités de bases (par exemple
-     * "m" ou "s") ou dérivées (par exemple "m/s").
+     * Les unitï¿½s vers lesquelles se feront les conversions.
+     * Il ne peut s'agir que d'unitï¿½s de bases (par exemple
+     * "m" ou "s") ou dï¿½rivï¿½es (par exemple "m/s").
      */
     public final SimpleUnit unit;
     
     /**
-     * Construit une unité proportionnelle à l'unité de base ou dérivée
-     * spécifiée. <code>new&nbsp;Scale(0.44704,&nbsp;unit)</code> créé
-     * une unité de milles/heure si <code>unit</code> représentait des
-     * mètres/seconde.
+     * Construit une unitï¿½ proportionnelle ï¿½ l'unitï¿½ de base ou dï¿½rivï¿½e
+     * spï¿½cifiï¿½e. <code>new&nbsp;Scale(0.44704,&nbsp;unit)</code> crï¿½ï¿½
+     * une unitï¿½ de milles/heure si <code>unit</code> reprï¿½sentait des
+     * mï¿½tres/seconde.
      *
      * @param amount Le facteur proportionnel.
-     * @param unit L'unité de base ou dérivée associée.
-     * @param symbol Le symbole associé à cette unité. Ne doit pas être nul.
-     * @param prefix Liste des préfix pouvant être placés devant le symbole
+     * @param unit L'unitï¿½ de base ou dï¿½rivï¿½e associï¿½e.
+     * @param symbol Le symbole associï¿½ ï¿½ cette unitï¿½. Ne doit pas ï¿½tre nul.
+     * @param prefix Liste des prï¿½fix pouvant ï¿½tre placï¿½s devant le symbole
      *        <code>symbol</code>, ou <code>null</code> s'il n'y en a pas.
      */
     private ScaledUnit(final double amount, final SimpleUnit unit, final String symbol, final PrefixSet prefix) {
@@ -115,36 +114,36 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Crée une nouvelle unité de même dimension que l'unité spécifiée,
-     * mais dont les données devront être multipliée par un facteur.
-     * Les conversions d'unités se feront par l'équation suivante:
+     * Crï¿½e une nouvelle unitï¿½ de mï¿½me dimension que l'unitï¿½ spï¿½cifiï¿½e,
+     * mais dont les donnï¿½es devront ï¿½tre multipliï¿½e par un facteur.
+     * Les conversions d'unitï¿½s se feront par l'ï¿½quation suivante:
      *
      * <center>
      *     <var>x</var><sub><code>unit</code></sub> =
      *     <var>x</var><sub><code>new</code></sub> * <code>amount</code>
      * </center>
      *
-     * où <var>x</var><sub><code>unit</code></sub> représente une quantité mesurée
-     * selon les unités <code>unit</code> et <var>x</var><sub><code>new</code></sub>
-     * représente une quantité mesurée selon les unités retournées par cette méthode.
+     * oï¿½ <var>x</var><sub><code>unit</code></sub> reprï¿½sente une quantitï¿½ mesurï¿½e
+     * selon les unitï¿½s <code>unit</code> et <var>x</var><sub><code>new</code></sub>
+     * reprï¿½sente une quantitï¿½ mesurï¿½e selon les unitï¿½s retournï¿½es par cette mï¿½thode.
      *
-     * Les unités crées par cette méthode <code>getInstance</code> servent
-     * à passer d'un système de d'unités à l'autre. Par exemple on pourrait
-     * construire des unités de miles anglais avec le code suivant:
+     * Les unitï¿½s crï¿½es par cette mï¿½thode <code>getInstance</code> servent
+     * ï¿½ passer d'un systï¿½me de d'unitï¿½s ï¿½ l'autre. Par exemple on pourrait
+     * construire des unitï¿½s de miles anglais avec le code suivant:
      *
      * <blockquote><pre>
      *     Unit MILE=ScaledUnit.<strong>getInstance</strong>(1609, METRE);
      * </blockquote></pre>
      *
-     * Ce code signifie qu'il faudra compter 1609 mètres dans chaque mille anglais.
+     * Ce code signifie qu'il faudra compter 1609 mï¿½tres dans chaque mille anglais.
      *
      * @param  amount Facteur par lequel il faudra multiplier les mesures
-     *         exprimées selon les nouvelles unités pour les convertir dans
-     *         les unités <code>unit</code>.
-     * @param  unit Unités proportionnelles aux unités à créer. Les nouvelles
-     *         unités créées représenteront <code>amount</code> de ces unités.
-     * @return Les unités créées, ou <code>unit</code> si le
-     *         paramètre <code>amount</code> est égal à 1.
+     *         exprimï¿½es selon les nouvelles unitï¿½s pour les convertir dans
+     *         les unitï¿½s <code>unit</code>.
+     * @param  unit Unitï¿½s proportionnelles aux unitï¿½s ï¿½ crï¿½er. Les nouvelles
+     *         unitï¿½s crï¿½ï¿½es reprï¿½senteront <code>amount</code> de ces unitï¿½s.
+     * @return Les unitï¿½s crï¿½ï¿½es, ou <code>unit</code> si le
+     *         paramï¿½tre <code>amount</code> est ï¿½gal ï¿½ 1.
      *
      * @see BaseUnit#getInstance
      * @see DerivedUnit#getInstance
@@ -155,41 +154,41 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Crée une nouvelle unité de même dimension que l'unité spécifiée,
-     * mais dont les données devront être multipliée par un facteur.
-     * Les conversions d'unités se feront par l'équation suivante:
+     * Crï¿½e une nouvelle unitï¿½ de mï¿½me dimension que l'unitï¿½ spï¿½cifiï¿½e,
+     * mais dont les donnï¿½es devront ï¿½tre multipliï¿½e par un facteur.
+     * Les conversions d'unitï¿½s se feront par l'ï¿½quation suivante:
      *
      * <center>
      *     <var>x</var><sub><code>unit</code></sub> =
      *     <var>x</var><sub><code>new</code></sub> * <code>amount</code>
      * </center>
      *
-     * où <var>x</var><sub><code>unit</code></sub> représente une quantité mesurée
-     * selon les unités <code>unit</code> et <var>x</var><sub><code>new</code></sub>
-     * représente une quantité mesurée selon les unités retournées par cette méthode.
+     * oï¿½ <var>x</var><sub><code>unit</code></sub> reprï¿½sente une quantitï¿½ mesurï¿½e
+     * selon les unitï¿½s <code>unit</code> et <var>x</var><sub><code>new</code></sub>
+     * reprï¿½sente une quantitï¿½ mesurï¿½e selon les unitï¿½s retournï¿½es par cette mï¿½thode.
      *
-     * Les unités crées par cette méthode <code>getInstance</code> servent
-     * à passer d'un système de d'unités à l'autre. Par exemple on pourrait
-     * construire des unités de miles anglais avec le code suivant:
+     * Les unitï¿½s crï¿½es par cette mï¿½thode <code>getInstance</code> servent
+     * ï¿½ passer d'un systï¿½me de d'unitï¿½s ï¿½ l'autre. Par exemple on pourrait
+     * construire des unitï¿½s de miles anglais avec le code suivant:
      *
      * <blockquote><pre>
      *     Unit MILE=ScaledUnit.<strong>getInstance</strong>(1609, METRE, "mile", null);
      * </blockquote></pre>
      *
-     * Ce code signifie qu'il faudra compter 1609 mètres dans chaque mille anglais.
+     * Ce code signifie qu'il faudra compter 1609 mï¿½tres dans chaque mille anglais.
      *
      * @param  amount Facteur par lequel il faudra multiplier les mesures
-     *         exprimées selon les nouvelles unités pour les convertir dans
-     *         les unités <code>unit</code>.
-     * @param  unit Unités proportionnelles aux unités à créer. Les nouvelles
-     *         unités créées représenteront <code>amount</code> de ces unités.
-     * @param  symbol Le symbole qui représentera les unités créées. Si
-     *         nul, alors un symbole par défaut sera créé. Dans l'exemple
-     *         précédent, ce symbole par défaut serait "\u00D71609&nbsp;m"
-     * @param  prefix Liste des préfix pouvant être placés devant le symbole
+     *         exprimï¿½es selon les nouvelles unitï¿½s pour les convertir dans
+     *         les unitï¿½s <code>unit</code>.
+     * @param  unit Unitï¿½s proportionnelles aux unitï¿½s ï¿½ crï¿½er. Les nouvelles
+     *         unitï¿½s crï¿½ï¿½es reprï¿½senteront <code>amount</code> de ces unitï¿½s.
+     * @param  symbol Le symbole qui reprï¿½sentera les unitï¿½s crï¿½ï¿½es. Si
+     *         nul, alors un symbole par dï¿½faut sera crï¿½ï¿½. Dans l'exemple
+     *         prï¿½cï¿½dent, ce symbole par dï¿½faut serait "\u00D71609&nbsp;m"
+     * @param  prefix Liste des prï¿½fix pouvant ï¿½tre placï¿½s devant le symbole
      *         <code>symbol</code>, ou <code>null</code> s'il n'y en a pas.
-     * @return Les unités créées, ou <code>unit</code> si le
-     *         paramètre <code>amount</code> est égal à 1.
+     * @return Les unitï¿½s crï¿½ï¿½es, ou <code>unit</code> si le
+     *         paramï¿½tre <code>amount</code> est ï¿½gal ï¿½ 1.
      *
      * @see BaseUnit#getInstance
      * @see DerivedUnit#getInstance
@@ -198,7 +197,7 @@ final class ScaledUnit extends Unit {
     public static Unit getInstance(double amount, final SimpleUnit unit, String symbol, final PrefixSet prefix) {
         /*
          * Si <code>amount</code> est presqu'une puissance de 10, arrondi
-         * à la puissance de 10 la plus proche. Cette étape vise à réduire
+         * ï¿½ la puissance de 10 la plus proche. Cette ï¿½tape vise ï¿½ rï¿½duire
          * certaines erreurs d'arrondissement.
          */
         final double power = Math.rint(XMath.log10(amount)*INV_EPS)/INV_EPS;
@@ -206,14 +205,14 @@ final class ScaledUnit extends Unit {
             amount=XMath.pow10(power);
         }
         /*
-         * Retourne les unités.
+         * Retourne les unitï¿½s.
          */
         if (amount==1) {
             if (unit==null) {
                 throw new NullPointerException(Resources.format(ResourceKeys.ERROR_NO_UNIT));
             }
             if (symbol!=null) {
-                // TODO: Que faire si le symbole spécifié
+                // TODO: Que faire si le symbole spï¿½cifiï¿½
                 //       n'est pas le symbole de 'unit'?
             }
             return unit;
@@ -227,13 +226,13 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Renvoie une unité identique à celle-ci, mais
-     * avec un nouveau symbole et de nouveaux préfix.
+     * Renvoie une unitï¿½ identique ï¿½ celle-ci, mais
+     * avec un nouveau symbole et de nouveaux prï¿½fix.
      *
-     * @param  symbol Nouveau symbole représentant cette unité. Si ce
-     *         paramètre est nul, un symbole par défaut sera créé.
-     * @param  prefix Liste des préfix autorisés pour le symbole.
-     * @return La même unité, mais avec le nouveau symbole. Peut être
+     * @param  symbol Nouveau symbole reprï¿½sentant cette unitï¿½. Si ce
+     *         paramï¿½tre est nul, un symbole par dï¿½faut sera crï¿½ï¿½.
+     * @param  prefix Liste des prï¿½fix autorisï¿½s pour le symbole.
+     * @return La mï¿½me unitï¿½, mais avec le nouveau symbole. Peut ï¿½tre
      *         <code>this</code>, mais ne sera jamais <code>null</code>.
      */
     public Unit rename(final String symbol, final PrefixSet prefix) { // CAST
@@ -241,10 +240,10 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Retourne le nom de l'unité dans la langue de l'utilisateur.
-     * Par exemple le symbole "cm" sera traduit par "centimètre"
-     * dans la langue française. Si aucun nom n'est disponible
-     * pour l'unité courante, retourne simplement son symbole.
+     * Retourne le nom de l'unitï¿½ dans la langue de l'utilisateur.
+     * Par exemple le symbole "cm" sera traduit par "centimï¿½tre"
+     * dans la langue franï¿½aise. Si aucun nom n'est disponible
+     * pour l'unitï¿½ courante, retourne simplement son symbole.
      */
     public String getLocalizedName() {
         PrefixSet prefix=unit.prefix;
@@ -259,20 +258,20 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Retourne la quantité que représente cette unité. Les quantités sont des chaînes de
-     * caractères qui décrivent le paramètre physique mesuré, comme "mass" ou "speed". Si
-     * aucune quantité n'est définie pour cette unité, retourne <code>null</code>.
+     * Retourne la quantitï¿½ que reprï¿½sente cette unitï¿½. Les quantitï¿½s sont des chaï¿½nes de
+     * caractï¿½res qui dï¿½crivent le paramï¿½tre physique mesurï¿½, comme "mass" ou "speed". Si
+     * aucune quantitï¿½ n'est dï¿½finie pour cette unitï¿½, retourne <code>null</code>.
      */
     public String getQuantityName() {
         return unit.getQuantityName();
     }
     
     /**
-     * Élève cette unité à une puissance entière.
+     * ï¿½lï¿½ve cette unitï¿½ ï¿½ une puissance entiï¿½re.
      *
-     * @param power La puissance à laquelle élever cette unité.
-     * @return Les unités résultant de l'élévation des unités
-     *         <code>this</code> à la puissance <code>power</code>.
+     * @param power La puissance ï¿½ laquelle ï¿½lever cette unitï¿½.
+     * @return Les unitï¿½s rï¿½sultant de l'ï¿½lï¿½vation des unitï¿½s
+     *         <code>this</code> ï¿½ la puissance <code>power</code>.
      *
      * @see #multiply
      * @see #divide
@@ -288,15 +287,15 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Élève ces unités à une puissance fractionnaire. Cette méthode est utile entre
-     * autre pour prendre la racine carré d'un nombre, ce qui revient à l'élever à la
-     * puissance ½.
+     * ï¿½lï¿½ve ces unitï¿½s ï¿½ une puissance fractionnaire. Cette mï¿½thode est utile entre
+     * autre pour prendre la racine carrï¿½ d'un nombre, ce qui revient ï¿½ l'ï¿½lever ï¿½ la
+     * puissance ï¿½.
      *
-     * @param power La puissance à laquelle élever cette unité.
-     * @return Les unités résultant de l'élévation des unités
-     *         <code>this</code> à la puissance <code>power</code>.
-     * @throws UnitException Si cette unité ne peut pas être élevée
-     *         à une puissance non-entière.
+     * @param power La puissance ï¿½ laquelle ï¿½lever cette unitï¿½.
+     * @return Les unitï¿½s rï¿½sultant de l'ï¿½lï¿½vation des unitï¿½s
+     *         <code>this</code> ï¿½ la puissance <code>power</code>.
+     * @throws UnitException Si cette unitï¿½ ne peut pas ï¿½tre ï¿½levï¿½e
+     *         ï¿½ une puissance non-entiï¿½re.
      */
     public Unit pow(final double power) throws UnitException {
         final int integer=(int) power;
@@ -307,11 +306,11 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Multiplie cette unité par une autre unité.
+     * Multiplie cette unitï¿½ par une autre unitï¿½.
      *
-     * @param  that L'unité par laquelle multiplier cette unité.
+     * @param  that L'unitï¿½ par laquelle multiplier cette unitï¿½.
      * @return Le produit de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si l'unité <code>that</code> est de la
+     * @throws UnitException Si l'unitï¿½ <code>that</code> est de la
      *         classe {@link OffsetUnit} ou d'une autre classe invalide.
      *
      * @see #pow
@@ -352,11 +351,11 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Divise cette unité par une autre unité.
+     * Divise cette unitï¿½ par une autre unitï¿½.
      *
-     * @param  that L'unité par laquelle diviser cette unité.
+     * @param  that L'unitï¿½ par laquelle diviser cette unitï¿½.
      * @return Le quotient de <code>this</code> par <code>that</code>.
-     * @throws UnitException Si l'unité <code>that</code> est de la
+     * @throws UnitException Si l'unitï¿½ <code>that</code> est de la
      *         classe {@link OffsetUnit} ou d'une autre classe invalide.
      *
      * @see #pow
@@ -397,15 +396,15 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Crée une nouvelle unité proportionnelle à cette unité. Par exemple
-     * pour convertir en kilomètres des mesures exprimées en mètres, il
+     * Crï¿½e une nouvelle unitï¿½ proportionnelle ï¿½ cette unitï¿½. Par exemple
+     * pour convertir en kilomï¿½tres des mesures exprimï¿½es en mï¿½tres, il
      * faut les diviser par 1000. On peut exprimer cette relation par le
      * code <code>Unit&nbsp;km=metre.scale(1000)</code>.
      *
      * @param  amount Facteur par lequel il faudra diviser les valeurs
-     *         exprimées selon ces unités pour obtenir des valeurs
-     *         exprimées selon les nouvelles unités.
-     * @return Les nouvelles unités.
+     *         exprimï¿½es selon ces unitï¿½s pour obtenir des valeurs
+     *         exprimï¿½es selon les nouvelles unitï¿½s.
+     * @return Les nouvelles unitï¿½s.
      *
      * @see #pow
      * @see #multiply
@@ -417,15 +416,15 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Crée une nouvelle unité décalée par rapport à cette unité. Par exemple
-     * pour convertir des degrés Kelvin en degrés Celsius, il faut soustraire
-     * 273.15 aux degrés Kelvin. On peut exprimer cette relation par le code
+     * Crï¿½e une nouvelle unitï¿½ dï¿½calï¿½e par rapport ï¿½ cette unitï¿½. Par exemple
+     * pour convertir des degrï¿½s Kelvin en degrï¿½s Celsius, il faut soustraire
+     * 273.15 aux degrï¿½s Kelvin. On peut exprimer cette relation par le code
      * <code>Unit&nbsp;celsius=kelvin.shift(273.15)</code>.
      *
-     * @param  offset Constante à soustraire aux valeurs exprimées selon ces
-     *         unités pour obtenir des valeurs exprimées selon les nouvelles
-     *         unités.
-     * @return Les nouvelles unités.
+     * @param  offset Constante ï¿½ soustraire aux valeurs exprimï¿½es selon ces
+     *         unitï¿½s pour obtenir des valeurs exprimï¿½es selon les nouvelles
+     *         unitï¿½s.
+     * @return Les nouvelles unitï¿½s.
      *
      * @see #pow
      * @see #multiply
@@ -437,13 +436,13 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Indique si les unités <code>this</code> et <code>that</code> sont compatibles.
-     * Si elles le sont, alors les méthodes <code>convert</code> ne lanceront jamais
-     * d'exception pour ces unités.
+     * Indique si les unitï¿½s <code>this</code> et <code>that</code> sont compatibles.
+     * Si elles le sont, alors les mï¿½thodes <code>convert</code> ne lanceront jamais
+     * d'exception pour ces unitï¿½s.
      *
-     * @param that Autre unités avec laquelle on veut
-     *        vérifier si ces unités sont compatibles.
-     * @return <code>true</code> Si l'on garantie que les méthodes
+     * @param that Autre unitï¿½s avec laquelle on veut
+     *        vï¿½rifier si ces unitï¿½s sont compatibles.
+     * @return <code>true</code> Si l'on garantie que les mï¿½thodes
      *         <code>convert</code> ne lanceront pas d'exceptions.
      */
     public boolean canConvert(final Unit that) {
@@ -451,13 +450,13 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Effectue la conversion d'une mesure exprimée selon d'autres unités. Par
+     * Effectue la conversion d'une mesure exprimï¿½e selon d'autres unitï¿½s. Par
      * exemple <code>METRE.convert(1,&nbsp;FOOT)</code> retournera <code>0.3048</code>.
      *
-     * @param value    La valeur exprimée selon les autres unités (<code>fromUnit</code>).
-     * @param fromUnit Les autres unités.
-     * @return         La valeur convertie selon ces unités (<code>this</code>).
-     * @throws         UnitException Si les unités ne sont pas compatibles.
+     * @param value    La valeur exprimï¿½e selon les autres unitï¿½s (<code>fromUnit</code>).
+     * @param fromUnit Les autres unitï¿½s.
+     * @return         La valeur convertie selon ces unitï¿½s (<code>this</code>).
+     * @throws         UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     public double convert(final double value, final Unit fromUnit) throws UnitException {
         if (fromUnit==this) {
@@ -467,15 +466,15 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures exprimées selon d'autres
-     * unités. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
+     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
      *
-     * @param  values En entré, les valeurs exprimées selon les autres unités
-     *         (<code>fromUnit</code>). En sortie, les valeurs exprimées selon ces
-     *         unités (<code>this</code>).
-     * @param  fromUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres unitï¿½s
+     *         (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es selon ces
+     *         unitï¿½s (<code>this</code>).
+     * @param  fromUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     public void convert(final double[] values, final Unit fromUnit) throws UnitException {
         if (!equalsIgnoreSymbol(fromUnit)) {
@@ -487,17 +486,17 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures exprimées selon d'autres
-     * unités. Les valeurs converties remplaceront les anciennes valeurs.
+     * Effectue sur-place la conversion de mesures exprimï¿½es selon d'autres
+     * unitï¿½s. Les valeurs converties remplaceront les anciennes valeurs.
      * Notez que d'importantes erreurs d'arrondissement peuvent survenir
      * si <code>fromUnit</code> est de la classe {@link OffsetUnit}.
      *
-     * @param  values En entré, les valeurs exprimées selon les autres
-     *         unités (<code>fromUnit</code>). En sortie, les valeurs exprimées
-     *         selon ces unités (<code>this</code>).
-     * @param  fromUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeurs exprimï¿½es selon les autres
+     *         unitï¿½s (<code>fromUnit</code>). En sortie, les valeurs exprimï¿½es
+     *         selon ces unitï¿½s (<code>this</code>).
+     * @param  fromUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     public void convert(final float[] values, final Unit fromUnit) throws UnitException {
         if (!equalsIgnoreSymbol(fromUnit)) {
@@ -509,16 +508,16 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Retourne un objet qui saura convertir selon ces unités les valeurs exprimées
-     * selon d'autres unités. Cette méthode est avantageuse si on prévoie faîre
-     * plusieurs conversions, car la transformation à utiliser est déterminée une
+     * Retourne un objet qui saura convertir selon ces unitï¿½s les valeurs exprimï¿½es
+     * selon d'autres unitï¿½s. Cette mï¿½thode est avantageuse si on prï¿½voie faï¿½re
+     * plusieurs conversions, car la transformation ï¿½ utiliser est dï¿½terminï¿½e une
      * fois pour toute.
      *
-     * @param  fromUnit Unités à partir de lesquel faire les conversions.
-     * @return Une transformation des unités <code>fromUnit</code>
-     *         vers les unités <code>this</code>. Cette méthode ne
+     * @param  fromUnit Unitï¿½s ï¿½ partir de lesquel faire les conversions.
+     * @return Une transformation des unitï¿½s <code>fromUnit</code>
+     *         vers les unitï¿½s <code>this</code>. Cette mï¿½thode ne
      *         retourne jamais <code>null</code>.
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     public UnitTransform getTransform(final Unit fromUnit) throws UnitException {
         if (!equalsIgnoreSymbol(fromUnit)) {
@@ -534,15 +533,15 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Convertit une mesure vers d'autre unités. Par exemple
+     * Convertit une mesure vers d'autre unitï¿½s. Par exemple
      * <code>METRE.inverseConvert(1,&nbsp;FOOT)</code> retournera
-     * <code>3.2808</code>. Cette méthode est l'inverse de la méthode
+     * <code>3.2808</code>. Cette mï¿½thode est l'inverse de la mï¿½thode
      * {@link #convert(double,Unit)}.
      *
-     * @param value  La valeur exprimée selon ces unités (<code>this</code>).
-     * @param toUnit Les autres unités.
-     * @return       La valeur convertie selon les autres unités (<code>toUnit</code>).
-     * @throws       UnitException Si les unités ne sont pas compatibles.
+     * @param value  La valeur exprimï¿½e selon ces unitï¿½s (<code>this</code>).
+     * @param toUnit Les autres unitï¿½s.
+     * @return       La valeur convertie selon les autres unitï¿½s (<code>toUnit</code>).
+     * @throws       UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     protected double inverseConvert(final double value, final Unit toUnit) throws UnitException {
         if (toUnit==this) {
@@ -552,16 +551,16 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unités.
+     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * méthode est l'inverse de la méthode {@link #convert(double[],Unit)}.
+     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(double[],Unit)}.
      *
-     * @param  values En entré, les valeur exprimées selon ces unités
-     *         (<code>this</code>). En sortie, les valeurs exprimées
-     *         selon les autres unités (<code>toUnit</code>).
-     * @param  toUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
+     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
+     *         selon les autres unitï¿½s (<code>toUnit</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     protected void inverseConvert(final double[] values, final Unit toUnit) throws UnitException {
         if (!equalsIgnoreSymbol(toUnit)) {
@@ -577,16 +576,16 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Effectue sur-place la conversion de mesures vers d'autres unités.
+     * Effectue sur-place la conversion de mesures vers d'autres unitï¿½s.
      * Les valeurs converties remplaceront les anciennes valeurs. Cette
-     * méthode est l'inverse de la méthode {@link #convert(float[],Unit)}.
+     * mï¿½thode est l'inverse de la mï¿½thode {@link #convert(float[],Unit)}.
      *
-     * @param  values En entré, les valeur exprimées selon ces unités
-     *         (<code>this</code>). En sortie, les valeurs exprimées
-     *         selon les autres unités (<code>toUnit</code>).
-     * @param  toUnit Les autres unités.
-     * @throws UnitException Si les unités ne sont pas compatibles. Dans ce
-     *         cas, aucun élément de <code>values</code> n'aura été modifié.
+     * @param  values En entrï¿½, les valeur exprimï¿½es selon ces unitï¿½s
+     *         (<code>this</code>). En sortie, les valeurs exprimï¿½es
+     *         selon les autres unitï¿½s (<code>toUnit</code>).
+     * @param  toUnit Les autres unitï¿½s.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles. Dans ce
+     *         cas, aucun ï¿½lï¿½ment de <code>values</code> n'aura ï¿½tï¿½ modifiï¿½.
      */
     protected void inverseConvert(final float[] values, final Unit toUnit) throws UnitException {
         if (!equalsIgnoreSymbol(toUnit)) {
@@ -602,15 +601,15 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Retourne un objet qui saura convertir selon d'autres unités les
-     * valeurs exprimées selon ces unités. Cette méthode est l'inverse
+     * Retourne un objet qui saura convertir selon d'autres unitï¿½s les
+     * valeurs exprimï¿½es selon ces unitï¿½s. Cette mï¿½thode est l'inverse
      * de {@link #getTransform}.
      *
-     * @param  toUnit Unités vers lesquel faire les conversions.
-     * @return Une transformation des unités <code>this</code>
-     *         vers les unités <code>toUnit</code>. Cette méthode
+     * @param  toUnit Unitï¿½s vers lesquel faire les conversions.
+     * @return Une transformation des unitï¿½s <code>this</code>
+     *         vers les unitï¿½s <code>toUnit</code>. Cette mï¿½thode
      *         ne retourne jamais <code>null</code>.
-     * @throws UnitException Si les unités ne sont pas compatibles.
+     * @throws UnitException Si les unitï¿½s ne sont pas compatibles.
      */
     protected UnitTransform getInverseTransform(final Unit toUnit) throws UnitException {
         if (!equalsIgnoreSymbol(toUnit)) {
@@ -627,8 +626,8 @@ final class ScaledUnit extends Unit {
     }
     
     /**
-     * Indique si deux unités sont égales, en ignorant leurs symboles. Le
-     * champs {@link #symbol} de chacune des deux unités ne sera pas pris
+     * Indique si deux unitï¿½s sont ï¿½gales, en ignorant leurs symboles. Le
+     * champs {@link #symbol} de chacune des deux unitï¿½s ne sera pas pris
      * en compte.
      */
     public boolean equalsIgnoreSymbol(final Unit unit) {
@@ -643,7 +642,7 @@ final class ScaledUnit extends Unit {
     
     /**
      * Retourne un code
-     * pour cette unité.
+     * pour cette unitï¿½.
      */
     public int hashCode() {
         final long code = Double.doubleToLongBits(amount);

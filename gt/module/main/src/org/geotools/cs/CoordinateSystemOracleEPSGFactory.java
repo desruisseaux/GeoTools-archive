@@ -21,8 +21,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.cs;
@@ -30,10 +30,9 @@ package org.geotools.cs;
 // J2SE dependencies
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 
 /**

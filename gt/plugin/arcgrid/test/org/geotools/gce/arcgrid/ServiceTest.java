@@ -8,7 +8,6 @@ package org.geotools.gce.arcgrid;
  */
 import java.util.Iterator;
 
-import org.geotools.gce.arcgrid.ArcGridFormatFactory;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.geotools.data.coverage.grid.GridFormatFinder;
 

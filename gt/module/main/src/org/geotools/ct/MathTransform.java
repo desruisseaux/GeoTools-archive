@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,28 +24,24 @@
 package org.geotools.ct;
 
 // J2SE, JAI and Java3D dependencies
+import java.awt.geom.AffineTransform;
 import java.rmi.RemoteException;
 import java.rmi.ServerException;
 import java.rmi.server.UnicastRemoteObject;
-import java.awt.geom.AffineTransform;        // For JavaDoc
-import javax.media.jai.PerspectiveTransform; // For JavaDoc
 
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import javax.media.jai.PerspectiveTransform;
 
-// OpenGIS dependencies
-import org.opengis.pt.PT_Matrix;
-import org.opengis.pt.PT_CoordinatePoint;
-import org.opengis.ct.CT_MathTransform;
-import org.opengis.ct.CT_DomainFlags;
-
-// Geotools dependencies
-import org.geotools.pt.Matrix;
 import org.geotools.pt.CoordinatePoint;
-import org.geotools.resources.cts.Resources;
+import org.geotools.pt.Matrix;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.ct.CT_DomainFlags;
+import org.opengis.ct.CT_MathTransform;
+import org.opengis.pt.PT_CoordinatePoint;
+import org.opengis.pt.PT_Matrix;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**

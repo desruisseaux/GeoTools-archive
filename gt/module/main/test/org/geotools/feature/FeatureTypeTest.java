@@ -6,23 +6,20 @@
 
 package org.geotools.feature;
 
-import java.util.HashSet;
-import java.util.Set; 
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.lang.reflect.Array;
 import java.net.URI;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 import java.util.Set;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.geotools.data.DataTestCase;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;

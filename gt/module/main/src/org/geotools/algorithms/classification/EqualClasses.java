@@ -6,10 +6,7 @@
 
 package org.geotools.algorithms.classification;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 
 /**

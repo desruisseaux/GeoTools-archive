@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,54 +22,50 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.gui.swing;
 
 // J2SE dependencies
-import java.util.Locale;
-import java.util.ResourceBundle;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTabbedPane;
-import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
-import javax.swing.table.AbstractTableModel;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-import java.awt.geom.Rectangle2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Dimension;
-
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.image.DataBuffer;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
-import java.awt.image.SampleModel;
-import java.awt.image.RenderedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderableImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-// JAI dependencies
 import javax.media.jai.JAI;
-import javax.media.jai.OperationNode;
-import javax.media.jai.PropertySource;
-import javax.media.jai.PropertyChangeEmitter;
-import javax.media.jai.RegistryElementDescriptor;
 import javax.media.jai.OperationDescriptor;
+import javax.media.jai.OperationNode;
+import javax.media.jai.PropertyChangeEmitter;
+import javax.media.jai.PropertySource;
+import javax.media.jai.RegistryElementDescriptor;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.resources.gui.Resources;
 import org.geotools.resources.gui.ResourceKeys;
+import org.geotools.resources.gui.Resources;
 
 
 /**

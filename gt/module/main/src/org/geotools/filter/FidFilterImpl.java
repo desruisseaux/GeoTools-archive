@@ -18,14 +18,13 @@ package org.geotools.filter;
 
 
 // Geotools dependencies
-import org.geotools.feature.Feature;
-
-// J2SE dependencies
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.geotools.feature.Feature;
 
 
 /**

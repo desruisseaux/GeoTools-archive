@@ -6,14 +6,15 @@
 
 package org.geotools.data.shapefile.shp;
 
+import java.util.ArrayList;
+
 import org.geotools.data.shapefile.TestCaseSupport;
-import junit.framework.*;
-import java.net.*;
-import com.vividsolutions.jts.geom.*;
-import java.io.*;
-import java.util.*;
-import org.geotools.data.shapefile.shp.*;
-import org.geotools.feature.*;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.PrecisionModel;
 /**
  *
  * @author  Ian Schneider

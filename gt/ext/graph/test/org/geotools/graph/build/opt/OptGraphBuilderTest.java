@@ -3,12 +3,13 @@ package org.geotools.graph.build.opt;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.structure.opt.OptEdge;
 import org.geotools.graph.structure.opt.OptNode;
-import junit.framework.TestCase;
 
 public class OptGraphBuilderTest extends TestCase {
   

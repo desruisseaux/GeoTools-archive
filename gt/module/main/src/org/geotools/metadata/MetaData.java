@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,30 +23,25 @@
 package org.geotools.metadata;
 
 // J2SE direct dependencies
-import java.util.Set;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Collections;
+import java.util.Set;
 
-// OpenGIS direct dependencies
-import org.opengis.metadata.quality.DataQuality;
-import org.opengis.metadata.maintenance.ScopeCode;
+import org.geotools.resources.Utilities;
+import org.geotools.util.CheckedHashSet;
+import org.opengis.metadata.ApplicationSchemaInformation;
+import org.opengis.metadata.MetadataExtensionInformation;
+import org.opengis.metadata.PortrayalCatalogueReference;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.distribution.Distribution;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.content.ContentInformation;
-import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.maintenance.MaintenanceInformation;
-import org.opengis.metadata.MetadataExtensionInformation;
-import org.opengis.metadata.ApplicationSchemaInformation;
-import org.opengis.metadata.PortrayalCatalogueReference;
+import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.metadata.quality.DataQuality;
+import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.referencing.ReferenceSystem;
-
-// Geotools dependencies
-import org.geotools.metadata.MetadataEntity;
-import org.geotools.util.CheckedHashSet;
-import org.geotools.resources.Utilities;
 
 
 /**
@@ -54,7 +49,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author Touraï¿½vane
  */
 public class MetaData extends MetadataEntity implements org.opengis.metadata.MetaData {
     /**

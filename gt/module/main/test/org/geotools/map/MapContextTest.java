@@ -21,11 +21,16 @@
  */
 package org.geotools.map;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.awt.geom.AffineTransform;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.LocalCoordinateSystem;
 import org.geotools.data.DataUtilities;
@@ -35,10 +40,8 @@ import org.geotools.map.event.MapBoundsListener;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListListener;
-import java.awt.geom.AffineTransform;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

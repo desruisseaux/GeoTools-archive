@@ -20,7 +20,6 @@
  */
 package org.geotools.gui.swing.sldeditor.property.std;
 
-import org.geotools.gui.swing.sldeditor.property.ScaleEditor;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionListener;
@@ -28,6 +27,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.text.NumberFormat;
 import java.text.ParseException;
+
 import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -35,8 +35,10 @@ import javax.swing.InputVerifier;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JList;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+
+import org.geotools.gui.swing.sldeditor.property.ScaleEditor;
 
 
 /**

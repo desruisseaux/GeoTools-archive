@@ -33,10 +33,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import org.geotools.data.Repository;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Repository;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 

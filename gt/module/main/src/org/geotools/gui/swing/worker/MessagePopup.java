@@ -18,6 +18,7 @@ package org.geotools.gui.swing.worker;
 
 import java.awt.Cursor;
 import java.awt.Toolkit;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 

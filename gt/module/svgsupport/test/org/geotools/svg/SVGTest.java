@@ -25,24 +25,6 @@ package org.geotools.svg;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.geotools.data.Query;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.map.DefaultMapContext;
-import org.geotools.map.MapContext;
-import org.geotools.resources.TestData;
-import org.geotools.styling.SLDStyle;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.xml.DocumentFactory;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

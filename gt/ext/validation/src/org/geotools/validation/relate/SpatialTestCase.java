@@ -24,8 +24,7 @@
  */
 package org.geotools.validation.relate;
 
-import java.util.ArrayList;
-import java.util.List;
+import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.memory.MemoryDataStore;
@@ -33,15 +32,12 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.validation.Validation;
 import org.geotools.validation.ValidationResults;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-
-import junit.framework.TestCase;
 
 /**
  * SpatialTestCase<br>

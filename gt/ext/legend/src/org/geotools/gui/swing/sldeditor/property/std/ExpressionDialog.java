@@ -16,17 +16,6 @@
  */
 package org.geotools.gui.swing.sldeditor.property.std;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.Expression;
-import org.geotools.filter.ExpressionBuilder;
-import org.geotools.filter.Filter;
-import org.geotools.filter.parser.ParseException;
-import org.geotools.gui.swing.sldeditor.SLDEditor;
-import org.geotools.gui.swing.sldeditor.util.FormUtils;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
@@ -38,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -46,6 +36,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureTypeFactory;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.filter.Expression;
+import org.geotools.filter.ExpressionBuilder;
+import org.geotools.filter.Filter;
+import org.geotools.filter.parser.ParseException;
+import org.geotools.gui.swing.sldeditor.SLDEditor;
+import org.geotools.gui.swing.sldeditor.util.FormUtils;
 
 
 /**

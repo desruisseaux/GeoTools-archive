@@ -21,8 +21,9 @@
  */
 package org.geotools.filter;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.feature.FeatureType;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

@@ -16,15 +16,6 @@
  */
 package org.geotools.xml;
 
-import org.geotools.factory.FactoryFinder;
-import org.geotools.xml.schema.Attribute;
-import org.geotools.xml.schema.AttributeGroup;
-import org.geotools.xml.schema.ComplexType;
-import org.geotools.xml.schema.Element;
-import org.geotools.xml.schema.Group;
-import org.geotools.xml.schema.Schema;
-import org.geotools.xml.schema.SimpleType;
-import org.xml.sax.SAXException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,9 +30,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.geotools.factory.FactoryFinder;
+import org.geotools.xml.schema.Attribute;
+import org.geotools.xml.schema.AttributeGroup;
+import org.geotools.xml.schema.ComplexType;
+import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.Group;
+import org.geotools.xml.schema.Schema;
+import org.geotools.xml.schema.SimpleType;
+import org.xml.sax.SAXException;
 
 
 /**

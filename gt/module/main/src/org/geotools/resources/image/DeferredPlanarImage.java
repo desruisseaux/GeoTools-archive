@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Développement
+ * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,61 +20,55 @@
 package org.geotools.resources.image;
 
 // Images and AWT
-import java.awt.Point;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.image.ColorModel;
-import java.awt.image.SampleModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferDouble;
+import java.awt.image.DataBufferFloat;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferShort;
+import java.awt.image.DataBufferUShort;
 import java.awt.image.IndexColorModel;
-import java.awt.image.TileObserver;
 import java.awt.image.Raster;
+import java.awt.image.RasterFormatException;
 import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.awt.image.TileObserver;
 import java.awt.image.WritableRaster;
 import java.awt.image.WritableRenderedImage;
-import java.awt.image.RasterFormatException;
-
-// DataBuffer
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferShort;
-import java.awt.image.DataBufferFloat;
-import java.awt.image.DataBufferDouble;
-import java.awt.image.DataBufferUShort;
-
-// Logging and utilities
-import java.util.Map;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
-// JAI dépendences
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
-import javax.media.jai.TileRequest;
-import javax.media.jai.TileScheduler; // For javadoc
 import javax.media.jai.TileComputationListener;
+import javax.media.jai.TileRequest;
+import javax.media.jai.TileScheduler;
 
-// Geotools dependencies
-import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.renderer.Resources;
+import org.geotools.resources.XArray;
 import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
 import org.geotools.util.WeakValueHashMap;
 
 
 /**
- * Gère l'affichage en différé d'une image composée de tuiles. Lorsqu'une tuile
- * solicitée n'est pas disponible, une tuile comportant une valeur par défaut est 
- * retournée. Lorsque la tuile est enfin disponible, un évènement est déclenché
- * indiquant au composant qui désire afficher l'image que la tuile est maintenant
+ * Gï¿½re l'affichage en diffï¿½rï¿½ d'une image composï¿½e de tuiles. Lorsqu'une tuile
+ * solicitï¿½e n'est pas disponible, une tuile comportant une valeur par dï¿½faut est 
+ * retournï¿½e. Lorsque la tuile est enfin disponible, un ï¿½vï¿½nement est dï¿½clenchï¿½
+ * indiquant au composant qui dï¿½sire afficher l'image que la tuile est maintenant
  * disponible.
  * <br><br>
- * Le composant qui désire être informé des évènements sur les tuiles doit au préalable 
- * s'enregistrer auprès de la classe <CODE>DefferedPlanarImage</CODE> au travers de la
- * méthode {@link #addTileObserver}. Lorsque le composant est informé qu'une tuile est
- * prête, il lui suffit d'appeler une méthode <CODE>repaint(...)</CODE> pour mettre à
+ * Le composant qui dï¿½sire ï¿½tre informï¿½ des ï¿½vï¿½nements sur les tuiles doit au prï¿½alable 
+ * s'enregistrer auprï¿½s de la classe <CODE>DefferedPlanarImage</CODE> au travers de la
+ * mï¿½thode {@link #addTileObserver}. Lorsque le composant est informï¿½ qu'une tuile est
+ * prï¿½te, il lui suffit d'appeler une mï¿½thode <CODE>repaint(...)</CODE> pour mettre ï¿½
  * jour cette tuile.
  *
  * @version $Id$

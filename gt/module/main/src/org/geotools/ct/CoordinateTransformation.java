@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,27 +24,22 @@
 package org.geotools.ct;
 
 // OpenGIS dependencies
-import org.opengis.ct.CT_TransformType;
-import org.opengis.ct.CT_MathTransform;
-import org.opengis.ct.CT_CoordinateTransformation;
-import org.opengis.cs.CS_CoordinateSystem;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.NoninvertibleTransformException;
-
-// Geotools dependencies
-import org.geotools.cs.Info;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
-
-// J2SE dependencies
-import java.util.Locale;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.lang.ref.WeakReference;
-import java.lang.ref.Reference;
+import java.util.Locale;
+
+import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.Info;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.cs.CS_CoordinateSystem;
+import org.opengis.ct.CT_CoordinateTransformation;
+import org.opengis.ct.CT_MathTransform;
+import org.opengis.ct.CT_TransformType;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 
 /**

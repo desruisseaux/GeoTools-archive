@@ -1,8 +1,8 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
- * (C) 1998, Pêches et Océans Canada
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 1998, Pï¿½ches et Ocï¿½ans Canada
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
+ *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -34,18 +34,18 @@
 package org.geotools.renderer.geom;
 
 // J2SE dependencies
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.PathIterator;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 
-// Geotools dependencies
-import org.geotools.util.WeakHashSet;
-import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.renderer.Resources;
-import org.geotools.resources.renderer.ResourceKeys;
 import org.geotools.renderer.array.ArrayData;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.XArray;
+import org.geotools.resources.renderer.ResourceKeys;
+import org.geotools.resources.renderer.Resources;
+import org.geotools.util.WeakHashSet;
 
 
 /**
@@ -58,28 +58,28 @@ import org.geotools.renderer.array.ArrayData;
  */
 final class PolylineCache {
     /**
-     * Cache vers les transformation affine déjà créées. Cette cache utilise des références
-     * faibles pour ne retenir les transformations que si ells sont déjà utilisées ailleurs
-     * dans la machine virtuelle. <strong>Tous les objets placés dans cette cache devraient
-     * être laissés constants (immutables).</strong>
+     * Cache vers les transformation affine dï¿½jï¿½ crï¿½ï¿½es. Cette cache utilise des rï¿½fï¿½rences
+     * faibles pour ne retenir les transformations que si ells sont dï¿½jï¿½ utilisï¿½es ailleurs
+     * dans la machine virtuelle. <strong>Tous les objets placï¿½s dans cette cache devraient
+     * ï¿½tre laissï¿½s constants (immutables).</strong>
      */
     private static final WeakHashSet pool = new WeakHashSet();
 
     /**
-     * Transformation affine identité. Cette transformation affine
-     * sera partagée par plusieurs objets {@link PolylineCache} et
-     * ne doit pas être modifiée.
+     * Transformation affine identitï¿½. Cette transformation affine
+     * sera partagï¿½e par plusieurs objets {@link PolylineCache} et
+     * ne doit pas ï¿½tre modifiï¿½e.
      */
     private static final AffineTransform IDENTITY = new AffineTransform();
 
     /**
-     * Transformation affine qui avait été utilisée pour transformer les données cachée.
+     * Transformation affine qui avait ï¿½tï¿½ utilisï¿½e pour transformer les donnï¿½es cachï¿½e.
      */
     private AffineTransform transform = IDENTITY;
 
     /**
      * Nombre d'objets {@link PathIterator} qui utilisent le tableau de points {@link #array}.
-     * Ce nombre sera incrémenté à chaque appel de {@link #getRenderingArray} et décrémenté
+     * Ce nombre sera incrï¿½mentï¿½ ï¿½ chaque appel de {@link #getRenderingArray} et dï¿½crï¿½mentï¿½
      * par {@link #releaseRenderingArray}.
      */
     private short lockCount;
@@ -130,8 +130,8 @@ final class PolylineCache {
      * @param  destination The destination iterator. The {@link ArrayData#array} field will be
      *         set to a direct reference to cache's internal data. Consequently, data should not
      *         be modified outside this <code>getRenderingArray</code> method.
-     * @param  newTransform Transformation affine à appliquer sur les données. La valeur
-     *         <code>null</code> sera interprétée comme étant la transformation identitée.
+     * @param  newTransform Transformation affine ï¿½ appliquer sur les donnï¿½es. La valeur
+     *         <code>null</code> sera interprï¿½tï¿½e comme ï¿½tant la transformation identitï¿½e.
      *
      * @see #releaseRenderingArray
      * @see #getPointCount
@@ -164,11 +164,11 @@ final class PolylineCache {
         }
         float[] array = (float[]) this.array;
         /*
-         * Si la transformation affine n'a pas changé depuis la dernière fois, alors on pourra
-         * retourner le tableau directement.  Sinon, on tentera de modifier les coordonnées en
+         * Si la transformation affine n'a pas changï¿½ depuis la derniï¿½re fois, alors on pourra
+         * retourner le tableau directement.  Sinon, on tentera de modifier les coordonnï¿½es en
          * prenant en compte seulement le **changement** de la transformation affine depuis la
-         * dernière fois.   Mais cette étape ne sera faite qu'à la condition que le tableau ne
-         * soit pas en cours d'utilisation par un autre itérateur (lockCount==0).
+         * derniï¿½re fois.   Mais cette ï¿½tape ne sera faite qu'ï¿½ la condition que le tableau ne
+         * soit pas en cours d'utilisation par un autre itï¿½rateur (lockCount==0).
          */
         if (array != null) {
             // If we are using this array for the second time, it may be worth to trim it...
@@ -193,7 +193,7 @@ final class PolylineCache {
             } catch (NoninvertibleTransformException exception) {
                 Utilities.unexpectedException("org.geotools.renderer.geom", "Polyline",
                                               "getPathIterator", exception);
-                // Continue... On va simplement reconstruire le tableau à partir de la base.
+                // Continue... On va simplement reconstruire le tableau ï¿½ partir de la base.
             } else {
                 // Should be uncommon. Doesn't hurt, but may be a memory issue for big polyline.
                 Polyline.LOGGER.info(Resources.format(ResourceKeys.WARNING_EXCESSIVE_MEMORY_USAGE));
@@ -203,8 +203,8 @@ final class PolylineCache {
             this.array = array = new float[32];
         }
         /*
-         * Reconstruit le tableau de points à partir des données de bas niveau.
-         * La projection cartographique sera appliquée par {@link Polyline#toArray}.
+         * Reconstruit le tableau de points ï¿½ partir des donnï¿½es de bas niveau.
+         * La projection cartographique sera appliquï¿½e par {@link Polyline#toArray}.
          */
         destination.setData(array, 0, null);
         polyline.toArray(destination, polyline.getRenderingResolution());

@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.Collections;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.fidmapper.AbstractFIDMapper;

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, 2004 Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,23 +26,21 @@ package org.geotools.referencing.operation.transform;
 // J2SE dependencies
 import java.io.Serializable;
 import java.util.Collections;
+
 import javax.units.SI;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
 import org.geotools.metadata.citation.Citation;
+import org.geotools.parameter.ParameterReal;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.parameter.ParameterReal;
-import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -107,7 +105,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
     private final double da, db;
     
     /**
-     * The square of excentricity of the ellipsoid: e² = (a²-b²)/a² where
+     * The square of excentricity of the ellipsoid: eï¿½ = (aï¿½-bï¿½)/aï¿½ where
      * <var>a</var> is the semi-major axis length and
      * <var>b</var> is the semi-minor axis length.
      */

@@ -16,11 +16,13 @@
  */
 package org.geotools.data;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import javax.swing.event.EventListenerList;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

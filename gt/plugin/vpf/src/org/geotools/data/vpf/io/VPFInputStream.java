@@ -16,13 +16,11 @@
  */
 package org.geotools.data.vpf.io;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.geotools.data.vpf.exc.VPFDataException;
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.ifc.VPFHeader;

@@ -2,12 +2,20 @@ package org.geotools.data.oracle.sdo;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Iterator;
 
-//import oracle.sql.ARRAY;
-//import oracle.sql.Datum;
-//import oracle.sql.NUMBER;
-//import oracle.sql.STRUCT;
+import oracle.jdbc.OracleConnection;
+import oracle.sql.ARRAY;
+import oracle.sql.ArrayDescriptor;
+import oracle.sql.CHAR;
+import oracle.sql.CharacterSet;
+import oracle.sql.Datum;
+import oracle.sql.NUMBER;
+import oracle.sql.STRUCT;
+import oracle.sql.StructDescriptor;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateList;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -17,22 +25,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import java.util.Iterator;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateList;
-
-import oracle.jdbc.OracleConnection;
-import oracle.sql.STRUCT;
-import oracle.sql.ARRAY;
-import oracle.sql.ArrayDescriptor;
-import oracle.sql.CHAR;
-import oracle.sql.CharacterSet;
-//import oracle.sql.CharacterSet;
-import oracle.sql.Datum;
-import oracle.sql.NUMBER;
-import oracle.sql.StructDescriptor;
 /**
  * Sample use of SDO class for simple JTS Geometry.
  * <p>

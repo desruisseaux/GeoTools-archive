@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,16 +23,13 @@
 package org.geotools.referencing.datum;
 
 // J2SE dependencies
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.referencing.datum.PixelInCell;
-
-// Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
+import org.opengis.referencing.datum.PixelInCell;
 
 
 /**
