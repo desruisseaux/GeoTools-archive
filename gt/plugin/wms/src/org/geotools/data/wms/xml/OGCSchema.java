@@ -1,5 +1,8 @@
 package org.geotools.data.wms.xml;
 
+import java.util.Map;
+import java.util.Collections;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -133,5 +136,12 @@ public class OGCSchema implements Schema {
                     ogcSimpleTypes.ExceptionsType.getInstance()};
         }
         return simpleTypes;
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

@@ -84,9 +84,11 @@ public class MathTransformParser extends AbstractParser {
      * and the default factories.
      *
      * @param symbols The symbols for parsing and formatting numbers.
+     *
+     * @todo Pass hints in argument.
      */
     public MathTransformParser(final Symbols symbols) {
-        this(symbols, FactoryFinder.getMathTransformFactory());
+        this(symbols, FactoryFinder.getMathTransformFactory(null));
     }
     
     /**

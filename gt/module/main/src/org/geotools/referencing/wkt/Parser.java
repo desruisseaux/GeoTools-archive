@@ -135,13 +135,15 @@ public class Parser extends MathTransformParser {
      * Constructs a parser for the specified set of symbols using default factories.
      *
      * @param symbols The symbols for parsing and formatting numbers.
+     *
+     * @todo Pass hints in argument.
      */
     public Parser(final Symbols symbols) {
         this(symbols,
-             FactoryFinder.getDatumFactory(),
-             FactoryFinder.getCSFactory(),
-             FactoryFinder.getCRSFactory(),
-             FactoryFinder.getMathTransformFactory());
+             FactoryFinder.getDatumFactory        (null),
+             FactoryFinder.getCSFactory           (null),
+             FactoryFinder.getCRSFactory          (null),
+             FactoryFinder.getMathTransformFactory(null));
     }
     
     /**

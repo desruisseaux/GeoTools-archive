@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
@@ -153,4 +154,10 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
         return ((names==null || names.length==0)?null:names[0]);
     }
 
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

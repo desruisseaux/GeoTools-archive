@@ -108,7 +108,7 @@ public abstract class Geometry implements org.opengis.spatialschema.geometry.Geo
             // No need to synchronize: this is not a problem if this method is invoked
             // twice in two different threads.
             try {
-                coordinateOperationFactory = FactoryFinder.getCoordinateOperationFactory();
+                coordinateOperationFactory = FactoryFinder.getCoordinateOperationFactory(null);
             } catch (NoSuchElementException exception) {
                 // TODO: localize the message
                 throw new TransformException("Can't transform the geometry", exception);

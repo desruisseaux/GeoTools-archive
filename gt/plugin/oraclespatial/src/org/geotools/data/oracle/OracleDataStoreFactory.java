@@ -17,6 +17,7 @@ package org.geotools.data.oracle;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -285,4 +286,10 @@ public class OracleDataStoreFactory
         };                
     }
  
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

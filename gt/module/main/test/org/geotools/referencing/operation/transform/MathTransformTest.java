@@ -108,7 +108,7 @@ public class MathTransformTest extends TestCase {
      * Tests a transformation on a <code>DirectPosition</code> object.
      */
     public void testDirectPositionTransform() throws FactoryException, TransformException {
-        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory().createFromWKT(
+        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                 "PROJCS[\"NAD_1983_UTM_Zone_10N\",\n"                      +
                 "  GEOGCS[\"GCS_North_American_1983\",\n"                  +
                 "    DATUM[\"D_North_American_1983\",\n"                   +
@@ -124,7 +124,7 @@ public class MathTransformTest extends TestCase {
                 "  PARAMETER[\"Latitude_Of_Origin\",0],\n"                 +
                 "  UNIT[\"Meter\",1]]");
         
-        MathTransform t = FactoryFinder.getCoordinateOperationFactory().createOperation(
+        MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
                                         GeographicCRS.WGS84, crs).getMathTransform();
         DirectPosition position = new GeneralDirectPosition(-123, 55);
         position = t.          transform(position, position);

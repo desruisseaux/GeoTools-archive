@@ -19,6 +19,7 @@ package org.geotools.xml.filter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
@@ -641,6 +642,7 @@ public class FilterSchema implements Schema {
         public Element findChildElement(String name) {
             return (getChild() == null) ? null : getChild().findChildElement(name);
         }
+        
         /**
          * Subclass must override this method to allow encoding.
          * @return <code>false</code>, subclass override to allow encoding
@@ -648,20 +650,29 @@ public class FilterSchema implements Schema {
         public boolean canEncode(Element element, Object value, Map hints) {
             return false;
         }
+        
         /**
          * Subclass should implement this, this implementation provides a good OperationsNotSupportedException.
          * 
-		 * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
-		 */
+         * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
+         */
         public void encode(Element element, Object value, PrintHandler output,
                 Map hints) throws IOException, OperationNotSupportedException {
             throw new OperationNotSupportedException(element.toString()+" encode value "+value );
         }
+        
         /* (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
-		public String toString() {
-			return getName();
-		}
+         * @see java.lang.Object#toString()
+         */
+        public String toString() {
+            return getName();
+        }
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

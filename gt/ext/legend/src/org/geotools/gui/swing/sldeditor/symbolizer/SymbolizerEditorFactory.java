@@ -4,6 +4,8 @@
 package org.geotools.gui.swing.sldeditor.symbolizer;
 
 import java.awt.Component;
+import java.util.Map;
+import java.util.Collections;
 
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
@@ -49,4 +51,11 @@ public abstract class SymbolizerEditorFactory implements Factory {
     public abstract SymbolizerEditor createRasterSymbolizerEditor(FeatureType featureType);
     
     public abstract SymbolizerChooserDialog createSymbolizerChooserDialog(Component parent, FeatureType featureType); 
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

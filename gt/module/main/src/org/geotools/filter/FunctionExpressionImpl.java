@@ -14,12 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * FunctionExpression.java
- *
- * Created on 28 July 2002, 15:18
- */
 package org.geotools.filter;
+
+import java.util.Map;
+import java.util.Collections;
 
 /**
  * Abstract class for a function expression implementation
@@ -77,5 +75,12 @@ public abstract class FunctionExpressionImpl
      */
     public void accept(FilterVisitor visitor) {
         visitor.visit(this);
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

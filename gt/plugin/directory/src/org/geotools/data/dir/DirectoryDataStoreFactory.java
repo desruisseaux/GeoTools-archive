@@ -19,6 +19,7 @@ package org.geotools.data.dir;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Collections;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
@@ -159,5 +160,12 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
      */
     public boolean isAvailable() {
         return true;
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

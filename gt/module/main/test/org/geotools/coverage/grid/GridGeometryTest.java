@@ -71,7 +71,7 @@ public class GridGeometryTest extends TestCase {
      * Tests the construction with an identity transform.
      */
     public void testIdentity() throws FactoryException {
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
+        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(null);
         final int[] lower = new int[] {0,     0, 2};
         final int[] upper = new int[] {100, 200, 4};
         final MathTransform identity = factory.createAffineTransform(new GeneralMatrix(4));

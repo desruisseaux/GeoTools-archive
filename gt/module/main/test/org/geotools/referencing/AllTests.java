@@ -53,6 +53,7 @@ public class AllTests extends TestCase {
         final TestSuite suite = new TestSuite("org.geotools.referencing");
         suite.addTest(org.geotools.math                           .AllTests                .suite());
         suite.addTest(org.geotools.measure                        .AllTests                .suite());
+        suite.addTest(org.geotools.factory                        .FactoryRegistryTest     .suite());
         suite.addTest(org.geotools.referencing                    .BasicTest               .suite());
         suite.addTest(org.geotools.referencing                    .CreationTest            .suite());
         suite.addTest(org.geotools.referencing                    .ParameterTest           .suite());

@@ -150,7 +150,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     public DatumAliases() {
         // Uses a slightly higher priority than the default factory, in order
         // to get WKT parser and authorities factories to use the aliases table.
-        super(NORM_PRIORITY + 1);
+        super(NORMAL_PRIORITY + 10);
         aliasURL = DatumAliases.class.getResource(ALIAS_TABLE);
         if (aliasURL == null) {
             throw new NoSuchElementException(ALIAS_TABLE);
@@ -177,7 +177,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
      * @param aliasURL The url to the alias table.
      */
     public DatumAliases(final DatumFactory factory, final URL aliasURL) {
-        super(NORM_PRIORITY + 1);
+        super(NORMAL_PRIORITY + 10);
         this.factory  = factory;
         this.aliasURL = aliasURL;
         ensureNonNull("factory",  factory );

@@ -109,7 +109,7 @@ public class ReprojectFeatureResults implements FeatureResults {
         this.schema = FeatureTypes.transform(type, destinationCS);
         this.results = results;
         
-        this.transform = FactoryFinder.getCoordinateOperationFactory().createOperation(originalCs,destinationCS).getMathTransform();
+        this.transform = FactoryFinder.getCoordinateOperationFactory(null).createOperation(originalCs,destinationCS).getMathTransform();
 
         // Optimization 1: if the wrapped results is a forced cs results we
         // "eat" it to avoid useless feature object creation
@@ -123,7 +123,7 @@ public class ReprojectFeatureResults implements FeatureResults {
         if (results instanceof ReprojectFeatureResults) {
             ReprojectFeatureResults reproject = (ReprojectFeatureResults) results;
             this.results = reproject.getOrigin();
-            this.transform = FactoryFinder.getMathTransformFactory().createConcatenatedTransform(reproject.transform,
+            this.transform = FactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(reproject.transform,
                     transform);
         }
     }

@@ -17,6 +17,8 @@
 package org.geotools.styling;
 
 import java.net.URL;
+import java.util.Map;
+import java.util.Collections;
 
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
@@ -253,4 +255,12 @@ public abstract class StyleFactory implements Factory {
     public abstract Font getDefaultFont();
 
     public abstract PointPlacement getDefaultPointPlacement();
+
+    /**
+     * Returns implementation hints for this factory.
+     * The default implementation returns an empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

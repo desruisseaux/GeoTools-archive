@@ -16,6 +16,9 @@
  */
 package org.geotools.data;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
@@ -97,4 +100,10 @@ public abstract class FeatureLockFactory implements Factory {
 
     protected abstract FeatureLock createLock(String name, long duration);
 
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

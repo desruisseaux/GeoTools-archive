@@ -79,6 +79,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
@@ -1071,8 +1072,9 @@ public class GeotoolsFactory extends AbstractFactory
         //       Since we share a single instance of this parser, we must
         //       synchronize.
         if (parser == null) {
-            parser = new Parser(Symbols.DEFAULT, FactoryFinder.getDatumFactory(), this, this,
-                                                 FactoryFinder.getMathTransformFactory());
+            final Hints hints = new Hints(getImplementationHints());
+            parser = new Parser(Symbols.DEFAULT, FactoryFinder.getDatumFactory(hints), this, this,
+                                                 FactoryFinder.getMathTransformFactory(hints));
         }
         try {
             return parser.parseCoordinateReferenceSystem(wkt);

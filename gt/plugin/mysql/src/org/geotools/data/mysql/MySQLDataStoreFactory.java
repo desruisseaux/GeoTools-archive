@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -307,5 +308,12 @@ public class MySQLDataStoreFactory
         return new Param[] {
             DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE
         };
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

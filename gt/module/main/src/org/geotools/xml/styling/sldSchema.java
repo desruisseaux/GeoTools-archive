@@ -5,6 +5,9 @@ package org.geotools.xml.styling;
  * licensing information. CopyRight 105
  */
 
+import java.util.Map;
+import java.util.Collections;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -271,5 +274,12 @@ public class sldSchema implements Schema {
     
     public Type getSLDType() {
         return getElements()[SLD_ELEMENT].getType();
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

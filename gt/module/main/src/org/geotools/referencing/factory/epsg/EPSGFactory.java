@@ -286,7 +286,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      * @param connection The connection to the underlying EPSG database.
      */
     public EPSGFactory(final FactoryGroup factories, final Connection connection) {
-        super(factories, MAX_PRIORITY-2);
+        super(factories, MAXIMUM_PRIORITY-20);
         this.connection = connection;
         ensureNonNull("connection", connection);
     }

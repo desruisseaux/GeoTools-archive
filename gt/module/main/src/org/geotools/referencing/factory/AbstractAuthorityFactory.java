@@ -23,7 +23,9 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
+import java.util.Iterator;
 import javax.units.Unit;
+import javax.imageio.spi.ServiceRegistry;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
@@ -103,7 +105,8 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      *
      * @param factories The factories to use.
      * @param priority The priority for this factory, as a number between
-     *        {@link #MIN_PRIORITY} and {@link #MAX_PRIORITY} inclusive.
+     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
+     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      */
     protected AbstractAuthorityFactory(final FactoryGroup factories, final int priority) {
         super(priority);
@@ -127,19 +130,6 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * database.
      */
     public abstract Citation getAuthority();
-
-    /**
-     * Returns {@code true} if this factory is for the same authority than the specified
-     * object. This method if for implementation of {@linkplain #onRegistration} method.
-     */
-    final boolean sameAuthority(final Factory factory) {
-        if (factory instanceof AuthorityFactory) {
-            final Citation authority = getAuthority();
-            return authority!=null &&
-                   authority.equals(((AuthorityFactory) factory).getAuthority());
-        }
-        return false;
-    }
 
     /**
      * Returns the low-level {@linkplain ObjectFactory object factory} used for
@@ -823,5 +813,41 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
                 "No code \""+code+"\" from the authority \""+authority+
                 "\" was found for object of type "+Utilities.getShortName(type)+".",
                 authority, code);
+    }
+
+    /**
+     * Called when this factory is added to the given <code>category</code> of the given
+     * <code>registry</code>. The factory may already be registered under another category
+     * or categories.
+     * <br><br>
+     * This method is invoked automatically when this factory is registered as a plugin,
+     * and should not be invoked directly by the user. The default implementation iterates
+     * through all services under the same category and for the same
+     * {@linkplain AuthorityFactory#getAuthority authority}, and set the ordering
+     * according the priority given at construction time.
+     *
+     * @param registry a <code>ServiceRegistry</code> where this factory has been registered.
+     * @param category a <code>Class</code> object indicating the registry category under which
+     *                 this object has been registered.
+     *
+     * @see #MINIMUM_PRIORITY
+     * @see #MAXIMUM_PRIORITY
+     * @see FactoryFinder
+     */
+    public void onRegistration(final ServiceRegistry registry, final Class category) {
+        for (final Iterator it=registry.getServiceProviders(category, false); it.hasNext();) {
+            final Object provider = it.next();
+            if (provider instanceof AbstractAuthorityFactory) {
+                final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) provider;
+                final Citation authority = getAuthority();
+                if (authority!=null && authority.equals(factory.getAuthority())) {
+                    if (priority > factory.priority) {
+                        registry.setOrdering(category, this, factory);
+                    } else if (priority < factory.priority) {
+                        registry.setOrdering(category, factory, this);
+                    }
+                }
+            }
+        }
     }
 }

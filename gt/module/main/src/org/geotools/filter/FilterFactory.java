@@ -16,6 +16,9 @@
  */
 package org.geotools.filter;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
@@ -306,4 +309,11 @@ public abstract class FilterFactory implements Factory {
      * @return The new Function Expression.
      */
     public abstract EnvironmentVariable createEnvironmentVariable(String name);
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

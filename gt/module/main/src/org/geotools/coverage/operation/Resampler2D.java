@@ -177,35 +177,23 @@ public final class Resampler2D extends GridCoverage2D {
                                            final CoordinateReferenceSystem targetCRS,
                                                  GridGeometry2D             targetGG,
                                            final Interpolation         interpolation,
-                                           final RenderingHints                hints)
+                                           final Hints                         hints)
             throws FactoryException, TransformException
     {
         /*
          * Gets the JAI instance and factories to use from the rendering hints.
          */
-        Object property = (hints!=null) ? hints.get(Hints.JAI_INSTANCE) : null;
         final JAI processor;
-        if (property instanceof JAI) {
-            processor = (JAI) property;
-        } else {
-            processor = JAI.getDefaultInstance();
+        if (true) {
+            final Object property = (hints!=null) ? hints.get(Hints.JAI_INSTANCE) : null;
+            if (property instanceof JAI) {
+                processor = (JAI) property;
+            } else {
+                processor = JAI.getDefaultInstance();
+            }
         }
-        property = (hints!=null) ? hints.get(Hints.COORDINATE_OPERATION_FACTORY) : null;
-        final CoordinateOperationFactory factory;
-        if (property instanceof CoordinateOperationFactory) {
-            factory = (CoordinateOperationFactory) property;
-        } else {
-            factory = FactoryFinder.getCoordinateOperationFactory();
-        }
-        property = (hints!=null) ? hints.get(Hints.MATH_TRANSFORM_FACTORY) : null;
-        final MathTransformFactory mtFactory;
-        if (property instanceof MathTransformFactory) {
-            mtFactory = (MathTransformFactory) property;
-        } else if (factory instanceof AbstractCoordinateOperationFactory) {
-            mtFactory = ((AbstractCoordinateOperationFactory) factory).getMathTransformFactory();
-        } else {
-            mtFactory = FactoryFinder.getMathTransformFactory();
-        }
+        final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory(hints);
+        final MathTransformFactory     mtFactory = FactoryFinder.getMathTransformFactory      (hints);
         /*
          * If the source coverage is already the result of a "Resample" operation,
          * go up in the chain and check if a previously computed image could fits.
@@ -749,7 +737,8 @@ public final class Resampler2D extends GridCoverage2D {
                 crs = source.getCoordinateReferenceSystem();
             }
             try {
-                coverage = reproject(source, crs, gridGeom, interp, hints);
+                coverage = reproject(source, crs, gridGeom, interp,
+                    (hints instanceof Hints) ? (Hints) hints : new Hints(hints));
             } catch (FactoryException exception) {
                 throw new CannotReprojectException(Resources.format(
                         ResourceKeys.ERROR_CANT_REPROJECT_$1, source.getName()), exception);

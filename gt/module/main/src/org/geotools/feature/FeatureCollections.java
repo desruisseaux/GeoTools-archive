@@ -17,6 +17,9 @@
 
 package org.geotools.feature;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryFinder;
 
@@ -50,10 +53,17 @@ public abstract class FeatureCollections implements Factory {
   public static FeatureCollection newCollection() {
     return instance().createCollection(); 
   }
+  
   /**
    * Subclasses must implement this to return a new FeatureCollection object.
    * @return A new FeatureCollection
    */
   protected abstract FeatureCollection createCollection();
-  
+
+  /**
+   * Returns the implementation hints. The default implementation returns en empty map.
+   */
+  public Map getImplementationHints() {
+    return Collections.EMPTY_MAP;
+  }  
 }

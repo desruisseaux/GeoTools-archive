@@ -130,7 +130,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      * Constructs a coordinate operation factory using the default factories.
      */
     public CoordinateOperationFactory() {
-        this(FactoryFinder.getMathTransformFactory());
+        this(FactoryFinder.getMathTransformFactory(null));
     }
 
     /**

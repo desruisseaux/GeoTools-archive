@@ -59,6 +59,7 @@ final class Properties extends AbstractMap {
      */
     public Properties(final IdentifiedObject info) {
         this.info = info;
+        org.geotools.referencing.IdentifiedObject.ensureNonNull("info", info);
     }
 
     /**

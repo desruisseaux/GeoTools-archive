@@ -64,6 +64,7 @@ import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.util.Singleton;
@@ -109,6 +110,13 @@ public class FactoryGroup {
     private MathTransformFactory mtFactory;
 
     /**
+     * The implementation hints.
+     *
+     * @todo There is not yet any API for setting it.
+     */
+    private final Hints hints = null;
+
+    /**
      * Constructs an instance using the default factories.
      * Default factories are:
      *
@@ -149,7 +157,7 @@ public class FactoryGroup {
      */
     public DatumFactory getDatumFactory() {
         if (datumFactory == null) {
-            datumFactory = FactoryFinder.getDatumFactory();
+            datumFactory = FactoryFinder.getDatumFactory(hints);
         }
         return datumFactory;
     }
@@ -159,7 +167,7 @@ public class FactoryGroup {
      */
     public CSFactory getCSFactory() {
         if (csFactory == null) {
-            csFactory = FactoryFinder.getCSFactory();
+            csFactory = FactoryFinder.getCSFactory(hints);
         }
         return csFactory;
     }
@@ -169,7 +177,7 @@ public class FactoryGroup {
      */
     public CRSFactory getCRSFactory() {
         if (crsFactory == null) {
-            crsFactory = FactoryFinder.getCRSFactory();
+            crsFactory = FactoryFinder.getCRSFactory(hints);
         }
         return crsFactory;
     }
@@ -179,7 +187,7 @@ public class FactoryGroup {
      */
     public MathTransformFactory getMathTransformFactory() {
         if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory();
+            mtFactory = FactoryFinder.getMathTransformFactory(hints);
         }
         return mtFactory;
     }

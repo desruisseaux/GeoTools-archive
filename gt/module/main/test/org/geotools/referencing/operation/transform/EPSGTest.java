@@ -149,7 +149,7 @@ public class EPSGTest extends TestCase {
      */
     public void testCreation() throws FactoryException {
         if (factory == null) return;
-        final CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory();
+        final CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
         CoordinateReferenceSystem sourceCRS, targetCRS;
         CoordinateOperation operation;
         
@@ -237,7 +237,7 @@ public class EPSGTest extends TestCase {
         if (factory == null) return;
         CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
         CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem("4322");
-        CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory();
+        CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
         CoordinateOperation cop = opf.createOperation(crs1, crs2);
         serialize(cop);
 

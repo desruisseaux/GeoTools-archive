@@ -57,7 +57,7 @@ public class JDBCAuthorityFactory implements CRSAuthorityFactory {
      *
      */
     public JDBCAuthorityFactory(ConnectionPool pool) {
-        factory=FactoryFinder.getCRSFactory();
+        factory=FactoryFinder.getCRSFactory(null);
         this.connectionPool=pool;
     }
     

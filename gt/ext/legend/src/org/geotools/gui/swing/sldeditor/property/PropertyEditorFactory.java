@@ -3,6 +3,9 @@
  */
 package org.geotools.gui.swing.sldeditor.property;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.factory.FactoryFinder;
@@ -95,4 +98,11 @@ public abstract class PropertyEditorFactory implements Factory {
     public abstract StrokeEditor createStrokeEditor(FeatureType featureType);
     
     public abstract SymbolEditor createSymbolEditor(FeatureType featureType);
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

@@ -21,7 +21,9 @@ package org.geotools.gce.geotiff;
 //Geotools dependencies
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
@@ -105,5 +107,11 @@ public class GeoTiffFormat extends AbstractGridFormat {
     public void setFactory(CoordinateSystemAuthorityFactory factory) {
         this.factory = factory;
     }
-    
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

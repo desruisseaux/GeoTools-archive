@@ -583,7 +583,7 @@ public final class CRSUtilities {
         try {
             crs = getCRS2D(crs);
             if (!equalsIgnoreMetadata(org.geotools.referencing.crs.GeographicCRS.WGS84, crs)) {
-                final CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory()
+                final CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory(null)
                         .createOperation(crs, org.geotools.referencing.crs.GeographicCRS.WGS84);
                 bounds = transform((MathTransform2D) op.getMathTransform(), bounds, null);
             }

@@ -132,7 +132,7 @@ public class Console extends AbstractConsole {
      * The coordinate operation factory to use.
      */
     private final CoordinateOperationFactory factory =
-                  FactoryFinder.getCoordinateOperationFactory();
+                  FactoryFinder.getCoordinateOperationFactory(null);
 
     /**
      * The source and target CRS, or <code>null</code> if not yet determined.

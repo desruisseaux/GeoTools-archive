@@ -20,6 +20,8 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.Collections;
 
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryConfigurationError;
@@ -874,4 +876,11 @@ public abstract class FeatureTypeFactory implements Factory {
      * @return
      */
     public abstract int getAttributeCount();
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

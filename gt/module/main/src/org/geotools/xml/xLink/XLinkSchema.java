@@ -18,6 +18,7 @@ package org.geotools.xml.xLink;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1467,5 +1468,12 @@ public class XLinkSchema implements Schema {
 
             return instance1;
         }
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

@@ -17,6 +17,7 @@
 package org.geotools.data.vpf.file;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
@@ -131,5 +132,12 @@ public class VPFFileFactory implements DataStoreFactorySpi {
     }
     public VPFFile getFile(String pathName) throws IOException{
         return (VPFFile)store.getSchema(pathName);
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

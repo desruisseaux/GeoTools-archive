@@ -84,14 +84,14 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
     	length.setArgs(new Expression[]{null});
     	CompareFilter cf = null;
-		try {
-			cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
-	    	cf.addLeftValue(length);
-	    	cf.addRightValue(ff.createLiteralExpression(fieldLength));
-		} catch (IllegalFilterException e) {
-			// TODO something
-		}
-		Filter f = cf == null?Filter.ALL:cf;
+        try {
+            cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
+        cf.addLeftValue(length);
+        cf.addRightValue(ff.createLiteralExpression(fieldLength));
+        } catch (IllegalFilterException e) {
+            // TODO something
+        }
+        Filter f = cf == null?Filter.ALL:cf;
     	
         if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
@@ -114,21 +114,20 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
             
         if( Geometry.class.isAssignableFrom( clazz) && metaData instanceof CoordinateReferenceSystem ){
 
-        	FilterFactory ff = FilterFactory.createFilterFactory();
-        	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
-        	length.setArgs(new Expression[]{null});
-        	CompareFilter cf = null;
-    		try {
-    			cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
-    	    	cf.addLeftValue(length);
-    	    	cf.addRightValue(ff.createLiteralExpression(fieldLength));
-    		} catch (IllegalFilterException e) {
-    			// TODO something
-    		}
-    		Filter f = cf == null?Filter.ALL:cf;
+            FilterFactory ff = FilterFactory.createFilterFactory();
+            LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
+            length.setArgs(new Expression[]{null});
+            CompareFilter cf = null;
+            try {
+                cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
+            cf.addLeftValue(length);
+            cf.addRightValue(ff.createLiteralExpression(fieldLength));
+            } catch (IllegalFilterException e) {
+                // TODO something
+            }
+            Filter f = cf == null?Filter.ALL:cf;
             return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
-            return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );
-
+        return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );
     }
 }

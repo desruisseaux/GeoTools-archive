@@ -18,6 +18,7 @@ package org.geotools.data.oracle;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -287,4 +288,12 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
             SCHEMA,
             NAMESPACE
         };                
-    }}
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
+}

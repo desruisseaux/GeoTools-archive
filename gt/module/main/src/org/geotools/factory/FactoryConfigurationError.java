@@ -16,6 +16,7 @@
  */
 package org.geotools.factory;
 
+
 /**
  * Deadly error. Usually if this is thrown, an application built upon geotools
  * will not be able to function. I make this an error so that the standard bad code<br>
@@ -24,9 +25,22 @@ package org.geotools.factory;
  * error will grind the application to a halt, as it should.
  *
  * @author Ian Schneider
- * @version $Id: FactoryConfigurationError.java,v 1.3 2003/07/30 19:34:49 jmacgill Exp $
+ * @version $Id$
  *
  * @see java.lang.Error
+ *
+ * @todo This error is used by {@link FactoryFinder}. The proposed replacement
+ *       ({@link FactoryRegistry}) uses an exception ({@link FactoryRegistryException}) instead of
+ *       an error. There is two reasons why we switched back to an exception instead of an error:
+ *       <ul>
+ *         <li>At the difference of {@link FactoryFinder}, {@link FactoryRegistry} do not expects
+ *             a default implementation to be specified.</li>
+ *         <li>{@link FactoryRegistry} can accepts an optional set of user-provided {@link Hints}.
+ *             Those hints may reduces the set of acceptable factories.</li>
+ *       </ul>
+ *       Because of the above, a "factory not found" exception may not be caused by a JVM,
+ *       compilation or packaging error. It is more similar to a
+ *       {@link java.util.MissingResourceException}.
  */
 public class FactoryConfigurationError extends Error {
     /**

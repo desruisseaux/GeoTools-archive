@@ -172,12 +172,12 @@ public class LiteShape2 implements Shape, Cloneable {
 		
 		if( mathTransform==null || mathTransform.isIdentity() ){
 			if( !affineTransform.isIdentity() ){
-				MathTransformFactory factory=FactoryFinder.getMathTransformFactory();
+				MathTransformFactory factory=FactoryFinder.getMathTransformFactory(null);
 				mathTransform=factory.createAffineTransform(new GeneralMatrix(affineTransform));
 				affineTransform=IDENTITY;
 			}
 		}else if( !affineTransform.isIdentity() ){
-			MathTransformFactory factory=FactoryFinder.getMathTransformFactory();
+			MathTransformFactory factory=FactoryFinder.getMathTransformFactory(null);
 			factory.createConcatenatedTransform(mathTransform, factory.createAffineTransform(new GeneralMatrix(affineTransform)));
 			affineTransform=IDENTITY;
 		}

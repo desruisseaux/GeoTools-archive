@@ -9,6 +9,7 @@ package org.geotools.data.wms.xml;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
@@ -282,6 +283,13 @@ public class WMSSchema implements Schema {
     
     public static Schema getInstance() {
         return instance;
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 
     // convinience method to deal with the URISyntaxException

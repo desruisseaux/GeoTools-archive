@@ -16,6 +16,9 @@
  */
 package org.geotools.gce.image;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
@@ -32,5 +35,12 @@ public class WorldImageFormatFactory implements GridFormatFactorySpi {
 
     public boolean isAvailable() {
         return true;
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

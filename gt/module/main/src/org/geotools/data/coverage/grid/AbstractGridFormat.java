@@ -48,8 +48,8 @@ import org.opengis.coverage.grid.Format;
  * @see AbstractFormatFactory
  */
 public abstract class AbstractGridFormat implements Format {
-
-  /**
+    
+    /**
      * The Map object is used by the information methods(such as getName()) as
      * a data source. The keys in the Map object (for the associated method)
      * are as follows:
@@ -68,72 +68,72 @@ public abstract class AbstractGridFormat implements Format {
     protected Map mInfo;
     protected ParameterValueGroup readParameters;
     protected ParameterValueGroup writeParameters;
-
+    
     /**
      * @see org.opengis.coverage.grid.Format#getName()
      */
     public String getName() {
-      return (String) mInfo.get("name");
+        return (String) mInfo.get("name");
     }
-
+    
     /**
      * @see org.opengis.coverage.grid.Format#getDescription()
      */
     public String getDescription() {
-      return (String) mInfo.get("description");
+        return (String) mInfo.get("description");
     }
-
+    
     /**
      * @see org.opengis.coverage.grid.Format#getVendor()
      */
     public String getVendor() {
-      return (String) mInfo.get("vendor");
+        return (String) mInfo.get("vendor");
     }
-
+    
     /**
      * @see org.opengis.coverage.grid.Format#getDocURL()
      */
     public String getDocURL() {
-      return (String) mInfo.get("docURL");
+        return (String) mInfo.get("docURL");
     }
-
+    
     /**
      * @see org.opengis.coverage.grid.Format#getVersion()
      */
     public String getVersion() {
-      return (String) mInfo.get("version");
+        return (String) mInfo.get("version");
     }
-
-
+    
+    
     /**
      * @todo javadoc
      */
-   abstract public org.opengis.coverage.grid.GridCoverageReader getReader(Object source);
-
+    abstract public org.opengis.coverage.grid.GridCoverageReader getReader(Object source);
+    
     /**
      * @todo javadoc
      */
-   abstract public org.opengis.coverage.grid.GridCoverageWriter getWriter(Object destination);
-
-   abstract public boolean accepts(Object input);
-
+    abstract public org.opengis.coverage.grid.GridCoverageWriter getWriter(Object destination);
+    
+    abstract public boolean accepts(Object input);
+    
     /**
      * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
      */
     public boolean equals(Format f) {
-      if (f.getClass() == getClass()) {
-        return true;
-      }
-      return false;
+        if (f.getClass() == getClass()) {
+            return true;
+        }
+        return false;
     }
+    
     /* (non-Javadoc)
-   * @see org.opengis.coverage.grid.Format#getReadParameters()
-   */
-  public  ParameterValueGroup getReadParameters(){return this.readParameters;}
-
-  /* (non-Javadoc)
-   * @see org.opengis.coverage.grid.Format#getWriteParameters()
-   */
-  public  ParameterValueGroup getWriteParameters() {return this.writeParameters;}
-
-  }
+     * @see org.opengis.coverage.grid.Format#getReadParameters()
+     */
+    public  ParameterValueGroup getReadParameters(){return this.readParameters;}
+    
+    /* (non-Javadoc)
+     * @see org.opengis.coverage.grid.Format#getWriteParameters()
+     */
+    public  ParameterValueGroup getWriteParameters() {return this.writeParameters;}
+}

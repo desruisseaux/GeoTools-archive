@@ -111,10 +111,10 @@ public class CreationTest extends TestCase {
         out.println("---------------------");
         out.println();
         out.println("create Coodinate Reference System....1: ");
-        final         DatumFactory datumFactory = FactoryFinder.getDatumFactory();
-        final            CSFactory    csFactory = FactoryFinder.getCSFactory();
-        final           CRSFactory   crsFactory = FactoryFinder.getCRSFactory();
-        final MathTransformFactory    mtFactory = FactoryFinder.getMathTransformFactory();
+        final         DatumFactory datumFactory = FactoryFinder.getDatumFactory        (null);
+        final            CSFactory    csFactory = FactoryFinder.getCSFactory           (null);
+        final           CRSFactory   crsFactory = FactoryFinder.getCRSFactory          (null);
+        final MathTransformFactory    mtFactory = FactoryFinder.getMathTransformFactory(null);
 
         final Ellipsoid airy1830;
         final Unit meters = SI.METER;
@@ -191,7 +191,7 @@ public class CreationTest extends TestCase {
         out.println();
         out.println("Testing classification names");
         out.println("----------------------------");
-        final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory();
+        final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
         final Collection methods = mtFactory.getAvailableMethods(Projection.class);
         for (final Iterator it=methods.iterator(); it.hasNext();) {
             final OperationMethod    method = (OperationMethod) it.next();
@@ -244,9 +244,9 @@ public class CreationTest extends TestCase {
 
         for (int i=0; i<3; i++) {
             switch (i) {
-                case  0: factory = new DatumAliases(factory);       break;
-                case  1: factory = FactoryFinder.getDatumFactory(); break;
-                case  2: ((DatumAliases) factory).freeUnused();     break;
+                case  0: factory = new DatumAliases(factory);           break;
+                case  1: factory = FactoryFinder.getDatumFactory(null); break;
+                case  2: ((DatumAliases) factory).freeUnused();         break;
                 default: throw new AssertionError(); // Should not occurs.
             }
             final String pass = "Pass #"+i;

@@ -6,6 +6,9 @@
 
 package org.geotools.filter;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.algorithms.RobustGeometryProperties;
 import org.geotools.feature.Feature;
 
@@ -82,5 +85,11 @@ public class AreaFunction implements org.geotools.filter.FunctionExpression {
     public Expression[] getArgs() {
         return args;
     }
-    
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

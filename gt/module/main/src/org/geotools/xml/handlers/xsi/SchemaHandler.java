@@ -10,12 +10,14 @@ package org.geotools.xml.handlers.xsi;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.geotools.xml.SchemaFactory;
@@ -1514,6 +1516,13 @@ public class SchemaHandler extends XSIElementHandler {
          */
         public String getPrefix() {
             return prefix;
+        }
+
+        /**
+         * Returns the implementation hints. The default implementation returns en empty map.
+         */
+        public Map getImplementationHints() {
+            return Collections.EMPTY_MAP;
         }
     }
 

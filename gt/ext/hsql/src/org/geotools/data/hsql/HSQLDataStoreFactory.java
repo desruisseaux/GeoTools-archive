@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.data.DataSourceException;
@@ -199,5 +200,12 @@ public class HSQLDataStoreFactory
         DataStore ds = createDataStore(url);
         String[] names = ds.getTypeNames(); // should be exactly one
         return ((names == null || names.length==0)?null:names[0]);
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

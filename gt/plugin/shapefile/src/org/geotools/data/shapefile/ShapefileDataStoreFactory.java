@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
+import java.util.Collections;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
@@ -207,5 +208,12 @@ public class ShapefileDataStoreFactory
         DataStore ds = createDataStore(url);
         String[] names = ds.getTypeNames(); // should be exactly one
         return ((names == null || names.length==0)?null:names[0]);
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

@@ -94,7 +94,7 @@ public class DimensionFilter {
      * default math transform factory}.
      */
     public DimensionFilter() {
-        this(FactoryFinder.getMathTransformFactory());
+        this(FactoryFinder.getMathTransformFactory(null));
     }
 
     /**

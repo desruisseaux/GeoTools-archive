@@ -89,7 +89,7 @@ public class JTS {
     public static ReferencedEnvelope transform(ReferencedEnvelope envelope, CoordinateReferenceSystem crs) throws TransformException, OperationNotFoundException, NoSuchElementException, FactoryException {
         double[] coords=new double[]{envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
         double[] newcoords=new double[4];
-        MathTransform transform = FactoryFinder.getCoordinateOperationFactory()
+        MathTransform transform = FactoryFinder.getCoordinateOperationFactory(null)
         .createOperation(envelope.getCRS(),crs).getMathTransform();
         transform.transform(coords, 0, newcoords, 0, 2);
         return new ReferencedEnvelope(new Envelope(newcoords[0],newcoords[2],newcoords[1],newcoords[3]),crs);
@@ -200,7 +200,7 @@ public class JTS {
     	if (crs.equals(GeographicCRS.WGS84)) {
             return env;
         }
-        MathTransform transform = FactoryFinder.getCoordinateOperationFactory()
+        MathTransform transform = FactoryFinder.getCoordinateOperationFactory(null)
                 .createOperation(crs, GeographicCRS.WGS84).getMathTransform();
         return JTS.transform(env, transform);
     }

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -1045,5 +1046,12 @@ public class GMLSchema implements Schema {
         public Element findChildElement(String name) {
             return null; // will never happen
         }
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

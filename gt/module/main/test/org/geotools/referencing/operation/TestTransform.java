@@ -57,22 +57,22 @@ public abstract class TestTransform extends TestCase {
     /**
      * The default datum factory.
      */
-    protected static final DatumFactory datumFactory = FactoryFinder.getDatumFactory();
+    protected static final DatumFactory datumFactory = FactoryFinder.getDatumFactory(null);
 
     /**
      * The default coordinate reference system factory.
      */
-    protected static final CRSFactory crsFactory = FactoryFinder.getCRSFactory();
+    protected static final CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
 
     /**
      * The default math transform factory.
      */
-    protected static final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory();
+    protected static final MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
 
     /**
      * The default transformations factory.
      */
-    protected static final CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory();
+    protected static final CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
     
     /**
      * Random numbers generator.

@@ -90,7 +90,7 @@ public class ProjectionTest extends TestCase {
      * Set up common objects used by all tests.
      */
     protected void setUp() {
-        mtFactory = FactoryFinder.getMathTransformFactory();
+        mtFactory = FactoryFinder.getMathTransformFactory(null);
     }
     
     /**

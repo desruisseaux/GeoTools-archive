@@ -18,6 +18,7 @@ package org.geotools.data;
 
 // J2SE dependencies
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,13 +49,14 @@ import org.opengis.parameter.ParameterDescriptorGroup;
  *      String user = (String) USER.lookUp(params);
  *      Integer port = (Integer) PORT.lookUp(params);
  *      String database = (String) DATABASE.lookUp(params);
- * 
+ *
  *      String description = "Connection to "+getDisplayName()+" on "+host+" as "+user ;
  *      return new DataSourceMetadataEnity( host+":"+port, database, description );
- * }
+ * }</code></pre>
+ *
  * @author Jody Garnett, Refractions Research
  */
-public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {    
+public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
     
     /** Default Implementation abuses the naming convention.
      * <p>
@@ -69,8 +71,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         name = name.substring( name.lastIndexOf('.') );
         if( name.endsWith("Factory")){
             name = name.substring(0, name.length()-7);
-        }
-        else if( name.endsWith("FactorySpi")){
+        } else if( name.endsWith("FactorySpi")){
             name = name.substring(0, name.length()-10);
         }
         return name;
@@ -110,61 +111,66 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         if (params == null) {
             return false;
         }
-        Param arrayParameters[] = getParametersInfo();        
+        Param arrayParameters[] = getParametersInfo();
         for (int i = 0; i < arrayParameters.length; i++) {
-        	Param param = arrayParameters[i];
-        	Object value;
-        	if( !params.containsKey( param.key ) ){
-        		if( param.required ){
-        			return false; // missing required key!
-        		}
-        		else {
-        			continue;
-        		}
-        	}
-			try {
-				value = param.lookUp( params );
-			} catch (IOException e) {
-				// could not upconvert/parse to expected type!
-				// even if this parameter is not required
-				// we are going to refuse to process
-				// these params
-				return false; 
-			}
-			if( value == null ){					
-				if (param.required) {
-                    return (false);
+            Param param = arrayParameters[i];
+            Object value;
+            if( !params.containsKey( param.key ) ){
+                if( param.required ){
+                    return false; // missing required key!
+                } else {
+                    continue;
                 }
             }
-			else {
-				if ( !param.type.isInstance( value )){
-					return false; // value was not of the required type
-				}
-			}
+            try {
+                value = param.lookUp( params );
+            } catch (IOException e) {
+                // could not upconvert/parse to expected type!
+                // even if this parameter is not required
+                // we are going to refuse to process
+                // these params
+                return false;
+            }
+            if( value == null ){
+                if (param.required) {
+                    return (false);
+                }
+            } else {
+                if ( !param.type.isInstance( value )){
+                    return false; // value was not of the required type
+                }
+            }
         }
         return true;
     }
-
+    
     /**
      * Defaults to true, only a few datastores need to check for drivers.
-     * 
+     *
      * @return <code>true</code>, override to check for drivers etc...
      */
     public boolean isAvailable() {
         return true;
     }
-
+    
     public ParameterDescriptorGroup getParameters(){
         Param params[] = getParametersInfo();
         ParameterDescriptor parameters[] = new ParameterDescriptor[ params.length ];
         for( int i=0; i<params.length; i++ ){
-            Param param = params[i];            
+            Param param = params[i];
             parameters[i] = new ParamDescriptor( params[i] );
-        }        
+        }
         Map properties = new HashMap();
         properties.put( "name", getDisplayName() );
-        properties.put( "remarks", getDescription() );        
+        properties.put( "remarks", getDescription() );
         return new org.geotools.parameter.ParameterDescriptorGroup(properties, parameters);
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }
 
@@ -179,14 +185,14 @@ class ParamDescriptor extends ParameterDescriptor {
         if (Double.TYPE.equals( getValueClass())) {
             return new ParameterReal(this){
                 protected Object valueOf(String text) throws IOException {
-    	            return param.handle( text );
-    	        }
+                    return param.handle( text );
+                }
             };
         }
         return new Parameter(this){
-	        protected Object valueOf(String text) throws IOException {
-	            return param.handle( text );
-	        }
+            protected Object valueOf(String text) throws IOException {
+                return param.handle( text );
+            }
         };
-    }            
+    }
 };

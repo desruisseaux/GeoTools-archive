@@ -59,17 +59,16 @@ public class JTSTest extends TestCase {
     public void testTransformEnvelopeMathTransform() throws Exception{
         Envelope env=new Envelope( 0,10,0,10);
         AffineTransform at=AffineTransform.getScaleInstance(.5,1);
-        MathTransform2D t=(MathTransform2D) FactoryFinder.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at));
+        MathTransform2D t=(MathTransform2D) FactoryFinder.getMathTransformFactory(null)
+                                            .createAffineTransform(new GeneralMatrix(at));
         env=JTS.transform(env, t);
         assertEquals( new Envelope(0, 5, 0, 10), env);
         env=JTS.transform(env, t.inverse());
         assertEquals( new Envelope(0, 10, 0, 10), env);
         
-        CoordinateReferenceSystem crs=FactoryFinder
-        .getCRSFactory()
-        .createFromWKT(
+        CoordinateReferenceSystem crs=FactoryFinder.getCRSFactory(null).createFromWKT(
                 "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
-        t=(MathTransform2D) FactoryFinder.getCoordinateOperationFactory().createOperation(
+        t=(MathTransform2D) FactoryFinder.getCoordinateOperationFactory(null).createOperation(
                 GeographicCRS.WGS84,crs).getMathTransform();
         env=new Envelope(-123,-133, 55, 60);
         env=JTS.transform(env, t);
@@ -83,17 +82,15 @@ public class JTSTest extends TestCase {
     public void testTransformCoordinate() throws Exception{
         Coordinate coord=new Coordinate( 10,10);
         AffineTransform at=AffineTransform.getScaleInstance(.5,1);
-        MathTransform2D t=(MathTransform2D) FactoryFinder.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at));
+        MathTransform2D t=(MathTransform2D) FactoryFinder.getMathTransformFactory(null).createAffineTransform(new GeneralMatrix(at));
         coord=JTS.transform(coord, coord, t);
         assertEquals( new Coordinate( 5, 10), coord);
         coord=JTS.transform(coord, coord, t.inverse());
         assertEquals( new Coordinate( 10, 10 ), coord);
         
-        CoordinateReferenceSystem crs=FactoryFinder
-        .getCRSFactory()
-        .createFromWKT(
+        CoordinateReferenceSystem crs=FactoryFinder.getCRSFactory(null).createFromWKT(
                 "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
-        t=(MathTransform2D) FactoryFinder.getCoordinateOperationFactory().createOperation(
+        t=(MathTransform2D) FactoryFinder.getCoordinateOperationFactory(null).createOperation(
                 GeographicCRS.WGS84,crs).getMathTransform();
         coord=new Coordinate(-123,55);
         coord=JTS.transform(coord,coord,  t);

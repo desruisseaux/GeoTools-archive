@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -821,6 +822,13 @@ public class SchemaFactory {
 
         public String getPrefix() {
             return prefix;
+        }
+
+        /**
+         * Returns the implementation hints. The default implementation returns en empty map.
+         */
+        public Map getImplementationHints() {
+            return Collections.EMPTY_MAP;
         }
     }
 }

@@ -19,6 +19,7 @@ package org.geotools.data.geomedia;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -224,5 +225,12 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
      */
     public Param[] getParametersInfo() {
         return PARAM_INFO;
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

@@ -99,7 +99,8 @@ public class ReprojectFeatureReader implements FeatureReader {
         
         this.schema = FeatureTypes.transform(type, cs);
         this.reader = reader;
-        transformer.setMathTransform((MathTransform2D)FactoryFinder.getCoordinateOperationFactory().createOperation(original,cs).getMathTransform());
+        transformer.setMathTransform((MathTransform2D) FactoryFinder.getCoordinateOperationFactory(null)
+                                     .createOperation(original,cs).getMathTransform());
     }
 
     /**

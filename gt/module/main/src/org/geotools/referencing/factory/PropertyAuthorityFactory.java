@@ -109,7 +109,7 @@ public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
                                     final URL          definitions)
             throws IOException
     {
-        super(factories, MIN_PRIORITY+1);
+        super(factories, MINIMUM_PRIORITY+10);
         this.authority = authority;
         final InputStream in = definitions.openStream();
         this.definitions.load(in);

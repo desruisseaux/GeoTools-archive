@@ -16,6 +16,9 @@
  */
 package org.geotools.feature;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryFinder;
 
@@ -207,4 +210,11 @@ public abstract class AttributeTypeFactory implements Factory {
      * @return the new AttributeType
      */        
     protected abstract AttributeType createAttributeType( String name, Class type, boolean isNillable, int fieldLength, Object defaultValue, Object metaData );        
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
 }

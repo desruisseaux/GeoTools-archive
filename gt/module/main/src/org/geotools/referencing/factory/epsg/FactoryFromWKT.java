@@ -64,7 +64,7 @@ public class FactoryFromWKT extends DeferredAuthorityFactory {
      * {@linkplain org.opengis.referencing.ObjectFactory object factories}.
      */
     public FactoryFromWKT() {
-        super(new FactoryGroup(), MIN_PRIORITY+2);
+        super(new FactoryGroup(), MINIMUM_PRIORITY+20);
         setTimeout(15*60*1000L); // Closes the connection after at least 15 minutes of inactivity.
     }
 

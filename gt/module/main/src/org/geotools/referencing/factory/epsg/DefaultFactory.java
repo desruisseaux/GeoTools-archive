@@ -42,6 +42,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
@@ -96,7 +97,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      * {@linkplain org.opengis.referencing.ObjectFactory object factories}.
      */
     public DefaultFactory() {
-        super(new FactoryGroup(), MAX_PRIORITY-1);
+        super(new FactoryGroup(), MAXIMUM_PRIORITY-10);
         setTimeout(30*60*1000L); // Closes the connection after at least 30 minutes of inactivity.
     }
 
@@ -333,6 +334,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      *             An arbitrary number of codes can be specified on the command line.
      */
     public static void main(String[] args) {
+        final Hints hints = null;
         MonolineFormatter.initGeotools(); // Use custom logger.
         final Arguments arguments = new Arguments(args);
         final String   datasource = arguments.getOptionalString("-datasource");
@@ -359,7 +361,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             try {
                 for (int i=0; i<args.length; i++) {
                     if (factory == null) {
-                        factory = FactoryFinder.getCRSAuthorityFactory("EPSG");
+                        factory = FactoryFinder.getCRSAuthorityFactory("EPSG", hints);
                     }
                     final Object object = factory.createObject(args[i]);
                     arguments.out.println(object);
@@ -380,7 +382,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
          * If the user asked for math transforms, prints them now.
          */
         if (printMT) {
-            final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory();
+            final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory(hints);
             for (int i=0; i<count; i++) {
                 for (int j=i+1; j<count; j++) {
                     try {

@@ -21,6 +21,7 @@ package org.geotools.data.tiger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
@@ -164,5 +165,12 @@ public class TigerDataStoreFactory implements DataStoreFactorySpi {
         } catch (Exception e) {
             return false;
         }        
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

@@ -201,5 +201,4 @@ public class DefaultPropertyEditorFactory extends PropertyEditorFactory {
     public SymbolEditor createSymbolEditor(FeatureType featureType) {
         return new DefaultSymbolEditor(featureType);
     }
-
 }

@@ -16,6 +16,9 @@
  */
 package org.geotools.data.wms.gce;
 
+import java.util.Map;
+import java.util.Collections;
+
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.geotools.data.ows.WMSCapabilities;
 import org.opengis.coverage.grid.Format;
@@ -67,5 +70,12 @@ public class WMSFormatFactory implements GridFormatFactorySpi {
      */
     public boolean isAvailable() {
         return true;
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 }

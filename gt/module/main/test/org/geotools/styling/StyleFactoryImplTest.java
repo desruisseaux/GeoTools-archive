@@ -194,9 +194,9 @@ public class StyleFactoryImplTest extends TestCase {
             try{
                 Class target = styleFactory.getClass();
 //                System.out.println("About to load get"+names[i]+"Mark");
-                Method method = target.getMethod("get"+names[i]+"Mark",null);
+                Method method = target.getMethod("get"+names[i]+"Mark",(Class[])null);
 //                System.out.println("got method back " + method.toString());
-                m = (Mark) method.invoke(styleFactory,null);
+                m = (Mark) method.invoke(styleFactory,(Object[])null);
                 assertNotNull("Failed to get " + names[i] + " mark ", m);
                 Expression exp = filterFactory.createLiteralExpression(names[i]);
                 assertEquals("Wrong sort of mark returned ", exp, m.getWellKnownName());
