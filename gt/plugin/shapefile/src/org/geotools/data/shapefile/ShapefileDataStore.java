@@ -1,20 +1,4 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
-/*
  *    Geotools - OpenSource mapping toolkit
  *    (C) 2002, Centre for Computational Geography
  *
@@ -38,6 +22,7 @@ package org.geotools.data.shapefile;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.AbstractAttributeIO;
+import org.geotools.data.AbstractDataStore;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.AbstractFeatureStore;
@@ -46,6 +31,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultFIDReader;
+import org.geotools.data.DefaultTypeEntry;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
@@ -53,6 +39,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.AbstractFileDataStore;
+import org.geotools.data.TypeEntry;
 import org.geotools.data.shapefile.dbf.DbaseFileException;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
@@ -78,12 +65,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.shapefile.prj.PrjFileReader;
 import org.geotools.feature.GeometryAttributeType;
@@ -161,6 +154,59 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         this.useMemoryMappedBuffer = useMemoryMappedBuffer;
     }
     
+    /**
+     * Create our own TypeEntry that will calculate BBox based on
+     * available metadata.
+     */
+    protected TypeEntry createTypeEntry( final String typeName ) {
+        URI namespace;
+        try {
+            namespace = getSchema( typeName ).getNamespace();
+        } catch (IOException e) {
+            namespace = null;
+        }
+        return new DefaultTypeEntry( this, namespace, typeName ) {            
+            /** Use ShapefileDataStore createMetadata method */
+            protected Map createMetadata() {
+                return ShapefileDataStore.this.createMetadata( typeName );
+            }
+            /**
+             * Grab bounds from metadata, if possible.
+             * 
+             * @return geographic bounding box
+             */
+            protected Envelope createBounds() {
+                Object meta = metadata().get( "shp.xml" );
+                if( meta != null ) {
+                    return (Envelope) meta;
+                }
+                return super.createBounds();
+            }
+        };
+    }
+    /**
+     * Latch onto xmlURL if it is there, we may be able to get out of
+     * calculating the bounding box!
+     * <p>
+     * This method is called by the createTypeEntry
+     * anonymous inner class DefaultTypeEntry.
+     * </p> 
+     * @return Map with xmlURL parsed, or an EMPTY_MAP.
+     */
+    protected Map createMetadata( String typeName ) {
+        Object meta = parseShpXML();
+        if( meta != null ) {
+            Map map = new HashMap();
+            map.put( "shp.xml", meta );
+            return map;
+        }
+        else {
+            return Collections.EMPTY_MAP;
+        }
+    }
+    protected Envelope parseShpXML() {
+        return null;
+    }
     /**
      * Determine if the location of this shapefile is local or remote.
      *
