@@ -296,6 +296,7 @@ public class DefaultAttributeType implements AttributeType {
         String details = "name=" + name;
         details += (" , type=" + type);
         details += (" , nillable=" + nillable);
+        details += (" , field length=" + fieldLength);
 
         return "DefaultAttributeType [" + details + "]";
     }
