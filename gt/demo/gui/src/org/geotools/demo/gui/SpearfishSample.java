@@ -14,7 +14,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.gc.GridCoverage;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
@@ -33,7 +32,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 /**
  * Simple map viewer
@@ -55,14 +54,14 @@ public class SpearfishSample {
         // URL demURL = (new java.io.File("/path/to/spearfish/dem")).toURL();
         // create the grid coverage reader
         URL url = ArcGridReader.class.getClassLoader().getResource("org/geotools/sampleData/spearfish_dem.asc.gz");
-        Format f = new org.geotools.data.arcgrid.ArcGridFormat();  //GridFormatFinder.findFormat(url);  //should this work also?
-        GridCoverageReader reader = f.getReader(url);
+        Format format = new org.geotools.data.arcgrid.ArcGridFormat();  //GridFormatFinder.findFormat(url);  //should this work also?
+        GridCoverageReader reader = format.getReader(url);
         
         //get the parameters and set them
-        OperationParameterGroup paramDescriptor = f.getReadParameters();
+        ParameterDescriptorGroup paramDescriptor = format.getReadParameters();
         ParameterGroup params = (ParameterGroup) paramDescriptor.createValue();
-        params.getValue( "Compressed" ).setValue( true );
-        params.getValue( "GRASS" ).setValue( true );
+        params.parameter( "Compressed" ).setValue( true );
+        params.parameter( "GRASS" ).setValue( true );
         
         //read the grid
         if (reader.hasMoreGridCoverages()) {                 //not yet implemented
