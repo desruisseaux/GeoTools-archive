@@ -56,6 +56,7 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest impl
      */
     public URL getFinalURL() {
         Iterator iter = queryLayers.iterator();
+        String initialQueryLayerString = properties.getProperty(QUERY_LAYERS) == null ? "" : properties.getProperty(QUERY_LAYERS); //$NON-NLS-1$
         String queryLayerString = properties.getProperty(QUERY_LAYERS) == null ? "" : properties.getProperty(QUERY_LAYERS); //$NON-NLS-1$
 
         while( iter.hasNext() ) {
@@ -68,8 +69,11 @@ public abstract class AbstractGetFeatureInfoRequest extends AbstractRequest impl
         }
 
         setProperty(QUERY_LAYERS, queryLayerString);
-
-        return super.getFinalURL();
+        URL url = super.getFinalURL();
+        
+        setProperty(QUERY_LAYERS, initialQueryLayerString);
+        
+        return url;
     }
 
     /**
