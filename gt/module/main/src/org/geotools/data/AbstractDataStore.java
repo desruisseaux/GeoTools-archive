@@ -26,10 +26,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.catalog.AbstractMetadataEntity;
 import org.geotools.catalog.CatalogEntry;
-import org.geotools.catalog.DefaultQueryResult;
-import org.geotools.catalog.MetadataEntity;
 import org.geotools.catalog.QueryRequest;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.view.DefaultView;
@@ -195,6 +192,7 @@ public abstract class AbstractDataStore implements DataStore {
             return null;
         }
     }
+    
     /**
      * Create a TypeEntry for the requested typeName.
      * <p>
@@ -215,8 +213,7 @@ public abstract class AbstractDataStore implements DataStore {
                 return AbstractDataStore.this.createMetadata( typeName );
             }  
         };
-    }
-    
+    }    
     /**
      * Subclass override to provide access to metadata.
      * <p>
