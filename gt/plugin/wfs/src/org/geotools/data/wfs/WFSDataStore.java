@@ -32,7 +32,9 @@ import org.geotools.data.crs.CRSService;
 import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
@@ -298,22 +300,37 @@ public class WFSDataStore extends AbstractDataStore {
         List l = capabilities.getFeatureTypes();
         Iterator i = l.iterator();
         String crsName = null;
+        String ftName = null;
 
         while (i.hasNext() && crsName==null) {
             	FeatureSetDescription fsd = (FeatureSetDescription) i.next();
-            	if (typeName.equals(fsd.getName())) {
+//System.out.println(typeName+"***"+fsd.getName());
+            	if (typeName.equals(fsd.getName()) || (fsd.getName()!=null && typeName.equals(fsd.getName().substring(typeName.indexOf(':')+1)))) {
             	    crsName = fsd.getSRS();
+            	    ftName = fsd.getName();
             	}
         }
         
         CoordinateReferenceSystem crs;
         try {
-            crs = getCRSService().createCRS(crsName);
-            t = CRSService.transform(t,crs);
+            if(crsName!=null){
+                crs = getCRSService().createCRS(crsName);
+            	t = CRSService.transform(t,crs);
+            }
         } catch (FactoryException e) {
             logger.warning(e.getMessage());
         } catch (SchemaException e) {
             logger.warning(e.getMessage());
+        }
+        
+        if(ftName!=null){
+            try {
+                t = FeatureTypeFactory.newFeatureType(t.getAttributeTypes(),ftName,t.getNamespaceURI(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
+            } catch (FactoryConfigurationError e1) {
+                logger.warning(e1.getMessage());
+            } catch (SchemaException e1) {
+                logger.warning(e1.getMessage());
+            }
         }
 
         if (t != null) {

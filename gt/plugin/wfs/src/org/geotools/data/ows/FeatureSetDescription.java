@@ -230,26 +230,6 @@ public class FeatureSetDescription {
     /**
      * DOCUMENT ME!
      *
-     * @return Returns the metadataURL.
-     */
-
-    //    public MetadataURL[] getMetadataURL() {
-    //        return metadataURL;
-    //    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-
-    //    public void setMetadataURL(MetadataURL[] metadataURL) {
-    //        this.metadataURL = metadataURL;
-    //    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @return Returns the name.
      */
     public String getName() {
