@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
@@ -63,6 +64,7 @@ public class WFSDataStore extends AbstractDataStore{
  	
  	WFSDataStore(URL host, Boolean get, Boolean post, String username, String password) throws SAXException, IOException{
  	    super(false); // TODO update when writeable
+ 	    logger.setLevel(Level.WARNING);
  	    
  	    if(username!=null && password!=null)
  	        auth = new WFSAuthenticator(username,password,host);
