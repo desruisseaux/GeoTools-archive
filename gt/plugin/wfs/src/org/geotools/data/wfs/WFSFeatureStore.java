@@ -7,6 +7,7 @@
 package org.geotools.data.wfs;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -73,7 +74,9 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore{
 		
 		if(trans == Transaction.AUTO_COMMIT){
 			ts.commit();
-			return ts.getFids();
+			String[] fids = ts.getFids();
+			r = new HashSet(Arrays.asList(fids));
+			return r;
 		}
 		return r;
 	}

@@ -19,9 +19,9 @@ package org.geotools.xml.wfs;
 import org.geotools.data.Query;
 import org.geotools.data.wfs.LockRequest;
 import org.geotools.data.wfs.LockResult;
-import org.geotools.data.wfs.TransactionRequest;
 import org.geotools.data.wfs.Action;
 import org.geotools.data.wfs.TransactionResult;
+import org.geotools.data.wfs.WFSTransactionState;
 import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
@@ -231,7 +231,7 @@ public class WFSTransactionComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return TransactionRequest.class;
+            return WFSTransactionState.class;
         }
 
         /**
@@ -239,7 +239,7 @@ public class WFSTransactionComplexTypes {
          *      java.lang.Object, java.util.Map)
          */
         public boolean canEncode(Element element, Object value, Map hints) {
-        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof TransactionRequest; 
+        	return element!=null && element.getType()!=null && getName().equals(element.getType().getName()) && value!=null && value instanceof WFSTransactionState; 
         }
 
         /**
@@ -256,10 +256,11 @@ public class WFSTransactionComplexTypes {
             attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[0].getName(),null,"string",attrs[0].getFixed());
             attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[1].getName(),null,"string",attrs[1].getFixed());
             attributes.addAttribute(WFSSchema.NAMESPACE.toString(),attrs[3].getName(),null,"string","ALL");
-            TransactionRequest transactionRequest = (TransactionRequest)value;
+            WFSTransactionState transactionRequest = (WFSTransactionState)value;
             
             output.startElement(element.getNamespace(),element.getName(),attributes);
-            elems[0].getType().encode(elems[0],transactionRequest.getLockId(),output,hints);
+            if(transactionRequest.getLockId()!=null)
+            	elems[0].getType().encode(elems[0],transactionRequest.getLockId(),output,hints);
             
             Iterator actions = transactionRequest.getActions().iterator();
             while(actions.hasNext()){

@@ -7,14 +7,25 @@
 package org.geotools.data.wfs;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.logging.Level;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.data.Query;
+import javax.naming.OperationNotSupportedException;
+
 import org.geotools.data.Transaction;
 import org.geotools.data.Transaction.State;
+import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.DocumentWriter;
+import org.geotools.xml.wfs.WFSSchema;
 import org.xml.sax.SAXException;
 
 /**
@@ -52,6 +63,10 @@ public class WFSTransactionState implements State {
 	public void addAuthorization(String AuthID) throws IOException {
 //		authId = AuthID;
 	}
+	
+	public String getLockId(){
+		return null; // add this later
+	}
 
 	/* (non-Javadoc)
 	 * @see org.geotools.data.Transaction.State#commit()
@@ -61,16 +76,33 @@ public class WFSTransactionState implements State {
 
 	    TransactionResult tr = null;
 	    if((ds.protos & WFSDataStore.POST_FIRST) == WFSDataStore.POST_FIRST && tr == null)
-	        tr = commitPost();
+			try {
+				tr = commitPost();
+			} catch (OperationNotSupportedException e) {
+				WFSDataStore.logger.warning(e.toString());
+				tr = null;
+			}catch (SAXException e) {
+				WFSDataStore.logger.warning(e.toString());
+				tr = null;
+			}
 
-	    if((ds.protos & WFSDataStore.GET_FIRST) == WFSDataStore.GET_FIRST && tr == null)
-	        tr = commitGet();
+			//	get not supported using kvp in spec except delete ... we don't allow it
+//	    if((ds.protos & WFSDataStore.GET_FIRST) == WFSDataStore.GET_FIRST && tr == null)
+//	        tr = commitGet();
 	        
 	    if((ds.protos & WFSDataStore.POST_OK) == WFSDataStore.POST_OK && tr == null)
-	        tr = commitPost();
+	    	try {
+				tr = commitPost();
+			} catch (OperationNotSupportedException e) {
+				WFSDataStore.logger.warning(e.toString());
+				tr = null;
+			}catch (SAXException e) {
+				WFSDataStore.logger.warning(e.toString());
+				tr = null;
+			}
 
-	    if((ds.protos & WFSDataStore.GET_OK) == WFSDataStore.GET_OK && tr == null)
-	        tr = commitGet();
+//	    if((ds.protos & WFSDataStore.GET_OK) == WFSDataStore.GET_OK && tr == null)
+//	        tr = commitGet();
 	    
 	    if(tr == null)
 	    	throw new IOException("An error occured");
@@ -78,6 +110,33 @@ public class WFSTransactionState implements State {
 	    	throw new IOException(tr.getError().toString());
 	    
 	    fids = tr.getInsertResult().getFids();
+	}
+	
+	private TransactionResult commitPost() throws OperationNotSupportedException, IOException, SAXException{
+		URL postUrl = ds.capabilities.getTransaction().getPost();
+
+		if(postUrl == null)
+			return null;
+	
+		HttpURLConnection hc = (HttpURLConnection)postUrl.openConnection();
+		hc.setRequestMethod("POST");
+    
+		OutputStream os = WFSDataStore.getOutputStream(hc,ds.auth);
+		// write request
+    
+		Writer w = new OutputStreamWriter(os);
+		Map hints = new HashMap();
+		hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[24]); // Transaction
+
+		DocumentWriter.writeDocument(this,WFSSchema.getInstance(),w,hints);
+		os.flush();
+	    os.close();
+	    
+	    InputStream is = WFSDataStore.getInputStream(hc,ds.auth);
+
+	    hints = new HashMap();
+	    TransactionResult ft = (TransactionResult)DocumentFactory.getInstance(is,hints,Level.WARNING);
+	    return ft;
 	}
 
 	/* (non-Javadoc)

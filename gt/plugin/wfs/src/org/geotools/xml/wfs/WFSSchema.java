@@ -117,21 +117,21 @@ public class WFSSchema implements Schema {
             new WFSElement("Keywords", XSISimpleTypes.String.getInstance()),
             new WFSElement("OnlineResource", XSISimpleTypes.String.getInstance()),
             new WFSElement("SRS", XSISimpleTypes.String.getInstance()),
-            new WFSElement("Title", XSISimpleTypes.String.getInstance()),
+            new WFSElement("Title", XSISimpleTypes.String.getInstance()), // 11
             
             // TODO check if these should be here - from capabilities ... used in operation type
             new WFSElement("Query", EmptyType.getInstance()),
             new WFSElement("Insert", EmptyType.getInstance()),
             new WFSElement("Update", EmptyType.getInstance()),
             new WFSElement("Delete", EmptyType.getInstance()),
-            new WFSElement("Lock", EmptyType.getInstance()),
+            new WFSElement("Lock", EmptyType.getInstance()), // 16
             new WFSElement("VendorSpecificCapabilities",
                 XSISimpleTypes.String.getInstance()),
             new WFSElement("WFS_Capabilities",
                 WFS_CapabilitiesType.getInstance()),
             new WFSElement("GML2", EmptyType.getInstance()),
             new WFSElement("GML2-GZIP", EmptyType.getInstance()),
-            new WFSElement("XMLSCHEMA", EmptyType.getInstance()),
+            new WFSElement("XMLSCHEMA", EmptyType.getInstance()), // 21
             new WFSElement("GetFeatureWithLock",
                 GetFeatureWithLockType.getInstance()),
             new WFSElement("LockFeature", LockFeatureType.getInstance()),

@@ -110,6 +110,10 @@ public class WFSFeatureReader extends FCBuffer {
 	private int insertSearchIndex = -1;
 	private boolean loadElement() throws NoSuchElementException, IOException, IllegalAttributeException{
 
+		if(ts==null){
+			while(next == null && super.hasNext())
+				next = super.next();
+		}else{
 		List l = ts.getActions();
 		
 		while(next == null && super.hasNext()){
@@ -165,7 +169,7 @@ public class WFSFeatureReader extends FCBuffer {
 					}
 				}
 			}
-		}
+		}}
 
 		return next !=null;
 	}

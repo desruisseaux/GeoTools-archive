@@ -78,7 +78,7 @@ public class WFSDataStore extends AbstractDataStore{
     protected static final int POST_OK = 4;
     protected static final int GET_OK = 8;
  	
- 	private Authenticator auth = null;
+ 	protected Authenticator auth = null;
  	
  	private int bufferSize = 10;
  	private int timeout = 3000;
@@ -118,7 +118,7 @@ public class WFSDataStore extends AbstractDataStore{
  	    this.bufferSize = buffer;
  	}
  	
- 	private static InputStream getInputStream(HttpURLConnection url, Authenticator auth) throws IOException{
+ 	protected static InputStream getInputStream(HttpURLConnection url, Authenticator auth) throws IOException{
  	   // TODO ensure that we can sync using the class loader and not have concurent thread issues
  	   //
  	   // should be ok, as we would only be playing with the classloader's allocated space
@@ -138,7 +138,7 @@ public class WFSDataStore extends AbstractDataStore{
  	   return new BufferedInputStream(result);
  	}
  	
- 	private static OutputStream getOutputStream(HttpURLConnection url, Authenticator auth) throws IOException{
+ 	protected static OutputStream getOutputStream(HttpURLConnection url, Authenticator auth) throws IOException{
  	   // TODO ensure that we can sync using the class loader and not have concurent thread issues
  	   //
  	   // should be ok, as we would only be playing with the classloader's allocated space
@@ -427,7 +427,7 @@ public class WFSDataStore extends AbstractDataStore{
         	}
         }
 
-System.out.println(url); // url to request
+//System.out.println(url); // url to request
         getUrl = new URL(url);
         HttpURLConnection hc = (HttpURLConnection)getUrl.openConnection();
         hc.setRequestMethod("GET");
@@ -461,17 +461,6 @@ System.out.println(url); // url to request
     }
     
     private String printBBoxGet(GeometryFilter gf) throws IOException{
-    	// ogc filter bbox
-//        Map hints = new HashMap();
-//        hints.put(DocumentWriter.BASE_ELEMENT,FilterSchema.getInstance().getElements()[24]); // BBOx
-//        StringWriter w = new StringWriter();
-//        try{
-//            DocumentWriter.writeFragment(gf,FilterSchema.getInstance(),w,hints);
-//        }catch(OperationNotSupportedException e){
-//            logger.warning(e.toString());
-//            throw new SAXException(e);
-//        }
-//        return w.toString();
     	Envelope e = null;
     	if(gf.getLeftGeometry().getType() == Expression.LITERAL_GEOMETRY){
     		e = ((Geometry)((LiteralExpression)gf.getLeftGeometry()).getLiteral()).getEnvelopeInternal();
@@ -501,17 +490,17 @@ System.out.println(url); // url to request
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,WFSSchema.getInstance().getElements()[2]); // GetFeature
 
-Writer sw = new StringWriter();
-try{
-    DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
-}catch(OperationNotSupportedException e){
-    logger.warning(e.toString());
-    throw new SAXException(e);
-}
-System.out.println("WFS FILTER START");
-System.out.println(sw);
-System.out.println("WFS FILTER END");
-System.out.println("FILTER WAS "+query.getFilter());
+//Writer sw = new StringWriter();
+//try{
+//    DocumentWriter.writeDocument(query,WFSSchema.getInstance(),sw,hints);
+//}catch(OperationNotSupportedException e){
+//    logger.warning(e.toString());
+//    throw new SAXException(e);
+//}
+//System.out.println("WFS FILTER START");
+//System.out.println(sw);
+//System.out.println("WFS FILTER END");
+//System.out.println("FILTER WAS "+query.getFilter());
         
         
         try{
