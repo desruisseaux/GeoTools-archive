@@ -17,8 +17,9 @@
 package org.geotools.data.wms.capabilities;
 
 /**
- * @author rgould
  * Represents a base object for a WMS getCapabilities response.
+ * 
+ * @author Richard Gould, Refractions Research
  */
 public class Capabilities {
     private Service service;

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.geotools.data.wms.ParseCapabilitiesException;
+import org.geotools.data.wms.WMSBuilder;
 import org.geotools.data.wms.WMSParser;
 import org.geotools.data.wms.capabilities.Capabilities;
 import org.jdom.Document;
@@ -51,7 +52,7 @@ public class GetCapabilitiesResponse extends AbstractResponse {
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(inputStream);
 		
-		capabilities = parser.constructCapabilities( document );
+		capabilities = parser.constructCapabilities( document, new WMSBuilder() );
 	}
 	
 	/** Retrived parsed Capabilities */

@@ -48,18 +48,19 @@ public interface WMSParser {
 	/** Indicates Parser provides custom or specific support for provided document */
 	public static final int CUSTOM = 2;
 	
-	/** Test if this WMSParser can handle the provided document.
+	/**
+	 * Test if this WMSParser can handle the provided document.
      * <p>
      * Sample use:
      * <pre><code>
      * SAXBuilder builder = new SAXBuilder();
-		Document document;
-		try {
-			document = builder.build(stream);
-			return parser.canProcess( document );
-		} catch (JDOMException e) {
-			throw new ParseCapabilitiesException( badXML );
-		}
+	 *	Document document;
+	 *	try {
+	 *		document = builder.build(stream);
+	 *		return parser.canProcess( document );
+	 *	} catch (JDOMException e) {
+	 *		throw new ParseCapabilitiesException( badXML );
+	 *	}
      * </code></pre>
      * </p>
      * @param document Document to test
@@ -77,5 +78,6 @@ public interface WMSParser {
 	 * </p>
 	 * @param document Document to parse
 	 */
-	public Capabilities constructCapabilities(Document docuemnt) throws ParseCapabilitiesException;
+	public Capabilities constructCapabilities(Document docuemnt, WMSBuilder builder )
+	    throws ParseCapabilitiesException;
 }

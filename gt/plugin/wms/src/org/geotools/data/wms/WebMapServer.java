@@ -165,7 +165,33 @@ public class WebMapServer {
 		
 		issueRequest(new GetCapabilitiesRequest(serverURL), !wait);
 	}
-	
+	/**
+	 * Negotiate for WMS GetCapabilities Document we know how to handle.
+	 * <p>
+	 * Version number negotiation occurs as follows (credit OGC):
+	 * <ul>
+	 * <li><b>1)</b> If the server implements the requested version number,
+	 *     the server shall send that version.
+	 * <li><b>2a)</b> If a version unknown to the server is requested, the
+	 *     server shall send the highest version less than the requested version.
+	 * <li><b>2b)</b> If the client request is for a version lower than any of
+	 *     those known to the server, then the server shall send the lowest version it knows.
+	 * <li><b>3a)</b> If the client does not understand the new version number sent by the
+	 *     server, it may either cease communicating with the server or send a new request
+	 *     with a new version number that the client does understand but which is less than
+	 *     that sent by the server (if the server had responded with a lower version).
+	 * <li><b>3b)</b> If the server had responded with a higher version (because the request
+	 *     was for a version lower than any known to the server), and the client does not
+	 *     understand the proposed higher version, then the client may send a new request with
+	 *     a version number higher than that sent by the server.
+	 * </ul>
+	 * </p>
+	 * @return GetCapabilitiesRequest suitable for use with a parser
+	 */
+	private GetCapabilitiesRequest negotiateGetCapDocument( GetCapabilitiesRequest request ){
+	    // right now this is a pass though
+	    return request;
+	}
 	/**
 	 * Gets the current status of the GetCapabilities document.
 	 * <UL>

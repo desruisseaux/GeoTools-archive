@@ -18,7 +18,6 @@ package org.geotools.data.wms;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.data.wms.capabilities.Capabilities;
@@ -28,7 +27,25 @@ import org.geotools.data.wms.capabilities.Request;
 import org.geotools.data.wms.capabilities.Service;
 
 /**
- * 
+ * Capabilities Builder for use by WMSParser instances.
+ * <p>
+ * WMSParsers are expected to call the methods in order:
+ * <ol>
+ * <li>buildCapabilities( version )
+ * <li>buildService( name, title, onlineResource, abstract, keywords )
+ * <li>buildGetCapabilitiesOperation( formats, get, post )
+ * <li>buildGetMapOperation( formats, get, post )
+ * <li>buildGetFeatureInfo( formats, get, post )
+ * <li>buildLayer( title, name, queryable, parentLayerTitle )
+ * <li>buildSRS( srs )
+ * <li>buildStyle( style )
+ * <li>finish() - to retrive generated Capabilities object
+ * </ul>
+ * </p>
+ * <p>
+ * At this time a WMSBuilder is not reuseable - finish() could be modified to
+ * reset the builder if such reuse is considered desireable.
+ * </p>
  * @author Richard Gould, Refractions Research
  */
 public class WMSBuilder {
@@ -65,21 +82,32 @@ public class WMSBuilder {
 		service.setKeywordList(keywords);
 	}
 		
-	public void buildGetCapabilitiesOperation(String[] formats, URL get, URL post) {
+	/**
+	 * Build description of GetCapabilities operation.
+	 * 
+	 * @param formats List<String> of available formats
+	 * @param get
+	 * @param post
+	 */
+	public void buildGetCapabilitiesOperation(List formats, URL get, URL post) {
 		getCapabilities = new OperationType();
-		buildOperationType(getCapabilities, formats, get, post);
+		buildOperationType( getCapabilities, formats, get, post);
 	}
 	
-	public void buildGetMapOperation(String[] formats, URL get, URL post) {
+	public void buildGetMapOperation(List formats, URL get, URL post) {
 		getMap = new OperationType();
 		buildOperationType(getMap, formats, get, post);
 	}
 	
-	public void buildGetFeatureInfo(String[] formats, URL get, URL post) {
+	public void buildGetFeatureInfo(List formats, URL get, URL post) {
 		getFeatureInfo = new OperationType();
 		buildOperationType(getFeatureInfo, formats, get, post);
 	}
 	
+	private void buildOperationType(OperationType operationType, List formats, URL get, URL post) {
+	    String formatStrings[] = (String[]) formats.toArray( new String[ formats.size() ] );
+	    buildOperationType( operationType, formatStrings, get, post );		
+	}
 	private void buildOperationType(OperationType operationType, String[] formats, URL get, URL post) {
 		operationType.setFormats(formats);
 		operationType.setGet(get);

@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,46 +37,42 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 
 /**
- * Genaerte a Capabilities bean from a WMS 1.1.1 complient GetCapabilities document.
+ * Initial start at generating a Capabilities bean from a WMS GetCapabilities document.
  * <p>
- * Feedback:
- * <ul>
- * <li>This classname does not conform to the geotools naming conventions - it shuld end in WMSParser
- * (since it impelments that interface).
- * <li>Consider rename to one of: Spec111WMSParser, CapabilitiesDocument111WMSParser
- * <li>WIth a rename of WMSParser to CapabilitiesParser we could use WMS111CapabilitiesParser
- *     (although this woudl prevent the addition processing other documents to the WMSParser
- *      interface)
- * </ul>
+ * Web Map Server specifications known at time of writing:
+ * <li>WMS 1.0.0: @link http://www.opengis.org/docs/00-028.pdf
+ * <li>WMS 1.1.0: @link http://www.opengis.org/docs/01-047r2.pdf
+ * <li>WMS 1.1.1: @link http://www.opengis.org/docs/01-068r3.pdf
+ * <li>WMS 1.3.0: @http://portal.opengis.org/files/?artifact_id=4756
  * </p>
- * @author Richard Gould, Refractions Research
- * @see OPENGIS PROJECT DOCUMENT 00-028 OpenGIS® Web Map Server Interface Implementation Specification
+ * 
+ * @author Jody Garnett, Refractions Research
  */
-public class Parser1_1_1 implements WMSParser {
-
+public abstract class AbstractWMSParser implements WMSParser {
+    
     /**
-     * Package visiable test method - not part of the public api.
+     * Version number understood by this parser.
      * <p>
-     * Used as a storage place for Richards Code while I adjust class
-     * to use of JDom
+     * The GetCapability document is epected to have this value as the
+     * name attribute of the root element.
      * </p>
+     * @return Name string in the format ""
      */
-    Capabilities parse(InputStream stream) throws ParseCapabilitiesException {
-        Document document;
-		try {
-		    SAXBuilder builder = new SAXBuilder();
-		    document = builder.build(stream);
-        } catch (JDOMException badXML) {
-            throw new ParseCapabilitiesException( badXML );
-        } catch (IOException badIO ) {
-		    throw new ParseCapabilitiesException( badIO );
-		}		
-		if( canProcess( document ) == NO ){
-		    throw new ParseCapabilitiesException( "Not a WMS 1.1.1 Document" );
-		}
-		return constructCapabilities( document, new WMSBuilder() );				
+    public String getName(){
+        return "WMT_MS_Capabilities";
     }
-    /** Test if this WMSParser can handle the provided document.
+    /**
+     * Version number understood by this parser.
+     * <p>
+     * The GetCapability document is epected to have this value
+     * as the version attribute of the root element.
+     * </p>
+     * @return <code>WMT_MS_Capabilities</code>
+     */
+    public abstract String getVersion();
+    
+    /**
+     * Test if this WMSParser can handle the provided document.
      * <p>
      * Sample use:
      * <pre><code>
@@ -89,22 +86,24 @@ public class Parser1_1_1 implements WMSParser {
 	 *	}
      * </code></pre>
      * </p>
+     * <p>
+     * Default implementation checks:
+     * <ul>
+     * <li>Root element name equals getName();
+     * <li>Root element version equals = getVersion();
+     * </ul>
+     * </p>
      * @param document Document to test
-     * @returns GENERIC for a WMS 1.1.1 GetCapabilities docuemnt
+     * @returns GENERIC for a GetCapabilities docuemnt matching getName and getVersion
      */
 	public int canProcess(Document document) {		
 		Element element = document.getRootElement(); //Root = "WMT_MS_Capabilities"
 			
-		// String Testing Feedback:
-		// - good habit to test w/ String first
-		//   !"WMT_MS_Capabilities".equals( element.getName() )
-		// - do you need to use element.getName().trim() or a regex for this comparison?
-		//   That is - you may want to be a little bit more forgiving of whitespace issues.
-		if (!element.getName().equals("WMT_MS_Capabilities")) {
+		if (!element.getName().equals( getName() )) {
 			return WMSParser.NO;
 		}
 		String version = element.getAttributeValue("version");
-		if (version == null || version.length() == 0 || !version.equals("1.1.1")) {
+		if (version == null || !version.equals( getVersion() )) {
 			return WMSParser.NO;
 		}
 		return WMSParser.GENERIC;
@@ -120,98 +119,67 @@ public class Parser1_1_1 implements WMSParser {
 	 * @param document Document to parse
 	 */
 	public Capabilities constructCapabilities(Document document, WMSBuilder builder ) throws ParseCapabilitiesException {
-		Capabilities capabilities;
-		Element capabilitiesElement = document.getRootElement();
-		//Populate the Capabilities object with data from the XML string.
-		try {
-			Element serviceElement = capabilitiesElement.getChild("Service");
-			
-			Service service = parseService(serviceElement);
-
-			Element capabilityElement = capabilitiesElement.getChild("Capability");
-			
-			//Parse Request
-	        Element requestElement = capabilityElement.getChild("Request");
-	        Request request = parseRequest(requestElement);
-
-			//Parse Layer
-	        Element layerElement = capabilityElement.getChild("Layer");
-	        
-	        List layerList = new ArrayList();
-	        parseLayers(layerElement, layerList);
-
-	        Layer[] layers = new Layer[layerList.size()];
-	        for (int i = 0; i < layerList.size(); i++) {
-	        	layers[i] = (Layer) layerList.get(i);
-	        }
-	        
-			capabilities = new Capabilities();
-			capabilities.setService(service);
-			capabilities.setRequest(request);
-			capabilities.setLayers(layers);
-			
+	    Element capabilitiesElement = document.getRootElement();
+		try {		    
 			String version = capabilitiesElement.getAttributeValue("version");
-			capabilities.setVersion(version);
 			
+			builder.buildCapabilities( version );
+			parseService( capabilitiesElement.getChild("Service"), builder );
+			
+			Element capabilityElement = capabilitiesElement.getChild("Capability");
+			{
+			    parseRequest( capabilityElement.getChild("Request"), builder );
+			    parseLayer( capabilityElement.getChild("Layer"), builder, null );
+			}			
 		} catch (MalformedURLException exception) {
 		    throw new ParseCapabilitiesException("Unable to parse URL properly", null, exception);
 		} catch (NullPointerException exception) {
 		    throw new ParseCapabilitiesException("XML does not conform to the WMS Specification.", null, exception);
-		}		
-		
-		return capabilities;
+		}				
+		return builder.finish();
 	}
 
     
     /**
-	 * @param layerElement
-	 * @param layerList
-	 */
-	protected void parseLayers(Element rootElement, List layerList) throws MalformedURLException {
-		Layer layer = parseLayer(rootElement);
-		layerList.add(layer);
-		
-		Iterator iter = rootElement.getChildren("Layer").iterator();
-		while (iter.hasNext()) {
-			Element layerElement = (Element) iter.next();
-			parseLayers(layerElement, layerList);
+     * Parse provided layer (including any childern).
+     * 
+     * @param layerElement element being parsed
+     * @param builder Builder used to construct
+     * @param parentTitle parentTitle (or null for root)
+     * @throws MalformedURLException
+     */
+	protected void parseLayer(Element layerElement, WMSBuilder builder, String parentTitle ) throws MalformedURLException {
+		String title = layerElement.getChildText("Title");
+        String name = layerElement.getChildText("Name");
+        List srsElements = querySRS( layerElement );
+        boolean queryable = Integer.parseInt(layerElement.getAttributeValue("queryable")) == 1;
+        builder.buildLayer( title, name, queryable, parentTitle );  
+        
+		List children = layerElement.getChildren( "Layer" );
+		for( Iterator i=children.iterator(); i.hasNext();) {
+			parseLayer( (Element) i.next(), builder, title );
 		}
 	}
-
 	/**
-     * @param layerElement
-     * @return
-     */
-    protected Layer parseLayer(Element layerElement) throws MalformedURLException {
-        Layer layer;
-        Iterator iter;
-        
-        String title = layerElement.getChildText("Title");
-        layer = new Layer(title);
-        
-        String name = layerElement.getChildText("Name");
-        if (name != null) {
-            layer.setName(name);
-        }
-        
+	 * List of available SRS for provided layerElement.
+	 * <p>
+	 * May need to override for WMS1.0.
+	 * </p>
+	 * @param layerElement
+	 * @return
+	 */
+    List querySRS( Element layerElement ){
         List srsElements = layerElement.getChildren("SRS");
         if (srsElements != null) {
             List srs = new ArrayList();
-            iter = srsElements.iterator();
+            Iterator iter = srsElements.iterator();
             while (iter.hasNext()) {
                 String srsValue = ((Element) iter.next()).getText();
                 srs.add(srsValue);
             }
-            layer.setSrs(srs);
         }
-      
-        if (Integer.parseInt(layerElement.getAttributeValue("queryable")) == 1) {
-            layer.setQueryable(true);
-        }
-        
-        return layer;
+        return null;
     }
-
 
     /**
      * Given an element that represents the getCapabilities request element, it will parse
@@ -220,24 +188,70 @@ public class Parser1_1_1 implements WMSParser {
      * @param requestElement an Element representing a request element
      * @return a Request object constructed from the passed-in element
      */
-    protected Request parseRequest(Element requestElement) throws MalformedURLException {
-        Request request = new Request();
-        OperationType operationType;
+    protected void parseRequest(Element requestElement, WMSBuilder builder ) throws MalformedURLException {
+        Element getCapabilities = requestElement.getChild("GetCapabilities"); 
         
-        operationType = parseOperationType(requestElement.getChild("GetCapabilities"));
-        request.setGetCapabilities(operationType);
+        builder.buildGetCapabilitiesOperation(
+            queryFormats( getCapabilities ),
+            queryGet( getCapabilities ),
+            queryPost( getCapabilities )
+        );
         
-        operationType = parseOperationType(requestElement.getChild("GetMap"));
-        request.setGetMap(operationType);
+        Element getMap = requestElement.getChild("GetMap");
+        builder.buildGetMapOperation(
+            queryFormats( getMap ),
+            queryGet( getMap ),
+            queryPost( getMap )
+        );
         
-        if (requestElement.getChild("GetFeatureInfo") != null) {
-            operationType = parseOperationType(requestElement.getChild("GetFeatureInfo"));
-            request.setGetFeatureInfo(operationType);
-        }
-        
-        return request;
+        Element getFeatureInfo = requestElement.getChild("GetFeatureInfo");
+        if( getFeatureInfo != null ){
+            builder.buildGetMapOperation(
+                queryFormats( getFeatureInfo ),
+                queryGet( getFeatureInfo ),
+                queryPost( getFeatureInfo )
+            );    
+        }        
     }
-
+    /** parse List<String> from opperation element */
+    protected List queryFormats( Element op ){
+        Iterator iter;
+        
+        List formats = new ArrayList();
+        List formatElements = op.getChildren("Format");
+        iter = formatElements.iterator();
+        while (iter.hasNext()) {
+            Element formatElement = (Element) iter.next();
+            formats.add(formatElement.getValue());
+        }        
+        return formats;
+    }
+    protected URL queryPost(Element element) throws MalformedURLException { 
+        List dcpTypeElements = element.getChildren("DCPType");
+        for( Iterator i = dcpTypeElements.iterator(); i.hasNext(); ) {
+            Element dcpTypeElement = (Element) i.next();
+            Element httpElement = dcpTypeElement.getChild("HTTP");
+            
+            Element get = httpElement.getChild("Post");
+            if (get!= null) {
+            	return parseOnlineResource(get.getChild("OnlineResource"));
+            }
+        }
+        return null;
+    } 
+    protected URL queryGet(Element element) throws MalformedURLException {
+        List dcpTypeElements = element.getChildren("DCPType");
+        for( Iterator i = dcpTypeElements.iterator(); i.hasNext(); ) {
+            Element dcpTypeElement = (Element) i.next();
+            Element httpElement = dcpTypeElement.getChild("HTTP");
+            
+            Element get = httpElement.getChild("Get");
+            if (get!= null) {
+            	return parseOnlineResource(get.getChild("OnlineResource"));
+            }
+        }
+        return null;
+    }
     protected OperationType parseOperationType(Element element) throws MalformedURLException {
         OperationType operationType = new OperationType();
         Iterator iter;
@@ -293,27 +307,22 @@ public class Parser1_1_1 implements WMSParser {
      * @param serviceElement an Element representing a service element
      * @return a Service object constructed from the passed-in element
      */
-    protected Service parseService(Element serviceElement) throws MalformedURLException {
-        Service service;
+    protected void parseService(Element serviceElement, WMSBuilder builder) throws MalformedURLException {
+        
+        
 		
         String name = serviceElement.getChildText("Name");
 		String title = serviceElement.getChildText("Title");
 		
-		//Optional attributes finished. Can construct.
-	    service = new Service();
-		service.setName(name);
-	    service.setTitle(title);
-	    service.setOnlineResource(parseOnlineResource(serviceElement.getChild("OnlineResource")));
-	    	    
-		service.set_abstract(serviceElement.getChildText("Abstract"));
-		
-		Element keywordListElement = serviceElement.getChild("KeywordList");
+		URL onlineResource = parseOnlineResource(serviceElement.getChild("OnlineResource"));
+	    String description = serviceElement.getChildText("Abstract");
+	    
+		String keywords[] = null;
+		Element keywordListElement = serviceElement.getChild("KeywordList");		
 		if (keywordListElement != null) {
-		    String[] keywords = parseKeywordList(keywordListElement);
-		    service.setKeywordList(keywords);
+		    keywords = parseKeywordList(keywordListElement);		    
 		}
-		
-		return service;
+		builder.buildService( name, title, onlineResource,description, keywords );				
     }
     /**
      * @param keywordListElement
