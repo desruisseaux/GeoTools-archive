@@ -16,12 +16,15 @@
  */
 package org.geotools.data.wms.request;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import org.geotools.util.URLEncoder2;
 
 
 /**
@@ -110,12 +113,12 @@ public class AbstractRequest implements Request{
         if (!url.endsWith("?")) { //$NON-NLS-1$
             url = url.concat("?"); //$NON-NLS-1$
         }
-
+        
         Iterator iter = properties.entrySet().iterator();
-
         while (iter.hasNext()) {
             Map.Entry entry = (Map.Entry) iter.next();
-            String param = entry.getKey() + "=" + entry.getValue(); //$NON-NLS-1$
+            
+            String param = entry.getKey() + "=" + entry.getValue();
 
             if (iter.hasNext()) {
                 param = param.concat("&"); //$NON-NLS-1$
@@ -123,6 +126,15 @@ public class AbstractRequest implements Request{
 
             url = url.concat(param);
         }
+
+        try {
+//        	System.out.println(url);
+			url = URLEncoder2.encode(url, "UTF-16");
+//			System.out.println(url);
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
         try {
             return new URL(url);
@@ -146,4 +158,5 @@ public class AbstractRequest implements Request{
     public Properties getProperties() {
         return (Properties) properties.clone();
     }
+    
 }
