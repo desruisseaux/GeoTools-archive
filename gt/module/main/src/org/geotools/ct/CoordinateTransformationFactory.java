@@ -83,6 +83,8 @@ import org.geotools.resources.image.JAIUtilities;
  * @author Martin Desruisseaux
  *
  * @see org.opengis.ct.CT_CoordinateTransformationFactory
+ *
+ * @deprecated Replaced by org.geotools.referencing.operation.CoordinateOperationFactory
  */
 public class CoordinateTransformationFactory {
     /**

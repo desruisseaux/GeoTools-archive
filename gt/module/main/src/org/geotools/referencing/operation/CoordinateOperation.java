@@ -124,7 +124,7 @@ public class CoordinateOperation extends IdentifiedObject
     protected final MathTransform transform;
 
     /**
-     * Construct a coordinate operation from a set of properties. The properties given in argument
+     * Constructs a coordinate operation from a set of properties. The properties given in argument
      * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
      * super-class constructor}. Additionally, the following properties are understood by this
      * construtor:

@@ -312,9 +312,12 @@ public final class Element {
      * @param key The name of the missing parameter.
      */
     private ParseException missingParameter(final String key) {
+        int error = offset;
+        if (keyword != null) {
+            error += keyword.length();
+        }
         return trim("missingParameter", new ParseException(complete(
-                    Resources.format(ResourceKeys.ERROR_MISSING_PARAMETER_$1, key)),
-                    offset + keyword.length()));
+                    Resources.format(ResourceKeys.ERROR_MISSING_PARAMETER_$1, key)), error));
     }
 
     /**

@@ -30,9 +30,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 // OpenGIS dependencies
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.SingleOperation;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
@@ -68,7 +70,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
     protected final SingleOperation[] operations;
 
     /**
-     * Construct a concatenated operation from the specified name.
+     * Constructs a concatenated operation from the specified name.
      *
      * @param name The operation name.
      * @param operations The sequence of operations.
@@ -80,7 +82,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
     }
 
     /**
-     * Construct a concatenated operation from a set of properties.
+     * Constructs a concatenated operation from a set of properties.
      * The properties given in argument follow the same rules than for the
      * {@link org.geotools.referencing.operation.CoordinateOperation} constructor.
      *
@@ -94,6 +96,26 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
     }
 
     /**
+     * Constructs a concatenated operation from a set of properties and a
+     * {@linkplain MathTransformFactory math transform factory}.
+     * The properties given in argument follow the same rules than for the
+     * {@link org.geotools.referencing.operation.CoordinateOperation} constructor.
+     *
+     * @param  properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param  operations The sequence of operations.
+     * @param  factory    The math transform factory to use for math transforms concatenation.
+     * @throws FactoryException if the factory can't concatenate the math transforms.
+     */
+    public ConcatenatedOperation(final Map properties,
+                                 final CoordinateOperation[] operations,
+                                 final MathTransformFactory factory)
+            throws FactoryException
+    {
+        this(properties, new ArrayList(operations!=null ? operations.length : 4),
+             operations, factory);
+    }
+
+    /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
@@ -101,8 +123,21 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
                                   final List list,
                                   final CoordinateOperation[] operations)
     {
-        this(properties,
-             expand(operations, list, true),
+        this(properties, expand(operations, list),
+             (SingleOperation[]) list.toArray(new SingleOperation[list.size()]));
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private ConcatenatedOperation(final Map  properties,
+                                  final List list,
+                                  final CoordinateOperation[] operations,
+                                  final MathTransformFactory factory)
+            throws FactoryException
+    {
+        this(properties, expand(operations, list, factory, true),
              (SingleOperation[]) list.toArray(new SingleOperation[list.size()]));
     }
 
@@ -122,16 +157,36 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
     }
 
     /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static MathTransform expand(final CoordinateOperation[] operations,
+                                        final List list)
+    {
+        try {
+            return expand(operations, list, null, true);
+        } catch (FactoryException exception) {
+            // Should not happen, since we didn't used any MathTransformFactory.
+            throw new AssertionError(exception);
+        }
+    }
+
+    /**
      * Transform the list of operations into a list of single operations. This method
      * also check against null value and make sure that all CRS dimension matches.
      *
      * @param  operations The array of operations to expand.
      * @param  list The list in which to add <code>SingleOperation</code>.
+     * @param  factory The math transform factory to use, or <code>null</code>
      * @param  wantTransform <code>true</code> if the concatenated math transform should be computed.
      * @return The concatenated math transform.
+     * @throws FactoryException if the factory can't concatenate the math transforms.
      */
     private static MathTransform expand(final CoordinateOperation[] operations,
-                                        final List list, final boolean wantTransform)
+                                        final List list,
+                                        final MathTransformFactory factory,
+                                        final boolean wantTransform)
+            throws FactoryException
     {
         MathTransform transform = null;
         ensureNonNull("operations", operations);
@@ -143,7 +198,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
             } else if (op instanceof org.opengis.referencing.operation.ConcatenatedOperation) {
                 final org.opengis.referencing.operation.ConcatenatedOperation cop;
                 cop = (org.opengis.referencing.operation.ConcatenatedOperation) op;
-                expand(cop.getOperations(), list, false);
+                expand(cop.getOperations(), list, factory, false);
             } else {
                 throw new IllegalArgumentException(Resources.format(
                                                    ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
@@ -173,6 +228,8 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
                 final MathTransform step = op.getMathTransform();
                 if (transform == null) {
                     transform = step;
+                } else if (factory != null) {
+                    transform = factory.createConcatenatedTransform(transform, step);
                 } else {
                     transform = ConcatenatedTransform.create(transform, step);
                 }
