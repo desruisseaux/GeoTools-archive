@@ -546,15 +546,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     //        return fidColumn;
     //    }
 
-    /**
-     * Gets the namespace of the data store.
-     *
-     * @return The namespace.
-     */
-    public String getNameSpace() {
-        return config.getNamespace();
-    }
-
     private static boolean isPresent(String[] array, String value) {
         if (array != null) {
             for (int i = 0; i < array.length; i++) {
