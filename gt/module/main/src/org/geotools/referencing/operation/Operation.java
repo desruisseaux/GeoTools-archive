@@ -183,7 +183,8 @@ public class Operation extends SingleOperation
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
+        final String name = super.formatWKT(formatter);
         formatter.append(method);
-        return super.formatWKT(formatter);
+        return name;
     }
 }

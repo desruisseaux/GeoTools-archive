@@ -297,6 +297,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
         for (int i=0; i<operations.length; i++) {
             formatter.append(operations[i]);
         }
-        return super.formatWKT(formatter);
+        formatter.setInvalidWKT();
+        return Utilities.getShortClassName(this);
     }
 }

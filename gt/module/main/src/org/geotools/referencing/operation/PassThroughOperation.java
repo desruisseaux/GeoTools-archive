@@ -154,6 +154,7 @@ public class PassThroughOperation extends SingleOperation
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
+        final String name = super.formatWKT(formatter);
         try {
             final int[] ordinates = getModifiedCoordinates();
             for (int i=0; i<ordinates.length; i++) {
@@ -164,6 +165,6 @@ public class PassThroughOperation extends SingleOperation
             formatter.setInvalidWKT();
         }
         formatter.append(operation);
-        return super.formatWKT(formatter);
+        return name;
     }
 }

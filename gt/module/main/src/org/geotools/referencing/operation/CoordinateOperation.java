@@ -38,6 +38,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.crs.GeneralDerivedCRS;
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -374,5 +375,19 @@ public class CoordinateOperation extends IdentifiedObject
         if (targetCRS != null) code ^= targetCRS.hashCode();
         if (transform != null) code ^= transform.hashCode();
         return code;
+    }
+    
+    /**
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
+     */
+    protected String formatWKT(final Formatter formatter) {
+        formatter.append(sourceCRS.getName().getCode());
+        formatter.append(targetCRS.getName().getCode());
+        return super.formatWKT(formatter);
     }
 }

@@ -374,9 +374,9 @@ public class ParameterWriter extends FilterWriter {
      * Format a summary of a collection of {@linkplain IdentifiedObject identified objects}.
      * The summary contains the identifier name and alias aligned in a table.
      *
-     * @param  parameters  The collection of parameters to format.
-     * @param  authorities The set of scopes to include in the table, of <code>null</code> for all
-     *                     of them. A restricted a set will produce a table with less columns.
+     * @param  parameters The collection of parameters to format.
+     * @param  scopes     The set of scopes to include in the table, of <code>null</code> for all
+     *                    of them. A restricted a set will produce a table with less columns.
      * @throws IOException if an error occured will writing to the stream.
      */
     public void summary(final Collection parameters, final Set/*<Sring>*/ scopes) throws IOException {
