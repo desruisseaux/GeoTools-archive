@@ -305,7 +305,7 @@ public class CRSService {
                 
                 geometry = (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
                         geometryType.getName(),
-                        geometryType.getClass(),
+                        geometryType.getType(),
                         geometryType.isNillable(),
                         geometryType.getFieldLength(),
                         geometryType.createDefaultValue(),
