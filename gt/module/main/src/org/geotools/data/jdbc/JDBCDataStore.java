@@ -16,28 +16,6 @@
  */
 package org.geotools.data.jdbc;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.QueryRequest;
 import org.geotools.data.DataSourceException;
@@ -74,6 +52,28 @@ import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * Abstract class for JDBC based DataStore implementations.
@@ -95,9 +95,9 @@ import org.geotools.filter.SQLEncoderException;
  * columns.
  * </li>
  * <li>
- * {@link #getGeometryAttributeIO(AttributeType, QueryData) getGeometryAttributeIO(AttributeType, QueryData)} 
- *  - Should be overriden to provide a way to read/write geometries into the format of the
- * database
+ * {@link #getGeometryAttributeIO(AttributeType, QueryData)
+ * getGeometryAttributeIO(AttributeType, QueryData)}  - Should be overriden to
+ * provide a way to read/write geometries into the format of the database
  * </li>
  * </ul>
  * </p>
@@ -107,9 +107,13 @@ import org.geotools.filter.SQLEncoderException;
  * 
  * <ul>
  * <li>
- * Use a specific FIDMapperFactory by overriding the {@link #buildFIDMapperFactory(JDBCDataStoreConfig) buildFIDMapperFactory(JDBCDataStoreConfig)}
- * method, and eventually disallow user overrides by throwing an {@link java.lang.UnsupportedOperationException UnsupportedOperationException} in the
- * {@link #setFIDMapperFactory(FIDMapperFactory) setFidMapperFactory()} method.  
+ * Use a specific FIDMapperFactory by overriding the {@link
+ * #buildFIDMapperFactory(JDBCDataStoreConfig)
+ * buildFIDMapperFactory(JDBCDataStoreConfig)} method, and eventually disallow
+ * user overrides by throwing an {@link
+ * java.lang.UnsupportedOperationException UnsupportedOperationException} in
+ * the {@link #setFIDMapperFactory(FIDMapperFactory) setFidMapperFactory()}
+ * method.
  * </li>
  * <li>
  * {@link #allowTable(String) allowTable} - Used to determine whether a table
@@ -125,39 +129,37 @@ import org.geotools.filter.SQLEncoderException;
  * query.
  * </li>
  * <li>
- * {@link #getResultSetType(boolean) getResultSetType} if the standard result set type
- * is not satisfactory/does not work with a normal FORWARD_ONLY resultset type
+ * {@link #getResultSetType(boolean) getResultSetType} if the standard result
+ * set type is not satisfactory/does not work with a normal FORWARD_ONLY
+ * resultset type
  * </li>
  * <li>
- * {@link #getConcurrency(boolean) getConcurrency} to set the level of concurrency for
- * the result set used to read/write the database
+ * {@link #getConcurrency(boolean) getConcurrency} to set the level of
+ * concurrency for the result set used to read/write the database
  * </li>
  * </ul>
  * </p>
+ * 
  * <p>
  * Additionally subclasses may want to set the value of:
  * 
  * <ul>
  * <li>
- * sqlNameEscape - character (String) to surround names of SQL objects to support
- * mixed-case and non-English names.
+ * sqlNameEscape - character (String) to surround names of SQL objects to
+ * support mixed-case and non-English names.
  * </li>
  * </ul>
  * </p>
- * <h2>
- * 
-
+ *
  * @author Sean  Geoghegan, Defence Science and Technology Organisation
  * @author Chris Holmes, TOPP
- * @author Andrea Aime
- *
- * $Id: JDBCDataStore.java,v 1.23.2.6 2004/05/09 15:15:42 aaime Exp $
+ * @author Andrea Aime $Id: JDBCDataStore.java,v 1.23.2.6 2004/05/09 15:15:42
+ *         aaime Exp $
  */
 public abstract class JDBCDataStore implements DataStore {
-    private BasicAttributeIO basicAttributeIO;
-
     /** The logger for the filter module. */
-    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+    protected static final Logger LOGGER = Logger.getLogger(
+            "org.geotools.data.jdbc");
 
     /**
      * Maps SQL types to Java classes. This might need to be fleshed out more
@@ -197,6 +199,8 @@ public abstract class JDBCDataStore implements DataStore {
         TYPE_MAPPINGS.put(new Integer(Types.TIMESTAMP), java.sql.Timestamp.class);
     }
 
+    private BasicAttributeIO basicAttributeIO;
+
     /** Manages listener lists for FeatureSource implementations */
     public FeatureListenerManager listenerManager = new FeatureListenerManager();
     private LockingManager lockingManager = createLockingManager();
@@ -204,182 +208,63 @@ public abstract class JDBCDataStore implements DataStore {
     /** The ConnectionPool */
     protected ConnectionPool connectionPool;
     protected final JDBCDataStoreConfig config;
-
     protected FeatureTypeHandler typeHandler = null;
 
-	/** The character(s) to surround schema, table and column names 
-	    an SQL query to support mixed-case and non-English names 
-	    */    
+    /**
+     * The character(s) to surround schema, table and column names  an SQL
+     * query to support mixed-case and non-English names
+     */
     protected String sqlNameEscape = "";
 
     /**
-     * When true, writes are allowed also on tables with volatile FID mappers. False by default
+     * When true, writes are allowed also on tables with volatile FID mappers.
+     * False by default
+     *
      * @see FIDMapper#isVolatile()
      */
     protected boolean allowWriteOnVolatileFIDs;
 
-    /** List<TypeEntry> subclass control provided by createContents.
+    /**
+     * List of TypeEntry subclass control provided by createContents.
+     * 
      * <p>
      * Access via entries(), creation by createContents.
+     * </p>
      */
-    private List contents = null;    
+    private List contents = null;
 
-/**
-  * Gets the SQL name escape string.
-  * <p>
-  * The value of this string is prefixed and appended to table schema names,
-  * table names and column names in an SQL statement to support
-  * mixed-case and non-English names.
-  * 
- * @return the value of the SQL name escape string.
- */
-public String getSqlNameEscape() {
-	return sqlNameEscape;
-}
-
-/**
- * Sets the SQL name escape string.
- * <p>
- * The value of this string is prefixed and appended to table schema names,
- * table names and column names in an SQL statement to support
- * mixed-case and non-English names.
- * <p>
- * This value is typically only set once when the DataStore implementation class is constructed.
- * 
- * @param sqlNameEscape the name escape character
- */
-
-protected void setSqlNameEscape(String sqlNameEscape) {
-	this.sqlNameEscape = sqlNameEscape;
-}
     /**
      * DOCUMENT ME!
      *
      * @param connectionPool
+     * @param config
      *
      * @throws IOException
      *
      * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
-     *             object.
-     *
-    public JDBCDataStore(ConnectionPool connectionPool) throws IOException {
-        this(connectionPool, null, new HashMap(), "");
-    }
+     *             object. public JDBCDataStore(ConnectionPool connectionPool,
+     *             String databaseSchemaName) throws IOException {
+     *             this(connectionPool, databaseSchemaName, new HashMap(),
+     *             databaseSchemaName); }
      */
-    /** List of TypeEntry entries - one for each featureType provided by this Datastore */
-    public List entries() {
-        if( contents == null ) {
-            contents = createContents();
-        }
-        return Collections.unmodifiableList( contents );
-    }
-    
     /**
-     * Create TypeEntries based on typeName.
-     * <p>
-     * This method is lazyly called to create a List of TypeEntry for
-     * each FeatureCollection in this DataStore.
-     * </p>
-     * @return List<TypeEntry>.
-     */
-    protected List createContents() {
-        String typeNames[];
-        try {
-            typeNames = getTypeNames();
-            List list = new ArrayList( typeNames.length );
-            for( int i=0; i<typeNames.length; i++){
-                list.add( createTypeEntry( typeNames[i] ));
-            }
-            return Collections.unmodifiableList( list );
-        }
-        catch (IOException help) {
-            // Contents are not available at this time!
-            LOGGER.warning( "Could not aquire getTypeName() to build contents" );
-            return null;
-        }
-    }
-    /**
-     * Create a TypeEntry for the requested typeName.
-     * <p>
-     * Default implementation is not that smart, subclass is free to override.
-     * This method should expand to take in the namespace URI.
-     * Or featureType schema - see AbstractDataStore2.
-     * </p>
-     */
-    protected TypeEntry createTypeEntry( final String typeName ) {
-        URI namespace;
-        try {
-            namespace = getSchema( typeName ).getNamespaceURI();
-        } catch (IOException e) {
-            namespace = null;
-        }
-        // can optimize with a custom JDBCTypeEntry to allow
-        // access to database metadata.
-        return new DefaultTypeEntry( this, namespace, typeName );
-    }
-
-    /**
-     * Metadata search through entries. 
-     * 
-     * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
-     * @param queryRequest
-     * @return List of matching TypeEntry
-     */
-    public List search( QueryRequest queryRequest ) {
-        if( queryRequest == QueryRequest.ALL ) {
-            return entries();
-        }
-        List queryResults = new ArrayList();
-CATALOG: for( Iterator i=entries().iterator(); i.hasNext(); ) {
-            CatalogEntry entry = (CatalogEntry) i.next();
-METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); ) {
-                if( queryRequest.match( m.next() ) ) {
-                    queryResults.add( entry );
-                    break METADATA;
-                }
-            }
-        }
-        return queryResults;
-    }
-    
-    /**
-     * 
+     * DOCUMENT ME!
      *
      * @param connectionPool
-     * @param databaseSchemaName
+     * @param config
      *
      * @throws IOException
      *
      * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
-     *             object.
-     *
-    public JDBCDataStore(ConnectionPool connectionPool, String databaseSchemaName)
-        throws IOException {
-        this(connectionPool, databaseSchemaName, new HashMap(), databaseSchemaName);
-    }
+     *             object. public JDBCDataStore( ConnectionPool
+     *             connectionPool, String databaseSchemaName, Map
+     *             fidGenerationTypes) throws IOException {
+     *             this(connectionPool, databaseSchemaName,
+     *             fidGenerationTypes, databaseSchemaName); }
      */
-    /**
-     * 
-     *
-     * @param connectionPool
-     * @param databaseSchemaName
-     * @param fidGenerationTypes
-     *
-     * @throws IOException
-     *
-     * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
-     *             object.
-     *
-    public JDBCDataStore(
-        ConnectionPool connectionPool,
-        String databaseSchemaName,
-        Map fidGenerationTypes)
-        throws IOException {
-        this(connectionPool, databaseSchemaName, fidGenerationTypes, databaseSchemaName);
-    }*/
 
     /*
-     * 
+     *
      *
      * @param connectionPool
      * @param databaseSchemaName
@@ -391,27 +276,28 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
      *             object.
      *
-    public JDBCDataStore(
-        ConnectionPool connectionPool,
-        String databaseSchemaName,
-        Map fidMapperTypes,
-        String namespace)
-        throws IOException {
-        this(
-            connectionPool,
-            new JDBCDataStoreConfig(namespace, databaseSchemaName, new HashMap(), fidMapperTypes));
-    }*/
+       public JDBCDataStore(
+           ConnectionPool connectionPool,
+           String databaseSchemaName,
+           Map fidMapperTypes,
+           String namespace)
+           throws IOException {
+           this(
+               connectionPool,
+               new JDBCDataStoreConfig(namespace, databaseSchemaName, new HashMap(), fidMapperTypes));
+       }*/
 
     /**
-     * Construct a JDBCDataStore with ConnectionPool and associated configuration.
-     * 
-     * @param connectionPool 
-     * @param config 
-     * @throws IOException 
-     * 
+     * Construct a JDBCDataStore with ConnectionPool and associated
+     * configuration.
+     *
+     * @param connectionPool
+     * @param config
+     *
+     * @throws IOException
      */
-    public JDBCDataStore(ConnectionPool connectionPool, JDBCDataStoreConfig config)
-        throws IOException {
+    public JDBCDataStore(ConnectionPool connectionPool,
+        JDBCDataStoreConfig config) throws IOException {
         this.connectionPool = connectionPool;
         this.config = config;
 
@@ -419,16 +305,169 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
     }
 
     /**
-     * @param config
+     * Gets the SQL name escape string.
+     * 
+     * <p>
+     * The value of this string is prefixed and appended to table schema names,
+     * table names and column names in an SQL statement to support mixed-case
+     * and non-English names.
+     * </p>
+     *
+     * @return the value of the SQL name escape string.
      */
-    protected FeatureTypeHandler getFeatureTypeHandler(JDBCDataStoreConfig config)
-        throws IOException {
-        return new FeatureTypeHandler(
-            this,
-            buildFIDMapperFactory(config),
+    public String getSqlNameEscape() {
+        return sqlNameEscape;
+    }
+
+    /**
+     * Sets the SQL name escape string.
+     * 
+     * <p>
+     * The value of this string is prefixed and appended to table schema names,
+     * table names and column names in an SQL statement to support mixed-case
+     * and non-English names.
+     * </p>
+     * 
+     * <p>
+     * This value is typically only set once when the DataStore implementation
+     * class is constructed.
+     * </p>
+     *
+     * @param sqlNameEscape the name escape character
+     */
+    protected void setSqlNameEscape(String sqlNameEscape) {
+        this.sqlNameEscape = sqlNameEscape;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
+     *             object. public JDBCDataStore(ConnectionPool connectionPool)
+     *             throws IOException { this(connectionPool, null, new
+     *             HashMap(), ""); }
+     */
+    /**
+     * List of TypeEntry entries - one for each featureType provided by this
+     * Datastore
+     *
+     * @return DOCUMENT ME!
+     */
+    public List entries() {
+        if (contents == null) {
+            contents = createContents();
+        }
+
+        return Collections.unmodifiableList(contents);
+    }
+
+    /**
+     * Create TypeEntries based on typeName.
+     * 
+     * <p>
+     * This method is lazyly called to create a List of TypeEntry for each
+     * FeatureCollection in this DataStore.
+     * </p>
+     *
+     * @return List of TypeEntry.
+     */
+    protected List createContents() {
+        String[] typeNames;
+
+        try {
+            typeNames = getTypeNames();
+
+            List list = new ArrayList(typeNames.length);
+
+            for (int i = 0; i < typeNames.length; i++) {
+                list.add(createTypeEntry(typeNames[i]));
+            }
+
+            return Collections.unmodifiableList(list);
+        } catch (IOException help) {
+            // Contents are not available at this time!
+            LOGGER.warning("Could not aquire getTypeName() to build contents");
+
+            return null;
+        }
+    }
+
+    /**
+     * Create a TypeEntry for the requested typeName.
+     * 
+     * <p>
+     * Default implementation is not that smart, subclass is free to override.
+     * This method should expand to take in the namespace URI. Or featureType
+     * schema - see AbstractDataStore2.
+     * </p>
+     *
+     * @param typeName DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    protected TypeEntry createTypeEntry(final String typeName) {
+        URI namespace;
+
+        try {
+            namespace = getSchema(typeName).getNamespaceURI();
+        } catch (IOException e) {
+            namespace = null;
+        }
+
+        // can optimize with a custom JDBCTypeEntry to allow
+        // access to database metadata.
+        return new DefaultTypeEntry(this, namespace, typeName);
+    }
+
+    /**
+     * Metadata search through entries.
+     *
+     * @param queryRequest
+     *
+     * @return List of matching TypeEntry
+     *
+     * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
+     */
+    public List search(QueryRequest queryRequest) {
+        if (queryRequest == QueryRequest.ALL) {
+            return entries();
+        }
+
+        List queryResults = new ArrayList();
+CATALOG: 
+        for (Iterator i = entries().iterator(); i.hasNext();) {
+            CatalogEntry entry = (CatalogEntry) i.next();
+METADATA: 
+            for (Iterator m = entry.metadata().values().iterator();
+                    m.hasNext();) {
+                if (queryRequest.match(m.next())) {
+                    queryResults.add(entry);
+
+                    break METADATA;
+                }
+            }
+        }
+
+        return queryResults;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param config
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     */
+    protected FeatureTypeHandler getFeatureTypeHandler(
+        JDBCDataStoreConfig config) throws IOException {
+        return new FeatureTypeHandler(this, buildFIDMapperFactory(config),
             config.getTypeHandlerTimeout());
     }
-    
+
     protected FIDMapperFactory buildFIDMapperFactory(JDBCDataStoreConfig config) {
         return new DefaultFIDMapperFactory();
     }
@@ -476,7 +515,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
     public void createSchema(FeatureType featureType) throws IOException {
-        throw new UnsupportedOperationException("Table creation not implemented");
+        throw new UnsupportedOperationException(
+            "Table creation not implemented");
     }
 
     /**
@@ -513,46 +553,43 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @see org.geotools.data.DataStore#updateSchema(java.lang.String,
      *      org.geotools.feature.FeatureType)
      */
-    public void updateSchema(String typeName, FeatureType featureType) throws IOException {
-        throw new UnsupportedOperationException("Table modification not supported");
+    public void updateSchema(String typeName, FeatureType featureType)
+        throws IOException {
+        throw new UnsupportedOperationException(
+            "Table modification not supported");
     }
 
     // This is the *better* implementation of getview from AbstractDataStore
     public FeatureSource getView(final Query query)
         throws IOException, SchemaException {
-        return new DefaultView( this.getFeatureSource( query.getTypeName() ), query );
+        return new DefaultView(this.getFeatureSource(query.getTypeName()), query);
     }
-    
+
     /*
-    // Jody - This is my recomendation for DataStore
-    // in order to support CS reprojection and override
-    public FeatureSource getView(final Query query) throws IOException, SchemaException {
-        String typeName = query.getTypeName();
-        FeatureType origionalType = getSchema(typeName);
-
-        //CoordinateSystem cs = query.getCoordinateSystem();
-        //final FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames(), cs );
-        final FeatureType featureType =
-            DataUtilities.createSubType(origionalType, query.getPropertyNames());
-
-        return new AbstractFeatureSource() {
-            public DataStore getDataStore() {
-                return JDBCDataStore.this;
-            }
-
-            public void addFeatureListener(FeatureListener listener) {
-                listenerManager.addFeatureListener(this, listener);
-            }
-
-            public void removeFeatureListener(FeatureListener listener) {
-                listenerManager.removeFeatureListener(this, listener);
-            }
-
-            public FeatureType getSchema() {
-                return featureType;
-            }
-        };
-    }*/
+       // Jody - This is my recomendation for DataStore
+       // in order to support CS reprojection and override
+       public FeatureSource getView(final Query query) throws IOException, SchemaException {
+           String typeName = query.getTypeName();
+           FeatureType origionalType = getSchema(typeName);
+           //CoordinateSystem cs = query.getCoordinateSystem();
+           //final FeatureType featureType = DataUtilities.createSubType( origionalType, query.getPropertyNames(), cs );
+           final FeatureType featureType =
+               DataUtilities.createSubType(origionalType, query.getPropertyNames());
+           return new AbstractFeatureSource() {
+               public DataStore getDataStore() {
+                   return JDBCDataStore.this;
+               }
+               public void addFeatureListener(FeatureListener listener) {
+                   listenerManager.addFeatureListener(this, listener);
+               }
+               public void removeFeatureListener(FeatureListener listener) {
+                   listenerManager.removeFeatureListener(this, listener);
+               }
+               public FeatureType getSchema() {
+                   return featureType;
+               }
+           };
+       }*/
 
     /**
      * Default implementation based on getFeatureReader and getFeatureWriter.
@@ -563,8 +600,10 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureSource getFeatureSource(String typeName) throws IOException {
-        if(typeHandler.getFIDMapper(typeName).isVolatile() || allowWriteOnVolatileFIDs) {
+    public FeatureSource getFeatureSource(String typeName)
+        throws IOException {
+        if (typeHandler.getFIDMapper(typeName).isVolatile()
+                || allowWriteOnVolatileFIDs) {
             if (getLockingManager() != null) {
                 // Use default JDBCFeatureLocking that delegates all locking
                 // the getLockingManager
@@ -596,10 +635,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
      *      org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(
-        final FeatureType requestType,
-        final Filter filter,
-        final Transaction transaction)
+    public FeatureReader getFeatureReader(final FeatureType requestType,
+        final Filter filter, final Transaction transaction)
         throws IOException {
         String typeName = requestType.getTypeName();
         FeatureType schemaType = getSchema(typeName);
@@ -616,8 +653,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
             // featureType is a proper subset and will require reTyping
             //
             String[] names = attributeNames(requestType, filter);
-            query =
-                new DefaultQuery(typeName, filter, Query.DEFAULT_MAX, names, "getFeatureReader");
+            query = new DefaultQuery(typeName, filter, Query.DEFAULT_MAX,
+                    names, "getFeatureReader");
         } else {
             // featureType is not compatiable
             //
@@ -648,7 +685,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @throws IOException If we can't get the schema.
      */
-    protected String[] attributeNames(FeatureType featureType, Filter filter) throws IOException {
+    protected String[] attributeNames(FeatureType featureType, Filter filter)
+        throws IOException {
         String typeName = featureType.getTypeName();
         FeatureType origional = getSchema(typeName);
         SQLBuilder sqlBuilder = getSqlBuilder(typeName);
@@ -659,8 +697,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         }
 
         String[] typeAttributes = DataUtilities.attributeNames(featureType);
-        String[] filterAttributes =
-            DataUtilities.attributeNames(sqlBuilder.getPostQueryFilter(filter));
+        String[] filterAttributes = DataUtilities.attributeNames(sqlBuilder
+                .getPostQueryFilter(filter));
 
         if ((filterAttributes == null) || (filterAttributes.length == 0)) {
             // no filter attributes required
@@ -700,9 +738,10 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @return A FeatureReader that contains features defined by the query.
      *
      * @throws IOException If an error occurs executing the query.
-     * @throws DataSourceException 
+     * @throws DataSourceException
      */
-    public FeatureReader getFeatureReader(Query query, Transaction trans) throws IOException {
+    public FeatureReader getFeatureReader(Query query, Transaction trans)
+        throws IOException {
         String typeName = query.getTypeName();
         FeatureType featureType = getSchema(typeName);
         FeatureTypeInfo typeInfo = typeHandler.getFeatureTypeInfo(typeName);
@@ -735,17 +774,15 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
             }
 
             try {
-                typeInfo =
-                    new FeatureTypeInfo(
-                        typeInfo.getFeatureTypeName(),
-                        DataUtilities.createSubType(typeInfo.getSchema(), requestedNames),
-                        typeInfo.getFIDMapper());
+                typeInfo = new FeatureTypeInfo(typeInfo.getFeatureTypeName(),
+                        DataUtilities.createSubType(typeInfo.getSchema(),
+                            requestedNames), typeInfo.getFIDMapper());
             } catch (SchemaException e1) {
                 throw new DataSourceException("Could not create subtype", e1);
             }
         } else {
-            throw new DataSourceException(
-                typeName + " does not contain requested proeprties:" + query);
+            throw new DataSourceException(typeName
+                + " does not contain requested proeprties:" + query);
         }
 
         AttributeType[] attrTypes = null;
@@ -755,31 +792,27 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         } catch (SchemaException schemaException) {
             throw new DataSourceException(
                 "Some Attribute Names were specified that"
-                    + " do not exist in the FeatureType "
-                    + typeName
-                    + ". "
-                    + "Requested names: "
-                    + Arrays.asList(propertyNames)
-                    + ", "
-                    + "FeatureType: "
-                    + featureType,
-                schemaException);
+                + " do not exist in the FeatureType " + typeName + ". "
+                + "Requested names: " + Arrays.asList(propertyNames) + ", "
+                + "FeatureType: " + featureType, schemaException);
         }
 
         String sqlQuery = constructQuery(query, attrTypes);
 
-        QueryData queryData = executeQuery(typeInfo, typeName, sqlQuery, trans, false);
+        QueryData queryData = executeQuery(typeInfo, typeName, sqlQuery, trans,
+                false);
 
         FeatureType schema;
 
         try {
-            schema = FeatureTypeFactory.newFeatureType(attrTypes, typeName, getNameSpace());
+            schema = FeatureTypeFactory.newFeatureType(attrTypes, typeName,
+                    getNameSpace());
         } catch (FactoryConfigurationError e) {
-            throw new DataSourceException(
-                "Schema Factory Error when creating schema for FeatureReader",
+            throw new DataSourceException("Schema Factory Error when creating schema for FeatureReader",
                 e);
         } catch (SchemaException e) {
-            throw new DataSourceException("Schema Error when creating schema for FeatureReader", e);
+            throw new DataSourceException("Schema Error when creating schema for FeatureReader",
+                e);
         }
 
         FeatureReader reader;
@@ -790,10 +823,12 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
             // (remove the attribtues only used for postFilter)
             //
             try {
-                FeatureType requestType = DataUtilities.createSubType(schema, requestedNames);
+                FeatureType requestType = DataUtilities.createSubType(schema,
+                        requestedNames);
                 reader = new ReTypeFeatureReader(reader, requestType);
             } catch (SchemaException schemaException) {
-                throw new DataSourceException("Could not handle query", schemaException);
+                throw new DataSourceException("Could not handle query",
+                    schemaException);
             }
         }
 
@@ -834,7 +869,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
                 buf.append(" WHERE '1' = '0'"); // NO-OP it
                 sqlQuery = buf.toString();
             } else {
-                sqlQuery = sqlBuilder.buildSQLQuery(typeName, mapper, attrTypes, preFilter);
+                sqlQuery = sqlBuilder.buildSQLQuery(typeName, mapper,
+                        attrTypes, preFilter);
             }
 
             LOGGER.fine("sql is " + sqlQuery);
@@ -866,13 +902,9 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @return
      *
      * @throws IOException
-     * @throws DataSourceException 
      */
-    protected FeatureReader createFeatureReader(
-        FeatureType schema,
-        Filter postFilter,
-        QueryData queryData)
-        throws IOException {
+    protected FeatureReader createFeatureReader(FeatureType schema,
+        Filter postFilter, QueryData queryData) throws IOException {
         FeatureReader fReader = getJDBCFeatureReader(queryData);
 
         if ((postFilter != null) && (postFilter != Filter.ALL)) {
@@ -882,7 +914,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         return fReader;
     }
 
-    protected JDBCFeatureReader getJDBCFeatureReader(QueryData queryData) throws IOException {
+    protected JDBCFeatureReader getJDBCFeatureReader(QueryData queryData)
+        throws IOException {
         return new JDBCFeatureReader(queryData);
     }
 
@@ -900,28 +933,35 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
     //    }
 
     /**
-     * Returns the basic AttributeIO that can read and write all of the simple data
-     * types
+     * Returns the basic AttributeIO that can read and write all of the simple
+     * data types
+     *
      * @param type
+     *
      * @return
      */
     protected AttributeIO getAttributeIO(AttributeType type) {
         if (basicAttributeIO == null) {
             basicAttributeIO = new BasicAttributeIO();
         }
+
         return basicAttributeIO;
     }
 
     /**
-     * Hook to create the geometry attribute IO for a vendor specific data source.
+     * Hook to create the geometry attribute IO for a vendor specific data
+     * source.
      *
-     * @param attrType The AttributeType to read.
-     * @param queryData The connection holder 
+     * @param type The AttributeType to read.
+     * @param queryData The connection holder
      *
      * @return The AttributeIO that will read and write the geometry from the
      *         results.
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    protected abstract AttributeIO getGeometryAttributeIO(AttributeType type, QueryData queryData) throws IOException;
+    protected abstract AttributeIO getGeometryAttributeIO(AttributeType type,
+        QueryData queryData) throws IOException;
 
     /**
      * Executes the SQL Query.
@@ -957,30 +997,26 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * overriden, but Im not sure
      * </p>
      *
-     * @param tableName 
+     * @param featureTypeInfo
+     * @param tableName
      * @param sqlQuery The SQL query to execute.
      * @param transaction The Transaction is included here for handling
      *        transaction connections at a later stage.  It is not currently
      *        used.
-     * @param resultSetType 
-     * @param concurrency 
+     * @param forWrite
      *
      * @return The QueryData object that contains the resources for the query.
      *
-     * @throws IOException 
+     * @throws IOException
      * @throws DataSourceException If an error occurs performing the query.
      *
      * @task HACK: This is just protected for postgis FeatureWriter purposes.
      *       Should move back to private when that stuff moves more abstract
      *       here.
      */
-    protected QueryData executeQuery(
-        FeatureTypeInfo featureTypeInfo,
-        String tableName,
-        String sqlQuery,
-        Transaction transaction,
-        boolean forWrite)
-        throws IOException {
+    protected QueryData executeQuery(FeatureTypeInfo featureTypeInfo,
+        String tableName, String sqlQuery, Transaction transaction,
+        boolean forWrite) throws IOException {
         LOGGER.fine("About to execute query: " + sqlQuery);
 
         Connection conn = null;
@@ -989,15 +1025,19 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
 
         try {
             conn = getConnection(transaction);
+
             if (!forWrite) {
-               //for postgis streaming, but I don't believe it hurts anyone.
-               conn.setAutoCommit(false);
+                //for postgis streaming, but I don't believe it hurts anyone.
+                conn.setAutoCommit(false);
             }
-            statement = conn.createStatement(getResultSetType(forWrite), getConcurrency(forWrite));
+
+            statement = conn.createStatement(getResultSetType(forWrite),
+                    getConcurrency(forWrite));
             statement.setFetchSize(200);
             rs = statement.executeQuery(sqlQuery);
 
-            return new QueryData(featureTypeInfo, this, conn, statement, rs, transaction);
+            return new QueryData(featureTypeInfo, this, conn, statement, rs,
+                transaction);
         } catch (SQLException e) {
             // if an error occurred we close the resources
             String msg = "Error Performing SQL query: " + sqlQuery;
@@ -1014,10 +1054,11 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
     }
 
     protected int getConcurrency(boolean forWrite) {
-        if (forWrite)
+        if (forWrite) {
             return ResultSet.CONCUR_UPDATABLE;
-        else
+        } else {
             return ResultSet.CONCUR_READ_ONLY;
+        }
     }
 
     /**
@@ -1032,26 +1073,28 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
         SQLEncoder encoder = new SQLEncoder();
         encoder.setFIDMapper(getFIDMapper(typeName));
+
         return new DefaultSQLBuilder();
     }
 
     /**
      * Gets a connection from the connection pool.
      *
-     * @param transaction 
+     * @param transaction
      *
      * @return A single use connection.
      *
-     * @throws IOException 
+     * @throws IOException
      * @throws DataSourceException If the connection can not be obtained.
      */
-    protected final Connection getConnection(Transaction transaction) throws IOException {
+    protected final Connection getConnection(Transaction transaction)
+        throws IOException {
         if (transaction != Transaction.AUTO_COMMIT) {
             // we will need to save a JDBC connection is
             // transaction.putState( connectionPool, JDBCState )
             //throw new UnsupportedOperationException("Transactions not supported yet");
-            JDBCTransactionState state =
-                (JDBCTransactionState) transaction.getState(connectionPool);
+            JDBCTransactionState state = (JDBCTransactionState) transaction
+                .getState(connectionPool);
 
             if (state == null) {
                 state = new JDBCTransactionState(connectionPool);
@@ -1064,7 +1107,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         try {
             return connectionPool.getConnection();
         } catch (SQLException sqle) {
-            throw new DataSourceException("Connection failed:"+sqle, sqle );
+            throw new DataSourceException("Connection failed:" + sqle, sqle);
         }
     }
 
@@ -1083,18 +1126,25 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
     }
 
     /**
-     * Builds the appropriate FID mapper given a table name and a FID mapper factory
+     * Builds the appropriate FID mapper given a table name and a FID mapper
+     * factory
+     *
      * @param typeName
      * @param factory
+     *
      * @return
+     *
      * @throws IOException
      */
-    FIDMapper buildFIDMapper(String typeName, FIDMapperFactory factory) throws IOException {
+    FIDMapper buildFIDMapper(String typeName, FIDMapperFactory factory)
+        throws IOException {
         Connection conn = null;
+
         try {
             conn = getConnection(Transaction.AUTO_COMMIT);
 
             FIDMapper mapper = factory.getMapper(null, null, typeName, conn);
+
             return mapper;
         } finally {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
@@ -1129,13 +1179,14 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @return The FeatureType for the table.
      *
-     * @throws IOException 
+     * @throws IOException
      * @throws DataSourceException This can occur if there is an SQL error or
      *         an error constructing the FeatureType.
      *
      * @see JDBCDataStore#buildAttributeType(ResultSet)
      */
-    protected FeatureType buildSchema(String typeName, FIDMapper mapper) throws IOException {
+    protected FeatureType buildSchema(String typeName, FIDMapper mapper)
+        throws IOException {
         final int NAME_COLUMN = 4;
         final int TYPE_NAME = 6;
         Connection conn = null;
@@ -1150,8 +1201,10 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
             tableInfo = dbMetaData.getColumns(null, null, typeName, "%");
 
             boolean tableInfoFound = false;
+
             while (tableInfo.next()) {
                 tableInfoFound = true;
+
                 try {
                     String columnName = tableInfo.getString(NAME_COLUMN);
 
@@ -1159,7 +1212,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
                         boolean isPresent = false;
 
                         for (int i = 0; i < mapper.getColumnCount(); i++) {
-                            if (columnName.equalsIgnoreCase(mapper.getColumnName(i))) {
+                            if (columnName.equalsIgnoreCase(
+                                        mapper.getColumnName(i))) {
                                 isPresent = true;
 
                                 break;
@@ -1176,7 +1230,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
                     if (attributeType != null) {
                         attributeTypes.add(attributeType);
                     } else {
-                        LOGGER.finest("Unknown SQL Type: " + tableInfo.getString(TYPE_NAME));
+                        LOGGER.finest("Unknown SQL Type: "
+                            + tableInfo.getString(TYPE_NAME));
                     }
                 } catch (DataSourceException dse) {
                     String msg = "Error building attribute type. The column will be ignored";
@@ -1184,22 +1239,25 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
                 }
             }
 
-            if (!tableInfoFound)
+            if (!tableInfoFound) {
                 throw new SchemaNotFoundException(typeName);
+            }
 
             AttributeType[] types = (AttributeType[]) attributeTypes.toArray(new AttributeType[0]);
 
-            return FeatureTypeFactory.newFeatureType(types, typeName, getNameSpace());
+            return FeatureTypeFactory.newFeatureType(types, typeName,
+                getNameSpace());
         } catch (SQLException sqlException) {
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, sqlException);
             conn = null; // prevent finally block from reclosing
-            throw new DataSourceException(
-                "SQL Error building FeatureType for " + typeName + " " + sqlException.getMessage(),
-                sqlException);
+            throw new DataSourceException("SQL Error building FeatureType for "
+                + typeName + " " + sqlException.getMessage(), sqlException);
         } catch (FactoryConfigurationError e) {
-            throw new DataSourceException("Error creating FeatureType " + typeName, e);
+            throw new DataSourceException("Error creating FeatureType "
+                + typeName, e);
         } catch (SchemaException e) {
-            throw new DataSourceException("Error creating FeatureType for " + typeName, e);
+            throw new DataSourceException("Error creating FeatureType for "
+                + typeName, e);
         } finally {
             JDBCUtils.close(tableInfo);
             JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
@@ -1233,14 +1291,10 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @return The AttributeType built from the ResultSet or null if the column
      *         should be excluded from the schema.
      *
-     * @throws SQLException If an error occurs processing the ResultSet.
-     * @throws DataSourceException Provided for overriding classes to wrap
-     *         exceptions caused by other operations they may perform to
-     *         determine additional types.  This will only be thrown by the
-     *         default implementation if a type is present that is not present
-     *         in the TYPE_MAPPINGS.
+     * @throws IOException If an error occurs processing the ResultSet.
      */
-    protected AttributeType buildAttributeType(ResultSet rs) throws IOException {
+    protected AttributeType buildAttributeType(ResultSet rs)
+        throws IOException {
         try {
             final int COLUMN_NAME = 4;
             final int DATA_TYPE = 5;
@@ -1282,9 +1336,10 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @return The SRID for the geometry column in the table or -1.
      *
-     * @throws IOException 
+     * @throws IOException
      */
-    protected int determineSRID(String tableName, String geometryColumnName) throws IOException {
+    protected int determineSRID(String tableName, String geometryColumnName)
+        throws IOException {
         return -1;
     }
 
@@ -1318,7 +1373,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @throws IOException This will only occur if there is an error getting a
      *         connection to the Database.
      */
-    protected String determineFidColumnName(String typeName) throws IOException {
+    protected String determineFidColumnName(String typeName)
+        throws IOException {
         final int NAME_COLUMN = 4;
         String fidColumnName = null;
         ResultSet rs = null;
@@ -1346,18 +1402,23 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
     }
 
     /**
-     * Gets the namespace of the data store.
-     * TODO: change config over to use URI
+     * Gets the namespace of the data store. TODO: change config over to use
+     * URI
+     *
      * @return The namespace.
      */
     public URI getNameSpace() {
         try {
-            if(config.getNamespace()!=null)
-                return new URI( config.getNamespace() );
+            if (config.getNamespace() != null) {
+                return new URI(config.getNamespace());
+            }
         } catch (URISyntaxException e) {
-            LOGGER.warning( "Could not use namespace "+config.getNamespace()+" - "+e.getMessage() );
+            LOGGER.warning("Could not use namespace " + config.getNamespace()
+                + " - " + e.getMessage());
+
             return null;
         }
+
         return null;
     }
 
@@ -1394,8 +1455,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      boolean, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
-        throws IOException {
+    public FeatureWriter getFeatureWriter(String typeName,
+        Transaction transaction) throws IOException {
         return getFeatureWriter(typeName, Filter.NONE, transaction);
     }
 
@@ -1428,9 +1489,10 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      boolean, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
-        throws IOException {
-        FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL, transaction);
+    public FeatureWriter getFeatureWriterAppend(String typeName,
+        Transaction transaction) throws IOException {
+        FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL,
+                transaction);
 
         while (writer.hasNext()) {
             writer.next(); // this would be a use for skip then :-)
@@ -1465,21 +1527,22 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      *
      * @throws IOException If typeName could not be located
      * @throws NullPointerException If the provided filter is null
-     * @throws DataSourceException 
+     * @throws DataSourceException
      *
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
      *      org.geotools.filter.Filter, org.geotools.data.Transaction)
      */
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
-        throws IOException {
+    public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+        Transaction transaction) throws IOException {
         if (filter == null) {
-            throw new NullPointerException(
-                "getFeatureReader requires Filter: " + "did you mean Filter.NONE?");
+            throw new NullPointerException("getFeatureReader requires Filter: "
+                + "did you mean Filter.NONE?");
         }
 
         if (transaction == null) {
             throw new NullPointerException(
-                "getFeatureReader requires Transaction: " + "did you mean Transaction.AUTO_COMMIT");
+                "getFeatureReader requires Transaction: "
+                + "did you mean Transaction.AUTO_COMMIT");
         }
 
         FeatureType featureType = getSchema(typeName);
@@ -1493,33 +1556,24 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         String sqlQuery;
 
         try {
-            sqlQuery = constructQuery(query, getAttributeTypes(typeName, propertyNames(query)));
+            sqlQuery = constructQuery(query,
+                    getAttributeTypes(typeName, propertyNames(query)));
         } catch (SchemaException e) {
             throw new DataSourceException(
                 "Some Attribute Names were specified that"
-                    + " do not exist in the FeatureType "
-                    + typeName
-                    + ". "
-                    + "Requested names: "
-                    + Arrays.asList(query.getPropertyNames())
-                    + ", "
-                    + "FeatureType: "
-                    + featureType,
-                e);
+                + " do not exist in the FeatureType " + typeName + ". "
+                + "Requested names: " + Arrays.asList(query.getPropertyNames())
+                + ", " + "FeatureType: " + featureType, e);
         }
 
-        QueryData queryData =
-            executeQuery(
-                typeHandler.getFeatureTypeInfo(typeName),
-                typeName,
-                sqlQuery,
-                transaction,
-                true);
-        FeatureReader reader = createFeatureReader(info.getSchema(), postFilter, queryData);
+        QueryData queryData = executeQuery(typeHandler.getFeatureTypeInfo(
+                    typeName), typeName, sqlQuery, transaction, true);
+        FeatureReader reader = createFeatureReader(info.getSchema(),
+                postFilter, queryData);
         FeatureWriter writer = createFeatureWriter(reader, queryData);
 
         if ((getLockingManager() != null)
-            && getLockingManager() instanceof InProcessLockingManager) {
+                && getLockingManager() instanceof InProcessLockingManager) {
             InProcessLockingManager inProcess = (InProcessLockingManager) getLockingManager();
             writer = inProcess.checkedWriter(writer, transaction);
         }
@@ -1531,8 +1585,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         return writer;
     }
 
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader, QueryData queryData)
-        throws IOException {
+    protected JDBCFeatureWriter createFeatureWriter(FeatureReader reader,
+        QueryData queryData) throws IOException {
         LOGGER.fine("returning jdbc feature writer");
 
         return new JDBCFeatureWriter(reader, queryData);
@@ -1585,8 +1639,8 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
      * @throws SchemaException if query contains a propertyName that is not a
      *         part of this type's schema.
      */
-    protected final AttributeType[] getAttributeTypes(String typeName, String[] propertyNames)
-        throws IOException, SchemaException {
+    protected final AttributeType[] getAttributeTypes(String typeName,
+        String[] propertyNames) throws IOException, SchemaException {
         FeatureType schema = getSchema(typeName);
         AttributeType[] types = new AttributeType[propertyNames.length];
 
@@ -1594,8 +1648,9 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
             types[i] = schema.getAttributeType(propertyNames[i]);
 
             if (types[i] == null) {
-                throw new SchemaException(
-                    typeName + " does not contain requested " + propertyNames[i] + " attribute");
+                throw new SchemaException(typeName
+                    + " does not contain requested " + propertyNames[i]
+                    + " attribute");
             }
         }
 
@@ -1619,6 +1674,7 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
 
     /**
      * Sets the FIDMapper for a specific type name
+     *
      * @param featureTypeName
      * @param fidMapper
      */
@@ -1628,20 +1684,28 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
 
     /**
      * Returns the FIDMapperFactory used for this data store
+     *
      * @return
      */
     public FIDMapperFactory getFIDMapperFactory() {
         return typeHandler.getFIDMapperFactory();
     }
 
-    /** 
+    /**
      * Allows to override the default FIDMapperFactory.
-     * <p>Warning: the ovveride may not be supported by all data stores, in this case an exception will
-     * be thrown
+     * 
+     * <p>
+     * Warning: the ovveride may not be supported by all data stores, in this
+     * case an exception will be thrown
+     * </p>
+     *
      * @param fmFactory
-     * @throws UnsupportedOperationException - if the datastore does not allow the factory override
+     *
+     * @throws UnsupportedOperationException - if the datastore does not allow
+     *         the factory override
      */
-    public void setFIDMapperFactory(FIDMapperFactory fmFactory) throws UnsupportedOperationException {
+    public void setFIDMapperFactory(FIDMapperFactory fmFactory)
+        throws UnsupportedOperationException {
         typeHandler.setFIDMapperFactory(fmFactory);
     }
 }
