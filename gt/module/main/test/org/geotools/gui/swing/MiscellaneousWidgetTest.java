@@ -123,7 +123,7 @@ public class MiscellaneousWidgetTest extends TestCase {
             }
             location += 30;
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException exception) {
                 // Ignore
             }
