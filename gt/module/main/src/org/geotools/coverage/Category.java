@@ -888,25 +888,48 @@ public class Category implements Serializable {
     }
 
     /**
-     * Serialize a single instance of this object.
-     * This is an optimisation for speeding up RMI.
+     * Returns the object to use after deserialization. This is usually <code>this</code>.
+     * However, if an identical object was previously deserialized, then this method replace
+     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
+     * This is correct only for immutable objects.
+     * <br><br>
+     * NOTE: we keep this method private for two reasons:
+     * <ul>
+     *   <li>The user may have created a mutable subclass. Since the need to subclass this class
+     *       should be exceptional, it is better to play safe.</li>
+     *   <li>{@link GeophysicsCategory} should not inherit it. {@link GeophysicsCategory} is never
+     *       serialized alone; it is always encapsulated in a <code>Category</code>. Concequently,
+     *       if <code>Category</code> has been canonicalized, then {@link GeophysicsCategory} has
+     *       been canonicalized too.</li>
+     * </ul>
      *
-     * We keep this method private because we don't need to canonicalize
-     * <code>GeophysicsCategory</code> for most serialization/deserialization
-     * operations. Canonicalizing {@link Category} is suffisient because
-     * if two {@link Category} objects are not equal, then we are sure
-     * that their enclosed <code>GeophysicsCategory</code> are not equal neither.
+     * @return A canonical instance of this object.
+     * @throws ObjectStreamException if this object can't be replaced.
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object readResolve() throws ObjectStreamException {
         return pool.canonicalize(this);
     }
 
     /**
-     * Canonicalize this category after deserialization.
-     * This is an attempt to reduce memory footprint. This
-     * method is private for the same reason than <code>writeReplace()</code>.
+     * Returns the object to write during serialization. This is usually <code>this</code>.
+     * However, if identical objects are found in the same graph during serialization, then
+     * they will be replaced by a single instance in order to reduce the amount of data sent
+     * to the output stream. This is correct only for immutable objects.
+     * <br><br>
+     * NOTE: we keep this method private for two reasons:
+     * <ul>
+     *   <li>The user may have created a mutable subclass. Since the need to subclass this class
+     *       should be exceptional, it is better to play safe.</li>
+     *   <li>{@link GeophysicsCategory} should not inherit it. {@link GeophysicsCategory} is never
+     *       serialized alone; it is always encapsulated in a <code>Category</code>. Concequently,
+     *       if <code>Category</code> has been canonicalized, then {@link GeophysicsCategory} has
+     *       been canonicalized too.</li>
+     * </ul>
+     *
+     * @return The object to serialize (usually <code>this</code>).
+     * @throws ObjectStreamException if this object can't be replaced.
      */
-    private Object readResolve() throws ObjectStreamException {
+    private Object writeReplace() throws ObjectStreamException {
         return pool.canonicalize(this);
     }
 

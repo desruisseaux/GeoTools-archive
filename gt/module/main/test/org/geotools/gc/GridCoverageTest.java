@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.gc;
 
@@ -84,7 +71,7 @@ public class GridCoverageTest extends TestCase {
     /**
      * Random number generator for this test.
      */
-    private Random random;
+    private static Random random = new Random();;
 
     /**
      * Returns the test suite.
@@ -98,14 +85,6 @@ public class GridCoverageTest extends TestCase {
      */
     public GridCoverageTest(final String name) {
         super(name);
-    }
-
-    /**
-     * Set up common objects used for all tests.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        random = new Random();
     }
 
     /**
@@ -237,6 +216,29 @@ public class GridCoverageTest extends TestCase {
         }
     }
 
+    /**
+     * Test the serialization of a grid coverage.
+     *
+     * @throws IOException if an I/O operation was needed and failed.
+     *
+     * @todo: this test is not yet enabled.
+     */
+    private void serialization() throws IOException, ClassNotFoundException {
+        final GridCoverage coverage = getRandomCoverage();
+        assertNotNull(coverage);
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        final ObjectOutputStream out = new ObjectOutputStream(buffer);
+        out.writeObject(coverage);
+        out.close();
+
+        final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+        final GridCoverage read = (GridCoverage) in.readObject();
+        in.close();
+    }
+
+//    public static void main(String[] args) throws Exception {
+//        new GridCoverageTest(null).serialization();
+//    }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////

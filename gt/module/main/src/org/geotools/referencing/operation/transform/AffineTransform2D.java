@@ -150,16 +150,20 @@ final class AffineTransform2D extends XAffineTransform implements MathTransform2
         }
         return inverse;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> element.
      *
+     * @todo This method can't be invoked directly since this class do not inherit from
+     *       {@link org.geotools.referencing.wkt.Formattable}. The current hack is to
+     *       invokes this method through the reflection API, which is why it is declared public.
+     *
      * @param  formatter The formatter to use.
      * @return The WKT element name.
      */
-    protected String formatWKT(final Formatter formatter) {
+    public String formatWKT(final Formatter formatter) {
         return ProjectiveTransform.formatWKT(formatter, getMatrix());
     }
 }

@@ -51,6 +51,7 @@ public class FormatTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
         TestRunner.run(suite());
     }
 
@@ -109,7 +110,7 @@ public class FormatTest extends TestCase {
     /**
      * Test formatting of a 4-dimensional coordinates.
      */
-    public void testFormat() {
+    public void testCoordinateFormat() {
         final Date epoch = new Date(1041375600000L); // January 1st, 2003
         final TemporalDatum datum = new TemporalDatum("Time", epoch);
         final CoordinateReferenceSystem crs = new CompoundCRS("WGS84 3D + time",

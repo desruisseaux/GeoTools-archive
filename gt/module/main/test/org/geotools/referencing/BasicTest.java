@@ -23,12 +23,18 @@ import java.io.*;
 import java.util.*;
 import javax.units.SI;
 import junit.framework.*;
+import java.awt.geom.AffineTransform;
+
 import org.geotools.parameter.*;
 import org.geotools.referencing.*;
 import org.geotools.referencing.cs.*;
 import org.geotools.referencing.crs.*;
+import org.geotools.referencing.wkt.*;
 import org.geotools.referencing.datum.*;
+import org.geotools.referencing.operation.*;
+import org.geotools.referencing.operation.transform.*;
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -40,10 +46,11 @@ import org.opengis.referencing.datum.VerticalDatumType;
  */
 public class BasicTest extends TestCase {
     /**
-     * Construct a test case.
+     * Run the suite from the command line.
      */
-    public BasicTest(String testName) {
-        super(testName);
+    public static void main(String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
     }
 
     /**
@@ -54,10 +61,10 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Run the suite from the command line.
+     * Construct a test case.
      */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    public BasicTest(String testName) {
+        super(testName);
     }
 
     /**
@@ -111,18 +118,18 @@ public class BasicTest extends TestCase {
      */
     public void testAxis() {
         // Test Well Know Text
-        assertEquals("x",         "AXIS[\"x\",EAST]",         CoordinateSystemAxis.X        .toWKT(0));
-        assertEquals("y",         "AXIS[\"y\",NORTH]",        CoordinateSystemAxis.Y        .toWKT(0));
-        assertEquals("z",         "AXIS[\"z\",UP]",           CoordinateSystemAxis.Z        .toWKT(0));
-        assertEquals("Longitude", "AXIS[\"Longitude\",EAST]", CoordinateSystemAxis.LONGITUDE.toWKT(0));
-        assertEquals("Latitude",  "AXIS[\"Latitude\",NORTH]", CoordinateSystemAxis.LATITUDE .toWKT(0));
-        assertEquals("Altitude",  "AXIS[\"Altitude\",UP]",    CoordinateSystemAxis.ALTITUDE .toWKT(0));
-        assertEquals("Time",      "AXIS[\"Time\",FUTURE]",    CoordinateSystemAxis.TIME     .toWKT(0));
+        assertEquals("x",         "AXIS[\"x\", EAST]",         CoordinateSystemAxis.X        .toWKT(0));
+        assertEquals("y",         "AXIS[\"y\", NORTH]",        CoordinateSystemAxis.Y        .toWKT(0));
+        assertEquals("z",         "AXIS[\"z\", UP]",           CoordinateSystemAxis.Z        .toWKT(0));
+        assertEquals("Longitude", "AXIS[\"Longitude\", EAST]", CoordinateSystemAxis.LONGITUDE.toWKT(0));
+        assertEquals("Latitude",  "AXIS[\"Latitude\", NORTH]", CoordinateSystemAxis.LATITUDE .toWKT(0));
+        assertEquals("Altitude",  "AXIS[\"Altitude\", UP]",    CoordinateSystemAxis.ALTITUDE .toWKT(0));
+        assertEquals("Time",      "AXIS[\"Time\", FUTURE]",    CoordinateSystemAxis.TIME     .toWKT(0));
 
-        assertEquals("Longitude", "AXIS[\"Geodetic longitude\",EAST]",  CoordinateSystemAxis.GEODETIC_LONGITUDE .toWKT(0));
-        assertEquals("Longitude", "AXIS[\"Spherical longitude\",EAST]", CoordinateSystemAxis.SPHERICAL_LONGITUDE.toWKT(0));
-        assertEquals("Latitude",  "AXIS[\"Geodetic latitude\",NORTH]",  CoordinateSystemAxis.GEODETIC_LATITUDE  .toWKT(0));
-        assertEquals("Latitude",  "AXIS[\"Spherical latitude\",NORTH]", CoordinateSystemAxis.SPHERICAL_LATITUDE .toWKT(0));
+        assertEquals("Longitude", "AXIS[\"Geodetic longitude\", EAST]",  CoordinateSystemAxis.GEODETIC_LONGITUDE .toWKT(0));
+        assertEquals("Longitude", "AXIS[\"Spherical longitude\", EAST]", CoordinateSystemAxis.SPHERICAL_LONGITUDE.toWKT(0));
+        assertEquals("Latitude",  "AXIS[\"Geodetic latitude\", NORTH]",  CoordinateSystemAxis.GEODETIC_LATITUDE  .toWKT(0));
+        assertEquals("Latitude",  "AXIS[\"Spherical latitude\", NORTH]", CoordinateSystemAxis.SPHERICAL_LATITUDE .toWKT(0));
 
         // Test localization
         assertEquals("English", "Time",  CoordinateSystemAxis.TIME.getName(Locale.ENGLISH));
@@ -209,9 +216,39 @@ public class BasicTest extends TestCase {
                                 "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], "+
                                 "PRIMEM[\"Greenwich\", 0.0], "+
                                 "UNIT[\"degree\", 0.017453292519943295], "+
-                                "AXIS[\"Geodetic longitude\",EAST], "+
-                                "AXIS[\"Geodetic latitude\",NORTH]]",
+                                "AXIS[\"Geodetic longitude\", EAST], "+
+                                "AXIS[\"Geodetic latitude\", NORTH]]",
                      GeographicCRS.WGS84.toWKT(0));
+    }
+
+    /**
+     * Test WKT formatting of transforms backed by matrix.
+     */
+    public void testMatrix() {
+        final Formatter  formatter = new Formatter(null);
+        final GeneralMatrix matrix = new GeneralMatrix(4);
+        matrix.setElement(0,2,  4);
+        matrix.setElement(1,0, -2);
+        matrix.setElement(2,3,  7);
+        MathTransform transform = ProjectiveTransform.create(matrix);
+        assertFalse(transform instanceof AffineTransform);
+        formatter.append(transform);
+        assertEquals(formatter.toString(), "PARAM_MT[\"Affine\", "          +
+                                           "PARAMETER[\"num_row\", 4], "    +
+                                           "PARAMETER[\"num_col\", 4], "    +
+                                           "PARAMETER[\"elt_0_2\", 4.0], "  +
+                                           "PARAMETER[\"elt_1_0\", -2.0], " +
+                                           "PARAMETER[\"elt_2_3\", 7.0]]");
+        matrix.setSize(3,3);
+        transform = ProjectiveTransform.create(matrix);
+        assertTrue(transform instanceof AffineTransform);
+        formatter.clear();
+        formatter.append(transform);
+        assertEquals(formatter.toString(), "PARAM_MT[\"Affine\", "          +
+                                           "PARAMETER[\"num_row\", 3], "    +
+                                           "PARAMETER[\"num_col\", 3], "    +
+                                           "PARAMETER[\"elt_0_2\", 4.0], "  +
+                                           "PARAMETER[\"elt_1_0\", -2.0]]");
     }
 
     /**

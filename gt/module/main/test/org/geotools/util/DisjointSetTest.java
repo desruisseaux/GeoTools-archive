@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.util;
 
@@ -48,6 +35,13 @@ import junit.framework.TestSuite;
  * @author Martin Desruisseaux
  */
 public final class DisjointSetTest extends TestCase {
+    /**
+     * Run the suit from the command line.
+     */
+    public static void main(final String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
+    }
 
     /**
      * Returns the test suite.
@@ -55,13 +49,6 @@ public final class DisjointSetTest extends TestCase {
      public static Test suite() {
          return new TestSuite(DisjointSetTest.class);
      }
-
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
 
     /**
      * Constructs a test case with the given name.

@@ -788,22 +788,36 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Canonicalize this category after deserialization.
-     * This is an attempt to reduce memory footprint.
+     * Returns the object to use after deserialization. This is usually <code>this</code>.
+     * However, if an identical object was previously deserialized, then this method replace
+     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
+     * This is correct only for immutable objects.
+     * <br><br>
+     * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
+     *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
+     *       in a <code>CategoryList</code>. Concequently, if <code>CategoryList</code> has been
+     *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
+     *
+     * @return A canonical instance of this object.
+     * @throws ObjectStreamException if this object can't be replaced.
      */
     private Object readResolve() throws ObjectStreamException {
         return Category.pool.canonicalize(this);
     }
 
     /**
-     * Serialize a single instance of this object.
-     * This is an optimisation for speeding up RMI.
+     * Returns the object to write during serialization. This is usually <code>this</code>.
+     * However, if identical objects are found in the same graph during serialization, then
+     * they will be replaced by a single instance in order to reduce the amount of data sent
+     * to the output stream. This is correct only for immutable objects.
+     * <br><br>
+     * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
+     *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
+     *       in a <code>CategoryList</code>. Concequently, if <code>CategoryList</code> has been
+     *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
      *
-     * We keep this method private because we don't need to canonicalize
-     * <code>GeophysicsCategoryList</code> for most serialization/deserialization
-     * operations. Canonicalizing {@link CategoryList} is suffisient because
-     * if two {@link CategoryList} objects are not equal, then we are sure
-     * that their enclosed <code>GeophysicsCategoryList</code> are not equal neither.
+     * @return The object to serialize (usually <code>this</code>).
+     * @throws ObjectStreamException if this object can't be replaced.
      */
     private Object writeReplace() throws ObjectStreamException {
         return Category.pool.canonicalize(this);

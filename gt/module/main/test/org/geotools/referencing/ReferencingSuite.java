@@ -25,17 +25,24 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-// Test units
-import org.geotools.referencing.*;
-
 
 /**
- * Performs all tests for the <code>org.geotools.referencing</code> packages.
+ * Performs all tests for the <code>org.geotools.referencing</code> packages. This
+ * also includes tests in some dependencies, like <code>org.geotools.measure</code>
+ * and <code>org.geotools.parameter</code> packages.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ReferencingSuite extends TestCase {
+    /**
+     * Run the suite from the command line.
+     */
+    public static void main(final String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        TestRunner.run(suite());
+    }
+
     /**
      * Construct a suite.
      */
@@ -44,21 +51,21 @@ public class ReferencingSuite extends TestCase {
     }        
 
     /**
-     * Run the suite from the command line.
-     */
-    public static void main(final String[] args) {
-        TestRunner.run(suite());
-    }
-
-    /**
      * Returns all suites.
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("All referencing tests");
-//      suite.addTest(CodeListTest  .suite());
-        suite.addTest(BasicTest     .suite());
-        suite.addTest(MatrixTest    .suite());
-        suite.addTest(ParameterTest .suite());
+        suite.addTest(org.geotools.resources   .NumberParserTest      .suite());
+//      suite.addTest(org.geotools.util        .MonolineFormatterTest .suite());
+        suite.addTest(org.geotools.util        .RangeSetTest          .suite());
+        suite.addTest(org.geotools.util        .DisjointSetTest       .suite());
+        suite.addTest(org.geotools.util        .WeakHashSetTest       .suite());
+        suite.addTest(org.geotools.util        .WeakValueHashMapTest  .suite());
+        suite.addTest(org.geotools.measure     .FormatTest            .suite());
+//      suite.addTest(org.geotools.referencing .CodeListTest          .suite());
+        suite.addTest(org.geotools.referencing .BasicTest             .suite());
+        suite.addTest(org.geotools.referencing .MatrixTest            .suite());
+        suite.addTest(org.geotools.referencing .ParameterTest         .suite());
         return suite;
     }
 }

@@ -39,10 +39,11 @@ import org.geotools.parameter.*;
  */
 public class ParameterTest extends TestCase {
     /**
-     * Construct a test case.
+     * Run the suite from the command line.
      */
-    public ParameterTest(String testName) {
-        super(testName);
+    public static void main(String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
     }
 
     /**
@@ -53,10 +54,10 @@ public class ParameterTest extends TestCase {
     }
 
     /**
-     * Run the suite from the command line.
+     * Construct a test case.
      */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    public ParameterTest(String testName) {
+        super(testName);
     }
 
     /**
@@ -104,6 +105,7 @@ public class ParameterTest extends TestCase {
         } catch (InvalidParameterValueException exception) {
             // This is the expected exception.
         }
+        assertEquals("Equals", param, param.clone());
     }
 
     /**
@@ -136,6 +138,7 @@ public class ParameterTest extends TestCase {
         } catch (InvalidParameterValueException exception) {
             // This is the expected exception.
         }
+        assertEquals("Equals", param, param.clone());
     }
 
     /**
@@ -163,7 +166,8 @@ public class ParameterTest extends TestCase {
             // This is the expected exception.
         }
         param = new ParameterValue("Test", AxisDirection.TOP);
-        param.setValue(dummy);
+        param.setValue(dummy); // Should not fails.
+        assertEquals("Equals", param, param.clone());
     }
 
     /**
@@ -188,6 +192,7 @@ public class ParameterTest extends TestCase {
                 assertEquals("height", height, ((ParameterValue) parameters.getValue("num_row")).intValue());
                 assertEquals("width",  width,  ((ParameterValue) parameters.getValue("num_col")).intValue());
                 assertEquals("equals", copy,   parameters.getMatrix());
+                assertEquals("Equals", parameters, parameters.clone());
             }        
         }
     }

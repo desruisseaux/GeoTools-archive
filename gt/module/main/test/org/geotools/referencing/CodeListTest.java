@@ -54,12 +54,13 @@ public class CodeListTest extends TestCase implements FileFilter {
      * for each test.
      */
     private static final Set toIgnore = new HashSet();
-
+    
     /**
-     * Construct a test case.
+     * Run the suite from the command line.
      */
-    public CodeListTest(String testName) {
-        super(testName);
+    public static void main(String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
     }
     
     /**
@@ -68,12 +69,12 @@ public class CodeListTest extends TestCase implements FileFilter {
     public static Test suite() {
         return new TestSuite(CodeListTest.class);
     }
-    
+
     /**
-     * Run the suite from the command line.
+     * Construct a test case.
      */
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    public CodeListTest(String testName) {
+        super(testName);
     }
     
     /**

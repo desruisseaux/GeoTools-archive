@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Collections;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralOperationParameter;
 import org.opengis.referencing.operation.MathTransform;
@@ -41,30 +42,30 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class OperationProvider extends OperationMethod {
+public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 440922384162006481L;
 
     /**
-     * Construct an operation provider from a name.
+     * Construct a math transform provider from a name.
      *
      * @param name The operation name.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
      * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
      */
-    public OperationProvider(final String name,
-                             final int sourceDimensions,
-                             final int targetDimensions,
-                             final GeneralOperationParameter[] parameters)
+    public MathTransformProvider(final String name,
+                                 final int sourceDimensions,
+                                 final int targetDimensions,
+                                 final GeneralOperationParameter[] parameters)
     {
         this(Collections.singletonMap("name", name), sourceDimensions, targetDimensions, parameters);
     }
 
     /**
-     * Construct an operation provider from a set of properties.
+     * Construct a math transform provider from a set of properties.
      * The properties map is given unchanged to the
      * {@linkplain OperationMethod#OperationMethod(Map,int,int,GeneralOperationParameter[])
      * super-class constructor}.
@@ -74,19 +75,38 @@ public abstract class OperationProvider extends OperationMethod {
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
      * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
      */
-    public OperationProvider(final Map properties,
-                             final int sourceDimensions,
-                             final int targetDimensions,
-                             final GeneralOperationParameter[] parameters)
+    public MathTransformProvider(final Map properties,
+                                 final int sourceDimensions,
+                                 final int targetDimensions,
+                                 final GeneralOperationParameter[] parameters)
     {
         super(properties, sourceDimensions, targetDimensions, parameters);
     }
 
     /**
      * Creates a math transform from the specified set of parameter values.
+     * The default implementation wraps the parameters in a group and invokes
+     * {@link #createMathTransform(ParameterValueGroup)}.
      *
      * @param  parameters The parameter values.
      * @return The created math transform.
      */
-    public abstract MathTransform createMathTransform(GeneralParameterValue[] parameters);
+    public MathTransform createMathTransform(GeneralParameterValue[] parameters) {
+        if (parameters.length == 1) {
+            final GeneralParameterValue param = parameters[0];
+            if (param instanceof ParameterValueGroup) {
+                return createMathTransform((ParameterValueGroup) param);
+            }
+        }
+        return createMathTransform(new org.geotools.parameter.ParameterValueGroup(
+                Collections.singletonMap("name", getName(null)), parameters));
+    }
+
+    /**
+     * Creates a math transform from the specified group of parameter values.
+     *
+     * @param  parameters The group of parameter values.
+     * @return The created math transform.
+     */
+    public abstract MathTransform createMathTransform(ParameterValueGroup parameters);
 }

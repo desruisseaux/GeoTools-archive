@@ -22,6 +22,9 @@
  */
 package org.geotools.parameter;
 
+// J2SE dependencies
+import java.util.Map;
+
 // OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.OperationParameterGroup;
@@ -75,6 +78,35 @@ public class ParameterValueGroup extends org.geotools.parameter.GeneralParameter
         for (int i=0; i<values.length; i++) {
             ensureNonNull("createValue", values[i] = parameters[i].createValue());
         }
+    }
+
+    /**
+     * Construct a parameter group from the specified list of parameters.
+     *
+     * @param properties The properties for the
+     *        {@linkplain org.geotools.parameter.OperationParameterGroup operation parameter group}
+     *        to construct from the list of parameters.
+     * @param values The list of parameters.
+     */
+    public ParameterValueGroup(final Map properties, final GeneralParameterValue[] values) {
+        super(createDescriptor(properties, values));
+        this.values = (GeneralParameterValue[]) values.clone();
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static OperationParameterGroup createDescriptor(final Map properties,
+                                                            final GeneralParameterValue[] values)
+    {
+        ensureNonNull("values", values);
+        final GeneralOperationParameter[] parameters = new GeneralOperationParameter[values.length];
+        for (int i=0; i<parameters.length; i++) {
+            ensureNonNull("values", values[i]);
+            parameters[i] = values[i].getDescriptor();
+        }
+        return new org.geotools.parameter.OperationParameterGroup(properties, parameters);
     }
 
     /**

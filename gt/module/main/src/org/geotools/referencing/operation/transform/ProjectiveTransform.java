@@ -39,14 +39,14 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.parameter.GeneralOperationParameter;
-import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies and resources
 import org.geotools.parameter.ParameterValue;
 import org.geotools.parameter.MatrixParameters;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
-import org.geotools.referencing.operation.OperationProvider;
+import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -431,18 +431,17 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static final class Provider extends OperationProvider {
+    public static final class Provider extends MathTransformProvider {
         /**
-         * Create a provider for affine transform with a default matrix size of 3&times;3.
+         * Create a provider for affine transform with a default matrix size of
+         * {@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}&times;{@value org.geotools.parameter.MatrixParameters#DEFAULT_MATRIX_SIZE}.
          */
         public Provider() {
-            /*
-             *
-             * Note: If the number of dimensions (currently 2) is changed, then the
-             *       default matrix size in MatrixParameters must be updated too.
-             */
-            super("Affine", 2, 2, new GeneralOperationParameter[] {
-                  new MatrixParameters(Collections.singletonMap("name", "Affine"))});
+            super("Affine",
+                  MatrixParameters.DEFAULT_MATRIX_SIZE-1,
+                  MatrixParameters.DEFAULT_MATRIX_SIZE-1,
+                  new GeneralOperationParameter[] {
+                      new MatrixParameters(Collections.singletonMap("name", "Affine"))});
         }
 
         /**
@@ -458,7 +457,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
             if (locale == null) {
                 return super.getName(locale);
             }
-            return Resources.format(ResourceKeys.AFFINE_TRANSFORM);
+            return Resources.getResources(locale).getString(ResourceKeys.AFFINE_TRANSFORM);
         }
 
         /**
@@ -467,7 +466,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          * @param  parameters The parameter values in standard units.
          * @return A {@link MathTransform} object of this classification.
          */
-        public MathTransform createMathTransform(final GeneralParameterValue[] parameters) {
+        public MathTransform createMathTransform(final ParameterValueGroup parameters) {
             final Matrix matrix = null;//MatrixParameters.getMatrix(parameters); (TODO)
             return create(matrix);
         }

@@ -15,21 +15,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
  */
 package org.geotools.util;
-
-// J2SE dependencies
-import java.io.PrintWriter;
-import java.io.IOException;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -49,20 +36,9 @@ import org.geotools.resources.Arguments;
  */
 public class RangeSetTest extends TestCase {
     /**
-     * Set to a non-null value for printing some diagnostic message to the standard output.
-     */
-    private static PrintWriter out;
-
-    /**
-     * Run the suit from the command line. Run the test with the
-     * "-print" option in order to print test to standard output.
+     * Run the suit from the command line.
      */
     public static void main(final String[] args) {
-        final Arguments arguments = new Arguments(args);
-        if (arguments.getFlag("-print")) {
-            out = arguments.out;
-        }
-        arguments.getRemainingArguments(0);
         org.geotools.util.MonolineFormatter.initGeotools();
         junit.textui.TestRunner.run(suite());
     }
@@ -79,13 +55,6 @@ public class RangeSetTest extends TestCase {
      */
     public RangeSetTest(final String name) {
         super(name);
-    }
-
-    /**
-     * Set up common objects used for all tests.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
     }
 
     /**

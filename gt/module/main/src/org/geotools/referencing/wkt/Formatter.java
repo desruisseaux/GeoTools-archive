@@ -45,7 +45,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -173,6 +172,31 @@ public class Formatter {
     }
 
     /**
+     * Add a separator to the buffer, if needed.
+     *
+     * @param indent if <code>true</code>, add indentation too.
+     */
+    private void appendSeparator(final boolean indent) {
+        int length = buffer.length();
+        char c;
+        do {
+            if (length == 0) {
+                return;
+            }
+            c = buffer.charAt(--length);
+            if (c == OPEN) {
+                return;
+            }
+        } while (Character.isSpaceChar(c));
+        buffer.append(SEPARATOR);
+        buffer.append(SPACE);
+        if (indent && indentation != 0) {
+            buffer.append('\n');
+            buffer.append(Utilities.spaces(margin += indentation));
+        }
+    }
+
+    /**
      * Append the specified <code>Formattable</code> object. This method will automatically append
      * the keyword (e.g. <code>"GEOCS"</code>), the name and the authority code, and will invokes
      * <code>formattable.{@linkplain Formattable#formatWKT formatWKT}(this)</code> for completing
@@ -181,17 +205,10 @@ public class Formatter {
      * @param formattable The formattable object to append to the WKT.
      */
     public void append(final Formattable formattable) {
-        final Info info = (formattable instanceof Info) ? (Info) formattable : null;
-        if (buffer.length() != 0) {
-            buffer.append(SEPARATOR);
-            buffer.append(SPACE);
-            if (indentation != 0) {
-                buffer.append('\n');
-                buffer.append(Utilities.spaces(margin += indentation));
-            }
-        }
+        appendSeparator(true);
         final int base = buffer.length();
         buffer.append(OPEN);
+        final Info info = (formattable instanceof Info) ? (Info) formattable : null;
         if (info != null) {
             buffer.append(QUOTE);
             buffer.append(info.getName(locale));
@@ -249,7 +266,7 @@ public class Formatter {
         if (info instanceof Formattable) {
             append((Formattable) info);
         } else {
-            throw new UnsupportedImplementationException(info.getClass());
+            append(new Adapter(info));
         }
     }
 
@@ -262,7 +279,7 @@ public class Formatter {
         if (transform instanceof Formattable) {
             append((Formattable) transform);
         } else {
-            throw new UnsupportedImplementationException(transform.getClass());
+            append(new Adapter(transform));
         }
     }
 
@@ -271,9 +288,7 @@ public class Formatter {
      */
     public void append(final CodeList code) {
         if (code != null) {
-            if (buffer.length() != 0) {
-                buffer.append(SEPARATOR);
-            }
+            appendSeparator(false);
             buffer.append(code.name());
         }
     }
@@ -290,10 +305,7 @@ public class Formatter {
         }
         if (parameter instanceof ParameterValue) {
             final ParameterValue param = (ParameterValue) parameter;
-            if (buffer.length() != 0) {
-                buffer.append(SEPARATOR);
-                buffer.append(SPACE);
-            }
+            appendSeparator(false);
             // Covariance: Remove cast if covariance is allowed.
             final OperationParameter descriptor = (OperationParameter) param.getDescriptor();
             Unit unit = descriptor.getUnit();
@@ -322,10 +334,7 @@ public class Formatter {
      */
     public void append(final Unit unit) {
         if (unit != null) {
-            if (buffer.length() != 0) {
-                buffer.append(SEPARATOR);
-                buffer.append(SPACE);
-            }
+            appendSeparator(false);
             buffer.append(usesClassname ? "Unit" : "UNIT");
             buffer.append(OPEN);
             buffer.append(QUOTE);
@@ -355,10 +364,7 @@ public class Formatter {
      * separator) will be written before the number if needed.
      */
     public void append(final int number) {
-        if (buffer.length() != 0) {
-            buffer.append(SEPARATOR);
-            buffer.append(SPACE);
-        }
+        appendSeparator(false);
         buffer.append(number);
     }
 
@@ -367,10 +373,7 @@ public class Formatter {
      * separator) will be written before the number if needed.
      */
     public void append(final double number) {
-        if (buffer.length() != 0) {
-            buffer.append(SEPARATOR);
-            buffer.append(SPACE);
-        }
+        appendSeparator(false);
         buffer.append(number);
     }
 
@@ -379,10 +382,7 @@ public class Formatter {
      * A comma (or any other element separator) will be written before the string if needed.
      */
     public void append(final String text) {
-        if (buffer.length() != 0) {
-            buffer.append(SEPARATOR);
-            buffer.append(SPACE);
-        }
+        appendSeparator(false);
         buffer.append(QUOTE);
         buffer.append(text);
         buffer.append(QUOTE);
@@ -439,5 +439,18 @@ public class Formatter {
      */
     public String toString() {
         return buffer.toString();
+    }
+
+    /**
+     * Clear this formatter. All properties (including {@linkplain #getContextualUnit contextual
+     * unit} and {@linkplain #isInvalidWKT WKT validity flag} are reset to their default value.
+     * After this method call, this <code>Formatter</code> object is ready for formatting a new
+     * object.
+     */
+    public void clear() {
+        buffer.setLength(0);
+        contextualUnit = null;
+        invalidWKT     = false;
+        margin         = 0;
     }
 }

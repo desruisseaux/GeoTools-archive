@@ -255,6 +255,7 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
             throw e;
         }
         ensureNonNull("code", code);
+        canonicalizeKeys(remarks);
     }
     
     /**
@@ -506,14 +507,28 @@ public class Identifier implements org.opengis.referencing.Identifier, Serializa
     }
     
     /**
-     * Returns a reference to a unique instance of this <code>Identifier</code>.
-     * This method is automatically invoked during deserialization.
+     * Returns the object to use after deserialization. This is usually <code>this</code>.
+     * However, if an identical object was previously deserialized, then this method replace
+     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
+     * This is correct only for immutable objects.
      *
      * @return A canonical instance of this object.
-     * @throws ObjectStreamException if the operation failed.
+     * @throws ObjectStreamException if this object can't be replaced.
      */
     protected Object readResolve() throws ObjectStreamException {
-        canonicalizeKeys(remarks);
+        return POOL.canonicalize(this);
+    }
+
+    /**
+     * Returns the object to write during serialization. This is usually <code>this</code>.
+     * However, if identical objects are found in the same graph during serialization, then
+     * they will be replaced by a single instance in order to reduce the amount of data sent
+     * to the output stream. This is correct only for immutable objects.
+     *
+     * @return The object to serialize (usually <code>this</code>).
+     * @throws ObjectStreamException if this object can't be replaced.
+     */
+    protected Object writeReplace() throws ObjectStreamException {
         return POOL.canonicalize(this);
     }
 }

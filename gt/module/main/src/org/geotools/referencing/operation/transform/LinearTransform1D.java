@@ -37,10 +37,12 @@ import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
- * A one dimensional, linear transform. Input values are converted into output values
- * using the following equation:
+ * A one dimensional, linear transform.
+ * Input values <var>x</var> are converted into
+ * output values <var>y</var> using the following equation:
  *
- * <p align="center"><code>y&nbsp;=&nbsp;{@link #offset}&nbsp;+&nbsp;{@link #scale}*x</code></p>
+ * <p align="center"><var>y</var> &nbsp;=&nbsp;
+ * {@linkplain #offset} + {@linkplain #scale}&times;<var>x</var></p>
  *
  * This class is the same as a 2&times;2 affine transform. However, this specialized
  * <code>LinearTransform1D</code> class is faster. It is defined there because extensively
@@ -48,6 +50,9 @@ import org.geotools.referencing.operation.GeneralMatrix;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see LogarithmicTransform1D
+ * @see ExponentialTransform1D
  */
 public class LinearTransform1D extends AbstractMathTransform
                             implements MathTransform1D, LinearTransform, Serializable
@@ -65,12 +70,12 @@ public class LinearTransform1D extends AbstractMathTransform
     /**
      * The value which is multiplied to input values.
      */
-    protected final double scale;
+    public final double scale;
     
     /**
      * The value to add to input values.
      */
-    protected final double offset;
+    public final double offset;
 
     /**
      * The inverse of this transform. Created only when first needed.
@@ -78,9 +83,9 @@ public class LinearTransform1D extends AbstractMathTransform
     private transient MathTransform inverse;
 
     /**
-     * Construct a new linear transform. The transformation equation is:
-     *
-     * <p><code>y&nbsp;=&nbsp;{@link #offset}&nbsp;+&nbsp;{@link #scale}*x</code></p>
+     * Construct a new linear transform. This constructor is provided for subclasses only.
+     * Instances should be created using the {@linkplain #create factory method}, which
+     * may returns optimized implementations for some particular argument values.
      *
      * @param scale  The <code>scale</code>  term in the linear equation.
      * @param offset The <code>offset</code> term in the linear equation.
@@ -91,9 +96,7 @@ public class LinearTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Construct a new linear transform. The transformation equation is:
-     *
-     * <p><code>y&nbsp;=&nbsp;{@link #offset}&nbsp;+&nbsp;{@link #scale}*x</code></p>
+     * Construct a new linear transform.
      *
      * @param scale  The <code>scale</code>  term in the linear equation.
      * @param offset The <code>offset</code> term in the linear equation.

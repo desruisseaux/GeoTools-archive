@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.util;
 
@@ -52,22 +39,18 @@ import junit.framework.TestSuite;
  */
 public class WeakHashSetTest extends TestCase {
     /**
-     * A random number generator.
+     * Run the suit from the command line.
      */
-    private Random random;
+    public static void main(final String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
+        junit.textui.TestRunner.run(suite());
+    }
 
     /**
      * Returns the test suite.
      */
-     public static Test suite() {
-         return new TestSuite(WeakHashSetTest.class);
-     }
-
-    /**
-     * Run the suit from the command line.
-     */
-    public static void main(final String[] args) {
-        junit.textui.TestRunner.run(suite());
+    public static Test suite() {
+        return new TestSuite(WeakHashSetTest.class);
     }
 
     /**
@@ -78,19 +61,12 @@ public class WeakHashSetTest extends TestCase {
     }
 
     /**
-     * Set up common objects used for all tests.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        random = new Random();
-    }
-
-    /**
      * Test the {@link WeakHashSet} using strong references.
      * The tested {@link WeakHashSet} should behave like a
      * standard {@link Set} object.
      */
     public void testStrongReferences() {
+        final Random random = new Random();
         for (int pass=0; pass<20; pass++) {
             final WeakHashSet weakSet = new WeakHashSet();
             final HashSet   strongSet = new HashSet();
@@ -129,6 +105,7 @@ public class WeakHashSetTest extends TestCase {
      * in <code>weakSet</code> may disaspear at any time!
      */
     public void testWeakReferences() throws InterruptedException {
+        final Random random = new Random();
         for (int pass=0; pass<2; pass++) {
             final WeakHashSet weakSet = new WeakHashSet();
             final HashSet   strongSet = new HashSet();

@@ -17,47 +17,51 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.ct;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.io.Serializable;
 
-// JAI dependencies
-import javax.media.jai.util.Range;
-import javax.media.jai.ParameterList;
+// OpenGIS dependencies
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
+import org.geotools.parameter.ParameterValue;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * A one dimensional power transform. Input values are converted into output values
- * using the following equation:
+ * A one dimensional exponentional transform.
+ * Input values <var>x</var> are converted into
+ * output values <var>y</var> using the following equation:
  *
- * <p align="center"><code>y&nbsp;=&nbsp;{@link #scale}*{@link #base}<sup>x</sup></code></p>
+ * <p align="center"><var>y</var> &nbsp;=&nbsp;
+ * {@linkplain #scale}&times;{@linkplain #base}<sup><var>x</var></sup></p>
  *
- * Reminder: This equation may be written in other form:
+ * This equation may be written in other form:
  *
- * <p align="center"><code>{@link #base}<sup>a&nbsp;+&nbsp;b*x</sup> =
- * {@link #base}<sup>a</sup>*({@link #base}<sup>b</sup>)<sup>x</sup></code></p>
+ * <p align="center">{@linkplain #base}<sup><var>a</var> + <var>b</var>&times;<var>x</var></sup> &nbsp;=&nbsp;
+ * {@linkplain #base}<sup><var>a</var></sup>&times;({@linkplain #base}<sup><var>b</var></sup>)<sup><var>x</var></sup></p>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
  * @see LogarithmicTransform1D
  * @see LinearTransform1D
- *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.transform.ExponentialTransform1D}.
  */
-final class ExponentialTransform1D extends AbstractMathTransform implements MathTransform1D, Serializable
+public class ExponentialTransform1D extends AbstractMathTransform
+                                implements MathTransform1D, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -6793025722241238043L;
+    private static final long serialVersionUID = 5331178990358868947L;
 
     /**
-     * The base to be raised to power.
+     * The base to be raised to a power.
      */
     public final double base;
 
@@ -73,12 +77,14 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
 
     /**
      * The inverse of this transform. Created only when first needed.
+     * Serialized in order to avoid rounding error if this transform
+     * is actually the one which was created from the inverse.
      */
-    private transient MathTransform inverse;
+    private MathTransform inverse;
 
     /**
-     * Construct a new logarithmic transform which is the
-     * inverse of the supplied power transform.
+     * Construct a new exponentional transform which is the
+     * inverse of the supplied logarithmic transform.
      */
     ExponentialTransform1D(final LogarithmicTransform1D inverse) {
         this.base     = inverse.base;
@@ -88,9 +94,9 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
     }
 
     /**
-     * Construct a new power transform. The transformation equation is
-     *
-     * <code>  y = scale * base^x  </code>
+     * Construct a new exponentional transform. This constructor is provided for subclasses only.
+     * Instances should be created using the {@linkplain #create factory method}, which
+     * may returns optimized implementations for some particular argument values.
      *
      * @param base   The base to be raised to a power.
      * @param scale  The scale value to be multiplied.
@@ -102,9 +108,7 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
     }
 
     /**
-     * Construct a new power transform. The transformation equation is
-     *
-     * <code>  y = scale * base^x  </code>
+     * Construct a new exponentional transform.
      *
      * @param base   The base to be raised to a power.
      * @param scale  The scale value to be multiplied.
@@ -264,14 +268,13 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
      */
     public int hashCode() {
         long code;
-        code = 16427632 + Double.doubleToLongBits(base);
-        code =  code*37 + Double.doubleToLongBits(scale);
+        code = serialVersionUID + Double.doubleToLongBits(base);
+        code = code*37          + Double.doubleToLongBits(scale);
         return (int)(code >>> 32) ^ (int)code;
     }
     
     /**
-     * Compares the specified object with
-     * this math transform for equality.
+     * Compares the specified object with this math transform for equality.
      */
     public boolean equals(final Object object) {
         if (object==this) {
@@ -287,18 +290,22 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
     }
     
     /**
-     * Returns the WKT for this math transform.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The WKT element name.
      */
-    public String toString() {
-        final StringBuffer buffer = paramMT("Exponential");
-        addParameter(buffer, "base", base);
-        if (scale != 1) {
+    protected String formatWKT(final Formatter formatter) {
+        formatter.append("Exponential");
+        formatter.append(new ParameterValue("base", base, null));
+        if (scale != 0) {
             // TODO: The following is NOT a parameter. For WKT formatting, we should decompose this
             //       LogarithmicTransform1D into a ConcatenatedTransform using a AffineTransform instead.
-            addParameter(buffer, "scale", scale);
+            formatter.append(new ParameterValue("scale", scale, null));
         }
-        buffer.append(']');
-        return buffer.toString();
+        return "PARAM_MT";
     }
     
     /**
@@ -307,58 +314,58 @@ final class ExponentialTransform1D extends AbstractMathTransform implements Math
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    static final class Provider extends MathTransformProvider {
-        /**
-         * The range of allowed value for the "Dimension" parameter.
-         * Current implementation support only one-dimensional transform.
-         */
-        private static final Range DIMENSION_RANGE;
-        static
-        {
-            final Integer ONE = new Integer(1);
-            DIMENSION_RANGE = new Range(Integer.class, ONE, true, ONE, true);
-        }
-
-        /**
-         * <code>false</code> to create a provider for {@link ExponentialTransform1D}, or
-         * <code>true</code> to create a provider for {@link LogarithmicTransform1D}.
-         */
-        private final boolean logarithm;
-
-        /**
-         * Create a provider for power or logarithmic transforms.
-         *
-         * @param logarithm <code>false</code> to create a provider for
-         *        {@link ExponentialTransform1D}, or <code>true</code> to create
-         *        a provider for {@link LogarithmicTransform1D}.
-         */
-        public Provider(final boolean logarithm) {
-            super(logarithm ? "Logarithmic" : "Exponential",
-                  logarithm ? ResourceKeys.LOGARITHM : ResourceKeys.EXPONENTIAL,
-                  null);
-            this.logarithm = logarithm;
-            put("base", 10, POSITIVE_RANGE);
-            putInt("dimension", 1, DIMENSION_RANGE);
-        }
-        
-        /**
-         * Returns a transform for the specified parameters.
-         *
-         * @param  parameters The parameter values.
-         * @return A {@link MathTransform} object of this classification.
-         */
-        public MathTransform create(final ParameterList parameters) {
-            final double   base = parameters.getDoubleParameter("base");
-            final int dimension = parameters.getIntParameter("dimension");
-            if (dimension == 1) {
-                if (logarithm) {
-                    return new LogarithmicTransform1D(base, 0);
-                } else {
-                    return ExponentialTransform1D.create(base, 1);
-                }
-            }
-            // TODO: make it more general.
-            throw new UnsupportedOperationException("Only 1D transforms are currently supported.");
-        }
-    }
+//    static final class Provider extends MathTransformProvider {
+//        /**
+//         * The range of allowed value for the "Dimension" parameter.
+//         * Current implementation support only one-dimensional transform.
+//         */
+//        private static final Range DIMENSION_RANGE;
+//        static
+//        {
+//            final Integer ONE = new Integer(1);
+//            DIMENSION_RANGE = new Range(Integer.class, ONE, true, ONE, true);
+//        }
+//
+//        /**
+//         * <code>false</code> to create a provider for {@link ExponentialTransform1D}, or
+//         * <code>true</code> to create a provider for {@link LogarithmicTransform1D}.
+//         */
+//        private final boolean logarithm;
+//
+//        /**
+//         * Create a provider for exponentional or logarithmic transforms.
+//         *
+//         * @param logarithm <code>false</code> to create a provider for
+//         *        {@link ExponentialTransform1D}, or <code>true</code> to create
+//         *        a provider for {@link LogarithmicTransform1D}.
+//         */
+//        public Provider(final boolean logarithm) {
+//            super(logarithm ? "Logarithmic" : "Exponential",
+//                  logarithm ? ResourceKeys.LOGARITHM : ResourceKeys.EXPONENTIAL,
+//                  null);
+//            this.logarithm = logarithm;
+//            put("base", 10, POSITIVE_RANGE);
+//            putInt("dimension", 1, DIMENSION_RANGE);
+//        }
+//        
+//        /**
+//         * Returns a transform for the specified parameters.
+//         *
+//         * @param  parameters The parameter values.
+//         * @return A {@link MathTransform} object of this classification.
+//         */
+//        public MathTransform create(final ParameterList parameters) {
+//            final double   base = parameters.getDoubleParameter("base");
+//            final int dimension = parameters.getIntParameter("dimension");
+//            if (dimension == 1) {
+//                if (logarithm) {
+//                    return new LogarithmicTransform1D(base, 0);
+//                } else {
+//                    return ExponentialTransform1D.create(base, 1);
+//                }
+//            }
+//            // TODO: make it more general.
+//            throw new UnsupportedOperationException("Only 1D transforms are currently supported.");
+//        }
+//    }
 }

@@ -451,7 +451,11 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      */
     public Matrix derivative(final DirectPosition point) throws TransformException {
         final int dimSource = getDimSource();
-        if (point != null) {
+        if (point == null) {
+            if (dimSource == 2) {
+                return derivative((Point2D) null);
+            }
+        } else {
             final int dimPoint = point.getDimension();
             if (dimPoint != dimSource) {
                 throw new MismatchedDimensionException(constructMessage("point", dimPoint, dimSource));
@@ -460,15 +464,12 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                 if (point instanceof Point2D) {
                     return derivative((Point2D) point);
                 }
-//              return derivative(point.toPoint2D());   // TODO: Available in GeoAPI 1.1?
                 return derivative(new Point2D.Double(point.getOrdinate(0), point.getOrdinate(1)));
             }
-        } else if (dimSource == 2) {
-            return derivative((Point2D)null);
-        }
-        if (this instanceof MathTransform1D) {
-            return new GeneralMatrix(1, 1, new double[] {
-                       ((MathTransform1D) this).derivative(point.getOrdinate(0))});
+            if (this instanceof MathTransform1D) {
+                return new GeneralMatrix(1, 1, new double[] {
+                           ((MathTransform1D) this).derivative(point.getOrdinate(0))});
+            }
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
     }

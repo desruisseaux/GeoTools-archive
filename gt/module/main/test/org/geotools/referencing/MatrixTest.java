@@ -57,6 +57,7 @@ public class MatrixTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
         final Package p = Package.getPackage("javax.vecmath");
         if (p != null) {
             System.out.println(p);

@@ -147,13 +147,15 @@ public class Info extends Formattable implements org.opengis.referencing.Info, S
 
     /**
      * Construct an object from a set of properties and copy unrecognized properties in the
-     * specified map. The <code>properties</code> argument is treated as in the one argument
-     * constructor. All properties unknow to this <code>Info</code> constructor are copied in
-     * the <code>subProperties</code> map, after their key has been normalized (usually lower
-     * case, leading and trailing space removed). If <code>localizables</code> is non-null, then
-     * all keys listed in this argument are treated as localizable one (i.e. may have a suffix
-     * like "_fr", "_de", etc.). Localizable properties are stored in the <code>subProperties</code>
-     * map as {@link Map} of {@link Locale}, {@link Object} pairs.
+     * specified map. The <code>properties</code> argument is treated as in the {@linkplain
+     * Info#Info(Map) one argument constructor}. All properties unknow to this <code>Info</code>
+     * constructor are copied in the <code>subProperties</code> map, after their key has been
+     * normalized (usually lower case, leading and trailing space removed).
+     *
+     * If <code>localizables</code> is non-null, then all keys listed in this argument are treated
+     * as localizable one (i.e. may have a suffix like "_fr", "_de", etc.). Localizable properties
+     * are stored in the <code>subProperties</code> map as {@link Map} with {@link Locale} keys and
+     * {@link Object} values.
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
      * @param subProperties The map in which to copy unrecognized properties.
@@ -230,6 +232,8 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
         this.remarks     = remarks;
         ensureNonNull("name", name);
         ensureNonNull("name", name.get(null));
+        org.geotools.referencing.Identifier.canonicalizeKeys(name);
+        org.geotools.referencing.Identifier.canonicalizeKeys(remarks);
     }
 
     /**
@@ -509,15 +513,28 @@ check:  for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) 
     }
     
     /**
-     * Returns a reference to a unique instance of this <code>Info</code>.
-     * This method is automatically invoked during deserialization.
+     * Returns the object to use after deserialization. This is usually <code>this</code>.
+     * However, if an identical object was previously deserialized, then this method replace
+     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
+     * This is correct only for immutable objects.
      *
      * @return A canonical instance of this object.
-     * @throws ObjectStreamException if the operation failed.
+     * @throws ObjectStreamException if this object can't be replaced.
      */
     protected Object readResolve() throws ObjectStreamException {
-        org.geotools.referencing.Identifier.canonicalizeKeys(name);
-        org.geotools.referencing.Identifier.canonicalizeKeys(remarks);
+        return org.geotools.referencing.Identifier.POOL.canonicalize(this);
+    }
+
+    /**
+     * Returns the object to write during serialization. This is usually <code>this</code>.
+     * However, if identical objects are found in the same graph during serialization, then
+     * they will be replaced by a single instance in order to reduce the amount of data sent
+     * to the output stream. This is correct only for immutable objects.
+     *
+     * @return The object to serialize (usually <code>this</code>).
+     * @throws ObjectStreamException if this object can't be replaced.
+     */
+    protected Object writeReplace() throws ObjectStreamException {
         return org.geotools.referencing.Identifier.POOL.canonicalize(this);
     }
 }

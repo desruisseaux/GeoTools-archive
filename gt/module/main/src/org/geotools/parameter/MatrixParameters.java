@@ -66,6 +66,11 @@ import org.geotools.referencing.operation.GeneralMatrix;
  */
 public class MatrixParameters extends OperationParameterGroup {
     /**
+     * The default matrix size for the {@linkplain #MatrixParameters(Map) one-argument constructor}.
+     */
+    public static final int DEFAULT_MATRIX_SIZE = 3;
+
+    /**
      * The height and weight of the matrix of {@link #parameters} to cache. Descriptors
      * for row or column indices greater than or equals to this value will not be cached.
      */
@@ -112,13 +117,10 @@ public class MatrixParameters extends OperationParameterGroup {
          *       transform will usually not be much more than 5, and the storage scheme
          *       used in this implementation is inefficient  for large amount of matrix
          *       elements.
-         *
-         * Note 2: If the default matrix size (currently 3) is changed, then the number
-         *         of dimensions in ProjectiveTransform.Provider must be updated too.
          */
         this(properties, new OperationParameter[] {
-            new org.geotools.parameter.OperationParameter("num_row", 3, 2, 50),
-            new org.geotools.parameter.OperationParameter("num_col", 3, 2, 50)
+            new org.geotools.parameter.OperationParameter("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
+            new org.geotools.parameter.OperationParameter("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
         }, "elt_", '_');
     }
 
