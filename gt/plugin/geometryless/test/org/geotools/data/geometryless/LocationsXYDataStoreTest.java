@@ -266,6 +266,22 @@ public class LocationsXYDataStoreTest extends TestCase {
         assertEquals("Number of filtered features off:", 2, count(reader));
     }
 
+    public void testGeometry() throws Exception {
+        String testTable = FEATURE_TABLE;
+        LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
+
+        FeatureReader reader =
+            dstore.getFeatureReader(schema, Filter.NONE, Transaction.AUTO_COMMIT);
+	Feature feature = reader.next();
+	LOGGER.fine("feature is: " + feature);
+	Geometry geom = feature.getDefaultGeometry();
+	LOGGER.info("geometry is " + geom);
+	assertEquals(geom.getClass(), Point.class);
+	Point gPoint = (Point) geom;
+	assertTrue(151.0 == gPoint.getX());
+	
+    }
+
 
     int count(FeatureReader reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
