@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
+import java.util.zip.GZIPInputStream;
 
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
@@ -320,7 +321,11 @@ public class WebMapServer implements Discovery {
         //        urlConnection.setRequestProperty("accept-encoding", "compress; q=1.0, gzip; q=0, *");
 
         InputStream io = urlConnection.getInputStream();
-
+        
+        if (urlConnection.getContentEncoding() != null && urlConnection.getContentEncoding().indexOf("gzip") != -1) {
+            io = new GZIPInputStream(io);
+        }
+        
         Object object = DocumentFactory.getInstance(io, hints, Level.WARNING);
 
         WMSCapabilities capabilities = (WMSCapabilities) object;
@@ -369,6 +374,11 @@ public class WebMapServer implements Discovery {
 
         URLConnection connection = finalURL.openConnection();
         InputStream inputStream = connection.getInputStream();
+        
+        if (connection.getContentEncoding() != null && connection.getContentEncoding().indexOf("gzip") != -1) {
+            inputStream = new GZIPInputStream(inputStream);
+        }
+
 
         String contentType = connection.getContentType();
 
