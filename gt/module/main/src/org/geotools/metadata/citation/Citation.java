@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
+import java.util.Locale;
+import java.util.Iterator;
 import java.util.Collections;
 import java.io.Serializable;
 
@@ -127,6 +129,13 @@ public class Citation extends MetadataEntity
     }
 
     /**
+     * List of authorities declared in this class.
+     */
+    private static final Citation[] AUTHORITIES = {
+        OPEN_GIS, EPSG, GEOTIFF, ESRI
+    };
+
+    /**
      * Name by which the cited resource is known.
      */
     private InternationalString title;
@@ -222,6 +231,44 @@ public class Citation extends MetadataEntity
         } else {
             this.title = new SimpleInternationalString(title.toString());
         }
+    }
+
+    /**
+     * Returns a citation of the given name. If the given name matches a
+     * {@linkplain #getTitle title} or an {@linkplain #getAlternateTitles
+     * alternate titles} of one of the pre-defined constants
+     * (e.g. {@link #EPSG}, {@link #GEOTIFF}, <cite>etc.</cite>),
+     * then this constant is returned. Otherwise, a new citation is created
+     * with the specified name as the title.
+     *
+     * @param name The citation name (or title).
+     */
+    public static Citation createCitation(final String name) {
+        for (int i=0; i<AUTHORITIES.length; i++) {
+            final Citation citation = AUTHORITIES[i];
+            InternationalString title = citation.getTitle();
+            Iterator iterator = null;
+            do {
+                if (title.toString(Locale.US).equalsIgnoreCase(name)) {
+                    return citation;
+                }
+                if (title.toString().equalsIgnoreCase(name)) {
+                    return citation;
+                }
+                if (iterator == null) {
+                    final List titles = citation.getAlternateTitles();
+                    if (titles == null) {
+                        break;
+                    }
+                    iterator = titles.iterator();
+                }
+                if (!iterator.hasNext()) {
+                    break;
+                }
+                title = (InternationalString) iterator.next();
+            } while (true);
+        }
+        return new Citation(name);
     }
 
     /**

@@ -241,7 +241,7 @@ public class BasicTest extends TestCase {
 
         GeodeticDatum datum = new GeodeticDatum(properties,
                                                 Ellipsoid.createEllipsoid("Test", 1000, 1000, SI.METER),
-                                                new PrimeMeridian("Test", 12), null);
+                                                new PrimeMeridian("Test", 12));
 
         assertEquals("name",          "This is a name",         datum.getName   ().getCode());
         assertEquals("scope",         "This is a scope",        datum.getScope  ().toString(null));

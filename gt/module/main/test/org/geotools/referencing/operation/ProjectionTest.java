@@ -42,7 +42,7 @@ import org.geotools.parameter.ParameterWriter;
 
 /**
  * Tests projection equations as well as the integration with {@link MathTransformFactory}. The
- * spherical tests here tests real spheres (tests in <code>"Simple_TestScript"</code>
+ * spherical tests here tests real spheres (tests in <code>"Simple"</code> test scripts
  * are not exactly spherical).
  *
  * @version $Id$

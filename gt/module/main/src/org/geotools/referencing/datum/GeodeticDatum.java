@@ -65,6 +65,11 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
                                               org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
 
     /**
+     * The property for {@linkplain #getTransformTo datum shifts}.
+     */
+    public static final String TRANSFORMATIONS_PROPERTY = "transformations";
+
+    /**
      * The ellipsoid.
      */
     private final Ellipsoid ellipsoid;
@@ -90,7 +95,7 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
                          final Ellipsoid     ellipsoid,
                          final PrimeMeridian primeMeridian)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), ellipsoid, primeMeridian, null);
+        this(Collections.singletonMap(NAME_PROPERTY, name), ellipsoid, primeMeridian);
     }
 
     /**
@@ -101,26 +106,32 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
      * @param properties      Set of properties. Should contains at least <code>"name"</code>.
      * @param ellipsoid       The ellipsoid.
      * @param primeMeridian   The prime meridian.
-     * @param transformations An optional set of transformation parameters from this datum
-     *                        to an other datum (usually {@link #WGS84 WGS 1984}.
      */
-    public GeodeticDatum(final Map                   properties,
-                         final Ellipsoid             ellipsoid,
-                         final PrimeMeridian         primeMeridian,
-                               BursaWolfParameters[] transformations)
+    public GeodeticDatum(final Map           properties,
+                         final Ellipsoid     ellipsoid,
+                         final PrimeMeridian primeMeridian)
     {
         super(properties);
         this.ellipsoid     = ellipsoid;
         this.primeMeridian = primeMeridian;
         ensureNonNull("ellipsoid",     ellipsoid);
         ensureNonNull("primeMeridian", primeMeridian);
-        if (transformations != null) {
-            if (transformations.length == 0) {
-                transformations = null;
-            } else {
-                transformations = (BursaWolfParameters[]) transformations.clone();
-                for (int i=0; i<transformations.length; i++) {
-                    transformations[i] = (BursaWolfParameters) transformations[i].clone();
+        BursaWolfParameters[] transformations;
+        final Object object = properties.get(TRANSFORMATIONS_PROPERTY);
+        if (object instanceof BursaWolfParameters) {
+            transformations = new BursaWolfParameters[] {
+                (BursaWolfParameters) ((BursaWolfParameters) object).clone()
+            };
+        } else {
+            transformations = (BursaWolfParameters[]) object;
+            if (transformations != null) {
+                if (transformations.length == 0) {
+                    transformations = null;
+                } else {
+                    transformations = (BursaWolfParameters[]) transformations.clone();
+                    for (int i=0; i<transformations.length; i++) {
+                        transformations[i] = (BursaWolfParameters) transformations[i].clone();
+                    }
                 }
             }
         }

@@ -20,42 +20,42 @@
 package org.geotools.referencing.wkt;
 
 // J2SE dependencies
-import java.util.Collections;
-
-// Parsing
 import java.util.Locale;
+import java.util.Collections;
 import java.text.ParsePosition;
 import java.text.ParseException;
-
-// Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 
-/*
+// Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
+
+
+/**
+ * Parser for {@linkplain MathTransform math transform}
+ * cite>Well Know Text</cite> (WKT).
  * 
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
-public final class MathTransformParser extends AbstractParser {
-    
+public class MathTransformParser extends AbstractParser {
     /**
-     * The factory to use for creating math transform.
+     * The factory to use for creating math transforms.
      */   
-    private final MathTransformFactory mtFactory;
+    protected final MathTransformFactory mtFactory;
     
     /**
      * Construct a parser using the default set of symbols.
@@ -65,20 +65,20 @@ public final class MathTransformParser extends AbstractParser {
     }
     
     /**
-     * Construct a parser for the specified set of symbols using default factories.
+     * Construct a parser using the specified set of symbols
+     * and the default factories.
      *
      * @param symbols The symbols for parsing and formatting numbers.
      */
     public MathTransformParser(final Symbols symbols) {
-        this(symbols, (org.geotools.referencing.operation.MathTransformFactory)FactoryFinder.getMathTransformFactory());
+        this(symbols, FactoryFinder.getMathTransformFactory());
     }
     
     /**
      * Construct a parser for the specified set of symbols and factory.
      *
-     * @param symbols The symbols for parsing and formatting numbers.
-     * @param mtFactory The {@link MathTransformFactory} to use to create 
-     * {@link MathTransform} objects.
+     * @param symbols   The symbols for parsing and formatting numbers.
+     * @param mtFactory The factory to use to create {@link MathTransform} objects.
      */
     public MathTransformParser(final Symbols symbols, final MathTransformFactory mtFactory) {
         super(symbols);
@@ -105,7 +105,9 @@ public final class MathTransformParser extends AbstractParser {
      * @return The next element as a {@link MathTransform} object.
      * @throws ParseException if the next element can't be parsed.
      */
-    private MathTransform parseMathTransform(final Element element, final boolean required) throws ParseException {
+    private MathTransform parseMathTransform(final Element element, final boolean required)
+            throws ParseException
+    {
         final Object key = element.peek();
         if (key instanceof Element) {
             final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
@@ -132,31 +134,26 @@ public final class MathTransformParser extends AbstractParser {
      * @throws ParseException if the "PARAM_MT" element can't be parsed.
      */
     private MathTransform parseParamMT(final Element parent) throws ParseException {     
-        final Element    element = parent.pullElement("PARAM_MT");
+        final Element element = parent.pullElement("PARAM_MT");
         final String classification = element.pullString("classification");
-        GeneralParameterValue[] parameters;
+        final ParameterValueGroup parameters;
         try {
-            // TODO: temporary hack. We should work directly on ParameterValueGroup instead.
-            parameters = org.geotools.parameter.Parameters.array(mtFactory.getDefaultParameters(classification));
+            parameters = mtFactory.getDefaultParameters(classification);
         } catch (NoSuchIdentifierException exception) {
             throw element.parseFailed(exception, null);
         }
-
         /*
          * Scan over all PARAMETER["name", value] elements and
-         * set the corresponding parameter in the ParameterList.
+         * set the corresponding parameter in the parameter group.
          */
         Element param;
-        ParameterValueGroup params = new org.geotools.parameter.ParameterGroup(
-            Collections.singletonMap("name", "params"), parameters);
         while ((param=element.pullOptionalElement("PARAMETER")) != null) {
             final String name = param.pullString("name");
-//I am assuming this will not be a ParameterValueGroup (bad assumption?)
-            ParameterValue parameter = params.parameter(name);
-//should be able to use parameter.getValue().getClass() here, but it returns null            
-            if (Integer.class.equals(((ParameterDescriptor)parameter.getDescriptor()).getValueClass())) {
+            final ParameterValue parameter = parameters.parameter(name);
+            final Class type = ((ParameterDescriptor)parameter.getDescriptor()).getValueClass();
+            if (Integer.class.equals(type)) {
                 parameter.setValue(param.pullInteger("value"));
-            } else if (Double.class.equals(((ParameterDescriptor)parameter.getDescriptor()).getValueClass())) {
+            } else if (Double.class.equals(type)) {
                 parameter.setValue(param.pullDouble("value"));
             } else {
                 parameter.setValue(param.pullString("value"));
@@ -165,9 +162,7 @@ public final class MathTransformParser extends AbstractParser {
         }
         element.close();
         try {
-            return mtFactory.createParameterizedTransform(
-                new org.geotools.parameter.ParameterGroup(
-                Collections.singletonMap("name", classification), parameters));
+            return mtFactory.createParameterizedTransform(parameters);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
@@ -187,7 +182,8 @@ public final class MathTransformParser extends AbstractParser {
     private MathTransform parseInverseMT(final Element parent) throws ParseException {       
         final Element element = parent.pullElement("INVERSE_MT");
         try {
-            final MathTransform transform = ((MathTransform)parseMathTransform(element, true)).inverse();
+            final MathTransform transform;
+            transform = ((MathTransform)parseMathTransform(element, true)).inverse();
             element.close();
             return transform;
         }
@@ -208,7 +204,7 @@ public final class MathTransformParser extends AbstractParser {
      * @throws ParseException if the "PASSTHROUGH_MT" element can't be parsed.
      */
     private MathTransform parsePassThroughMT(final Element parent) throws ParseException {
-        final Element        element = parent.pullElement("PASSTHROUGH_MT");
+        final Element           element = parent.pullElement("PASSTHROUGH_MT");
         final int firstAffectedOrdinate = parent.pullInteger("firstAffectedOrdinate");
         final MathTransform   transform = parseMathTransform(element, true);
         element.close();
@@ -233,7 +229,6 @@ public final class MathTransformParser extends AbstractParser {
     private MathTransform parseConcatMT(final Element parent) throws ParseException {       
         final Element element = parent.pullElement("CONCAT_MT");
         MathTransform transform = parseMathTransform(element, true);
-        
         MathTransform optionalTransform;
         while ((optionalTransform = parseMathTransform(element, false)) != null) {
             try {

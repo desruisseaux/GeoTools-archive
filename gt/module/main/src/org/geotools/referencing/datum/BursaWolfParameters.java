@@ -28,8 +28,8 @@ import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.util.Cloneable;
-import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -79,14 +79,14 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
     public double ppm;
 
     /** The target datum for this parameters. */
-    public final Datum targetDatum;
+    public final GeodeticDatum targetDatum;
     
     /**
      * Constructs a transformation info with all parameters set to 0.
      *
      * @param target The target datum for this parameters.
      */
-    public BursaWolfParameters(final Datum target) {
+    public BursaWolfParameters(final GeodeticDatum target) {
         this.targetDatum = target;
     }
 
@@ -188,7 +188,7 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
         formatter.append(ey);
         formatter.append(ez);
         formatter.append(ppm);
-        if (!GeodeticDatum.isWGS84(targetDatum)) {
+        if (!org.geotools.referencing.datum.GeodeticDatum.isWGS84(targetDatum)) {
             formatter.setInvalidWKT();
         }
         return "TOWGS84";

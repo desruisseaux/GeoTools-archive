@@ -59,7 +59,7 @@ public class Parameters {
      * @deprecated This method was provided as a bridge between the old API (array-based) to the
      *             new API (list-based). New code should work directly on the list instead.
      */
-    public static GeneralParameterValue[] array(ParameterValueGroup group) {
+    private static GeneralParameterValue[] array(ParameterValueGroup group) {
         List params = group.values(); 
         return (GeneralParameterValue[]) params.toArray( new GeneralParameterValue[ params.size()] );
     }

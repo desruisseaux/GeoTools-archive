@@ -31,14 +31,18 @@ import java.text.ParseException;
 // OpenGIS dependencies
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
- * The base class for <cite>Well Know Text</cite> (WKT) parser and formatter.
+ * Base class for <cite>Well Know Text</cite> (WKT) parser.
  *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
+ * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
  */
 public abstract class AbstractParser extends Format {
     /**
@@ -135,7 +139,10 @@ public abstract class AbstractParser extends Format {
         }
         try {
             formatter.buffer = toAppendTo;
-            if (object instanceof GeneralParameterValue) {
+            formatter.bufferBase = toAppendTo.length();
+            if (object instanceof MathTransform) {
+                formatter.append((MathTransform) object);
+            } else if (object instanceof GeneralParameterValue) {
                 // Special processing for parameter values, which is formatted
                 // directly in 'Formatter'. Note that in GeoAPI, this interface
                 // doesn't share the same parent interface than other interfaces.
@@ -146,6 +153,7 @@ public abstract class AbstractParser extends Format {
             return toAppendTo;
         } finally {
             formatter.buffer = null;
+            formatter.clear();
         }
     }     
 }

@@ -41,10 +41,19 @@ import javax.units.NonSI;
 import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterValue;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.Identifier;
+import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.metadata.citation.Citation;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -52,8 +61,8 @@ import org.geotools.resources.cts.ResourceKeys;
 /**
  * Parser for
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
- * Known Text</cite> (WKT)</A>.
- * Instances of this class are thread-safe.
+ * Known Text</cite> (WKT)</A>. This parser can parse {@linkplain MathTransform math transform}
+ * objects as well, which is part of the WKT's <code>FITTED_CS</code> element.
  *
  * @version $Id$
  * @author Remi Eve
@@ -62,27 +71,34 @@ import org.geotools.resources.cts.ResourceKeys;
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
  */
-public abstract class Parser extends AbstractParser {
+public class Parser extends MathTransformParser {
     /**
      * The factory to use for creating {@linkplain Datum datum}.
      */
-    private final DatumFactory datumFactory;
+    protected final DatumFactory datumFactory;
 
     /**
      * The factory to use for creating {@linkplain CoordinateSystem coordinate systems}.
      */
-    private final CSFactory csFactory;
+    protected final CSFactory csFactory;
 
     /**
      * The factory to use for creating {@linkplain CoordinateReferenceSystem
      * coordinate reference systems}.
      */
-    private final CRSFactory crsFactory;
+    protected final CRSFactory crsFactory;
 
     /**
      * The list of {@linkplain AxisDirection axis directions} from their name.
      */
     private final Map directions;
+    
+    /**
+     * Construct a parser using the default set of symbols and factories.
+     */
+    public Parser() {
+        this(Symbols.DEFAULT);
+    }
     
     /**
      * Construct a parser for the specified set of symbols using default factories.
@@ -93,7 +109,8 @@ public abstract class Parser extends AbstractParser {
         this(symbols,
              FactoryFinder.getDatumFactory(),
              FactoryFinder.getCSFactory(),
-             FactoryFinder.getCRSFactory());
+             FactoryFinder.getCRSFactory(),
+             FactoryFinder.getMathTransformFactory());
     }
     
     /**
@@ -105,17 +122,19 @@ public abstract class Parser extends AbstractParser {
      *                     coordinate systems}.
      * @param crsFactory   The factory to use for creating {@linkplain CoordinateReferenceSystem
      *                     coordinate reference systems}.
+     * @param mtFactory    The factory to use for creating {@linkplain MathTransform
+     *                     math transform} objects.
      */
-    public Parser(final Symbols           symbols,
-                  final DatumFactory datumFactory,
-                  final CSFactory       csFactory,
-                  final CRSFactory     crsFactory)
+    public Parser(final Symbols                symbols,
+                  final DatumFactory      datumFactory,
+                  final CSFactory            csFactory,
+                  final CRSFactory          crsFactory,
+                  final MathTransformFactory mtFactory)
     {
-        super(symbols);
+        super(symbols, mtFactory);
         this.datumFactory = datumFactory;
         this. csFactory   =    csFactory;
         this.crsFactory   =   crsFactory;
-
         final AxisDirection[] values = AxisDirection.values();
         directions = new HashMap((int)Math.ceil((values.length+1)/0.75f), 0.75f);
         for (int i=0; i<values.length; i++) {
@@ -139,14 +158,17 @@ public abstract class Parser extends AbstractParser {
     private static Map parseAuthority(final Element parent, final String parentName)
             throws ParseException
     {
-        final Map properties = new HashMap(7);
-        properties.put("name", parentName);
         final Element element = parent.pullOptionalElement("AUTHORITY");
-        if (element != null) {
-            properties.put("authority", element.pullString("name"));
-            properties.put("code",      element.pullString("code"));
-            element.close();
+        if (element == null) {
+            return Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, parentName);
         }
+        final String name = element.pullString("name");
+        final String code = element.pullString("code");
+        element.close();
+        final Map     properties = new HashMap(4);
+        final Citation authority = Citation.createCitation(name);
+        properties.put(IdentifiedObject.       NAME_PROPERTY, new Identifier(authority, name));
+        properties.put(IdentifiedObject.IDENTIFIERS_PROPERTY, new Identifier(authority, code));
         return properties;
     }
 
@@ -193,7 +215,8 @@ public abstract class Parser extends AbstractParser {
      *         if the axis was not required and there is no axis object.
      * @throws ParseException if the "AXIS" element can't be parsed.
      */
-    private CoordinateSystemAxis parseAxis(final Element parent, final Unit unit,
+    private CoordinateSystemAxis parseAxis(final Element parent,
+                                           final Unit    unit,
                                            final boolean required)
             throws ParseException
     {
@@ -209,14 +232,16 @@ public abstract class Parser extends AbstractParser {
         final String         name = element.pullString     ("name");
         final Element orientation = element.pullVoidElement("orientation");
         element.close();
-        final AxisDirection direction = (AxisDirection) directions.get(orientation.keyword.trim().toUpperCase());
+        final AxisDirection direction = (AxisDirection) directions.get(
+                                        orientation.keyword.trim().toUpperCase());
         if (direction == null) {
             throw element.parseFailed(null,
                   Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, orientation));
         }
         try {
-            return csFactory.createCoordinateSystemAxis(Collections.singletonMap("name", name),
-                                                        name, direction, unit);
+            return csFactory.createCoordinateSystemAxis(
+                   Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, name),
+                   name, direction, unit);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
@@ -247,37 +272,40 @@ public abstract class Parser extends AbstractParser {
         }
     }
 
-//    /**
-//     * Parses an <strong>optional</strong> "TOWGS84" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * TOWGS84[<dx>, <dy>, <dz>, <ex>, <ey>, <ez>, <ppm>]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "TOWGS84" element as a {@link WGS84ConversionInfo} object,
-//     *         or <code>null</code> if no "TOWGS84" has been found.
-//     * @throws ParseException if the "TOWGS84" can't be parsed.
-//     */
-//    private static WGS84ConversionInfo parseToWGS84(final Element parent)
-//        throws ParseException 
-//    {          
-//        final Element element = parent.pullOptionalElement("TOWGS84");
-//        if (element == null) {
-//            return null;
-//        }
-//        final WGS84ConversionInfo info = new WGS84ConversionInfo();
-//        info.dx  = element.pullDouble("dx");
-//        info.dy  = element.pullDouble("dy");
-//        info.dz  = element.pullDouble("dz");
-//        info.ex  = element.pullDouble("ex");
-//        info.ey  = element.pullDouble("ey");
-//        info.ez  = element.pullDouble("ez");
-//        info.ppm = element.pullDouble("ppm");
-//        element.close();
-//        return info;
-//    }
+    /**
+     * Parses an <strong>optional</strong> "TOWGS84" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * TOWGS84[<dx>, <dy>, <dz>, <ex>, <ey>, <ez>, <ppm>]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "TOWGS84" element as a {@link BursaWolfParameters} object,
+     *         or <code>null</code> if no "TOWGS84" has been found.
+     * @throws ParseException if the "TOWGS84" can't be parsed.
+     */
+    private static BursaWolfParameters parseToWGS84(final Element parent)
+        throws ParseException 
+    {          
+        final Element element = parent.pullOptionalElement("TOWGS84");
+        if (element == null) {
+            return null;
+        }
+        final BursaWolfParameters info = new BursaWolfParameters(
+                org.geotools.referencing.datum.GeodeticDatum.WGS84);
+        info.dx  = element.pullDouble("dx");
+        info.dy  = element.pullDouble("dy");
+        info.dz  = element.pullDouble("dz");
+        if (element.peek() != null) {
+            info.ex  = element.pullDouble("ex");
+            info.ey  = element.pullDouble("ey");
+            info.ez  = element.pullDouble("ez");
+            info.ppm = element.pullDouble("ppm");
+        }
+        element.close();
+        return info;
+    }
 
     /**
      * Parses a "SPHEROID" element. This element has the following pattern:
@@ -298,87 +326,121 @@ public abstract class Parser extends AbstractParser {
         Map           properties = parseAuthority(element, name);
         element.close();
         if (inverseFlattening == 0) {
-            // Inverse flattening nul is an OGC convention for a sphere.
+            // Inverse flattening null is an OGC convention for a sphere.
             inverseFlattening = Double.POSITIVE_INFINITY;
         }
         try {
-            return datumFactory.createFlattenedSphere(properties, semiMajorAxis, inverseFlattening, SI.METER);
+            return datumFactory.createFlattenedSphere(properties,
+                    semiMajorAxis, inverseFlattening, SI.METER);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
     }
 
-//    /**
-//     * Parses a "PROJECTION" element. This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * PROJECTION["<name>" {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @param  ellipsoid The ellipsoid, or <code>null</code> if none.
-//     * @param  unit The linear unit of the parent PROJCS element, or <code>null</code> if none.
-//     * @return The "PROJECTION" element as a {@link Projection} object.
-//     * @throws ParseException if the "PROJECTION" element can't be parsed.
-//     */
-//    private Projection parseProjection(final Element parent, final Ellipsoid ellipsoid, final Unit unit)
-//        throws ParseException
-//    {                
-//        final Element   element = parent.pullElement("PROJECTION");
-//        final String  classname = element.pullString("name");
-//        final CharSequence name = parseAuthority(element, classname);
-//        element.close();
-//                
-//        // Set the list of parameters. NOTE: Parameters are defined in
-//        // the parent Element (usually a "PROJCS" element), not in this
-//        // "PROJECTION" element.
-//        final ParameterList parameters = crsFactory.createProjectionParameterList(classname);
-//        Element param;
-//        while ((param=parent.pullOptionalElement("PARAMETER")) != null) {
-//            String paramName  = param.pullString("name");
-//            double paramValue = param.pullDouble("value");
-//            Unit   paramUnit  = DescriptorNaming.getParameterUnit(paramName);
-//            if (unit!=null && paramUnit!=null && paramUnit.canConvert(unit)) {
-//                paramValue = paramUnit.convert(paramValue, unit);
-//            }
-//            parameters.setParameter(paramName, paramValue);
-//        }
-//        if (ellipsoid != null) {
-//            final Unit axisUnit = ellipsoid.getAxisUnit();
-//            parameters.setParameter("semi_major", Unit.METRE.convert(ellipsoid.getSemiMajorAxis(), axisUnit));
-//            parameters.setParameter("semi_minor", Unit.METRE.convert(ellipsoid.getSemiMinorAxis(), axisUnit));
-//        }
-//        try {
-//            return crsFactory.createProjection(name, classname, parameters);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//
-//    /**
-//     * Parses a "DATUM" element. This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * DATUM["<name>", <spheroid> {,<to wgs84>} {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "DATUM" element as a {@link HorizontalDatum} object.
-//     * @throws ParseException if the "DATUM" element can't be parsed.
-//     */
-//    private HorizontalDatum parseDatum(final Element parent) throws ParseException {
-//        Element             element = parent.pullElement("DATUM");
-//        CharSequence           name = element.pullString("name");
-//        Ellipsoid         ellipsoid = parseSpheroid(element);
-//        WGS84ConversionInfo toWGS84 = parseToWGS84(element); // Optional; may be null.
-//        name = parseAuthority(element, name);
-//        element.close();
-//        try {
-//            return crsFactory.createHorizontalDatum(name, DatumType.GEOCENTRIC, ellipsoid, toWGS84);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }        
+    /**
+     * Parses a "PROJECTION" element. This element has the following pattern:
+     *
+     * <blockquote><code>
+     * PROJECTION["<name>" {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @param  ellipsoid The ellipsoid, or <code>null</code> if none.
+     * @param  unit The linear unit of the parent PROJCS element, or <code>null</code> if none.
+     * @return The "PROJECTION" element as a {@link ParameterValueGroup} object.
+     * @throws ParseException if the "PROJECTION" element can't be parsed.
+     */
+    private ParameterValueGroup parseProjection(final Element   parent,
+                                                final Ellipsoid ellipsoid,
+                                                final Unit      unit)
+        throws ParseException
+    {                
+        final Element   element = parent.pullElement("PROJECTION");
+        final String  classname = element.pullString("name");
+        final Map    properties = parseAuthority(element, classname);
+        element.close();
+        /*
+         * Set the list of parameters. NOTE: Parameters are defined in
+         * the parent Element (usually a "PROJCS" element), not in this
+         * "PROJECTION" element.
+         */
+        final ParameterValueGroup parameters;
+        try {
+            parameters = mtFactory.getDefaultParameters(classname);
+        } catch (NoSuchIdentifierException exception) {
+            throw element.parseFailed(exception, null);
+        }
+        Element param;
+        while ((param=parent.pullOptionalElement("PARAMETER")) != null) {
+            final String         paramName  = param.pullString("name");
+            final double         paramValue = param.pullDouble("value");
+            final ParameterValue parameter  = parameters.parameter(paramName);
+            if (unit != null) {
+                parameter.setValue(paramValue, unit);
+            } else {
+                parameter.setValue(paramValue);
+            }
+        }
+        if (ellipsoid != null) {
+            final Unit axisUnit = ellipsoid.getAxisUnit();
+            setValue(parameters.parameter("semi_major"), ellipsoid.getSemiMajorAxis(), axisUnit);
+            setValue(parameters.parameter("semi_minor"), ellipsoid.getSemiMinorAxis(), axisUnit);
+        }
+        return parameters;
+    }
+
+    /**
+     * Set the value for the specified parameter.
+     *
+     * @todo Warning logging not yet implemented.
+     */
+    private static void setValue(final ParameterValue param, final double value, final Unit unit) {
+        if (false) try {
+            final double old = param.doubleValue(unit);
+            if (old > 0) {
+                // TODO: log a warning.
+            }
+        } catch (IllegalStateException exception) {
+            // Parameter not set and no default value. Ignore.
+        }
+        param.setValue(value, unit);
+    }
+
+    /**
+     * Parses a "DATUM" element. This element has the following pattern:
+     *
+     * <blockquote><code>
+     * DATUM["<name>", <spheroid> {,<to wgs84>} {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @param  meridian the prime meridian.
+     * @return The "DATUM" element as a {@link GeodeticDatum} object.
+     * @throws ParseException if the "DATUM" element can't be parsed.
+     */
+    private GeodeticDatum parseDatum(final Element parent,
+                                     final PrimeMeridian meridian)
+            throws ParseException
+    {
+        Element             element = parent.pullElement("DATUM");
+        String                 name = element.pullString("name");
+        Ellipsoid         ellipsoid = parseSpheroid(element);
+        BursaWolfParameters toWGS84 = parseToWGS84(element); // Optional; may be null.
+        Map              properties = parseAuthority(element, name);
+        element.close();
+        if (toWGS84 != null) {
+            if (properties.size() == 1) {
+                properties = new HashMap(properties);
+            }
+            properties.put(org.geotools.referencing.datum.GeodeticDatum.TRANSFORMATIONS_PROPERTY,
+                           toWGS84);
+        }
+        try {
+            return datumFactory.createGeodeticDatum(properties, ellipsoid, meridian);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }        
 
     /**
      * Parses a "VERT_DATUM" element. This element has the following pattern:
@@ -490,29 +552,30 @@ public abstract class Parser extends AbstractParser {
      * @return The "GEOCCS" element as a {@link GeocentricCRS} object.
      * @throws ParseException if the "GEOCCS" element can't be parsed.
      */
-//    private GeocentricCRS parseGeoCCS(final Element parent) throws ParseException {        
-//        Element        element = parent.pullElement("GEOCCS");
-//        String            name = element.pullString("name");
-//        HorizontalDatum  datum = parseDatum (element);
-//        PrimeMeridian meridian = parsePrimem(element, NonSI.DEGREE_ANGLE);
-//        Unit              unit = parseUnit  (element, SI.METER);
-//        AxisInfo[] axes = new AxisInfo[3];
-//        axes[0] = parseAxis(element, false);
-//        if (axes[0] != null) {
-//            axes[1] = parseAxis(element, true);
-//            axes[2] = parseAxis(element, true);
-//        }
-//        else {
-//            axes = GeocentricCoordinateSystem.DEFAULT_AXIS;
-//        }
-//        name = parseAuthority(element, name);                
-//        element.close();
-//        try {
-//            return crsFactory.createGeocentricCoordinateSystem(name, unit, datum, meridian, axes);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }        
+    private GeocentricCRS parseGeoCCS(final Element parent) throws ParseException {        
+        final Element        element = parent.pullElement("GEOCCS");
+        final String            name = element.pullString("name");
+        final Map         properties = parseAuthority(element, name);
+        final PrimeMeridian meridian = parsePrimem   (element, NonSI.DEGREE_ANGLE);
+        final GeodeticDatum    datum = parseDatum    (element, meridian);
+        final Unit              unit = parseUnit     (element, SI.METER);
+        element.close();
+        final CartesianCS cs;
+        final CoordinateSystemAxis axis0 = parseAxis(element, unit, false);
+        try {
+            if (axis0 != null) {
+                final CoordinateSystemAxis axis1 = parseAxis(element, unit, true);
+                final CoordinateSystemAxis axis2 = parseAxis(element, unit, true);
+                cs = csFactory.createCartesianCS(properties, axis0, axis1, axis2);
+            }
+            else {
+                cs = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
+            }
+            return crsFactory.createGeocentricCRS(properties, datum, cs);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }        
 
     /**
      * Parses an <strong>optional</strong> "VERT_CS" element.
@@ -613,7 +676,7 @@ public abstract class Parser extends AbstractParser {
 //        name = parseAuthority(element, name);
 //        element.close();
 //        try {
-//            return crsFactory.createProjectedCoordinateSystem(name, gcs, projection, unit, axis0, axis1);      
+//            return crsFactory.createProjectedCoordinateSystem(name, gcs, projection, unit, axis0, axis1);
 //        } catch (FactoryException exception) {
 //            throw element.parseFailed(exception, null);
 //        }

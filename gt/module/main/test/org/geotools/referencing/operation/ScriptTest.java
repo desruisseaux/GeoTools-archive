@@ -113,57 +113,57 @@ public class ScriptTest extends TestCase {
     /**
      * A simple test file to parse and execute.
      */
-    private static final String SIMPLE_SCRIPT = "Simple_TestScript.txt";
+    private static final String SIMPLE_SCRIPT = "scripts/Simple.txt";
     
     /**
      * A test file to parse and execute for stereographic projection.
      */
-    private static final String MERCATOR_SCRIPT = "Mercator_TestScript.txt";
+    private static final String MERCATOR_SCRIPT = "scripts/Mercator.txt";
     
     /**
      * A test file to parse and execute for stereographic projection.
      */
-    private static final String TRANSVERSE_MERCATOR_SCRIPT = "TransverseMercator_TestScript.txt";
+    private static final String TRANSVERSE_MERCATOR_SCRIPT = "scripts/TransverseMercator.txt";
     
     /**
      * A test file to parse and execute for stereographic projection.
      */
-    private static final String STEREOGRAPHIC_SCRIPT = "Stereographic_TestScript.txt";
+    private static final String STEREOGRAPHIC_SCRIPT = "scripts/Stereographic.txt";
     
     /**
      * A test file to parse and execute for stereographic projection.
      */
-    private static final String ORTHOGRAPHIC_SCRIPT = "Orthographic_TestScript.txt";
+    private static final String ORTHOGRAPHIC_SCRIPT = "scripts/Orthographic.txt";
     
     /**
      * A test file to parse and execute for Albers equals area projection.
      */
-    private static final String ALBERS_SCRIPT = "AlbersEqualArea_TestScript.txt";
+    private static final String ALBERS_SCRIPT = "scripts/AlbersEqualArea.txt";
     
     /**
      * A test file to parse and execute for Lambert conic projection.
      */
-    private static final String LAMBERT_SCRIPT = "LambertConic_TestScript.txt";
+    private static final String LAMBERT_SCRIPT = "scripts/LambertConic.txt";
     
     /**
      * The OpenGIS test file to parse and execute.
      */
-    private static final String OPENGIS_SCRIPT = "OpenGIS_TestScript.txt";
+    private static final String OPENGIS_SCRIPT = "scripts/OpenGIS.txt";
     
     /**
      * A test file to parse and execute for projections as math transforms.
      */
-    private static final String MT_PROJ_SCRIPT = "MT_Projection_TestScript.txt";
+    private static final String MT_PROJ_SCRIPT = "scripts/MT_Projection.txt";
     
     /**
      * A test file to parse and execute for Abridged Molodensky math transforms.
      */
-    private static final String MT_ABRIDGED_MOL_SCRIPT = "MT_AbridgedMolodensky_TestScript.txt";
+    private static final String MT_ABRIDGED_MOL_SCRIPT = "scripts/MT_AbridgedMolodensky.txt";
     
     /**
      * A test file to parse and execute for Molodensky math transforms.
      */
-    private static final String MT_MOLODENSKY_SCRIPT = "MT_Molodensky_TestScript.txt";
+    private static final String MT_MOLODENSKY_SCRIPT = "scripts/MT_Molodensky.txt";
  
     /**
      * The coordinate system factory to use for the test.
@@ -785,7 +785,7 @@ public class ScriptTest extends TestCase {
             done = true;
         }
         if (script!=null && !done) {
-            test.runScript(script+"_TestScript.txt");
+            test.runScript("scripts/" + script + ".txt");
         }
         test.tearDown();
     }

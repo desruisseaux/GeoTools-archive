@@ -2,8 +2,7 @@
 // Test coordinate transformations for simple cases.
 // This is not the test provided by OpenGIS. This is
 // a set of simplier tests  focusing on one Geotools
-// class at time, which make debugging easier.   For
-// OpenGIS tests, see CT_TestScript and MT_TestScript.
+// class at time, which make debugging easier.
 //
 
 
@@ -59,7 +58,7 @@ pt_target=(49.21666666, -123.10000000)
 
 
 /////////////////London Test////////////////////  
-//a transform using this datum shift (and a transverse mercator transform) is currently failing in CT_TestScript
+//a transform using this datum shift (and a transverse mercator transform) is currently failing using OpenGIS test.
 
 //lat, long
 cs_source=_Osgb36_

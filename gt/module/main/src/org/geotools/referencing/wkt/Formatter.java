@@ -109,6 +109,12 @@ public class Formatter {
     StringBuffer buffer;
 
     /**
+     * The starting point in the buffer. Always 0, except when used by
+     * {@link AbstractParser#format}.
+     */
+    int bufferBase;
+
+    /**
      * The amount of space to use in indentation, or 0 if indentation is disabled.
      */
     final int indentation;
@@ -196,7 +202,7 @@ public class Formatter {
         int length = buffer.length();
         char c;
         do {
-            if (length == 0) {
+            if (length == bufferBase) {
                 return;
             }
             c = buffer.charAt(--length);
@@ -207,7 +213,7 @@ public class Formatter {
         buffer.append(symbols.separator);
         buffer.append(symbols.space);
         if (indent && indentation != 0) {
-            buffer.append('\n');
+            buffer.append(System.getProperty("line.separator", "\n"));
             buffer.append(Utilities.spaces(margin += indentation));
         }
     }
@@ -334,7 +340,7 @@ public class Formatter {
             buffer.append(symbols.separator);
             buffer.append(symbols.space);
             if (unit != null) {
-                buffer.append(param.doubleValue(unit));
+                format(param.doubleValue(unit));
             } else {
                 appendObject(param.getValue());
             }
@@ -364,12 +370,11 @@ public class Formatter {
             buffer.append(symbols.closeArray);
             return;
         }
-        final boolean isNumeric = (value instanceof Number);
-        if (!isNumeric) {
+        if (value instanceof Number) {
+            format((Number) value);
+        } else {
             buffer.append(symbols.quote);
-        }
-        buffer.append(value);
-        if (!isNumeric) {
+            buffer.append(value);
             buffer.append(symbols.quote);
         }
     }
@@ -380,14 +385,7 @@ public class Formatter {
      */
     public void append(final int number) {
         appendSeparator(false);
-        if (numberFormat != null) {
-            final int fraction = numberFormat.getMinimumFractionDigits();
-            numberFormat.setMinimumFractionDigits(0);
-            numberFormat.format(number, buffer, dummy);
-            numberFormat.setMinimumFractionDigits(fraction);
-        } else {
-            buffer.append(number);
-        }
+        format(number);
     }
 
     /**
@@ -396,11 +394,7 @@ public class Formatter {
      */
     public void append(final double number) {
         appendSeparator(false);
-        if (numberFormat != null) {
-            numberFormat.format(number, buffer, dummy);
-        } else {
-            buffer.append(number);
-        }
+        format(number);
     }
 
     /**
@@ -443,6 +437,49 @@ public class Formatter {
         buffer.append(symbols.quote);
         buffer.append(text);
         buffer.append(symbols.quote);
+    }
+
+    /**
+     * Format an arbitrary number.
+     */
+    private void format(final Number number) {
+        if (numberFormat != null) {
+            if (number instanceof Byte  ||
+                number instanceof Short ||
+                number instanceof Integer)
+            {
+                format(number.intValue());
+            } else {
+                format(number.doubleValue());
+            }
+        } else {
+            buffer.append(number);
+        }
+    }
+
+    /**
+     * Format an integer number.
+     */
+    private void format(final int number) {
+        if (numberFormat != null) {
+            final int fraction = numberFormat.getMinimumFractionDigits();
+            numberFormat.setMinimumFractionDigits(0);
+            numberFormat.format(number, buffer, dummy);
+            numberFormat.setMinimumFractionDigits(fraction);
+        } else {
+            buffer.append(number);
+        }
+    }
+
+    /**
+     * Format a floating point number.
+     */
+    private void format(final double number) {
+        if (numberFormat != null) {
+            numberFormat.format(number, buffer, dummy);
+        } else {
+            buffer.append(number);
+        }
     }
 
     /**
@@ -576,7 +613,9 @@ public class Formatter {
      * object.
      */
     public void clear() {
-        buffer.setLength(0);
+        if (buffer != null) {
+            buffer.setLength(0);
+        }
         contextualUnit = null;
         invalidWKT     = false;
         margin         = 0;
@@ -588,7 +627,7 @@ public class Formatter {
      * method can be invoked from the command line using the following syntax:
      *
      * <blockquote>
-     * <code>java org.geotools.referencing.wkt.Formatter -identation=</code><var>&lt;preferred
+     * <code>java org.geotools.referencing.wkt.Formatter -indentation=</code><var>&lt;preferred
      * indentation&gt;</var>
      * </blockquote>
      */

@@ -217,7 +217,8 @@ public class Factory implements CSFactory, DatumFactory, CRSFactory {
     {
         GeodeticDatum datum;
         try {
-            datum = new org.geotools.referencing.datum.GeodeticDatum(properties, ellipsoid, primeMeridian, null);
+            datum = new org.geotools.referencing.datum.GeodeticDatum(
+                        properties, ellipsoid, primeMeridian);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
