@@ -30,6 +30,8 @@ import org.geotools.data.arcgrid.ArcGridDataSource;
 import org.geotools.gui.swing.StyledMapPane;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.parameter.ParameterGroupDescriptor;
+import org.geotools.parameter.ParameterValueGroup;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.StyleBuilder;
@@ -42,7 +44,6 @@ import org.geotools.data.coverage.grid.Format;
 import org.geotools.gc.GridCoverage;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralOperationParameter;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.OperationParameter;
 import java.util.Collections;
@@ -90,21 +91,18 @@ public class ArcGridReader {
         GridCoverageReader reader = f.getReader(url);
         
         //get the parameters and set them
-        GeneralOperationParameter[] params = f.getReadParameters();
-        GeneralParameterValue[] paramValues = new ParameterValue[2];
-        paramValues[0] = (ParameterValue) params[0].createValue();
-        paramValues[1] = (ParameterValue) params[1].createValue();
-        ParameterValueGroup paramsValGroup = new org.geotools.parameter.ParameterValueGroup(
-                Collections.singletonMap("name", "params"), paramValues);
-        ((ParameterValue) paramsValGroup.getValue("Compressed")).setValue(true);  //zipped files do not work
-        ((ParameterValue) paramsValGroup.getValue("GRASS")).setValue(true);
+        ParameterGroupDescriptor paramDescriptor = f.getReadParameters();
+        ParameterValueGroup params = (ParameterValueGroup) paramDescriptor.createValue();
+        
+        params.getValue( "Compressed" ).setValue( true ); //zipped files do not work
+        params.getValue( "GRASS" ).setValue( true );
         
         //read the grid
         if (reader.hasMoreGridCoverages()) {
             System.out.println("Reader has a GC to read");
         }
         //should call reader.hasMoreGridCoverages()
-        GridCoverage gc = reader.read(paramValues);
+        GridCoverage gc = reader.read( params );
         
         //wrap grid coverage in a Feature in a FeatureCollection
         FeatureCollection fc = FeatureCollections.newCollection();
