@@ -225,6 +225,8 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
      * @author Martin Desruisseaux
      */
     private static class Code {
+        /** The authority - should usually be AUTO */
+        public String authority;
         /**
          * The code number.
          */
@@ -270,7 +272,9 @@ public class CRSAUTOFactory implements CRSAuthorityFactory {
                 final String field = text.substring(startField, endField).trim();
                 try {
                     switch (i) {
-                        case 0:  code      = Integer.parseInt  (field); break;
+                        case 0:  int split = field.indexOf(':');
+                                 authority = field.substring(0,split);
+                                 code      = Integer.parseInt  (field.substring(split+1)); break;
                         case 1:  longitude = Double.parseDouble(field); break;
                         case 2:  latitude  = Double.parseDouble(field); break parse;
                         // Add case statements here if the is more fields to parse.
