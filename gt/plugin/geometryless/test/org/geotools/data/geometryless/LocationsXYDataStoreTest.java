@@ -49,6 +49,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();
+    private static String GEOM_NAME = "location";
     private FilterFactory filterFac = FilterFactory.createFilterFactory();
   
     private FeatureCollection collection = FeatureCollections.newCollection();
@@ -113,7 +114,6 @@ public class LocationsXYDataStoreTest extends TestCase {
             local.put("xcolumn", xcolumn);
              String ycolumn = resource.getString("ycolumn");
             local.put("ycolumn", ycolumn);
-                       
         if (namespace.equals("http://www.geotools.org/data/postgis")) {
             throw new IllegalStateException(
                 "The fixture.properties file needs to be configured for your own database");
@@ -132,7 +132,7 @@ public class LocationsXYDataStoreTest extends TestCase {
             LOGGER.fine("getting connection pool");
             connPool = connFactory.getConnectionPool();
             setupTestTable(connPool.getConnection());
-            dstore = new LocationsXYDataStore(connPool, TEST_NS, xcolumn, ycolumn);
+            dstore = new LocationsXYDataStore(connPool, TEST_NS, xcolumn, ycolumn, GEOM_NAME);
 
             dstore.setFIDMapper(
                 "testset",
@@ -268,12 +268,12 @@ public class LocationsXYDataStoreTest extends TestCase {
 
     public void testGeometry() throws Exception {
         String testTable = FEATURE_TABLE;
-        LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
+        LOGGER.info("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
         FeatureReader reader =
             dstore.getFeatureReader(schema, Filter.NONE, Transaction.AUTO_COMMIT);
 	Feature feature = reader.next();
-	LOGGER.fine("feature is: " + feature);
+	LOGGER.info("feature is: " + feature);
 	Geometry geom = feature.getDefaultGeometry();
 	LOGGER.info("geometry is " + geom);
 	assertEquals(geom.getClass(), Point.class);
@@ -282,6 +282,33 @@ public class LocationsXYDataStoreTest extends TestCase {
 	
     }
 
+    //This test currently fails, meaning that this datastore will not work
+    //if the geometry is requested in any position other than last.  This
+    //is because the QueryData object is not yet equipped to deal with anything
+    //other than one result set column per attribute.  It should be refactored
+    //to do so, as part of the refactoring for complex types in general.  For
+    //the immediate a way forward may be to investigate sql concatting. Postgis
+    //supports this with the || operator, which I believe is ansi standard.
+    //It looks like you can run mysql in ansi mode and it will accept the ||
+    //operator, normally it uses a concat() function, and || is OR.  
+    //If going this route then the XYLocationsSQLBuilder would use the concat
+    //statement for the x column, a delimiter, and the y column, probably
+    //do an AS (of the geom attribute name).  Then the PointXYAttributeIO
+    //would read the column, split on the delimiter, and parse the string
+    //to a number.  Not the fastest, but it may do the work with out having
+    //to re-architect geotools. -ch
+    /*public void testGeometryFirst() throws Exception {
+	String testTable = FEATURE_TABLE;
+        LOGGER.info("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
+	String[] propNames = { GEOM_NAME, "gid", "name", "perimeter" }; 
+	Query geomQuery = new DefaultQuery(testTable, Filter.NONE, 500,
+					   propNames, "geomFirst");
+					   
+        FeatureReader reader =
+            dstore.getFeatureReader(geomQuery, Transaction.AUTO_COMMIT);
+	Feature feature = reader.next();
+	LOGGER.info("feature is: " + feature);
+	}*/
 
     int count(FeatureReader reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
