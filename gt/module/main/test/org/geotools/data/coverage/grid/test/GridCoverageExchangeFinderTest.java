@@ -6,8 +6,9 @@
  */
 package org.geotools.data.coverage.grid.test;
 
+import junit.framework.TestCase;
 
-import org.geotools.data.coverage.grid.TestCaseSupport;
+
 
 
 /**
@@ -16,7 +17,7 @@ import org.geotools.data.coverage.grid.TestCaseSupport;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class GridCoverageExchangeFinderTest extends TestCaseSupport {
+public class GridCoverageExchangeFinderTest extends TestCase {
 
     /**
      * @param name

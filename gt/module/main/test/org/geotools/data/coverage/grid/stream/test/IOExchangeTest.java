@@ -7,13 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
+import java.net.URLDecoder;
 
-import org.geotools.data.coverage.grid.TestCaseSupport;
+import junit.framework.TestCase;
+
 import org.geotools.data.coverage.grid.stream.IOExchange;
+import org.geotools.resources.TestData;
 /**
  * @author jeichar
  */
-public class IOExchangeTest extends TestCaseSupport {
+public class IOExchangeTest extends TestCase{
 	final String TEST_FILE = "ArcGrid.asc";
 	IOExchange mExchange;
 	/**
@@ -39,7 +42,7 @@ public class IOExchangeTest extends TestCaseSupport {
 		Reader reader;
 		
 		// Test URL
-		URL fileURL = getTestResource(TEST_FILE);
+		URL fileURL = TestData.getResource(this, TEST_FILE);
 		reader=mExchange.getReader(fileURL);
 		assertNotNull(reader);
 		assertTrue(reader.ready());
@@ -53,7 +56,7 @@ public class IOExchangeTest extends TestCaseSupport {
 		assertEquals(char1,reader.read());
 		
 		//Test File
-		File file=new File(fileURL.getFile());
+		File file=new File(URLDecoder.decode(fileURL.toString(),"UTF-8"));
 		reader=mExchange.getReader(file);
 		assertNotNull(reader);
 		assertTrue(reader.ready());
@@ -71,9 +74,6 @@ public class IOExchangeTest extends TestCaseSupport {
 		assertNotNull(reader);
 		assertTrue(reader.ready());
 		assertEquals(char1,reader.read());
-		
-		
-		
 		
 	}
 }

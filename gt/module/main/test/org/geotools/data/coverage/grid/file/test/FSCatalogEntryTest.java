@@ -7,13 +7,17 @@
 package org.geotools.data.coverage.grid.file.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Iterator;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.geotools.data.coverage.grid.TestCaseSupport;
 import org.geotools.data.coverage.grid.file.FSCatalogEntry;
 import org.geotools.data.coverage.grid.file.FileMetadata;
+import org.geotools.resources.TestData;
 
 
 
@@ -23,7 +27,7 @@ import org.geotools.data.coverage.grid.file.FileMetadata;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class FSCatalogEntryTest extends TestCaseSupport {
+public class FSCatalogEntryTest extends TestCase {
 
 	URL resource;
 	File f;
@@ -37,26 +41,26 @@ public class FSCatalogEntryTest extends TestCaseSupport {
 		// TODO Auto-generated constructor stub
 	}
 
-	void init(){
-		resource = getTestResource("ArcGrid.asc");
-		f=new File(resource.getFile());
+	void init()throws IOException{
+		resource = TestData.getResource(this,"ArcGrid.asc");
+		f=new File(URLDecoder.decode(resource.toString(),"UTF-8"));
 		entry=new FSCatalogEntry(f,GridFormatFinder.getFormatArray());
 	}
 	
-	public void testFSCatalogEntry() {
-		resource = getTestResource("ArcGrid.asc");
-		f=new File(resource.getFile());	
+	public void testFSCatalogEntry()throws IOException {
+		resource = TestData.getResource(this,"ArcGrid.asc");
+		f=new File(URLDecoder.decode(resource.toString(),"UTF-8"));	
 		entry=new FSCatalogEntry(f, GridFormatFinder.getFormatArray());
 		assertNotNull(entry);
 	}
 
-	public void testGetDataName() {
+	public void testGetDataName() throws IOException{
 		init();
 		
 		assertTrue(entry.getDataName().endsWith("ArcGrid.asc"));
 	}
 
-	public void testGetMetadataNames() {
+	public void testGetMetadataNames()throws IOException {
 		init();
 		
 		assertTrue(entry.getMetadataNames()[0].endsWith("ArcGrid.asc"));
@@ -66,19 +70,19 @@ public class FSCatalogEntryTest extends TestCaseSupport {
 	/*
 	 * Class under test for Metadata getMetadata(String)
 	 */
-	public void testGetMetadataString() {
+	public void testGetMetadataString()throws IOException {
 		init();
-		assertNotNull(resource.getFile());
-		assertNotNull(entry.getMetadata(resource.getFile()));
+		assertNotNull(f);
+		assertNotNull(entry.getMetadata(f.toString()));
 	}
 
-	public void testGetResource() {
+	public void testGetResource() throws IOException{
 		init();
 		assertEquals(File.class, entry.getResource().getClass());
-		assertEquals(resource.getFile(), ((File)entry.getResource()).getPath());
+		assertEquals(f, entry.getResource());
 	}
 
-	public void testIterator() {
+	public void testIterator() throws IOException{
 		init();
 		Iterator iter=entry.iterator();
 		assertNotNull(iter);
@@ -88,7 +92,7 @@ public class FSCatalogEntryTest extends TestCaseSupport {
 		assertTrue(m instanceof FileMetadata);
 	}
 
-	public void testGetNumMetadata() {
+	public void testGetNumMetadata() throws IOException{
 		init();
 		assertEquals(1,entry.getNumMetadata());
 	}
@@ -96,7 +100,7 @@ public class FSCatalogEntryTest extends TestCaseSupport {
 	/*
 	 * Class under test for Metadata getMetadata(int)
 	 */
-	public void testGetMetadataint() {
+	public void testGetMetadataint() throws IOException{
 		init();
 		assertNotNull(entry.getMetadata(0));
 	}

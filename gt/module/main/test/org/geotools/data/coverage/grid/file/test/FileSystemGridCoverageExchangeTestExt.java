@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 
+import junit.framework.TestCase;
+
 
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.DefaultQueryDefinition;
@@ -13,11 +15,11 @@ import org.geotools.catalog.QueryResult;
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.coverage.grid.GridCoverageWriter;
-import org.geotools.data.coverage.grid.TestCaseSupport;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.expr.Expr;
 import org.geotools.expr.Exprs;
 import org.geotools.metadata.Query;
+import org.geotools.resources.TestData;
 
 
 
@@ -29,15 +31,15 @@ import org.geotools.metadata.Query;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class FileSystemGridCoverageExchangeTestExt extends TestCaseSupport {
+public class FileSystemGridCoverageExchangeTestExt extends TestCase {
 
 	File root;
 	FileSystemGridCoverageExchange exchange;
 	
 		
 	
-	private void init(){
-		URL url=getTestResource("ArcGrid.asc");
+	private void init() throws IOException{
+		URL url=TestData.getResource(this,"ArcGrid.asc");
 		root=new File(url.getFile()).getParentFile();
 		exchange=new FileSystemGridCoverageExchange();
 		exchange.setRecursive(true);
@@ -45,8 +47,8 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCaseSupport {
 	}
 	
 
-	public void testFileSystemGridCoverageExchange() {
-		URL url=getTestResource("ArcGrid.asc");
+	public void testFileSystemGridCoverageExchange()throws IOException {
+		URL url=TestData.getResource(this,"ArcGrid.asc");
 		exchange= new FileSystemGridCoverageExchange();
 		assertNotNull(exchange);
 		
@@ -65,7 +67,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCaseSupport {
 	}
 
 
-	public void testGetFormats() {
+	public void testGetFormats() throws IOException{
 		init();
 		Format[] formats=exchange.getFormats();
 		assertNotNull(formats);
@@ -79,7 +81,7 @@ public class FileSystemGridCoverageExchangeTestExt extends TestCaseSupport {
 		assertNotNull(arcgrid);
 	}
 
-	public void testQuery() {
+	public void testQuery()throws IOException {
 		init();
 		
 		Expr expr=Exprs.meta("Name");

@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.geotools.data.coverage.grid.TestCaseSupport;
 import org.geotools.data.coverage.grid.file.FileMetadata;
 import org.geotools.data.coverage.grid.file.FileMetadataImpl;
 import org.geotools.metadata.Metadata;
 import org.geotools.metadata.Metadata.Entity;
+import org.geotools.resources.TestData;
 
 /**
  * TODO type description
@@ -19,7 +21,7 @@ import org.geotools.metadata.Metadata.Entity;
  * @author jeichar
  *
  */
-public class FileMetadataImplTest extends TestCaseSupport {
+public class FileMetadataImplTest extends TestCase {
 
     /**
      * @param name
@@ -34,7 +36,7 @@ public class FileMetadataImplTest extends TestCaseSupport {
     
     protected void setUp() throws Exception{
         super.setUp();
-        resource = getTestResource("ArcGrid.asc");
+        resource = TestData.getResource(this,"ArcGrid.asc");
         assertNotNull(resource);
     }
 
