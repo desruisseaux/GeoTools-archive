@@ -13,12 +13,43 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.data.wms.xml.WMSComplexTypes.OperationType;
+import org.geotools.data.wms.xml.WMSComplexTypes._AttributionType;
+import org.geotools.data.wms.xml.WMSComplexTypes._AuthorityURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._BoundingBoxType;
+import org.geotools.data.wms.xml.WMSComplexTypes._CapabilityType;
+import org.geotools.data.wms.xml.WMSComplexTypes._ContactAddressType;
+import org.geotools.data.wms.xml.WMSComplexTypes._ContactInformationType;
+import org.geotools.data.wms.xml.WMSComplexTypes._ContactPersonPrimaryType;
+import org.geotools.data.wms.xml.WMSComplexTypes._DCPTypeType;
+import org.geotools.data.wms.xml.WMSComplexTypes._DataURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._DimensionType;
+import org.geotools.data.wms.xml.WMSComplexTypes._EX_GeographicBoundingBoxType;
+import org.geotools.data.wms.xml.WMSComplexTypes._ExceptionType;
+import org.geotools.data.wms.xml.WMSComplexTypes._FeatureListURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._GetType;
+import org.geotools.data.wms.xml.WMSComplexTypes._HTTPType;
+import org.geotools.data.wms.xml.WMSComplexTypes._IdentifierType;
+import org.geotools.data.wms.xml.WMSComplexTypes._KeywordListType;
+import org.geotools.data.wms.xml.WMSComplexTypes._KeywordType;
+import org.geotools.data.wms.xml.WMSComplexTypes._LayerType;
+import org.geotools.data.wms.xml.WMSComplexTypes._LegendURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._LogoURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._MetadataURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._OnlineResourceType;
+import org.geotools.data.wms.xml.WMSComplexTypes._PostType;
+import org.geotools.data.wms.xml.WMSComplexTypes._RequestType;
+import org.geotools.data.wms.xml.WMSComplexTypes._ServiceType;
+import org.geotools.data.wms.xml.WMSComplexTypes._StyleSheetURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._StyleType;
+import org.geotools.data.wms.xml.WMSComplexTypes._StyleURLType;
+import org.geotools.data.wms.xml.WMSComplexTypes._WMS_CapabilitiesType;
+import org.geotools.data.wms.xml.WMSComplexTypes.__ExtendedCapabilitiesType;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
-import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Group;
@@ -28,13 +59,10 @@ import org.geotools.xml.schema.Type;
 import org.geotools.xml.schema.impl.AttributeGT;
 import org.geotools.xml.schema.impl.FacetGT;
 import org.geotools.xml.schema.impl.SimpleTypeGT;
-import org.geotools.xml.wfs.WFSSchema;
 import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import org.geotools.data.wms.xml.WMSComplexTypes.*;
 
 /**
  * @author Richard Gould
@@ -274,7 +302,7 @@ public class WMSSchema implements Schema {
         return false;
     }
     
-    public Schema instance() {
+    public static Schema getInstance() {
         return instance;
     }
 
@@ -479,35 +507,11 @@ public class WMSSchema implements Schema {
         }
 
         /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getAttributes()
-         */
-        public Attribute[] getAttributes() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
          * @see org.geotools.xml.schema.ComplexType#getBlock()
          */
         public int getBlock() {
             // TODO Auto-generated method stub
             return 0;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getChild()
-         */
-        public ElementGrouping getChild() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see org.geotools.xml.schema.ComplexType#getChildElements()
-         */
-        public Element[] getChildElements() {
-            // TODO Auto-generated method stub
-            return null;
         }
 
         /* (non-Javadoc)

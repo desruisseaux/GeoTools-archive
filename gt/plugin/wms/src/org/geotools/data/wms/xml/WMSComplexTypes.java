@@ -19,6 +19,7 @@ import org.geotools.xml.PrintHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeValue;
 import org.geotools.xml.schema.Element;
+import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Facet;
 import org.geotools.xml.schema.Sequence;
@@ -50,6 +51,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _WMS_CapabilitiesType extends WMSComplexType {
@@ -70,6 +92,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _ServiceType extends WMSComplexType {
@@ -93,6 +136,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _KeywordListType extends WMSComplexType {
@@ -105,7 +169,25 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class _KeywordType extends WMSComplexType {
@@ -116,7 +198,25 @@ public class WMSComplexTypes {
         };
         public static WMSComplexType getInstance() {
             return instance;
-        }                
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attributes;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return null;
+		}                
     }
     
     protected static class _ContactInformationType extends WMSComplexType {
@@ -134,7 +234,25 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class _ContactPersonPrimaryType extends WMSComplexType {
@@ -147,7 +265,25 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class _ContactAddressType extends WMSComplexType {
@@ -164,7 +300,25 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class _CapabilityType extends WMSComplexType {
@@ -180,7 +334,25 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class __ExtendedCapabilitiesType extends WMSComplexType {
@@ -191,6 +363,27 @@ public class WMSComplexTypes {
         
 		public boolean isAbstract() {
 			return true;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return null;
 		}
     }
     
@@ -206,7 +399,25 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class _DCPTypeType extends WMSComplexType {
@@ -221,6 +432,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _HTTPType extends WMSComplexType {
@@ -235,6 +467,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _GetType extends WMSComplexType {
@@ -249,6 +502,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _PostType extends WMSComplexType {
@@ -263,6 +537,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _ExceptionType extends WMSComplexType {
@@ -275,7 +570,25 @@ public class WMSComplexTypes {
         private static Sequence seq = new SequenceGT(elems);
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
 
     protected static class _LayerType extends WMSComplexType {
@@ -315,7 +628,19 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class _EX_GeographicBoundingBoxType extends WMSComplexType {
@@ -332,7 +657,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}  
     }
     
     protected static class _BoundingBoxType extends WMSComplexType {
@@ -351,6 +697,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return null;
+		}
     }
     
     protected static class _DimensionType extends WMSComplexType {
@@ -369,6 +736,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return null;
+		}
     }
     
     protected static class _AttributionType extends WMSComplexType {
@@ -385,6 +773,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _LogoURLType extends WMSComplexType {
@@ -404,7 +813,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}  
     }
     
     protected static class _MetadataURLType extends WMSComplexType {
@@ -423,7 +853,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}  
     }
     
     protected static class _AuthorityURLType extends WMSComplexType {
@@ -441,7 +892,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}  
     }
     
     protected static class _IdentifierType extends WMSComplexType {
@@ -453,7 +925,28 @@ public class WMSComplexTypes {
 
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return null;
+		}  
     }
     
     protected static class _DataURLType extends WMSComplexType {
@@ -468,7 +961,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}  
     }
     
     protected static class _FeatureListURLType extends WMSComplexType {
@@ -483,7 +997,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}  
     }
     
     protected static class _StyleType extends WMSComplexType {
@@ -502,7 +1037,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }  
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}  
     }
     
     protected static class _LegendURLType extends WMSComplexType {
@@ -522,7 +1078,28 @@ public class WMSComplexTypes {
         
         public static WMSComplexType getInstance() {
             return instance;
-        }        
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}        
     }
     
     protected static class _StyleSheetURLType extends WMSComplexType {
@@ -538,6 +1115,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _StyleURLType extends WMSComplexType {
@@ -553,6 +1151,27 @@ public class WMSComplexTypes {
         public static WMSComplexType getInstance() {
             return instance;
         }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return seq;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return elems;
+		}
     }
     
     protected static class _OnlineResourceType extends WMSComplexType {
@@ -564,7 +1183,28 @@ public class WMSComplexTypes {
     	
         public static WMSComplexType getInstance() {
         	return instance;
-        }    	
+        }
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getAttributes()
+		 */
+		public Attribute[] getAttributes() {
+			return attrs;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChild()
+		 */
+		public ElementGrouping getChild() {
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#getChildElements()
+		 */
+		public Element[] getChildElements() {
+			return null;
+		}    	
     }
     
     static class LongitudeType implements SimpleType {
