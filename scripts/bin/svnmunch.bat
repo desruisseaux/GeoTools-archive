@@ -1,0 +1,1 @@
+%JAVA_HOME%\bin\javaw.exe %SCRIPT_HOME%\taget\classes\SVNMunch %1 %2
