@@ -17,6 +17,7 @@
 package org.geotools.data.view;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -168,16 +169,33 @@ public class DefaultView implements FeatureSource {
             return constraintQuery;
         }
 
-        try {
-            String handle = query.getHandle();
-            int maxFeatures = query.getMaxFeatures();
-            String typeName = query.getTypeName();
+        try {            
             String[] propNames = extractAllowedAttributes( query );
-            Filter filter = query.getFilter();
-            filter = makeDefinitionFilter( filter );
-
-            return new DefaultQuery(typeName, filter, maxFeatures, propNames,
-                handle);
+            
+            String typeName = query.getTypeName();            
+            if( typeName == null ) {
+                typeName = constraintQuery.getTypeName();
+            }
+            
+            URI namespace = query.getNamespace();            
+            if( namespace == null || namespace == Query.NO_NAMESPACE ) {
+                namespace = constraintQuery.getNamespace();
+            }
+            Filter filter = makeDefinitionFilter( query.getFilter() );
+            
+            int maxFeatures = Math.min( query.getMaxFeatures(), constraintQuery.getMaxFeatures() );
+            
+            String handle = query.getHandle();
+            if( handle == null ){
+                handle = constraintQuery.getHandle();
+            }
+            else if (constraintQuery.getHandle() != null ){
+                handle = handle + "(" + constraintQuery.getHandle() + ")";
+            }            
+            
+            
+            return new DefaultQuery(typeName, namespace, filter, maxFeatures, propNames,
+                handle );
         } catch (Exception ex) {
             throw new DataSourceException(
                 "Could not restrict the query to the definition criteria: "
