@@ -86,7 +86,7 @@ import org.geotools.resources.cts.Resources;
  * for the later only.
  * <br><br>
  *
- * <strong>WARNING:<strong> Tests points calculated with ArcGIS's "Double Stereographic" are
+ * <strong>WARNING:</strong> Tests points calculated with ArcGIS's "Double Stereographic" are
  * not always equal to points calculated with the <code>"Oblique_Stereographic"</code>.
  * However, where there are differences, two different implementations of these equations
  * (EPSG guidence note 7 and libproj) calculate the same values as we do. Until these 
@@ -108,9 +108,9 @@ import org.geotools.resources.cts.Resources;
  * <br><br>
  *
  * The "Polar Stereographic (variant B)", "Stereographic_North_Pole", and 
- * "Stereographic_South_Pole" cases include a "standard_parallel_1" paramter.
+ * "Stereographic_South_Pole" cases include a "standard_parallel_1" parameter.
  * This parameter sets the latitude with a scale factor equal to the supplied
- * scale factor. The "Polar Stereographic (variant B)" recieves its "lattitude_of_origin"
+ * scale factor. The "Polar Stereographic (variant B)" recieves its "latitude_of_origin"
  * paramater value from the hemisphere of the "standard_parallel_1" value.
  * <br><br>
  *
@@ -214,10 +214,11 @@ public abstract class Stereographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
+            //values here are in degrees (the standard units for this parameter)
             final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
                     return new StereographicPolar.Spherical(parameters, descriptors, Double.NaN, EPSG);
                 }
                 // Equatorial case.
@@ -230,7 +231,7 @@ public abstract class Stereographic extends MapProjection {
                 }
             } else {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
                     return new StereographicPolar(parameters, descriptors, Double.NaN, EPSG);
                 }
                 // Generic (oblique) case.
@@ -560,10 +561,11 @@ public abstract class Stereographic extends MapProjection {
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
-            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
+            //values here are in degrees (the standard units for this parameter)
+            final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));         
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
                     return new StereographicPolar.Spherical(parameters, descriptors, Double.NaN, USGS);
                 }
                 // Equatorial case.
@@ -576,7 +578,7 @@ public abstract class Stereographic extends MapProjection {
                 }
             } else {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - 90.0) < EPS) {
                     return new StereographicPolar(parameters, descriptors, Double.NaN, USGS);
                 }
                 // Equatorial case.
