@@ -39,7 +39,7 @@ public class WFSDataStoreReadTest extends TestCase {
         Logger.global.setLevel(Level.SEVERE);
     }
 
-    private WFSDataStore getDataStore(URL server) throws IOException{
+    public static WFSDataStore getDataStore(URL server) throws IOException{
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,server);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000));
@@ -75,19 +75,9 @@ public class WFSDataStoreReadTest extends TestCase {
     public void testGaldos() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
         URL url = new URL("http://wfs.galdosinc.com:8680/wfs/http?Request=GetCapabilities&service=WFS");
         System.out.println("\nGaldos");
-        doFeatureType(url,true,false,1);
+//        doFeatureType(url,true,false,1);
 //        doFeatureReader(url,false,false,1);
 //        doFeatureReaderWithFilter(url,false,false,1);
-        System.out.println("");
-    }
-    
-    public void testGeoServer() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
-        URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
-//        
-        System.out.println("\nGeoServer");
-        doFeatureType(url,true,false,1);
-//        doFeatureReader(url,true,true,1);
-//        doFeatureReaderWithFilter(url,true,true,1);
         System.out.println("");
     }
     
@@ -117,7 +107,7 @@ public class WFSDataStoreReadTest extends TestCase {
     }
     
     public void testInterGraph() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
-        URL url = new URL("http://ogc.intergraph.com/OregonDOT_wfs/request.asp?VERSION=0.0.14&request=GetCapabilities");
+        URL url = new URL("http://ogc.intergraph.com/OregonDOT_wfs/request.asp?VERSION=VERSION=1.0.0&request=GetCapabilities");
         
         System.out.println("\nInterGraph");
 
@@ -167,12 +157,12 @@ public class WFSDataStoreReadTest extends TestCase {
        System.out.println("");
    }
     
-    public void doFeatureType(URL url,boolean get, boolean post, int i) throws IOException, SAXException{
+    public static void doFeatureType(URL url,boolean get, boolean post, int i) throws IOException, SAXException{
         WFSDataStore wfs = getDataStore(url);
         System.out.println("Get FeatureTypeTest + "+url);
         assertNotNull("No featureTypes",wfs.getTypeNames());
         assertNotNull("Null featureType in ["+i+"]",wfs.getTypeNames()[i]);
-//        System.out.println("FT name = "+wfs.getTypeNames()[i]);
+        System.out.println("FT name = "+wfs.getTypeNames()[i]);
         if(get){
             // get
             FeatureType ft = wfs.getSchemaGet(wfs.getTypeNames()[i]);
@@ -187,7 +177,7 @@ public class WFSDataStoreReadTest extends TestCase {
         }
     }
     
-    public void doFeatureReader(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
+    public static void doFeatureReader(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
 
         System.out.println("Post FeatureReaderTest + "+url);
         WFSDataStore wfs = getDataStore(url);
@@ -212,7 +202,7 @@ public class WFSDataStoreReadTest extends TestCase {
             ft.close();}
     }
     
-    public void doFeatureReaderWithFilter(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IllegalAttributeException, OperationNotSupportedException, IOException, SAXException{
+    public static void doFeatureReaderWithFilter(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IllegalAttributeException, OperationNotSupportedException, IOException, SAXException{
 
         System.out.println("Get FeatureReaderWithFilterTest + "+url);
         WFSDataStore wfs = getDataStore(url);

@@ -31,6 +31,7 @@ import org.geotools.data.ows.FilterCapabilities;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.ogc.FilterSchema;
@@ -338,7 +339,14 @@ public class WFSCapabilitiesComplexTypes {
                     "Invalid inputs for parsing a GetCapabilitiesType");
             }
 
-            if (value.length < 1) {
+            boolean validation = true;
+            if(hints != null && hints.containsKey(DocumentFactory.VALIDATION_HINT)){
+                Boolean t = (Boolean)hints.get(DocumentFactory.VALIDATION_HINT);
+                if(t!=null)
+                    validation = t.booleanValue();
+            }
+            
+            if (validation && value.length < 1) {
                 throw new SAXException(
                     "Invalid number of inputs for parsing a GetCapabilitiesType");
             }
@@ -2457,14 +2465,21 @@ public class WFSCapabilitiesComplexTypes {
                 }
             }
 
-            if ((value == null) || (value.length != 4)) {
+            boolean validation = true;
+            if(hints != null && hints.containsKey(DocumentFactory.VALIDATION_HINT)){
+                Boolean t = (Boolean)hints.get(DocumentFactory.VALIDATION_HINT);
+                if(t!=null)
+                    validation = t.booleanValue();
+            }
+            
+            if (validation && ((value == null) || (value.length != 4))) {
                 throw new SAXException(
                     "The WFS Capabilites document has the wrong number of children");
             }
 
             WFSCapabilities result = new WFSCapabilities();
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 4 && i < value.length; i++) {
                 if (elements[0].getName().equals(value[i].getElement().getName())) {
                     // service
                     result.setService((Service) value[i].getValue());
@@ -2503,12 +2518,13 @@ public class WFSCapabilitiesComplexTypes {
                                 result.setFilterCapabilities((FilterCapabilities) value[i]
                                     .getValue());
                             } else {
-                                // error
-                                throw new SAXException("The element "
+                                if(validation){
+                                    // error
+                                    throw new SAXException("The element "
                                     + ((value[i].getElement() == null) ? "null"
-                                                                       : value[i].getElement()
-                                                                                 .getName())
+                                    : value[i].getElement().getName())
                                     + " was not found as a valid element ...");
+                                }
                             }
                         }
                     }

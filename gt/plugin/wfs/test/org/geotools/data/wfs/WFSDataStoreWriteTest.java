@@ -50,14 +50,14 @@ public class WFSDataStoreWriteTest extends TestCase {
         Logger.global.setLevel(Level.SEVERE);
     }
 
-    private WFSDataStore getDataStore(URL server) throws IOException{
+    public static WFSDataStore getDataStore(URL server) throws IOException{
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,server);
         m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
         return (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
     }
     
-    public FidFilter doInsert(DataStore ds,FeatureType ft,FeatureReader insert) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public static FidFilter doInsert(DataStore ds,FeatureType ft,FeatureReader insert) throws NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
@@ -98,7 +98,7 @@ public class WFSDataStoreWriteTest extends TestCase {
     	return ff;
     }
     
-    public void doDelete(DataStore ds,FeatureType ft, FidFilter ff) throws NoSuchElementException, IllegalAttributeException, IOException{
+    public static void doDelete(DataStore ds,FeatureType ft, FidFilter ff) throws NoSuchElementException, IllegalAttributeException, IOException{
     	assertNotNull("doInsertFailed?",ff);
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
@@ -138,7 +138,7 @@ public class WFSDataStoreWriteTest extends TestCase {
     	assertTrue(count2==count3);
     }
     
-    public void doUpdate(DataStore ds,FeatureType ft) throws IllegalFilterException, FactoryConfigurationError, NoSuchElementException, IOException, IllegalAttributeException{
+    public static void doUpdate(DataStore ds,FeatureType ft) throws IllegalFilterException, FactoryConfigurationError, NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
@@ -190,63 +190,4 @@ public class WFSDataStoreWriteTest extends TestCase {
     	fs.modifyFeatures(at,"1",Filter.NONE);
     	t.commit();
     }
-    
-    public void testGeoServer() throws NoSuchElementException, IllegalFilterException, FactoryConfigurationError, IOException, IllegalAttributeException{
-//        URL url = new URL("http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities");
-    	URL url = new URL("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
-
-        DataStore post = getDataStore(url);
-        FeatureType ft = post.getSchema("topp:states");
-
-		GeometryFactory gf = new GeometryFactory();
-        MultiPolygon mp = gf.createMultiPolygon(new Polygon[]{gf.createPolygon(gf.createLinearRing(new Coordinate[]{new Coordinate(-88.071564,37.51099), new Coordinate(-88.467644,37.400757), new Coordinate(-90.638329,42.509361), new Coordinate(-89.834618,42.50346),new Coordinate(-88.071564,37.51099)}),new LinearRing[]{})});
-        mp.setUserData("http://www.opengis.net/gml/srs/epsg.xml#4326");
-        
-        Object[] attrs = {
-        		mp,
-        		"MyStateName",
-				"70",
-				"Refrac",
-				"RR",
-				new Double(180),
-				new Double(18),
-				new Double(220),
-				new Double(80),
-				new Double(20),
-				new Double(40),
-				new Double(180),
-				new Double(90),
-				new Double(100),
-				new Double(40),
-				new Double(80),
-				new Double(40),
-				new Double(180),
-				new Double(90),
-				new Double(70),
-				new Double(70),
-				new Double(60),
-				new Double(10)	
-        };
-        
-        System.out.println(attrs[0]);
-        Feature f = ft.create(attrs);
-        
-        FeatureReader inserts = DataUtilities.reader(new Feature[] {f});
-        FidFilter fp = doInsert(post,ft,inserts);
-        // geoserver does not return the correct fid here ... 
-        // get the 3rd feature ... and delete it?
-        
-        inserts.close();
-        inserts = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);
-        int i = 0;
-        while(inserts.hasNext() && i<3){
-        	f = inserts.next();i++;
-        }
-        inserts.close();
-        fp = FilterFactory.createFilterFactory().createFidFilter(f.getID());
-        
-        doDelete(post,ft,fp);
-        doUpdate(post,ft);
-    }
-    
 }

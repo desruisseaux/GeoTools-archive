@@ -78,7 +78,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 
 
@@ -160,14 +159,16 @@ public class WFSDataStore extends AbstractDataStore {
         // TODO support using POST for getCapabilities
         
         Object t = null;
+        Map hints = new HashMap();
+        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
         try{
             HttpURLConnection hc = (HttpURLConnection) host.openConnection();
             InputStream is = getInputStream(hc, auth);
-            t = DocumentFactory.getInstance(is, null, WFSDataStoreFactory.logger.getLevel());
+            t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }catch(Throwable e){
             HttpURLConnection hc = (HttpURLConnection) createGetCapabilitiesRequest(host).openConnection();
             InputStream is = getInputStream(hc, auth);
-            t = DocumentFactory.getInstance(is, null, WFSDataStoreFactory.logger.getLevel());
+            t = DocumentFactory.getInstance(is, hints, WFSDataStoreFactory.logger.getLevel());
         }
         if (t instanceof WFSCapabilities) {
             capabilities = (WFSCapabilities) t;
@@ -257,18 +258,20 @@ public class WFSDataStore extends AbstractDataStore {
         }
     }
 
+    private String[] typeNames = null;
     /**
      * @see org.geotools.data.AbstractDataStore#getTypeNames()
      */
     public String[] getTypeNames() {
-        List l = capabilities.getFeatureTypes();
-        String[] result = new String[l.size()];
+        if(typeNames == null){
+            List l = capabilities.getFeatureTypes();
+            typeNames = new String[l.size()];
 
-        for (int i = 0; i < l.size(); i++) {
-            result[i] = ((FeatureSetDescription) l.get(i)).getName();
+            for (int i = 0; i < l.size(); i++) {
+                typeNames[i] = ((FeatureSetDescription) l.get(i)).getName();
+            }
         }
-
-        return result;
+        return typeNames;
     }
 
     /**
@@ -382,7 +385,8 @@ public class WFSDataStore extends AbstractDataStore {
             return null;
         }
 
-        String query = getUrl.getQuery().toUpperCase();
+        String query = getUrl.getQuery();
+        query = query == null?null:query.toUpperCase();
         String url = getUrl.toString();
 
         if ((query == null) || "".equals(query)) {
