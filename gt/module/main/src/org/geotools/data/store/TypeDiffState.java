@@ -60,9 +60,9 @@ public class TypeDiffState implements State {
      */
     Map diffMap = new HashMap();
 
-    private TypeEntry entry;
+    private ActiveTypeEntry entry;
 
-    public TypeDiffState(TypeEntry typeEntry) {
+    public TypeDiffState(ActiveTypeEntry typeEntry) {
         entry = typeEntry;
     }
 

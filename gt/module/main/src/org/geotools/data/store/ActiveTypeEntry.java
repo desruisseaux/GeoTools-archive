@@ -1,5 +1,6 @@
 package org.geotools.data.store;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -7,7 +8,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.catalog.CatalogEntry;
+import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
+import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.GeographicCoordinateSystem;
+import org.geotools.cs.HorizontalDatum;
+import org.geotools.ct.CoordinateTransformation;
+import org.geotools.ct.CoordinateTransformationFactory;
+import org.geotools.ct.MathTransform;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.AbstractFeatureStore;
@@ -30,10 +38,18 @@ import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
+import org.geotools.data.TypeEntry;
+import org.geotools.data.crs.CRSService;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import org.geotools.pt.CoordinatePoint;
+import org.geotools.units.Unit;
+import org.geotools.util.SimpleInternationalString;
+
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -70,7 +86,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author jgarnett
  */
-final class TypeEntry implements CatalogEntry {
+final class ActiveTypeEntry implements TypeEntry {
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.store");
     
     /**
@@ -81,16 +97,116 @@ final class TypeEntry implements CatalogEntry {
      */
     DataStore parent;
     private final FeatureType schema;    
-    private final Map metadata;
-    
+    private final Map metadata;    
     private FeatureListenerManager listeners = new FeatureListenerManager();
     
-    public TypeEntry( DataStore parent, FeatureType schema, Map metadata ) {
+    /** Cached count */
+    int count;
+    
+    /** Cached bounds */
+    Envelope bounds; 
+    
+    public ActiveTypeEntry( DataStore parent, FeatureType schema, Map metadata ) {
         this.schema = schema;
         this.metadata = metadata;
         this.parent = parent;
+        
+        // TODO: Should listen to events and empty the cache when edits occur
+        
     }
 
+    /**
+     * TODO summary sentence for getDisplayName ...
+     * 
+     * @see org.geotools.data.TypeEntry#getDisplayName()
+     * @return
+     */
+    public InternationalString getDisplayName() {
+        return new SimpleInternationalString( schema.getTypeName() );
+        
+    }
+
+    /**
+     * TODO summary sentence for getDescription ...
+     * 
+     * @see org.geotools.data.TypeEntry#getDescription()
+     * @return
+     */
+    public InternationalString getDescription() {
+        return null;
+    }
+
+    /**
+     * TODO summary sentence for getFeatureType ...
+     * 
+     * @see org.geotools.data.TypeEntry#getFeatureType()
+     * @return
+     * @throws IOException
+     */
+    public FeatureType getFeatureType() throws IOException {
+        return null;
+    }
+    /**
+     * Bounding box for associated Feature Collection, will be calcualted as needed.
+     * <p>
+     * Note bounding box is returned in lat/long - the coordinate system of the default geometry
+     * is used to provide this reprojection.
+     * </p>
+     */
+    public synchronized Envelope getBounds() {        
+        if( bounds != null ) {
+            bounds = createBounds();            
+        }
+        return bounds;        
+    }
+    /**
+     * Override to provide your own optimized calculation of bbox.
+     * <p>
+     * Default impelmenation uses the a feature source.
+     * 
+     * @return BBox in lat long
+     */
+    protected Envelope createBounds() {
+        Envelope bbox;
+        try {
+            FeatureSource source = getFeatureSource();
+            bbox = source.getBounds();
+            if( bbox == null ){
+                bbox = source.getFeatures().getBounds();
+            }
+            try {
+                CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
+                bbox = CRSService.toGeographic( bbox, cs );
+            }
+            catch (Error badRepoject ) {
+                badRepoject.printStackTrace();
+            }
+        } catch (Exception e) {
+            bbox = new Envelope();
+        }        
+        return bbox;        
+    }
+    
+    /**
+     * TODO summary sentence for getCount ...
+     * 
+     * @see org.geotools.data.TypeEntry#getCount()
+     * @return
+     */
+    public int getCount() {
+        if( count != -1 ) return count;
+        try {
+            FeatureSource source = getFeatureSource();
+            count = source.getCount( Query.ALL );
+            if( count == -1 ){
+                count = source.getFeatures().getCount();
+            }
+        } catch (IOException e) {
+            bounds = new Envelope();
+        }
+        return count;
+    }
+ 
     /**
      * Get unique data name for this CatalogEntry.
      * 
@@ -469,5 +585,5 @@ final class TypeEntry implements CatalogEntry {
         }
         return writer;
     }
-    
+       
 }

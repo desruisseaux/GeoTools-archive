@@ -20,6 +20,7 @@ package org.geotools.data.crs;
 
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import org.geotools.cs.AxisInfo;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.CoordinateSystemAuthorityFactory;
 import org.geotools.cs.CoordinateSystemFactory;
+import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.NoSuchAuthorityCodeException;
 import org.geotools.cs.PrimeMeridian;
@@ -376,6 +378,38 @@ public class CRSService {
 	    return null; // could not transform!
 	}
 	
+    /** Reproject provided bound evelope to lat/long */
+    public static Envelope toGeographic( Envelope env, CoordinateReferenceSystem crs ) throws Exception {
+        MathTransform transform = reproject( crs, GEOGRAPHIC, false );
+        return transform( env, transform );
+        
+        /*
+        CoordinateSystem cs = cs( crs );         
+        String wkt = cs.toWKT();
+        
+        CoordinateSystemFactory csFactory = CoordinateSystemFactory.getDefault();
+        org.geotools.cs.CoordinateSystem cs2 = csFactory.createFromWKT( wkt );
+        Unit       angularUnit = Unit.DEGREE;
+        HorizontalDatum  datum = HorizontalDatum.WGS84;
+        org.geotools.cs.PrimeMeridian meridian = org.geotools.cs.PrimeMeridian.GREENWICH;
+        GeographicCoordinateSystem geographic =
+            csFactory.createGeographicCoordinateSystem("geographic", angularUnit, datum, meridian, AxisInfo.LONGITUDE, AxisInfo.LATITUDE );
+        CoordinateTransformationFactory trFactory = CoordinateTransformationFactory.getDefault();
+        CoordinateTransformation transformation = trFactory.createFromCoordinateSystems(cs2, geographic );
+        MathTransform transform = transformation.getMathTransform();
+        CoordinatePoint p1 = new CoordinatePoint( env.getMinX(), env.getMinY());
+        CoordinatePoint p2 = new CoordinatePoint( env.getMaxX(), env.getMaxY());
+        transform.transform( p1, p1 );
+        transform.transform( p2, p2 );
+        Envelope rebounds = new Envelope();
+        Point2D point = p1.toPoint2D();
+        rebounds.expandToInclude( point.getX(), point.getY() );
+        point = p2.toPoint2D();
+        rebounds.expandToInclude( point.getX(), point.getY() );     
+        return rebounds;
+        */
+    }
+    
 	public static Envelope transform( Envelope envelope, MathTransform transform ) throws MismatchedDimensionException, TransformException {
 		// This code does not provide an exact transform, since the transformed envelope may not
 		// be a rectangle

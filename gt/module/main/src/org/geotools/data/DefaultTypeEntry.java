@@ -19,6 +19,7 @@ import org.geotools.cs.HorizontalDatum;
 import org.geotools.ct.CoordinateTransformation;
 import org.geotools.ct.CoordinateTransformationFactory;
 import org.geotools.ct.MathTransform;
+import org.geotools.data.crs.CRSService;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.pt.CoordinatePoint;
@@ -194,45 +195,36 @@ public class DefaultTypeEntry implements TypeEntry {
      * </p>
      */
     public synchronized Envelope getBounds() {        
-        if( bounds != null ) return bounds;
-        
-        try {
-            bounds = source.getBounds();
-            if( bounds == null ){
-                bounds = source.getFeatures().getBounds();
-            }
-            bounds = reBound( bounds );            
-        } catch (Exception e) {
-            bounds = new Envelope();
-        }        
-        return bounds;
+        if( bounds != null ) {
+            bounds = createBounds();            
+        }
+        return bounds;        
     }
-    /** Reproject provided bound evelope to lat/long */
-    private Envelope reBound( Envelope env ) throws Exception {
-        FeatureType schema = source.getSchema();
-        CoordinateReferenceSystem crs = schema.getDefaultGeometry().getCoordinateSystem();
-        CoordinateSystem cs = crs.getCoordinateSystem();
-        String wkt = cs.toWKT();
-        CoordinateSystemFactory csFactory = CoordinateSystemFactory.getDefault();
-        org.geotools.cs.CoordinateSystem cs2 = csFactory.createFromWKT( wkt );
-        Unit       angularUnit = Unit.DEGREE;
-        HorizontalDatum  datum = HorizontalDatum.WGS84;
-        org.geotools.cs.PrimeMeridian meridian = org.geotools.cs.PrimeMeridian.GREENWICH;
-        GeographicCoordinateSystem geographic =
-            csFactory.createGeographicCoordinateSystem("geographic", angularUnit, datum, meridian, AxisInfo.LONGITUDE, AxisInfo.LATITUDE );
-        CoordinateTransformationFactory trFactory = CoordinateTransformationFactory.getDefault();
-        CoordinateTransformation transformation = trFactory.createFromCoordinateSystems(cs2, geographic );
-        MathTransform transform = transformation.getMathTransform();
-        CoordinatePoint p1 = new CoordinatePoint( env.getMinX(), env.getMinY());
-        CoordinatePoint p2 = new CoordinatePoint( env.getMaxX(), env.getMaxY());
-        transform.transform( p1, p1 );
-        transform.transform( p2, p2 );
-        Envelope rebounds = new Envelope();
-        Point2D point = p1.toPoint2D();
-        rebounds.expandToInclude( point.getX(), point.getY() );
-        point = p2.toPoint2D();
-        rebounds.expandToInclude( point.getX(), point.getY() );     
-        return rebounds;
+    /**
+     * Override to provide your own optimized calculation of bbox.
+     * <p>
+     * Default impelmenation uses the a feature source.
+     * 
+     * @return BBox in lat long
+     */
+    protected Envelope createBounds() {
+        Envelope bbox;
+        try {
+            bbox = source.getBounds();
+            if( bbox == null ){
+                bbox = source.getFeatures().getBounds();
+            }
+            try {
+                CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
+                bbox = CRSService.toGeographic( bbox, cs );
+            }
+            catch (Error badRepoject ) {
+                badRepoject.printStackTrace();
+            }
+        } catch (Exception e) {
+            bbox = new Envelope();
+        }        
+        return bbox;        
     }
     
     /** Number of features in associated Feature Collection, will be calcualted as needed */

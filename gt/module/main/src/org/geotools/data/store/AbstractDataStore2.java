@@ -122,7 +122,7 @@ public class AbstractDataStore2 implements DataStore, Discovery {
         lockingManager = createLockingManager();
     }
 
-    /** List<TypeEntry> subclass control provided by createContents */
+    /** List<ActiveTypeEntry> subclass control provided by createContents */
     private List contents = null;
     
     /**
@@ -139,7 +139,7 @@ public class AbstractDataStore2 implements DataStore, Discovery {
         return new InProcessLockingManager();
     }
     
-    /** List of TypeEntry entries - one for each featureType provided by this Datastore */
+    /** List of ActiveTypeEntry entries - one for each featureType provided by this Datastore */
     public List entries() {
         if( contents == null ) {
             contents = createContents();
@@ -154,10 +154,10 @@ public class AbstractDataStore2 implements DataStore, Discovery {
      * them during object creation (where an IOException can be thrown).
      * </p>
      * <p>
-     * This method is lazyly called to create a List of TypeEntry for
+     * This method is lazyly called to create a List of ActiveTypeEntry for
      * each FeatureCollection in this DataStore.
      * </p>
-     * @return List<TypeEntry>.
+     * @return List<ActiveTypeEntry>.
      */
     protected List createContents() {
         throw new UnsupportedOperationException("createContent not implemented");
@@ -185,15 +185,15 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         String names[] = new String[ all.size() ];
         int index = 0;
         for( Iterator i=all.iterator(); i.hasNext(); index++ ) {
-            TypeEntry entry = (TypeEntry) i.next();
+            ActiveTypeEntry entry = (ActiveTypeEntry) i.next();
             names[ index ] = entry.getTypeName();
         }
         return names;
     }
-    public TypeEntry entry( String typeName ) {
+    public ActiveTypeEntry entry( String typeName ) {
         if( typeName == null ) return null;
         for( Iterator i=entries().iterator(); i.hasNext(); ) {
-            TypeEntry entry = (TypeEntry) i.next();
+            ActiveTypeEntry entry = (ActiveTypeEntry) i.next();
             if( typeName.equals( entry.getTypeName() ) ) {
                 return entry;
             }            
