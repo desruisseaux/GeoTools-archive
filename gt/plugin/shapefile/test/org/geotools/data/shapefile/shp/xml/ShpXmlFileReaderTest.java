@@ -5,7 +5,7 @@ import java.net.URL;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.TypeEntry;
-import org.geotools.data.shape.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.resources.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -46,7 +46,7 @@ public class ShpXmlFileReaderTest extends TestCase {
         actual = entry.getBounds();
         assertNotNull( "entry works", actual );
         assertTrue( "expected contains actual", expected.contains( actual ));
-        //assertEquals( "entry optimized", expected, actual );
+        assertEquals( "entry optimized", expected, actual );
         
         // optimization # 2
         FeatureSource source = entry.getFeatureSource();
