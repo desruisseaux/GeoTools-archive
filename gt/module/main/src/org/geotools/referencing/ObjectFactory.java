@@ -1063,7 +1063,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
             throws FactoryException
     {
         return new FactoryGroup(this, this, this, null).createProjectedCRS(
-                                properties, base, parameters, derivedCS);
+                                properties, base, null, parameters, derivedCS);
     }
 
     /**

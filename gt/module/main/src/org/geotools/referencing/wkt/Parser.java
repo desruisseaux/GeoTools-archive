@@ -801,7 +801,7 @@ public class Parser extends MathTransformParser {
             if (factories == null) {
                 factories = new FactoryGroup(datumFactory, csFactory, crsFactory, mtFactory);
             }
-            return factories.createProjectedCRS(properties, geoCRS, projection,
+            return factories.createProjectedCRS(properties, geoCRS, null, projection,
                     csFactory.createCartesianCS(properties, axis0, axis1));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);

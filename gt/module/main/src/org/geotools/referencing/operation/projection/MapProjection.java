@@ -274,14 +274,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         double v;
         final Unit unit = param.getUnit();
         if (descriptors.contains(param)) {
-            final ParameterValue value = group.parameter(param.getName().getCode());
-            if (unit != null) {
-                v = value.doubleValue(unit);
-                if (NonSI.DEGREE_ANGLE.equals(unit)) {
-                    v = Math.toRadians(v);
-                }
-            } else {
-                v = value.doubleValue();
+            v = AbstractProvider.doubleValue(group, param);
+            if (NonSI.DEGREE_ANGLE.equals(unit)) {
+                v = Math.toRadians(v);
             }
         } else {
             final Object value = param.getDefaultValue();
@@ -1166,6 +1161,17 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         static boolean isSpherical(final ParameterValueGroup values) {
             return doubleValue(SEMI_MAJOR, values) ==
                    doubleValue(SEMI_MINOR, values);
+        }
+
+        /**
+         * Gives to {@link MapProjection} an access to a protected method from
+         * {@link MathTransformProvider}.
+         */
+        static double doubleValue(final ParameterValueGroup group,
+                                  final ParameterDescriptor param)
+                throws ParameterNotFoundException
+        {
+            return MathTransformProvider.doubleValue(param, group);
         }
     }
 }

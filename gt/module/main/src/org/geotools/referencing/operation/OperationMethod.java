@@ -64,9 +64,16 @@ public class OperationMethod extends IdentifiedObject
     private static final long serialVersionUID = -98032729598205972L;
 
     /**
+     * Key for the <code>{@value #FORMULA_PROPERTY}</code> property to be given to the
+     * {@linkplain #OperationMethod(Map) constructor}. This is used
+     * for setting the value to be returned by {@link #getFormula}.
+     */
+    public static final String FORMULA_PROPERTY = "formula";
+
+    /**
      * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
      */
-    private static final String[] LOCALIZABLES = {"formula"};
+    private static final String[] LOCALIZABLES = {FORMULA_PROPERTY};
 
     /**
      * Formula(s) or procedure used by this operation method. This may be a reference to a
@@ -185,7 +192,7 @@ public class OperationMethod extends IdentifiedObject
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;<code>"formula"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #FORMULA_PROPERTY "formula"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getFormula}</td>
      *   </tr>
@@ -215,7 +222,7 @@ public class OperationMethod extends IdentifiedObject
                             ParameterDescriptorGroup parameters)
     {
         super(properties, subProperties, LOCALIZABLES);
-        formula = (InternationalString) subProperties.get("formula");
+        formula = (InternationalString) subProperties.get(FORMULA_PROPERTY);
         // 'parameters' may be null, which is okay. A null value will
         // make serialization smaller and faster than an empty object.
         this.parameters       = parameters;

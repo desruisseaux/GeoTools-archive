@@ -188,8 +188,11 @@ public class FactoryGroup {
                                                       Collection          methods)
             throws NoSuchIdentifierException, FactoryException
     {
-        final MathTransform transform;
         final MathTransformFactory mtFactory = getMathTransformFactory();
+        if (methods == null) {
+            return mtFactory.createParameterizedTransform(parameters);
+        }
+        final MathTransform transform;
         if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
             // Special processing for Geotools implementation.
             transform = ((org.geotools.referencing.operation.MathTransformFactory) mtFactory)
@@ -217,12 +220,14 @@ public class FactoryGroup {
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  base Geographic coordinate reference system to base projection on.
+     * @param  method The operation method, or <code>null</code> for a default one.
      * @param  parameters The parameter values to give to the projection.
      * @param  derivedCS The coordinate system for the projected CRS.
      * @throws FactoryException if the object creation failed.
      */
     public ProjectedCRS createProjectedCRS(Map                 properties,
                                            GeographicCRS             base,
+                                           OperationMethod         method,
                                            ParameterValueGroup parameters,
                                            CartesianCS          derivedCS)
             throws FactoryException
@@ -252,15 +257,17 @@ public class FactoryGroup {
          * Create a concatenation of the matrix computed above and the projection.
          * If 'method' is null, an exception will be thrown in 'createProjectedCRS'.
          */
-        final Singleton methods = new Singleton();
+        final Singleton methods = (method==null) ? new Singleton() : null;
         final MathTransformFactory  mtFactory = getMathTransformFactory();
         final MathTransform step1 = mtFactory.createAffineTransform(swap1);
         final MathTransform step2 = createParameterizedTransform(parameters, methods);
         final MathTransform step3 = mtFactory.createAffineTransform(swap3);
         final MathTransform mt    = mtFactory.createConcatenatedTransform(
                                     mtFactory.createConcatenatedTransform(step1, step2), step3);
-        return getCRSFactory().createProjectedCRS(properties, (OperationMethod) methods.get(),
-                                                  base, mt, derivedCS);
+        if (method == null) {
+            method = (OperationMethod) methods.get();
+        }
+        return getCRSFactory().createProjectedCRS(properties, method, base, mt, derivedCS);
     }
 
     /**

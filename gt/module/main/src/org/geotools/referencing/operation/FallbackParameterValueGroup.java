@@ -23,6 +23,7 @@ package org.geotools.referencing.operation;
 import java.util.Collections;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -60,11 +61,11 @@ final class FallbackParameterValueGroup extends ParameterGroup {
      * @param fallback The expected descriptor.
      * @param values The list of parameters.
      */
-    public FallbackParameterValueGroup(final ParameterDescriptorGroup fallback,
+    public FallbackParameterValueGroup(final Identifier name,
+                                       final ParameterDescriptorGroup fallback,
                                        final GeneralParameterValue[] values)
     {
-        super(Collections.singletonMap(IdentifiedObject.NAME_PROPERTY,
-                                       fallback.getName()), values);
+        super(Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, name), values);
         this.fallback = fallback;
     }
 

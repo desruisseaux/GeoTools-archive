@@ -28,6 +28,7 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
@@ -231,8 +232,12 @@ public abstract class MathTransformProvider extends OperationMethod {
     protected ParameterValueGroup ensureValidValues(final ParameterValueGroup values)
             throws InvalidParameterNameException, InvalidParameterValueException
     {
+//TODO
+//System.out.println(values);
+//if (true) return values;
         final ParameterDescriptorGroup parameters = getParameters();
-        if (parameters.equals(values.getDescriptor())) {
+        final GeneralParameterDescriptor descriptor = values.getDescriptor();
+        if (parameters.equals(descriptor)) {
             /*
              * Since the "official" parameter descriptor was used, the descriptor should
              * have already enforced argument validity. Concequently, there is no need to
@@ -250,8 +255,8 @@ public abstract class MathTransformProvider extends OperationMethod {
         }
         final Collection asList = values.values();
         ensureValidValues(asList, parameters);
-        return new FallbackParameterValueGroup(parameters, (GeneralParameterValue[])
-                   asList.toArray(new GeneralParameterValue[asList.size()]));
+        return new FallbackParameterValueGroup(descriptor.getName(), parameters,
+               (GeneralParameterValue[]) asList.toArray(new GeneralParameterValue[asList.size()]));
     }
 
     /**
@@ -329,7 +334,27 @@ public abstract class MathTransformProvider extends OperationMethod {
                                            final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        return group.parameter(param.getName().getCode());
+        /*
+         * Search for an identifier matching the group's authority, if any.
+         * This is needed if the parameter values group was created from an
+         * EPSG database for example: we need to use the EPSG names instead
+         * of the OGC ones.
+         */
+        String name = param.getName().getCode();
+        final Citation authority = group.getDescriptor().getName().getAuthority();
+        if (authority != null) {
+            final GenericName[] alias = param.getAlias();
+            for (int i=0; i<alias.length; i++) {
+                final GenericName scope = alias[i].getScope();
+                if (scope != null) {
+                    if (org.geotools.metadata.citation.Citation.titleMatches(authority, scope.toString())) {
+                        name = alias[i].asLocalName().toString();
+                        break;
+                    }
+                }
+            }
+        }
+        return group.parameter(name);
     }
     
     /**
