@@ -324,11 +324,10 @@ public class FilterFactoryImpl extends FilterFactory {
             }
             return exp;
             
-      //return (FunctionExpression) Class.forName("org.geotools.filter."
-      //          + name + "Function").newInstance();
+      
         } catch (Exception e) {
             throw new RuntimeException("Unable to create class " + name
-                + "Function", e);  //changed the word "Filter" to "Function".
+                + "Function", e);  
         }
     }
 
@@ -339,5 +338,12 @@ public class FilterFactoryImpl extends FilterFactory {
      */
     public NullFilter createNullFilter() {
         return new NullFilterImpl();
+    }
+    
+    public EnvironmentVariable createEnvironmentVariable(String name){
+        if(name.equalsIgnoreCase("MapScaleDenominator")){
+            return new MapScaleDenominatorImpl();
+        }
+         throw new RuntimeException("Unknown environment variable:" + name);
     }
 }

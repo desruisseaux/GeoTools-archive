@@ -196,6 +196,11 @@ public class SLDStyleFactory {
     
     private long requests;
     
+    /**
+     * Holds value of property mapScaleDenominator.
+     */
+    private double mapScaleDenominator = Double.NaN;;
+    
     
     public double getHitRatio() {
         return (double) hits/ (double) requests;
@@ -1265,6 +1270,24 @@ public class SLDStyleFactory {
         } else {
             return java.awt.BasicStroke.CAP_SQUARE;
         }
+    }
+
+    /**
+     * Getter for property mapScaleDenominator.
+     * @return Value of property mapScaleDenominator.
+     */
+    public double getMapScaleDenominator() {
+
+        return this.mapScaleDenominator;
+    }
+
+    /**
+     * Setter for property mapScaleDenominator.
+     * @param mapScaleDenominator New value of property mapScaleDenominator.
+     */
+    public void setMapScaleDenominator(double mapScaleDenominator) {
+
+        this.mapScaleDenominator = mapScaleDenominator;
     }
 
     /**

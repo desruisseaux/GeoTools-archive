@@ -291,4 +291,13 @@ public abstract class FilterFactory implements Factory {
      * @return The new Function Expression.
      */
     public abstract FunctionExpression createFunctionExpression(String name);
+    
+     /**
+     * Creates an Environment Variable
+     *
+     * @param name the function name.
+     *
+     * @return The new Function Expression.
+     */
+    public abstract EnvironmentVariable createEnvironmentVariable(String name);
 }
