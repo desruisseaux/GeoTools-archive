@@ -119,7 +119,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
             //     I'm not 100% sure if this is correct, but I dont think you can
             //     have any tag here that's not in "convertType()".
             //DJB: Found "UpperBoundary" and "LowerBoundary" - these are completely ignored by this parser!!!
-            //     Thats a pain, but...
+            //     More checking shows its handled when the tag ENDs, so this isnt a problem.
             //DJB: <Distance> also looks like its hacked in this function (see bottom)
             //DJB: Also found <gml:pointMember>-like things from the CITE tests.
             
