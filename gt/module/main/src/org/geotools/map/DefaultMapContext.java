@@ -52,6 +52,7 @@ import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
@@ -494,7 +495,7 @@ public class DefaultMapContext implements MapContext {
                     if ((sourceCs != null) && (crs != null)
                             && !sourceCs.equals(crs)) {
                         
-                    	MathTransform2D transform = (MathTransform2D) FactoryFinder.getCoordinateOperationFactory().createOperation(sourceCs,crs);
+                    	MathTransform transform = FactoryFinder.getCoordinateOperationFactory().createOperation(sourceCs,crs).getMathTransform();
 
                         if (transform != null) {
                             env = JTS.transform(env, transform);

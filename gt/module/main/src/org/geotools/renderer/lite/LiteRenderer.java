@@ -2801,4 +2801,9 @@ public class LiteRenderer implements Renderer, Renderer2D {
     public void setGeneralizationDistance(double d) {
         generalizationDistance = d;
     }
+
+
+    void setScreenSize( Rectangle screenSize ) {
+        this.screenSize=screenSize;
+    }
 }

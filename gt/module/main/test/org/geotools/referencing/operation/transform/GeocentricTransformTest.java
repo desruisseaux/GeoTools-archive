@@ -71,6 +71,8 @@ public class GeocentricTransformTest extends TransformationTest {
         super(name);
     }
     
+    
+    
     /**
      * Tests the orthodromic distance computed by {@link Ellipsoid}. There is actually two
      * algorithms used: one for the ellipsoidal model, and a simpler one for spherical model.

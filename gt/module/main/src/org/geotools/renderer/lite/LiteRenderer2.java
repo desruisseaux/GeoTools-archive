@@ -53,6 +53,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.operation.CoordinateOperationFactory;
@@ -496,7 +497,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     // unprojected geometries
                     MathTransform transform = operationFactory.createOperation(destinationCrs, sourceCrs).getMathTransform();
                     if( transform!=null)
-                    	envelope = transform(envelope, transform);
+                    	envelope = JTS.transform(envelope, transform);
                 }
 
                 Filter filter = null;
@@ -551,20 +552,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
         return results;
     }
-
-    /**
-     * Transforms the Envelope using the MathTransform.
-	 * @param envelope the envelope to transform
-	 * @param transform the transformation to use
-	 * @return a new Envelope
-     * @throws TransformException 
-	 */
-	private Envelope transform(Envelope envelope, MathTransform transform) throws TransformException {
-		double[] coords=new double[]{envelope.getMinX(), envelope.getMaxX(), envelope.getMinY(), envelope.getMaxX()};
-		double[] newcoords=new double[4];
-		transform.transform(coords, 0, newcoords, 0, 4);
-		return new Envelope(newcoords[0],newcoords[1],newcoords[2],newcoords[3]);
-	}
 
 	/**
      * Inspects the <code>MapLayer</code>'s style and retrieves it's needed
@@ -1000,8 +987,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     private Shape getTransformedShape(Geometry g, MathTransform2D transform)
         throws TransformException {
-        LiteShape base = new LiteShape(g, new AffineTransform(), false);
-
+        LiteShape base = new LiteShape(g, null, false);
         return transform.createTransformedShape(base);
     }
 
@@ -1035,15 +1021,18 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             return null;
         }
 
-        transform = (MathTransform2D) operationFactory.createOperation(sourceCrs, destinationCrs).getMathTransform();;
+        transform = (MathTransform2D) operationFactory.createOperation(sourceCrs, destinationCrs).getMathTransform();
 
         if (transform != null) {
-            transform = (MathTransform2D) operationFactory.getMathTransformFactory().createConcatenatedTransform( transform, 
-            	operationFactory.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at)));
+            transform = (MathTransform2D) operationFactory.getMathTransformFactory().createConcatenatedTransform(transform,   
+                    operationFactory.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at))
+            	);
+        }else{
+            transform=(MathTransform2D) operationFactory.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at));
         }
 
         transformMap.put(sourceCrs, transform);
-
+        
         return transform;
     }
 

@@ -18,6 +18,9 @@ package org.geotools.renderer.lite;
 
 import java.awt.geom.AffineTransform;
 
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.TransformException;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Polygon;
@@ -163,7 +166,7 @@ class PolygonIterator extends AbstractLiteIterator {
         if (currentCoord == 0) {
             coords[0] = this.coords[0].x;
             coords[1] = this.coords[0].y;
-            at.transform(coords, 0, coords, 0, 1);
+            transform(coords, 0, coords, 0, 1);
 
             return SEG_MOVETO;
         } else if (currentCoord == this.coords.length) {
@@ -171,10 +174,14 @@ class PolygonIterator extends AbstractLiteIterator {
         } else {
             coords[0] = this.coords[currentCoord].x;
             coords[1] = this.coords[currentCoord].y;
-            at.transform(coords, 0, coords, 0, 1);
+            transform(coords, 0, coords, 0, 1);
 
             return SEG_LINETO;
         }
+    }
+    
+    protected void transform(double[] src, int index, double[] dest, int destIndex, int numPoints){
+            at.transform(src, index, dest, destIndex, numPoints);
     }
 
     /**

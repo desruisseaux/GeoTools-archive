@@ -23,6 +23,8 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import org.opengis.referencing.operation.MathTransform2D;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -55,8 +57,6 @@ public class LiteShape implements Shape {
 	private float xScale;
 
 	private float yScale;
-
-    
 
     /**
      * Creates a new LiteShape object.
@@ -404,7 +404,8 @@ public class LiteShape implements Shape {
             pi = new PointIterator((Point) geometry, combined);
         }
 
-        if (this.geometry instanceof Polygon) {
+        if (this.geometry instanceof Polygon) {             
+
             pi = new PolygonIterator((Polygon) geometry, combined, generalize,
                     maxDistance);
         } else if (this.geometry instanceof LinearRing) {
