@@ -6,6 +6,8 @@ import com.vividsolutions.jts.geom.*;
 import java.util.*;
 import org.geotools.data.*;
 import org.geotools.feature.*;
+
+import java.io.IOException;
 import java.sql.*;
 import java.util.logging.Logger;
 import org.geotools.filter.*;
@@ -36,7 +38,7 @@ public class MysqlTestSuite extends TestCase {
 
     private MysqlConnection db;
 
-    private DataSource mysql = null;
+    private FeatureStore mysql = null;
 
     private FeatureCollection collection = FeatureCollections.newCollection();
 
@@ -61,12 +63,21 @@ public class MysqlTestSuite extends TestCase {
         return suite;
     }
     
-    public void setUp() {
+    public void setUp() throws Exception {
 	LOGGER.info("creating MysqlConnection connection...");
-	db = new MysqlConnection ("localhost","3306","test_Feature"); 
+	db = new MysqlConnection ( "localhost","3306","test_Feature"); 
 	LOGGER.info("created new db connection");
-	mysql = new MysqlDataSource(db, FEATURE_TABLE);
-	LOGGER.info("created new datasource");
+	MySQLDataStoreFactory factory = new MySQLDataStoreFactory();
+	Map params = new HashMap();
+	params.put( MySQLDataStoreFactory.DATABASE.key, FEATURE_TABLE );
+	params.put( MySQLDataStoreFactory.DBTYPE.key, "mysql");
+	params.put( MySQLDataStoreFactory.HOST.key, "localhost");
+	params.put( MySQLDataStoreFactory.PORT.key, "3306");
+	
+	MySQLDataStore data = (MySQLDataStore) factory.createDataStore( params );
+	LOGGER.info("created new datastore");
+	mysql = (FeatureStore) data.getFeatureSource( FEATURE_TABLE );
+	
 	//create a filter that is always true, just to pass into getFeatures
 	try {
 	    tFilter = filterFactory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
@@ -79,10 +90,10 @@ public class MysqlTestSuite extends TestCase {
 	}
     }
     	
-     public void testGet() {
+     public void testGet() throws IOException {
         LOGGER.info("starting type enforcement tests...");
         try {
-	       	    mysql.getFeatures(collection, tFilter);
+	       	    collection = mysql.getFeatures( tFilter).collection();
 	     assertEquals(4, collection.size());
 	} catch(DataSourceException e) {
             LOGGER.info("...threw data source exception: " + e.getMessage());    
@@ -143,21 +154,21 @@ public class MysqlTestSuite extends TestCase {
     
 	}*/
 
-    public void testRemove() {
+    public void testRemove() throws IOException {
 	try {
-	    FeatureCollection delFeatures = mysql.getFeatures(tFilter);
+	    FeatureCollection delFeatures = mysql.getFeatures(tFilter).collection();
 	    mysql.removeFeatures(tFilter);
-	    collection = mysql.getFeatures(tFilter);
+	    collection = mysql.getFeatures(tFilter).collection();
 	    assertEquals(0, collection.size());
-	    mysql.addFeatures(delFeatures);
-	    collection = mysql.getFeatures(tFilter);
+	    mysql.addFeatures( DataUtilities.reader(delFeatures));
+	    collection = mysql.getFeatures(tFilter).collection();
 	    assertEquals(4, collection.size());
 	} catch (DataSourceException e){
 	    fail("Data source exception " + e);
 	}
     }
     
-    public void testModify() {
+    public void testModify() throws IOException {
 	Integer tBulbs = new Integer(NUM_TEST_BULBS);
 	Integer restBulbs = new Integer(NUM_TEST_BULBS - 2);
 	Geometry geom = new Point(new Coordinate(6, 10), new PrecisionModel(), 1);
@@ -165,11 +176,11 @@ public class MysqlTestSuite extends TestCase {
 	    mysql.modifyFeatures(lampAttr[0], tBulbs, tFilter);
 	    //mysql.modifyFeatures(lampAttr[1], geom, tFilter);
 	    //do a geom test when we figure out how to get the filters to work
-	    collection = mysql.getFeatures(tFilter);
+	    collection = mysql.getFeatures(tFilter).collection();
 	    assertEquals(tBulbs, 
 			 (Integer) collection.features().next().getAttribute("NUM_BULBS"));
 	    mysql.modifyFeatures(lampAttr[0], restBulbs, tFilter);
-	    collection = mysql.getFeatures(tFilter);
+	    collection = mysql.getFeatures(tFilter).collection();
 	    assertEquals(restBulbs, 
 	    	 (Integer) collection.features().next().getAttribute("NUM_BULBS"));
 	} catch (DataSourceException e) {

@@ -156,7 +156,7 @@ public class MySQLDataStoreFactory
                         && (arrayParameters[i].type.isInstance(value)))) {
                     if (arrayParameters[i].required) {
                         if (LOGGER.isLoggable(Level.FINE)) {
-                            LOGGER.fine("Failed on : " + arrayParameters[i].key);
+                            LOGGER.warning("Failed on : " + arrayParameters[i].key);
                             LOGGER.fine(params.toString());
                         }
                         return (false);
@@ -191,11 +191,7 @@ public class MySQLDataStoreFactory
      *         or connecting the datasource.
      */
     public DataStore createDataStore(Map params) throws IOException {
-        if (!canProcess(params)) {
-            LOGGER.warning("Can not process : " + params);
-            throw new IOException("The parameteres map isn't correct!!");
-        }
-
+        // lookup will throw nice exceptions back to the client code
         String host = (String) HOST.lookUp(params);
         String user = (String) USER.lookUp(params);
         String passwd = (String) PASSWD.lookUp(params);
@@ -204,6 +200,12 @@ public class MySQLDataStoreFactory
         Charset charSet = (Charset) CHARSET.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
 
+        if (!canProcess(params)) {
+            // Do this as a last sanity check.
+            LOGGER.warning("Can not process : " + params);
+            throw new IOException("The parameteres map isn't correct!!");
+        }
+        
         MySQLConnectionFactory connFact = new MySQLConnectionFactory(host,
                 new Integer(port).intValue(), database);
 
