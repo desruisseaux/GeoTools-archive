@@ -332,7 +332,15 @@ public class Formatter {
             if (unit != null) {
                 buffer.append(param.doubleValue(unit));
             } else {
-                buffer.append(param.getValue());
+                final Object value = param.getValue();
+                final boolean isNumber = (value instanceof Number);
+                if (!isNumber) {
+                    buffer.append(QUOTE);
+                }
+                buffer.append(value);
+                if (!isNumber) {
+                    buffer.append(QUOTE);
+                }
             }
             buffer.append(CLOSE);
         }
