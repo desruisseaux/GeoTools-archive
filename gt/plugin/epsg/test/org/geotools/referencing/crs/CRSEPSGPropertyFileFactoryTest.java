@@ -18,6 +18,8 @@
  */
 package org.geotools.referencing.crs;
 
+import java.util.Set;
+
 import org.opengis.metadata.citation.Citation;
 
 import junit.framework.TestCase;
@@ -56,11 +58,10 @@ public class CRSEPSGPropertyFileFactoryTest extends TestCase {
         assert( vendor.getIdentifiers().contains( "EPSG" ) );                        
     }
     public void testCodes() throws Exception {
-        factory.getAuthorityCodes( CoordinateReferenceSystem.class );
+        Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
         
-        Citation vendor = factory.getVendor();        
-        assertNotNull( vendor );
-        assertEquals( "Geotools", vendor.getTitle().toString() );
-        assert( vendor.getIdentifiers().contains( "EPSG" ) );                        
+        assertNotNull( codes );
+        System.out.println( codes.size() );
+                               
     }
 }
