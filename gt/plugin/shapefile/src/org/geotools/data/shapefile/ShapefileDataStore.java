@@ -38,7 +38,6 @@ package org.geotools.data.shapefile;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.AbstractAttributeIO;
-import org.geotools.data.AbstractDataStore;
 import org.geotools.data.AbstractFeatureLocking;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.AbstractFeatureStore;
@@ -53,6 +52,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
+import org.geotools.data.dir.AbstractFileDataStore;
 import org.geotools.data.shapefile.dbf.DbaseFileException;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
@@ -93,7 +93,7 @@ import java.nio.channels.WritableByteChannel;
  *
  * @todo fix file creation bug
  */
-public class ShapefileDataStore extends AbstractDataStore {
+public class ShapefileDataStore extends AbstractFileDataStore {
     private final URL shpURL;
     private final URL dbfURL;
     private final URL shxURL;
@@ -259,13 +259,18 @@ public class ShapefileDataStore extends AbstractDataStore {
         throws IOException {
         typeCheck(typeName);
 
-        try {
-            return createFeatureReader(typeName, getAttributesReader(true),
-                schema);
-        } catch (SchemaException se) {
-            throw new DataSourceException("Error creating schema", se);
-        }
+        return getFeatureReader();
     }
+    protected FeatureReader getFeatureReader()
+    throws IOException {
+
+    try {
+        return createFeatureReader(getSchema().getTypeName(), getAttributesReader(true),
+            schema);
+    } catch (SchemaException se) {
+        throw new DataSourceException("Error creating schema", se);
+    }
+}
 
     /**
      * Just like the basic version, but adds a small optimization: if no attributes
@@ -367,7 +372,7 @@ public class ShapefileDataStore extends AbstractDataStore {
      * @return An array of length one containing the single type held.
      */
     public String[] getTypeNames() {
-        return new String[] { getCurrentTypeName() };
+        return new String[] { getCurrentTypeName(), };
     }
 
     /**
@@ -437,7 +442,9 @@ public class ShapefileDataStore extends AbstractDataStore {
      */
     public FeatureType getSchema(String typeName) throws IOException {
         typeCheck(typeName);
-
+        return getSchema();
+    }
+    public FeatureType getSchema() throws IOException {
         if (schema == null) {
             try {
                 schema = FeatureTypeFactory.newFeatureType(readAttributes(),

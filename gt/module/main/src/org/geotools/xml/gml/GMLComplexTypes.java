@@ -78,6 +78,7 @@ public class GMLComplexTypes {
             "net.refractions.gml.static");
     
     public static final String STREAM_HINT = "org.geotools.xml.gml.STREAM_HINT";
+    private static final String STREAM_FEATURE_NAME_HINT = "org.geotools.xml.gml.STREAM_FEATURE_NAME_HINT";
 
     /**
      * <p>
@@ -2825,10 +2826,10 @@ public class GMLComplexTypes {
             Feature f = getFeature(element,value,attrs,hints);
             if(hints==null || hints.get(STREAM_HINT)==null)
                 return f;
-            if(element.getType().getParent()!=null && 
-                    element.getType().getParent().getInstanceType().
-                    equals(AbstractFeatureCollectionType.getInstance().
-                            getInstanceType())){
+			if(hints.get(STREAM_FEATURE_NAME_HINT)==null)
+			    hints.put(STREAM_FEATURE_NAME_HINT,element.getName());	
+			String nm = (String)hints.get(STREAM_FEATURE_NAME_HINT);
+            if(nm!=null && nm.equals(element.getName())){
                 stream(f,(FCBuffer)hints.get(STREAM_HINT));
                 return null;
             }else{

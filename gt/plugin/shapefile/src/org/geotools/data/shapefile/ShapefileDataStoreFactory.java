@@ -23,12 +23,12 @@ package org.geotools.data.shapefile;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
+import org.geotools.data.dir.FileDataStoreFactorySpi;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * @version $Id: ShapefileDataStoreFactory.java,v 1.7 2004/05/06 21:50:10 ianschneider Exp $
  */
 public class ShapefileDataStoreFactory
-    implements org.geotools.data.DataStoreFactorySpi {
+    implements FileDataStoreFactorySpi {
     private static final Param URLP = new Param("url", URL.class,
         "url to a .shp file");
     private static final Param MEMORY_MAPPED = new Param("memory mapped buffer",
@@ -59,7 +59,7 @@ public class ShapefileDataStoreFactory
         if (params.containsKey(URLP.key)) {
             try {
                 URL url = (URL) URLP.lookUp(params);
-                accept = url.getFile().toUpperCase().endsWith("SHP");
+                accept = canProcess(url);
             } catch (IOException ioe) {
                 // yes, I am eating this
             }
@@ -170,5 +170,43 @@ public class ShapefileDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] { URLP, MEMORY_MAPPED };
+    }
+
+    /**
+     * @see org.geotools.data.dir.FileDataStoreFactorySpi#getFileExtensions()
+     */
+    public String[] getFileExtensions() {
+        return new String[] {".shp",};
+    }
+
+    /**
+     * @see org.geotools.data.dir.FileDataStoreFactorySpi#canProcess(java.net.URL)
+     */
+    public boolean canProcess(URL f) {
+        return f.getFile().toUpperCase().endsWith("SHP");
+    }
+
+    /**
+     * @see org.geotools.data.dir.FileDataStoreFactorySpi#createDataStore(java.net.URL)
+     */
+    public DataStore createDataStore(URL url)  throws IOException{
+        DataStore ds = null;
+        try {
+            ds = new ShapefileDataStore(url,Boolean.TRUE.booleanValue());
+        } catch (MalformedURLException mue) {
+            throw new DataSourceException("Unable to attatch datastore to "
+                + url, mue);
+        } 
+ 
+        return ds;
+    }
+
+    /**
+     * @see org.geotools.data.dir.FileDataStoreFactorySpi#getTypeName(java.net.URL)
+     */
+    public String getTypeName(URL url) throws IOException {
+        DataStore ds = createDataStore(url);
+        String[] names = ds.getTypeNames(); // should be exactly one
+        return ((names == null || names.length==0)?null:names[0]);
     }
 }

@@ -1,13 +1,12 @@
 package org.geotools.data.gml;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
-import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.dir.AbstractFileDataStore;
 import org.geotools.feature.FeatureType;
 import org.geotools.xml.gml.FCBuffer;
 
@@ -18,7 +17,7 @@ import org.geotools.xml.gml.FCBuffer;
  * @author dzwiers
  *
  */
-public class GMLDataStore extends AbstractDataStore {
+public class GMLDataStore extends AbstractFileDataStore {
     
     /*
      * should not be used
@@ -26,20 +25,18 @@ public class GMLDataStore extends AbstractDataStore {
     private GMLDataStore(){}
     
     // contains the data repository location
-    private File dir;
-    
-    private Map featureReaders; // un-used featureReaders
-    private Map featureTypes; // cached featureTypes
+    private URI uri;
+
+    private FCBuffer fcBuffer;
     
     /**
      * Creates a dataStore for the directory specified.
      * 
      * @param dir
+     * @throws URISyntaxException
      */
-    protected GMLDataStore(File dir){
-        featureReaders = new HashMap();
-        featureTypes = new HashMap();
-        this.dir = dir; // this is a dir if it came from the factory
+    protected GMLDataStore(URL url) throws URISyntaxException{
+        this.uri = new URI(url.toExternalForm()); // this is a url if it came from the factory
     }
 
     /**
@@ -50,57 +47,44 @@ public class GMLDataStore extends AbstractDataStore {
      * @see org.geotools.data.DataStore#getTypeNames()
      */
     public String[] getTypeNames() {
-        return dir.list(new GMLFileNameFilter(dir));
+        if(fcBuffer == null)
+            fcBuffer = (FCBuffer)FCBuffer.getFeatureReader(uri,100);
+        FeatureType ft = fcBuffer.getFeatureType();
+        return new String[] {ft.getTypeName(),};
     }
     
-    private static class GMLFileNameFilter implements FilenameFilter{
-        
-        /*
-         * Should not be used
-         */
-        private GMLFileNameFilter(){}
-        
-        // do not want child directories ... so keep track of the parent
-        private File dir;
-        
-        /**
-         * 
-         * @param dir parent directory ... to avoid nested directories
-         */
-        public GMLFileNameFilter(File dir){
-            this.dir = dir;
-        }
-
-        /**
-         * @see java.io.FilenameFilter#accept(java.io.File, java.lang.String)
-         */
-        public boolean accept(File dir, String name) {
-            return this.dir.equals(dir) && name.endsWith(".gml");
-        }
-    }
-
-    /**
+       /**
      * @see org.geotools.data.DataStore#getSchema(java.lang.String)
      */
     public FeatureType getSchema(String arg0) throws IOException {
-        if(featureTypes.get(arg0)!=null)
-            return (FeatureType)featureTypes.get(arg0);
-        FCBuffer fcBuffer = (FCBuffer)getFeatureSource(arg0);
-        FeatureType ft = fcBuffer.getFeatureType();
-        featureReaders.put(arg0,fcBuffer);
-        featureTypes.put(arg0,ft);
-        return ft;
+        return getSchema();
     }
-
+    
     /**
-     * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
-     */
-    protected FeatureReader getFeatureReader(String arg0) throws IOException {
-        if(featureReaders.containsKey(arg0))
-            return (FeatureReader)featureReaders.remove(arg0);
-        
-        File f = new File(dir,arg0);
-        return FCBuffer.getFeatureReader(f.toURI(),100);
-    }
+  * @see org.geotools.data.DataStore#getSchema(java.lang.String)
+  */
+ public FeatureType getSchema() throws IOException {
+     if(fcBuffer == null)
+         fcBuffer = (FCBuffer)FCBuffer.getFeatureReader(uri,100);
+     FeatureType ft = fcBuffer.getFeatureType();
+     return ft;
+ }
+
+ /**
+  * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
+  */
+ protected FeatureReader getFeatureReader(String arg0) throws IOException {
+     return getFeatureReader();
+ }
+ /**
+  * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String)
+  */
+ protected FeatureReader getFeatureReader() throws IOException {
+     if(fcBuffer == null)
+         return FCBuffer.getFeatureReader(uri,100);
+     FCBuffer r = fcBuffer;
+     fcBuffer = null;
+     return r;
+ }
 
 }
