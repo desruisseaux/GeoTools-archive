@@ -18,6 +18,7 @@ package org.geotools.xml.wfs;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -335,6 +336,13 @@ public class WFSSchema implements Schema {
      */
     public String getPrefix() {
         return "wfs";
+    }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
     }
 
     /**
