@@ -225,7 +225,7 @@ public class BasicTest extends TestCase {
      * Test WKT formatting of transforms backed by matrix.
      */
     public void testMatrix() {
-        final Formatter  formatter = new Formatter(null);
+        final org.geotools.referencing.wkt.Formatter  formatter = new  org.geotools.referencing.wkt.Formatter(null);
         final GeneralMatrix matrix = new GeneralMatrix(4);
         matrix.setElement(0,2,  4);
         matrix.setElement(1,0, -2);
