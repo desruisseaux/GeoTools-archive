@@ -24,6 +24,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -91,7 +92,7 @@ public class EPSGTest extends TestCase {
         assertNotNull(crs.getIdentifiers());
         assertTrue(crs.getIdentifiers().length>0);
         Identifier expected = new Identifier(org.geotools.metadata.citation.Citation.EPSG,"42102");
-        assertTrue( Arrays.asList( (Object[]) crs.getIdentifiers() ).contains( expected ));
+        assertTrue( Arrays.asList( crs.getIdentifiers() ).contains( expected ));
     }
     public void testSuccess() throws Exception {
         Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
@@ -116,7 +117,7 @@ public class EPSGTest extends TestCase {
      * A random CRS for fun.
      */
     public void test26910Lower() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:26910");
+        CoordinateReferenceSystem crs = CRS.decode("epsg:26910");
         assertNotNull( crs );                
     }
     
@@ -124,37 +125,37 @@ public class EPSGTest extends TestCase {
      * A random CRS for fun.
      */
     public void test26986Lower() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:26986");
+        CoordinateReferenceSystem crs = CRS.decode("epsg:26986");
         assertNotNull( crs );                
     }
     
     /** wfs requires this to work */
     public void test4326Lower() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:4326");
+        CoordinateReferenceSystem crs = CRS.decode("epsg:4326");
         assertNotNull( crs );
     }
     /** wfs requires this to work */
     public void test26742Lower() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:26742");
+        CoordinateReferenceSystem crs = CRS.decode("epsg:26742");
         assertNotNull( crs );
     }
     /** wfs requires this to work */
     public void test4269Lower() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:4269");
+        CoordinateReferenceSystem crs = CRS.decode("epsg:4269");
         assertNotNull( crs );
     }
     /** wfs requires this to work */
     public void test42304Lower() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:42304");
+        CoordinateReferenceSystem crs = CRS.decode("epsg:42304");
         assertNotNull( crs );
     }
     /** wfs requires this to work */
     public void test42102Lower() throws Exception {
-        CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("epsg:42102");
+        CoordinateReferenceSystem crs = CRS.decode("epsg:42102");
         assertNotNull( crs );
         assertNotNull(crs.getIdentifiers());
         assertTrue(crs.getIdentifiers().length>0);
         Identifier expected = new Identifier(org.geotools.metadata.citation.Citation.EPSG,"42102");
-        assertTrue( Arrays.asList( (Object[]) crs.getIdentifiers() ).contains( expected ));
+        assertTrue( Arrays.asList( crs.getIdentifiers() ).contains( expected ));
     }
 }

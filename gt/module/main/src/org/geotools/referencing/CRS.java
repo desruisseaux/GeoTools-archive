@@ -171,7 +171,7 @@ public class CRS {
                 if( !authority.getIdentifiers().contains( AUTHORITY ) ) continue;
                 
                 System.out.println("Lookup "+code+ " authority "+factory.getClass().toString() );
-                CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code );
+                CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject( code.toUpperCase() );
                 if( crs != null ) return crs;
             } catch (FactoryException e) {
                 trouble = e;
