@@ -26,6 +26,7 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import org.geotools.coverage.grid.GridCoverageImpl;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.FileFormatNotCompatibleWithGridCoverageException;
 import org.opengis.coverage.grid.Format;
@@ -122,7 +123,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 	public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
 		
-		RenderedImage image = coverage.getRenderedImage();
+		RenderedImage image = ((GridCoverageImpl)coverage).getRenderedImage();
 		
 		Envelope env = coverage.getEnvelope();
 		double xMin = env.getMinimum(0);
