@@ -226,15 +226,7 @@ public interface Query {
      * to return the latest version. Systems that do not support versioning
      * can ignore the parameter and return the only version  that they have.
      * 
-     * <p>
-     * This will not be used for awhile, but at some future point geotools
-     * should support feature versioning.  Obviously none do now, nor are any
-     * close to supporting it, so perhaps we should just wait and see.  And of
-     * course we'd need the corresponding supportsFeatureVersioning in the
-     * datasource metadata object.
-     * </p>
-     *
-     * @return the version of the feature to return.
+     * @return the version of the feature to return, or null for latest.
      */
     String getVersion();
 
