@@ -66,6 +66,7 @@ public class ReferencingSuite extends TestCase {
         suite.addTest(org.geotools.referencing .BasicTest             .suite());
         suite.addTest(org.geotools.referencing .MatrixTest            .suite());
         suite.addTest(org.geotools.referencing .ParameterTest         .suite());
+        suite.addTest(org.geotools.referencing .LocalizationGridTest  .suite());
         return suite;
     }
 }

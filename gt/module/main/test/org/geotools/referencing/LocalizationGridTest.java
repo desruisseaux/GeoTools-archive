@@ -17,25 +17,23 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gc;
+package org.geotools.referencing;
 
 // J2SE dependencies
 import java.util.Random;
 import java.util.Arrays;
 import java.awt.geom.*;
 
-// Geotools dependencies
-import org.geotools.gc.*;
-import org.geotools.cs.*;
-import org.geotools.ct.*;
-
-// OpenGIS dependencies
-import org.opengis.referencing.operation.TransformException;
-
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+// OpenGIS dependencies
+import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.transform.LocalizationGrid;
 
 
 /**
@@ -49,12 +47,12 @@ public class LocalizationGridTest extends TestCase {
     /**
      * Random number generator for this test.
      */
-    private Random random;
+    private static final Random random = new Random(78421369762L);
 
     /**
      * The grid of localization to test.
      */
-    protected LocalizationGrid grid;
+    private LocalizationGrid grid;
     
     /**
      * The "real world" coordinates of the image.
@@ -113,6 +111,7 @@ public class LocalizationGridTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
+        org.geotools.util.MonolineFormatter.initGeotools();
         junit.textui.TestRunner.run(suite());
     }
 
@@ -136,8 +135,6 @@ public class LocalizationGridTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        random = new Random();
-
         final int width  = GRID_DATA[0].length/2;
         final int height = GRID_DATA.length;
         grid = new LocalizationGrid(width, height);
