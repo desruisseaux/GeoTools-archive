@@ -436,7 +436,7 @@ public class GT2Eclipse {
 							+ jar + "\"/>");
 		}
 		classpath.println("    <classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>");
-		classpath.println("    <classpathentry kind=\"output\" path=\"target\\eclise\"/>");
+		classpath.println("    <classpathentry kind=\"output\" path=\"target\\eclipse\"/>");
 		classpath.println("</classpath>");
 		classpath.close();
 
