@@ -137,7 +137,7 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link DatumFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
      *
      * @return First datum factory found.
@@ -160,7 +160,7 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link CSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
      *
      * @return The first coordinate system factory found.
@@ -183,7 +183,7 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link CRSFactory}. If no implementation is
      * registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
      *
      * @return The first coordinate reference system factory found.
@@ -219,7 +219,7 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link MathTransformFactory}. If no implementation
      * is registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setOrdering ordering is set}, then the preferred
+     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
      *
      * @throws NoSuchElementException if no implementation was found for the
@@ -240,7 +240,7 @@ public final class FactoryFinder {
     /**
      * Returns the default implementation of {@link CoordinateOperationFactory}. If no
      * implementation is registered, then this method throws an exception. If more than
-     * one implementation is registered and an {@linkplain #setOrdering ordering is set},
+     * one implementation is registered and an {@linkplain #setVendorOrdering ordering is set},
      * then the preferred implementation is returned. Otherwise an arbitrary one is selected.
      *
      * @throws NoSuchElementException if no implementation was found for the

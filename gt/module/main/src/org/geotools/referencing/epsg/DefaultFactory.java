@@ -53,6 +53,7 @@ import javax.units.SI;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -65,9 +66,11 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.nature.Units;
 import org.geotools.referencing.AuthorityFactory;
 import org.geotools.referencing.FactoryGroup;
 import org.geotools.referencing.Identifier;
+import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -92,29 +95,6 @@ import org.geotools.util.ScopedName;
  *   <li>Data source name should be "EPSG". Filename can be anything; click on the "Select..."
  *       button to select it.</li>
  * </ul>
- *
- * <br>
- * <h2>Note about multi-radix units</h2>
- * <P>The EPSG database express many angles in some multi-radix units. For example, a lot of EPSG's
- * angles are coded in the following format: <cite>sign - degrees - decimal point - minutes (two
- * digits) - integer seconds (two digits) - fraction of seconds (any precision)</cite>. According
- * this convention, the angle <code>40°30'N</code> would be coded as <code>40.30</code>
- * (sexagesimal degree) instead of <code>40.5</code> (fractional degree). Unfortunatly,
- * sexagesimal degrees have the following inconvenients:</P>
- *
- * <ul>
- *   <li>They are not suitable for computation purpose. For example, we can't compute the
- *       difference between two angles using an ordinary substraction.</li>
- *   <li>They make coordinate transformations harder. For example, we can't scale them with
- *       an affine transform.</li>
- *   <li>Their unit can't be formatted correctly in a Well Know Text (WKT).</li>
- *   <li>What sexagesimal unit try to do is really the
- *       {@link org.geotools.measure.AngleFormat}'s job.</li>
- * </ul>
- *
- * <P>Consequently, <code>DefaultFactory</code> will <strong>not</strong> use sexagesimal degrees
- * for coordinate systems. Any sexagesimal degrees will be replaced by fractional degrees, which
- * are way more convenient for computation purpose (radians would be as good).</P>
  *
  * @version $Id$
  * @author Yann Cézard
@@ -155,10 +135,10 @@ public class DefaultFactory extends AuthorityFactory
             case 9103: return NonSI.MINUTE_ANGLE;
             case 9104: return NonSI.SECOND_ANGLE;
             case 9105: return NonSI.GRADE;
-            case 9107: return NonSI.DEGREE_ANGLE; // Formatted degree - minute - second.
-            case 9108: return NonSI.DEGREE_ANGLE; // Formatted degree - minute - second - hemisphere.
+            case 9107: return Units.DEGREE_MINUTE_SECOND;
+            case 9108: return Units.DEGREE_MINUTE_SECOND;
             case 9109: return    SI.MICRO(SI.RADIAN);
-//TODO      case 9110: return NonSI.SEXAGESIMAL_DMS;
+            case 9110: return Units.SEXAGESIMAL_DMS;
 //TODO      case 9111: return NonSI.SEXAGESIMAL_DM;
             case 9201: return  Unit.ONE;
             default  : return null;
@@ -379,7 +359,7 @@ public class DefaultFactory extends AuthorityFactory
      * @throws FactoryException if access to the underlying database failed.
      */
     public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Not yet implemented."); // TODO
     }
 
     /**
@@ -392,7 +372,7 @@ public class DefaultFactory extends AuthorityFactory
      * @throws FactoryException if the query failed for some other reason.
      */
     public InternationalString getDescriptionText(String code) throws FactoryException {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Not yet implemented."); // TODO
     }
 
     /**
@@ -540,12 +520,12 @@ public class DefaultFactory extends AuthorityFactory
         alias.clear();
         try {
             final PreparedStatement stmt;
-            stmt = prepareStatement("Alias", "SELECT [NAMING_SYSTEM_NAME],"
-                                           +       " [ALIAS]"
-                                           +  " FROM [Alias] INNER JOIN [Naming System]"
-                                           +    " ON [Alias].[NAMING_SYSTEM_CODE] ="
-                                           +       " [Naming System].[NAMING_SYSTEM_CODE]"
-                                           + " WHERE [OBJECT_CODE] = ?");
+            stmt = prepareStatement("Alias", "SELECT NAMING_SYSTEM_NAME,"
+                                           +       " ALIAS"
+                                           + " FROM [Alias] INNER JOIN [Naming System]"
+                                           +   " ON [Alias].NAMING_SYSTEM_CODE ="
+                                           +      " [Naming System].NAMING_SYSTEM_CODE"
+                                           + " WHERE OBJECT_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
@@ -657,12 +637,12 @@ public class DefaultFactory extends AuthorityFactory
         Unit returnValue = null;
         try {
             final PreparedStatement stmt;
-            stmt = prepareStatement("Unit", "SELECT [UOM_CODE],"
-                                          +       " [FACTOR_B],"
-                                          +       " [FACTOR_C],"
-                                          +       " [TARGET_UOM_CODE]"
-                                          +  " FROM [Unit of Measure]"
-                                          + " WHERE [UOM_CODE] = ?");
+            stmt = prepareStatement("Unit", "SELECT UOM_CODE,"
+                                          +       " FACTOR_B,"
+                                          +       " FACTOR_C,"
+                                          +       " TARGET_UOM_CODE"
+                                          + " FROM [Unit of Measure]"
+                                          + " WHERE UOM_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
             /*
@@ -716,14 +696,14 @@ public class DefaultFactory extends AuthorityFactory
         Ellipsoid returnValue = null;
         try {
             final PreparedStatement stmt;
-            stmt = prepareStatement("Ellipsoid", "SELECT [ELLIPSOID_NAME],"
-                                               +       " [SEMI_MAJOR_AXIS],"
-                                               +       " [INV_FLATTENING],"
-                                               +       " [SEMI_MINOR_AXIS],"
-                                               +       " [UOM_CODE],"
-                                               +       " [REMARKS]"
-                                               +  " FROM [Ellipsoid]"
-                                               + " WHERE [ELLIPSOID_CODE] = ?");
+            stmt = prepareStatement("Ellipsoid", "SELECT ELLIPSOID_NAME,"
+                                               +       " SEMI_MAJOR_AXIS,"
+                                               +       " INV_FLATTENING,"
+                                               +       " SEMI_MINOR_AXIS,"
+                                               +       " UOM_CODE,"
+                                               +       " REMARKS"
+                                               + " FROM [Ellipsoid]"
+                                               + " WHERE ELLIPSOID_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
             /*
@@ -799,12 +779,12 @@ public class DefaultFactory extends AuthorityFactory
         PrimeMeridian returnValue = null;
         try {
             final PreparedStatement stmt;
-            stmt = prepareStatement("PrimeMeridian", "SELECT [PRIME_MERIDIAN_NAME],"
-                                                   +       " [GREENWICH_LONGITUDE],"
-                                                   +       " [UOM_CODE],"
-                                                   +       " [REMARKS]"
-                                                   +  " FROM [Prime Meridian]"
-                                                   + " WHERE [PRIME_MERIDIAN_CODE] = ?");
+            stmt = prepareStatement("PrimeMeridian", "SELECT PRIME_MERIDIAN_NAME,"
+                                                   +       " GREENWICH_LONGITUDE,"
+                                                   +       " UOM_CODE,"
+                                                   +       " REMARKS"
+                                                   + " FROM [Prime Meridian]"
+                                                   + " WHERE PRIME_MERIDIAN_CODE = ?");
             stmt.setString(1, code);
             final ResultSet result = stmt.executeQuery();
             /*
@@ -832,6 +812,112 @@ public class DefaultFactory extends AuthorityFactory
         }
         return returnValue;
     }
+
+//    /**
+//     * Returns the parameter values for an operation method code.
+//     *
+//     * @param  code The operation code.
+//     * @return The parameters.
+//     * @throws FactoryException if an access to the database failed.
+//     */
+//    private ParameterValueGroup createParameters(final String code) throws FactoryException {
+//        final List list = new ArrayList();
+//        final PreparedStatement stmt;
+//        stmt = prepareStatement("Parameters", "SELECT "
+//                                       + " COP.PARAMETER_NAME,"
+//                                       + " COPV.PARAMETER_VALUE,"
+//                                       + " COPV.UOM_CODE"
+//                                       + " FROM [Coordinate_Operation Parameter Usage] AS COPU,"
+//                                       + " [Coordinate_Operation] AS CO,"
+//                                       + " [Coordinate_Operation Parameter] AS COP,"
+//                                       + " [Coordinate_Operation Parameter Value] AS COPV"
+//                                       + " WHERE CO.COORD_OP_CODE = ?"
+//                                       + " AND CO.COORD_OP_METHOD_CODE = COPU.COORD_OP_METHOD_CODE"
+//                                       + " AND COP.PARAMETER_CODE = COPU.PARAMETER_CODE"
+//                                       + " AND COPV.PARAMETER_CODE = COPU.PARAMETER_CODE"
+//                                       + " AND COPV.COORD_OP_CODE = ?"
+//                                       + " ORDER BY COPU.SORT_ORDER");
+//        stmt.setString(1, code);
+//        stmt.setString(2, code);
+//        final ResultSet result = stmt.executeQuery();
+//        while (result.next()) {
+//            final String  name = getString(result, 1, code);
+//            final double value = result.getDouble(2);
+//            if (result.wasNull()) {
+//                /*
+//                 * This a temporary hack because sometimes PARAMETER_VALUE is
+//                 * not defined, it is replaced by PARAMETER_VALUE_FILE_RE.
+//                 */
+//                result.close();
+//                throw new UnsupportedOperationException("Not yet implemented");
+//            }
+//            final String  unit = getString(result, 3, code);
+//            list.add(new Parameter(name, value, createUnit(unit)));
+//        }
+//        result.close();
+//        return (Parameter[]) list.toArray(new Parameter[list.size()]);
+//    }
+
+//    /** 
+//     * Returns Bursa-Wolf parameters for a geodetic datum. If the specified datum has
+//     * no conversion informations, then this method will returns an empty array.
+//     *  
+//     * @param  code The EPSG code of the {@link GeodeticDatum}.
+//     * @return an array of Bursa-Wolf parameters, which may be empty.
+//     */
+//    private BursaWolfParameters[] createBursaWolfParameters(final String code)
+//            throws FactoryException
+//    {
+//        final List list = new ArrayList();
+//        try {
+//            final PreparedStatement stmt;
+//            stmt = prepareStatement("BursaWolfParameters",
+//                                             "SELECT CO.COORD_OP_CODE,"
+//                                     +             " CO.TARGET_CRS_CODE,"
+//                                     +             " CO.COORD_OP_METHOD_CODE"
+//                                     +       " FROM [Coordinate_Operation] AS CO,"
+//                                     + " INNER JOIN [Coordinate Reference System] AS CRS"
+//                                     +          " ON CO.SOURCE_CRS_CODE = CRS.COORD_REF_SYS_CODE"
+//                                     +       " WHERE CRS.DATUM_CODE = ?"
+//                                     +    " ORDER BY CO.COORD_OP_CODE");
+//            stmt.setString(1, code);
+//            final ResultSet result = stmt.executeQuery();
+//            while (result.next()) {
+//                final Parameter[] param = createParameters(getString(result, 1, code));
+//                if ((param != null) && (param.length != 0)) {
+//                    final String areaOfUse    = result.getString(2); // Accept null.
+//                    final String methodOpCode = getString(result, 3, code);
+//                    // Value could be something else, but I don't know what to do when
+//                    // it is the case (for example 9618, with a radian Unit).
+//                    // So limiting to 9603 and 9606 cases for the moment.
+//                    if (methodOpCode.equals("9603") || methodOpCode.equals("9606")) {
+//                        final WGS84ConversionInfo info = new WGS84ConversionInfo();
+//                        // First we get the description of the area of use
+//                        info.areaOfUse = areaOfUse;
+//
+//                        // Then we get the coordinates. For each one we convert the unit in meter
+//                        info.dx = Unit.METRE.convert(param[0].value, param[0].unit);
+//                        info.dy = Unit.METRE.convert(param[1].value, param[1].unit);
+//                        info.dz = Unit.METRE.convert(param[2].value, param[2].unit);
+//
+//                        if (methodOpCode.equals("9606")) {
+//                            // Here we know that the database provides four more informations
+//                            // for WGS84 conversion : ex, ey, ez and ppm
+//                            info.ex  = Unit.ARC_SECOND.convert(param[3].value, param[3].unit);
+//                            info.ey  = Unit.ARC_SECOND.convert(param[4].value, param[4].unit);
+//                            info.ez  = Unit.ARC_SECOND.convert(param[5].value, param[5].unit);
+//                            info.ppm = param[6].value; // Parts per million, no conversion needed
+//                        }
+//                        list.add(info);
+//                    }
+//                }
+//            }            
+//            result.close();
+//        } catch (SQLException exception) {
+//            throw new FactoryException(code, exception);
+//        }
+//        return (WGS84ConversionInfo[]) list.toArray(new WGS84ConversionInfo[list.size()]);
+//    }
 
 //    /**
 //     * Returns a datum from a code. This method may
@@ -920,73 +1006,7 @@ public class DefaultFactory extends AuthorityFactory
 //        }
 //        return returnValue;
 //    }
-//
-//    /** 
-//     * Returns the differents WGS84 Conversion Informations
-//     * for a {@link HorizontalDatum}. If the specified datum
-//     * has no WGS84 conversion informations, then this method
-//     * will returns an empty array.
-//     *  
-//     * @param  code the EPSG code of the {@link HorizontalDatum}.
-//     * @return an array of {@link WGS84ConversionInfo}, which may
-//     *         be empty.
-//     */
-//    private WGS84ConversionInfo[] createWGS84ConversionInfo(final String code)
-//            throws FactoryException
-//    {
-//        final List list = new ArrayList();
-//        try {
-//            final PreparedStatement stmt;
-//            stmt = prepareStatement("WGS84ConversionInfo", "select CO.COORD_OP_CODE,"
-//                                               + " A.AREA_OF_USE,"
-//                                               + " CO.COORD_OP_METHOD_CODE"
-//                                               + " from [Coordinate_Operation] as CO,"
-//                                               + " [Coordinate Reference System] as CRS,"
-//                                               + " [Area] as A"
-//                                               + " where CRS.DATUM_CODE = ?"
-//                                               + " and CO.SOURCE_CRS_CODE = CRS.COORD_REF_SYS_CODE"
-//                                               + " and CO.TARGET_CRS_CODE = 4326"
-//                                               + " and A.AREA_CODE = CO.AREA_OF_USE_CODE"
-//                                               + " order by CO.COORD_OP_CODE");
-//            stmt.setString(1, code);
-//            final ResultSet result = stmt.executeQuery();
-//            while (result.next()) {
-//                final Parameter[] param = createParameters(getString(result, 1, code));
-//                if ((param != null) && (param.length != 0)) {
-//                    final String areaOfUse    = result.getString(2); // Accept null.
-//                    final String methodOpCode = getString(result, 3, code);
-//                    // Value could be something else, but I don't know what to do when
-//                    // it is the case (for example 9618, with a radian Unit).
-//                    // So limiting to 9603 and 9606 cases for the moment.
-//                    if (methodOpCode.equals("9603") || methodOpCode.equals("9606")) {
-//                        final WGS84ConversionInfo info = new WGS84ConversionInfo();
-//                        // First we get the description of the area of use
-//                        info.areaOfUse = areaOfUse;
-//
-//                        // Then we get the coordinates. For each one we convert the unit in meter
-//                        info.dx = Unit.METRE.convert(param[0].value, param[0].unit);
-//                        info.dy = Unit.METRE.convert(param[1].value, param[1].unit);
-//                        info.dz = Unit.METRE.convert(param[2].value, param[2].unit);
-//
-//                        if (methodOpCode.equals("9606")) {
-//                            // Here we know that the database provides four more informations
-//                            // for WGS84 conversion : ex, ey, ez and ppm
-//                            info.ex  = Unit.ARC_SECOND.convert(param[3].value, param[3].unit);
-//                            info.ey  = Unit.ARC_SECOND.convert(param[4].value, param[4].unit);
-//                            info.ez  = Unit.ARC_SECOND.convert(param[5].value, param[5].unit);
-//                            info.ppm = param[6].value; // Parts per million, no conversion needed
-//                        }
-//                        list.add(info);
-//                    }
-//                }
-//            }            
-//            result.close();
-//        } catch (SQLException exception) {
-//            throw new FactoryException(code, exception);
-//        }
-//        return (WGS84ConversionInfo[]) list.toArray(new WGS84ConversionInfo[list.size()]);
-//    }
-//    
+    
 //    /**
 //     * Returns a coordinate system from a code.
 //     *
@@ -1435,131 +1455,8 @@ public class DefaultFactory extends AuthorityFactory
         super.finalize();
     }
 
-//    /**
-//     * Returns the parameter list for an operation method code.
-//     *
-//     * @param  code The operation code.
-//     * @return Parameters.
-//     * @throws SQLException if an error occured during database access.
-//     * @throws FactoryException if some other errors has occured.
-//     *
-//     * @task HACK: This method has a temporary hack when PARAMETER_VALUE_FILE_RE
-//     *             is defined instead of PARAMETER_VALUE.
-//     */
-//    private Parameter[] createParameters(final String code) throws SQLException, FactoryException {
-//        final List list = new ArrayList();
-//        final PreparedStatement stmt;
-//        stmt = prepareStatement("Parameter", "select "
-//                                       + " COP.PARAMETER_NAME,"
-//                                       + " COPV.PARAMETER_VALUE,"
-//                                       + " COPV.UOM_CODE"
-//                                       + " from [Coordinate_Operation Parameter Usage] as COPU,"
-//                                       + " [Coordinate_Operation] as CO,"
-//                                       + " [Coordinate_Operation Parameter] as COP,"
-//                                       + " [Coordinate_Operation Parameter Value] as COPV"
-//                                       + " where CO.COORD_OP_CODE = ?"
-//                                       + " and CO.COORD_OP_METHOD_CODE = COPU.COORD_OP_METHOD_CODE"
-//                                       + " and COP.PARAMETER_CODE = COPU.PARAMETER_CODE"
-//                                       + " and COPV.PARAMETER_CODE = COPU.PARAMETER_CODE"
-//                                       + " and COPV.COORD_OP_CODE = ?"
-//                                       + " order by COPU.SORT_ORDER");
-//        stmt.setString(1, code);
-//        stmt.setString(2, code);
-//        final ResultSet result = stmt.executeQuery();
-//        while (result.next()) {
-//            final String  name = getString(result, 1, code);
-//            final double value = result.getDouble(2);
-//            if (result.wasNull()) {
-//                /*
-//                 * This a temporary hack because sometimes PARAMETER_VALUE is
-//                 * not defined, it is replaced by PARAMETER_VALUE_FILE_RE.
-//                 */
-//                result.close();
-//                throw new UnsupportedOperationException("Not yet implemented");
-//            }
-//            final String  unit = getString(result, 3, code);
-//            list.add(new Parameter(name, value, createUnit(unit)));
-//        }
-//        result.close();
-//        return (Parameter[]) list.toArray(new Parameter[list.size()]);
-//    }
-//    
-//    /**
-//     * An internal class for Operations Parameters informations
-//     */
-//    private static final class Parameter {
-//        /**
-//         * The EPSG name for this Parameter
-//         */
-//        public final String name;
-//
-//        /**
-//         * The value of the parameter.
-//         */
-//        public final double value;
-//        
-//        /**
-//         * The Unit for this parameter.
-//         */
-//        public final Unit unit;
-//        
-//        /**
-//         * Main class constructor.
-//         */
-//        private Parameter(final String name, final double value, final Unit unit)
-//        {
-//            this.name  = name;
-//            this.value = value;
-//            this.unit  = unit;
-//        }
-//
-//        /**
-//         * Copy this parameter in the specified {@link ParameterList}. The EPSG parameter
-//         * name will be converted into OGC name, and the value into standard units. If the
-//         * parameter can't be set, a warning is logged but the process continue.
-//         *
-//         * @param list The parameter list in which to copy this parameter.
-//         */
-//        final void setParameter(final ParameterList list)
-//        {
-//            final String ogcName = fromEPSGtoOGC(name);
-//            double standardValue = value;
-//            if (Unit.METRE.canConvert(unit)) {
-//                standardValue = Unit.METRE.convert(standardValue, unit);
-//            }
-//            if (Unit.DEGREE.canConvert(unit)) {
-//                standardValue = Unit.DEGREE.convert(standardValue, unit);
-//            }
-//            try {
-//                list.setParameter(ogcName, standardValue);
-//            } catch (IllegalArgumentException exception) {
-//                final LogRecord record = Resources.getResources(null).getLogRecord(Level.WARNING,
-//                        ResourceKeys.WARNING_UNKNOW_PARAMETER_$3, name, new Double(value), unit);
-//                record.setSourceClassName("CoordinateSystemEPSGFactory");
-//                record.setSourceMethodName("createProjectedCoordinateSystem");
-//                record.setThrown(exception);
-//                Logger.getLogger("org.geotools.referencing").log(record);
-//            }
-//        }
-//
-//        /**
-//         * Returns a string representation for debugging purpose.
-//         */
-//        public String toString()
-//        {
-//            final StringBuffer buffer = new StringBuffer("Parameter[\"");
-//            buffer.append(name);
-//            buffer.append("\"=");
-//            buffer.append(value);
-//            buffer.append(' ');
-//            buffer.append(unit);
-//            buffer.append(']');
-//            return buffer.toString();
-//        }
-//    }
-
     /**
-     * Construct an object from the EPSG database and print its WKT (Well Know Text) to
+     * Constructs an object from the EPSG database and print its WKT (Well Know Text) to
      * the standard output. This method can be invoked from the command line. For example:
      *
      * <blockquote><pre>

@@ -1,0 +1,155 @@
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2005, Geotools Project Managment Committee (PMC)
+ * (C) 2000, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package org.geotools.nature;
+
+// J2SE dependencies and extensions
+import javax.units.Converter;
+import javax.units.ConversionException;
+
+
+/**
+ * A converter from fractional degrees to sexagesimal degrees.
+ * Sexagesimal degrees are pseudo-unit in the format
+ *
+ * <cite>sign - degrees - decimal point - minutes (two digits) - integer seconds (two digits) -
+ * fraction of seconds (any precision)</cite>.
+ *
+ * Unfortunatly, this pseudo-unit is extensively used in the EPSG database.
+ *
+ * @version $Id$
+ * @author Martin Desruisseaux
+ */
+class SexagesimalConverter extends Converter {
+    /**
+     * The value to divide DMS unit by.
+     * For "degree minute second" (EPSG code 9107), this is 1.
+     * For "sexagesimal degree" (EPSG code 9110), this is 10000.
+     */
+    final int divider;
+
+    /**
+     * The inverse of this converter.
+     */
+    private final Converter inverse;
+    
+    /**
+     * Constructs a converter for sexagesimal units.
+     *
+     * @param converter The value to divide DMS unit by.
+     *        For "degree minute second" (EPSG code 9107), this is 1.
+     *        For "sexagesimal degree" (EPSG code 9110), this is 10000.
+     */
+    public SexagesimalConverter(final int divider) {
+        this.divider = divider;
+        this.inverse = new Inverse(this);
+    }
+    
+    /**
+     * Constructs a converter for sexagesimal units.
+     * This constructor is for {@link Inverse} usage only.
+     */
+    private SexagesimalConverter(final int divider, final Converter inverse) {
+        this.divider = divider;
+        this.inverse = inverse;
+    }
+
+    /**
+     * Returns the inverse of this converter.
+     */
+    public final Converter inverse() {
+        return inverse;
+    }
+    
+    /**
+     * Performs a conversion from fractional degrees to sexagesimal degrees.
+     */
+    public double convert(double value) throws ConversionException {
+        final int deg,min,sec;  deg = (int) value; // Round toward 0
+        value = (value-deg)*60; min = (int) value; // Round toward 0
+        value = (value-min)*60; sec = (int) value; // Round toward 0
+        return (((deg*100 + min)*100 + sec) + value)/divider;
+    }
+
+    /**
+     * Returns this converter derivative for the specified <code>x</code> value.
+     */
+    public final double derivative(double x) {
+        return 1;
+    }
+
+    /**
+     * Returns <code>false</code> since this converter is non-linear.
+     */
+    public final boolean isLinear() {
+        return false;
+    }
+
+    /**
+     * Compares this converter with the specified object.
+     */
+    public final boolean equals(final Object object) {
+        return object!=null && object.getClass().equals(getClass()) &&
+                ((SexagesimalConverter) object).divider == divider;
+    }
+
+    /**
+     * Returns a hash value for this converter.
+     */
+    public int hashCode() {
+        return 568378689 + divider;
+    }
+
+    /**
+     * The inverse of {@link SexagesimalConverter}.
+     */
+    private static final class Inverse extends SexagesimalConverter {
+        /**
+         * Constructs a converter.
+         */
+        public Inverse(final SexagesimalConverter inverse) {
+            super(inverse.divider, inverse);
+        }
+
+        /**
+         * Performs a conversion from sexagesimal degrees to fractional degrees.
+         */
+        public double convert(double value) throws ConversionException {
+            value *= this.divider;
+            final int deg,min;
+            deg = (int) (value/10000); value -= 10000*deg;
+            min = (int) (value/  100); value -=   100*min;
+            if (min<=-60 || min>=60) {  // Accepts NaN
+                throw new ConversionException("Invalid minutes: "+min);
+            }
+            if (value<=-60 || value>=60) { // Accepts NaN
+                throw new ConversionException("Invalid secondes: "+value);
+            }
+            value = ((value/60) + min)/60 + deg;
+            return value;
+        }
+
+        /**
+         * Returns a hash value for this converter.
+         */
+        public int hashCode() {
+            return 457829627 + divider;
+        }
+    }
+}
