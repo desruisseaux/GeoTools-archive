@@ -47,6 +47,8 @@ import org.geotools.renderer.Renderer2D;
 import org.geotools.renderer.lite.LiteRenderer;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Shape;
+import java.awt.geom.Point2D;
 
 
 /**
@@ -187,20 +189,6 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
             renderer.paint((Graphics2D) graphics,  
                 graphics.getClipBounds(),
                 dotToCoordinateTransform.createInverse());
-            if (selectionCircle != null){
-                System.out.println("Selection circle is: " + selectionCircle);
-                graphics.drawOval((int) Math.round(selectionCircle.getMinX()),
-                                  (int) Math.round(selectionCircle.getMinY()),
-                                  (int) Math.round(selectionCircle.getWidth()),
-                                  (int) Math.round(selectionCircle.getHeight()));
-            }
-            if (selectionBox != null){
-                System.out.println("Selection box is: " + selectionBox);
-                graphics.drawRect((int) Math.round(selectionBox.getMinX()), 
-                                  (int) Math.round(selectionBox.getMinY()), 
-                                  (int) Math.round(selectionBox.getWidth()), 
-                                  (int) Math.round(selectionBox.getHeight()));
-            }
         } catch (java.awt.geom.NoninvertibleTransformException e) {
             LOGGER.warning("Transform error while rendering. Cause is: " +
                 e.getCause());
@@ -371,6 +359,67 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
     }
 
     /**
+     * Added by Jamison Conley Aug 12, 2004
+     * Takes a point in screen coordinates and returns the same point in real world coordinates.
+     *
+     * @param screenPoint the point in screen coordinates
+     *
+     * @return the point in real world coordinates
+     */
+    public Point2D toWorldPoint(Point2D screenPoint){
+        Point2D retPoint = new Point2D.Double();
+        dotToCoordinateTransform.transform(screenPoint, retPoint);
+        return retPoint;
+    }
+    
+    /**
+     * Added by Jamison Conley Aug 12, 2004
+     * Takes a point in real world coordinates and returns the same point in screen coordinates.
+     *
+     * @param worldPoint the point in real world coordinates
+     *
+     * @return the point in screen coordinates
+     */
+    public Point2D toScreenPoint(Point2D worldPoint){
+        try{
+            Point2D retPoint = new Point2D.Double();
+            dotToCoordinateTransform.createInverse().transform(worldPoint, retPoint);
+            return retPoint;                   
+        } catch (java.awt.geom.NoninvertibleTransformException nte){
+            throw new RuntimeException("The transform from screen to real world coordinates could not be inverted: " + nte.getMessage());
+        }
+    }
+    
+    /**
+     * Added by Jamison Conley Aug 13, 2004
+     * Takes a shape in screen coordinates and returns the smape in real world coordinates
+     *
+     * @param screenShape the shape in screen coordinates
+     *
+     * @return the shape in real world coordinates
+     */
+    
+    public Shape toWorldShape(Shape screenShape){
+        return dotToCoordinateTransform.createTransformedShape(screenShape);
+    }
+    
+    /**
+     * Added by Jamison Conley Aug 13, 2004
+     * Takes a point in real world coordinates and returns the same point in screen coordinates.
+     *
+     * @param worldPoint the point in real world coordinates
+     *
+     * @return the shape in screen coordinates
+     */
+    public Shape toScreenShape(Shape worldShape){
+        try{
+            return dotToCoordinateTransform.createInverse().createTransformedShape(worldShape);          
+        } catch (java.awt.geom.NoninvertibleTransformException nte){
+            throw new RuntimeException("The transform from screen to real world coordinates could not be inverted: " + nte.getMessage());
+        }
+    }    
+    
+    /**
      * Set the ToolList for this class.
      *
      * @param toolList The list of tools than can be used by this class.
@@ -424,22 +473,4 @@ public class MapPaneImpl extends JPanel implements MapBoundsListener,
 		repaint(getVisibleRect());
 	}
 
-        public void addBox(Envelope e){
-            selectionBox = e;
-        }
-        
-        public void removeBox(){
-            selectionBox = null;
-        }
-        
-        public void addCircle(Envelope e, double radius){
-            selectionCircle = new Envelope(e.getMinX() - radius,
-                                           e.getMinX() + radius,
-                                           e.getMinY() - radius,
-                                           e.getMinY() + radius);
-        }
-        
-        public void removeCircle(){
-            selectionCircle = null;
-        }
 }

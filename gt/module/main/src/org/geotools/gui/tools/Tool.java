@@ -18,6 +18,7 @@ package org.geotools.gui.tools;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Graphics;
 
 import org.geotools.map.MapContext;
 
@@ -94,4 +95,6 @@ public abstract interface Tool {
      * Clean up this class.
      */
     void destroy();
+    
+    void paint(Graphics g);
 }

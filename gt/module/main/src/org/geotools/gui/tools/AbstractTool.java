@@ -2,6 +2,7 @@ package org.geotools.gui.tools;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -203,6 +204,9 @@ public abstract class AbstractTool
      *
      */
     public void mouseMoved(MouseEvent e) {
+    }
+    
+    public void paint(Graphics g){        
     }
     
     /**
