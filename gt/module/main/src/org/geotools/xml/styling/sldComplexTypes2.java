@@ -119,7 +119,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -131,7 +131,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -144,7 +144,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -159,7 +159,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -196,7 +196,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -208,7 +208,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -221,7 +221,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -236,7 +236,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -273,7 +273,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -285,7 +285,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -298,7 +298,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -313,7 +313,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -354,19 +354,18 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return LineSymbolizer.class;
         }
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -379,7 +378,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -394,7 +393,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -456,19 +455,18 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return Mark.class;
         }
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -481,7 +479,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -496,7 +494,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -556,7 +554,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -568,7 +566,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -581,7 +579,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -596,7 +594,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -635,7 +633,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -647,7 +645,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -660,7 +658,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -675,7 +673,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -708,7 +706,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -720,7 +718,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -733,7 +731,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -748,7 +746,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -783,7 +781,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -795,7 +793,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -808,7 +806,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -823,7 +821,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -863,7 +861,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -875,7 +873,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -888,7 +886,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -903,7 +901,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -949,7 +947,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -961,7 +959,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -974,7 +972,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -989,7 +987,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1030,19 +1028,18 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return PointSymbolizer.class;
         }
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1055,7 +1052,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1070,7 +1067,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1128,19 +1125,18 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return PolygonSymbolizer.class;
         }
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1153,7 +1149,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1168,7 +1164,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1219,7 +1215,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -1231,7 +1227,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1244,7 +1240,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1259,7 +1255,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1284,14 +1280,13 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return RasterSymbolizer.class;
         }
     
         private static Attribute[] attrs = null;
@@ -1330,7 +1325,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1343,7 +1338,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1358,7 +1353,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1431,7 +1426,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -1443,7 +1438,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1456,7 +1451,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1471,7 +1466,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1530,7 +1525,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -1542,7 +1537,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1555,7 +1550,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1570,7 +1565,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1612,7 +1607,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -1624,7 +1619,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1637,7 +1632,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1652,7 +1647,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1686,14 +1681,13 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return Stroke.class;
         }
         private static int GRAPHICFILL = 0;
         private static int GRAPHICSTROKE = 1;
@@ -1714,7 +1708,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1727,7 +1721,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1742,7 +1736,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1818,7 +1812,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -1829,7 +1823,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1842,7 +1836,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1857,7 +1851,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -1931,19 +1925,18 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return TextSymbolizer.class;
         }
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -1956,7 +1949,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -1971,7 +1964,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -2045,7 +2038,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -2057,7 +2050,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -2070,7 +2063,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -2085,7 +2078,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -2126,7 +2119,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -2138,7 +2131,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -2151,7 +2144,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -2166,7 +2159,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -2206,19 +2199,18 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return elems[EXPRESSION].getType().getInstanceType();
         }
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -2231,7 +2223,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -2246,7 +2238,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -2303,19 +2295,18 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
          */
         public Class getInstanceType() {
-            return null;
-            // TODO fill me in
+            return org.geotools.styling.SelectedChannelType.class;
         }
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -2328,7 +2319,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -2343,7 +2334,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
@@ -2390,7 +2381,7 @@ public class sldComplexTypes2 {
         
         /**
          * 
-         * TODO summary sentence for getInstanceType ...
+         *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
          * @return
@@ -2402,7 +2393,7 @@ public class sldComplexTypes2 {
         
         
         /**
-         * TODO summary sentence for canEncode ...
+         *  canEncode ...
          * 
          * @see org.geotools.xml.schema.Type#canEncode(org.geotools.xml.schema.Element, java.lang.Object, java.util.Map)
          * @param element
@@ -2415,7 +2406,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for encode ...
+         *  encode ...
          * 
          * @see org.geotools.xml.schema.Type#encode(org.geotools.xml.schema.Element, java.lang.Object, org.geotools.xml.PrintHandler, java.util.Map)
          * @param element
@@ -2430,7 +2421,7 @@ public class sldComplexTypes2 {
             // TODO fill me in
         }
         /**
-         * TODO summary sentence for getValue ...
+         *  getValue ...
          * 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element, org.geotools.xml.schema.ElementValue[], org.xml.sax.Attributes, java.util.Map)
          * @param element
