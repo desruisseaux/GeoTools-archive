@@ -19,9 +19,11 @@ package org.geotools.expr;
 import java.io.IOException;
 import java.util.Set;
 
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
+import org.geotools.metadata.Metadata;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -76,6 +78,68 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Jody Garnett
  */
 public interface Expr {
+	/**
+	 * Bind all meta entries according to provided metadata.
+	 * <p>
+	 * <pre><code>
+	 * Feature
+	 * </code></pre>
+	 * </p>
+	 * @param metadata
+	 * @return Expr with all meta( xpath ) Exprs resolved
+	 */
+	public Expr resolve( Metadata metadata );
+	
+	/**
+	 * 
+	 * Reduce attributes matching "bind/x" to "x".
+	 * <p>
+	 * This may be used to reduce an Expr as part of an otter join, to
+	 * something simple that can be passed off to an DataStore by way
+	 * of filter( FeatureType ).
+	 * </p>
+	 * <p>
+	 * Example:
+	 * <pre><code>
+	 * FeatureType RIVER = river.getSchema();
+	 * FeatureType HAZZARD = hazard.getSchema();
+	 * 
+	 * Expr joinExpr = Exprs.attribute("river/name").eq( Exprs.attribute("hazzard/river") );
+	 * 
+	 * FeatureReader outer = river.getFeatures().reader();
+	 * while( reader.hasNext() ){
+	 *   Feature aRiver = outer.next();
+	 * 
+	 *   Expr inner = joinExpr.resolve( "river", aRiver ).reduce( "hazzard" );
+	 *   FeatureReader inner = district.getFeatures( inner.filter( HAZZARD ) );
+	 * 	 while( inner.hasNext() ){
+	 *      Feature aHazzard = inner.next();
+	 * 
+	 * 		// code here has access to both aRiver and aHazzard 
+	 *   } 
+	 *   inner.close();
+	 * }
+	 * outer.close();
+	 * </code></pre>
+	 * </p>
+	 */
+	public Expr reduce( String bind );
+	/**
+	 * Bind attributes matching "bind/**" to feature.getAttribute("**).
+	 * <p>
+	 * This may be used to reduce an Expr as part of an otter join, to
+	 * something simple that can be passed off to an DataStore by way
+	 * of filter( FeatureType ).
+	 * </p>
+	 * <p>
+	 * This method will also try and reduce any metadata xpath
+	 * expression matching "bind/**".
+	 * </p>
+	 * @param bind
+	 * @param feature
+	 * @return Expr modified with literals in place of "bind/**" attributes.
+	 */
+	public Expr resolve( String bind, Feature feature );
 	
 	/** Lazy binding of Expr into a Filter */
 	public Filter filter(FeatureType schema) throws IOException;

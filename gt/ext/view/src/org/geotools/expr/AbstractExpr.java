@@ -30,6 +30,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.metadata.Metadata;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -57,7 +58,70 @@ import com.vividsolutions.jts.geom.Envelope;
   */
  abstract class AbstractExpr implements Expr {
  	protected FilterFactory factory = FilterFactory.createFilterFactory();
- 	
+	/**
+	 * Bind all meta entries according to provided metadata.
+	 * <p>
+	 * <pre><code>
+	 * Feature
+	 * </code></pre>
+	 * </p>
+	 * @param metadata
+	 * @return Expr with all meta( xpath ) Exprs resolved
+	 */
+	public Expr resolve( Metadata metadata ){
+		return this;
+	}
+	
+	/**
+	 * 
+	 * Reduce attributes matching "bind/x" to "x".
+	 * <p>
+	 * This may be used to reduce an Expr as part of an otter join, to
+	 * something simple that can be passed off to an DataStore by way
+	 * of filter( FeatureType ).
+	 * </p>
+	 * <p>
+	 * Example:
+	 * <pre><code>
+	 * FeatureType RIVER = river.getSchema();
+	 * FeatureType HAZZARD = hazard.getSchema();
+	 * 
+	 * Expr joinExpr = Exprs.attribute("river/name").eq( Exprs.attribute("hazzard/river") );
+	 * 
+	 * FeatureReader outer = river.getFeatures().reader();
+	 * while( reader.hasNext() ){
+	 *   Feature aRiver = outer.next();
+	 * 
+	 *   Expr inner = joinExpr.resolve( "river", aRiver ).reduce( "hazzard" );
+	 *   FeatureReader inner = district.getFeatures( inner.filter( HAZZARD ) );
+	 * 	 while( inner.hasNext() ){
+	 *      Feature aHazzard = inner.next();
+	 * 
+	 * 		// code here has access to both aRiver and aHazzard 
+	 *   } 
+	 *   inner.close();
+	 * }
+	 * outer.close();
+	 * </code></pre>
+	 * </p>
+	 */
+	public Expr reduce( String bind ){
+		return this;
+	}
+	/**
+	 * Bind attributes matching "bind/x" to feature.getAttribute("x").
+	 * <p>
+	 * This may be used to reduce an Expr as part of an otter join, to
+	 * something simple that can be passed off to an DataStore by way
+	 * of filter( FeatureType ).
+	 * </p>
+	 * @param bind
+	 * @param feature
+	 * @return
+	 */
+	public Expr resolve( String bind, Feature feature ){
+		return this;
+	}
  	/**
  	 * Useful super class that casts expressions into a Filter.
  	 * <p>

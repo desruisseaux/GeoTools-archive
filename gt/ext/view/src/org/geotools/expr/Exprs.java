@@ -198,7 +198,7 @@ public class Exprs {
 	 * @return Expr
 	 */
 	static public Expr meta( String xpath ){
-		return new AttributeExpr( xpath );
+		return new MetadataExpr( xpath );
 	}
 	
 	/**
