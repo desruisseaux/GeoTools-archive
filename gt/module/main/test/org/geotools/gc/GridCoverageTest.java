@@ -261,19 +261,20 @@ public class GridCoverageTest extends TestCase {
      * @return The "real world" grid coverage.
      * @throws IOException if an I/O operation was needed and failed.
      */
-    public static GridCoverage getExample(final int number) throws IOException {
+    public static GridCoverage getExample( final int number) throws IOException {
         final String           path;
         final String           unit;
         final Category[] categories;
         final CoordinateSystem   cs;
         final Rectangle2D    bounds;
 
+
         switch (number) {
             default: {
                 throw new IllegalArgumentException(String.valueOf(number));
             }
             case 0: {
-                unit = "°C";
+                //unit = "°C";
                 path = "QL95209.png";
                 cs   = GeographicCoordinateSystem.WGS84;
                 categories = new Category[] {
@@ -290,7 +291,7 @@ public class GridCoverageTest extends TestCase {
                 break;
             }
             case 1: {
-                unit = "mg/m³";
+                //unit = "mg/m³";
                 path = "CHL01195.png";
                 cs   = GeographicCoordinateSystem.WGS84;
                 categories = new Category[] {
@@ -303,8 +304,9 @@ public class GridCoverageTest extends TestCase {
                 break;
             }
         }
+
         final SampleDimension[] bands = new SampleDimension[] {
-            new SampleDimension(categories, (unit!=null) ? Unit.get(unit).rename(unit, null) : null)
+            new SampleDimension(categories, null)
         };
         final Envelope   envelope = new Envelope(bounds);
         final RenderedImage image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
