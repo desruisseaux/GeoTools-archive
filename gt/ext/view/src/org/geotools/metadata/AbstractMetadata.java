@@ -3,8 +3,12 @@ package org.geotools.metadata;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 
 /**
  * TODO type description
@@ -14,100 +18,32 @@ import java.util.List;
  */
 public abstract class AbstractMetadata implements Metadata {
 
-    ArrayList elementlist; 
-    Entity type;
+    EntityImpl type;
+    
+    public AbstractMetadata(){
+        type=new EntityImpl(getClass());
+    }
     
     /** 
      * @see org.geotools.metadata.Metadata#getElements(java.lang.Object[])
      */
-    public final Object[] getElements(Object[] elements) {
-        if( elementlist==null){
-            initElementList();
-        }
+    public final List getElements(List elements) {        
+        if(elements==null)
+            elements=new ArrayList();
         
-        if(elements==null){
-            elements=elementlist.toArray();
-        }else{           
-            elementlist.toArray(elements);
+        List methods=type.getGetMethods();
+        for (Iterator iter = methods.iterator(); iter.hasNext();) {
+            Method method = (Method) iter.next();
+            try{
+                elements.add(method.invoke(this,null));
+            }catch (Exception e) {
+                throw new RuntimeException( "There must be a bug in the EntityImpl class during the introspection.", e );
+            }
         }
+            
         return elements;
     }
 
-    /**
-     * 
-     */
-    private void initElementList() {
-        
-        if( elementlist!=null )
-            return;
-        
-        elementlist=new ArrayList();
-        
-        ArrayList ifaces=new ArrayList(); 
-        getInterfaces(getClass(),ifaces);
-        
-        
-        /*
-         * Inspects each interface.  If the interface is not the MetadataEntity
-         * interface then its getXXX() methods are used to identify the MetadataElements
-         * of the Metadata
-         */
-        for (Iterator iter = ifaces.iterator(); iter.hasNext();) {
-            Class iface = (Class) iter.next();
-
-            Method[] methods= iface.getDeclaredMethods();
-            
-            /*
-             * locate and add field that the getXXX() indicates
-             */
-            for (int j = 0; j < methods.length; j++) {
-                Method method = methods[j];
-                String name = method.getName();
-                if(name.startsWith("get")){
-                    try{
-                        elementlist.add(method.invoke(this,null));
-                    }catch(IllegalAccessException iae){
-                        throw new RuntimeException(iae);
-                    }catch(InvocationTargetException ite){
-                        throw new RuntimeException(ite);
-                    }//try
-                }//if
-            }//for
-        }//for
-    }
-
-    private void getInterfaces(Class class1, List list){
-
-         Class[] ifaces=class1.getInterfaces();
-        
-        for (int i = 0; i < ifaces.length; i++) {
-            Class iface = ifaces[i];
-            getInterfaces(iface, list);
-        }//for
-        
-        if( !class1.isInterface() )
-            return;
-        
-        if (class1==Metadata.class )
-            return;
-        
-        if(!Metadata.class.isAssignableFrom(class1))
-            return;
-        if(list.contains(class1)){
-            return;
-        }   
-        list.add(class1);
-    }
-    
-    /** 
-     * @see org.geotools.metadata.Metadata#getElement(int)
-     */
-    public final Object getElement(int index) {
-        if( elementlist==null )
-            initElementList();
-        
-        return elementlist.get(index);
-    }
 
     /** 
      * @see org.geotools.metadata.Metadata#getElement(java.lang.String)
@@ -118,26 +54,184 @@ public abstract class AbstractMetadata implements Metadata {
     }
 
     /** 
-     * @see org.geotools.metadata.Metadata#getNumElements()
-     */
-    public final int getNumElements() {
-        if( elementlist==null )
-            initElementList();
-        return elementlist.size();
-    }
-
-    /** 
      * @see org.geotools.metadata.Metadata#getElement(org.geotools.metadata.ElementType)
      */
     public Object getElement(Element element) {
-        // TODO Auto-generated method stub
-        return null;
+
+        ElementImpl elemImpl;
+        
+        if (element instanceof ElementImpl) {
+            elemImpl = (ElementImpl) element;
+         }else{
+             elemImpl = (ElementImpl) type.getElement(element.getName());
+         }
+        return invoke(elemImpl.getMethod());
     }
+    
+    private Object invoke(Method m){
+        try{
+            return m.invoke(this,null);
+        }catch (Exception e) {
+            throw new RuntimeException( "There must be a bug in the EntityImpl class during the introspection.", e );
+        }        
+    }
+    
     /** 
      * @see org.geotools.metadata.Metadata#getEntity()
      */
     public Entity getEntity() {
-        // TODO Auto-generated method stub
-        return null;
+        return type;
+    }
+    
+    private class EntityImpl implements Entity{
+        
+        ArrayList elemList=new ArrayList();
+        
+        HashMap elemMap=new HashMap();
+        
+        List getMethods;
+        
+        public EntityImpl( Class clazz ){
+            init(clazz);
+        }
+        
+        private void init(Class clazz){
+            getMethods=new ArrayList();
+            
+            ArrayList ifaces=new ArrayList(); 
+            getInterfaces(clazz,ifaces);
+            
+            /*
+             * Inspects each interface.  If the interface is not the MetadataEntity
+             * interface then its getXXX() methods are used to identify the MetadataElements
+             * of the Metadata
+             */
+            for (Iterator iter = ifaces.iterator(); iter.hasNext();) {
+                Class iface = (Class) iter.next();
+
+                Method[] newmethods= iface.getDeclaredMethods();
+                
+                /*
+                 * locate and add field that the getXXX() indicates
+                 */
+                for (int j = 0; j < newmethods.length; j++) {
+                    Method method=newmethods[j];
+                    if( method.getName().startsWith("get") ){
+                        getMethods.add(method);
+                        Class elementClass=method.getReturnType();
+                        if( Metadata.class.isAssignableFrom(elementClass) ){
+                            EntityImpl entity=new EntityImpl(elementClass);
+                            elemMap.put(method.getName().substring(3), entity);
+                            elemList.add(entity);
+                        }
+                        else{
+                            ElementImpl element=new ElementImpl(elementClass);
+                            elemMap.put(method.getName().substring(3), element);
+                            elemList.add(element);
+                        }
+                    }
+                }//for
+            }//for
+            
+        }
+        
+
+        private void getInterfaces(Class class1, List list){
+
+             Class[] ifaces=class1.getInterfaces();
+            
+            for (int i = 0; i < ifaces.length; i++) {
+                Class iface = ifaces[i];
+                getInterfaces(iface, list);
+            }//for
+            
+            if( !class1.isInterface() )
+                return;
+            
+            if (class1==Metadata.class )
+                return;
+            
+            if(!Metadata.class.isAssignableFrom(class1))
+                return;
+            if(list.contains(class1)){
+                return;
+            }   
+            list.add(class1);
+        }
+
+        List getGetMethods(){
+            return getMethods;
+        }
+        
+        /** 
+         * @see org.geotools.metadata.Metadata.Entity#getElement(java.lang.String)
+         */
+        public Element getElement(String xpath) {
+            return (Element)elemMap.get(xpath);
+            
+            //TODO implement for more complicated xpaths
+        }
+
+        /** 
+         * @see org.geotools.metadata.Metadata.Entity#getElements()
+         */
+        public List getElements() {
+            
+            return elemList;
+        }
+
+    }
+
+    private class ElementImpl implements Element{
+
+
+        /**
+         * @param elementClass
+         */
+        public ElementImpl(Class elementClass) {
+            
+            // TODO Auto-generated constructor stub
+        }
+
+        /**
+         * @return
+         */
+        public Method getMethod() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /** 
+         * @see org.geotools.metadata.Metadata.Element#getType()
+         */
+        public Class getType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /** 
+         * @see org.geotools.metadata.Metadata.Element#getName()
+         */
+        public String getName() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /** 
+         * @see org.geotools.metadata.Metadata.Element#isNillable()
+         */
+        public boolean isNillable() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /** 
+         * @see org.geotools.metadata.Metadata.Element#isMetadataEntity()
+         */
+        public boolean isMetadataEntity() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        
     }
 }
