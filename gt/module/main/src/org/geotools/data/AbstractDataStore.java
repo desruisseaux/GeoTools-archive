@@ -17,6 +17,7 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -26,18 +27,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.catalog.AbstractMetadataEntity;
+import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.DefaultQueryResult;
+import org.geotools.catalog.MetadataEntity;
+import org.geotools.catalog.QueryRequest;
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
-import org.opengis.catalog.Catalog;
-import org.opengis.catalog.CatalogEntry;
-import org.opengis.catalog.MetadataEntity;
-import org.opengis.catalog.QueryDefinition;
-import org.opengis.catalog.QueryResult;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -89,7 +88,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author jgarnett
  */
-public abstract class AbstractDataStore implements DataStore, Catalog {
+public abstract class AbstractDataStore implements DataStore {
     /** The logger for the filter module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
 
@@ -113,6 +112,12 @@ public abstract class AbstractDataStore implements DataStore, Catalog {
      */
     private InProcessLockingManager lockingManager;
 
+    /** List<TypeEntry> subclass control provided by createContents.
+     * <p>
+     * Access via entries(), creation by createContents.
+     */
+    private List contents = null;
+    
     /** Default (Writeable) DataStore */
     public AbstractDataStore() {
         this(true);
@@ -158,45 +163,97 @@ public abstract class AbstractDataStore implements DataStore, Catalog {
         listenerManager.fireFeaturesChanged( typeName, Transaction.AUTO_COMMIT, bounds );
     }
 
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.Catalog#add(org.opengis.catalog.CatalogEntry)
-     */
-    public void add(CatalogEntry arg0) throws IllegalStateException {
-        throw new UnsupportedOperationException("DataStore does not support the modification of catalog information" );
-    }
-    /* (non-Javadoc)
-     * @see org.opengis.catalog.Catalog#remove(org.opengis.catalog.CatalogEntry)
-     */
-    public void remove(CatalogEntry arg0) throws IllegalStateException {
-        throw new UnsupportedOperationException("DataStore does not support the modification of catalog information" );
-    }
-    /** Iterator of Catalog entries - one for each featureType provided by this Datastore */
-    public Iterator iterator() {
-        String typeNames[] = getTypeNames();
-        List list = new ArrayList( typeNames.length );
-        for( int i=0; i<typeNames.length; i++){
-            list.add( catalogEntry( typeNames[i] ));
+    /** List of TypeEntry entries - one for each featureType provided by this Datastore */
+    public List entries() {
+        if( contents == null ) {
+            contents = createContents();
         }
-        return list.iterator();
-    }
-    public QueryResult query(QueryDefinition arg0) {
-        QueryResult result = new DefaultQueryResult();
-        
-        return null;
+        return Collections.unmodifiableList( contents );
     }
     
-    public MetadataEntity metadata( final String typeName ){
-        return new AbstractMetadataEntity(){
-            String getName(){
-                return typeName;
+    /**
+     * Create TypeEntries based on typeName.
+     * <p>
+     * This method is lazyly called to create a List of TypeEntry for
+     * each FeatureCollection in this DataStore.
+     * </p>
+     * @return List<TypeEntry>.
+     */
+    protected List createContents() {
+        String typeNames[];
+        try {
+            typeNames = getTypeNames();
+            List list = new ArrayList( typeNames.length );
+            for( int i=0; i<typeNames.length; i++){
+                list.add( createTypeEntry( typeNames[i] ));
             }
+            return Collections.unmodifiableList( list );
+        }
+        catch (IOException help) {
+            // Contents are not available at this time!
+            LOGGER.warning( "Could not aquire getTypeName() to build contents" );
+            return null;
+        }
+    }
+    /**
+     * Create a TypeEntry for the requested typeName.
+     * <p>
+     * Default implementation is not that smart, subclass is free to override.
+     * This method should expand to take in the namespace URI.
+     * Or featureType schema - see AbstractDataStore2.
+     * </p>
+     */
+    protected TypeEntry createTypeEntry( final String typeName ) {
+        URI namespace;
+        try {
+            namespace = getSchema( typeName ).getNamespace();
+        } catch (IOException e) {
+            namespace = null;
+        }
+        return new DefaultTypeEntry( this, namespace, typeName ) {
+            protected Map createMetadata() {
+                return AbstractDataStore.this.createMetadata( typeName );
+            }  
         };
     }
-    protected CatalogEntry catalogEntry( final String typeName ){
-        return new DataStoreCatalogEntry(this, null, typeName);
+    
+    /**
+     * Subclass override to provide access to metadata.
+     * <p>
+     * CreateTypeEntry uses this method to aquire metadata information,
+     * if available.
+     * </p>
+     */
+    protected Map createMetadata( String typeName ) {
+        return Collections.EMPTY_MAP;
     }
+    
+    /**
+     * Metadata search through entries. 
+     * 
+     * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
+     * @param queryRequest
+     * @return List of matching TypeEntry
+     */
+    public List search( QueryRequest queryRequest ) {
+        if( queryRequest == QueryRequest.ALL ) {
+            return entries();
+        }
+        List queryResults = new ArrayList();
+CATALOG: for( Iterator i=entries().iterator(); i.hasNext(); ) {
+            CatalogEntry entry = (CatalogEntry) i.next();
+METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); ) {
+                if( queryRequest.match( m.next() ) ) {
+                    queryResults.add( entry );
+                    break METADATA;
+                }
+            }
+        }
+        return queryResults;
+    }
+    
     /** Convience method for retriving all the names from the Catalog Entires */
-    public abstract String[] getTypeNames();
+    public abstract String[] getTypeNames() throws IOException;
 
     /** Retrive schema information for typeName */
     public abstract FeatureType getSchema(String typeName)

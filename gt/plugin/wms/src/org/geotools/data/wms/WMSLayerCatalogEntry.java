@@ -27,8 +27,8 @@ import java.util.List;
 public class WMSLayerCatalogEntry implements CatalogEntry {
     WebMapServer wms;
     Layer layer;
-    List metadatas;
-
+    List metadatas;    
+    
     public WMSLayerCatalogEntry(WebMapServer wms, Layer layer) {
         this.wms = wms;
         this.layer = layer;

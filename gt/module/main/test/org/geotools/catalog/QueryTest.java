@@ -31,11 +31,11 @@ public class QueryTest extends TestCase {
         StupidNestedMetadata mdata=new StupidNestedMetadataImpl();
         Expr expr=Exprs.meta("fileData/name");
         QueryRequest q= new QueryRequest(expr);
-        assertTrue(q.accepts(mdata));
+        assertTrue(q.match(mdata));
         
         expr=Exprs.meta("data");
         q= new QueryRequest(expr);
-        assertTrue(q.accepts(mdata));
+        assertTrue(q.match(mdata));
 
         
     }

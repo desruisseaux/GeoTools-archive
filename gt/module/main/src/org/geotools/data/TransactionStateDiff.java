@@ -95,9 +95,14 @@ public class TransactionStateDiff implements State {
             return diff;
         }
     }
-
+    
     boolean exists(String typeName) {
-        String[] types = store.getTypeNames();
+        String[] types;
+        try {
+            types = store.getTypeNames();
+        } catch (IOException e) {
+            return false;
+        }
         Arrays.sort(types);
 
         return Arrays.binarySearch(types, typeName) != -1;

@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.geotools.catalog.CatalogEntry;
 import org.geotools.catalog.Discovery;
 import org.geotools.catalog.QueryDefinition;
+import org.geotools.catalog.QueryRequest;
 import org.geotools.data.DataStore;
 import org.geotools.data.EmptyFeatureWriter;
 import org.geotools.data.FeatureReader;
@@ -138,7 +139,7 @@ public class AbstractDataStore2 implements DataStore, Discovery {
         return new InProcessLockingManager();
     }
     
-    /** Iterator of Catalog entries - one for each featureType provided by this Datastore */
+    /** List of TypeEntry entries - one for each featureType provided by this Datastore */
     public List entries() {
         if( contents == null ) {
             contents = createContents();
@@ -161,15 +162,18 @@ public class AbstractDataStore2 implements DataStore, Discovery {
     protected List createContents() {
         throw new UnsupportedOperationException("createContent not implemented");
     }
-    public List query( QueryDefinition query ) {
-        if( query == QueryDefinition.ALL ) {
+    public List search( QueryRequest queryRequest ) {
+        if( queryRequest == QueryRequest.ALL ) {
             return entries();
         }
         List queryResults = new ArrayList();
-        for( Iterator i=entries().iterator(); i.hasNext(); ) {
+CATALOG: for( Iterator i=entries().iterator(); i.hasNext(); ) {
             CatalogEntry entry = (CatalogEntry) i.next();
-            if( query.accept( entry ) ) {
-                queryResults.add( entry );
+METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); ) {
+                if( queryRequest.match( m.next() ) ) {
+                    queryResults.add( entry );
+                    break METADATA;
+                }
             }
         }
         return queryResults;

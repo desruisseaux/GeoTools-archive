@@ -16,8 +16,11 @@
  */
 package org.geotools.data.dir;
 
+import org.geotools.catalog.CatalogEntry;
+import org.geotools.catalog.QueryRequest;
 import org.geotools.data.AbstractFileDataStore;
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultTypeEntry;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -26,14 +29,21 @@ import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.TypeEntry;
+import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,10 +67,97 @@ public class DirectoryDataStore implements DataStore, LockingManager {
     // suffix order to attempt to store new featureTypes
     private String[] createOrder;
 
+    /** List<TypeEntry> subclass control provided by createContents.
+     * <p>
+     * Access via entries(), creation by createContents.
+     */
+    private List contents = null;   
+    
     // should not be used
     private DirectoryDataStore() {
     }
 
+    /** List of TypeEntry entries - one for each featureType provided by this Datastore */
+    public List entries() {
+        if( contents == null ) {
+            contents = createContents();
+        }
+        return Collections.unmodifiableList( contents );
+    }
+    
+    /**
+     * Create TypeEntries based on typeName.
+     * <p>
+     * This method is lazyly called to create a List of TypeEntry for
+     * each FeatureCollection in this DataStore.
+     * </p>
+     * @return List<TypeEntry>.
+     */
+    protected List createContents() {
+        String typeNames[];
+        try {
+            typeNames = getTypeNames();
+            List list = new ArrayList( typeNames.length );
+            for( int i=0; i<typeNames.length; i++){
+                list.add( createTypeEntry( typeNames[i] ));
+            }
+            return Collections.unmodifiableList( list );
+        }
+        catch (IOException help) {
+            // Contents are not available at this time!
+            //LOGGER.warning( "Could not aquire getTypeName() to build contents" );
+            return null;
+        }
+    }
+    /**
+     * Create a TypeEntry for the requested typeName.
+     * <p>
+     * Default implementation is not that smart, subclass is free to override.
+     * This method should expand to take in the namespace URI.
+     * Or featureType schema - see AbstractDataStore2.
+     * </p>
+     */
+    protected TypeEntry createTypeEntry( final String typeName ) {
+        URI namespace;
+        try {
+            namespace = getSchema( typeName ).getNamespace();
+        } catch (IOException e) {
+            namespace = null;
+        }
+        // can optimize with a custom JDBCTypeEntry to allow
+        // access to database metadata.
+        return new DefaultTypeEntry( this, namespace, typeName );
+    }
+
+    /**
+     * Metadata search through entries. 
+     * 
+     * @see org.geotools.catalog.Discovery#search(org.geotools.catalog.QueryRequest)
+     * @param queryRequest
+     * @return List of matching TypeEntry
+     */
+    public List search( QueryRequest queryRequest ) {
+        if( queryRequest == QueryRequest.ALL ) {
+            return entries();
+        }
+        List queryResults = new ArrayList();
+CATALOG: for( Iterator i=entries().iterator(); i.hasNext(); ) {
+            CatalogEntry entry = (CatalogEntry) i.next();
+METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); ) {
+                if( queryRequest.match( m.next() ) ) {
+                    queryResults.add( entry );
+                    break METADATA;
+                }
+            }
+        }
+        return queryResults;
+    }
+    // This is the *better* implementation of getview from AbstractDataStore
+    public FeatureSource getView(final Query query)
+        throws IOException, SchemaException {
+        return new DefaultView( this.getFeatureSource( query.getTypeName() ), query );
+    }
+    
     /**
      * Creates a new DirectoryDataStore object.
      *

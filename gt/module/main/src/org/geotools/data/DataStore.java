@@ -16,10 +16,15 @@
  */
 package org.geotools.data;
 
+import org.geotools.catalog.CatalogEntry;
+import org.geotools.catalog.Discovery;
+import org.geotools.catalog.QueryRequest;
+import org.geotools.catalog.QueryResult;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
 import java.io.IOException;
-
+import java.util.List;
 
 /**
  * Represents a Physical Store for FeatureTypes.
@@ -82,9 +87,57 @@ import java.io.IOException;
  * @author Jody Garnett, Refractions Research
  * @version $Id: DataStore.java,v 1.4 2004/01/11 02:31:07 jive Exp $
  */
-public interface DataStore {
+public interface DataStore extends Discovery {
+
     /**
-     * Retrieves a list of of the available FeatureTypes
+     * Creates storage for a new <code>featureType</code>.
+     * 
+     * <p>
+     * The provided <code>featureType</code> we be accessable by the typeName
+     * provided by featureType.getTypeName().
+     * </p>
+     *
+     * @param featureType FetureType to add to DataStore
+     *
+     * @throws IOException If featureType cannot be created
+     */
+    void createSchema(FeatureType featureType) throws IOException;
+    
+    /**
+     * Used to force namespace and CS info into a persistent change.
+     * <p>
+     * The provided featureType should completely cover the existing schema.
+     * All attributes should be accounted for and the typeName should match.
+     * </p>
+     * <p>
+     * Suggestions:
+     * </p>
+     * <ul>
+     * <li>Sean - don't do this</li>
+     * <li>Jody - Just allow changes to metadata: CS, namespace, and others</li> 
+     * <li>James - Allow change/addition of attribtues</li> 
+     * </ul>
+     * @param typeName
+     * @throws IOException
+     */
+    void updateSchema( String typeName, FeatureType featureType ) throws IOException;
+    
+    /**
+     * Entire contents.
+     * <p>
+     * Shortcut for query( QueryDefinition.ALL )
+     * <M/p>
+     *
+     * @return Traverse the entire catalog.
+     *
+     * @UML inferred from section 3.1.1.1.2 <i>Other Functions on Catalog </i> in the
+     *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
+     *      Catalog Services </A> Specification
+     */
+    List entries();
+    
+    /**
+     * Retrieves a list of of the available FeatureTypes.
      * 
      * <p>
      * This is simply a list of the FeatureType names as aquiring the actual
@@ -105,8 +158,7 @@ public interface DataStore {
      * 
      * @return typeNames for available FeatureTypes.
      */
-    String[] getTypeNames() throws IOException;
-    
+    String[] getTypeNames() throws IOException;    
     // String[] getTypeNames( URI namespace );
 
     /**
@@ -125,37 +177,18 @@ public interface DataStore {
     FeatureType getSchema(String typeName) throws IOException;
 
     /**
-     * Creates storage for a new <code>featureType</code>.
+     * Searches through the catalog and finds the entries that that match the query.
      * 
-     * <p>
-     * The provided <code>featureType</code> we be accessable by the typeName
-     * provided by featureType.getTypeName().
-     * </p>
+     * @param  query A {@linkplain QueryRequest query definition} used to select
+     *         {@linkplain CatalogEntry catalog entries}.
+     * @return {@linkplain QueryResult Query result} containing all matching
+     *         {@linkplain CatalogEntry catalog entries}.
      *
-     * @param featureType FetureType to add to DataStore
-     *
-     * @throws IOException If featureType cannot be created
+     * @UML inferred from section 3.1.1.1.1 <i>Query Functions </i> in the
+     *      <A HREF="http://www.opengis.org/docs/99-113.pdf">OGC Abstract
+     *      Catalog Services </A> Specification
      */
-    void createSchema(FeatureType featureType) throws IOException;
-
-    /**
-     * Used to force namespace and CS info into a persistent change.
-     * <p>
-     * The provided featureType should completely cover the existing schema.
-     * All attributes should be accounted for and the typeName should match.
-     * </p>
-     * <p>
-     * Suggestions:
-     * </p>
-     * <ul>
-     * <li>Sean - don't do this</li>
-     * <li>Jody - Just allow changes to metadata: CS, namespace, and others</li> 
-     * <li>James - Allow change/addition of attribtues</li> 
-     * </ul>
-     * @param typeName
-     * @throws IOException
-     */
-    void updateSchema( String typeName, FeatureType featureType ) throws IOException;
+    List search(QueryRequest query); // really a List<TypeEntry> 
 
     /**
      * Access a FeatureSource for Query providing a high-level API.
@@ -184,7 +217,7 @@ public interface DataStore {
      * @throws IOException If FeatureSource is not available
      * @throws SchemaException If fetureType is not covered by existing schema
      */
-    //FeatureSource getView( Query query ) throws IOException, SchemaException;
+    FeatureSource getView( Query query ) throws IOException, SchemaException;
     
     /**
      * Access a FeatureSource for typeName providing a high-level API.

@@ -1,41 +1,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotools.catalog.CatalogEntry;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.data.AbstractFeatureLocking;
-import org.geotools.data.AbstractFeatureSource;
-import org.geotools.data.AbstractFeatureStore;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
-import org.geotools.data.DiffFeatureReader;
-import org.geotools.data.EmptyFeatureReader;
-import org.geotools.data.EmptyFeatureWriter;
-import org.geotools.data.FeatureListener;
-import org.geotools.data.FeatureListenerManager;
-import org.geotools.data.FeatureLocking;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.FilteringFeatureReader;
-import org.geotools.data.InProcessLockingManager;
-import org.geotools.data.MaxFeatureReader;
-import org.geotools.data.Query;
-import org.geotools.data.ReTypeFeatureReader;
-import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -73,16 +42,14 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author jgarnett
  */
-public interface TypeEntry{
+public interface TypeEntry extends CatalogEntry {
     
     public InternationalString getDisplayName();
     
     public InternationalString getDescription();
     
-    public FeatureType getFeatureType();
-    
-    public URL getURL();
-    
+    public FeatureType getFeatureType() throws IOException;
+        
     /**
      * Bounding box for associated Feature Collection, will be calcualted as needed.
      * <p>
@@ -110,11 +77,41 @@ public interface TypeEntry{
      * Several default implemenations are provided
      * 
      * @return FeatureLocking allowing access to content.
+     * @throws IOException
      */
-    public FeatureSource getFeatureSource();
+    public FeatureSource getFeatureSource() throws IOException;
     
     public void fireAdded( Feature newFeature, Transaction transaction );
     public void fireRemoved( Feature removedFeature, Transaction transaction );
     public void fireChanged( Feature before, Feature after, Transaction transaction ); 
     
+    /**
+     * Equals based only on resource definition information (not connection information).
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     * @param obj
+     * @return true if TypeEntry represents the same resource
+     */
+    public boolean equals( Object obj );
+
+    /**
+     * This hashcode is *VERY* important!
+     * <p>
+     * The hascode must be dependent only on the parameters that "define"
+     * the resource, not those that control opperation.
+     * <ul>
+     * <li>when representing a URL the hashcode must be: url.hashCode()
+     * <li>when representing a File the hashcode must be: file.toURL().hashcode()
+     * <li>when representing a database connection: hascode of jdbc url w/ out username, password
+     * </ul> 
+     * </p>
+     * <p>
+     * Implemetnation tip - URL.hashCode is a blocking operation, so you calculate and cache when the URL changes,
+     * rather than block this method.
+     * </p>
+     * @see java.lang.Object#hashCode()
+     * @return hashCode based on resource definition
+     */
+    public int hashCode();
+
 }
