@@ -2,8 +2,6 @@ package org.geotools.catalog;
 
 import java.io.IOException;
 
-import org.opengis.catalog.MetadataEntity;
-
 import org.geotools.expr.Expr;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
@@ -12,6 +10,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
+import org.opengis.catalog.MetadataEntity;
+
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
