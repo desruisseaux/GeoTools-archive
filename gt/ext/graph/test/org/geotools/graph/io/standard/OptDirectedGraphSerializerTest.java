@@ -46,7 +46,7 @@ public class OptDirectedGraphSerializerTest extends TestCase {
     final Map edge2id = (Map)obj[3];
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
       
       serializer().write(builder().getGraph());
@@ -99,7 +99,7 @@ public class OptDirectedGraphSerializerTest extends TestCase {
     GraphTestUtil.buildPerfectBinaryTree(builder(), k);
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
       
       serializer().write(builder().getGraph());

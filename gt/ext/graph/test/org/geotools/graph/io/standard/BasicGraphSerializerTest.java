@@ -48,7 +48,7 @@ public class BasicGraphSerializerTest extends TestCase {
     GraphTestUtil.buildNoBifurcations(builder(), nnodes);    
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       m_serializer.setProperty(SerializedReaderWriter.FILENAME, filename);
       
       m_serializer.write(builder().getGraph());
@@ -119,7 +119,7 @@ public class BasicGraphSerializerTest extends TestCase {
     final Map obj2node = (Map)obj[1];    
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       m_serializer.setProperty(SerializedReaderWriter.FILENAME, filename);
       
       m_serializer.write(builder().getGraph());
@@ -219,7 +219,7 @@ public class BasicGraphSerializerTest extends TestCase {
     assertTrue(builder().getGraph().getEdges().size() == nnodes-3);
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       m_serializer.setProperty(SerializedReaderWriter.FILENAME, filename);
       
       m_serializer.write(builder().getGraph());

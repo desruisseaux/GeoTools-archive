@@ -35,7 +35,7 @@ public class DirectedGraphSerializerTest
     GraphTestUtil.buildNoBifurcations(builder(), nnodes);    
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
       
       serializer().write(builder().getGraph());
@@ -105,7 +105,7 @@ public class DirectedGraphSerializerTest
     final Map obj2node = (Map)obj[1];    
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
       
       serializer().write(builder().getGraph());
@@ -201,7 +201,7 @@ public class DirectedGraphSerializerTest
     assertTrue(builder().getGraph().getEdges().size() == nnodes-3);
     
     try {
-      String filename = System.getProperty("user.dir") + "\\.tmp";
+      String filename = System.getProperty("user.dir") + "\tmp.tmp";
       serializer().setProperty(SerializedReaderWriter.FILENAME, filename);
       
       serializer().write(builder().getGraph());
