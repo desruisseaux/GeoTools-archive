@@ -3,27 +3,28 @@
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-indexed-shapefile</name>
-  <id>indexed-shapefile</id>
+  <id>hsql</id>
   <currentVersion>2.1.x</currentVersion>
-  <shortDescription>indexed shapefile module</shortDescription>
-  <description>indexed shapefile module</description>
+  <shortDescription>hsql datastore module</shortDescription>
+  <description>Provide a local datastore using hsql as an alternative to the pickle format.</description>
   <developers>
     <developer>
-      <name>Tommaso Nolli</name>
-      <id>tnolli</id>
-      <email>tommaso.nolli@asimantova.it</email>
-      <organization>Azienda Servizi Informativi S.p.a</organization>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jgarnett@refractions.net</email>
+      <organization>Refractions Research</organization>
       <roles>
+        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
     <developer>
-      <name>Jesse Eichar</name>
-      <id>jeichar</id>
-      <email>jeichar@refractions.net</email>
-      <organization>Refraction Research Inc.</organization>
+      <name>David Blasby</name>
+      <id>dblasby</id>
+      <email>dblasby@openplans.org</email>
+      <organization>The Open Planning Project</organization>
       <roles>
-	  <role>Module Maintainer</role>
+	  <role>Not Yet Module Maintainer</role>
 	  <role>Java Developer</role>
       </roles>
     </developer>
