@@ -33,6 +33,7 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
 
 // JTS dependencies
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import java.util.NoSuchElementException;
@@ -69,25 +70,87 @@ public class JTS {
         return new Envelope(newcoords[0],newcoords[2],newcoords[1],newcoords[3]);
     }
     
+    /**
+     * Creates a GeometryCoordinateSequenceTransformer.  This basic transformer
+     * transforms the vertices and assumes that the underlying data structure is
+     * an array of Coordinate objects.
+     * 
+     * @return a GeometryCoordinateSequenceTransformer
+     */
     public static GeometryCoordinateSequenceTransformer createGeometryTransformer(){
     	return new GeometryCoordinateSequenceTransformer();
     }
     
-    public static GeometryCoordinateSequenceTransformer createPreciseGeometryTransformer(){
-    	return new GeometryCoordinateSequenceTransformer(new PreciseCoordinateSequenceTransformer());
+    /**
+     * Creates a GeometryCoordinateSequenceTransformer.  This transformer
+     * is more accurate than the basic geometry transformer.  It assumes that the underlying data structure is
+     * an array of Coordinate objects.
+     * @param flatness The error in the transform is linked to the "flattening", the higher the flattening,
+     * the bigger the error, but also, the lesser the number of points that will be used
+     * to represent the resulting coordinate sequence.
+     * @return a GeometryCoordinateSequenceTransformer
+     */
+    public static GeometryCoordinateSequenceTransformer createPreciseGeometryTransformer(double flatness){
+        PreciseCoordinateSequenceTransformer t=new PreciseCoordinateSequenceTransformer();
+        t.setFlatness(flatness);
+    	return new GeometryCoordinateSequenceTransformer(t);
     }
    
+    /**
+     * Transforms the geometry using the default transformer.
+     * 
+     * @param geom The geom to transform
+     * @param transform the transform to use during the transformation.
+     * @return the transformed geometry.  It will be a new geometry.
+     * @throws MismatchedDimensionException
+     * @throws TransformException
+     */
     public static Geometry transform( Geometry geom, MathTransform transform ) throws MismatchedDimensionException, TransformException{
     	GeometryCoordinateSequenceTransformer transformer=createGeometryTransformer();
     	transformer.setMathTransform(transform);
 		return transformer.transform(geom);
 	}
     
-	public static Geometry preciseTransform( Geometry geom, MathTransform transform ) throws MismatchedDimensionException, TransformException{
-    	GeometryCoordinateSequenceTransformer transformer=createPreciseGeometryTransformer();
+    /**
+     * Transforms the geometry using the Precise transformer.
+     * 
+     * @param geom The geom to transform
+     * @param flatness the "flatness" of the new geometry.  Higher is more accurate but has more vertices.
+     * @param transform the transform to use during the transformation.
+     * @return the transformed geometry.  It will be a new geometry.
+     * @throws MismatchedDimensionException
+     * @throws TransformException
+     */
+	public static Geometry preciseTransform( Geometry geom, double flatness, MathTransform transform ) throws MismatchedDimensionException, TransformException{
+    	GeometryCoordinateSequenceTransformer transformer=createPreciseGeometryTransformer(flatness);
     	transformer.setMathTransform(transform);
 		return transformer.transform(geom);	    
 	}
+    
+    /**
+     * 
+     * Transforms the coordinate using the provided math transform.
+     * @param source the source coordinate that will be transformed
+     * @param dest the coordinate that will be set.  May be null or the source coordinate (or new coordinate of course). 
+     * return the destination coordinate if not null or a new Coordinate.
+     * @throws TransformException 
+     */     
+    public static Coordinate transform( Coordinate source, Coordinate dest, MathTransform transform ) throws TransformException{
+        double[] array=null;
+        if ( transform.getSourceDimensions()==2 )
+            array=new double[]{ source.x, source.y };
+        else if( transform.getSourceDimensions()==3 )
+            array=new double[]{ source.x, source.y, source.z };
+        
+        transform.transform(array,0,array,0,1);
+        
+        dest.x=array[0];
+        dest.y=array[1];
+        if ( transform.getTargetDimensions()==3)
+            dest.z=array[2];
+        
+        return dest;
+    }
     
     /**
      * Transforms the envelope from its current crs to WGS84 coordinate system.

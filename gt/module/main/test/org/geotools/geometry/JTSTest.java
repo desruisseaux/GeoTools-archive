@@ -25,6 +25,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 import junit.framework.TestCase;
@@ -78,14 +79,27 @@ public class JTSTest extends TestCase {
         assertTrue(Math.abs(55-env.getMinY())<DIFF);
         assertTrue(Math.abs(60-env.getMaxY())<DIFF);
     }
-
-    /*
-     * Class under test for Geometry transform(Geometry, MathTransform)
-     */
-    public void testTransformGeometryMathTransform() {
-    }
-
-    public void testPreciseTransform() {
+    
+    public void testTransformCoordinate() throws Exception{
+        Coordinate coord=new Coordinate( 10,10);
+        AffineTransform at=AffineTransform.getScaleInstance(.5,1);
+        MathTransform2D t=(MathTransform2D) FactoryFinder.getMathTransformFactory().createAffineTransform(new GeneralMatrix(at));
+        coord=JTS.transform(coord, coord, t);
+        assertEquals( new Coordinate( 5, 10), coord);
+        coord=JTS.transform(coord, coord, t.inverse());
+        assertEquals( new Coordinate( 10, 10 ), coord);
+        
+        CoordinateReferenceSystem crs=FactoryFinder
+        .getCRSFactory()
+        .createFromWKT(
+                "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
+        t=(MathTransform2D) FactoryFinder.getCoordinateOperationFactory().createOperation(
+                GeographicCRS.WGS84,crs).getMathTransform();
+        coord=new Coordinate(-123,55);
+        coord=JTS.transform(coord,coord,  t);
+        coord=JTS.transform(coord,coord,  t.inverse());
+        assertTrue(Math.abs(-123-coord.x)<DIFF);
+        assertTrue(Math.abs(55-coord.y)<DIFF);
     }
 
 }
