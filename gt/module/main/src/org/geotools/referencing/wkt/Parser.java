@@ -43,6 +43,7 @@ import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -143,6 +144,77 @@ public class Parser extends MathTransformParser {
     }
 
     /**
+     * Parses a coordinate reference system element.
+     *
+     * @param  text The text to be parsed.
+     * @return The coordinate reference system.
+     * @throws ParseException if the string can't be parsed.
+     */
+    public CoordinateReferenceSystem parseCoordinateReferenceSystem(final String text)
+            throws ParseException
+    {
+        final Element element = getTree(text, new ParsePosition(0));
+        final CoordinateReferenceSystem crs = parseCoordinateReferenceSystem(element);
+        element.close();
+        return crs;
+    }
+    
+    /**
+     * Parses a coordinate reference system element.
+     *
+     * @param  parent The parent element.
+     * @return The next element as a {@link CoordinateReferenceSystem} object.
+     * @throws ParseException if the next element can't be parsed.
+     */
+    private CoordinateReferenceSystem parseCoordinateReferenceSystem(final Element element)
+            throws ParseException
+    {
+        final Object key = element.peek();
+        if (key instanceof Element) {
+            final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
+            if (   "GEOGCS".equals(keyword)) return parseGeoGCS  (element);
+            if (   "PROJCS".equals(keyword)) return parseProjCS  (element);
+            if (   "GEOCCS".equals(keyword)) return parseGeoCCS  (element);
+            if (  "VERT_CS".equals(keyword)) return parseVertCS  (element);
+            if ( "LOCAL_CS".equals(keyword)) return parseLocalCS (element);
+            if ( "COMPD_CS".equals(keyword)) return parseCompdCS (element);
+            if ("FITTED_CS".equals(keyword)) return parseFittedCS(element);
+        }
+        throw element.parseFailed(null, Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, key));
+    }
+
+    /**
+     * Parses the next element in the specified <cite>Well Know Text</cite> (WKT) tree.
+     *
+     * @param  element The element to be parsed.
+     * @return The object.
+     * @throws ParseException if the element can't be parsed.
+     *
+     * @todo All sequences of <code>if ("FOO".equals(keyword))</code> in this method
+     *       and other methods of this class and subclasses, could be optimized with
+     *       a <code>switch</code> statement.
+     */
+    protected Object parse(final Element element) throws ParseException {
+        final Object key = element.peek();
+        if (key instanceof Element) {
+            final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
+            if (       "AXIS".equals(keyword)) return parseAxis      (element, SI.METER, true);
+            if (     "PRIMEM".equals(keyword)) return parsePrimem    (element, NonSI.DEGREE_ANGLE);
+            if (    "TOWGS84".equals(keyword)) return parseToWGS84   (element);
+            if (   "SPHEROID".equals(keyword)) return parseSpheroid  (element);
+            if ( "VERT_DATUM".equals(keyword)) return parseVertDatum (element);
+            if ("LOCAL_DATUM".equals(keyword)) return parseLocalDatum(element);
+            if (      "DATUM".equals(keyword)) return parseDatum     (element,
+                              org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+        }
+        final MathTransform mt = parseMathTransform(element, false);
+        if (mt != null) {
+            return mt;
+        }
+        return parseCoordinateReferenceSystem(element);
+    }
+
+    /**
      * Parses an <strong>optional</strong> "AUTHORITY" element.
      * This element has the following pattern:
      *
@@ -181,7 +253,7 @@ public class Parser extends MathTransformParser {
      * </code></blockquote>
      *
      * @param  parent The parent element.
-     * @param  unit The contextual unit. Usually {@link NonSI#DEGREE_ANGLE} or {@link SI#METRE}.
+     * @param  unit The contextual unit. Usually {@link SI#METRE} or {@link SI#RADIAN}.
      * @return The "UNIT" element as an {@link Unit} object.
      * @throws ParseException if the "UNIT" can't be parsed.
      *
@@ -360,15 +432,25 @@ public class Parser extends MathTransformParser {
         final Map    properties = parseAuthority(element, classname);
         element.close();
         /*
-         * Set the list of parameters. NOTE: Parameters are defined in
+         * Set the list of parameters.  NOTE: Parameters are defined in
          * the parent Element (usually a "PROJCS" element), not in this
          * "PROJECTION" element.
+         *
+         * We will set the semi-major and semi-minor parameters from the
+         * ellipsoid first. If those values were explicitly specified in
+         * a "PARAMETER" statement, they will overwrite the values inferred
+         * from the ellipsoid.
          */
         final ParameterValueGroup parameters;
         try {
             parameters = mtFactory.getDefaultParameters(classname);
         } catch (NoSuchIdentifierException exception) {
             throw element.parseFailed(exception, null);
+        }
+        if (ellipsoid != null) {
+            final Unit axisUnit = ellipsoid.getAxisUnit();
+            parameters.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), axisUnit);
+            parameters.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), axisUnit);
         }
         Element param;
         while ((param=parent.pullOptionalElement("PARAMETER")) != null) {
@@ -381,29 +463,7 @@ public class Parser extends MathTransformParser {
                 parameter.setValue(paramValue);
             }
         }
-        if (ellipsoid != null) {
-            final Unit axisUnit = ellipsoid.getAxisUnit();
-            setValue(parameters.parameter("semi_major"), ellipsoid.getSemiMajorAxis(), axisUnit);
-            setValue(parameters.parameter("semi_minor"), ellipsoid.getSemiMinorAxis(), axisUnit);
-        }
         return parameters;
-    }
-
-    /**
-     * Set the value for the specified parameter.
-     *
-     * @todo Warning logging not yet implemented.
-     */
-    private static void setValue(final ParameterValue param, final double value, final Unit unit) {
-        if (false) try {
-            final double old = param.doubleValue(unit);
-            if (old > 0) {
-                // TODO: log a warning.
-            }
-        } catch (IllegalStateException exception) {
-            // Parameter not set and no default value. Ignore.
-        }
-        param.setValue(value, unit);
     }
 
     /**
@@ -559,7 +619,6 @@ public class Parser extends MathTransformParser {
         final PrimeMeridian meridian = parsePrimem   (element, NonSI.DEGREE_ANGLE);
         final GeodeticDatum    datum = parseDatum    (element, meridian);
         final Unit              unit = parseUnit     (element, SI.METER);
-        element.close();
         final CartesianCS cs;
         final CoordinateSystemAxis axis0 = parseAxis(element, unit, false);
         try {
@@ -571,6 +630,7 @@ public class Parser extends MathTransformParser {
             else {
                 cs = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
             }
+            element.close();
             return crsFactory.createGeocentricCRS(properties, datum, cs);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
@@ -611,159 +671,155 @@ public class Parser extends MathTransformParser {
         }
     }
 
-//    /**
-//     * Parses a "GEOGCS" element. This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * GEOGCS["<name>", <datum>, <prime meridian>, <angular unit>  {,<twin axes>} {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "GEOGCS" element as a {@link GeographicCoordinateSystem} object.
-//     * @throws ParseException if the "GEOGCS" element can't be parsed.
-//     */
-//    private GeographicCoordinateSystem parseGeoGCS(final Element parent) throws ParseException {
-//        Element        element = parent.pullElement("GEOGCS");
-//        CharSequence      name = element.pullString("name");
-//        HorizontalDatum  datum = parseDatum(element);
-//        Unit              unit = parseUnit(element, Unit.RADIAN);
-//        PrimeMeridian meridian = parsePrimem(element, unit);
-//        AxisInfo         axis0 = parseAxis(element, false);
-//        AxisInfo         axis1;
-//        if (axis0 != null) {
-//            axis1 = parseAxis(element, true);
-//        } else {
-//            axis0 = AxisInfo.LONGITUDE;
-//            axis1 = AxisInfo.LATITUDE;
-//        }
-//        name = parseAuthority(element, name);
-//        element.close();
-//        try {
-//            return crsFactory.createGeographicCoordinateSystem(name, unit, datum, meridian, axis0, axis1);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//
-//    /**
-//     * Parses a "PROJCS" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * PROJCS["<name>", <geographic cs>, <projection>, {<parameter>,}*,
-//     *        <linear unit> {,<twin axes>}{,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "PROJCS" element as a {@link ProjectedCoordinateSystem} object.
-//     * @throws ParseException if the "GEOGCS" element can't be parsed.
-//     */
-//    private ProjectedCoordinateSystem parseProjCS(final Element parent) throws ParseException {
-//        Element                element = parent.pullElement("PROJCS");
-//        CharSequence              name = element.pullString("name");
-//        GeographicCoordinateSystem gcs = parseGeoGCS(element);
-//        Ellipsoid            ellipsoid = gcs.getHorizontalDatum().getEllipsoid();
-//        Unit                      unit = parseUnit(element, Unit.METRE);
-//        Projection          projection = parseProjection(element, ellipsoid, unit);
-//        AxisInfo                 axis0 = parseAxis(element, false);
-//        AxisInfo                 axis1;
-//        if (axis0 != null) {
-//            axis1 = parseAxis(element, true);
-//        } else {
-//            axis0 = AxisInfo.X;
-//            axis1 = AxisInfo.Y;
-//        }
-//        name = parseAuthority(element, name);
-//        element.close();
-//        try {
-//            return crsFactory.createProjectedCoordinateSystem(name, gcs, projection, unit, axis0, axis1);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }        
-//
-//    /**
-//     * Parses a "COMPD_CS" element.
-//     * This element has the following pattern:
-//     *
-//     * <blockquote><code>
-//     * COMPD_CS["<name>", <head cs>, <tail cs> {,<authority>}]
-//     * </code></blockquote>
-//     *
-//     * @param  parent The parent element.
-//     * @return The "COMPD_CS" element as a {@link CompoundCoordinateSystem} object.
-//     * @throws ParseException if the "COMPD_CS" element can't be parsed.
-//     */
-//    private CompoundCoordinateSystem parseCompdCS(final Element parent) throws ParseException
-//    {        
-//        Element         element = parent.pullElement("COMPD_CS");
-//        CharSequence       name = element.pullString("name");
-//        CoordinateSystem headCS = parseCoordinateSystem(element);
-//        CoordinateSystem tailCS = parseCoordinateSystem(element);
-//        name = parseAuthority(element, name);
-//        element.close();
-//        try {
-//            return crsFactory.createCompoundCoordinateSystem(name, headCS, tailCS);
-//        } catch (FactoryException exception) {
-//            throw element.parseFailed(exception, null);
-//        }
-//    }
-//    
-//    /**
-//     * Parses a coordinate system element.
-//     *
-//     * @param  parent The parent element.
-//     * @return The next element as a {@link CoordinateSystem} object.
-//     * @throws ParseException if the next element can't be parsed.
-//     */
-//    private CoordinateSystem parseCoordinateSystem(final Element element) throws ParseException
-//    {
-//        final Object key = element.peek();
-//        if (key instanceof Element) {
-//            final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
-//            if (  "GEOGCS".equals(keyword)) return parseGeoGCS (element);
-//            if (  "PROJCS".equals(keyword)) return parseProjCS (element);
-//            if (  "GEOCCS".equals(keyword)) return parseGeoCCS (element);
-//            if ( "VERT_CS".equals(keyword)) return parseVertCS (element);
-//            if ("LOCAL_CS".equals(keyword)) return parseLocalCS(element);
-//            if ("COMPD_CS".equals(keyword)) return parseCompdCS(element);
-//        }
-//        throw element.parseFailed(null, Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, key));
-//    }
-//
-//    /**
-//     * Parses the next element in the specified <cite>Well Know Text</cite> (WKT) tree.
-//     *
-//     * @param  element The element to be parsed.
-//     * @return The object.
-//     * @throws ParseException if the element can't be parsed.
-//     */
-//    protected Object parse(final Element element) throws ParseException {
-//        final Object key = element.peek();
-//        if (key instanceof Element) {
-//            final String keyword = ((Element) key).keyword.trim().toUpperCase(symbols.locale);
-//            if (       "AXIS".equals(keyword)) return parseAxis      (element, true);
-//            if (     "PRIMEM".equals(keyword)) return parsePrimem    (element, Unit.DEGREE);
-//            if (    "TOWGS84".equals(keyword)) return parseToWGS84   (element);
-//            if (   "SPHEROID".equals(keyword)) return parseSpheroid  (element);
-//            if (      "DATUM".equals(keyword)) return parseDatum     (element);
-//            if ( "VERT_DATUM".equals(keyword)) return parseVertDatum (element);
-//            if ("LOCAL_DATUM".equals(keyword)) return parseLocalDatum(element);
-//        }
-//        return parseCoordinateSystem(element);
-//    }
-//
-//    /**
-//     * Parses a coordinate system element.
-//     *
-//     * @param  text The text to be parsed.
-//     * @return The coordinate system.
-//     * @throws ParseException if the string can't be parsed.
-//     */
-//    public CoordinateSystem parseCoordinateSystem(final String text) throws ParseException {
-//        final Element element = getTree(text, new ParsePosition(0));
-//        final CoordinateSystem cs = parseCoordinateSystem(element);
-//        element.close();
-//        return cs;
-//    }
+    /**
+     * Parses a "GEOGCS" element. This element has the following pattern:
+     *
+     * <blockquote><code>
+     * GEOGCS["<name>", <datum>, <prime meridian>, <angular unit>  {,<twin axes>} {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "GEOGCS" element as a {@link GeographicCRS} object.
+     * @throws ParseException if the "GEOGCS" element can't be parsed.
+     */
+    private GeographicCRS parseGeoGCS(final Element parent) throws ParseException {
+        Element            element = parent.pullElement("GEOGCS");
+        String                name = element.pullString("name");
+        Map             properties = parseAuthority(element, name);
+        Unit                  unit = parseUnit     (element, SI.RADIAN);
+        PrimeMeridian     meridian = parsePrimem   (element, unit);
+        GeodeticDatum        datum = parseDatum    (element, meridian);
+        CoordinateSystemAxis axis0 = parseAxis     (element, unit, false);
+        CoordinateSystemAxis axis1 = null;
+        EllipsoidalCS cs;
+        if (axis0 != null) {
+            axis1 = parseAxis(element, unit, true);
+        }
+        element.close();
+        try {
+            if (axis0 != null) {
+                cs = csFactory.createEllipsoidalCS(properties, axis0, axis1);
+            } else {
+                cs = org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D;
+            }
+            return crsFactory.createGeographicCRS(properties, datum, cs);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
+    /**
+     * Parses a "PROJCS" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * PROJCS["<name>", <geographic cs>, <projection>, {<parameter>,}*,
+     *        <linear unit> {,<twin axes>}{,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "PROJCS" element as a {@link ProjectedCRS} object.
+     * @throws ParseException if the "GEOGCS" element can't be parsed.
+     */
+    private ProjectedCRS parseProjCS(final Element parent) throws ParseException {
+        Element                 element = parent.pullElement("PROJCS");
+        String                     name = element.pullString("name");
+        Map                  properties = parseAuthority(element, name);
+        GeographicCRS            geoCRS = parseGeoGCS(element);
+        Ellipsoid             ellipsoid = ((GeodeticDatum) geoCRS.getDatum()).getEllipsoid();
+        Unit                       unit = parseUnit(element, SI.METER);
+        ParameterValueGroup  projection = parseProjection(element, ellipsoid, unit);
+        CoordinateSystemAxis      axis0 = parseAxis(element, unit, false);
+        CoordinateSystemAxis      axis1 = null;
+        CartesianCS cs;
+        if (axis0 != null) {
+            axis1 = parseAxis(element, unit, true);
+        }
+        element.close();
+        try {
+            if (axis0 != null) {
+                cs = csFactory.createCartesianCS(properties, axis0, axis1);
+            } else {
+                cs = org.geotools.referencing.cs.CartesianCS.PROJECTED;
+            }
+            return crsFactory.createProjectedCRS(properties, geoCRS,
+                    mtFactory.createParameterizedTransform(projection), cs);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }        
+
+    /**
+     * Parses a "COMPD_CS" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * COMPD_CS["<name>", <head cs>, <tail cs> {,<authority>}]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "COMPD_CS" element as a {@link CompoundCRS} object.
+     * @throws ParseException if the "COMPD_CS" element can't be parsed.
+     */
+    private CompoundCRS parseCompdCS(final Element parent) throws ParseException {
+        final CoordinateReferenceSystem[] CRS = new CoordinateReferenceSystem[2];
+        Element element = parent.pullElement("COMPD_CS");
+        String     name = element.pullString("name");
+        Map  properties = parseAuthority(element, name);
+        CRS[0] = parseCoordinateReferenceSystem(element);
+        CRS[1] = parseCoordinateReferenceSystem(element);
+        element.close();
+        try {
+            return crsFactory.createCompoundCRS(properties, CRS);
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
+
+    /**
+     * Parses a "FITTED_CS" element.
+     * This element has the following pattern:
+     *
+     * <blockquote><code>
+     * FITTED_CS["<name>", <to base>, <base cs>]
+     * </code></blockquote>
+     *
+     * @param  parent The parent element.
+     * @return The "FITTED_CS" element as a {@link CompoundCRS} object.
+     * @throws ParseException if the "COMPD_CS" element can't be parsed.
+     */
+    private DerivedCRS parseFittedCS(final Element parent) throws ParseException {
+        Element element = parent.pullElement("FITTED_CS");
+        String     name = element.pullString("name");
+        Map  properties = parseAuthority(element, name);
+        final CoordinateReferenceSystem base = parseCoordinateReferenceSystem(element);
+        final MathTransform toBase = parseMathTransform(element, true);
+        element.close();
+        /*
+         * WKT provides no informations about the underlying CS of a derived CRS.
+         * We have to guess some reasonable one with arbitrary units.  We try to
+         * construct the one which contains as few information as possible, in
+         * order to avoid providing wrong informations.
+         */
+        final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[toBase.getDimSource()];
+        final StringBuffer buffer = new StringBuffer(name);
+        buffer.append(" axis ");
+        final int start = buffer.length();
+        try {
+            for (int i=0; i<axis.length; i++) {
+                final String number = String.valueOf(i);
+                buffer.setLength(start);
+                buffer.append(number);
+                axis[i] = csFactory.createCoordinateSystemAxis(
+                    Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, buffer.toString()),
+                    number, AxisDirection.OTHER, Unit.ONE);
+            }
+            return crsFactory.createDerivedCRS(properties, base, toBase.inverse(),
+                   new org.geotools.referencing.cs.CoordinateSystem(properties, axis));
+        } catch (FactoryException exception) {
+            throw element.parseFailed(exception, null);
+        } catch (NoninvertibleTransformException exception) {
+            throw element.parseFailed(exception, null);
+        }
+    }
 }

@@ -75,6 +75,13 @@ public class WKTParserTest extends TestCase {
     }
 
     /**
+     * Parse parsing of coordinate reference systems.
+     */
+    public void testCoordinateReferenceSystem() throws IOException, ParseException {
+//        testParsing(new Parser(), "wkt/CoordinateReferenceSystem.txt");
+    }
+
+    /**
      * Parse all elements from the specified file. Parsing creates a set of
      * geographic objects. No special processing are done with them; we just
      * check if the parsing work without error and produces distincts objects.

@@ -84,7 +84,21 @@ public class MathTransformParser extends AbstractParser {
         super(symbols);
         this.mtFactory = mtFactory;
     }
-    
+
+    /**
+     * Parses a math transform element.
+     *
+     * @param  text The text to be parsed.
+     * @return The math transform.
+     * @throws ParseException if the string can't be parsed.
+     */
+    public MathTransform parseMathTransform(final String text) throws ParseException {
+        final Element element = getTree(text, new ParsePosition(0));
+        final MathTransform mt = parseMathTransform(element, true);
+        element.close();
+        return mt;
+    }
+
     /**
      * Parses the next element in the specified <cite>Well Know Text</cite> (WKT) tree.
      *
@@ -105,7 +119,7 @@ public class MathTransformParser extends AbstractParser {
      * @return The next element as a {@link MathTransform} object.
      * @throws ParseException if the next element can't be parsed.
      */
-    private MathTransform parseMathTransform(final Element element, final boolean required)
+    final MathTransform parseMathTransform(final Element element, final boolean required)
             throws ParseException
     {
         final Object key = element.peek();
