@@ -131,7 +131,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
          */
         String implementation = "sun.jdbc.odbc.ee.DataSource";
         try {
-            final Preferences prefs = Preferences.systemNodeForPackage(DefaultFactory.class);
+            final Preferences prefs = Preferences.userNodeForPackage(DefaultFactory.class);
             implementation = prefs.get(DATASOURCE_NODE, implementation);
         } catch (SecurityException exception) {
             // We are not allowed to get preferences (for example we are
@@ -313,7 +313,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      *       Sets the default {@linkplain DataSource data source} class. This class is used for
      *       {@linkplain #createDataSource creating a default data source} if no data source was
      *       found in the naming system for the <code>{@value #DATASOURCE_NAME}</code> name. The
-     *       specified classname is stored in {@linkplain Preferences#systemRoot system preferences}
+     *       specified classname is stored in {@linkplain Preferences#userRoot user preferences}
      *       for future execution. The "{@code default}" string reset the default value, which is
      *       "{@code sun.jdbc.odbc.ee.DataSource}".
      *       <br><br>
@@ -332,7 +332,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         final String   datasource = arguments.getOptionalString("-datasource");
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         if (datasource != null) {
-            final Preferences prefs = Preferences.systemNodeForPackage(DefaultFactory.class);
+            final Preferences prefs = Preferences.userNodeForPackage(DefaultFactory.class);
             if (datasource.equalsIgnoreCase("default")) {
                 prefs.remove(DATASOURCE_NODE);
             } else {
