@@ -2999,6 +2999,12 @@ public class WMSComplexTypes {
 			return attrs;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.geotools.xml.schema.ComplexType#isMixed()
+		 */
+		public boolean isMixed() {
+			return true;
+		}
 		/*
 		 * (non-Javadoc)
 		 * 
