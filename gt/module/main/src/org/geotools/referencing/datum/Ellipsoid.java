@@ -60,11 +60,19 @@ public class Ellipsoid extends Info implements org.opengis.referencing.datum.Ell
     private static final long serialVersionUID = -1149451543954764081L;
     
     /**
-     * WGS 1984 ellipsoid. This ellipsoid is used in GPS systems
-     * and is the default for most <code>org.geotools</code> packages.
+     * WGS 1984 ellipsoid with axis in {@linkplain SI#METER metres}. This ellipsoid is used
+     * in GPS systems and is the default for most <code>org.geotools</code> packages.
      */
     public static final Ellipsoid WGS84 =
             createFlattenedSphere("WGS84", 6378137.0, 298.257223563, SI.METER);
+
+    /**
+     * A sphere with a radius of 6371000 {@linkplain SI#METER metres}. Spheres use a simplier
+     * algorithm for {@linkplain #orthodromicDistance orthodromic distance computation}, which
+     * may be faster and more robust.
+     */
+    public static final Ellipsoid SPHERE =
+            createEllipsoid("SPHERE", 6371000, 6371000, SI.METER);
     
     /**
      * The equatorial radius.

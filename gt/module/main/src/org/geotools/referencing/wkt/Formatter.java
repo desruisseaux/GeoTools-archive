@@ -25,6 +25,7 @@ package org.geotools.referencing.wkt;
 // J2SE dependencies
 import java.util.Locale;
 import java.text.FieldPosition;
+import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 import javax.units.UnitFormat;
@@ -119,7 +120,7 @@ public class Formatter {
     private final StringBuffer buffer = new StringBuffer();
 
     /**
-     * The amount of space to use in indentation, or -1 if indentation is disabled.
+     * The amount of space to use in indentation, or 0 if indentation is disabled.
      */
     private final int indentation;
 
@@ -136,20 +137,25 @@ public class Formatter {
     private boolean invalidWKT;
 
     /**
-     * Creates a new instance of the formatter. The whole WKT while be formatted
+     * True if the formatter should use class name instead of "GEOCS", "DATUM", etc. keywords.
+     */
+    boolean usesClassname;
+
+    /**
+     * Creates a new instance of the formatter. The whole WKT will be formatted
      * on a single line.
      *
      * @param locale The locale, or <code>null</code>.
      */
     public Formatter(final Locale locale) {
-        this.locale = locale;
-        this.indentation = -1;
+        this(locale, 0);
     }
 
     /**
      * Creates a new instance of the formatter with the specified indentation width.
      * The WKT will be formatted on many lines, and the indentation width will have
-     * the value specified to this constructor.
+     * the value specified to this constructor. If the specified indentation is 0,
+     * then the whole WKT will be formatted on a single line.
      *
      * @param locale The locale, or <code>null</code>.
      * @param indentation The amount of spaces to use in indentation. Typical values are 2 or 4.
@@ -173,22 +179,32 @@ public class Formatter {
      * @param formattable The formattable object to append to the WKT.
      */
     public void append(final Formattable formattable) {
+        final Info info = (formattable instanceof Info) ? (Info) formattable : null;
         if (buffer.length() != 0) {
             buffer.append(SEPARATOR);
             buffer.append(SPACE);
-            if (indentation >= 0) {
+            if (indentation != 0) {
                 buffer.append('\n');
                 buffer.append(Utilities.spaces(margin += indentation));
             }
         }
         final int base = buffer.length();
         buffer.append(OPEN);
-        if (formattable instanceof Info) {
-            final Info info = (Info) formattable;
+        if (info != null) {
             buffer.append(QUOTE);
             buffer.append(info.getName(locale));
             buffer.append(QUOTE);
-            buffer.insert(base, formattable.formatWKT(this));
+        }
+        String keyword = formattable.formatWKT(this);
+        if (usesClassname) {
+            keyword = Utilities.getShortClassName(formattable);
+            final int inner = keyword.indexOf('.');
+            if (inner >= 0) {
+                keyword = keyword.substring(0, inner);
+            }
+        }
+        buffer.insert(base, keyword);
+        if (info != null) {
             final Identifier[] identifiers = info.getIdentifiers();
             for (int i=0; i<identifiers.length; i++) {
                 final Identifier identifier = identifiers[i];
@@ -215,8 +231,6 @@ public class Formatter {
                     }
                 }
             }
-        } else {
-            buffer.insert(base, formattable.formatWKT(this));
         }
         buffer.append(CLOSE);
         if (margin >= 0) {
@@ -299,10 +313,14 @@ public class Formatter {
                 buffer.append(SEPARATOR);
                 buffer.append(SPACE);
             }
-            buffer.append("UNIT");
+            buffer.append(usesClassname ? "Unit" : "UNIT");
             buffer.append(OPEN);
             buffer.append(QUOTE);
-            unitFormat.format(unit, buffer, dummy);
+            if (NonSI.DEGREE_ANGLE.equals(unit)) {
+                buffer.append("degree");
+            } else {
+                unitFormat.format(unit, buffer, dummy);
+            }
             buffer.append(QUOTE);
             Unit base = null;
             if (SI.METER.isCompatible(unit)) {

@@ -46,8 +46,8 @@ public class Formattable {
 
     /**
      * Returns a string representation for this object. The default implementation returns
-     * an extension of the <cite>Well Known Text</cite> (WKT) format. The extension consist
-     * in usage of classname where no WKT keyword is defined. For example the
+     * a string similar to the <cite>Well Known Text</cite> (WKT) format. The difference
+     * consist in usage of classnames instead of WKT keywords. For example the
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT
      * specification</A> do not defines any keyword for
      * {@linkplain org.geotools.referencing.cs.CoordinateSystem coordinate system} objects. If this
@@ -56,7 +56,8 @@ public class Formattable {
      * </code><i>etc.</i><code>]"</code>.
      */
     public String toString() {
-        final Formatter formatter = new Formatter(null);
+        final Formatter formatter = new Formatter(null, 2);
+        formatter.usesClassname = true;
         formatter.append(this);
         return formatter.toString();
     }
@@ -66,7 +67,8 @@ public class Formattable {
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> for this object using a default {@linkplain Formatter formatter}.
      *
-     * @param  indentation The amount of spaces to use in indentation for WKT formatting.
+     * @param  indentation The amount of spaces to use in indentation for WKT formatting,
+     *         or 0 for formatting the whole WKT on a single line.
      * @return The Well Know Text for this object.
      *
      * @throws UnformattableObjectException If an object can't be formatted as WKT.
