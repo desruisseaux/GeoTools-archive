@@ -20,12 +20,17 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
+import org.postgresql.jdbc3.Jdbc3ResultSet;
 import org.wkb4j.engine.WKBParser;
-import org.wkb4j.factories.JTSFactory;
+import org.wkb4j.jts.JTSFactory;
+
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 
 
@@ -110,6 +115,16 @@ public class PgWKBAttributeIO implements AttributeIO {
       
       return wkbBytes;
     }
+    
+    private byte[] byteaToBytes(byte[] bytes) {
+        for(int i = 0; i < bytes.length; i++) {
+            if(bytes[i] >= 'A')
+                bytes[i] -= ('A' + 10);
+            else
+                bytes[i] -= '0';
+        }
+        return bytes;
+    }
 
     /**
      * @see org.geotools.data.jdbc.attributeio.AttributeIO#read(java.sql.ResultSet,
@@ -117,13 +132,25 @@ public class PgWKBAttributeIO implements AttributeIO {
      */
     public Object read(ResultSet rs, int position) throws IOException {
         try {
-            if(useByteArray)
+            if(useByteArray) {
                 return WKB2Geometry(rs.getBytes(position));
-            else 
+            } else {
                 return WKB2Geometry(hexToBytes(rs.getString(position)));
+            }
         } catch (SQLException e) {
             throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
         }
+    }
+
+    /**
+     * @param metaData
+     * @throws SQLException
+     */
+    private void printMetadata(ResultSetMetaData md) throws SQLException {
+        for (int i = 1; i <= md.getColumnCount(); i++) {
+            System.out.println(i + " " + md.getColumnName(i) + " " + md.getColumnTypeName(i));
+        }
+        
     }
 
     /**
@@ -133,6 +160,30 @@ public class PgWKBAttributeIO implements AttributeIO {
      */
     public void write(ResultSet rs, int position, Object value)
         throws IOException {
-        throw new UnsupportedOperationException("Cannot use WKB for writing data at the moment");
+        try {
+            if(value == null) {
+                rs.updateNull(position);
+            } else {
+                rs.updateString(position, WKBEncoder.encodeGeometryHex((Geometry) value));
+            }
+        } catch (SQLException e) {
+            throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
+        }
+    }
+
+    /**
+     * @see org.geotools.data.jdbc.attributeio.AttributeIO#write(java.sql.PreparedStatement, int, java.lang.Object)
+     */
+    public void write(PreparedStatement ps, int position, Object value) throws IOException {
+        try {
+            if(value == null) {
+                ps.setNull(position, Types.OTHER);
+            } else {
+                ps.setString(position, WKBEncoder.encodeGeometryHex((Geometry) value));
+            }
+        } catch (SQLException e) {
+            throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
+        }
+        
     }
 }

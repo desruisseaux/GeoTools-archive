@@ -157,14 +157,21 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** Current optimize mode */
     public final int OPTIMIZE_MODE;
 
-    /** If true, WKB format is used instead of WKT */
+    /**
+     * If true, WKB format is used instead of WKT
+     * 
+     * @uml.property name="WKBEnabled"
+     */
     protected boolean WKBEnabled = false;
 
     /**
      * If true, the bytea function will be used to optimize even further data
      * loading when using WKB format
+     * 
+     * @uml.property name="byteaEnabled"
      */
     protected boolean byteaEnabled = false;
+
 
     protected PostgisDataStore(ConnectionPool connPool)
         throws IOException {
@@ -455,6 +462,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
         PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder);
         builder.setWKBEnabled(WKBEnabled);
+        builder.setByteaEnabled(byteaEnabled);
 
         return builder;
     }
@@ -1027,7 +1035,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected JDBCFeatureWriter createFeatureWriter(FeatureReader fReader,
         QueryData queryData) throws IOException {
-        return new PostgisFeatureWriter(fReader, queryData);
+        return new PostgisFeatureWriter(fReader, queryData, WKBEnabled);
     }
 
     /**
@@ -1126,7 +1134,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     protected AttributeIO getGeometryAttributeIO(AttributeType type,
         QueryData queryData) {
         if (WKBEnabled) {
-            return new PgWKBAttributeIO(byteaEnabled);
+            return new PgWKBAttributeIO(isByteaEnabled());
         } else {
             return new WKTAttributeIO();
         }
@@ -1143,8 +1151,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /**
      * Returns true if the WKB format is used to transfer geometries, false
      * otherwise
-     *
+     * 
      * @return
+     * 
+     * @uml.property name="WKBEnabled"
      */
     public boolean isWKBEnabled() {
         return WKBEnabled;
@@ -1152,8 +1162,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
     /**
      * If turned on, WKB will be used to transfer geometry data instead of  WKT
-     *
+     * 
      * @param enabled
+     * 
+     * @uml.property name="WKBEnabled"
      */
     public void setWKBEnabled(boolean enabled) {
         WKBEnabled = enabled;
@@ -1162,8 +1174,10 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /**
      * Returns true if the data store is using the bytea function to fasten WKB
      * data transfer, false otherwise
-     *
+     * 
      * @return
+     * 
+     * @uml.property name="byteaEnabled"
      */
     public boolean isByteaEnabled() {
         return byteaEnabled;
@@ -1172,10 +1186,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /**
      * Enables the use of bytea function for WKB data transfer (will improve
      * performance)
-     *
+     * 
      * @param byteaEnabled
+     * 
+     * @uml.property name="byteaEnabled"
      */
     public void setByteaEnabled(boolean byteaEnabled) {
         this.byteaEnabled = byteaEnabled;
     }
+
 }
