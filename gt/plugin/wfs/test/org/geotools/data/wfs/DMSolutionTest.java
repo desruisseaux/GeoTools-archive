@@ -21,8 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
-import javax.naming.OperationNotSupportedException;
-
 import junit.framework.TestCase;
 
 import org.geotools.feature.IllegalAttributeException;
@@ -56,13 +54,12 @@ public class DMSolutionTest extends TestCase {
     }
     
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureType(url,true,false,0);
+        WFSDataStoreReadTest.doFeatureType(url,true,true,0);
     }
     public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
-        // FAILS due to Choice !!!
-        WFSDataStoreReadTest.doFeatureReader(url,true,false,0);
+        WFSDataStoreReadTest.doFeatureReader(url,true,true,0);
     }
-    public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,false,0);
+    public void testFeatureReaderWithFilter() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
+        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,true,0);
     }
 }

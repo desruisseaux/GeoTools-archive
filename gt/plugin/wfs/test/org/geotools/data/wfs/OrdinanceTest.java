@@ -52,7 +52,7 @@ public class OrdinanceTest extends TestCase {
     private URL url = null;
     
     public OrdinanceTest() throws MalformedURLException{
-        url = new URL("http://cavalier.ordnancesurvey.co.uk/magnesium/wfs/OSNL?");//request=GETFEATURE&typename=TopographicArea&SRS=OSGB:BNG&BBOX=486263,153479,487263,154479&USEBOX=TRUE&MAXFEATURES=10");
+        url = new URL("http://cavalier.ordnancesurvey.co.uk/magnesium/wfs/OSNL?");
     }
     
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{

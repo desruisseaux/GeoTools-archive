@@ -16,17 +16,10 @@
  */
 package org.geotools.data.wfs;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
-import javax.naming.OperationNotSupportedException;
-
 import junit.framework.TestCase;
-
-import org.geotools.feature.IllegalAttributeException;
-import org.xml.sax.SAXException;
 
 /**
  *  summary sentence.
@@ -51,21 +44,20 @@ public class CubewerksTest extends TestCase {
 
     private URL url = null;
     
-    public CubewerksTest() throws MalformedURLException{
+    public CubewerksTest(){
 
         //old server -- do not test version 0.0.16
 //        url = new URL("http://ceoware2.ccrs.nrcan.gc.ca/cubewerx/cwwfs/cubeserv.cgi?datastore=CEOWARE2&version=1.0.0&service=WFS&request=GetCapabilities");
 //        url = new URL("http://cgns.nrcan.gc.ca/wfs/cubeserv.cgi?DATASTORE=cgns&REQUEST=GetCapabilities&VERSION=1.0.0&SERVICE=WFS");
     }
     
-    public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
+    public void testFeatureType() throws NoSuchElementException{
 //        WFSDataStoreReadTest.doFeatureType(url,true,true,0);
     }
-    public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
-        // FAILS due to Choice !!!
+    public void testFeatureReader() throws NoSuchElementException{
 //        WFSDataStoreReadTest.doFeatureReader(url,true,true,0);
     }
-    public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
+    public void testFeatureReaderWithFilter() throws NoSuchElementException{
 //        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,true,0);
     }
 }

@@ -21,8 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
-import javax.naming.OperationNotSupportedException;
-
 import junit.framework.TestCase;
 
 import org.geotools.feature.IllegalAttributeException;
@@ -61,7 +59,7 @@ public class CarisTest extends TestCase {
     public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
         WFSDataStoreReadTest.doFeatureReader(url,false,true,0);
     }
-    public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
+    public void testFeatureReaderWithFilter() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
         WFSDataStoreReadTest.doFeatureReaderWithFilter(url,false,true,0);
     }
 }

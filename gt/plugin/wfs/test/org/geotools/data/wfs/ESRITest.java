@@ -16,17 +16,11 @@
  */
 package org.geotools.data.wfs;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.NoSuchElementException;
 
-import javax.naming.OperationNotSupportedException;
-
 import junit.framework.TestCase;
-
-import org.geotools.feature.IllegalAttributeException;
-import org.xml.sax.SAXException;
 
 /**
  *  summary sentence.
@@ -56,13 +50,13 @@ public class ESRITest extends TestCase {
         url = new URL("http://dev.geographynetwork.ca/ogcwfs/servlet/com.esri.ogc.wfs.WFSServlet?Request=GetCapabilities");
     }
     
-    public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
+    public void testFeatureType() throws NoSuchElementException{
 //        WFSDataStoreReadTest.doFeatureType(url,true,false,2);
     }
-    public void testFeatureReader() throws NoSuchElementException, IOException, IllegalAttributeException, SAXException{
+    public void testFeatureReader() throws NoSuchElementException{
 //        WFSDataStoreReadTest.doFeatureReader(url,true,false,2);
     }
-    public void testFeatureReaderWithFilter() throws NoSuchElementException, OperationNotSupportedException, IllegalAttributeException, IOException, SAXException{
+    public void testFeatureReaderWithFilter() throws NoSuchElementException{
 //        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,false,2);
     }
 }

@@ -58,8 +58,10 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
@@ -99,7 +101,7 @@ public class WFSDataStore extends AbstractDataStore {
     protected Authenticator auth = null; // visible for transaction
     
     private int bufferSize = 10;
-    private int timeout = 3000;
+    private int timeout = 10000;
 
     /**
      * Construct <code>WFSDataStore</code>.
@@ -426,14 +428,20 @@ public class WFSDataStore extends AbstractDataStore {
         if(uri!=null)
             hints.put(DocumentWriter.SCHEMA_ORDER, new String[]{WFSSchema.NAMESPACE.toString(), uri.toString()});
 
+
+//        // START DEBUG
 //        try {
+//            System.out.println("\n");
 //            System.out.println(postUrl);
+//            System.out.println("\n");
 //            DocumentWriter.writeDocument(new String[] { typeName },
 //                WFSSchema.getInstance(), new OutputStreamWriter(System.out), hints);
+//            System.out.println("\n");
 //        } catch (OperationNotSupportedException e) {
 //            WFSDataStoreFactory.logger.warning(e.toString());
 //            throw new SAXException(e);
 //        }
+//        // END DEBUG
         
         try {
             DocumentWriter.writeDocument(new String[] { typeName },
@@ -641,6 +649,20 @@ public class WFSDataStore extends AbstractDataStore {
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
+
+//        // START DEBUG
+//        try {
+//            System.out.println("\n");
+//            System.out.println(postUrl);
+//            System.out.println("\n");
+//            DocumentWriter.writeDocument(query, WFSSchema.getInstance(), new OutputStreamWriter(System.out),
+//                hints);
+//            System.out.println("\n");
+//        } catch (OperationNotSupportedException e) {
+//            WFSDataStoreFactory.logger.warning(e.toString());
+//            throw new SAXException(e);
+//        }
+//        // END DEBUG
         
         try {
             DocumentWriter.writeDocument(query, WFSSchema.getInstance(), w,
@@ -653,8 +675,16 @@ public class WFSDataStore extends AbstractDataStore {
         os.flush();
         os.close();
 
-        BufferedInputStream is = new BufferedInputStream(hc.getInputStream());
+        
+//        // DEBUG
+//        BufferedReader br = new BufferedReader(new InputStreamReader(hc.getInputStream()));
+//        while(br.ready()){
+//            System.out.println(br.readLine());
+//        }
+//        // END DEBUG
 
+        BufferedInputStream is = new BufferedInputStream(hc.getInputStream());
+        
         // 	    System.out.println("ready?"+is.available());
         WFSTransactionState ts = null;
 

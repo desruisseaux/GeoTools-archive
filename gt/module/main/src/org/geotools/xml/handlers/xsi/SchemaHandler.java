@@ -91,16 +91,20 @@ public class SchemaHandler extends XSIElementHandler {
      *      java.lang.String)
      */
     public void startPrefixMapping(String pref, String uri) {
-//System.out.print("Prefix = "+pref);
         if (targetNamespace == null) {
             if (prefixCache == null) {
                 prefixCache = new HashMap();
             }
 
             prefixCache.put(uri, pref);
-//System.out.println("+");
+            
+            if(this.uri == null && (pref == null || "".equals(pref)))
+                try {
+                    this.uri = new URI(uri);
+                } catch (URISyntaxException e) {
+                    logger.warning(e.getMessage());
+                }
         } else {
-//System.out.println("*");
             // we have already started
             if (targetNamespace.equals(uri.toString())) {
                 prefix = pref;
@@ -372,19 +376,30 @@ public class SchemaHandler extends XSIElementHandler {
                 IncludeHandler inc = (IncludeHandler) it.next();
                 logger.finest("compressing include " + inc.getSchemaLocation());
 
-                Schema cs;
-                URI incURI = thisURI.normalize().resolve(inc.getSchemaLocation());
-                cs = SchemaFactory.getInstance(targetNamespace, incURI,
+                if(inc != null && inc.getSchemaLocation() != null){
+                    Schema cs;
+                    URI incURI = null;
+                    if(thisURI == null){
+                        try {
+                            incURI = new URI(inc.getSchemaLocation());
+                        } catch (URISyntaxException e) {
+                            logger.warning(e.getMessage());
+                        }
+                    }else{
+                        incURI = thisURI.normalize().resolve(inc.getSchemaLocation());
+                    }
+                    cs = SchemaFactory.getInstance(targetNamespace, incURI,
                         logger.getLevel());
 
-                if (uri != null) {
-                    uri = incURI.resolve(uri);
-                } else {
-                    uri = incURI;
-                }
+                    if (uri != null) {
+                        uri = incURI.resolve(uri);
+                    } else {
+                        uri = incURI;
+                    }
 
-                // already compressed
-                addSchema(cs);
+                    //  already compressed
+                    addSchema(cs);
+                }
             }
         }
 
