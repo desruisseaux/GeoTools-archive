@@ -48,7 +48,7 @@
     </dependency>
     <dependency>
       <id>geoapi</id>
-      <version>1.1.0alpha</version>
+      <version>SNAPSHOT</version>
       <url>http://geoapi.sourceforge.net</url>
     </dependency>
     <dependency>
