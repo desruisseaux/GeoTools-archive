@@ -35,6 +35,7 @@ import javax.xml.transform.TransformerException;
 import org.geotools.filter.ExpressionDOMParser;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterDOMParser;
+import org.geotools.filter.FilterTransformer;
 import org.geotools.gml.producer.GeometryTransformer;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -428,11 +429,10 @@ public class ArgHelper {
             f = (Filter) obj;
 
             StringWriter sw = new StringWriter();
-            org.geotools.filter.XMLEncoder xe = new org.geotools.filter.XMLEncoder(sw);
-
+            
             try {
-                xe.encode(f);
-            } catch (IOException e) {
+                sw.write((new FilterTransformer()).transform(f));
+            } catch (TransformerException e) {
                 throw new ValidationException(e);
             }
 
@@ -454,11 +454,10 @@ public class ArgHelper {
             f = (Filter) obj;
 
             StringWriter sw = new StringWriter();
-            org.geotools.filter.XMLEncoder xe = new org.geotools.filter.XMLEncoder(sw);
 
             try {
-                xe.encode(f);
-            } catch (IOException e) {
+                sw.write((new FilterTransformer()).transform(f));
+            } catch (TransformerException e) {
                 return null;
             }
 
@@ -511,7 +510,7 @@ public class ArgHelper {
          * @see org.geotools.validation.xml.ArgHelper.Mapping#getInstance(org.w3c.dom.Element)
          */
         public Object getInstance(Element value) {
-            return (Geometry) ExpressionDOMParser.parseGML(value);
+            return ExpressionDOMParser.parseGML(value);
         }
 
         public Object getInstance(String value) {
@@ -538,7 +537,7 @@ public class ArgHelper {
                 return null;
             }
 
-            return (Geometry) ExpressionDOMParser.parseGML(elem);
+            return ExpressionDOMParser.parseGML(elem);
         }
 
         /**
@@ -575,7 +574,6 @@ public class ArgHelper {
 
             try {
                 transformer.transform(obj, sw);
-                ;
             } catch (TransformerException e) {
                 throw new ValidationException(e);
             }
@@ -589,7 +587,6 @@ public class ArgHelper {
 
             try {
                 transformer.transform(obj, sw);
-                ;
             } catch (TransformerException e) {
                 return null;
             }

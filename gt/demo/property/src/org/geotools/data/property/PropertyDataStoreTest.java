@@ -79,7 +79,7 @@ public class PropertyDataStoreTest extends TestCase {
         FeatureType type = store.getSchema( "road" );
         assertNotNull( type );
         assertEquals( "road", type.getTypeName() );
-        assertEquals( "propertyTestData", type.getNamespace() );
+        assertEquals( "propertyTestData", type.getNamespaceURI().toString() );
         assertEquals( 2, type.getAttributeCount() );
         
         AttributeType id = type.getAttributeType(0);        
