@@ -84,9 +84,9 @@ import org.opengis.util.InternationalString;
  */
 public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
-     * The underlying factory.
+     * The underlying authority factory.
      */
-    private final AbstractAuthorityFactory factory;
+    protected final AbstractAuthorityFactory authorityFactory;
 
     /**
      * The pool of cached objects.
@@ -124,9 +124,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     {
         super(factory.factories, factory.priority);
         while (factory instanceof BufferedAuthorityFactory) {
-            factory = ((BufferedAuthorityFactory) factory).factory;
+            factory = ((BufferedAuthorityFactory) factory).authorityFactory;
         }
-        this.factory = factory;
+        this.authorityFactory    = factory;
         this.maxStrongReferences = maxStrongReferences;
     }
 
@@ -134,7 +134,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Returns the vendor responsible for creating the underlying factory implementation.
      */
     public Citation getVendor() {
-        return factory.getVendor();
+        return authorityFactory.getVendor();
     }
 
     /**
@@ -142,7 +142,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * underlying database.
      */
     public Citation getAuthority() {
-        return factory.getAuthority();
+        return authorityFactory.getAuthority();
     }
 
     /**
@@ -156,7 +156,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @throws FactoryException if access to the underlying database failed.
      */
     public Set getAuthorityCodes(final Class type) throws FactoryException {
-        return factory.getAuthorityCodes(type);
+        return authorityFactory.getAuthorityCodes(type);
     }
 
     /**
@@ -169,7 +169,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @throws FactoryException if the query failed for some other reason.
      */
     public InternationalString getDescriptionText(final String code) throws FactoryException {
-        return factory.getDescriptionText(code);
+        return authorityFactory.getDescriptionText(code);
     }
 
     /**
@@ -183,7 +183,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof IdentifiedObject) {
             object = (IdentifiedObject) cached;
         } else {
-            object = factory.createObject(code);
+            object = authorityFactory.createObject(code);
         }
         put(code, object);
         return object;
@@ -200,7 +200,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof Datum) {
             datum = (Datum) cached;
         } else {
-            datum = factory.createDatum(code);
+            datum = authorityFactory.createDatum(code);
         }
         put(code, datum);
         return datum;
@@ -217,7 +217,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof EngineeringDatum) {
             datum = (EngineeringDatum) cached;
         } else {
-            datum = factory.createEngineeringDatum(code);
+            datum = authorityFactory.createEngineeringDatum(code);
         }
         put(code, datum);
         return datum;
@@ -234,7 +234,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof ImageDatum) {
             datum = (ImageDatum) cached;
         } else {
-            datum = factory.createImageDatum(code);
+            datum = authorityFactory.createImageDatum(code);
         }
         put(code, datum);
         return datum;
@@ -251,7 +251,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof VerticalDatum) {
             datum = (VerticalDatum) cached;
         } else {
-            datum = factory.createVerticalDatum(code);
+            datum = authorityFactory.createVerticalDatum(code);
         }
         put(code, datum);
         return datum;
@@ -268,7 +268,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof TemporalDatum) {
             datum = (TemporalDatum) cached;
         } else {
-            datum = factory.createTemporalDatum(code);
+            datum = authorityFactory.createTemporalDatum(code);
         }
         put(code, datum);
         return datum;
@@ -285,7 +285,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof GeodeticDatum) {
             datum = (GeodeticDatum) cached;
         } else {
-            datum = factory.createGeodeticDatum(code);
+            datum = authorityFactory.createGeodeticDatum(code);
         }
         put(code, datum);
         return datum;
@@ -302,7 +302,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof Ellipsoid) {
             ellipsoid = (Ellipsoid) cached;
         } else {
-            ellipsoid = factory.createEllipsoid(code);
+            ellipsoid = authorityFactory.createEllipsoid(code);
         }
         put(code, ellipsoid);
         return ellipsoid;
@@ -319,7 +319,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof PrimeMeridian) {
             meridian = (PrimeMeridian) cached;
         } else {
-            meridian = factory.createPrimeMeridian(code);
+            meridian = authorityFactory.createPrimeMeridian(code);
         }
         put(code, meridian);
         return meridian;
@@ -331,7 +331,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @deprecated May be replaced by an alias mechanism.
      */
     public String geoidFromWktName(final String wkt) {
-        return factory.geoidFromWktName(wkt);
+        return authorityFactory.geoidFromWktName(wkt);
     }
 
     /**
@@ -340,7 +340,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * @deprecated May be replaced by an alias mechanism.
      */
     public String wktFromGeoidName(final String geoid) {
-        return factory.wktFromGeoidName(geoid);
+        return authorityFactory.wktFromGeoidName(geoid);
     }
 
     /**
@@ -354,7 +354,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CoordinateSystem) {
             cs = (CoordinateSystem) cached;
         } else {
-            cs = factory.createCoordinateSystem(code);
+            cs = authorityFactory.createCoordinateSystem(code);
         }
         put(code, cs);
         return cs;
@@ -371,7 +371,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CartesianCS) {
             cs = (CartesianCS) cached;
         } else {
-            cs = factory.createCartesianCS(code);
+            cs = authorityFactory.createCartesianCS(code);
         }
         put(code, cs);
         return cs;
@@ -388,7 +388,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof PolarCS) {
             cs = (PolarCS) cached;
         } else {
-            cs = factory.createPolarCS(code);
+            cs = authorityFactory.createPolarCS(code);
         }
         put(code, cs);
         return cs;
@@ -405,7 +405,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CylindricalCS) {
             cs = (CylindricalCS) cached;
         } else {
-            cs = factory.createCylindricalCS(code);
+            cs = authorityFactory.createCylindricalCS(code);
         }
         put(code, cs);
         return cs;
@@ -422,7 +422,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof SphericalCS) {
             cs = (SphericalCS) cached;
         } else {
-            cs = factory.createSphericalCS(code);
+            cs = authorityFactory.createSphericalCS(code);
         }
         put(code, cs);
         return cs;
@@ -439,7 +439,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof EllipsoidalCS) {
             cs = (EllipsoidalCS) cached;
         } else {
-            cs = factory.createEllipsoidalCS(code);
+            cs = authorityFactory.createEllipsoidalCS(code);
         }
         put(code, cs);
         return cs;
@@ -456,7 +456,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof VerticalCS) {
             cs = (VerticalCS) cached;
         } else {
-            cs = factory.createVerticalCS(code);
+            cs = authorityFactory.createVerticalCS(code);
         }
         put(code, cs);
         return cs;
@@ -473,7 +473,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof TimeCS) {
             cs = (TimeCS) cached;
         } else {
-            cs = factory.createTimeCS(code);
+            cs = authorityFactory.createTimeCS(code);
         }
         put(code, cs);
         return cs;
@@ -490,7 +490,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CoordinateSystemAxis) {
             axis = (CoordinateSystemAxis) cached;
         } else {
-            axis = factory.createCoordinateSystemAxis(code);
+            axis = authorityFactory.createCoordinateSystemAxis(code);
         }
         put(code, axis);
         return axis;
@@ -507,7 +507,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof Unit) {
             unit = (Unit) cached;
         } else {
-            unit = factory.createUnit(code);
+            unit = authorityFactory.createUnit(code);
         }
         put(code, unit);
         return unit;
@@ -524,7 +524,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CoordinateReferenceSystem) {
             crs = (CoordinateReferenceSystem) cached;
         } else {
-            crs = factory.createCoordinateReferenceSystem(code);
+            crs = authorityFactory.createCoordinateReferenceSystem(code);
         }
         put(code, crs);
         return crs;
@@ -541,7 +541,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof CompoundCRS) {
             crs = (CompoundCRS) cached;
         } else {
-            crs = factory.createCompoundCRS(code);
+            crs = authorityFactory.createCompoundCRS(code);
         }
         put(code, crs);
         return crs;
@@ -558,7 +558,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof DerivedCRS) {
             crs = (DerivedCRS) cached;
         } else {
-            crs = factory.createDerivedCRS(code);
+            crs = authorityFactory.createDerivedCRS(code);
         }
         put(code, crs);
         return crs;
@@ -575,7 +575,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof EngineeringCRS) {
             crs = (EngineeringCRS) cached;
         } else {
-            crs = factory.createEngineeringCRS(code);
+            crs = authorityFactory.createEngineeringCRS(code);
         }
         put(code, crs);
         return crs;
@@ -592,7 +592,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof GeographicCRS) {
             crs = (GeographicCRS) cached;
         } else {
-            crs = factory.createGeographicCRS(code);
+            crs = authorityFactory.createGeographicCRS(code);
         }
         put(code, crs);
         return crs;
@@ -609,7 +609,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof GeocentricCRS) {
             crs = (GeocentricCRS) cached;
         } else {
-            crs = factory.createGeocentricCRS(code);
+            crs = authorityFactory.createGeocentricCRS(code);
         }
         put(code, crs);
         return crs;
@@ -626,7 +626,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof ImageCRS) {
             crs = (ImageCRS) cached;
         } else {
-            crs = factory.createImageCRS(code);
+            crs = authorityFactory.createImageCRS(code);
         }
         put(code, crs);
         return crs;
@@ -643,7 +643,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof ProjectedCRS) {
             crs = (ProjectedCRS) cached;
         } else {
-            crs = factory.createProjectedCRS(code);
+            crs = authorityFactory.createProjectedCRS(code);
         }
         put(code, crs);
         return crs;
@@ -660,7 +660,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof TemporalCRS) {
             crs = (TemporalCRS) cached;
         } else {
-            crs = factory.createTemporalCRS(code);
+            crs = authorityFactory.createTemporalCRS(code);
         }
         put(code, crs);
         return crs;
@@ -677,7 +677,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         if (cached instanceof VerticalCRS) {
             crs = (VerticalCRS) cached;
         } else {
-            crs = factory.createVerticalCRS(code);
+            crs = authorityFactory.createVerticalCRS(code);
         }
         put(code, crs);
         return crs;
@@ -686,14 +686,17 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
      * Releases resources immediately instead of waiting for the garbage collector.
      */
-    public void dispose() throws FactoryException {
-        factory.dispose();
+    public synchronized void dispose() throws FactoryException {
+        authorityFactory.dispose();
+        pool.clear();
         super.dispose();
     }
 
     /**
      * Returns an object from the pool for the specified code. If the object was retained as a
      * {@linkplain Reference weak reference}, the {@link Reference#get referent} is returned.
+     *
+     * @todo Consider logging a message here to the finer or finest level.
      */
     private Object get(final String code) {
         Object object = pool.get(code);

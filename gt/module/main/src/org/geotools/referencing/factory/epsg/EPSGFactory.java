@@ -25,7 +25,6 @@ package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies and extensions
 import java.io.File;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -47,7 +46,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 import javax.imageio.spi.ServiceRegistry;
 import javax.units.NonSI;
 import javax.units.Unit;
@@ -96,11 +94,9 @@ import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.projection.MapProjection;
-import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.util.LocalName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
@@ -109,7 +105,7 @@ import org.geotools.util.ScopedName;
 /**
  * Default implementation for a coordinate system factory backed by the EPSG database. The EPSG
  * database is freely available at <A HREF="http://www.epsg.org">http://www.epsg.org</a>. Current
- * version of this class requires EPSG database version 6.
+ * version of this class requires EPSG database version 6.6.
  * <br>
  * <h2>EPSG database installation</h2>
  * The EPSG database is available in MS Access format. The <code>EPSG_v6.mdb</code> file can be
@@ -129,28 +125,16 @@ import org.geotools.util.ScopedName;
  * @author Rueben Schulz
  */
 public class EPSGFactory extends AbstractAuthorityFactory {
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    ////////                                                                            ////////
-    ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
-    ////////                                                                            ////////
-    ////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * The logger for EPSG factory.
      */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.referencing.factory.epsg");
 
-    /**
-     * Preference node for the JDBC driver class name, and its default value.
-     */
-    private static final String DRIVER = "JDBC driver",
-                        DEFAULT_DRIVER = "sun.jdbc.odbc.JdbcOdbcDriver";
-
-    /**
-     * Preference node for the EPSG database connection string, and its default value.
-     */
-    private static final String CONNECTION = "EPSG connection",
-                        DEFAULT_CONNECTION = "jdbc:odbc:EPSG";
-
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                            ////////
+    ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
+    ////////                                                                            ////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Returns a hard-coded unit from an EPSG code. We do not need to provide all units here,
      * but we must at least provide all base units declared in the [TARGET_UOM_CODE] column
@@ -159,9 +143,6 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      *
      * @param  code The code.
      * @return The unit, or <code>null</code> if the code is unrecognized.
-     *
-     * @todo Sexagesimal units not yet ported from legacy CTS code.
-     *       If we supports them, investigate the potential impact on WKT formatting.
      */
     private static Unit getUnit(final int code) {
         switch (code) {
@@ -320,7 +301,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      * to a different value by {@link DefaultFactory} only, which will point toward a
      * buffered factory wrapping this {@code EPSGFactory} for efficienty.
      */
-    private AbstractAuthorityFactory buffered = this;
+    AbstractAuthorityFactory buffered = this;
 
     /**
      * The connection to the EPSG database.
@@ -328,63 +309,20 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     protected final Connection connection;
 
     /**
-     * Constructs an authority factory using the default set of
-     * {@linkplain org.opengis.referencing.ObjectFactory object factories} and the
-     * default connection parameters to the EPSG database.
-     *
-     * @throws SQLException if the constructor failed to connect to the EPSG database.
-     */
-    public EPSGFactory() throws SQLException {
-        this(new FactoryGroup());
-        // NOTE: A log message with connection information will be logged at level CONFIG.
-    }
-
-    /**
-     * Constructs an authority factory using the specified set of
-     * {@linkplain org.opengis.referencing.ObjectFactory object factories} and the
-     * default connection parameters to the EPSG database.
-     * <br><br>
-     * By default, this constructor loads the <code>"sun.jdbc.odbc.JdbcOdbcDriver"</code> and
-     * ask for a connection to the <code>"jdbc:odbc:EPSG"</code> database. This default
-     * behavior can be changed by invoking the {@link #main} method from the command line.
-     * For example:
-     * <blockquote><pre>
-     * java org.geotools.referencing.espg.EPSGFactory -driver=[my driver] -connection=[my url]
-     * </pre></blockquote>
-     *
-     * @param factories The set of object factories to use.
-     * @throws SQLException if the constructor failed to connect to the EPSG database.
-     */
-    public EPSGFactory(final FactoryGroup factories) throws SQLException {
-        this(factories, Preferences.systemNodeForPackage(EPSGFactory.class));
-    }
-
-    /**
-     * Work around for RFE #4093999 in Sun's bug database.
-     */
-    private EPSGFactory(final FactoryGroup factories,
-                        final Preferences preferences) throws SQLException
-    {
-        this(factories,
-             preferences.get(CONNECTION, DEFAULT_CONNECTION),
-             preferences.get(DRIVER,     DEFAULT_DRIVER));
-    }
-
-    /**
      * Constructs an authority factory using the specified URL to an EPSG database.
      *
      * @param  factories The underlying factory used for objects creation.
      * @param  url       The url to the EPSG database. For example, a connection
      *                   using the ODBC-JDBC bridge may have an URL likes
-     *                   <code>"jdbc:odbc:EPSG"</code>.
+     *                   {@code "jdbc:odbc:EPSG"}.
      * @param  driver    An optional driver to load, or <code>null</code> if none.
      *                   This is a convenience argument for the following pseudo-code:
      *                   <blockquote><code>
      *                   Class.forName(driver).newInstance();
      *                   </code></blockquote>
-     *                   A message is logged to <code>"org.geotools.referencing"</code> wether
+     *                   A message is logged to {@code "org.geotools.referencing"} wether
      *                   the loading sucseeds of fails. For JDBC-ODBC bridge, a typical value
-     *                   for this argument is <code>"sun.jdbc.odbc.JdbcOdbcDriver"</code>.
+     *                   for this argument is {@code "sun.jdbc.odbc.JdbcOdbcDriver"}.
      *                   This argument needs to be non-null only once for a specific driver.
      *
      * @throws SQLException if the constructor failed to connect to the EPSG database.
@@ -1818,85 +1756,5 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     {
         return new FactoryException("Database failure will constructing a " +
                 Utilities.getShortName(type) + "for code \""+code+"\".", cause);
-    }
-
-    /**
-     * Constructs an object from the EPSG database and print its WKT (Well Know Text) to
-     * the standard output. This method can be invoked from the command line. For example:
-     *
-     * <blockquote><pre>
-     * java org.geotools.referencing.epsg.EPSGFactory 4181
-     * </pre></blockquote>
-     *
-     * Should print:
-     *
-     * <blockquote><pre>
-     * GEOGCS["Luxembourg 1930", DATUM["Luxembourg 1930", <FONT face="Arial">etc...</FONT>
-     * </pre></blockquote>
-     *
-     * The following optional arguments are supported:
-     * <blockquote>
-     *   <strong><code>-connection</code></strong><br>
-     *       Set the EPSG database URL. The URL must conform to
-     *       {@link DriverManager#getConnection(String)} specification. The default value
-     *       is <code>jdbc:odbc:EPSG</code>. The specified URL is stored in system preferences
-     *       and will become the default URL every time an <code>EPSGFactory</code>
-     *       is created without explicit URL. The "<code>default</code>" string reset the default
-     *       URL.
-     *       <br><br>
-     *
-     *   <strong><code>-driver</code></strong><br>
-     *       Set the driver class. The default value is <code>sun.jdbc.odbc.JdbcOdbcDriver</code>.
-     *       The specified classname is stored in system preferences and will become the default
-     *       driver every time an <code>EPSGFactory</code> is created without explicit
-     *       driver. The "<code>default</code>" string reset the default driver.
-     *       <br><br>
-     *
-     *   <strong><code>-encoding</code></strong><br>
-     *       Set the console encoding for this application output.
-     *       This value has no impact on <code>EPSGFactory</code> behavior.
-     * </blockquote>
-     *
-     * @param args A list of EPSG code to display.
-     *             An arbitrary number of code can be specified on the command line.
-     */
-    public static void main(String[] args) {
-        MonolineFormatter.initGeotools(); // Use custom logger.
-        final Arguments arguments = new Arguments(args);
-        final PrintWriter     out = arguments.out;
-        final String       driver = arguments.getOptionalString("-driver");
-        final String   connection = arguments.getOptionalString("-connection");
-        final Preferences   prefs = Preferences.systemNodeForPackage(EPSGFactory.class);
-        if (driver != null) {
-            if (driver.equalsIgnoreCase("default")) {
-                prefs.remove(DRIVER);
-            } else {
-                prefs.put(DRIVER, driver);
-            }
-        }
-        if (connection != null) {
-            if (connection.equalsIgnoreCase("default")) {
-                prefs.remove(CONNECTION);
-            } else {
-                prefs.put(CONNECTION, connection);
-            }
-        }
-        args = arguments.getRemainingArguments(Integer.MAX_VALUE);
-        try {
-            EPSGFactory factory = null;
-            try {
-                factory = new EPSGFactory();
-                for (int i=0; i<args.length; i++) {
-                    out.println(factory.createObject(args[i]));
-                }
-            } finally {
-                if (factory != null) {
-                    factory.dispose();
-                }
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace(out);
-        }
-        out.flush();
     }
 }

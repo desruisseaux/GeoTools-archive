@@ -205,14 +205,104 @@ public final class FactoryFinder {
     public static synchronized Set getCRSFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(CRSFactory.class));
     }
+
+    /**
+     * Returns the first authority factory for the specified authority.
+     *
+     * @param  iterator The set of authority factories.
+     * @param  authority The desired authority.
+     * @return The factory for the specified authority.
+     * @throws NoSuchElementException If no factory was found for the specified authority.
+     */
+    private static AuthorityFactory next(final Iterator iterator, final String authority)
+            throws NoSuchElementException
+    {
+        AuthorityFactory factory;
+        do factory = (AuthorityFactory) iterator.next();
+        while (!org.geotools.metadata.citation.Citation.titleMatches(factory.getAuthority(), authority));
+        return factory;
+    }
+
+    /**
+     * Returns the default implementation of {@link DatumAuthorityFactory}. If no implementation is
+     * registered for the given authority, then this method throws an exception. If more than one
+     * implementation is registered and an {@linkplain #setVendorOrdering ordering is set}, then
+     * the preferred implementation is returned.
+     *
+     * @param  authority The desired authority (e.g. "EPSG").
+     * @return First datum authority factory found.
+     * @throws NoSuchElementException if no implementation was found for the
+     *         {@link DatumAuthorityFactory} interface.
+     */
+    public static synchronized DatumAuthorityFactory getDatumAuthorityFactory(final String authority)
+            throws NoSuchElementException
+    {
+        return (DatumAuthorityFactory) next(getServiceRegistry().getServiceProviders(
+                                            DatumAuthorityFactory.class), authority);
+    }
+
+    /**
+     * Returns a set of all available implementations for the {@link DatumAuthorityFactory}
+     * interface.
+     *
+     * @return Set of available datum authority factory implementations.
+     */
+    public static synchronized Set getDatumAuthorityFactories() {
+        return new LazySet(getServiceRegistry().getServiceProviders(DatumAuthorityFactory.class));
+    }
+
+    /**
+     * Returns the default implementation of {@link CSAuthorityFactory}. If no implementation is
+     * registered for the given authority, then this method throws an exception. If more than one
+     * implementation is registered and an {@linkplain #setVendorOrdering ordering is set}, then
+     * the preferred implementation is returned.
+     *
+     * @param  authority The desired authority (e.g. "EPSG").
+     * @return First coordinate system authority factory found.
+     * @throws NoSuchElementException if no implementation was found for the
+     *         {@link CSAuthorityFactory} interface.
+     */
+    public static synchronized CSAuthorityFactory getCSAuthorityFactory(final String authority)
+            throws NoSuchElementException
+    {
+        return (CSAuthorityFactory) next(getServiceRegistry().getServiceProviders(
+                                         CSAuthorityFactory.class), authority);
+    }
+
+    /**
+     * Returns a set of all available implementations for the {@link CSAuthorityFactory} interface.
+     *
+     * @return Set of available coordinate system authority factory implementations.
+     */
+    public static synchronized Set getCSAuthorityFactories() {
+        return new LazySet(getServiceRegistry().getServiceProviders(CSAuthorityFactory.class));
+    }
+
+    /**
+     * Returns the default implementation of {@link CRSAuthorityFactory}. If no implementation is
+     * registered for the given authority, then this method throws an exception. If more than one
+     * implementation is registered and an {@linkplain #setVendorOrdering ordering is set}, then
+     * the preferred implementation is returned.
+     *
+     * @param  authority The desired authority (e.g. "EPSG").
+     * @return First coordinate reference system authority factory found.
+     * @throws NoSuchElementException if no implementation was found for the
+     *         {@link CRSAuthorityFactory} interface.
+     */
+    public static synchronized CRSAuthorityFactory getCRSAuthorityFactory(final String authority)
+            throws NoSuchElementException
+    {
+        return (CRSAuthorityFactory) next(getServiceRegistry().getServiceProviders(
+                                          CRSAuthorityFactory.class), authority);
+    }
     
     /**
-     * Returns a set of all available implementations for the {@link AuthorityFactory} interface.
+     * Returns a set of all available implementations for the {@link CRSAuthorityFactory} interface.
      * <p>
      * This set can be used to list the available codes known to all authorities.
      * In the event that the same code is understood by more then one authority
      * you will need to assume both are close enough, or make use of this set directly
-     * rather than use the decode method.
+     * rather than use the {@link CRS#decode} convenience method.
      * </p>
      */
     public static synchronized Set getCRSAuthorityFactories() {
