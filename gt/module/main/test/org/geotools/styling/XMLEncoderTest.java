@@ -44,7 +44,7 @@ public class XMLEncoderTest extends TestCase {
         
         java.net.URL surl = org.geotools.resources.TestData.getResource(this, "markTest.sld");
         LOGGER.info("reading "+surl);
-        SLDStyle stylereader = new SLDStyle(factory,surl);
+        SLDParser stylereader = new SLDParser(factory,surl);
         Style[] style = stylereader.readXML();
         StringWriter output = new StringWriter();
 //        Writer output = new PrintWriter(System.out); 

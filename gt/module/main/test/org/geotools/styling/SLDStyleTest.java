@@ -68,7 +68,7 @@ public class SLDStyleTest extends TestCase {
         StyleFactory factory = StyleFactory.createStyleFactory();
         //java.net.URL surl = new java.net.URL(base + "/test-sld.xml");
         java.net.URL surl = TestData.getResource(this, "test-sld.xml");
-        SLDStyle stylereader = new SLDStyle(factory, surl);
+        SLDParser stylereader = new SLDParser(factory, surl);
         StyledLayerDescriptor sld = stylereader.parseSLD();
         assertEquals("My Layer", sld.getName());
         assertEquals("A layer by me", sld.getTitle());
