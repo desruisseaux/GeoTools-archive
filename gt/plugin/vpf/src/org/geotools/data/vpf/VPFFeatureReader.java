@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
+import org.geotools.data.vpf.ifc.FCode;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -39,7 +40,8 @@ import org.geotools.feature.IllegalAttributeException;
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
  */
-public class VPFFeatureReader implements FeatureReader {
+public class VPFFeatureReader
+    implements FeatureReader, FCode {
     private boolean hasNext = true;
     private Feature currentFeature = null;
     private final VPFFeatureType featureType;
@@ -65,34 +67,34 @@ public class VPFFeatureReader implements FeatureReader {
      * @return
      */
     private Map generateFileRowMap(VPFFile file, Feature row)
-    		throws IOException{
-    	String tileFileName = null;
-    	Map rows = new HashMap();
-    	rows.put(file, row);
-    	Iterator joinIter = featureType.getFeatureClass().getJoinList().iterator();
-    	while (joinIter.hasNext()) {
-    		ColumnPair columnPair = (ColumnPair) joinIter.next();
-    		VPFFile primaryFile = getVPFFile(columnPair.column1);
-    		VPFFile joinFile = null;
-    		joinFile = getVPFFile(columnPair.column2);
+            throws IOException{
+        String tileFileName = null;
+        Map rows = new HashMap();
+        rows.put(file, row);
+        Iterator joinIter = featureType.getFeatureClass().getJoinList().iterator();
+        while (joinIter.hasNext()) {
+            ColumnPair columnPair = (ColumnPair) joinIter.next();
+            VPFFile primaryFile = getVPFFile(columnPair.column1);
+            VPFFile joinFile = null;
+            joinFile = getVPFFile(columnPair.column2);
     
-    		if (!rows.containsKey(joinFile) && rows.containsKey(primaryFile)) {
-    			Feature joinRow = (Feature) rows.get(primaryFile);
+            if (!rows.containsKey(joinFile) && rows.containsKey(primaryFile)) {
+                Feature joinRow = (Feature) rows.get(primaryFile);
     
-    			try {
-    				int joinID = Integer.parseInt(joinRow.getAttribute(columnPair.column1.getName()).toString());
-    				rows.put(joinFile, getVPFFile(columnPair.column2).getRowFromId(columnPair.column2.getName(), joinID));
-    			} catch (NullPointerException exc) {
-    				// Non-matching joins - just put in a NULL
-    				rows.put(joinFile, null);
-    			} catch (IllegalAttributeException exc) {
+                try {
+                    int joinID = Integer.parseInt(joinRow.getAttribute(columnPair.column1.getName()).toString());
+                    rows.put(joinFile, getVPFFile(columnPair.column2).getRowFromId(columnPair.column2.getName(), joinID));
+                } catch (NullPointerException exc) {
+                    // Non-matching joins - just put in a NULL
+                    rows.put(joinFile, null);
+                } catch (IllegalAttributeException exc) {
                     // I really don't expect to see this one
                     exc.printStackTrace();
                     rows.put(joinFile, null);
                 }
-    		}
-    	}
-    	return rows;
+            }
+        }
+        return rows;
     
     }
 
@@ -135,9 +137,9 @@ public class VPFFeatureReader implements FeatureReader {
      */
     private boolean readNext() throws IOException {
         boolean result = true;
-    	VPFFile file = (VPFFile) featureType.getFeatureClass().getFileList().get(0);
-    	hasNext = false;
-		Feature row = null;
+        VPFFile file = (VPFFile) featureType.getFeatureClass().getFileList().get(0);
+        hasNext = false;
+        Feature row = null;
         try {
             if(file.hasNext()){
                 row = file.readFeature();
@@ -152,11 +154,15 @@ public class VPFFeatureReader implements FeatureReader {
         if ((row == null)) {
             hasNext = false;
             result = false;
-		}
-		// Exclude objects with a different FACC Code
-		else if (featureType.getFaccCode() != null){
-		    try {
-                String faccCode = row.getAttribute("f_code").toString().trim(); 
+        }
+        // Exclude objects with a different FACC Code
+        else if (featureType.getFaccCode() != null){
+            try {
+                Object temp = null;
+                for (int i = 0; temp == null && i < ALLOWED_FCODE_ATTRIBUTES.length; i++) {
+                    temp = row.getAttribute( ALLOWED_FCODE_ATTRIBUTES[i] );
+                }
+                String faccCode = temp.toString().trim();
                 if(featureType.getFaccCode().equals(faccCode)){
                     retrieveObject(file, row);
                     hasNext = true;
@@ -165,7 +171,7 @@ public class VPFFeatureReader implements FeatureReader {
             } catch (RuntimeException exc) {
                 // Ignore this case because it typically means the f_code is invalid
             }
-		} 
+        } 
         return result;
     }
     /** 
@@ -269,8 +275,8 @@ public class VPFFeatureReader implements FeatureReader {
      * 
      */
     public void reset(){
-    		VPFFile file = (VPFFile) featureType.getFeatureClass()
-    				.getFileList().get(0);
-    		file.reset();
+            VPFFile file = (VPFFile) featureType.getFeatureClass()
+                    .getFileList().get(0);
+            file.reset();
     }
 }

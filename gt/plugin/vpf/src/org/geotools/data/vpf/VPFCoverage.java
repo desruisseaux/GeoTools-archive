@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
+import org.geotools.data.vpf.ifc.FCode;
 import org.geotools.data.vpf.ifc.FileConstants;
 import org.geotools.data.vpf.ifc.VPFCoverageIfc;
 import org.geotools.feature.Feature;
@@ -38,7 +39,7 @@ import org.geotools.feature.SchemaException;
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  *
  */
-public class VPFCoverage implements FileConstants, VPFCoverageIfc {
+public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
     /**
      * The description attribute of the coverage
      */
@@ -71,7 +72,7 @@ public class VPFCoverage implements FileConstants, VPFCoverageIfc {
      */
     public VPFCoverage(VPFLibrary cLibrary, Feature feature, String cDirectoryName)
         throws IOException, SchemaException {
-    	topologyLevel = Short.parseShort(feature.getAttribute(FIELD_LEVEL).toString());
+        topologyLevel = Short.parseShort(feature.getAttribute(FIELD_LEVEL).toString());
         library = cLibrary;
         description = feature.getAttribute(VPFCoverageIfc.FIELD_DESCRIPTION).toString();
         pathName = cDirectoryName.concat(File.separator).concat(feature.getAttribute(FIELD_COVERAGE_NAME).toString());
@@ -135,9 +136,11 @@ public class VPFCoverage implements FileConstants, VPFCoverageIfc {
             while (charVDTIter.hasNext()) {
                 // Figure out which featureClass owns it
                 Feature row = (Feature) charVDTIter.next();
-                if(!row.getAttribute("attribute").toString().trim().toLowerCase().equals("f_code")){
-                	continue;
-                }
+                String attr = row.getAttribute("attribute").toString().trim().toLowerCase();
+
+                if (!ALLOWED_FCODE_ATTRIBUTES_LIST.contains(attr))
+                    continue;
+                
                 String tableFileName = row.getAttribute("table").toString().trim();
 
                 // We need to go through all of this
@@ -232,12 +235,12 @@ public class VPFCoverage implements FileConstants, VPFCoverageIfc {
     public String getPathName() {
         return pathName;
     }
-	/**
-	 * @return Returns the topologyLevel.
-	 */
-	public int getTopologyLevel() {
-		return topologyLevel;
-	}
+    /**
+     * @return Returns the topologyLevel.
+     */
+    public int getTopologyLevel() {
+        return topologyLevel;
+    }
     /*
      *  (non-Javadoc)
      * @see java.lang.Object#toString()
