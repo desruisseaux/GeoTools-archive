@@ -70,7 +70,7 @@ import javax.media.jai.util.CaselessStringKey;
 
 // Resources
 import org.geotools.units.Unit;
-import org.geotools.resources.Geotools;
+import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
@@ -1651,7 +1651,7 @@ public class CoordinateSystemEPSGFactory extends CoordinateSystemAuthorityFactor
      *             An arbitrary number of code can be specified on the command line.
      */
     public static void main(String [] args) {
-        Geotools.init(); // Use custom logger.
+        MonolineFormatter.initGeotools(); // Use custom logger.
         final Arguments  arguments = new Arguments(args);
         final PrintWriter      out = arguments.out;
         final String     newDriver = arguments.getOptionalString("-driver");

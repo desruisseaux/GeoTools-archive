@@ -316,7 +316,7 @@ public class OperationTest extends GridCoverageTest {
      * Run the suit from the command line.
      */
     public static void main(final String[] args) {
-        org.geotools.resources.Geotools.init(Level.INFO);
+        org.geotools.util.MonolineFormatter.initGeotools(Level.INFO);
         final Arguments arguments = new Arguments(args);
         if (arguments.getFlag("-verbose")) {
             out = arguments.out;

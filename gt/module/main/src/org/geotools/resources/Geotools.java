@@ -33,7 +33,7 @@
 package org.geotools.resources;
 
 import java.util.logging.Level;
-
+import org.geotools.util.MonolineFormatter;
 
 /**
  * A central place where to provides system-wide services for Geotools. The 
@@ -43,9 +43,10 @@ import java.util.logging.Level;
  *
  * @version $Id: Geotools.java,v 1.7 2004/02/03 15:51:28 desruisseaux Exp $
  * @author Martin Desruisseaux
+ *
+ * @deprecated Invoke {@link MonolineFormatter#initGeotools} instead.
  */
 public final class Geotools {
-
     /**
      * Do not allow instanciation of this class.
      */
@@ -54,6 +55,8 @@ public final class Geotools {
 
     /**
      * Performs a system-wide initialization for Geotools.
+     *
+     * @deprecated Invoke {@link MonolineFormatter#initGeotools()} instead.
      */
     public static void init() {
         init(null);
@@ -66,6 +69,8 @@ public final class Geotools {
      *       find confusing to see his setting ignored.
      *
      * @param level The logging level, or <code>null</code> if no level should be set.
+     *
+     * @deprecated Invoke {@link MonolineFormatter#initGeotools(Level)} instead.
      */
     public static void init(final Level level) {
         final MonolineFormatter f = MonolineFormatter.init("org.geotools", level);

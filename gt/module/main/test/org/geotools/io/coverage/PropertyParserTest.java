@@ -68,7 +68,7 @@ public class PropertyParserTest extends TestCase {
             out = arguments.out;
         }
         arguments.getRemainingArguments(0);
-        org.geotools.resources.Geotools.init();
+        org.geotools.util.MonolineFormatter.initGeotools();
         junit.textui.TestRunner.run(suite());
     }
 

@@ -7,7 +7,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.resources.Geotools;
 import org.geotools.util.Cloneable;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -33,7 +32,7 @@ public class FeatureFlatTest extends TestCase {
     }
 
     public static void main(String[] args) {
-        Geotools.init();
+        org.geotools.util.MonolineFormatter.initGeotools();
         junit.textui.TestRunner.run(suite());
     }
 

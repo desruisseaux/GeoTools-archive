@@ -22,7 +22,6 @@ import org.geotools.data.*;
 import org.geotools.feature.*;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
-import org.geotools.resources.Geotools;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import java.io.*;

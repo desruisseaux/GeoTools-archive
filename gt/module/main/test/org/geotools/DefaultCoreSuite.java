@@ -32,7 +32,7 @@ public class DefaultCoreSuite extends TestCase {
     }        
     
     public static void main(java.lang.String[] args) {
-        org.geotools.resources.Geotools.init();
+        org.geotools.util.MonolineFormatter.initGeotools();
         junit.textui.TestRunner.run(suite());
     }
     

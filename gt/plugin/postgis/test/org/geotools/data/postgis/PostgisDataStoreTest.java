@@ -25,7 +25,6 @@ import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.feature.*;
 import org.geotools.filter.*;
 import org.geotools.filter.FilterFactory;
-import org.geotools.resources.Geotools;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;

@@ -23,7 +23,6 @@ import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.feature.*;
 import org.geotools.filter.*;
 import org.geotools.filter.FilterFactory;
-import org.geotools.resources.Geotools;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;

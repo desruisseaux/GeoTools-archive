@@ -293,7 +293,7 @@ public final class ResampleTest extends GridCoverageTest {
      */
     public static void main(final String[] args) {
         SHOW = true;
-        org.geotools.resources.Geotools.init(Level.FINER);
+        org.geotools.util.MonolineFormatter.initGeotools(Level.FINER);
         junit.textui.TestRunner.run(suite());
     }
 }
