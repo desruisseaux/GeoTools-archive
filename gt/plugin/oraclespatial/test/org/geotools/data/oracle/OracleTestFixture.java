@@ -16,7 +16,6 @@
  */
 package org.geotools.data.oracle;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -71,12 +70,14 @@ public class OracleTestFixture {
 	                properties.getProperty("port"), properties.getProperty("instance"));
 	       fact.setLogin(properties.getProperty("user"), properties.getProperty("passwd"));
 	       
-	       cPool = fact.getConnectionPool();
-	       Connection conn = cPool.getConnection();
-	       System.out.println(conn.getTypeMap());
-	        
-	       connection = (OracleConnection)
-	           DriverManager.getConnection  ("jdbc:oracle:thin:@hydra:1521:rrdev","dblasby","dave2000");	    	                  
+	       cPool = fact.getConnectionPool();	       
+	       System.out.println( "Connect to"+ properties );
+	       //connection = (OracleConnection) cPool.getConnection();
+	       
+	        	       
+	       // connection = (OracleConnection) DriverManager.getConnection  ("jdbc:oracle:thin:@hydra:1521:rrdev","dblasby","dave2000");
+	       connection = (OracleConnection) DriverManager.getConnection  ("jdbc:oracle:thin:@hydra:1521:dev","egouge","emily2004");
+	       System.out.println( connection.getTypeMap());
 	    }	    
 	    public void close() throws SQLException{
 	        connection.close();
