@@ -49,7 +49,7 @@ import java.util.Set;
  *         go to Window - Preferences - Java - Code Style - Code Templates
  */
 public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
-    protected Transaction trans;
+    protected Transaction trans = Transaction.AUTO_COMMIT;
 
     public WFSFeatureStore(WFSDataStore ds, FeatureType ft) {
         super(ds, ft);
