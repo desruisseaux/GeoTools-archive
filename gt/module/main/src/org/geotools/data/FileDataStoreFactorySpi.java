@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.dir;
+package org.geotools.data;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;

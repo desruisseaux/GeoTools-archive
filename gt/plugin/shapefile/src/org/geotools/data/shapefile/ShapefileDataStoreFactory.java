@@ -23,7 +23,7 @@ package org.geotools.data.shapefile;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataSourceMetadataEnity;
 import org.geotools.data.DataStore;
-import org.geotools.data.dir.FileDataStoreFactorySpi;
+import org.geotools.data.FileDataStoreFactorySpi;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

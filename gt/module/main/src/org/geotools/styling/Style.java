@@ -42,6 +42,5 @@ public interface Style {
     void setFeatureTypeStyles(FeatureTypeStyle[] types);
     void addFeatureTypeStyle(FeatureTypeStyle type);
     void accept(StyleVisitor visitor);
-    
 }
 
