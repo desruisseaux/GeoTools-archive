@@ -169,6 +169,13 @@ final class MetadataResult {
     }
 
     /**
+     * Returns {@code true} if the last value returned by a {@code getFoo} method was null.
+     */
+    public boolean wasNull() throws SQLException {
+        return results.wasNull();
+    }
+
+    /**
      * Close this statement and free all resources.
      * After this method has been invoked, this object can't be used anymore.
      *

@@ -226,10 +226,12 @@ public class MetadataSource {
          * value is a foreigner key. Queries again the database in the foreigner table.
          */
         if (valueType.isInterface() && isMetadata(valueType)) {
-            return getEntry(valueType, result.getInt(identifier, columnName));
+            final int foreigner = result.getInt(identifier, columnName);
+            return result.wasNull() ? null : getEntry(valueType, foreigner);
         }
         if (CodeList.class.isAssignableFrom(valueType)) {
-            return getCodeList(valueType, result.getInt(identifier, columnName));
+            final int foreigner = result.getInt(identifier, columnName);
+            return result.wasNull() ? null : getCodeList(valueType, foreigner);
         }
         /*
          * Not a foreigner key. Get the value and transform it to the
