@@ -16,31 +16,24 @@
  */
 package org.geotools.data.wms.gce;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
 import org.geotools.cs.CoordinateSystem;
 import org.geotools.cs.GeographicCoordinateSystem;
-
 import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridCoverageReader;
 import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetMapResponse;
-
 import org.geotools.gc.GridCoverage;
-
 import org.geotools.pt.Envelope;
-
 import org.opengis.coverage.MetadataNameNotFoundException;
-
 import org.opengis.parameter.GeneralParameterValue;
-
-import java.awt.image.BufferedImage;
-
-import java.io.IOException;
-
-import java.util.List;
-
-import javax.imageio.ImageIO;
 
 
 /**

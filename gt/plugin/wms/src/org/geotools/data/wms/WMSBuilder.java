@@ -60,20 +60,36 @@ public class WMSBuilder {
     private WMSOperationType getFeatureInfo;
     private List layers;
     private Layer layer;
-    private List srss;
-    private List styles;
     private HashMap bboxes;
 
+    /**
+     * Constructs a WMSBuilder
+     */
     public WMSBuilder() {
         layers = new ArrayList();
         request = new WMSRequest();
     }
 
+    /**
+     * Builds a capabilities object. This should only be called once each
+     * time this object is constructed. Each call will reset the previous
+     * capabilities object. 
+     * 
+     * @param version the version number for the capabilities object
+     */
     public void buildCapabilities(String version) {
         capabilities = new WMSCapabilities();
         capabilities.setVersion(version);
     }
 
+    /**
+     * Builds a Service object with the provided parameters. 
+     * @param name the machine-readable name of the service
+     * @param title the human-readable title of the service
+     * @param onlineResource the URL of the server that provides the service
+     * @param _abstract a description of the service
+     * @param keywords searchable metadata keywords about the server
+     */
     public void buildService(String name, String title, URL onlineResource,
         String _abstract, String[] keywords) {
         service = new Service();
@@ -85,22 +101,35 @@ public class WMSBuilder {
     }
 
     /**
-     * Build description of GetCapabilities operation.
+     * Builds a GetCapabilities operation
      *
-     * @param formats List<String> of available formats
-     * @param get
-     * @param post
+     * @param formats List of available formats
+     * @param get the URL for performing a GET request
+     * @param post the URL for performing a POST request
      */
     public void buildGetCapabilitiesOperation(List formats, URL get, URL post) {
         getCapabilities = new WMSOperationType();
         buildWMSOperationType(getCapabilities, formats, get, post);
     }
 
+    /**
+     * Builds a GetMap operation
+     * 
+     * @param formats a List containing Strings of possible format for the GetMap response
+     * @param get the URL for performing a GET request
+     * @param post the URL for performing a POST request
+     */
     public void buildGetMapOperation(List formats, URL get, URL post) {
         getMap = new WMSOperationType();
         buildWMSOperationType(getMap, formats, get, post);
     }
-
+    /**
+     * Builds a GetFeatureInfo operation
+     * 
+     * @param formats a List containing Strings of possible format for the GetFeatureInfo response
+     * @param get the URL for performing a GET request
+     * @param post the URL for performing a POST request
+     */
     public void buildGetFeatureInfoOperation(List formats, URL get, URL post) {
         getFeatureInfo = new WMSOperationType();
         buildWMSOperationType(getFeatureInfo, formats, get, post);
@@ -119,6 +148,19 @@ public class WMSBuilder {
         operationType.setPost(post);
     }
 
+    /**
+     * Begins the construction of a Layer object. The layer has its initial
+     * information added to it, but is not completed until another call to
+     * buildLayer() or finish() is made. This allows the building of bounding
+     * boxes objects. 
+     * 
+     * @param title a human-readable title
+     * @param name a machine-readable name, indicated that this layer is drawable
+     * @param queryable true if this layer is queryable, false otherwise
+     * @param parentLayerTitle the title of this layer's parent
+     * @param srss a List of Strings containing this layer's possible CRS/SRS values
+     * @param styles a List of Strings containing this layer's possible style values
+     */
     public void buildLayer(String title, String name, boolean queryable,
         String parentLayerTitle, List srss, List styles) {
         if (layer != null) {
@@ -149,6 +191,15 @@ public class WMSBuilder {
         layer.setStyles(styles);
     }
 
+    /**
+     * Constructs a BoundingBox object and adds it to the current layer.
+     * 
+     * @param crs the Coordinate Reference System (or SRS) that this bounding box is in
+     * @param minX the X value of the lower coordinate
+     * @param minY the Y value of the lower coordinate
+     * @param maxX the X value of the higher coordinate
+     * @param maxY the Y value of the higher coordinate
+     */
     public void buildBoundingBox(String crs, double minX, double minY,
         double maxX, double maxY) {
         BoundingBox bbox = new BoundingBox(crs, minX, minY, maxX, maxY);
@@ -163,6 +214,10 @@ public class WMSBuilder {
         bboxes = null;
     }
 
+    /**
+     * Completes the capabilities structure and returns it. 
+     * @return the completed WMSCapabilities data object.
+     */
     public WMSCapabilities finish() {
         capabilities.setService(service);
 

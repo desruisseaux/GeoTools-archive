@@ -21,9 +21,12 @@ import java.util.List;
 
 
 /**
- * @author rgould
- *
  * Nested list of zero or more map Layers offered by this server.
+ *
+ * It contains only fields for information that we currently find
+ * interesting. Feel free to add your own.
+ *
+ * @author rgould
  */
 public class Layer implements Comparable {
     /** A machine-readable (typically one word) identifier */
@@ -56,18 +59,43 @@ public class Layer implements Comparable {
         this.title = title;
     }
 
+    /**
+     * Returns every BoundingBox contained within this layer. The <code>HashMap</code>
+     * returned has each bounding box's CRS/SRS value as the key, and the value
+     * is the <code>BoundingBox</code> object itself.
+     * @return a HashMap of all of this layer's bounding boxes.
+     */
     public HashMap getBoundingBoxes() {
         return boundingBoxes;
     }
 
+    /**
+     * Sets this layer's bounding boxes. The HashMap must have each BoundingBox's 
+     * CRS/SRS value as its key, and the <code>BoundingBox</code> object as its value.
+     * 
+     * @param boundingBoxes a HashMap containing bounding boxes
+     */
     public void setBoundingBoxes(HashMap boundingBoxes) {
         this.boundingBoxes = boundingBoxes;
     }
 
+    /**
+     * Gets the name of the <code>Layer</code>. It is designed to be machine
+     * readable, and if it is present, this layer is determined to be drawable
+     * and is a valid candidate for use in a GetMap or GetFeatureInfo request.
+     * 
+     * @return the machine-readable name of the layer
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of this layer. Giving the layer name indicates that it 
+     * can be drawn during a GetMap or GetFeatureInfo request.
+     * 
+     * @param name the layer's new name
+     */
     public void setName(String name) {
         this.name = name;
     }

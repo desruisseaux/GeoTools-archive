@@ -66,7 +66,8 @@ public interface WMSParser {
     * </code></pre>
     * </p>
     * @param document Document to test
-    * @returns GENERIC for a WMS 1.1.1 GetCapabilities docuemnt
+    * @return GENERIC for a WMS 1.1.1 GetCapabilities docuemnt
+    * @throws IOException if there is an error while accessing the document
     */
     public int canProcess(Document document) throws IOException;
 
@@ -79,7 +80,10 @@ public interface WMSParser {
      * dependent.
      * </p>
      * @param document Document to parse
+     * @param builder a WMSBuilder object used to construct the capabilities object
+     * @return a WMSCapabilities object that contains the parsed information
+     * @throws ParseCapabilitiesException if the capabilities document is malformed
      */
-    public WMSCapabilities constructCapabilities(Document docuemnt,
+    public WMSCapabilities constructCapabilities(Document document,
         WMSBuilder builder) throws ParseCapabilitiesException;
 }

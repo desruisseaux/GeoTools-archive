@@ -108,11 +108,27 @@ import java.util.TreeSet;
  * @author Richard Gould, Refractions Research
  */
 public class WebMapServer {
-    //private WMSParser[] parsers;
+
+    /**
+     * Returned by getStatus(). Indicates that the server is currently performing a request.
+     */
     public static final int IN_PROGRESS = 1;
+    
+    /**
+     * Returned by getStatus(). Indicates that the capabilities document has not yet been retrieved.
+     */
     public static final int NOTCONNECTED = 0;
+    
+    /**
+     * Returned by getStatus(). Indicates that there was an error with the most recently executed request.
+     */
     public static final int ERROR = -1;
+    
+    /**
+     * Returned by getStatus(). Indicates that the capabilities document has been successfully retrieved.
+     */
     public static final int CONNECTED = 2;
+    
     private final URL serverURL;
     private WMSCapabilities capabilities;
     private Exception problem;
@@ -215,21 +231,19 @@ public class WebMapServer {
      * @return GetCapabilitiesRequest suitable for use with a parser
      */
     private GetCapabilitiesRequest negotiateVersion(URL server) {
-        List specs = specifications();
-        List versions = new ArrayList(specs.size());
+        List versions = new ArrayList(specs.length);
 
-        for (Iterator i = specs.iterator(); i.hasNext();) {
-            Specification specification = (Specification) i.next();
-            versions.add(specification.getVersion());
+        for (int i = 0; i < specs.length; i++) {
+            versions.add(specs[i].getVersion());
         }
 
         int minClient = 0;
-        int maxClient = specs.size() - 1;
+        int maxClient = specs.length - 1;
 
         int test = maxClient;
 
         while ((minClient <= test) && (test <= maxClient)) {
-            Specification specification = (Specification) specs.get(test);
+            Specification specification = specs[test];
             String clientVersion = specification.getVersion();
 
             GetCapabilitiesRequest request = specification.createGetCapabilitiesRequest(server);
@@ -346,24 +360,10 @@ public class WebMapServer {
         return after;
     }
 
-    /**
-     * Map of known specifications.
-     * <p>
-     * We could do the plug-in thing here to add specifications at a later date.
-     * @return Sorted Map of Specifications by version number.
-     */
-    private List specifications() {
-        List specs = new ArrayList(2);
-        specs.add(new WMS1_0_0());
-        specs.add(new WMS1_1_1());
-
-        return specs;
-    }
-
     private String queryVersion(Document document) {
         Element element = document.getRootElement();
 
-        return element.getAttributeValue("version");
+        return element.getAttributeValue("version"); //$NON-NLS-1$
     }
 
     private Document buildDocument(URL url) {

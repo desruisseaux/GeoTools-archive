@@ -16,7 +16,6 @@
  */
 package org.geotools.data.wms;
 
-import org.geotools.data.ows.BoundingBox;
 import org.geotools.data.ows.WMSCapabilities;
 
 import org.jdom.Document;
@@ -27,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,7 +52,7 @@ public abstract class AbstractWMSParser implements WMSParser {
      * @return Name string in the format ""
      */
     public String getName() {
-        return "WMT_MS_Capabilities";
+        return "WMT_MS_Capabilities"; //$NON-NLS-1$
     }
 
     /**
@@ -90,7 +88,7 @@ public abstract class AbstractWMSParser implements WMSParser {
      * </ul>
      * </p>
      * @param document Document to test
-     * @returns GENERIC for a GetCapabilities docuemnt matching getName and getVersion
+     * @return GENERIC for a GetCapabilities document matching getName and getVersion
      */
     public int canProcess(Document document) {
         Element element = document.getRootElement(); //Root = "WMT_MS_Capabilities"
@@ -99,7 +97,7 @@ public abstract class AbstractWMSParser implements WMSParser {
             return WMSParser.NO;
         }
 
-        String version = element.getAttributeValue("version");
+        String version = element.getAttributeValue("version"); //$NON-NLS-1$
 
         if ((version == null) || !version.equals(getVersion())) {
             return WMSParser.NO;
@@ -117,21 +115,24 @@ public abstract class AbstractWMSParser implements WMSParser {
      * dependent.
      * </p>
      * @param document Document to parse
+     * @param builder a WMSBuilder object which will construct the capabilities
+     * @return a WMSCapabilities object containing the values of a parse capabilities document
+     * @throws ParseCapabilitiesException if the document is unable to be parsed.
      */
     public WMSCapabilities constructCapabilities(Document document,
         WMSBuilder builder) throws ParseCapabilitiesException {
         Element capabilitiesElement = document.getRootElement();
 
         try {
-            String version = capabilitiesElement.getAttributeValue("version");
+            String version = capabilitiesElement.getAttributeValue("version"); //$NON-NLS-1$
 
             builder.buildCapabilities(version);
-            parseService(capabilitiesElement.getChild("Service"), builder);
+            parseService(capabilitiesElement.getChild("Service"), builder); //$NON-NLS-1$
 
             Element capabilityElement = capabilitiesElement.getChild(
-                    "Capability");
-            parseRequest(capabilityElement.getChild("Request"), builder);
-            parseLayer(capabilityElement.getChild("Layer"), builder, null);
+                    "Capability"); //$NON-NLS-1$
+            parseRequest(capabilityElement.getChild("Request"), builder); //$NON-NLS-1$
+            parseLayer(capabilityElement.getChild("Layer"), builder, null); //$NON-NLS-1$
         } catch (MalformedURLException exception) {
             throw new ParseCapabilitiesException("Unable to parse URL properly",
                 null, exception);
@@ -153,20 +154,20 @@ public abstract class AbstractWMSParser implements WMSParser {
      */
     protected void parseLayer(Element layerElement, WMSBuilder builder,
         String parentTitle) throws MalformedURLException {
-        String title = layerElement.getChildText("Title");
-        String name = layerElement.getChildText("Name");
+        String title = layerElement.getChildText("Title"); //$NON-NLS-1$
+        String name = layerElement.getChildText("Name"); //$NON-NLS-1$
         List srsElements = querySRS(layerElement);
         List styleElements = queryStyles(layerElement);
 
         boolean queryable = Integer.parseInt(layerElement.getAttributeValue(
-                    "queryable")) == 1;
+                    "queryable")) == 1; //$NON-NLS-1$
 
         builder.buildLayer(title, name, queryable, parentTitle, srsElements,
             styleElements);
 
         parseBoundingBoxes(layerElement, builder);
 
-        List children = layerElement.getChildren("Layer");
+        List children = layerElement.getChildren("Layer"); //$NON-NLS-1$
 
         for (Iterator i = children.iterator(); i.hasNext();) {
             parseLayer((Element) i.next(), builder, title);
@@ -174,7 +175,7 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
     protected void parseBoundingBoxes(Element layerElement, WMSBuilder builder) {
-        List bboxElements = layerElement.getChildren("BoundingBox");
+        List bboxElements = layerElement.getChildren("BoundingBox"); //$NON-NLS-1$
         Iterator iter = bboxElements.iterator();
 
         while (iter.hasNext()) {
@@ -182,20 +183,20 @@ public abstract class AbstractWMSParser implements WMSParser {
 
             String crs = bboxElement.getAttributeValue(getBBoxCRSName());
             double minX = Double.parseDouble(bboxElement.getAttributeValue(
-                        "minx"));
+                        "minx")); //$NON-NLS-1$
             double minY = Double.parseDouble(bboxElement.getAttributeValue(
-                        "miny"));
+                        "miny")); //$NON-NLS-1$
             double maxX = Double.parseDouble(bboxElement.getAttributeValue(
-                        "maxx"));
+                        "maxx")); //$NON-NLS-1$
             double maxY = Double.parseDouble(bboxElement.getAttributeValue(
-                        "maxy"));
+                        "maxy")); //$NON-NLS-1$
 
             builder.buildBoundingBox(crs, minX, minY, maxX, maxY);
         }
     }
 
     protected String getBBoxCRSName() {
-        return "SRS";
+        return "SRS"; //$NON-NLS-1$
     }
 
     /**
@@ -205,14 +206,14 @@ public abstract class AbstractWMSParser implements WMSParser {
      */
     protected List queryStyles(Element layerElement) {
         // TODO This is buggy. Need to extract Style.Name.value not Style.value
-        List styleElements = layerElement.getChildren("Style");
+        List styleElements = layerElement.getChildren("Style"); //$NON-NLS-1$
         List styles = new ArrayList();
 
         if (styleElements != null) {
             Iterator iter = styleElements.iterator();
 
             while (iter.hasNext()) {
-                String value = ((Element) iter.next()).getChildText("Name");
+                String value = ((Element) iter.next()).getChildText("Name"); //$NON-NLS-1$
                 styles.add(value);
             }
         }
@@ -226,10 +227,10 @@ public abstract class AbstractWMSParser implements WMSParser {
      * May need to override for WMS1.0.0.
      * </p>
      * @param layerElement
-     * @return
+     * @return A List containing Strings representing the layer's SRS values
      */
     protected List querySRS(Element layerElement) {
-        return extractStrings(layerElement, "SRS");
+        return extractStrings(layerElement, "SRS"); //$NON-NLS-1$
     }
 
     /**
@@ -261,10 +262,11 @@ public abstract class AbstractWMSParser implements WMSParser {
      * that element and return a Request object.
      *
      * @param requestElement an Element representing a request element
-     * @return a Request object constructed from the passed-in element
+     * @param builder a WMSBuilder object which will construct the capabilities
+     * @throws MalformedURLException if the request element contains invalid URLs 
      */
     protected void parseRequest(Element requestElement, WMSBuilder builder)
-        throws MalformedURLException {
+    	throws MalformedURLException {
         Element getCapabilities = requestElement.getChild(getRequestGetCapName());
 
         builder.buildGetCapabilitiesOperation(queryFormats(getCapabilities),
@@ -283,15 +285,15 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
     protected String getRequestGetFeatureInfoName() {
-        return "GetFeatureInfo";
+        return "GetFeatureInfo"; //$NON-NLS-1$
     }
 
     protected String getRequestGetMapName() {
-        return "GetMap";
+        return "GetMap"; //$NON-NLS-1$
     }
 
     protected String getRequestGetCapName() {
-        return "GetCapabilities";
+        return "GetCapabilities"; //$NON-NLS-1$
     }
 
     /**
@@ -334,12 +336,13 @@ public abstract class AbstractWMSParser implements WMSParser {
      * convert these formats to mime types for the rest of the api.
      * </p>
      * @param op Opperation Element (like getMap)
+     * @return A List of Strings representing the formats that this operation can be performed with
      */
     protected List queryFormats(Element op) {
         Iterator iter;
 
         List formats = new ArrayList();
-        List formatElements = op.getChildren("Format");
+        List formatElements = op.getChildren("Format"); //$NON-NLS-1$
         iter = formatElements.iterator();
 
         while (iter.hasNext()) {
@@ -351,26 +354,26 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
     protected URL queryPost(Element element) throws MalformedURLException {
-        return queryDCPType(element, "Post");
+        return queryDCPType(element, "Post"); //$NON-NLS-1$
     }
 
     protected URL queryGet(Element element) throws MalformedURLException {
-        return queryDCPType(element, "Get");
+        return queryDCPType(element, "Get"); //$NON-NLS-1$
     }
 
     protected URL queryDCPType(Element element, String httpType)
         throws MalformedURLException {
-        List dcpTypeElements = element.getChildren("DCPType");
+        List dcpTypeElements = element.getChildren("DCPType"); //$NON-NLS-1$
 
         for (Iterator i = dcpTypeElements.iterator(); i.hasNext();) {
             Element dcpTypeElement = (Element) i.next();
-            Element httpElement = dcpTypeElement.getChild("HTTP");
+            Element httpElement = dcpTypeElement.getChild("HTTP"); //$NON-NLS-1$
 
             Element httpTypeElement = httpElement.getChild(httpType);
 
             if (httpTypeElement != null) {
                 return parseOnlineResource(httpTypeElement.getChild(
-                        "OnlineResource"));
+                        "OnlineResource")); //$NON-NLS-1$
             }
         }
 
@@ -379,11 +382,11 @@ public abstract class AbstractWMSParser implements WMSParser {
 
     protected URL parseOnlineResource(Element onlineResourceElement)
         throws MalformedURLException {
-        Namespace xlink = Namespace.getNamespace("xlink",
-                "http://www.w3.org/1999/xlink");
+        Namespace xlink = Namespace.getNamespace("xlink", //$NON-NLS-1$
+                "http://www.w3.org/1999/xlink"); //$NON-NLS-1$
 
         //Element onlineResourceElement = element.getChild(ONLINE_RESOURCE);
-        String onlineResource = onlineResourceElement.getAttributeValue("href",
+        String onlineResource = onlineResourceElement.getAttributeValue("href", //$NON-NLS-1$
                 xlink);
 
         return new URL(onlineResource);
@@ -394,16 +397,17 @@ public abstract class AbstractWMSParser implements WMSParser {
      * that element and return a Service object.
      *
      * @param serviceElement an Element representing a service element
-     * @return a Service object constructed from the passed-in element
+     * @param builder a WMSBuilder object which will construct the capabilities
+     * @throws MalformedURLException if the service's OnlineResource contains an invalid URL 
      */
     protected void parseService(Element serviceElement, WMSBuilder builder)
         throws MalformedURLException {
-        String name = serviceElement.getChildText("Name");
-        String title = serviceElement.getChildText("Title");
+        String name = serviceElement.getChildText("Name"); //$NON-NLS-1$
+        String title = serviceElement.getChildText("Title"); //$NON-NLS-1$
 
         URL onlineResource = queryServiceOnlineResource(serviceElement);
 
-        String description = serviceElement.getChildText("Abstract");
+        String description = serviceElement.getChildText("Abstract"); //$NON-NLS-1$
 
         String[] keywords = queryKeywords(serviceElement);
 
@@ -411,21 +415,27 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
     /**
+     * Takes a Service element, extracts the OnlineResource value and creates
+     * a URL from it.
+     *  
      * @param serviceElement
-     * @return
+     * @throws MalformedURLException if the OnlineResource element contains an invalid URL
+     * @return a URL containing the value in the OnlineResource element
      */
     protected URL queryServiceOnlineResource(Element serviceElement)
         throws MalformedURLException {
-        return parseOnlineResource(serviceElement.getChild("OnlineResource"));
+        return parseOnlineResource(serviceElement.getChild("OnlineResource")); //$NON-NLS-1$
     }
 
     /**
+     * Takes a Service element and extracts all the keywords from it.
+     * 
      * @param serviceElement
-     * @return
+     * @return A String[], each element containing a keyword
      */
     protected String[] queryKeywords(Element serviceElement) {
         String[] keywords = null;
-        Element keywordListElement = serviceElement.getChild("KeywordList");
+        Element keywordListElement = serviceElement.getChild("KeywordList"); //$NON-NLS-1$
 
         if (keywordListElement != null) {
             keywords = queryKeywordList(keywordListElement);
@@ -435,15 +445,19 @@ public abstract class AbstractWMSParser implements WMSParser {
     }
 
     /**
+     * Takes a KeywordList element and extracts all the keywords from it.
+     * 
+     * This is for WMS version 1.1.0 and on.
+     * 
      * @param keywordListElement
-     * @return
+     * @return A String[], each element containing a keyword
      */
     protected String[] queryKeywordList(Element keywordListElement) {
         String[] keywords = new String[keywordListElement.getChildren().size()];
 
         for (int i = 0; i < keywordListElement.getChildren().size(); i++) {
             Element keyword = (Element) keywordListElement.getChildren().get(i);
-            keywords[i] = (String) keyword.getText();
+            keywords[i] = keyword.getText();
         }
 
         return keywords;
