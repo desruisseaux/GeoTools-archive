@@ -17,11 +17,13 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.pt;
+package org.geotools.measure;
 
 // J2SE dependencies
 import java.util.Date;
 import java.util.Locale;
+import java.text.Format;
+import java.text.ParseException;
 
 // Geotools dependencies
 import org.geotools.referencing.*;
@@ -51,7 +53,7 @@ public class BasicTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(CoordinateFormatTest.class);
+        return new TestSuite(BasicTest.class);
     }
 
     /**
@@ -59,6 +61,28 @@ public class BasicTest extends TestCase {
      */
     public BasicTest(final String name) {
         super(name);
+    }
+
+    /**
+     * Test {@link AngleFormat}.
+     */
+    public void testAngleFormat() throws ParseException {
+        AngleFormat f = new AngleFormat("DD.ddd", Locale.CANADA);
+        assertEquals("20.000", new Angle(20), f);
+    }
+
+    /**
+     * Format an object and parse the result. The format
+     * output is compared with the expected output.
+     */
+    private static void assertEquals(final String expected,
+                                     final Object value,
+                                     final Format format) throws ParseException
+    {
+        final String label = value.toString();
+        final String text  = format.format(value);
+        assertEquals("Formatting of \""+label+'"', expected, text);
+        assertEquals("Parsing of \""   +label+'"', value, format.parseObject(text));
     }
 
     /**
