@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ * (C) 2002, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,41 +21,39 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing.operation;
-
-// J2SE dependencies
-import java.util.Arrays;
+package org.geotools.referencing.operation.transform;
 
 
 /**
- * A one dimensional, constant transform. Output values are set to a constant value regardless
- * of input values. This class is really a special case of {@link LinearTransform1D} in which
- * <code>{@link #scale} = 0</code> and <code>{@link #offset} = constant</code>. However, this
- * specialized <code>ConstantTransform1D</code> class is faster.
+ * A one dimensional, identity transform. Output values are identical to input values.
+ * This class is really a special case of {@link LinearTransform1D} optimized for speed.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class ConstantTransform1D extends LinearTransform1D {
+final class IdentityTransform1D extends LinearTransform1D {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -1583675681650985947L;
+    private static final long serialVersionUID = -7378774584053573789L;
 
     /**
-     * Construct a new constant transform.
-     *
-     * @param offset The <code>offset</code> term in the linear equation.
+     * The shared instance of the identity transform.
      */
-    protected ConstantTransform1D(final double offset) {
-        super(0, offset);
+    public static final LinearTransform1D ONE = new IdentityTransform1D();
+
+    /**
+     * Construct a new identity transform.
+     */
+    private IdentityTransform1D() {
+        super(1, 0);
     }
     
     /**
      * Transforms the specified value.
      */
     public double transform(double value) {
-        return offset;
+        return value;
     }
     
     /**
@@ -64,7 +62,7 @@ final class ConstantTransform1D extends LinearTransform1D {
     public void transform(final float[] srcPts, int srcOff,
                           final float[] dstPts, int dstOff, int numPts)
     {
-        Arrays.fill(dstPts, dstOff, dstOff+numPts, (float)offset);
+        System.arraycopy(srcPts, srcOff, dstPts, dstOff, numPts);
     }
     
     /**
@@ -73,6 +71,6 @@ final class ConstantTransform1D extends LinearTransform1D {
     public void transform(final double[] srcPts, int srcOff,
                           final double[] dstPts, int dstOff, int numPts)
     {
-        Arrays.fill(dstPts, dstOff, dstOff+numPts, offset);
+        System.arraycopy(srcPts, srcOff, dstPts, dstOff, numPts);
     }
 }

@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing.operation;
+package org.geotools.referencing.operation.transform;
 
 // J2SE and vecmath dependencies
 import java.io.Serializable;
@@ -54,7 +54,7 @@ import org.geotools.referencing.wkt.Formatter;
 
 
 /**
- * Provides a default implementations for most methods required by the
+ * Provides a default implementation for most methods required by the
  * {@link MathTransform} interface. <code>AbstractMathTransform</code>
  * provides a convenient base class from which other transform classes
  * can be easily derived. In addition, <code>AbstractMathTransform</code>
@@ -83,10 +83,17 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
 
     /**
      * Construct an error message for the {@link MismatchedDimensionException}.
+     *
+     * @param argument  The argument name with the wrong number of dimensions.
+     * @param dimension The wrong dimension.
+     * @param expected  The expected dimension.
      */
-    private static String constructMessage(final int dim1, final int dim2) {
-        return Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-                                new Integer(dim1), new Integer(dim2));
+    private static String constructMessage(final String argument,
+                                           final int   dimension,
+                                           final int    expected)
+    {
+        return Resources.format(ResourceKeys.ERROR_MISMATCHED_DIMENSION_$3,
+                                argument, new Integer(dimension), new Integer(expected));
     }
     
     /**
@@ -107,9 +114,12 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @see MathTransform2D#transform(Point2D,Point2D)
      */
     public Point2D transform(final Point2D ptSrc, final Point2D ptDst) throws TransformException {
-        if (getDimSource()!=2 || getDimTarget()!=2) {
-            // TODO: provide a localized detail message.
-            throw new MismatchedDimensionException();
+        int dim;
+        if ((dim = getDimSource()) != 2) {
+            throw new MismatchedDimensionException(constructMessage("ptSrc", 2, dim));
+        }
+        if ((dim = getDimTarget()) != 2) {
+            throw new MismatchedDimensionException(constructMessage("ptDst", 2, dim));
         }
         final double[] ord = new double[] {ptSrc.getX(), ptSrc.getY()};
         this.transform(ord, 0, ord, 0, 1);
@@ -133,28 +143,48 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         final int dimSource = getDimSource();
         final int dimTarget = getDimTarget();
         if (dimPoint != dimSource) {
-            throw new MismatchedDimensionException(constructMessage(dimPoint, dimSource));
+            throw new MismatchedDimensionException(constructMessage("ptSrc", dimPoint, dimSource));
         }
         if (ptDst == null) {
-            ptDst = new org.geotools.geometry.DirectPosition(dimTarget);
-        } else {
             dimPoint = ptDst.getDimension();
             if (dimPoint != dimTarget) {
-                throw new MismatchedDimensionException(constructMessage(dimPoint, dimTarget));
+                throw new MismatchedDimensionException(constructMessage("ptDst", dimPoint, dimTarget));
             }
-        }
-        final double[] array;
-        if (dimSource <= dimTarget) {
-            array = ptSrc.getCoordinates();
+            /*
+             * Transforms the coordinates using a temporary 'double[]' buffer,
+             * and copy the transformation result in the destination position.
+             */
+            final double[] array;
+            if (dimSource <= dimTarget) {
+                array = ptSrc.getCoordinates();
+            } else {
+                array = new double[dimTarget];
+                for (int i=dimSource; --i>=0;) {
+                    array[i] = ptSrc.getOrdinate(i);
+                }
+            }
+            transform(array, 0, array, 0, 1);
+            for (int i=dimTarget; --i>=0;) {
+                ptDst.setOrdinate(i, array[i]);
+            }
         } else {
-            array = new double[dimTarget];
-            for (int i=0; i<dimSource; i++) {
-                array[i] = ptSrc.getOrdinate(i);
+            /*
+             * Destination not set.  We are going to create the destination here.  Since we know
+             * that the destination will be the Geotools implementation, write directly into the
+             * 'ordinates' array.
+             */
+            final org.geotools.geometry.DirectPosition destination;
+            ptDst = destination = new org.geotools.geometry.DirectPosition(dimTarget);
+            final double[] source;
+            if (dimSource <= dimTarget) {
+                source = destination.ordinates;
+                for (int i=dimSource; --i>=0;) {
+                    source[i] = ptSrc.getOrdinate(i);
+                }
+            } else {
+                source = ptSrc.getCoordinates();
             }
-        }
-        transform(array, 0, array, 0, 1);
-        for (int i=0; i<dimTarget; i++) {
-            ptDst.setOrdinate(i, array[i]);
+            transform(source, 0, destination.ordinates, 0, 1);
         }
         return ptDst;
     }
@@ -223,9 +253,9 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                                        final int quadDir)
         throws TransformException
     {
-        if (getDimSource()!=2 || getDimTarget()!=2) {
-            // TODO: provides a localized detail message.
-            throw new MismatchedDimensionException();
+        int dim;
+        if ((dim=getDimSource())!=2 || (dim=getDimTarget())!=2) {
+            throw new MismatchedDimensionException(constructMessage("shape", 2, dim));
         }
         final PathIterator    it = shape.getPathIterator(preTr);
         final GeneralPath   path = new GeneralPath(it.getWindingRule());
@@ -373,7 +403,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     public Matrix derivative(final Point2D point) throws TransformException {
         final int dimSource = getDimSource();
         if (dimSource != 2) {
-            throw new MismatchedDimensionException(constructMessage(2, dimSource));
+            throw new MismatchedDimensionException(constructMessage("point", 2, dimSource));
         }
         throw new TransformException(Resources.format(ResourceKeys.ERROR_CANT_COMPUTE_DERIVATIVE));
     }
@@ -407,7 +437,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         if (point != null) {
             final int dimPoint = point.getDimension();
             if (dimPoint != dimSource) {
-                throw new MismatchedDimensionException(constructMessage(dimPoint, dimSource));
+                throw new MismatchedDimensionException(constructMessage("point", dimPoint, dimSource));
             }
             if (dimSource == 2) {
                 if (point instanceof Point2D) {

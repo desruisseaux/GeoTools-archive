@@ -25,11 +25,14 @@ package org.geotools.coverage.grid;
 
 // J2SE and extensions
 import java.util.Map;
+import java.text.NumberFormat;
+import java.text.FieldPosition;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.PropertySource;
 import javax.media.jai.util.CaselessStringKey;
 
 // OpenGIS dependencies
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
@@ -78,5 +81,26 @@ public abstract class GridCoverage extends Coverage
      */
     protected GridCoverage(final GridCoverage coverage) {
         super(coverage);
+    }
+    
+    /**
+     * Construct a string for the specified point.
+     * This is used for formatting error messages.
+     *
+     * @param  point The coordinate point to format.
+     * @return The coordinate point as a string, without '(' or ')' characters.
+     */
+    static String toString(final DirectPosition point) {
+        final StringBuffer buffer = new StringBuffer();
+        final FieldPosition dummy = new FieldPosition(0);
+        final NumberFormat format = NumberFormat.getNumberInstance();
+        final int       dimension = point.getDimension();
+        for (int i=0; i<dimension; i++) {
+            if (i!=0) {
+                buffer.append(", ");
+            }
+            format.format(point.getOrdinate(i), buffer, dummy);
+        }
+        return buffer.toString();
     }
 }

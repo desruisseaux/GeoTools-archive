@@ -21,12 +21,13 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing.operation;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.util.Arrays;
 import java.io.Serializable;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import javax.vecmath.GMatrix;
 import javax.vecmath.SingularMatrixException;
 
@@ -40,16 +41,16 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.LinearTransform;
 
 
 /**
  * Transforms multi-dimensional coordinate points using a {@link Matrix}.
  *
  * @version $Id$
- * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
  */
-final class MatrixTransform extends AbstractMathTransform implements LinearTransform, Serializable {
+public class MatrixTransform extends AbstractMathTransform implements LinearTransform, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -71,9 +72,12 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
     private final double[] elt;
     
     /**
-     * Construct a transform.
+     * Construct a transform from the specified matrix.
+     * The matrix should be affine, but it will not be verified.
+     *
+     * @param matrix The matrix.
      */
-    protected MatrixTransform(final GMatrix matrix) {
+    protected MatrixTransform(final Matrix matrix) {
         numRow = matrix.getNumRow();
         numCol = matrix.getNumCol();
         elt = new double[numRow*numCol];
@@ -83,6 +87,33 @@ final class MatrixTransform extends AbstractMathTransform implements LinearTrans
                 elt[index++] = matrix.getElement(j,i);
             }
         }
+    }
+
+    /**
+     * Creates a transform for the specified matrix.
+     * The matrix should be affine, but it will not be verified.
+     */
+    public static LinearTransform create(final Matrix matrix) {
+        if (matrix.getNumRow() == 3 && matrix.getNumCol() == 3) {
+            // TODO: Invokes some 'wrap' method instead.
+            if (matrix instanceof org.geotools.referencing.operation.Matrix) {
+                final org.geotools.referencing.operation.Matrix m;
+                m = (org.geotools.referencing.operation.Matrix) matrix;
+                if (m.isAffine()) {
+                    return create(m.toAffineTransform2D());
+                }
+            }
+        }
+        return new MatrixTransform(matrix);
+    }
+
+    /**
+     * Creates a transform for the specified matrix as a Java2D object.
+     * This method is provided for interoperability with
+     * <A HREF="http://java.sun.com/products/java-media/2D/index.jsp">Java2D</A>.
+     */
+    public static LinearTransform create(final AffineTransform matrix) {
+        return new AffineTransform2D(matrix);
     }
     
     /**

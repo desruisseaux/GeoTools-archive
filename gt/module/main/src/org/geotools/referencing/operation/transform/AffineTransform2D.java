@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing.operation;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.awt.geom.Point2D;
@@ -39,6 +39,7 @@ import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.referencing.operation.LinearTransform;
 
 
 /**

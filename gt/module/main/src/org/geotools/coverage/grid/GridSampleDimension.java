@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.gc;
+package org.geotools.coverage.grid;
 
 // J2SE dependencies
 import java.util.Arrays;
@@ -32,20 +32,23 @@ import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.RenderingHints;
 import java.awt.Color;
+import javax.units.Unit;
 
 // JAI dependencies
 import javax.media.jai.Histogram;
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.RectIterFactory;
 
+// OpenGIS dependencies
+import org.opengis.coverage.SampleDimensionType;
+import org.opengis.coverage.ColorInterpretation;
+import org.opengis.referencing.operation.MathTransform1D;
+
 // Geotools dependencies
-import org.geotools.gp.Hints;
-import org.geotools.cv.Category;
-import org.geotools.cv.SampleDimension;
-import org.geotools.cv.SampleDimensionType;
-import org.geotools.cv.ColorInterpretation;
-import org.geotools.ct.MathTransform1D;
-import org.geotools.units.Unit;
+import org.geotools.gp.Hints;  // TODO
+import org.geotools.coverage.Category;
+import org.geotools.coverage.SampleDimension;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.gcs.Resources;
@@ -56,9 +59,8 @@ import org.geotools.resources.gcs.ResourceKeys;
  * Describes the band values for a grid coverage.
  *
  * @version $Id$
+ * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.GridSampleDimension}.
  */
 final class GridSampleDimension extends SampleDimension {
     /**
@@ -127,7 +129,7 @@ final class GridSampleDimension extends SampleDimension {
         final SampleModel model = image.getSampleModel();
         this.band     = bandNumber;
         this.numBands = model.getNumBands();
-        this.type     = SampleDimensionType.getEnum(model, bandNumber);
+        this.type     = getSampleDimensionType(model, bandNumber);
     }
 
     /**
@@ -299,11 +301,11 @@ final class GridSampleDimension extends SampleDimension {
          * the raster data use integer numbers, then we will rescale the numbers only
          * if they would not fit in the rendering type.
          */
-        SampleDimensionType renderingType = SampleDimensionType.UBYTE;
+        SampleDimensionType renderingType = SampleDimensionType.UNSIGNED_8BITS;
         if (rasterType!=DataBuffer.TYPE_BYTE && hints!=null) {
             renderingType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
         }
-        final boolean byteRenderingType = renderingType.getSize()<=8;
+        final boolean byteRenderingType = false; //TODO renderingType.getSize()<=8;
         final NumberRange sampleValueRange;
         final Category[]  categories;
         boolean needScaling = true;
@@ -317,7 +319,7 @@ final class GridSampleDimension extends SampleDimension {
             }
             case DataBuffer.TYPE_BYTE:
             case DataBuffer.TYPE_USHORT: {
-                if (rasterType == renderingType.getDataBufferType()) {
+                if (rasterType == /*renderingType.getDataBufferType()*/0) {  // TODO
                     needScaling = false;
                 }
                 // fall through
@@ -392,7 +394,7 @@ final class GridSampleDimension extends SampleDimension {
             if (needScaling) {
                 categories[0] = new Category(name, c, sampleValueRange, geophysicsValueRange);
             } else {
-                categories[0] = new Category(name, c, sampleValueRange, MathTransform1D.IDENTITY);
+                categories[0] = new Category(name, c, sampleValueRange, LinearTransform1D.IDENTITY);
             }
             dst[b] = new SampleDimension(categories, units).geophysics(true);
         }
@@ -412,7 +414,7 @@ final class GridSampleDimension extends SampleDimension {
      * Returns the color interpretation of the sample dimension.
      */
     public ColorInterpretation getColorInterpretation() {
-        return ColorInterpretation.getEnum(getColorModel(band, numBands), band);
+        return getColorInterpretation(getColorModel(band, numBands), band);
     }
 
     /**

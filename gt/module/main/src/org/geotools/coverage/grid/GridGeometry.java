@@ -31,8 +31,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;  // For Javadoc
 import java.awt.image.BufferedImage;  // For Javadoc
-import java.text.FieldPosition;
-import java.text.NumberFormat;
 
 // JAI dependencies
 import javax.media.jai.IntegerSequence;
@@ -47,13 +45,13 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.Matrix;
+import org.geotools.referencing.operation.transform.MatrixTransform;
 
 // Resources
 import org.geotools.resources.Utilities;
@@ -210,18 +208,12 @@ public class GridGeometry implements Serializable {
                 case 1: scaleY=scale; transY=trans; break;
             }
         }
-        final MathTransformFactory factory = FactoryFinder.getMathTransformFactory();
-        try {
-            gridToCoordinateSystem = factory.createAffineTransform(matrix);
-            if (gridToCoordinateSystem instanceof MathTransform2D) {
-                gridToCoordinateSystem2D = (MathTransform2D) gridToCoordinateSystem;
-            } else {
-                gridToCoordinateSystem2D = factory.createAffineTransform(
-                        new AffineTransform(scaleX, 0, 0, scaleY, transX, transY));
-            }
-        } catch (FactoryException exception) {
-            // TODO: provides a better exception.
-            throw new IllegalArgumentException();
+        gridToCoordinateSystem = MatrixTransform.create(matrix);
+        if (gridToCoordinateSystem instanceof MathTransform2D) {
+            gridToCoordinateSystem2D = (MathTransform2D) gridToCoordinateSystem;
+        } else {
+            gridToCoordinateSystem2D = (MathTransform2D) MatrixTransform.create(
+                    new AffineTransform(scaleX, 0, 0, scaleY, transX, transY));
         }
         this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
     }
@@ -251,15 +243,10 @@ public class GridGeometry implements Serializable {
         final double transY = userRange.getMaxY()   + gridRange.y*scaleY;
         final AffineTransform tr = new AffineTransform(scaleX, 0, 0, -scaleY, transX, transY);
         tr.translate(0.5, 0.5); // Map to pixel center
-        try {
-            this.gridRange                  = new org.geotools.coverage.grid.GridRange(gridRange);
-            this.gridToCoordinateSystem2D   = FactoryFinder.getMathTransformFactory().createAffineTransform(tr);
-            this.gridToCoordinateSystem     = gridToCoordinateSystem2D;
-            this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
-        } catch (FactoryException exception) {
-            // TODO: provides a better exception.
-            throw new IllegalArgumentException();
-        }
+        this.gridRange                  = new org.geotools.coverage.grid.GridRange(gridRange);
+        this.gridToCoordinateSystem2D   = (MathTransform2D) MatrixTransform.create(tr);
+        this.gridToCoordinateSystem     = gridToCoordinateSystem2D;
+        this.gridFromCoordinateSystem2D = inverse(gridToCoordinateSystem2D);
     }
     
     /**
@@ -452,32 +439,11 @@ public class GridGeometry implements Serializable {
             } catch (TransformException exception) {
                 throw new CannotEvaluateException(
                           Resources.format(ResourceKeys.ERROR_CANT_EVALUATE_$1,
-                          toString(new DirectPosition2D(point)), exception));
+                          GridCoverage.toString(new DirectPosition2D(point)), exception));
             }
         }
         throw new InvalidGridGeometryException(Resources.format(
                   ResourceKeys.ERROR_NO_TRANSFORM2D_AVAILABLE));
-    }
-    
-    /**
-     * Construct a string for the specified point. This is
-     * used by constructor expecting a coordinate point.
-     *
-     * @param  point The coordinate point to format.
-     * @return The coordinate point as a string, without '(' or ')' characters.
-     */
-    static String toString(final DirectPosition point) {
-        final StringBuffer buffer = new StringBuffer();
-        final FieldPosition dummy = new FieldPosition(0);
-        final NumberFormat format = NumberFormat.getNumberInstance();
-        final int       dimension = point.getDimension();
-        for (int i=0; i<dimension; i++) {
-            if (i!=0) {
-                buffer.append(", ");
-            }
-            format.format(point.getOrdinate(i), buffer, dummy);
-        }
-        return buffer.toString();
     }
     
     /**
@@ -579,7 +545,7 @@ public class GridGeometry implements Serializable {
      * is usually provided for debugging purposes.
      */
     public String toString() {
-        final StringBuffer buffer=new StringBuffer(Utilities.getShortClassName(this));
+        final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));
         buffer.append('[');
         buffer.append(gridRange);
         buffer.append(", ");

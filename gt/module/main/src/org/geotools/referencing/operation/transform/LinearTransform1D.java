@@ -21,7 +21,7 @@
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
  */
-package org.geotools.referencing.operation;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.io.Serializable;
@@ -36,6 +36,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.operation.LinearTransform;
 
 
 /**

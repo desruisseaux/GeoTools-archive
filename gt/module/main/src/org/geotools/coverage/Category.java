@@ -44,7 +44,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
 import org.geotools.referencing.operation.Matrix;
-import org.geotools.referencing.operation.LinearTransform1D;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
 
 // Resources
 import org.geotools.resources.XMath;

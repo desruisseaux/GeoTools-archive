@@ -39,7 +39,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.LinearTransform1D;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
 
 
 /**
