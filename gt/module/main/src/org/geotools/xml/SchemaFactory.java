@@ -103,6 +103,7 @@ public class SchemaFactory {
 
                 while (e.hasMoreElements()) {
                     URL res = (URL) e.nextElement();
+//System.out.println("Service file location for Schema "+res);
                     BufferedReader rd = new BufferedReader(new InputStreamReader(
                                 res.openStream(), "UTF-8"));
 
@@ -114,7 +115,7 @@ public class SchemaFactory {
                                                       .getDeclaredMethod("getInstance",
                                     new Class[0]).invoke(null, new Object[0]);
 
-//                            System.out.println(s.getTargetNamespace());
+//System.out.println(s.getTargetNamespace());
                             schemas.put(s.getTargetNamespace(), s);
                         } catch (IllegalArgumentException e1) {
                             // TODO log this

@@ -1240,6 +1240,8 @@ public class SchemaHandler extends XSIElementHandler {
      * @throws SAXException
      */
     protected Type lookUpType(String qname) throws SAXException {
+        if(qname == null)
+            return null;
         Type t = null;
         t = lookUpComplexType(qname);
         t = t==null?lookUpSimpleType(qname):t;
