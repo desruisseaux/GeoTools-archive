@@ -674,6 +674,14 @@ public class GMLSchema implements Schema {
         public Type getParent() {
             return null;
         }
+        
+        /**
+         * 
+         * @see org.geotools.xml.schema.ComplexType#cache()
+         */
+        public boolean cache(Element e, Map m){
+            return true;
+        }
     }
 
     /**

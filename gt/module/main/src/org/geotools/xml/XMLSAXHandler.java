@@ -126,7 +126,7 @@ public class XMLSAXHandler extends DefaultHandler {
         try {
             String text = String.copyValueOf(ch, start, length);
 
-            if ((text != null) && !"".equals(text.trim())) {
+            if ((text != null) && !"".equals(text)) {
                 ((XMLElementHandler) handlers.peek()).characters(text);
             }
         } catch (SAXException e) {
@@ -230,7 +230,7 @@ public class XMLSAXHandler extends DefaultHandler {
             //                                ((Sequence)((ComplexType)parent.getType()).getChild()).getChildren().length)+"":"null"))));
             logger.finest("This Node = " + localName + " :: " + namespaceURI);
 
-            XMLElementHandler eh = parent.getHandler(namespaceURI, localName);
+            XMLElementHandler eh = parent.getHandler(namespaceURI, localName,hints);
 
             if (eh == null) {
                 eh = new IgnoreHandler();

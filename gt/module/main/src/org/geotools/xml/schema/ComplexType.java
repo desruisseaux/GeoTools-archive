@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import java.util.Map;
+
 /**
  * <p>
  * This interface is intended to represent an XML Schema complexType. This
@@ -123,4 +125,13 @@ public interface ComplexType extends Type {
      * @return 
      */
     public boolean isDerived();
+    
+    /**
+     * This method is a directive to the parser whether to keep the data around in 
+     * memory for post processing. Generally this should return True, except when 
+     * streaming.
+     * 
+     * @return True, except when streaming the element.
+     */
+    public boolean cache(Element element, Map hints);
 }

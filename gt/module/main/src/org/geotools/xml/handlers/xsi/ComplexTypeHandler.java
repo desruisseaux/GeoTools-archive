@@ -938,6 +938,15 @@ public class ComplexTypeHandler extends XSIElementHandler {
         boolean abstracT;
         boolean mixed;
 
+        
+        /**
+         * 
+         * @see org.geotools.xml.schema.ComplexType#cache()
+         */
+        public boolean cache(Element e, Map m){
+            return true;
+        }
+        
         /**
          * 
          * @see org.geotools.xml.xsi.Type#getNamespace()

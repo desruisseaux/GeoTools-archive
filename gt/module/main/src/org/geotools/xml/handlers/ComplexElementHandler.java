@@ -110,11 +110,15 @@ public class ComplexElementHandler extends XMLElementHandler {
             } else {
                 this.text = text;
             }
-        } else if (type.getName() == null) {
-            throw new SAXException("This type may not have mixed content");
         } else {
-            throw new SAXException("The " + type.getName()
-                + " type may not have mixed content");
+            if(!"".equals(text.trim())){
+            if (type.getName() == null) {
+                throw new SAXException("This type may not have mixed content");
+            } else {
+            	throw new SAXException("The " + type.getName()
+                    + " type may not have mixed content");
+        	}
+            }
         }
     }
 
@@ -124,6 +128,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      */
     public void endElement(String namespaceURI, String localName, Map hints)
         throws SAXException {
+        text = text==null?null:text.trim();
         if (elements == null) {
             if (type != null) {
                 ElementValue[] vals = new ElementValue[1];
@@ -408,7 +413,7 @@ public class ComplexElementHandler extends XMLElementHandler {
      * 
      * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String, java.lang.String)
      */
-    public XMLElementHandler getHandler(String namespaceURI, String localName)
+    public XMLElementHandler getHandler(String namespaceURI, String localName, Map hints)
         throws SAXException {
         if (elements == null) {
             elements = new LinkedList();
@@ -421,8 +426,8 @@ public class ComplexElementHandler extends XMLElementHandler {
 
         if (e != null) {
             XMLElementHandler r = ehf.createElementHandler(e);
-            elements.add(r);
-
+            if(type.cache(r.getElement(),hints))
+                elements.add(r);
             return r;
         }
 
@@ -431,8 +436,8 @@ public class ComplexElementHandler extends XMLElementHandler {
         XMLElementHandler r = ehf.createElementHandler(namespaceURI, localName);
 
         if (r != null) {
-            elements.add(r);
-
+            if(type.cache(r.getElement(),hints))
+                elements.add(r);
             return r;
         }
 

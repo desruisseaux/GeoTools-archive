@@ -51,6 +51,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.ElementValue;
 import org.geotools.xml.schema.Sequence;
+import org.geotools.xml.schema.Type;
 import org.geotools.xml.xLink.XLinkSchema;
 import org.geotools.xml.xsi.XSISimpleTypes;
 import org.xml.sax.Attributes;
@@ -2655,7 +2656,7 @@ public class GMLComplexTypes {
                 cs = attrs.getValue(GMLSchema.NAMESPACE, "cs");
             }
 
-            cs = ((cs == null) || (cs == "")) ? "," : cs;
+            cs = ((cs == null) || (cs == "")) ? ",\\s*" : cs+"\\s*";
             ts = attrs.getValue("", "ts");
 
             if (ts == null) {
@@ -2667,6 +2668,8 @@ public class GMLComplexTypes {
                 + "\\s*"); // handle whitespace
 
             String val = (String) value[0].getValue();
+//System.out.println("**"+val+"**");
+//System.out.println("TOUPLE SPLITER = ^^^"+ts+"^^^");
             String[] touples = val.split(ts);
             Coordinate[] coordinates = new Coordinate[touples.length];
 
@@ -2688,8 +2691,8 @@ public class GMLComplexTypes {
                         pts[j] = Double.parseDouble(t);
                     } catch (NumberFormatException e) {
                         logger.warning(e.toString());
-                        logger.warning("Double = '" + points[j] + "' " + j
-                            + "/" + points.length);
+                        logger.warning("Double = '" + t + "' " + j
+                            + "/" + points.length+"  Touples = "+i+"/"+touples.length);
                         throw e;
                     }
                 }
@@ -3129,6 +3132,22 @@ public class GMLComplexTypes {
             FCBuffer fcb = (FCBuffer)hints.get(STREAM_HINT);
             fcb.state = FCBuffer.FINISH;
             return null;
+        }
+        
+        /**
+         * 
+         * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
+         */
+        public boolean cache(Element element, Map hints){
+            if(hints==null || hints.get(STREAM_HINT)==null)
+                return true;
+            Type e = element.getType();
+            while(e!=null){
+                if(e.getName()!=null && e.getName().equals(BoxType.getInstance().getName()))
+                    return true;
+                e = e.getParent();
+            }
+            return false;
         }
         
         private FeatureCollection getCollection(ElementValue[] value){

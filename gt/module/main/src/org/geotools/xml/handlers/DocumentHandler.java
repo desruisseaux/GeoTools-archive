@@ -67,7 +67,7 @@ public class DocumentHandler extends XMLElementHandler {
      * 
      * @see org.geotools.xml.XMLElementHandler#getHandler(java.lang.String, java.lang.String)
      */
-    public XMLElementHandler getHandler(String namespaceURI, String localName)
+    public XMLElementHandler getHandler(String namespaceURI, String localName, Map hints)
         throws SAXException {
         if (xeh != null) {
             throw new SAXNotRecognizedException(

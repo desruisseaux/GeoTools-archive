@@ -101,7 +101,7 @@ public abstract class XMLElementHandler implements Serializable {
      * @throws SAXException
      */
     public abstract XMLElementHandler getHandler(String namespaceURI,
-            String localName) throws SAXException;
+            String localName, Map hints) throws SAXException;
 
     /**
      * This method will get the value of the element depending on it's type.
