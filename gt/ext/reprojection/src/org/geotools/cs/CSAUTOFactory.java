@@ -158,7 +158,7 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory {
 	
     /**
      * A code parsed by the {@link CoordinateSystemAUTOFactory#parseCode} method.
-     * The expected format is <code>code|lon0|lat0</code>.
+     * The expected format is <code>code,lon0,lat0</code>.
      *
      * @version $Id$
      * @author Jody Garnett
@@ -212,7 +212,7 @@ public class CSAUTOFactory extends CoordinateSystemAuthorityFactory {
                     switch (i) {
                         case 0:  code      = Integer.parseInt  (field); break;
                         case 1:  longitude = Double.parseDouble(field); break;
-                        case 2:  latitude  = Double.parseDouble(field); break;
+                        case 2:  latitude  = Double.parseDouble(field); break parse;
                         // Add case statements here if the is more fields to parse.
                         default: break parse;
                     }

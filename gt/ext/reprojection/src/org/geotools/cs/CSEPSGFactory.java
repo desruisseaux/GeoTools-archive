@@ -118,7 +118,7 @@ public class CSEPSGFactory extends CoordinateSystemAuthorityFactory {
 		if( wkt == null ) {
 			throw new FactoryException("Unknonwn EPSG code: '"+code+"'" );
 		}
-		return factory.createFromWKT( code );
+		return factory.createFromWKT( wkt );
 	}
 
 }

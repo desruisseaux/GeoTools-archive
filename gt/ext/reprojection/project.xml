@@ -3,7 +3,7 @@
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-reprojection</name>
-  <id>graph</id>
+  <id>reprojection</id>
   <currentVersion>2.0-B6-DEV</currentVersion>
   <versions>
     <version>
