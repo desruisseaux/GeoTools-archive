@@ -34,7 +34,6 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.data.shape.ShapefileDataStore;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
