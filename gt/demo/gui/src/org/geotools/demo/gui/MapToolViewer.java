@@ -23,6 +23,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.logging.Logger;
+import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -43,7 +44,8 @@ import org.geotools.styling.StyleBuilder;
 /**
  * A demonstration of a Map geotools-src\docs\sdocbook\resourcesViewer which uses geotools2.
  *
- * To run this, set a local shapefile to load data from in the mapPane method
+ * The shapefile to view is given as an agument for this class. If no arguments
+ * are given, a shapefile from sample-data is used.
  *
  * @author Cameron Shorter
  * @author Andrea Aime
@@ -88,13 +90,13 @@ public class MapToolViewer {
         layer = new DefaultMapLayer(fc, style);
         layer.setTitle("Test layer");
         context.addLayer(layer);
-
+        
         try {
-			// Create MapPane
-			mapPane = new MapPaneImpl(context);
-		} catch (Exception e) {
-			// I'm sure they won't be thrown since I'm working with a FeatureCollection
-		}
+            // Create MapPane
+            mapPane = new MapPaneImpl(context);
+        } catch (Exception e) {
+            // I'm sure they won't be thrown since I'm working with a FeatureCollection
+        }
         mapPane.setBackground(Color.WHITE);
         mapPane.setPreferredSize(new Dimension(300, 300));
 
@@ -135,18 +137,27 @@ public class MapToolViewer {
     /**
      * The MapViewer main program.
      *
-     * @param args the command line arguments
+     * @param args the location of the shapefile you want to view
      *
      * @throws Exception DOCUMENT ME!
      */
     public static void main(String[] args) throws Exception {
-        mapPane();
+        switch (args.length) {
+            default: // Fall through
+            case  1:
+                mapPane(new File(args[0]).toURL()); 
+                break;
+            case  0: 
+                mapPane(MapToolViewer.class.getClassLoader().getResource(
+                    "org/geotools/sampleData/statepop.shp")); 
+                break;
+        }
+
     }
 
-    public static void mapPane() throws Exception {
-        // load data from file (USE SOMETHING ON YOUR LOCAL DISK)
-        ShapefileDataStore sds = new ShapefileDataStore(new File(
-                    "f:/work/pnnl/data.frame.zone.shp").toURL());
+    public static void mapPane(URL dataUrl) throws Exception {
+
+        ShapefileDataStore sds = new ShapefileDataStore(dataUrl);
         FeatureCollection fc = sds.getFeatureSource(sds.getTypeNames()[0]).getFeatures().collection();
 
         // create the style
@@ -155,6 +166,6 @@ public class MapToolViewer {
                     Color.LIGHT_GRAY, Color.BLACK, 1));
 
         // show the map
-        new MapToolViewer(fc, simple); //.show();
+        new MapToolViewer(fc, simple);
     }
 }
