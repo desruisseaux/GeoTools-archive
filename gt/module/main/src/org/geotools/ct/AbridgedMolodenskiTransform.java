@@ -42,8 +42,8 @@ import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
- * The Abridged Molodensky transformation is a simplified version of the
- * Molodensky transformation method. This transforms three dimensional 
+ * The Abridged Molodensky transformation (EPSG code 9605) is a simplified version of the
+ * {@link MolodenskiTransform} method. This transforms three dimensional 
  * geographic points from one geographic coordinate reference system to another
  * (a datum shift), using three shift parameters (delta X, delta Y, delta Z) and
  * the difference between the semi-major axis and flattenings of the two ellipsoids.
@@ -134,9 +134,9 @@ class AbridgedMolodenskiTransform extends AbstractMathTransform implements Seria
         dz =     srcInfo.dz - tgtInfo.dz;
         a  =     srcEllipsoid.getSemiMajorAxis();
         b  =     srcEllipsoid.getSemiMinorAxis();
-        f  = 1 / srcEllipsoid.getInverseFlattening();
         da = tgtEllipsoid.getSemiMajorAxis() - a;
         db = tgtEllipsoid.getSemiMinorAxis() - b;
+        f  = 1 / srcEllipsoid.getInverseFlattening();
         df = 1/tgtEllipsoid.getInverseFlattening() - f;
         e2  = 1 - (b*b)/(a*a);
         adf = (a*df) + (f*da);
