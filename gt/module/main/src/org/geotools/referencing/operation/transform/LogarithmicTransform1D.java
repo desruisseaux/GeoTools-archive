@@ -25,9 +25,9 @@ import java.io.Serializable;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -37,7 +37,7 @@ import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.parameter.ParameterRealValue;
+import org.geotools.parameter.ParameterReal;
 import org.geotools.resources.cts.ResourceKeys;
 
 
@@ -135,10 +135,10 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     public ParameterValueGroup getParameterValues() {
         final ParameterValue[] parameters = new ParameterValue[offset!=0 ? 2 : 1];
         switch (parameters.length) {
-            case 2: parameters[1] = new ParameterRealValue(Provider.OFFSET, offset); // fall through
-            case 1: parameters[0] = new ParameterRealValue(Provider.BASE,   base);   // fall through
+            case 2: parameters[1] = new ParameterReal(Provider.OFFSET, offset); // fall through
+            case 1: parameters[0] = new ParameterReal(Provider.BASE,   base);   // fall through
         }
-        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS, parameters);
+        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS, parameters);
     }
     
     /**
@@ -292,23 +292,23 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * The operation parameter descriptor for the {@link #base base} parameter value.
          * Valid values range from 0 to infinity. The default value is 10.
          */
-        public static final OperationParameter BASE = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor BASE = new org.geotools.parameter.ParameterDescriptor(
                 "base", 10, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The operation parameter descriptor for the {@link #offset offset} parameter value.
          * Valid values range is unrestricted. The default value is 0.
          */
-        public static final OperationParameter OFFSET = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor OFFSET = new org.geotools.parameter.ParameterDescriptor(
                 "offset", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The parameters group.
          */
-        static final OperationParameterGroup PARAMETERS = group(
+        static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
                         new Identifier(Citation.GEOTOOLS, null, "Logarithmic")
-                     }, new OperationParameter[] {
+                     }, new ParameterDescriptor[] {
                         BASE, OFFSET
                      });
 

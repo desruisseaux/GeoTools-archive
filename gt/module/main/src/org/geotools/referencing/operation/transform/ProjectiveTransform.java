@@ -39,7 +39,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.OperationParameterGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies and resources
@@ -50,6 +49,7 @@ import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.parameter.MatrixParameterValues;
 import org.geotools.parameter.MatrixParameters;
+import org.geotools.parameter.ParameterGroupDescriptor;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -436,7 +436,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          *
          * @todo We should register EPSG parameter identifiers (A0, A1, A2, B0, B1, B2) as well.
          */
-        static final OperationParameterGroup PARAMETERS;
+        static final ParameterGroupDescriptor PARAMETERS;
         static {
             final Map properties = new HashMap(4);
             properties.put("name", "Affine");
@@ -466,7 +466,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
-            return create(((MatrixParameters) parameters).getMatrix(values));
+            return create(((MatrixParameters) getParameters()).getMatrix(values));
         }
 
         /**

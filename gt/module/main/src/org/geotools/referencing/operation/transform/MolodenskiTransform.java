@@ -25,14 +25,13 @@ package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.io.Serializable;
-import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 
@@ -40,7 +39,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.parameter.ParameterRealValue;
+import org.geotools.parameter.ParameterReal;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -166,18 +165,18 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * @return The parameters for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterValue dim = new org.geotools.parameter.ParameterValue(Provider.DIM);
+        final ParameterValue dim = new org.geotools.parameter.Parameter(Provider.DIM);
         dim.setValue(getDimSource());
-        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS,
+        return new org.geotools.parameter.ParameterGroup(Provider.PARAMETERS,
                new ParameterValue[] {
                    dim,
-                   new ParameterRealValue(Provider.DX,             dx),
-                   new ParameterRealValue(Provider.DY,             dy),
-                   new ParameterRealValue(Provider.DZ,             dz),
-                   new ParameterRealValue(Provider.SRC_SEMI_MAJOR, a),
-                   new ParameterRealValue(Provider.SRC_SEMI_MINOR, b),
-                   new ParameterRealValue(Provider.TGT_SEMI_MAJOR, a+da),
-                   new ParameterRealValue(Provider.TGT_SEMI_MINOR, b+db)
+                   new ParameterReal(Provider.DX,             dx),
+                   new ParameterReal(Provider.DY,             dy),
+                   new ParameterReal(Provider.DZ,             dz),
+                   new ParameterReal(Provider.SRC_SEMI_MAJOR, a),
+                   new ParameterReal(Provider.SRC_SEMI_MINOR, b),
+                   new ParameterReal(Provider.TGT_SEMI_MAJOR, a+da),
+                   new ParameterReal(Provider.TGT_SEMI_MINOR, b+db)
                });
     }
     
@@ -327,66 +326,66 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * The number of geographic dimension (2 or 3). The default value is 2.
          */
-        public static final OperationParameter DIM = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor DIM = new org.geotools.parameter.ParameterDescriptor(
                 "dim", 2, 2, 3);
 
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final OperationParameter DX = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor DX = new org.geotools.parameter.ParameterDescriptor(
                 "dx", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "dy" parameter value.
          * Valid values range from -infinity to infinity.
          */
-        public static final OperationParameter DY = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor DY = new org.geotools.parameter.ParameterDescriptor(
                 "dy", Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "dx" parameter value.
          * Valid values range from -infinity to infinity, default is 0.0.
          */
-        public static final OperationParameter DZ = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor DZ = new org.geotools.parameter.ParameterDescriptor(
                 "dz", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "src_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SRC_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SRC_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "src_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the "src_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SRC_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SRC_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "src_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "tgt_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter TGT_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor TGT_SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "tgt_semi_major", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
         
         /**
          * The operation parameter descriptor for the "tgt_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter TGT_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor TGT_SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "tgt_semi_minor", Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The parameters group.
          */
-        static final OperationParameterGroup PARAMETERS = group(
+        static final ParameterDescriptorGroup PARAMETERS = group(
                      new Identifier[] {
                         new Identifier(Citation.OPEN_GIS, null,  "Molodenski"),
                         new Identifier(Citation.EPSG,    "EPSG", "9604")
-                     }, new OperationParameter[] {
+                     }, new ParameterDescriptor[] {
                         DIM, DX, DY, DZ,
                         SRC_SEMI_MAJOR, SRC_SEMI_MINOR,
                         TGT_SEMI_MAJOR, TGT_SEMI_MINOR

@@ -265,7 +265,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
         if (transform instanceof AbstractMathTransform) {
             ParameterValueGroup params = ((AbstractMathTransform) transform).getParameterValues();
             if (params != null) {
-                String name = params.getDescriptor().getName(null);
+                String name = params.getDescriptor().getName().toString(null);
                 if (name!=null && (name=name.trim()).length()!=0) {
                     return name;
                 }

@@ -34,7 +34,7 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.geotools.referencing.cs.CartesianCS;      // For javadoc
 import org.geotools.referencing.datum.GeodeticDatum; // For javadoc
 import org.geotools.referencing.crs.DerivedCRS;      // For javadoc
-import org.geotools.referencing.crs.GeographicCRS;   // For javadoc
+//import org.geotools.referencing.crs.GeographicCRS;   // For javadoc (was not used in javadocs)
 import org.geotools.coverage.grid.GridGeometry;      // For javadoc
 
 

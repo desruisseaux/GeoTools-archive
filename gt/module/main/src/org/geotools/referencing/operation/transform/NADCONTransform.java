@@ -30,8 +30,9 @@ import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // OpenGIS dependencies
@@ -265,14 +266,16 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * @return A copy of the parameter values for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterValue lat_diff_file = new org.geotools.parameter.ParameterValue(Provider.LAT_DIFF_FILE);
+        final ParameterValue lat_diff_file = new org.geotools.parameter.Parameter(Provider.LAT_DIFF_FILE);
         lat_diff_file.setValue(latGridName);
 
-        final ParameterValue long_diff_file = new org.geotools.parameter.ParameterValue(Provider.LONG_DIFF_FILE);
+        final ParameterValue long_diff_file = new org.geotools.parameter.Parameter(Provider.LONG_DIFF_FILE);
         long_diff_file.setValue(longGridName);
 
-        return new org.geotools.parameter.ParameterValueGroup(Provider.PARAMETERS,
-            new ParameterValue[] { lat_diff_file, long_diff_file });
+        return new org.geotools.parameter.ParameterGroup(
+            Provider.PARAMETERS,
+            new GeneralParameterValue[] { lat_diff_file, long_diff_file }
+        );
     }
 
     /**
@@ -940,7 +943,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * The operation parameter descriptor for the "Latitude_difference_file" 
          * parameter value. The default value is "conus.las".
          */
-        public static final OperationParameter LAT_DIFF_FILE 
+        public static final ParameterDescriptor LAT_DIFF_FILE 
             = new org.geotools.parameter.ParameterDescriptor(
                 "Latitude_difference_file", "".getClass(), null, "conus.las");
         
@@ -948,15 +951,15 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * The operation parameter descriptor for the "Longitude_difference_file" 
          * parameter value. The default value is "conus.los".
          */
-        public static final OperationParameter LONG_DIFF_FILE 
+        public static final ParameterDescriptor LONG_DIFF_FILE 
             = new org.geotools.parameter.ParameterDescriptor(
                 "Longitude_difference_file", new String().getClass(), null, "conus.los");
 
         /** The parameters group. */
-        static final OperationParameterGroup PARAMETERS = group(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = group(new Identifier[] {
                     new Identifier(Citation.OPEN_GIS, null, "NADCON"),
                     new Identifier(Citation.EPSG, "EPSG", "9613")
-                }, new OperationParameter[] { LAT_DIFF_FILE, LONG_DIFF_FILE });
+                }, new ParameterDescriptor[] { LAT_DIFF_FILE, LONG_DIFF_FILE });
 
         /**
          * Constructs a provider.

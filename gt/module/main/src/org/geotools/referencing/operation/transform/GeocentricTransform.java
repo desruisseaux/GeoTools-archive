@@ -34,18 +34,17 @@ import javax.units.SI;
 // OpenGIS dependencies
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.metadata.citation.Citation;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformProvider;
-import org.geotools.parameter.ParameterRealValue;
+import org.geotools.parameter.ParameterReal;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 
@@ -200,19 +199,19 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * @param  descriptor The parameters descriptor.
      * @return A copy of the parameter values for this math transform.
      */
-    final ParameterValueGroup getParameterValues(final OperationParameterGroup descriptor) {
+    final ParameterValueGroup getParameterValues(final ParameterDescriptorGroup descriptor) {
         final int dim = getDimSource();
         final boolean includeDim = (dim != ((Number)Provider.DIM.getDefaultValue()).intValue());
         final ParameterValue[] parameters = new ParameterValue[includeDim ? 3 : 2];
         int index = 0;
         if (includeDim) {
-            final ParameterValue p = new org.geotools.parameter.ParameterValue(Provider.DIM);
+            final ParameterValue p = new org.geotools.parameter.Parameter(Provider.DIM);
             p.setValue(dim);
             parameters[index++] = p;
         }
-        parameters[index++] = new ParameterRealValue(Provider.SEMI_MAJOR, a);
-        parameters[index++] = new ParameterRealValue(Provider.SEMI_MINOR, b);
-        return new org.geotools.parameter.ParameterValueGroup(descriptor, parameters);
+        parameters[index++] = new ParameterReal(Provider.SEMI_MAJOR, a);
+        parameters[index++] = new ParameterReal(Provider.SEMI_MINOR, b);
+        return new org.geotools.parameter.ParameterGroup(descriptor, parameters);
     }
     
     /**
@@ -574,37 +573,37 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The operation parameter descriptor for the "semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the "semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
-        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
          * The default value is 3.
          */
-        private static final OperationParameter DIM = new org.geotools.parameter.ParameterDescriptor(
+        private static final ParameterDescriptor DIM = new org.geotools.parameter.ParameterDescriptor(
                 "dim", 3, 2, 3);
 
         /**
          * The parameters group.
          */
-        static final OperationParameterGroup PARAMETERS = group("Ellipsoid_To_Geocentric", "9602");
+        static final ParameterDescriptorGroup PARAMETERS = group("Ellipsoid_To_Geocentric", "9602");
 
         /**
          * Construct the parameters group.
          */
-        static OperationParameterGroup group(final String ogc, final String epsg) {
+        static ParameterDescriptorGroup group(final String ogc, final String epsg) {
             return group(
                      new Identifier[] {
                         new Identifier(Citation.OPEN_GIS, null,  ogc),
                         new Identifier(Citation.EPSG,    "EPSG", epsg)
-                     }, new OperationParameter[] {
+                     }, new ParameterDescriptor[] {
                         SEMI_MAJOR, SEMI_MINOR, DIM
                      });
         }
@@ -619,7 +618,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         /**
          * Constructs a provider.
          */
-        public Provider(final OperationParameterGroup parameters) {
+        public Provider(final ParameterDescriptorGroup parameters) {
             super(3, 3, parameters);
         }
         
@@ -667,7 +666,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The parameters group.
          * NOTE: The EPSG code seems to be the same than for the direct transform.
          */
-        static final OperationParameterGroup PARAMETERS = group("Geocentric_To_Ellipsoid", "9602");
+        static final ParameterDescriptorGroup PARAMETERS = group("Geocentric_To_Ellipsoid", "9602");
 
         /**
          * Create a provider.
