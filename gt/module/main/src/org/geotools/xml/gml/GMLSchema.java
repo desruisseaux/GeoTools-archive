@@ -67,9 +67,6 @@ public class GMLSchema implements Schema {
     // static element set
     private static Element[] elements = loadElements();
 
-    // static import set
-    private static Schema[] imports = loadImports();
-
     // static attribute group set
     private static AttributeGroup[] attributeGroups = {
             new GMLAssociationAttributeGroup(),
@@ -82,7 +79,7 @@ public class GMLSchema implements Schema {
     /**
      * Creates a new GMLSchema object.
      */
-    public GMLSchema() {
+    private GMLSchema() {
     }
 
     public static void setLogLevel(Level l) {
@@ -349,20 +346,9 @@ public class GMLSchema implements Schema {
         return null;
     }
 
-    private static Schema[] loadImports() {
-        Schema[] r = new Schema[1];
-        r[0] = XLinkSchema.getInstance();
-
-        if (r[0] == null) {
-            // make + register a new one ...
-            // but should already be done by the class loader
-            r[0] = new XLinkSchema();
-            SchemaFactory.registerSchema(XLinkSchema.NAMESPACE, r[0]);
-        }
-
-        return r;
-    }
-
+    private static Schema[] imports = new Schema[]{
+        XLinkSchema.getInstance()
+    };
     /**
      * @see schema.Schema#getImports()
      */

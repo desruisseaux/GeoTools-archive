@@ -230,7 +230,7 @@ public class GMLComplexTypes {
         }
 
         if (e == null) {
-            encode((new GMLSchema()).getElements()[39], (LineString) g, output);
+            encode(((GMLSchema.getInstance()).getElements()[39]), (LineString) g, output);
         } else {
             encode(e, (LineString) g, output);
         }
@@ -264,11 +264,11 @@ public class GMLComplexTypes {
             output.startElement(e.getNamespace(), e.getName(), ai);
         }
 
-        ((new GMLSchema()).getElements()[35]).getType().encode((new GMLSchema()).getElements()[35],g.getExteriorRing(),output,null);
+        ((GMLSchema.getInstance()).getElements()[35]).getType().encode((GMLSchema.getInstance()).getElements()[35],g.getExteriorRing(),output,null);
 
         if (g.getNumInteriorRing() > 0) {
             for (int i = 0; i < g.getNumInteriorRing(); i++)
-            	((new GMLSchema()).getElements()[36]).getType().encode((new GMLSchema()).getElements()[36],g.getInteriorRingN(i),output,null);
+            	((GMLSchema.getInstance()).getElements()[36]).getType().encode((GMLSchema.getInstance()).getElements()[36],g.getInteriorRingN(i),output,null);
         }
 
         if (e == null) {
