@@ -26,7 +26,7 @@ import org.geotools.filter.Filter;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * Filter/Expression construction kit.
+ * Filter/Expression construction kit - this class forms chains.
  * <p>
  * I can't take Filter anymore, the turning point was the fact that I
  * needed a FeatureType to make a AttributeExpression. Simply *no*,
@@ -44,17 +44,21 @@ import com.vividsolutions.jts.geom.Envelope;
  * Filter.
  * </p>
  * <p>
+ * Example:<br>
+ * <code>Exprs.bbox( extent ).and( Exprs.attribute("cost").lt( 50 ) )</code>
+ * </p>
+ * <p>
  * BTW: just so we can have everything make sense
  * <ul>
  * <li> Expr is immutable
  * <li> I don't care if Expr trees simplfy themselves during construction
- * <li> If you are going to simply - '.' means AND - <br>
- *      <code>Expr.bbox( extent ).lt( Expr.attribute("cost"), 50 ) ==
- *  	Expr.bbox( extent ).and( lt( Expr.attribute("cost"), 50 ) )</code>
+ * <li> Allow user to type less by using '.' to mean AND - <br>
+ *      <code>Exprs.bbox( extent ).fids( fidSet) ==
+ *  	Exprs.bbox( extent ).and( Exprs.fids( fidSet ) )
  * <li> There are convience methods that make sense - <br>
- * 		<code>Expr.bbox( extent ) == geom().disjoint( Expr.literal( extent)).not()</code>
+ * 		<code>Exprs.bbox( extent ) == geom().disjoint( Expr.literal( extent)).not()</code>
  * <li> Or you have to do by hand - <br>
- *      <code>Expr.fid( "road.1234" ).or( Expr.fid("road.4321) )</code>
+ *      <code>Exprs.fid( "road.1234" ).or( Exprs.fid("road.4321) )</code>
  * </ul>
  * </p>
  * <p>
@@ -67,7 +71,6 @@ import com.vividsolutions.jts.geom.Envelope;
  *     those nasty As FeatureView/Opperation chains work....<br>
  *     <code>repository.view("road").as("name", "CUSTOMER_NAME").as( "addresss", "ADDRESS" )<code></br>
  *     Still does not look right - sigh.
- * 
  * <ul>
  * </p>
  * @author Jody Garnett

@@ -23,18 +23,18 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FunctionExpression;
 
 
-class FunctionExpr extends AbstractExpressionExpr {
+public class FunctionExpr extends AbstractExpressionExpr {
 	Expr expr[];	
 	String name;	
-	FunctionExpr( String name, Expr expr ){		
+	public FunctionExpr( String name, Expr expr ){		
 		this.name = name;
 		this.expr = new Expr[]{ expr, };
 	}
-	FunctionExpr( String name, Expr expr1, Expr expr2 ){		
+	public FunctionExpr( String name, Expr expr1, Expr expr2 ){		
 		this.name = name;
 		this.expr = new Expr[]{ expr1, expr2 };
 	}
-	FunctionExpr( String name, Expr expr[] ){		
+	public FunctionExpr( String name, Expr expr[] ){		
 		this.name = name;
 		this.expr = expr;
 	}
