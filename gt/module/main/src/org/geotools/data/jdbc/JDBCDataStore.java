@@ -832,6 +832,10 @@ public abstract class JDBCDataStore implements DataStore {
 
         try {
             conn = getConnection(transaction);
+            if (!forWrite) {
+               //for postgis streaming, but I don't believe it hurts anyone.
+               conn.setAutoCommit(false);
+            }
             statement = conn.createStatement(getResultSetType(forWrite), getConcurrency(forWrite));
             statement.setFetchSize(200);
             rs = statement.executeQuery(sqlQuery);
