@@ -45,6 +45,8 @@ public class Layer implements Comparable {
     private List styles;
     
     private boolean queryable = false;
+ 
+    private Layer parent;
     
     /**
      * @param title
@@ -101,5 +103,17 @@ public class Layer implements Comparable {
 			return this.getName().compareTo(layer.getName());
 		}
 		return this.getTitle().compareTo(layer.getTitle());
+	}
+	/**
+	 * @return Returns the parent.
+	 */
+	public Layer getParent() {
+		return parent;
+	}
+	/**
+	 * @param parent The parent to set.
+	 */
+	public void setParent(Layer parent) {
+		this.parent = parent;
 	}
 }

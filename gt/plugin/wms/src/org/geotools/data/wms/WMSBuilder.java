@@ -78,7 +78,7 @@ public class WMSBuilder {
 		operationType.setPost(post);
 	}
 	
-	public void buildLayer(String title, String name, boolean queryable ) {
+	public void buildLayer(String title, String name, boolean queryable, String parentLayerTitle ) {
 		if (layer != null) {
 			layer.setBoundingBoxes(boundingBoxes);
 			layer.setSrs(srss);
@@ -93,6 +93,16 @@ public class WMSBuilder {
 		
 		layer.setName(name);
 		layer.setQueryable(queryable);
+		if (parentLayerTitle != null && parentLayerTitle.length() != 0) {
+			int index = -1;
+			for (int i = 0; i < layers.size(); i++) {
+				if (((Layer)layers.get(i)).getTitle().equals(parentLayerTitle) ) {
+					index = i;
+					break;
+				}
+			}
+			layer.setParent((Layer) layers.get(index));
+		}
 	}
 	
 	public void buildSRS(String srs) {

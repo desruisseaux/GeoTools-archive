@@ -9,8 +9,8 @@ package org.geotools.data.wms.response;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.geotools.data.wms.CapabilitiesParser;
 import org.geotools.data.wms.ParseCapabilitiesException;
+import org.geotools.data.wms.WMSParser;
 import org.geotools.data.wms.capabilities.Capabilities;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -27,7 +27,7 @@ public class GetCapabilitiesResponse extends AbstractResponse {
 
 	private Capabilities capabilities;
 
-	public GetCapabilitiesResponse(String contentType, InputStream inputStream) throws JDOMException, ParseCapabilitiesException, IOException {
+	public GetCapabilitiesResponse(WMSParser parser, String contentType, InputStream inputStream) throws JDOMException, ParseCapabilitiesException, IOException {
 		super(contentType, inputStream);
 		
 		SAXBuilder builder = new SAXBuilder();
@@ -35,7 +35,7 @@ public class GetCapabilitiesResponse extends AbstractResponse {
 
 		Element root = document.getRootElement(); //Root = "WMT_MS_Capabilities"
 		
-		capabilities = CapabilitiesParser.parseCapabilities(root);
+		capabilities = parser.constructCapabilities(root);
 	}
 	
 	public Capabilities getCapabilities() {

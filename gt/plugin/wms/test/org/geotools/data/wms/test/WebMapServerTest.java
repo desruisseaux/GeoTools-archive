@@ -115,6 +115,10 @@ public class WebMapServerTest extends TestCase {
 	    while (iter.hasNext()) {
 	    	SimpleLayer simpleLayer = (SimpleLayer) iter.next();
 	    	Object[] styles = simpleLayer.getValidStyles().toArray();
+	    	if (styles.length == 0) {
+	    		simpleLayer.setStyle("");
+	    		continue;
+	    	}
 	    	Random random = new Random();
 	    	int randomInt = random.nextInt(styles.length);
 	    	simpleLayer.setStyle((String) styles[randomInt]);
@@ -130,8 +134,8 @@ public class WebMapServerTest extends TestCase {
 	    
 	    request.setBBox("366800,2170400,816000,2460400");
 	    
-	    List exceptions = request.getAvailableExceptions();
-	    request.setExceptions((String) exceptions.get(0));
+	    //List exceptions = request.getAvailableExceptions();
+	    //request.setExceptions((String) exceptions.get(0));
 	        
 	    GetMapResponse response = (GetMapResponse) wms.issueRequest(request, false);
 	    

@@ -7,13 +7,11 @@
 package org.geotools.data.wms;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.geotools.data.wms.capabilities.Layer;
-import org.geotools.data.wms.capabilities.Style;
 
 /**
  * @author Richard Gould
@@ -31,34 +29,32 @@ public class Utils {
 	 * @param rootLayer The layer to start processing from
 	 * @return a list of type SimpleLayer
 	 */
-	public static List findDrawableLayers(Layer rootLayer) {
-		ArrayList layers = new ArrayList();
-		findDrawableLayers(rootLayer, layers, null);
-		return layers;
-	}
-	
-	private static void findDrawableLayers(Layer layer, List finalLayers, Set parentStyles) {
-		Set layerStyles = new TreeSet();
-		Iterator iterator = layer.getStyles().iterator();
-		while (iterator.hasNext()) {
-			Style style = (Style) iterator.next();
-			layerStyles.add(style.getName());
-		}
-		if (parentStyles != null) {
-			layerStyles.addAll(parentStyles);
-		}
-		
-		if (layer.getName() != null && layer.getName() != "") {
-			SimpleLayer simpleLayer = new SimpleLayer(layer.getName(), layerStyles);
-			finalLayers.add(simpleLayer);
-		}
-		
-		if (layer.getSubLayers() != null) {
-			Iterator iter = layer.getSubLayers().iterator();
-			while (iter.hasNext()) {
-				findDrawableLayers((Layer) iter.next(), finalLayers, layerStyles);
+	public static SimpleLayer[] findDrawableLayers(Layer[] layers) {
+		List drawableLayers = new ArrayList();
+		for (int i = 0; i < layers.length; i++) {
+			if (layers[i].getName() == null || layers[i].getName().length() == 0){
+				continue;
 			}
+			Layer parentLayer = layers[i].getParent();
+			Set styles = new TreeSet();
+			if (layers[i].getStyles() != null) {
+				styles.addAll(layers[i].getStyles());
+			}
+			while (parentLayer != null) {
+				if (layers[i].getStyles() != null) {
+					styles.addAll(parentLayer.getStyles());
+				}
+				parentLayer = parentLayer.getParent();
+			}
+			SimpleLayer layer = new SimpleLayer(layers[i].getName(), styles);
+			drawableLayers.add(layer);
 		}
+		
+		SimpleLayer[] simpleLayers = new SimpleLayer[drawableLayers.size()];
+		for (int i = 0; i < drawableLayers.size(); i++) {
+			simpleLayers[i] = (SimpleLayer) drawableLayers.get(i);
+		}
+
+		return simpleLayers;
 	}
-	
 }

@@ -17,6 +17,8 @@
 package org.geotools.data.wms.request;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -47,15 +49,16 @@ public class GetMapRequest extends AbstractRequest {
      * @param version
      */
     public GetMapRequest(URL onlineResource, String version,
-    					 List availableLayers, 
+    					 SimpleLayer[] availableLayers, 
 						 Set availableSRSs, 
-						 List availableFormats, 
+						 String[] availableFormats, 
 						 List availableExceptions) {
     	super(onlineResource);
     	
-    	this.availableLayers = availableLayers;
+    	this.availableLayers = Arrays.asList(availableLayers);
+    	
     	this.availableSRSs = availableSRSs;
-    	this.availableFormats = availableFormats;
+    	this.availableFormats = Arrays.asList(availableFormats);
     	this.availableExceptions = availableExceptions;
 
     	setProperty("REQUEST", "GetMap");

@@ -22,16 +22,16 @@
 package org.geotools.data.wms;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.geotools.data.wms.capabilities.DCPType;
-import org.geotools.data.wms.capabilities.Get;
 import org.geotools.data.wms.capabilities.Layer;
 import org.geotools.data.wms.capabilities.Capabilities;
 import org.geotools.data.wms.request.AbstractRequest;
@@ -206,7 +206,8 @@ public class WebMapServer {
 				currentResponse = new GetMapResponse(contentType, inputStream);
 			} else if (currentRequest instanceof GetCapabilitiesRequest) {
 				try {
-					currentResponse = new GetCapabilitiesResponse(contentType, inputStream);
+					//TODO VERSION SUPPORT, FIX THIS HACK
+					currentResponse = new GetCapabilitiesResponse(new Parser1_1_1(), contentType, inputStream);
 					capabilities = ((GetCapabilitiesResponse) currentResponse).getCapabilities();
 				} catch (JDOMException e) {
 					problem = e;
@@ -234,28 +235,15 @@ public class WebMapServer {
     public List getNamedLayers() {
         List namedLayers = new ArrayList();
         
-        Layer root = capabilities.getCapability().getLayer();
-        getNamedLayers(root, namedLayers);
-                
+        Layer[] layers = capabilities.getLayers();
+        for (int i = 0; i < layers.length; i++) {
+        	if (layers[i].getName() != null && layers[i].getName().length() != 0) {
+        		namedLayers.add(layers[i]);
+        	}
+        }
+        
         return namedLayers;
     }
-	private void getNamedLayers(Layer root, List namedLayers) {
-		
-		if (root.getName() != null && root.getName().length() != 0) {
-			namedLayers.add(root);
-		}
-		
-		if (root.getSubLayers() == null) {
-			return;
-		}
-		
-		Iterator iter = root.getSubLayers().iterator();
-        while (iter.hasNext()) {
-            Layer layer = (Layer) iter.next();
-
-            getNamedLayers(layer, namedLayers);
-        }
-	}
 
 	public Exception getProblem() {
 		return problem;
@@ -267,15 +255,12 @@ public class WebMapServer {
 			throw new RuntimeException("Unable to create a GetMapRequest when the GetCapabilities document has not been retrieved");
 		}
 		
-		DCPType dcpType = (DCPType) getCapabilities().getCapability().getRequest().getGetMap().getDcpTypes().get(0);
-	    Get get = (Get) dcpType.getHttp().getGets().get(0);
-		
 		GetMapRequest request = 
-			new GetMapRequest(get.getOnlineResource(),
+			new GetMapRequest(getCapabilities().getRequest().getGetMap().getGet(),
 							  getCapabilities().getVersion(),
-							  Utils.findDrawableLayers(getCapabilities().getCapability().getLayer()),
+							  Utils.findDrawableLayers(getCapabilities().getLayers()),
 							  getSRSs(),
-							  getCapabilities().getCapability().getRequest().getGetMap().getFormats(),
+							  getCapabilities().getRequest().getGetMap().getFormats(),
 							  getExceptions()
 							  );
 		
@@ -287,19 +272,16 @@ public class WebMapServer {
 			throw new RuntimeException("Unable to create a GetFeatureInfoRequest without a GetCapabilities document");
 		}
 		
-		if (getCapabilities().getCapability().getRequest().getGetFeatureInfo() == null) {
+		if (getCapabilities().getRequest().getGetFeatureInfo() == null) {
 			throw new UnsupportedOperationException("This Web Map Server does not support GetFeatureInfo requests");
 		}
 		
-		DCPType dcpType = (DCPType) getCapabilities().getCapability().getRequest().getGetFeatureInfo().getDcpTypes().get(0);
-	    Get get = (Get) dcpType.getHttp().getGets().get(0);
-		
 		GetFeatureInfoRequest request = 
 			new GetFeatureInfoRequest(
-					get.getOnlineResource(),
+					getCapabilities().getRequest().getGetFeatureInfo().getGet(),
 					getMapRequest,
 					getQueryableLayers(),
-					getCapabilities().getCapability().getRequest().getGetFeatureInfo().getFormats()
+					getCapabilities().getRequest().getGetFeatureInfo().getFormats()
 					);
 		return request;
 	}
@@ -320,24 +302,25 @@ public class WebMapServer {
 
 
 	private List getExceptions() {
-		return getCapabilities().getCapability().getException().getFormats();
+		//TODO hack - fix this later.
+		return null;
+		//return getCapabilities().getCapability().getException().getFormats();
 	}
 
 	private Set getSRSs() {
 		Set srss = new TreeSet();
 		
-		getSRSs(getCapabilities().getCapability().getLayer(), srss);
+		Layer[] layers = getCapabilities().getLayers();
+		for (int i = 0; i < layers.length; i++) {
+			srss.addAll(layers[i].getSrs());
+			
+			Layer parentLayer = layers[i].getParent();
+			while (parentLayer != null) {
+				srss.addAll(parentLayer.getSrs());
+				parentLayer = parentLayer.getParent();
+			}
+		}
 		
 		return srss;
-	}
-
-	private void getSRSs(Layer rootLayer, Set srss) {
-		srss.addAll(rootLayer.getSrs());
-		
-		Iterator iter = rootLayer.getSubLayers().iterator();
-		while (iter.hasNext()) {
-			Layer layer = (Layer) iter.next();
-			getSRSs(layer, srss);
-		}
 	}
 }

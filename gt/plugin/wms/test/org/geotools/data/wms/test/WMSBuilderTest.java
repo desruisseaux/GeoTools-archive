@@ -35,12 +35,12 @@ public class WMSBuilderTest extends TestCase {
 		builder.buildGetCapabilitiesOperation(null, new URL("http://get.com"), new URL("http://post.com"));
 		String[] formats = {"image/jpeg"};
 		builder.buildGetMapOperation(formats, new URL("http://get.com"), new URL("http://post.com"));
-		builder.buildLayer("Layer1", "layer1", true);
+		builder.buildLayer("Layer1", "layer1", true, null);
 		builder.buildSRS("EPSG:blah");
 		builder.buildSRS("EPSG:2");
 		builder.buildStyle("Style1");
 		builder.buildStyle("Style2");
-		builder.buildLayer("Layer2", "layer2", false);
+		builder.buildLayer("Layer2", "layer2", false, null);
 		builder.buildSRS("EPSG:3");
 		builder.buildStyle("Style3");
 		

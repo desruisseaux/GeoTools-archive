@@ -7,12 +7,14 @@
 package org.geotools.data.wms.request;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.capabilities.Layer;
 
 
@@ -42,16 +44,16 @@ public class GetFeatureInfoRequest extends GetMapRequest {
 			URL onlineResource, 
 			GetMapRequest request, 
 			Set queryableLayers, 
-			List infoFormats) {
+			String[] infoFormats) {
 		super(onlineResource, "1.1.1", 
-				request.getAvailableLayers(),
-				request.getAvailableSRSs(), request.getAvailableFormats(),
+				(SimpleLayer[]) request.getAvailableLayers().toArray(),
+				request.getAvailableSRSs(), (String[]) request.getAvailableFormats().toArray(),
 				request.getAvailableExceptions());
 		this.properties = request.properties;
 		setProperty("REQUEST", "GetFeatureInfo");
 		
 		this.queryableLayers = queryableLayers;
-		this.infoFormats = infoFormats;
+		this.infoFormats = Arrays.asList(infoFormats);
 		queryLayers = new TreeSet();
 	}
 	
