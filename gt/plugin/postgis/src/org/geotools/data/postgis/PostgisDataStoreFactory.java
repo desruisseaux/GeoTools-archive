@@ -115,21 +115,41 @@ public class PostgisDataStoreFactory
      *         for host, user, passwd, and database.
      */
     public boolean canProcess(Map params) {
-        Object value;
-
         if (params != null) {
             for (int i = 0; i < arrayParameters.length; i++) {
-                if (!(((value = params.get(arrayParameters[i].key)) != null)
-                        && (arrayParameters[i].type.isInstance(value)))) {
-                    if (arrayParameters[i].required) {
+            	Param param = arrayParameters[i];
+            	Object value;
+            	if( !params.containsKey( param.key ) ){
+            		if( param.required ){
+            			return false; // missing required key!
+            		}
+            		else {
+            			continue;
+            		}
+            	}
+				try {
+					value = param.lookUp( params );
+				} catch (IOException e) {
+					// could not upconvert/parse to expected type!
+					// even if this parameter is not required
+					// we are going to refuse to process
+					// these params
+					return false; 
+				}
+				if( value == null ){					
+					if (param.required) {
                         return (false);
                     }
                 }
+				else {
+					if ( !param.type.isInstance( value )){
+						return false; // value was not of the required type
+					}
+				}
             }
         } else {
             return (false);
         }
-
         if (!(((String) params.get("dbtype")).equalsIgnoreCase("postgis"))) {
             return (false);
         } else {
