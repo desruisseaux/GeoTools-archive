@@ -307,6 +307,7 @@ public class FileSystemNode extends Node {
         try {
             // Allocate needed space for this node
             if (this.offset == -1) {
+                /*
                 synchronized (channel) {
                     this.offset = channel.size();
                     channel.position(this.offset);
@@ -325,6 +326,16 @@ public class FileSystemNode extends Node {
                         channel.force(false);
                     }
                 }
+                */
+                
+                int len = pageLen;
+                
+                if (this.isLeaf()) {
+                    len += this.params.getDataDef().getEncodedLen() * 
+                           this.params.getMaxNodeEntries();
+                }
+                
+                this.offset = this.params.getNewNodeOffset(len);
                 
                 this.flushNeeded = true;
             }
@@ -479,6 +490,7 @@ public class FileSystemNode extends Node {
             return;
         }
         
+        /*
         FileChannel channel = this.params.getChannel();
         
         ByteBuffer buf = this.getEmptyByteBuffer();
@@ -496,6 +508,7 @@ public class FileSystemNode extends Node {
                 channel.force(false);
             }
         }
+        */
         
         this.flushNeeded = false;
         this.params.removeFromCache(this);

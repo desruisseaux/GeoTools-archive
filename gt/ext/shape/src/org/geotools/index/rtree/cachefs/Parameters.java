@@ -40,6 +40,7 @@ public class Parameters {
     private Stack freePages;
     private boolean forceChannel;
     private NodeCache cache;
+    private long newNodeOffset;
 
     public Parameters() {
         this.freePages = new Stack();
@@ -181,6 +182,24 @@ public class Parameters {
         }
         
         return node;
+    }
+    
+    /**
+     * 
+     * @param len
+     * @return
+     */
+    public synchronized long getNewNodeOffset(int len) throws IOException {
+        long offset = 0L;
+        
+        if (this.newNodeOffset == 0L) {
+            offset = this.channel.size();
+        } else {
+            offset = this.newNodeOffset;
+        }
+        
+        this.newNodeOffset = offset + len;
+        return offset;
     }
     
     /**

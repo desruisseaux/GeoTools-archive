@@ -19,8 +19,10 @@
  */
 package org.geotools.index.rtree;
 
+import java.util.Iterator;
 import java.util.logging.Logger;
 
+import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
@@ -53,10 +55,10 @@ public class FilterConsumer implements FilterVisitor {
         return this.bounds;
     }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
-	 */
-	public void visit(Filter filter) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
+     */
+    public void visit(Filter filter) {
         if (filter.getFilterType() == Filter.NONE.getFilterType()){
             this.bounds = new Envelope(Double.NEGATIVE_INFINITY,
                                        Double.POSITIVE_INFINITY,
@@ -69,25 +71,25 @@ public class FilterConsumer implements FilterVisitor {
         }
     }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
-	 */
-	public void visit(BetweenFilter filter) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
+     */
+    public void visit(BetweenFilter filter) {
         LOGGER.finest("BetweenFilter ignored!");
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.CompareFilter)
-	 */
-	public void visit(CompareFilter filter) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.CompareFilter)
+     */
+    public void visit(CompareFilter filter) {
         LOGGER.finest("CompareFilter ignored!");
     }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
-	 */
-	public void visit(GeometryFilter filter) {
-		if (filter.getFilterType() == Filter.GEOMETRY_BBOX) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
+     */
+    public void visit(GeometryFilter filter) {
+        if (filter.getFilterType() == Filter.GEOMETRY_BBOX) {
             DefaultExpression left = (DefaultExpression)filter.getLeftGeometry();
             DefaultExpression right = (DefaultExpression)filter.getRightGeometry();
 
@@ -99,55 +101,71 @@ public class FilterConsumer implements FilterVisitor {
                 right.accept(this);
             }
 
-		}
-	}
+        }
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
-	 */
-	public void visit(LikeFilter filter) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
+     */
+    public void visit(LikeFilter filter) {
         LOGGER.finest("LikeFilter ignored!");
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
-	 */
-	public void visit(LogicFilter filter) {
-        LOGGER.finest("LogicFilter ignored!");
-	}
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
+     */
+    public void visit(LogicFilter filter) {
+        switch (filter.getFilterType()) {
+            case AbstractFilter.LOGIC_NOT:
+                LOGGER.finest("[NOT] LogicFilter ignored!");
+                break;
+            case AbstractFilter.LOGIC_OR:
+                LOGGER.finest("[OR] LogicFilter ignored!");
+                break;
+            case AbstractFilter.LOGIC_AND:
+                Iterator list = filter.getFilterIterator();
+                while (list.hasNext()) {
+                    ((AbstractFilter) list.next()).accept(this);
+                }
+                break;
+            default:
+                LOGGER.finest("LogicFilter ignored!");
+        }
+        
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
-	 */
-	public void visit(NullFilter filter) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
+     */
+    public void visit(NullFilter filter) {
         LOGGER.finest("NullFilter ignored!");
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FidFilter)
-	 */
-	public void visit(FidFilter filter) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FidFilter)
+     */
+    public void visit(FidFilter filter) {
         LOGGER.finest("FidFilter ignored!");
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
-	 */
-	public void visit(AttributeExpression expression) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
+     */
+    public void visit(AttributeExpression expression) {
         LOGGER.finest("AttributeExpression ignored!");
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
-	 */
-	public void visit(Expression expression) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
+     */
+    public void visit(Expression expression) {
         LOGGER.finest("Expression ignored!");
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
-	 */
-	public void visit(LiteralExpression expression) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
+     */
+    public void visit(LiteralExpression expression) {
         if(expression.getType() == DefaultExpression.LITERAL_GEOMETRY) {
             Geometry bbox = (Geometry)expression.getLiteral();
             if (this.bounds == null) {
@@ -159,20 +177,20 @@ public class FilterConsumer implements FilterVisitor {
         } else {
             LOGGER.warning("LiteralExpression ignored!");
         }
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
-	 */
-	public void visit(MathExpression expression) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
+     */
+    public void visit(MathExpression expression) {
         LOGGER.finest("MathExpression ignored!");
-	}
+    }
 
-	/**
-	 * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
-	 */
-	public void visit(FunctionExpression expression) {
+    /**
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
+     */
+    public void visit(FunctionExpression expression) {
         LOGGER.finest("FunctionExpression ignored!");
-	}
+    }
 
 }
