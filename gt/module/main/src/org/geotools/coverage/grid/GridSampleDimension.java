@@ -39,7 +39,6 @@ import javax.units.Unit;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.SampleDimension;
-import org.geotools.gp.Hints;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -297,10 +296,10 @@ final class GridSampleDimension extends SampleDimension {
          * the raster data use integer numbers, then we will rescale the numbers only
          * if they would not fit in the rendering type.
          */
-        SampleDimensionType renderingType = SampleDimensionType.UNSIGNED_8BITS;
-        if (rasterType!=DataBuffer.TYPE_BYTE && hints!=null) {
-            renderingType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
-        }
+//        SampleDimensionType renderingType = SampleDimensionType.UNSIGNED_8BITS;
+//        if (rasterType!=DataBuffer.TYPE_BYTE && hints!=null) {
+//            renderingType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
+//        }
         final boolean byteRenderingType = false; //TODO renderingType.getSize()<=8;
         final NumberRange sampleValueRange;
         final Category[]  categories;
