@@ -62,13 +62,17 @@ public class CRSService {
         Set available = new HashSet();
         Iterator it = FactoryFinder.factories(CRSAuthoritySpi.class);
         CoordinateSystemAuthorityFactory factory = null;
+        
         while (it.hasNext()) {
             try {
                 factory = (CoordinateSystemAuthorityFactory) it.next();
                 register( factory );
             }
+            catch( NoClassDefFoundError notFound ){
+                System.err.println("Could not locate:"+notFound );
+            }
             catch( Throwable t ){
-                System.err.println("Could not register "+factory );
+                System.err.println("Could not register "+factory+":"+t );
             }
         }
 	}

@@ -107,9 +107,9 @@ public final class FactoryFinder {
                 spiClass = Class.forName(clazz);
             } else {
                 spiClass = loader.loadClass(clazz);
-            }
-            
+            }            
             return spiClass.newInstance();
+            
         } catch (ClassNotFoundException x) {
             throw new FactoryConfigurationError("Provider " + clazz
             + " not found - " + "please check your classpath", x);
@@ -201,10 +201,11 @@ public final class FactoryFinder {
         return null;
     }
     
+    static final Logger LOG = Logger.getLogger("org.geotools.factory"); 
     private static List getFactories(URL resource, ClassLoader loader)
     throws IOException {
-        Logger.getLogger("org.geotools.factory").finest(
-        "Searching resource " + resource);
+        
+        LOG.finest( "Searching resource " + resource);
         
         if (resource == null) {
             return null;
@@ -231,10 +232,7 @@ public final class FactoryFinder {
                 
                 list.add(newInstance(factoryClassName, loader));
                 
-                
-                log
-                .finest("Factory name unacceptable : '" + factoryClassName
-                + "'");
+                log.finest("Factory name unacceptable : '" + factoryClassName + "'");
                 factoryClassName = rd.readLine();
             }
             
