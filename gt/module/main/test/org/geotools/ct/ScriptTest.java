@@ -131,6 +131,11 @@ public class ScriptTest extends TestCase {
     private static final String MT_ABRIDGED_MOL_SCRIPT = "MT_AbridgedMolodensky_TestScript.txt";
     
     /**
+     * A test file to parse and execute for Molodensky math transforms.
+     */
+    private static final String MT_MOLODENSKY_SCRIPT = "MT_Molodensky_TestScript.txt";
+ 
+    /**
      * The coordinate system factory to use for the test.
      * This is also the class used for parsing WKT texts.
      */
@@ -676,6 +681,17 @@ public class ScriptTest extends TestCase {
     }
     
     /**
+     * Run the {@link #MT_MOLODENSKY_SCRIPT}.
+     *
+     * @throws IOException If {@link #MT_MOLODENSKY_SCRIPT} can't be read.
+     * @throws FactoryException if a line can't be parsed.
+     * @throws TransformException if the transformation can't be run.
+     */
+    public void testMTMolodesky() throws IOException, FactoryException {
+        runScript(MT_MOLODENSKY_SCRIPT);
+    }
+    
+    /**
      * Run the test from the command line. By default, this method run all tests. In order
      * to run only one test, use one of the following line:
      * <ul>
@@ -735,6 +751,10 @@ public class ScriptTest extends TestCase {
         }
         if (script==null || script.equalsIgnoreCase("MT_AbridgedMolodensky")) {
             test.testMTAbridgedMol();
+            done = true;
+        }
+        if (script==null || script.equalsIgnoreCase("MT_Molodensky")) {
+            test.testMTMolodesky();
             done = true;
         }
         if (script!=null && !done) {
