@@ -32,24 +32,19 @@ import javax.units.SI;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.OperationParameterGroup;
-import org.opengis.parameter.OperationParameter;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
-import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.cts.Resources;
@@ -217,13 +212,13 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     protected MapProjection(final ParameterValueGroup values) throws ParameterNotFoundException {
-        semiMajor           = values.getValue("semi_major")        .doubleValue(SI.METER);
-        semiMinor           = values.getValue("semi_minor")        .doubleValue(SI.METER);
-        centralMeridian     = values.getValue("central_meridian")  .doubleValue(SI.RADIAN);
-        latitudeOfOrigin    = values.getValue("latitude_of_origin").doubleValue(SI.RADIAN);
-        scaleFactor         = values.getValue("scale_factor")      .doubleValue(Unit.ONE);
-        falseEasting        = values.getValue("false_easting")     .doubleValue(SI.METER);
-        falseNorthing       = values.getValue("false_northing")    .doubleValue(SI.METER);
+        semiMajor           = values.parameter("semi_major")        .doubleValue(SI.METER);
+        semiMinor           = values.parameter("semi_minor")        .doubleValue(SI.METER);
+        centralMeridian     = values.parameter("central_meridian")  .doubleValue(SI.RADIAN);
+        latitudeOfOrigin    = values.parameter("latitude_of_origin").doubleValue(SI.RADIAN);
+        scaleFactor         = values.parameter("scale_factor")      .doubleValue(Unit.ONE);
+        falseEasting        = values.parameter("false_easting")     .doubleValue(SI.METER);
+        falseNorthing       = values.parameter("false_northing")    .doubleValue(SI.METER);
         isSpherical         = (semiMajor == semiMinor);
         excentricitySquared = 1.0 - (semiMinor*semiMinor)/(semiMajor*semiMajor);
         excentricity        = Math.sqrt(excentricitySquared);
@@ -913,7 +908,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final OperationParameter SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SEMI_MAJOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_major", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
@@ -922,21 +917,21 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final OperationParameter SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SEMI_MINOR = new org.geotools.parameter.ParameterDescriptor(
                 "semi_minor", Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the {@link #centralMeridian centralMeridian}
          * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
-        public static final OperationParameter CENTRAL_MERIDIAN = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor CENTRAL_MERIDIAN = new org.geotools.parameter.ParameterDescriptor(
                 "central_meridian", 0, -180, 180, NonSI.DEGREE_ANGLE);
 
         /**
          * The operation parameter descriptor for the {@link #latitudeOfOrigin latitudeOfOrigin}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
-        public static final OperationParameter LATITUDE_OF_ORIGIN = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor LATITUDE_OF_ORIGIN = new org.geotools.parameter.ParameterDescriptor(
                 "latitude_of_origin", 0, -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
@@ -945,21 +940,21 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          *
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
-        public static final OperationParameter SCALE_FACTOR = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SCALE_FACTOR = new org.geotools.parameter.ParameterDescriptor(
                 "scale_factor", 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The operation parameter descriptor for the {@link #falseEasting falseEasting}
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
-        public static final OperationParameter FALSE_EASTING = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor FALSE_EASTING = new org.geotools.parameter.ParameterDescriptor(
                 "false_easting", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
          * The operation parameter descriptor for the {@link #falseNorthing falseNorthing}
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
-        public static final OperationParameter FALSE_NORTHING = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor FALSE_NORTHING = new org.geotools.parameter.ParameterDescriptor(
                 "false_northing", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
@@ -971,7 +966,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * @param targetDimensions Number of dimensions in the target CRS of this operation method.
          * @param parameters The set of parameters (never <code>null</code>).
          */
-        public Provider(final OperationParameterGroup parameters) {
+        public Provider(final ParameterDescriptorGroup parameters) {
             super(2, 2, parameters);
         }
     }

@@ -25,11 +25,11 @@ import java.util.Collections;
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.OperationParameterGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
-import org.geotools.parameter.ParameterValueGroup;
+import org.geotools.parameter.ParameterGroup;
 
 
 /**
@@ -39,7 +39,7 @@ import org.geotools.parameter.ParameterValueGroup;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class FallbackParameterValueGroup extends ParameterValueGroup {
+final class FallbackParameterValueGroup extends ParameterGroup {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -49,7 +49,7 @@ final class FallbackParameterValueGroup extends ParameterValueGroup {
      * The expected parameter descriptor. Will be used in order to create default values
      * when the requested value was not found.
      */
-    private final OperationParameterGroup fallback;
+    private final ParameterDescriptorGroup fallback;
     
     /**
      * Construct a parameter group from the specified list of parameters.
@@ -59,10 +59,10 @@ final class FallbackParameterValueGroup extends ParameterValueGroup {
      * @param fallback The expected descriptor.
      * @param values The list of parameters.
      */
-    public FallbackParameterValueGroup(final OperationParameterGroup fallback,
+    public FallbackParameterValueGroup(final ParameterDescriptorGroup fallback,
                                        final GeneralParameterValue[] values)
     {
-        super(Collections.singletonMap("name", fallback.getName(null)), values);
+        super(Collections.singletonMap("name", fallback.getName().toString()), values);
         this.fallback = fallback;
     }
 
@@ -75,7 +75,7 @@ final class FallbackParameterValueGroup extends ParameterValueGroup {
      */
     public ParameterValue getValue(final String name) throws ParameterNotFoundException {
         try {
-            return super.getValue(name);
+            return super.parameter(name);
         } catch (ParameterNotFoundException exception) {
             try {
                 // Remove cast if covariance is allowed.

@@ -29,7 +29,8 @@ import java.util.Locale;
 import java.util.HashMap;
 
 // OpenGIS dependencies
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
@@ -38,13 +39,15 @@ import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
-
+import org.geotools.parameter.ParameterGroupDescriptor;
 
 /**
  * Definition of an algorithm used to perform a coordinate operation. Most operation
  * methods use a number of operation parameters, although some coordinate conversions
  * use none. Each coordinate operation using the method assigns values to these parameters.
  *  
+ * <p>
+ * FEEDBACK: This really looks like a ParameterDescriptorGroup with formula, sourceDimensions, targetDimensions
  * @version $Id$
  * @author Martin Desruisseaux
  *
@@ -57,11 +60,6 @@ public class OperationMethod extends IdentifiedObject
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -98032729598205972L;
-
-    /**
-     * An empty array of parameters.
-     */
-    private static final GeneralOperationParameter[] EMPTY_PARAMETER = new GeneralOperationParameter[0];
 
     /**
      * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
@@ -88,7 +86,8 @@ public class OperationMethod extends IdentifiedObject
     /**
      * The set of parameters, or <code>null</code> if none.
      */
-    private final GeneralOperationParameter[] parameters;
+    private final ParameterDescriptorGroup parameters;
+    //private final GeneralParameterDescriptor[] parameters;
 
     /**
      * Construct an operation method from a set of properties. The properties given in argument
@@ -117,31 +116,96 @@ public class OperationMethod extends IdentifiedObject
     public OperationMethod(final Map properties,
                            final int sourceDimensions,
                            final int targetDimensions,
-                           final GeneralOperationParameter[] parameters)
+                           final ParameterDescriptorGroup parameters)
     {
         this(properties, new HashMap(), sourceDimensions, targetDimensions, parameters);
     }
-
+    /**
+     * Construct an operation method from a set of properties. The properties given in argument
+     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}. Additionally, the following properties are understood by this
+     * construtor:
+     * <br><br>
+     * <table border='1'>
+     *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+     *     <th nowrap>Property name</th>
+     *     <th nowrap>Value type</th>
+     *     <th nowrap>Value given to</th>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;<code>"formula"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #getFormula}</td>
+     *   </tr>
+     * </table>
+     *
+     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
+     * @param targetDimensions Number of dimensions in the target CRS of this operation method.
+     * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
+     */
+    public OperationMethod(final Map properties,
+                           final int sourceDimensions,
+                           final int targetDimensions,
+                           final GeneralParameterDescriptor[] parameters)
+    {
+        this(properties, new HashMap(), sourceDimensions, targetDimensions, parameters);
+    }
+    /**
+     * Construct an operation method from a set of properties. The properties given in argument
+     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * super-class constructor}. Additionally, the following properties are understood by this
+     * construtor:
+     * <br><br>
+     * <table border='1'>
+     *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+     *     <th nowrap>Property name</th>
+     *     <th nowrap>Value type</th>
+     *     <th nowrap>Value given to</th>
+     *   </tr>
+     *   <tr>
+     *     <td nowrap>&nbsp;<code>"formula"</code>&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #getFormula}</td>
+     *   </tr>
+     * </table>
+     *
+     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
+     * @param targetDimensions Number of dimensions in the target CRS of this operation method.
+     * @param parameters Parameter set, or <code>null</code>if none.
+     */    
+    public OperationMethod(final Map properties,
+				           final Map subProperties,
+				           final int sourceDimensions,
+				           final int targetDimensions,
+				           GeneralParameterDescriptor[] parameters)
+	{
+        this(properties, subProperties, sourceDimensions, targetDimensions, group( properties, parameters ));
+	}
+    /** Utility method used to kludge GeneralParameterDescriptor[] into a ParameterDescriptorGroup */
+    private static ParameterDescriptorGroup group( Map properties, GeneralParameterDescriptor[] parameters ){
+        return parameters == null ? org.geotools.parameter.Parameters.EMPTY_GROUP
+                : new ParameterGroupDescriptor( properties, parameters );
+    }
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
+     * @param parameters Parameter group, or <code>null</code>if none.
      */
-    private OperationMethod(final Map properties, final Map subProperties,
+    private OperationMethod(final Map properties,
+                            final Map subProperties,
                             final int sourceDimensions,
                             final int targetDimensions,
-                            GeneralOperationParameter[] parameters)
+                            ParameterDescriptorGroup parameters)
     {
         super(properties, subProperties, LOCALIZABLES);
         formula = (Map)    subProperties.get("formula");
-        if (parameters==null || parameters.length==0) {
-            parameters = null;
+        if (parameters==null ) {
+            this.parameters = org.geotools.parameter.Parameters.EMPTY_GROUP;
         } else {
-            parameters = (GeneralOperationParameter[]) parameters.clone();
-            for (int i=0; i<parameters.length; i++) {
-                ensureNonNull("parameters", parameters, i);
-            }
-        }
-        this.parameters       = parameters;
+            this.parameters = parameters; // can I not clone this?            
+        }                
         this.sourceDimensions = sourceDimensions;
         this.targetDimensions = targetDimensions;
     }
@@ -184,9 +248,8 @@ public class OperationMethod extends IdentifiedObject
      *
      * @return The parameters, or an empty array if none.
      */
-    public GeneralOperationParameter[] getParameters() {
-        return (parameters!=null) ? (GeneralOperationParameter[]) parameters.clone()
-                                  : EMPTY_PARAMETER;
+    public ParameterDescriptorGroup getParameters() {
+        return parameters;                
     }
 
     /**
@@ -220,11 +283,7 @@ public class OperationMethod extends IdentifiedObject
      */
     public int hashCode() {
         int code = (int)serialVersionUID + sourceDimensions + 37*targetDimensions;
-        if (parameters != null) {
-            for (int i=parameters.length; --i>=0;) {
-                code = code*37 + parameters[i].hashCode();
-            }
-        }
+        code = code * 37 + parameters.hashCode();
         return code;
     }
     

@@ -38,10 +38,13 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.NoSuchIdentifierException;
-import org.opengis.parameter.GeneralOperationParameter;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
+import org.geotools.parameter.Parameters;
 import org.geotools.referencing.Identifier;         // For javadoc
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.operation.GeneralMatrix;
@@ -222,12 +225,10 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     public GeneralParameterValue[] getDefaultParameters(final String identifier)
             throws NoSuchIdentifierException
     {
-        final GeneralOperationParameter[] parameters = getProvider(identifier).getParameters();
-        final GeneralParameterValue[] values = new GeneralParameterValue[parameters.length];
-        for (int i=0; i<values.length; i++) {
-            values[i] = parameters[i].createValue();
-        }
-        return values;
+        ParameterDescriptorGroup type = getProvider(identifier).getParameters();
+        ParameterValueGroup group = (ParameterValueGroup) type.createValue();
+        
+        return Parameters.array( group );         
     }
 
     /**

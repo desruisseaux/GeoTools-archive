@@ -20,31 +20,26 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.OperationParameter;
-import org.opengis.parameter.ParameterValueGroup;
+import org.geotools.parameter.Parameters;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.opengis.metadata.Identifier;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.OperationParameterGroup;
-import org.opengis.parameter.GeneralOperationParameter;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.metadata.Identifier;
-import org.opengis.referencing.IdentifiedObject;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.resources.cts.Resources;
-import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -70,13 +65,6 @@ public abstract class MathTransformProvider extends OperationMethod {
     private static final long serialVersionUID = 7530475536803158473L;
 
     /**
-     * The {@linkplain #getParameters parameters} represented as a group of descriptors. This
-     * convenience field make it easier to {@linkplain ParameterGroupDescriptor#getParameter(String)
-     * search for named parameters}.
-     */
-    protected final OperationParameterGroup parameters;
-
-    /**
      * Constructs a math transform provider from a set of parameters. The provider
      * {@linkplain #getIdentifiers identifiers} will be the same than the parameter
      * ones.
@@ -87,7 +75,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      */
     public MathTransformProvider(final int sourceDimensions,
                                  final int targetDimensions,
-                                 final OperationParameterGroup parameters)
+                                 final ParameterDescriptorGroup parameters)
     {
         this(toMap(parameters, null), sourceDimensions, targetDimensions, parameters);
     }
@@ -106,10 +94,9 @@ public abstract class MathTransformProvider extends OperationMethod {
     public MathTransformProvider(final Map properties,
                                  final int sourceDimensions,
                                  final int targetDimensions,
-                                 final OperationParameterGroup parameters)
+                                 final ParameterDescriptorGroup parameters)
     {
-        super(properties, sourceDimensions, targetDimensions, parameters.getParameters());
-        this.parameters = parameters;
+        super(properties, sourceDimensions, targetDimensions, parameters);        
     }
 
     /**
@@ -127,7 +114,7 @@ public abstract class MathTransformProvider extends OperationMethod {
             throw new IllegalArgumentException();
         }
         final Map properties = new HashMap(4);
-        properties.put("name", (parameters!=null) ? parameters.getName(null) : identifiers[0].getCode());
+        properties.put("name", (parameters!=null) ? parameters.getName().toString() : identifiers[0].getCode());
         properties.put("identifiers", identifiers);
         return properties;
     }
@@ -141,8 +128,8 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @param identifiers The operation identifiers. Should contains at least one identifier.
      * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
      */
-    protected static OperationParameterGroup group(final Identifier[] identifiers,
-                                                   final GeneralOperationParameter[] parameters)
+    protected static ParameterDescriptorGroup group(final Identifier[] identifiers,
+                                                   final GeneralParameterDescriptor[] parameters)
     {
         return new org.geotools.parameter.ParameterGroupDescriptor(toMap(null, identifiers), parameters);
     }
@@ -183,20 +170,20 @@ public abstract class MathTransformProvider extends OperationMethod {
         for (int i=0; i<values.length; i++) {
             final GeneralParameterValue value = values[i];
             if (value instanceof ParameterValueGroup) {
-                ensureValidValues(((ParameterValueGroup) value).getValues());
+                ensureValidValues( Parameters.array((ParameterValueGroup) value));
                 continue;
             }
             final String name;
-            final GeneralOperationParameter userDescriptor = value.getDescriptor();
+            final GeneralParameterDescriptor userDescriptor = value.getDescriptor();
             final Identifier[] identifiers = userDescriptor.getIdentifiers();
             if (identifiers!=null && identifiers.length!=0) {
                 name = identifiers[0].getCode();
             } else {
-                name = userDescriptor.getName(null);
+                name = userDescriptor.getName().toString();
             }
-            final OperationParameter descriptor;
+            final ParameterDescriptor descriptor;
             try {
-                descriptor = parameters.getParameter(name);
+                descriptor = getParameters().getParameter(name);
             } catch (ParameterNotFoundException cause) {
                 final InvalidParameterNameException exception =
                       new InvalidParameterNameException(Resources.format(
@@ -205,7 +192,7 @@ public abstract class MathTransformProvider extends OperationMethod {
                 throw exception;
             }
             if (value instanceof ParameterValue) {
-                org.geotools.parameter.ParameterValue.ensureValidValue(descriptor, 
+                org.geotools.parameter.Parameter.ensureValidValue(descriptor, 
                                                       ((ParameterValue) value).getValue());
             }
         }
@@ -237,13 +224,15 @@ public abstract class MathTransformProvider extends OperationMethod {
         ensureValidValues(values);
         if (values.length == 1) {
             final GeneralParameterValue value = values[0];
-            if (parameters.equals(value.getDescriptor())) {
+            if (getParameters().equals(value.getDescriptor())) {
                 if (value instanceof ParameterValueGroup) {
                     return createMathTransform((ParameterValueGroup) value);
                 }
             }
         }
-        return createMathTransform(new FallbackParameterValueGroup(parameters, values));
+        return createMathTransform(
+            new FallbackParameterValueGroup( getParameters(), values)
+        );
     }
 
     /**
@@ -272,7 +261,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @todo Revisit if a more elaborated test is needed for choosing an identifier.
      */
     private static ParameterValue getValue(final ParameterValueGroup group,
-                                           final OperationParameter  param)
+                                           final ParameterDescriptor  param)
             throws ParameterNotFoundException
     {
         final Identifier[] identifiers = param.getIdentifiers();
@@ -280,9 +269,9 @@ public abstract class MathTransformProvider extends OperationMethod {
         if (identifiers!=null && identifiers.length!=0) {
             name = identifiers[0].getCode();
         } else {
-            name = param.getName(null);
+            name = param.getName().toString();
         }
-        return group.getValue(name);
+        return group.parameter(name);
     }
 
     /**
@@ -296,7 +285,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @throws ParameterNotFoundException if the parameter is not found.
      */
     protected static int intValue(final ParameterValueGroup group,
-                                  final OperationParameter  param)
+                                  final ParameterDescriptor  param)
             throws ParameterNotFoundException
     {
         return getValue(group, param).intValue();
@@ -316,7 +305,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      *       for null units).
      */
     protected static double doubleValue(final ParameterValueGroup group,
-                                        final OperationParameter  param)
+                                        final ParameterDescriptor  param)
             throws ParameterNotFoundException
     {
         return getValue(group, param).doubleValue();
@@ -333,7 +322,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @throws ParameterNotFoundException if the parameter is not found.
      */
     protected static String stringValue(final ParameterValueGroup group,
-                                       final OperationParameter  param)
+                                       final ParameterDescriptor  param)
             throws ParameterNotFoundException
     {
         return getValue(group, param).stringValue();
