@@ -15,7 +15,7 @@ public class FidsExpr extends AbstractExpr {
 	}
 	public FidsExpr( String fid ){
 		fids.add( fid );
-	}
+	}	
 	public Filter filter(FeatureType schema) {
 		FidFilter filter = factory.createFidFilter();
 		filter.addAllFids( fids );

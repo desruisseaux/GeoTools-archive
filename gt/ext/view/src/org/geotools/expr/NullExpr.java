@@ -12,6 +12,18 @@ class NullExpr extends AbstractExpr {
 	NullExpr( Expr expr ){
 		this.expr = expr;
 	}
+	public Expr eval() {
+		Expr eval = expr.eval();		
+		
+		if( eval instanceof ResolvedExpr ){
+			Object value = ((ResolvedExpr)eval).getValue();			
+			return new LiteralExpr( value != null ); 
+		}		
+		if( eval == expr ){
+			return this;
+		}
+		return new NullExpr( eval );		
+	}	
 	public Filter filter(FeatureType schema) throws IOException {
 		try {
 			NullFilter nullFilter = factory.createNullFilter();

@@ -58,7 +58,18 @@ import com.vividsolutions.jts.geom.Envelope;
   */
  abstract class AbstractExpr implements Expr {
  	
- 	protected FilterFactory factory = FilterFactory.createFilterFactory(); 	
+ 	protected FilterFactory factory = FilterFactory.createFilterFactory();
+ 	
+ 	/**
+ 	 * Evaludate Expr - with LiteralExpr as a goal.
+ 	 * <p>
+ 	 * By default this method simply returns the current Expr.
+ 	 * </p>
+ 	 */
+ 	public Expr eval(){
+ 		return this;
+ 	}
+ 	
 	/**
 	 * Bind all meta entries according to provided metadata.
 	 * <p>
@@ -149,29 +160,7 @@ import com.vividsolutions.jts.geom.Envelope;
 					return false;
 				}
 				Object value = expression.getValue( feature );
-				if( value == null ) return false;
-				if( value instanceof Boolean) {
-					return ((Boolean)value).booleanValue();
-				}
-				if( value instanceof Number ){
-					return ((Number)value).doubleValue() != 0.0;
-				}
-				if( value instanceof String ){
-					return ((String)value).length() != 0; 
-				}
-				if( value.getClass().isArray() ){
-					return Array.getLength( value ) != 0;
-				}
-				if( value instanceof Collection ){
-					return !((Collection)value).isEmpty();
-				}
-				if( value instanceof Map ){
-					return !((Map)value).isEmpty();
-				}
-				if( value instanceof Envelope ){
-					return ((Envelope)value).isNull();						
-				}
-				return false;
+				return Exprs.truth( value );				
 			}
 			public Filter and(Filter filter) {
 				try {

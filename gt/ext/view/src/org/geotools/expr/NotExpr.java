@@ -10,6 +10,19 @@ class NotExpr extends AbstractExpr {
 	NotExpr( Expr expr ){
 		this.expr = expr;
 	}
+	public Expr eval() {
+		Expr eval = expr.eval();		
+		
+		if( eval instanceof ResolvedExpr ){
+			Object value = ((ResolvedExpr)eval).getValue();
+			boolean not = !Exprs.truth( value );
+			return new LiteralExpr( not ); 
+		}		
+		if( eval == expr ){
+			return this;
+		}
+		return new NotExpr( eval );		
+	}		
 	public Filter filter(FeatureType schema) throws IOException {
 		return expr.filter( schema ).not();
 	}

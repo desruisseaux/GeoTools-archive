@@ -79,6 +79,22 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public interface Expr {
 	/**
+	 * Evaludate Expr (with LiteralExpr as a goal).
+	 * <p>
+	 * This method has been introduced for testing, although it will
+	 * help when implementing a testing evaluator.
+	 * </p>
+	 * </p>
+	 * Note: The returned result may still be an Expr (if the Expr
+	 * contains any unresolved metadata or Feature information).
+	 * If all metadata,geom and attribute Expr have been resolved
+	 * the result will be a LiteralExpr - that represents the value of
+	 * the Expr. 
+	 * </p>
+	 * */
+	public Expr eval();
+	
+	/**
 	 * Bind all meta entries according to provided metadata.
 	 * <p>
 	 * <pre><code>

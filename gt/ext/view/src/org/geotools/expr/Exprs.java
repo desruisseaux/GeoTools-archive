@@ -16,7 +16,10 @@
  */
 package org.geotools.expr;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.geotools.filter.FilterFactory;
@@ -231,6 +234,44 @@ public class Exprs {
  	}
  	static public Expr fn( String name, Expr expr[] ){
  		return new FunctionExpr( name, expr );
+ 	}
+ 	/**
+ 	 * Defines the usual Perl concept of "true".
+ 	 * <ul>
+ 	 * <li>Boolean.TRUE is true
+ 	 * <li>Non empty String is true
+ 	 * <li>Non zero is true
+ 	 * <li>Non zero length array is true
+ 	 * <li>Non isEmpty Collection/Map is true
+ 	 * <li>Non isNull Envelope is true
+ 	 * </ul>
+ 	 * @value value To be examined for truthfulness
+ 	 * @return the truth is out there
+ 	 */ 	
+ 	static boolean truth( Object value ){ 		
+		if( value == null ) return false;
+		if( value instanceof Boolean) {
+			return ((Boolean)value).booleanValue();
+		}
+		if( value instanceof Number ){
+			return ((Number)value).doubleValue() != 0.0;
+		}
+		if( value instanceof String ){
+			return ((String)value).length() != 0; 
+		}
+		if( value.getClass().isArray() ){
+			return Array.getLength( value ) != 0;
+		}
+		if( value instanceof Collection ){
+			return !((Collection)value).isEmpty();
+		}
+		if( value instanceof Map ){
+			return !((Map)value).isEmpty();
+		}
+		if( value instanceof Envelope ){
+			return ((Envelope)value).isNull();						
+		}
+		return false;
  	}
 }
 

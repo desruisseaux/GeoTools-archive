@@ -17,7 +17,7 @@ import org.geotools.filter.IllegalFilterException;
  * readability.
  * </p>
  */
-public class LiteralExpr extends AbstractExpr {
+public class LiteralExpr extends AbstractExpr implements ResolvedExpr {
 	Object literal;	
 	public LiteralExpr( boolean b ){
 		this( b ? Boolean.TRUE : Boolean.FALSE );		
@@ -31,5 +31,16 @@ public class LiteralExpr extends AbstractExpr {
 		} catch (IllegalFilterException e) {
 			return null;
 		}
+	}
+	/**
+	 * Value of this LiteralExpr.
+	 * <p>
+	 * Expr is doing its best to be immutable, Please 
+	 * don't duck around this idea.
+	 * </p>
+	 * @return value of literal Expr
+	 */
+	public Object getValue(){
+		return literal;
 	}
 }
