@@ -184,7 +184,8 @@ public abstract class AbstractDataStore implements DataStore, Catalog {
         
         return null;
     }
-    protected MetadataEntity metadata( final String typeName ){
+    
+    public MetadataEntity metadata( final String typeName ){
         return new AbstractMetadataEntity(){
             String getName(){
                 return typeName;
@@ -192,43 +193,7 @@ public abstract class AbstractDataStore implements DataStore, Catalog {
         };
     }
     protected CatalogEntry catalogEntry( final String typeName ){
-        return new CatalogEntry(){            
-            public Object getResource() {
-                try {
-                    return getFeatureSource( typeName );
-                } catch (IOException e) {
-                    return null;
-                }
-            }
-            public String getDataName() {
-                return typeName;
-            }
-            public int getNumMetadata() {
-                return 1;
-            }
-
-            public String[] getMetadataNames() {
-                return new String[]{ "default", };
-            }
-            public MetadataEntity getMetadata(int index) {
-                if( index == 1){
-                    return metadata( typeName );
-                }
-                return null;
-            }
-
-            public MetadataEntity getMetadata(String metadataName ) {
-                if( "default".equals( metadataName )){
-                    return metadata( typeName );
-                }
-                return null;
-            }
-
-            public Iterator iterator() {
-                return Collections.singleton( metadata( typeName) ).iterator();                
-            }
-            
-        };
+        return new DataStoreCatalogEntry(this, null, typeName);
     }
     /** Convience method for retriving all the names from the Catalog Entires */
     public abstract String[] getTypeNames();

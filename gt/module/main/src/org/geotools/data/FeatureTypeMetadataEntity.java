@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * </p>
  * @author Jody Garnett, Refractions Research
  */
-public class FeatureTypeMetadataEnity extends AbstractMetadataEntity {
+public class FeatureTypeMetadataEntity extends AbstractMetadataEntity {
     DataStore store;
     URI namespace;
     String typeName;
@@ -69,9 +69,8 @@ public class FeatureTypeMetadataEnity extends AbstractMetadataEntity {
     
     FeatureSource source;
     int count;
-    Envelope bounds;
-    
-    public FeatureTypeMetadataEnity( DataStore store, URI namespace, String typeName ){
+    Envelope bounds;    
+    public FeatureTypeMetadataEntity( DataStore store, URI namespace, String typeName ){
         this.store = store;
         this.typeName = typeName;
         this.displayName = new InternationalString( typeName.substring(0,1).toUpperCase() + typeName.substring(1).toLowerCase() );
@@ -84,7 +83,15 @@ public class FeatureTypeMetadataEnity extends AbstractMetadataEntity {
                 }                
             });            
         } catch (IOException e) {            
-        }        
+        }
+        if( namespace != null ){
+            this.namespace = namespace;    
+        }
+        else {
+            this.namespace = source.getSchema().getNamespace();
+        }
+        
+        
     }    
     /** Called to reset the count and bounds, they will be recalculated as needed */     
     public synchronized void reset(){
