@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -53,9 +53,9 @@ import org.geotools.util.WeakValueHashMap;
  */
 final class ColorModelFactory {
     /**
-     * Modï¿½les de couleurs suggï¿½rï¿½s pour l'affichage des catï¿½gories. Ces modï¿½les de couleurs
-     * peuvent ï¿½tre construits ï¿½ partir des couleurs qui ont ï¿½tï¿½ dï¿½finies dans les diffï¿½rentes
-     * catï¿½gories du tableau {@link #categories}.
+     * Modèles de couleurs suggérés pour l'affichage des catégories. Ces modèles de couleurs
+     * peuvent être construits à partir des couleurs qui ont été définies dans les différentes
+     * catégories du tableau {@link #categories}.
      */
     private static final Map colors = new WeakValueHashMap();
 
@@ -191,13 +191,13 @@ final class ColorModelFactory {
         }
         /*
          * Calcule le nombre de couleurs de la palette
-         * en cherchant l'index le plus ï¿½levï¿½ des thï¿½mes.
+         * en cherchant l'index le plus élevé des thèmes.
          */
         final int mapSize = (int)Math.round(categories[categories.length-1].maximum)+1;
         final int[]  ARGB = new int[mapSize];
         /*
          * Interpole les codes de couleurs dans la palette. Les couleurs
-         * correspondantes aux plages non-dï¿½finies par un thï¿½me seront transparentes.
+         * correspondantes aux plages non-définies par un thème seront transparentes.
          */
         for (int i=0; i<categories.length; i++) {
             final Category category = categories[i];

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -276,7 +276,7 @@ public class ObjectFactory extends Factory implements CSFactory, DatumFactory, C
      * Creates a vertical datum from an enumerated type value.
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  type The type of this vertical datum (often ï¿½geoidalï¿½).
+     * @param  type The type of this vertical datum (often “geoidal”).
      * @throws FactoryException if the object creation failed.
      */
     public VerticalDatum createVerticalDatum(Map         properties,

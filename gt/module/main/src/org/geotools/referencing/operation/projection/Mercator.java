@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -72,7 +72,7 @@ import org.opengis.referencing.operation.MathTransform;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
  * 
  * @version $Id$
- * @author Andrï¿½ Gosselin
+ * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -149,7 +149,7 @@ public class Mercator extends MapProjection {
     public static final class Provider2SP extends Provider {
         /**
          * The operation parameter descriptor for the {@link #standardParallel standard parallel}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new Identifier[] {

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ package org.geotools.metadata.extent;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraï¿½vane
+ * @author Touraïvane
  */
 public class GeographicBoundingBox extends GeographicExtent
        implements org.opengis.metadata.extent.GeographicBoundingBox
@@ -94,7 +94,7 @@ public class GeographicBoundingBox extends GeographicExtent
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      *
-     * @return The western-most longitude between -180 and +180ï¿½.
+     * @return The western-most longitude between -180 and +180°.
      */
     public double getWestBoundLongitude() {
         return westBoundLongitude;
@@ -115,7 +115,7 @@ public class GeographicBoundingBox extends GeographicExtent
      * dataset extent. The value is expressed in longitude in
      * decimal degrees (positive east).
      *
-     * @return The eastern-most longitude between -180 and +180ï¿½.
+     * @return The eastern-most longitude between -180 and +180°.
      */
     public double getEastBoundLongitude() {
         return eastBoundLongitude;
@@ -136,7 +136,7 @@ public class GeographicBoundingBox extends GeographicExtent
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      *
-     * @return The southern-most latitude between -90 and +90ï¿½.
+     * @return The southern-most latitude between -90 and +90°.
      */
     public double getSouthBoundLatitude()  {
         return southBoundLatitude;
@@ -157,7 +157,7 @@ public class GeographicBoundingBox extends GeographicExtent
      * dataset extent. The value is expressed in latitude in
      * decimal degrees (positive north).
      *
-     * @return The northern-most latitude between -90 and +90ï¿½.
+     * @return The northern-most latitude between -90 and +90°.
      */
     public double getNorthBoundLatitude()   {
         return northBoundLatitude;

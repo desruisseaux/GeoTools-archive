@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -243,16 +243,16 @@ public class PaletteFactory {
     }
     
     /**
-     * Procï¿½de au chargement d'un ensemble de couleurs. Les couleurs doivent
-     * ï¿½tre codï¿½es sur trois colonnes dans un fichier texte. Les colonnes
-     * doivent ï¿½tre des entiers de 0 ï¿½ 255 correspondant (dans l'ordre) aux
+     * Procède au chargement d'un ensemble de couleurs. Les couleurs doivent
+     * être codées sur trois colonnes dans un fichier texte. Les colonnes
+     * doivent être des entiers de 0 à 255 correspondant (dans l'ordre) aux
      * couleurs rouge (R), verte (G) et bleue (B). Les lignes vierges ainsi
-     * que les lignes dont le premier caractï¿½re non-blanc est # seront ignorï¿½es.
+     * que les lignes dont le premier caractère non-blanc est # seront ignorées.
      *
      * @param  input Flot contenant les codes de couleurs de la palette.
-     * @return Couleurs obtenues ï¿½ partir des codes lues.
+     * @return Couleurs obtenues à partir des codes lues.
      * @throws IOException si une erreur est survenue lors de la lecture.
-     * @throws IIOException si une erreur est survenue lors de l'interprï¿½tation des codes de couleurs.
+     * @throws IIOException si une erreur est survenue lors de l'interprétation des codes de couleurs.
      */
     private Color[] getColors(final BufferedReader input) throws IOException {
         int values[]=new int[3]; // On attend exactement 3 composantes par ligne.
@@ -352,7 +352,7 @@ public class PaletteFactory {
     }
     
     /**
-     * Vï¿½rifie que la valeur <code>value</code> spï¿½cifiï¿½e
+     * Vérifie que la valeur <code>value</code> spécifiée
      * est dans la plage [0..255] inclusivement.
      *
      * @throws ParseException si le nombre n'est pas dans la plage [0..255].

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -702,7 +702,7 @@ public class CoordinateOperationFactory extends Factory
                  * WEST). Compute the amount of angle to add to the source longitude in order to
                  * get the destination longitude. This amount is measured in units of the target
                  * axis.  The affine transform is then updated in order to take this rotation in
-                 * account. Note that the resulting longitude may be outside the usual [-180..180ï¿½]
+                 * account. Note that the resulting longitude may be outside the usual [-180..180°]
                  * range.
                  */
                 final Unit              unit = axis.getUnit();
@@ -863,7 +863,7 @@ public class CoordinateOperationFactory extends Factory
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo When rotating the prime meridian, we should ensure that
-     *       transformed longitudes stay in the range [-180..+180ï¿½].
+     *       transformed longitudes stay in the range [-180..+180°].
      *
      * @todo We should use Molodenski transforms when applicable.
      */
@@ -881,7 +881,7 @@ public class CoordinateOperationFactory extends Factory
              * different. Note: this special block is mandatory for avoiding never-ending loop,
              * since it is invoked by 'createOperationStep(GeocentricCRS...)'.
              *
-             * TODO: We should ensure that longitude is in range [-180..+180ï¿½].
+             * TODO: We should ensure that longitude is in range [-180..+180°].
              */
             // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
             final EllipsoidalCS sourceCS = (EllipsoidalCS) sourceCRS.getCoordinateSystem();

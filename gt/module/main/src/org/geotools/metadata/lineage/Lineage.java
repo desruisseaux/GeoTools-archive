@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ import org.opengis.util.InternationalString;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraï¿½vane
+ * @author Touraïvane
  */
 public class Lineage extends MetadataEntity implements org.opengis.metadata.lineage.Lineage {
     /**
@@ -52,7 +52,7 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
     private static final long serialVersionUID = 3351230301999744987L;
     
     /**
-     * General explanation of the data producerï¿½s knowledge about the lineage of a dataset.
+     * General explanation of the data producer’s knowledge about the lineage of a dataset.
      * Should be provided only if
      * {@linkplain org.geotools.metadata.quality.Scope#getLevel scope level} is
      * {@linkplain org.opengis.metadata.maintenance.ScopeCode#DATASET dataset} or
@@ -77,7 +77,7 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
     }
 
     /**
-     * Returns the general explanation of the data producerï¿½s knowledge about the lineage
+     * Returns the general explanation of the data producer’s knowledge about the lineage
      * of a dataset.
      * Should be provided only if
      * {@linkplain org.geotools.metadata.quality.Scope#getLevel scope level} is
@@ -89,7 +89,7 @@ public class Lineage extends MetadataEntity implements org.opengis.metadata.line
     }
     
     /**
-     * Set the general explanation of the data producerï¿½s knowledge about the lineage
+     * Set the general explanation of the data producer’s knowledge about the lineage
      * of a dataset.
      */
     public synchronized void setStatement(final InternationalString newValue) {

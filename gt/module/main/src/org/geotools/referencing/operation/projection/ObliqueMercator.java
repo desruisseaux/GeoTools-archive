@@ -279,7 +279,7 @@ public class ObliqueMercator extends MapProjection {
 
         /**
          * The operation parameter descriptor for the {@link #latitudeOfCentre}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor LAT_OF_CENTRE = createDescriptor(
                 new Identifier[] {
@@ -292,7 +292,7 @@ public class ObliqueMercator extends MapProjection {
         
         /**
          * The operation parameter descriptor for the {@link #longitudeOfCentre}
-         * parameter value. Valid values range is from -180 to 180ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
         public static final ParameterDescriptor LONG_OF_CENTRE = createDescriptor(
                 new Identifier[] {
@@ -320,7 +320,7 @@ public class ObliqueMercator extends MapProjection {
         /**
          * The operation parameter descriptor for the {@link #rectGridAngle}
          * parameter value. It is an optional parameter with valid values ranging
-         * from -360 to 360ï¿½. Default value is {@link #alpha_c}.
+         * from -360 to 360°. Default value is {@link #alpha_c}.
          */
         public static final ParameterDescriptor RECTIFIED_GRID_ANGLE = createDescriptor(
                 new Identifier[] {
@@ -445,7 +445,7 @@ public class ObliqueMercator extends MapProjection {
     public static class Provider_TwoPoint extends Provider {
     		/**
          * The operation parameter descriptor for the {@link #latitudeOfCentre}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor LAT_OF_CENTRE = createDescriptor(
                 new Identifier[] {
@@ -458,7 +458,7 @@ public class ObliqueMercator extends MapProjection {
         
     	    /**
          * The operation parameter descriptor for the {@link #latitudeOf1stPoint}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor LAT_OF_1ST_POINT = createDescriptor(
                 new Identifier[] {
@@ -468,7 +468,7 @@ public class ObliqueMercator extends MapProjection {
         
         /**
          * The operation parameter descriptor for the {@link #longitudeOf1stPoint}
-         * parameter value. Valid values range is from -180 to 180ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
         public static final ParameterDescriptor LONG_OF_1ST_POINT = createDescriptor(
                 new Identifier[] {
@@ -478,7 +478,7 @@ public class ObliqueMercator extends MapProjection {
         
         /**
          * The operation parameter descriptor for the {@link #latitudeOf2ndPoint}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor LAT_OF_2ND_POINT = createDescriptor(
                 new Identifier[] {
@@ -488,7 +488,7 @@ public class ObliqueMercator extends MapProjection {
         
         /**
          * The operation parameter descriptor for the {@link #longitudeOf2ndPoint}
-         * parameter value. Valid values range is from -180 to 180ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
         public static final ParameterDescriptor LONG_OF_2ND_POINT = createDescriptor(
                 new Identifier[] {

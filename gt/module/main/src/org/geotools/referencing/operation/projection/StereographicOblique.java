@@ -1,7 +1,7 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, 2004, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -61,7 +61,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * projection. This is similar but <strong>NOT</strong> equal to EPSG code 9809.
  *
  * @version $Id$
- * @author Andrï¿½ Gosselin
+ * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -552,7 +552,7 @@ public final class CRSUtilities {
     
     /**
      * Returns a character string for the specified geographic area. The string will have the
-     * form "45ï¿½00.00'N-50ï¿½00.00'N 30ï¿½00.00'E-40ï¿½00.00'E". If a map projection is required in
+     * form "45°00.00'N-50°00.00'N 30°00.00'E-40°00.00'E". If a map projection is required in
      * order to obtain this representation, it will be automatically applied.  This string is
      * mostly used for debugging purpose.
      *
@@ -568,7 +568,7 @@ public final class CRSUtilities {
 //                               createFromCoordinateSystems(cs, GeographicCoordinateSystem.WGS84);
 //                bounds = transform((MathTransform2D) tr.getMathTransform(), bounds, null);
             }
-            final AngleFormat fmt = new AngleFormat("DDï¿½MM.m'");
+            final AngleFormat fmt = new AngleFormat("DD°MM.m'");
             buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');
             buffer = fmt.format(new  Latitude(bounds.getMaxY()), buffer, null); buffer.append(' ');
             buffer = fmt.format(new Longitude(bounds.getMinX()), buffer, null); buffer.append('-');

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -395,7 +395,7 @@ public class TextMatrixImageReader extends TextImageReader {
      *     public MyCustomSpi()
      *     {
      *         super("MyCustomFormat", "text/matrix");
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Dï¿½veloppement";
+     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
      *         {@link #version    version}    = "1.0";
      *         {@link #locale     locale}     = Locale.US;
      *         {@link #charset    charset}    = Charset.forName("ISO-LATIN-1");
@@ -474,10 +474,10 @@ public class TextMatrixImageReader extends TextImageReader {
         }
         
         /**
-         * Vï¿½rifie si la ligne a un nombre de valeurs acceptable. Cette mï¿½thode est appelï¿½e
+         * Vérifie si la ligne a un nombre de valeurs acceptable. Cette méthode est appelée
          * automatiquement par {@link #canDecodeLine} avec en argument le nombre de valeurs
-         * dans une des premiï¿½res lignes trouvï¿½es dans la source. Cette indication n'est
-         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de faï¿½on
+         * dans une des premières lignes trouvées dans la source. Cette indication n'est
+         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de façon
          * conservative.
          */
         Boolean isValueCountAcceptable(final int count) {

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2003, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2003, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -59,16 +59,16 @@ import org.geotools.util.WeakValueHashMap;
 
 
 /**
- * Gï¿½re l'affichage en diffï¿½rï¿½ d'une image composï¿½e de tuiles. Lorsqu'une tuile
- * solicitï¿½e n'est pas disponible, une tuile comportant une valeur par dï¿½faut est 
- * retournï¿½e. Lorsque la tuile est enfin disponible, un ï¿½vï¿½nement est dï¿½clenchï¿½
- * indiquant au composant qui dï¿½sire afficher l'image que la tuile est maintenant
+ * Gère l'affichage en différé d'une image composée de tuiles. Lorsqu'une tuile
+ * solicitée n'est pas disponible, une tuile comportant une valeur par défaut est 
+ * retournée. Lorsque la tuile est enfin disponible, un évènement est déclenché
+ * indiquant au composant qui désire afficher l'image que la tuile est maintenant
  * disponible.
  * <br><br>
- * Le composant qui dï¿½sire ï¿½tre informï¿½ des ï¿½vï¿½nements sur les tuiles doit au prï¿½alable 
- * s'enregistrer auprï¿½s de la classe <CODE>DefferedPlanarImage</CODE> au travers de la
- * mï¿½thode {@link #addTileObserver}. Lorsque le composant est informï¿½ qu'une tuile est
- * prï¿½te, il lui suffit d'appeler une mï¿½thode <CODE>repaint(...)</CODE> pour mettre ï¿½
+ * Le composant qui désire être informé des évènements sur les tuiles doit au préalable 
+ * s'enregistrer auprès de la classe <CODE>DefferedPlanarImage</CODE> au travers de la
+ * méthode {@link #addTileObserver}. Lorsque le composant est informé qu'une tuile est
+ * prête, il lui suffit d'appeler une méthode <CODE>repaint(...)</CODE> pour mettre à
  * jour cette tuile.
  *
  * @version $Id$

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -213,22 +213,22 @@ public final class SwingUtilities {
             choice=JOptionPane.showInternalOptionDialog(
                     owner,                         // Composante parente
                     dialog,                        // Message
-                    title,                         // Titre de la boï¿½te de dialogue
-                    JOptionPane.OK_CANCEL_OPTION,  // Boutons ï¿½ placer
+                    title,                         // Titre de la boîte de dialogue
+                    JOptionPane.OK_CANCEL_OPTION,  // Boutons à placer
                     JOptionPane.PLAIN_MESSAGE,     // Type du message
                     null,                          // Icone
                     options,                       // Liste des boutons
-                    initialValue);                 // Bouton par dï¿½faut
+                    initialValue);                 // Bouton par défaut
         } else {
             choice=JOptionPane.showOptionDialog(
                     owner,                         // Composante parente
                     dialog,                        // Message
-                    title,                         // Titre de la boï¿½te de dialogue
-                    JOptionPane.OK_CANCEL_OPTION,  // Boutons ï¿½ placer
+                    title,                         // Titre de la boîte de dialogue
+                    JOptionPane.OK_CANCEL_OPTION,  // Boutons à placer
                     JOptionPane.PLAIN_MESSAGE,     // Type du message
                     null,                          // Icone
                     options,                       // Liste des boutons
-                    initialValue);                 // Bouton par dï¿½faut
+                    initialValue);                 // Bouton par défaut
         }
         return choice==okChoice;
     }
@@ -264,13 +264,13 @@ public final class SwingUtilities {
             JOptionPane.showInternalMessageDialog(
                     owner,     // Composante parente
                     message,   // Message
-                    title,     // Titre de la boï¿½te de dialogue
+                    title,     // Titre de la boîte de dialogue
                     type);     // Type du message
         } else {
             JOptionPane.showMessageDialog(
                     owner,     // Composante parente
                     message,   // Message
-                    title,     // Titre de la boï¿½te de dialogue
+                    title,     // Titre de la boîte de dialogue
                     type);     // Type du message
         }
     }
@@ -309,28 +309,28 @@ public final class SwingUtilities {
             choice=JOptionPane.showInternalConfirmDialog(
                     owner,                     // Composante parente
                     message,                   // Message
-                    title,                     // Titre de la boï¿½te de dialogue
-                    JOptionPane.YES_NO_OPTION, // Boutons ï¿½ faire apparaï¿½tre
+                    title,                     // Titre de la boîte de dialogue
+                    JOptionPane.YES_NO_OPTION, // Boutons à faire apparaître
                     type);                     // Type du message
         } else {
             choice=JOptionPane.showConfirmDialog(
                     owner,                     // Composante parente
                     message,                   // Message
-                    title,                     // Titre de la boï¿½te de dialogue
-                    JOptionPane.YES_NO_OPTION, // Boutons ï¿½ faire apparaï¿½tre
+                    title,                     // Titre de la boîte de dialogue
+                    JOptionPane.YES_NO_OPTION, // Boutons à faire apparaître
                     type);                     // Type du message
         }
         return choice==JOptionPane.YES_OPTION;
     }
 
     /**
-     * Retourne une ï¿½tiquette pour la composante spï¿½cifiï¿½e.
-     * Le texte de l'ï¿½tiquette pourra ï¿½ventuellement ï¿½tre
-     * distribuï¿½ sur plusieurs lignes.
+     * Retourne une étiquette pour la composante spécifiée.
+     * Le texte de l'étiquette pourra éventuellement être
+     * distribué sur plusieurs lignes.
      *
-     * @param owner Composante pour laquelle on construit une ï¿½tiquette.
-     *              L'ï¿½tiquette aura la mï¿½me largeur que <code>owner</code>.
-     * @param text  Texte ï¿½ placer dans l'ï¿½tiquette.
+     * @param owner Composante pour laquelle on construit une étiquette.
+     *              L'étiquette aura la même largeur que <code>owner</code>.
+     * @param text  Texte à placer dans l'étiquette.
      */
     public static JComponent getMultilineLabelFor(final JComponent owner, final String text) {
         final JTextArea label=new JTextArea(text);

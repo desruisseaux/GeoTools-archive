@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@ import org.opengis.util.InternationalString;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraï¿½vane
+ * @author Touraïvane
  */
 public class Format extends MetadataEntity implements org.opengis.metadata.distribution.Format {
     /**
@@ -74,7 +74,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
     private InternationalString fileDecompressionTechnique;
 
     /**
-     * Provides information about the distributorï¿½s format.
+     * Provides information about the distributor’s format.
      */
     private Set formatDistributors;
     
@@ -170,7 +170,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
     }
 
     /**
-     * Provides information about the distributorï¿½s format.
+     * Provides information about the distributor’s format.
      */
     public Set getFormatDistributors() {
         final Set formatDistributors = this.formatDistributors; // Avoid synchronization
@@ -178,7 +178,7 @@ public class Format extends MetadataEntity implements org.opengis.metadata.distr
     }
     
     /**
-     * Set information about the distributorï¿½s format.
+     * Set information about the distributor’s format.
      */
     public synchronized void setFormatDistributors(final Set newValues) {
         checkWritePermission();

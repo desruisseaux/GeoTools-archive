@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import org.opengis.util.InternationalString;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraï¿½vane
+ * @author Touraïvane
  */
 public class Georeferenceable extends GridSpatialRepresentation
         implements org.opengis.metadata.spatial.Georeferenceable

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -69,7 +69,7 @@ final class SampleTranscoder extends PointOpImage {
     public static final String OPERATION_NAME = "org.geotools.SampleTranscode";
 
     /**
-     * Ensemble des catï¿½gories qui donnent une signification aux pixels de l'image. La
+     * Ensemble des catégories qui donnent une signification aux pixels de l'image. La
      * longueur de ce tableau doit correspondre au nombre de bandes de l'image source.
      */
     private final CategoryList[] categories;

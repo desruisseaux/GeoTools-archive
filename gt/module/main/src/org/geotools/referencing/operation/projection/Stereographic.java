@@ -1,7 +1,7 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, 2004, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -90,10 +90,10 @@ import org.opengis.referencing.operation.MathTransform;
  * <br><br>
  *
  * If a <code>"latitude_of_origin"</code> parameter is supplied and is not consistent with the
- * projection classification (for example a latitude different from &plusmn;90ï¿½ for the polar case),
+ * projection classification (for example a latitude different from &plusmn;90° for the polar case),
  * then the oblique or polar case will be automatically inferred from the latitude. In other
  * words, the latitude of origin has precedence on the projection classification. If ommited,
- * then the default value is 90ï¿½N for <code>"Polar_Stereographic"</code> and 0ï¿½ for
+ * then the default value is 90°N for <code>"Polar_Stereographic"</code> and 0° for
  * <code>"Oblique_Stereographic"</code>.
  * <br><br>
  *
@@ -132,7 +132,7 @@ import org.opengis.referencing.operation.MathTransform;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/random_issues.html#stereographic">Some Random Stereographic Issues</A>
  *
  * @version $Id$
- * @author Andrï¿½ Gosselin
+ * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -300,7 +300,7 @@ public abstract class Stereographic extends MapProjection {
     public static class Provider_Polar_B extends Provider {
         /**
          * The operation parameter descriptor for the latitudeTrueScale
-         * parameter value. Valid values range is from -90 to 90ï¿½. 
+         * parameter value. Valid values range is from -90 to 90°. 
          * Default value is Double.NaN.
          */
         public static final ParameterDescriptor LATITUDE_TRUE_SCALE = createDescriptor(

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@ import org.opengis.util.InternationalString;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraï¿½vane
+ * @author Touraïvane
  */
 public class DataIdentification extends Identification
         implements org.opengis.metadata.identification.DataIdentification
@@ -95,7 +95,7 @@ public class DataIdentification extends Identification
     private Set geographicDescription;
 
     /**
-     * Description of the dataset in the producerï¿½s processing environment, including items
+     * Description of the dataset in the producer’s processing environment, including items
      * such as the software, the computer operating system, file name, and the dataset size
      */
     private InternationalString environmentDescription;
@@ -278,7 +278,7 @@ public class DataIdentification extends Identification
     }
 
     /**
-     * Description of the dataset in the producerï¿½s processing environment, including items
+     * Description of the dataset in the producer’s processing environment, including items
      * such as the software, the computer operating system, file name, and the dataset size.
      */
     public InternationalString getEnvironmentDescription() {
@@ -286,7 +286,7 @@ public class DataIdentification extends Identification
     }
 
     /**
-     * Set the description of the dataset in the producerï¿½s processing environment.
+     * Set the description of the dataset in the producer’s processing environment.
      */
     public synchronized void setEnvironmentDescription(final InternationalString newValue)  {
         checkWritePermission();

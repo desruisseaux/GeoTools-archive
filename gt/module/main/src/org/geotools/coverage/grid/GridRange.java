@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -300,7 +300,7 @@ public class GridRange implements org.opengis.coverage.grid.GridRange, Serializa
     }
     
     /**
-     * Returns a string reprï¿½sentation of this grid range.
+     * Returns a string représentation of this grid range.
      * The returned string is implementation dependent. It
      * is usually provided for debugging purposes.
      */

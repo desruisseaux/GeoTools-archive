@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, 2004 Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -105,7 +105,7 @@ public class AbridgedMolodenskiTransform extends AbstractMathTransform implement
     private final double da, db;
     
     /**
-     * The square of excentricity of the ellipsoid: eï¿½ = (aï¿½-bï¿½)/aï¿½ where
+     * The square of excentricity of the ellipsoid: e² = (a²-b²)/a² where
      * <var>a</var> is the semi-major axis length and
      * <var>b</var> is the semi-minor axis length.
      */

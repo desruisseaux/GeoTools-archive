@@ -62,7 +62,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * impement FeatureSource.
  * </p>
  * 
- * @author Gabriel Roldï¿½n
+ * @author Gabriel Roldán
  */
 public class DefaultView implements FeatureSource {
 

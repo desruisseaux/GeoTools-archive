@@ -339,8 +339,8 @@ public class GeodeticCalculator {
      * the {@linkplain #getDestinationPoint() destination point} are discarted.
      * They will need to be specified again.
      *
-     * @param  longitude The longitude in degrees between -180 and +180ï¿½
-     * @param  latitude  The latitude  in degrees between  -90 and  +90ï¿½
+     * @param  longitude The longitude in degrees between -180 and +180°
+     * @param  latitude  The latitude  in degrees between  -90 and  +90°
      * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
      */
     public void setAnchorPoint(double longitude, double latitude) throws IllegalArgumentException {
@@ -385,8 +385,8 @@ public class GeodeticCalculator {
      * effect of this call. They will be recomputed the next time {@link #getAzimuth()} or
      * {@link #getOrthodromicDistance()} are invoked.
      *
-     * @param  longitude The longitude in degrees between -180 and +180ï¿½
-     * @param  latitude  The latgitude in degrees between  -90 and  +90ï¿½
+     * @param  longitude The longitude in degrees between -180 and +180°
+     * @param  latitude  The latgitude in degrees between  -90 and  +90°
      * @throws IllegalArgumentException if the longitude or the latitude is out of bounds.
      */
     public void setDestinationPoint(double longitude, double latitude) throws IllegalArgumentException {
@@ -439,7 +439,7 @@ public class GeodeticCalculator {
      * The destination point will be updated as a side effect of this call. It will be
      * recomputed the next time {@link #getDestinationPoint()} is invoked.
      *
-     * @param  azimuth The azimuth in degrees from -180ï¿½ to 180ï¿½.
+     * @param  azimuth The azimuth in degrees from -180° to 180°.
      * @param  distance The orthodromic distance in the same units as the
      *         {@linkplain #getEllipsoid ellipsoid} axis.
      * @throws IllegalArgumentException if the azimuth or the distance is out of bounds.
@@ -467,7 +467,7 @@ public class GeodeticCalculator {
      * has been invoked after. In this later case, the azimuth will be computed from the
      * {@linkplain #getAnchorPoint anchor point} to the destination point.
      *
-     * @return The azimuth, in degrees from -180ï¿½ to +180ï¿½.
+     * @return The azimuth, in degrees from -180° to +180°.
      * @throws IllegalStateException if the destination point has not been set.
      */
     public double getAzimuth() throws IllegalStateException {
@@ -822,7 +822,7 @@ public class GeodeticCalculator {
      *         {@linkplain #getAnchorPoint anchor point} to the
      *         {@linkplain #getDestinationPoint destination point}.
      *
-     * @todo We should check for cases where the path cross the 90ï¿½N, 90ï¿½S, 90ï¿½E or 90ï¿½W boundaries.
+     * @todo We should check for cases where the path cross the 90°N, 90°S, 90°E or 90°W boundaries.
      */
     public Shape getGeodeticCurve(final int numberOfPoints) {
         checkNumberOfPoints(numberOfPoints);
@@ -886,7 +886,7 @@ public class GeodeticCalculator {
         ** THE FOLLOWING IS CHECKED FOR COMPILER ERROR, BUT EXCLUDED FROM THE .class FILE.  **
         ** THIS CODE IS WRONG: LOXODROMIC CURVES ARE STRAIGHT LINES IN MERCATOR PROJECTION, **
         ** NOT IT PLAIN (longitude,latitude) SPACE. FURTHERMORE, THE "OUT OF BOUNDS" CHECK  **
-        ** IS UNFINISHED: WHEN THE PATH CROSS THE 180ï¿½ LONGITUDE, A +360ï¿½ ADDITION NEED TO  **
+        ** IS UNFINISHED: WHEN THE PATH CROSS THE 180° LONGITUDE, A +360° ADDITION NEED TO  **
         ** BE PERFORMED ON ONE OF THE SOURCE OR TARGET POINT  BEFORE TO COMPUTE THE LINEAR  **
         ** INTERPOLATION (OTHERWISE, THE SLOPE VALUE IS WRONG). FORMULAS FOR COMPUTING MID- **
         ** POINT ON A LOXODROMIC CURVE ARE AVAILABLE THERE:                                 **
@@ -929,15 +929,15 @@ public class GeodeticCalculator {
         if (Boolean.FALSE.equals(yDirect)) {
             /*
              * Crossing North or South pole is more complicated than what we do for now: If we
-             * follow the 0ï¿½ longitude toward North, then we have to follow the 180ï¿½ longitude
-             * from North to South pole and follow the 0ï¿½ longitude again toward North up to
+             * follow the 0° longitude toward North, then we have to follow the 180° longitude
+             * from North to South pole and follow the 0° longitude again toward North up to
              * the destination point.
              */
             throw new UnsupportedOperationException("Crossing pole is not yet implemented");
         }
         /*
          * The azimuth is heading in the opposite direction of the path from P1 to P2. Computes
-         * the intersection points at the 90ï¿½N / 90ï¿½S boundaries, or the 180ï¿½E / 180ï¿½W boundaries.
+         * the intersection points at the 90°N / 90°S boundaries, or the 180°E / 180°W boundaries.
          * (xout,yout) is the point where the path goes out (initialized to the corner where the
          * azimuth is heading); (xin,yin) is the point where the path come back in the opposite
          * hemisphere.
@@ -957,14 +957,14 @@ public class GeodeticCalculator {
              * The path is diagonal (neither horizontal or vertical). The following loop
              * is executed exactly twice:  the first pass computes the "out" point,  and
              * the second pass computes the "in" point.  Each pass computes actually two
-             * points: the intersection point against the 180ï¿½W or 180ï¿½E boundary, and
-             * the intersection point against the 90ï¿½N or 90ï¿½S boundary. Usually one of
+             * points: the intersection point against the 180°W or 180°E boundary, and
+             * the intersection point against the 90°N or 90°S boundary. Usually one of
              * those points will be out of range and the other one is selected.
              */
             boolean in = false;
             do {
-                final double meridX, meridY; // The point where the path cross the +/-180ï¿½ meridian.
-                final double zonalX, zonalY; // The point where the path cross the +/- 90ï¿½ parallel.
+                final double meridX, meridY; // The point where the path cross the +/-180° meridian.
+                final double zonalX, zonalY; // The point where the path cross the +/- 90° parallel.
                 meridX = in ? xin : xout;    meridY = dy/dx * (meridX-x1) + y1;
                 zonalY = in ? yin : yout;    zonalX = dx/dy * (zonalY-y1) + x1;
                 if (Math.abs(meridY) < Math.abs(zonalX)*0.5) {

@@ -1,7 +1,7 @@
 /*
  * Geotools - OpenSource mapping toolkit
  * (C) 2003, 2004 Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  * (C) 1999, Fisheries and Oceans Canada
  *
  *    This library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ import org.opengis.referencing.operation.MathTransform;
  * Lambert Conical Conformal Projection.  Areas and shapes are deformed
  * as one moves away from standard parallels.  The angles are true in
  * a limited area.  This projection is used for the charts of North America.
- * It uses a default central latitude of 40ï¿½N.
+ * It uses a default central latitude of 40°N.
  * <br><br>
  *
  * This implementation provides transforms for three cases of the lambert conic 
@@ -82,7 +82,7 @@ import org.opengis.referencing.operation.MathTransform;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp_belgium.html">lambert_conic_conformal_2sp_belgium</A>
  *
  * @version $Id$
- * @author Andrï¿½ Gosselin
+ * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
@@ -187,7 +187,7 @@ public class LambertConformal extends MapProjection{
     public static class Provider2SP extends Provider {
         /**
          * The operation parameter descriptor for the {@link #phi1 standard parallel 1}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new Identifier[] {
@@ -199,7 +199,7 @@ public class LambertConformal extends MapProjection{
                 
         /**
          * The operation parameter descriptor for the {@link #phi2 standard parallel 2}
-         * parameter value. Valid values range is from -90 to 90ï¿½. Default value is 0.
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createDescriptor(
                 new Identifier[] {

@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -52,12 +52,12 @@ public abstract class ClassChanger {
     };
 
     /**
-     * Liste des classes d'objets pouvant ï¿½tre convertis en nombre. Cette liste
-     * contiendra par dï¿½faut quelques instances de {@link ClassChanger} pour
+     * Liste des classes d'objets pouvant être convertis en nombre. Cette liste
+     * contiendra par défaut quelques instances de {@link ClassChanger} pour
      * quelques classes standards du Java, telle que {@link Date}. Toutefois,
-     * d'autres objets pourront ï¿½tre ajoutï¿½s par la suite. Cette liste est
-     * <u>ordonnï¿½e</u>. Les classe le plus hautes dans la hierarchie (les
-     * classes parentes) doivent apparaï¿½tre ï¿½ la fin.
+     * d'autres objets pourront être ajoutés par la suite. Cette liste est
+     * <u>ordonnée</u>. Les classe le plus hautes dans la hierarchie (les
+     * classes parentes) doivent apparaître à la fin.
      */
     private static ClassChanger[] list = new ClassChanger[] {
         new ClassChanger(Date.class, Long.class) {
@@ -150,10 +150,10 @@ public abstract class ClassChanger {
         for (i=0; i<list.length; i++) {
             if (list[i].source.isAssignableFrom(converter.source)) {
                 /*
-                 * On a trouvï¿½ un convertisseur qui utilisait
+                 * On a trouvé un convertisseur qui utilisait
                  * une classe parente. Le nouveau convertisseur
-                 * devra s'insï¿½rer avant son parent. Mais on va
-                 * d'abord s'assurer qu'il n'existait pas dï¿½jï¿½
+                 * devra s'insérer avant son parent. Mais on va
+                 * d'abord s'assurer qu'il n'existait pas déjà
                  * un convertisseur pour cette classe.
                  */
                 for (int j=i; j<list.length; j++) {

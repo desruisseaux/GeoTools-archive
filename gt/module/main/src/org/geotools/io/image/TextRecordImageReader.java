@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Dï¿½veloppement
+ * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,8 @@
  *     UNITED KINGDOM: James Macgill
  *             mailto:j.macgill@geog.leeds.ac.uk
  *
- *     FRANCE: Surveillance de l'Environnement Assistï¿½e par Satellite
- *             Institut de Recherche pour le Dï¿½veloppement / US-Espace
+ *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
+ *             Institut de Recherche pour le Développement / US-Espace
  *             mailto:seasnet@teledetection.fr
  *
  *     CANADA: Observatoire du Saint-Laurent
@@ -108,105 +108,105 @@ import org.geotools.resources.gcs.Resources;
  */
 public class TextRecordImageReader extends TextImageReader {
     /**
-     * Petit facteur de tolï¿½rance servant ï¿½ tenir
+     * Petit facteur de tolérance servant à tenir
      * compte des erreurs d'arrondissement.
      */
     private static final float EPS = 1E-5f;
     
     /**
-     * Intervalle (en nombre d'octets) entre les rapports de progrï¿½s.
+     * Intervalle (en nombre d'octets) entre les rapports de progrès.
      */
     private static final int PROGRESS_INTERVAL = 4096;
     
     /**
      * Lorsque la lecture se fait par-dessus une image {@link BufferedReader} existante,
-     * indique s'il faut effacer la rï¿½gion dans laquelle sera placï¿½e l'image avant de la
+     * indique s'il faut effacer la région dans laquelle sera placée l'image avant de la
      * lire. La valeur <code>false</code> permettra de conserver les anciens pixels dans
-     * les rï¿½gions ou le fichier ne dï¿½finit pas de nouvelles valeurs.
+     * les régions ou le fichier ne définit pas de nouvelles valeurs.
      */
     private static final boolean CLEAR = true;
     
     /**
-     * Numï¿½ro de colonne des <var>x</var>, comptï¿½ ï¿½ partir de 0.
+     * Numéro de colonne des <var>x</var>, compté à partir de 0.
      * Ce champ n'existe que pour des raisons de performances; il
-     * n'est utilisï¿½ que par {@link #parseLine} pendant la lecture
-     * d'une image. Dans tous les autres cas, on utilisera plutï¿½t
+     * n'est utilisé que par {@link #parseLine} pendant la lecture
+     * d'une image. Dans tous les autres cas, on utilisera plutôt
      * {@link #getColumnX}.
      */
     private transient int xColumn = 0;
     
     /**
-     * Numï¿½ro de colonne des <var>y</var>, comptï¿½ ï¿½ partir de 0.
+     * Numéro de colonne des <var>y</var>, compté à partir de 0.
      * Ce champ n'existe que pour des raisons de performances; il
-     * n'est utilisï¿½ que par {@link #parseLine} pendant la lecture
-     * d'une image. Dans tous les autres cas, on utilisera plutï¿½t
+     * n'est utilisé que par {@link #parseLine} pendant la lecture
+     * d'une image. Dans tous les autres cas, on utilisera plutôt
      * {@link #getColumnY}.
      */
     private transient int yColumn = 1;
     
     /**
-     * Valeur reprï¿½sentant les donnï¿½es manquantes,   ou {@link Double#NaN} s'il n'y en
-     * a pas. Ce champ n'existe que pour des raisons de performances; il n'est utilisï¿½
+     * Valeur représentant les données manquantes,   ou {@link Double#NaN} s'il n'y en
+     * a pas. Ce champ n'existe que pour des raisons de performances; il n'est utilisé
      * que par {@link #parseLine} pendant la lecture d'une image. Dans tous les autres
-     * cas, on utilisera plutï¿½t {@link #getPadValue}.
+     * cas, on utilisera plutôt {@link #getPadValue}.
      */
     private transient double padValue = Double.NaN;
     
     /**
-     * Objet ï¿½ utiliser pour lire chacune des lignes de fichier. Ce champ n'existe que
-     * pour des raisons de performances; il n'est utilisï¿½ que par {@link #parseLine}
-     * pendant la lecture d'une image. Dans tous les autres cas, on utilisera plutï¿½t
+     * Objet à utiliser pour lire chacune des lignes de fichier. Ce champ n'existe que
+     * pour des raisons de performances; il n'est utilisé que par {@link #parseLine}
+     * pendant la lecture d'une image. Dans tous les autres cas, on utilisera plutôt
      * {@link #getLineFormat}.
      */
     private transient LineFormat lineFormat;
     
     /**
-     * Donnï¿½es des images, ou <code>null</code> si aucune lecture n'a encore ï¿½tï¿½
-     * faite. Chaque ï¿½lï¿½ment contient les donnï¿½es de l'image ï¿½ l'index correspondant
-     * (i.e. l'ï¿½lï¿½ment <code>data[0]</code> contient les donnï¿½es de l'image #0,
-     * <code>data[1]</code> contient les donnï¿½es de l'image #1, etc.). Des ï¿½lï¿½ments
-     * de ce tableau peuvent ï¿½tre nuls si les donnï¿½es des images correspondantes
-     * ne sont pas retenues aprï¿½s chaque lecture (c'est-ï¿½-dire si
+     * Données des images, ou <code>null</code> si aucune lecture n'a encore été
+     * faite. Chaque élément contient les données de l'image à l'index correspondant
+     * (i.e. l'élément <code>data[0]</code> contient les données de l'image #0,
+     * <code>data[1]</code> contient les données de l'image #1, etc.). Des éléments
+     * de ce tableau peuvent être nuls si les données des images correspondantes
+     * ne sont pas retenues après chaque lecture (c'est-à-dire si
      * <code>{@link #seekForwardOnly}==true</code>).
      */
     private RecordList[] data;
     
     /**
-     * Index de la prochaine image ï¿½ lire. Cet index n'est pas nï¿½cessairement
-     * ï¿½gal ï¿½ la longueur du tableau {@link #data}. Il peut ï¿½tre aussi bien
+     * Index de la prochaine image à lire. Cet index n'est pas nécessairement
+     * égal à la longueur du tableau {@link #data}. Il peut être aussi bien
      * plus petit que plus grand.
      */
     private int nextImageIndex;
     
     /**
-     * Nombre moyen de caractï¿½res par donnï¿½es (incluant les espaces et les codes
-     * de fin de ligne). Cette information n'est qu'ï¿½ titre indicative, mais son
-     * exactitude peut aider ï¿½ accelerer la lecture et rendre les rapport des
-     * progrï¿½s plus prï¿½cis. Elle sera automatiquement mise ï¿½ jour en fonction
+     * Nombre moyen de caractères par données (incluant les espaces et les codes
+     * de fin de ligne). Cette information n'est qu'à titre indicative, mais son
+     * exactitude peut aider à accelerer la lecture et rendre les rapport des
+     * progrès plus précis. Elle sera automatiquement mise à jour en fonction
      * des lignes lues.
      */
     private float expectedDatumLength = 10.4f;
     
     /**
-     * Construit un dï¿½codeur d'images
+     * Construit un décodeur d'images
      * de type {@link DataBuffer#TYPE_FLOAT}.
      *
      * @param provider Le fournisseur
-     *        qui a construit ce dï¿½codeur.
+     *        qui a construit ce décodeur.
      */
     public TextRecordImageReader(final ImageReaderSpi provider) {
         super(provider, DataBuffer.TYPE_FLOAT);
     }
     
     /**
-     * Construit un dï¿½codeur d'images.
+     * Construit un décodeur d'images.
      *
-     * @param provider Le fournisseur qui a construit ce dï¿½codeur.
-     * @param rawImageType Type par dï¿½faut des images. Ce type devrait ï¿½tre une des
+     * @param provider Le fournisseur qui a construit ce décodeur.
+     * @param rawImageType Type par défaut des images. Ce type devrait être une des
      *        constantes de {@link DataBuffer}, notamment {@link DataBuffer#TYPE_INT}
      *        ou {@link DataBuffer#TYPE_FLOAT}. Le type {@link DataBuffer#TYPE_DOUBLE}
-     *        est acceptï¿½ mais dï¿½conseillï¿½, ï¿½tant donnï¿½ que l'implï¿½mentation actuelle
-     *        ne lira les donnï¿½es qu'avec la prï¿½cision des types <code>float</code>.
+     *        est accepté mais déconseillé, étant donné que l'implémentation actuelle
+     *        ne lira les données qu'avec la précision des types <code>float</code>.
      */
     public TextRecordImageReader(final ImageReaderSpi provider, final int rawImageType) {
         super(provider, rawImageType);
@@ -224,48 +224,48 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Retourne le numï¿½ro de colonne des <var>x</var>, comptï¿½ ï¿½ partir de 0.
-     * L'implï¿½mentation par dï¿½faut retourne le numï¿½ro de colonne qui avait ï¿½tï¿½
-     * spï¿½cifiï¿½ dans l'objet {@link Spi} qui a crï¿½ï¿½ ce dï¿½codeur. Les classes
-     * dï¿½rivï¿½es peuvent redï¿½finir cette mï¿½thode pour dï¿½terminer cette valeur
-     * d'une faï¿½on plus ï¿½laborï¿½e.
+     * Retourne le numéro de colonne des <var>x</var>, compté à partir de 0.
+     * L'implémentation par défaut retourne le numéro de colonne qui avait été
+     * spécifié dans l'objet {@link Spi} qui a créé ce décodeur. Les classes
+     * dérivées peuvent redéfinir cette méthode pour déterminer cette valeur
+     * d'une façon plus élaborée.
      *
-     * @param  imageIndex Index de l'image ï¿½ lire.
-     * @throws IOException si l'opï¿½ration nï¿½cessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tï¿½te) et que cette lecture a ï¿½chouï¿½e.
+     * @param  imageIndex Index de l'image à lire.
+     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
+     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
      */
     public int getColumnX(final int imageIndex) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).xColumn : 0;
     }
     
     /**
-     * Retourne le numï¿½ro de colonne des <var>y</var>, comptï¿½ ï¿½ partir de 0.
-     * L'implï¿½mentation par dï¿½faut retourne le numï¿½ro de colonne qui avait ï¿½tï¿½
-     * spï¿½cifiï¿½ dans l'objet {@link Spi} qui a crï¿½ï¿½ ce dï¿½codeur. Les classes
-     * dï¿½rivï¿½es peuvent redï¿½finir cette mï¿½thode pour dï¿½terminer cette valeur
-     * d'une faï¿½on plus ï¿½laborï¿½e.
+     * Retourne le numéro de colonne des <var>y</var>, compté à partir de 0.
+     * L'implémentation par défaut retourne le numéro de colonne qui avait été
+     * spécifié dans l'objet {@link Spi} qui a créé ce décodeur. Les classes
+     * dérivées peuvent redéfinir cette méthode pour déterminer cette valeur
+     * d'une façon plus élaborée.
      *
-     * @param  imageIndex Index de l'image ï¿½ lire.
-     * @throws IOException si l'opï¿½ration nï¿½cessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tï¿½te) et que cette lecture a ï¿½chouï¿½e.
+     * @param  imageIndex Index de l'image à lire.
+     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
+     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
      */
     public int getColumnY(final int imageIndex) throws IOException {
         return (originatingProvider instanceof Spi) ? ((Spi)originatingProvider).yColumn : 1;
     }
     
     /**
-     * Retourne le numï¿½ro de colonne dans laquelle se trouvent les donnï¿½es de la
-     * bande spï¿½cifiï¿½e. L'implï¿½mentation par dï¿½faut retourne <code>band</code>+1
-     * ou 2 si la bande est plus grand ou ï¿½gal ï¿½ {@link #getColumnX} et/ou
-     * {@link #getColumnY}. Cette implï¿½mentation devrait convenir pour des donnï¿½es
-     * se trouvant aussi bien avant qu'aprï¿½s les colonnes <var>x</var>
-     * et <var>y</var>, mï¿½me si ces derniï¿½res ne sont pas consï¿½cutives.
+     * Retourne le numéro de colonne dans laquelle se trouvent les données de la
+     * bande spécifiée. L'implémentation par défaut retourne <code>band</code>+1
+     * ou 2 si la bande est plus grand ou égal à {@link #getColumnX} et/ou
+     * {@link #getColumnY}. Cette implémentation devrait convenir pour des données
+     * se trouvant aussi bien avant qu'après les colonnes <var>x</var>
+     * et <var>y</var>, même si ces dernières ne sont pas consécutives.
      *
-     * @param  imageIndex Index de l'image ï¿½ lire.
-     * @param  band Bande de l'image ï¿½ lire.
-     * @return Numï¿½ro de colonne des donnï¿½es de l'image.
-     * @throws IOException si l'opï¿½ration nï¿½cessitait une lecture du fichier (par exemple
-     *         des informations inscrites dans un en-tï¿½te) et que cette lecture a ï¿½chouï¿½e.
+     * @param  imageIndex Index de l'image à lire.
+     * @param  band Bande de l'image à lire.
+     * @return Numéro de colonne des données de l'image.
+     * @throws IOException si l'opération nécessitait une lecture du fichier (par exemple
+     *         des informations inscrites dans un en-tête) et que cette lecture a échouée.
      */
     private int getColumn(final int imageIndex, int band) throws IOException {
         final int xColumn = getColumnX(imageIndex);
@@ -276,13 +276,13 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Spï¿½cifie le flot ï¿½ utiliser en entrï¿½. Ce flot peut ï¿½tre un objet des
-     * objets suivants (en ordre de prï¿½fï¿½rence): {@link java.io.File},
+     * Spécifie le flot à utiliser en entré. Ce flot peut être un objet des
+     * objets suivants (en ordre de préférence): {@link java.io.File},
      * {@link java.net.URL} ou {@link java.io.BufferedReader}.
      *
      * Les flots de type {@link java.io.Reader}, {@link java.io.InputStream} et
-     * {@link javax.imageio.stream.ImageInputStream} sont aussi acceptï¿½s, mais
-     * moins conseillï¿½s.
+     * {@link javax.imageio.stream.ImageInputStream} sont aussi acceptés, mais
+     * moins conseillés.
      */
     public void setInput(final Object  input,
                          final boolean seekForwardOnly,
@@ -389,14 +389,14 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Retourne la valeur minimale et maximale mï¿½morisï¿½e dans une bande de l'image.
+     * Retourne la valeur minimale et maximale mémorisée dans une bande de l'image.
      *
-     * @param  imageIndex Index de l'image dont on veut connaï¿½tre la plage de valeurs.
-     * @param  band Bande pour laquelle on veut la valeur minimale. Les numï¿½ros de
-     *         bandes commencent ï¿½ 0  et sont indï¿½pendents des valeurs qui peuvent
-     *         avoir ï¿½tï¿½ spï¿½cifiï¿½es ï¿½ {@link ImageReadParam#setSourceBands}.
-     * @return Plage de valeurs trouvï¿½e dans l'image et la bande spï¿½cifiï¿½e.
-     * @throws IOException si l'opï¿½ration a ï¿½chouï¿½e ï¿½ cause d'une erreur d'entrï¿½s/sorties.
+     * @param  imageIndex Index de l'image dont on veut connaître la plage de valeurs.
+     * @param  band Bande pour laquelle on veut la valeur minimale. Les numéros de
+     *         bandes commencent à 0  et sont indépendents des valeurs qui peuvent
+     *         avoir été spécifiées à {@link ImageReadParam#setSourceBands}.
+     * @return Plage de valeurs trouvée dans l'image et la bande spécifiée.
+     * @throws IOException si l'opération a échouée à cause d'une erreur d'entrés/sorties.
      */
     public Range getExpectedRange(final int imageIndex, final int band) throws IOException {
         final int         column = getColumn(imageIndex, band);
@@ -406,24 +406,24 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Convertit une ligne en valeurs numï¿½riques. Cette mï¿½thode est appelï¿½e automatiquement
+     * Convertit une ligne en valeurs numériques. Cette méthode est appelée automatiquement
      * lors de la lecture de chaque ligne, avec en argument la ligne lue (<code>line</code>)
-     * et le buffer dans lequel placer les valeurs numï¿½riques (<code>values</code>).
+     * et le buffer dans lequel placer les valeurs numériques (<code>values</code>).
      *
-     * L'implï¿½mentation par dï¿½faut dï¿½code la ligne en exigeant qu'il y ait autant de nombres
+     * L'implémentation par défaut décode la ligne en exigeant qu'il y ait autant de nombres
      * que la longueur du tableau <code>values</code>.  Elle remplace ensuite les occurences
      * de <code>padValue</code> par {@link Double#NaN}  dans toutes les colonnes sauf celles
-     * des coordonnï¿½es <var>x</var> et <var>y</var>.
+     * des coordonnées <var>x</var> et <var>y</var>.
      *
-     * @param line   Ligne ï¿½ dï¿½coder.
-     * @param values Derniï¿½res valeurs ï¿½ avoir ï¿½tï¿½ lues, ou <code>null</code> si cette ligne
-     *               est la premiï¿½re ï¿½ ï¿½tre dï¿½codï¿½e. Ce buffer peut ï¿½tre rï¿½utilisï¿½ en ï¿½crasant
+     * @param line   Ligne à décoder.
+     * @param values Dernières valeurs à avoir été lues, ou <code>null</code> si cette ligne
+     *               est la première à être décodée. Ce buffer peut être réutilisé en écrasant
      *               les anciennes valeurs par les nouvelles valeurs de la ligne <code>line</code>.
-     * @return Les valeurs lues, ou <code>null</code> si la fin de l'image a ï¿½tï¿½ atteinte. Le
-     *         tableau retournï¿½ sera habituellement le mï¿½me que <code>values</code>, mais pas
+     * @return Les valeurs lues, ou <code>null</code> si la fin de l'image a été atteinte. Le
+     *         tableau retourné sera habituellement le même que <code>values</code>, mais pas
      *         obligatoirement. Par convention, un tableau de longueur 0 signifie que la ligne
-     *         ne contient aucune donnï¿½e et doit ï¿½tre ignorï¿½e.
-     * @throws ParseException si une erreur est survenue lors du dï¿½codage de la ligne.
+     *         ne contient aucune donnée et doit être ignorée.
+     * @throws ParseException si une erreur est survenue lors du décodage de la ligne.
      */
     protected double[] parseLine(final String line, double[] values) throws ParseException {
         if (line==null) return null;
@@ -440,17 +440,17 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Retourne les donnï¿½es de l'image ï¿½ l'index spï¿½cifiï¿½. Si cette image avait dï¿½jï¿½ ï¿½tï¿½ lue, ses
-     * donnï¿½es seront retournï¿½es immï¿½diatement.  Sinon, cette image sera lue ainsi que toutes les
-     * images qui prï¿½cï¿½dent <code>imageIndex</code> et qui n'avaient pas encore ï¿½tï¿½ lues. Que ces
-     * images prï¿½cï¿½dentes soient mï¿½morisï¿½es ou oubliï¿½es dï¿½pend de {@link #seekForwardOnly}.
+     * Retourne les données de l'image à l'index spécifié. Si cette image avait déjà été lue, ses
+     * données seront retournées immédiatement.  Sinon, cette image sera lue ainsi que toutes les
+     * images qui précèdent <code>imageIndex</code> et qui n'avaient pas encore été lues. Que ces
+     * images précédentes soient mémorisées ou oubliées dépend de {@link #seekForwardOnly}.
      *
-     * @param  imageIndex Index de l'image ï¿½ lire.
-     * @return Les donnï¿½es de l'image. Cette mï¿½thode ne retourne jamais <code>null</code>.
+     * @param  imageIndex Index de l'image à lire.
+     * @return Les données de l'image. Cette méthode ne retourne jamais <code>null</code>.
      * @throws IOException si une erreur est survenue lors de la lecture du flot,
-     *         ou si des nombres n'ï¿½taient pas correctement formatï¿½s dans le flot.
-     * @throws IndexOutOfBoundsException si l'index spï¿½cifiï¿½ est en dehors des
-     *         limites permises ou si aucune image n'a ï¿½tï¿½ conservï¿½e ï¿½ cet index.
+     *         ou si des nombres n'étaient pas correctement formatés dans le flot.
+     * @throws IndexOutOfBoundsException si l'index spécifié est en dehors des
+     *         limites permises ou si aucune image n'a été conservée à cet index.
      */
     private RecordList getRecords(final int imageIndex) throws IOException {
         clearAbortRequest();
@@ -463,9 +463,9 @@ public class TextRecordImageReader extends TextImageReader {
             long   nextProgressPosition = (origine>=0 && length>0) ? 0 : Long.MAX_VALUE;
             for (;nextImageIndex<=imageIndex; nextImageIndex++) {
                 /*
-                 * Rï¿½duit la consommation de mï¿½moire des images prï¿½cï¿½dentes. On ne rï¿½duit
+                 * Réduit la consommation de mémoire des images précédentes. On ne réduit
                  * pas celle de l'image courante,  puisque la plupart du temps le tableau
-                 * sera bientï¿½t dï¿½truit de toute faï¿½on.
+                 * sera bientôt détruit de toute façon.
                  */
                 if (seekForwardOnly) {
                     minIndex=nextImageIndex;
@@ -481,9 +481,9 @@ public class TextRecordImageReader extends TextImageReader {
                     }
                 }
                 /*
-                 * Procï¿½de ï¿½ la lecture de chacune des lignes de donnï¿½es. Que ces lignes
-                 * soient mï¿½morisï¿½es ou pas dï¿½pend de l'image que l'on est en train de
-                 * dï¿½coder ainsi que de la valeur de {@link #seekForwardOnly}.
+                 * Procède à la lecture de chacune des lignes de données. Que ces lignes
+                 * soient mémorisées ou pas dépend de l'image que l'on est en train de
+                 * décoder ainsi que de la valeur de {@link #seekForwardOnly}.
                  */
                 double[]    values = null;
                 RecordList records = null;
@@ -520,9 +520,9 @@ public class TextRecordImageReader extends TextImageReader {
                     throw new IIOException(getPositionString(exception.getLocalizedMessage()), exception);
                 }
                 /*
-                 * Aprï¿½s la lecture d'une image, vï¿½rifie s'il y avait un nombre suffisant de lignes.
-                 * Une exception sera lancï¿½e si l'image ne contenait pas au moins deux lignes. On
-                 * ajustera ensuite le nombre moyens de caractï¿½res par donnï¿½es.
+                 * Après la lecture d'une image, vérifie s'il y avait un nombre suffisant de lignes.
+                 * Une exception sera lancée si l'image ne contenait pas au moins deux lignes. On
+                 * ajustera ensuite le nombre moyens de caractères par données.
                  */
                 if (records!=null) {
                     final int lineCount = records.getLineCount();
@@ -542,9 +542,9 @@ public class TextRecordImageReader extends TextImageReader {
             processImageComplete();
         }
         /*
-         * Une fois les lectures terminï¿½es, retourne les donnï¿½es de l'image
-         * demandï¿½e. Une exception sera lancï¿½e si ces donnï¿½es n'ont pas ï¿½tï¿½
-         * conservï¿½es.
+         * Une fois les lectures terminées, retourne les données de l'image
+         * demandée. Une exception sera lancée si ces données n'ont pas été
+         * conservées.
          */
         if (data!=null && imageIndex<data.length) {
             final RecordList records = data[imageIndex];
@@ -658,9 +658,9 @@ public class TextRecordImageReader extends TextImageReader {
         }
         for (int i=0; i<dataCount; i+=columnCount) {
             /*
-             * On convertit maintenant la coordonnï¿½e (x,y) logique en coordonnï¿½e pixel. Cette
-             * coordonnï¿½e pixel se rï¿½fï¿½re ï¿½ l'image "source";  elle ne se rï¿½fï¿½re pas encore ï¿½
-             * l'image destination. Elle doit obligatoirement ï¿½tre entiï¿½re. Plus loin, nous
+             * On convertit maintenant la coordonnée (x,y) logique en coordonnée pixel. Cette
+             * coordonnée pixel se réfère à l'image "source";  elle ne se réfère pas encore à
+             * l'image destination. Elle doit obligatoirement être entière. Plus loin, nous
              * tiendrons compte du "subsampling".
              */
             final double fx = (data[i+xColumn]-xmin)*scaleX; // (fx,fy) may be NaN: Use
@@ -687,16 +687,16 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Retourne quelques types d'images qui pourront contenir les donnï¿½es.
-     * Le premier type retournï¿½ sera celui qui se rapprochera le plus du
-     * type des donnï¿½es ï¿½ lire.
+     * Retourne quelques types d'images qui pourront contenir les données.
+     * Le premier type retourné sera celui qui se rapprochera le plus du
+     * type des données à lire.
      *
      * @param  imageIndex Index de l'image dont on veut les types.
      * @param  numBanfd Nombre de bandes.
-     * @return Itï¿½rateur balayant les types de l'image.
+     * @return Itérateur balayant les types de l'image.
      * @throws IndexOutOfBoundsException si <code>imageIndex</code> est invalide.
-     * @throws IllegalStateException si aucune source n'a ï¿½tï¿½ spï¿½cifiï¿½e avec {@link #setInput}.
-     * @throws IIOException si l'opï¿½ration a ï¿½chouï¿½ pour une autre raison.
+     * @throws IllegalStateException si aucune source n'a été spécifiée avec {@link #setInput}.
+     * @throws IIOException si l'opération a échoué pour une autre raison.
      */
     private Iterator getImageTypes(final int imageIndex, final int numBands) throws IOException {
         final List list = new ArrayList();
@@ -708,9 +708,9 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Prï¿½vient qu'une coordonnï¿½e est mauvaise. Cette mï¿½thode est appelï¿½e lors de la lecture
-     * s'il a ï¿½tï¿½ dï¿½tectï¿½ qu'une coordonnï¿½e est en dehors des limites prï¿½vues, ou qu'elle ne
-     * correspond pas ï¿½ des coordonnï¿½es pixels entiï¿½res.
+     * Prévient qu'une coordonnée est mauvaise. Cette méthode est appelée lors de la lecture
+     * s'il a été détecté qu'une coordonnée est en dehors des limites prévues, ou qu'elle ne
+     * correspond pas à des coordonnées pixels entières.
      */
     private void fireBadCoordinate(final float coordinate) {
         processWarningOccurred(getPositionString(Resources.format(
@@ -718,8 +718,8 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Supprime les donnï¿½es de toutes les images
-     * qui avait ï¿½tï¿½ conservï¿½es en mï¿½moire.
+     * Supprime les données de toutes les images
+     * qui avait été conservées en mémoire.
      */
     private void clear() {
         data                = null;
@@ -739,7 +739,7 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Replace le dï¿½codeur dans son ï¿½tat initial.
+     * Replace le décodeur dans son état initial.
      */
     public void reset() {
         clear();
@@ -761,7 +761,7 @@ public class TextRecordImageReader extends TextImageReader {
      *     public CLSImageReaderSpi()
      *     {
      *         super("CLS", "text/x-grid-CLS");
-     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Dï¿½veloppement";
+     *         {@link #vendorName vendorName} = "Institut de Recherche pour le Développement";
      *         {@link #version    version}    = "1.0";
      *         {@link #locale     locale}     = Locale.US;
      *         {@link #charset    charset}    = Charset.forName("ISO-LATIN-1");
@@ -780,9 +780,9 @@ public class TextRecordImageReader extends TextImageReader {
      */
     public static class Spi extends TextImageReader.Spi {
         /**
-         * Numï¿½ro de colonne des <var>x</var>, comptï¿½ ï¿½ partir de 0.
-         * Par dï¿½faut, on suppose que les <var>x</var> se trouvent
-         * dans la premiï¿½re colonne (colonne #0).
+         * Numéro de colonne des <var>x</var>, compté à partir de 0.
+         * Par défaut, on suppose que les <var>x</var> se trouvent
+         * dans la première colonne (colonne #0).
          *
          * @see TextRecordImageReader#getColumnX
          * @see TextRecordImageReader#parseLine
@@ -790,9 +790,9 @@ public class TextRecordImageReader extends TextImageReader {
         final int xColumn;
         
         /**
-         * Numï¿½ro de colonne des <var>y</var>, comptï¿½ ï¿½ partir de 0.
-         * Par dï¿½faut, on suppose que les <var>y</var> se trouvent
-         * dans la deuxiï¿½me colonne (colonne #1).
+         * Numéro de colonne des <var>y</var>, compté à partir de 0.
+         * Par défaut, on suppose que les <var>y</var> se trouvent
+         * dans la deuxième colonne (colonne #1).
          *
          * @see TextRecordImageReader#getColumnY
          * @see TextRecordImageReader#parseLine
@@ -868,12 +868,12 @@ public class TextRecordImageReader extends TextImageReader {
         }
         
         /**
-         * Vï¿½rifie si la ligne spï¿½cifiï¿½e peut ï¿½tre dï¿½codï¿½e.
+         * Vérifie si la ligne spécifiée peut être décodée.
          *
-         * @param  line Une des premiï¿½res lignes du flot ï¿½ lire.
-         * @return {@link Boolean#TRUE} si la ligne peut ï¿½tre dï¿½codï¿½e, {@link Boolean#FALSE}
-         *         si elle ne peut pas ï¿½tre dï¿½codï¿½e ou <code>null</code> si on ne sait pas.
-         *         Dans ce dernier cas, cette mï¿½thode sera appelï¿½e une nouvelle fois avec la
+         * @param  line Une des premières lignes du flot à lire.
+         * @return {@link Boolean#TRUE} si la ligne peut être décodée, {@link Boolean#FALSE}
+         *         si elle ne peut pas être décodée ou <code>null</code> si on ne sait pas.
+         *         Dans ce dernier cas, cette méthode sera appelée une nouvelle fois avec la
          *         ligne suivante.
          */
         protected Boolean canDecodeLine(final String line) {
@@ -904,10 +904,10 @@ public class TextRecordImageReader extends TextImageReader {
         }
         
         /**
-         * Vï¿½rifie si la ligne a un nombre de valeurs acceptable. Cette mï¿½thode est appelï¿½e
+         * Vérifie si la ligne a un nombre de valeurs acceptable. Cette méthode est appelée
          * automatiquement par {@link #canDecodeLine} avec en argument le nombre de valeurs
-         * dans une des premiï¿½res lignes trouvï¿½es dans la source. Cette indication n'est
-         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de faï¿½on
+         * dans une des premières lignes trouvées dans la source. Cette indication n'est
+         * qu'approximative et il est correct de retourner {@link Boolean#FALSE} de façon
          * conservative.
          */
         Boolean isValueCountAcceptable(final int count) {
