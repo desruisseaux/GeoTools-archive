@@ -48,6 +48,13 @@ import java.util.List;
  * Spatial Data Objects
  * </p>
  *
+ * <p>
+ * This class can be used for normal JTS Geometry persistence with little fuss
+ * and bother - please see GeometryConverter for an example of this.
+ * <p>
+ * With a little fuss and bother LRS information can also be handled.
+ * Although it is very rare that JTS makes use of such things. 
+ * </p>
  * @author Jody Garnett, Refractions Reasearch Inc.
  * @version CVS Version
  *
