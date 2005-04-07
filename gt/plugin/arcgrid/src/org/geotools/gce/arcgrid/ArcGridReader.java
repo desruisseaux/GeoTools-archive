@@ -426,7 +426,7 @@ public class ArcGridReader
                             new NumberRange(1, 255),
                             new NumberRange( (float) arcGridRaster.getMinValue(),
                                             (float) arcGridRaster.getMaxValue()));
-      nan = new Category("nodata", Color.BLACK, 0);
+      nan = new Category("nodata", new Color(0,0,0,1), 0);
       SampleDimensionGT band =
           new SampleDimensionGT(new Category[] {nan,
                                 values}, uom);
