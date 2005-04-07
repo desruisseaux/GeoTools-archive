@@ -423,7 +423,7 @@ public class ArcGridReader
       Category values, nan;
       values = new Category("values",
                             new Color[] {Color.BLUE, Color.GREEN, Color.RED},
-                            new NumberRange(1, 65535),
+                            new NumberRange(1, 255),
                             new NumberRange( (float) arcGridRaster.getMinValue(),
                                             (float) arcGridRaster.getMaxValue()));
       nan = new Category("nodata", Color.BLACK, 0);
