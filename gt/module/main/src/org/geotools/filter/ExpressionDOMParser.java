@@ -21,24 +21,22 @@
  */
 package org.geotools.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.logging.Logger;
-
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 
 /**
@@ -212,6 +210,7 @@ public final class ExpressionDOMParser {
                 }
             }
         }
+
         if (childName.equalsIgnoreCase("add")) {
             try {
                 LOGGER.fine("processing an Add");
@@ -336,15 +335,14 @@ public final class ExpressionDOMParser {
             }
         }
 
-       
-
         if (childName.equalsIgnoreCase("PropertyName")) {
             try {
                 //NodeList kids = child.getChildNodes();
                 AttributeExpression attribute = FILTER_FACT
-                    .createAttributeExpression((FeatureType)null,child.getFirstChild().getNodeValue());
-//                attribute.setAttributePath(child.getFirstChild().getNodeValue());
+                    .createAttributeExpression((FeatureType) null,
+                        child.getFirstChild().getNodeValue());
 
+                //                attribute.setAttributePath(child.getFirstChild().getNodeValue());
                 return attribute;
             } catch (IllegalFilterException ife) {
                 LOGGER.warning("Unable to build expression: " + ife);
@@ -363,9 +361,11 @@ public final class ExpressionDOMParser {
             for (int k = 0; k < map.getLength(); k++) {
                 String res = map.item(k).getNodeValue();
                 String name = map.item(k).getLocalName();
-                if (name == null){
+
+                if (name == null) {
                     name = map.item(k).getNodeName();
                 }
+
                 LOGGER.fine("attribute " + name + " with value of " + res);
 
                 if (name.equalsIgnoreCase("name")) {
@@ -375,12 +375,13 @@ public final class ExpressionDOMParser {
             }
 
             if (func == null) {
-                if (funcName != null){
-                    LOGGER.severe("failed to create instance of function " + funcName);
-                }
-                else{
+                if (funcName != null) {
+                    LOGGER.severe("failed to create instance of function "
+                        + funcName);
+                } else {
                     LOGGER.severe("failed to find a function name in " + child);
                 }
+
                 return null;
             }
 
@@ -448,19 +449,20 @@ public final class ExpressionDOMParser {
         List coordList;
         int type = 0;
         Node child = root;
-        //String childName = (child.getLocalName()!=null)?child.getLocalName():child.getNodeName();
-		/*
-		 * GR here: strange we were evaluating a qualified name but asking for the localname first instead of the node name.
-		 */
-		String childName = child.getNodeName();
-		if(childName == null){
-			childName = child.getLocalName();
-			if(!childName.startsWith("gml:"))
-				childName = "gml:" + childName;
-		}
-		
+
+        //Jesus I hate DOM.  I have no idea why this was checking for localname
+        //and then nodename - lead to non-deterministic behavior, that for
+        //some reason only failed if the filter parser was used within the
+        //SLDparser.  I really would like that class redone, so we don't have
+        //to use this crappy DOM GML parser.
+        String childName = child.getNodeName();
+            if(childName == null){
+                childName = child.getLocalName();
+     		if(!childName.startsWith("gml:"))
+                    childName = "gml:" + childName;
+            }
+
         if (childName.equalsIgnoreCase("gml:box")) {
-            LOGGER.finer("box");
             type = GML_BOX;
             coordList = parseCoords(child);
 
@@ -502,11 +504,19 @@ public final class ExpressionDOMParser {
                 Node kid = kids.item(i);
                 LOGGER.finer("doing " + kid);
 
-                String kidName = (kid.getLocalName()!=null)?kid.getLocalName():kid.getNodeName(); 
+		String kidName = kid.getNodeName();
+                if(kidName == null){
+                    kidName = child.getLocalName();
+                    if(!kidName.startsWith("gml:"))
+                	kidName = "gml:" + childName;
+                }
+       	
+       	
+		
                 if (kidName.equalsIgnoreCase("gml:outerBoundaryIs")) {
                     outer = (LinearRing) parseGML(kid);
-                }
-
+        	 }
+        	
                 if (kidName.equalsIgnoreCase("gml:innerBoundaryIs")) {
                     inner.add((LinearRing) parseGML(kid));
                 }
@@ -538,7 +548,7 @@ public final class ExpressionDOMParser {
 
             try {
                 ring = gfac.createLinearRing((Coordinate[]) coordList.toArray(
-                            new Coordinate[] {}));
+                            new Coordinate[] {  }));
             } catch (TopologyException te) {
                 LOGGER.finer("Topology Exception build linear ring: " + te);
 
@@ -555,7 +565,7 @@ public final class ExpressionDOMParser {
 
             com.vividsolutions.jts.geom.LineString line = null;
             line = gfac.createLineString((Coordinate[]) coordList.toArray(
-                        new Coordinate[] {}));
+                        new Coordinate[] {  }));
 
             return line;
         }
@@ -610,15 +620,13 @@ public final class ExpressionDOMParser {
             //if (child.getLocalName().equalsIgnoreCase("gml:coordinate")) {
             //  String internal = child.getNodeValue();
             //}
-            
-            
-            //String childName = (child.getLocalName()!=null)?child.getLocalName():child.getNodeName();
-			String childName = child.getNodeName();
-			if(childName == null){
-				childName = child.getLocalName();
-				if(!childName.startsWith("gml:"))
-					childName = "gml:" + childName;
-			}
+            String childName = child.getNodeName();
+            if(childName == null){
+                childName = child.getLocalName();
+     		if(!childName.startsWith("gml:"))
+                    childName = "gml:" + childName;
+            }
+
             if (childName.equalsIgnoreCase("gml:coordinates")) {
                 LOGGER.finer("coordinates "
                     + child.getFirstChild().getNodeValue());
