@@ -849,19 +849,19 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
                     boolean doElse = true;
 
-						        if (LOGGER.isLoggable(Level.FINE)) {
+						        if (LOGGER.isLoggable(Level.FINER)) {
 						            LOGGER.fine("trying to read Feature ...");
 						        }
 
                     Feature feature = reader.next();
 
-						        if (LOGGER.isLoggable(Level.FINE)) {
-						            LOGGER.fine("... done: " + feature.toString());
+						        if (LOGGER.isLoggable(Level.FINEST)) {
+						            LOGGER.finest("... done: " + feature.toString());
 						        }
 
                     String typeName = feature.getFeatureType().getTypeName();
 
-						        if (LOGGER.isLoggable(Level.FINE)) {
+						        if (LOGGER.isLoggable(Level.FINER)) {
 						            LOGGER.fine("... done: " + typeName);
 						        }
 
@@ -874,14 +874,14 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
                             Rule r = (Rule) it.next();
 
-										        if (LOGGER.isLoggable(Level.FINE)) {
-										            LOGGER.fine("applying rule: " + r.toString());
+										        if (LOGGER.isLoggable(Level.FINER)) {
+										            LOGGER.finer("applying rule: " + r.toString());
 										        }
 
                             // if this rule applies
                             if (isWithInScale(r) && !r.hasElseFilter()) {
-												        if (LOGGER.isLoggable(Level.FINE)) {
-												            LOGGER.fine("this rule applies ...");
+												        if (LOGGER.isLoggable(Level.FINER)) {
+												            LOGGER.finer("this rule applies ...");
 												        }
                             	
                             		// if( r != null ) {
@@ -890,16 +890,16 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 		                                if ((filter == null) || filter.contains(feature)) {
 		                                    doElse = false;
 
-																        if (LOGGER.isLoggable(Level.FINE)) {
-																            LOGGER.fine("processing Symobolizer ...");
+																        if (LOGGER.isLoggable(Level.FINER)) {
+																            LOGGER.finer("processing Symobolizer ...");
 																        }
 		
 		                                    Symbolizer[] symbolizers = r.getSymbolizers();
 		                                    processSymbolizers(graphics, feature, symbolizers, scaleRange,
 		                                            at, destinationCrs);
 		
-																        if (LOGGER.isLoggable(Level.FINE)) {
-																            LOGGER.fine("... done!");
+																        if (LOGGER.isLoggable(Level.FINER)) {
+																            LOGGER.finer("... done!");
 																        }
 		                                }
                             		// }
@@ -908,30 +908,30 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
                         if (doElse) {
                             // rules with an else filter
-										        if (LOGGER.isLoggable(Level.FINE)) {
-										            LOGGER.fine("rules with an else filter");
+										        if (LOGGER.isLoggable(Level.FINER)) {
+										            LOGGER.finer("rules with an else filter");
 										        }
 
                             for( Iterator it = elseRuleList.iterator(); it.hasNext(); ) {
                                 Rule r = (Rule) it.next();
                                 Symbolizer[] symbolizers = r.getSymbolizers();
 
-												        if (LOGGER.isLoggable(Level.FINE)) {
-												            LOGGER.fine("processing Symobolizer ...");
+												        if (LOGGER.isLoggable(Level.FINER)) {
+												            LOGGER.finer("processing Symobolizer ...");
 												        }
 
                                 processSymbolizers(graphics, feature, symbolizers, scaleRange,
                                         at, destinationCrs);
 
-												        if (LOGGER.isLoggable(Level.FINE)) {
-												            LOGGER.fine("... done!");
+												        if (LOGGER.isLoggable(Level.FINER)) {
+												            LOGGER.finer("... done!");
 												        }
                             }
                         }
                     }
 
-						        if (LOGGER.isLoggable(Level.FINE)) {
-						            LOGGER.fine("feature rendered event ...");
+						        if (LOGGER.isLoggable(Level.FINER)) {
+						            LOGGER.finer("feature rendered event ...");
 						        }
 
                     fireFeatureRenderedEvent(feature);
