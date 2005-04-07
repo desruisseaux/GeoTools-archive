@@ -419,20 +419,18 @@ public class ArcGridReader
       //    uom = null;
       //}
 
-      raster = preprocessRaster(raster,(float) arcGridRaster.getMinValue(),
-                                         (float) arcGridRaster.getMaxValue());
-
       //IT WILL BECOME GRAYSCALE FOR THE MOMENT
       Category values, nan;
       values = new Category("values",
                             new Color[] {Color.BLUE, Color.GREEN, Color.RED},
-                            new NumberRange(1, 255),
+                            new NumberRange(1, 65535),
                             new NumberRange( (float) arcGridRaster.getMinValue(),
                                             (float) arcGridRaster.getMaxValue()));
       nan = new Category("nodata", Color.BLACK, 0);
       SampleDimensionGT band =
           new SampleDimensionGT(new Category[] {nan,
                                 values}, uom);
+      band=band.geophysics(true);
       BufferedImage image = new BufferedImage(band.getColorModel(),
                                               raster,
                                               false,
@@ -457,7 +455,7 @@ public class ArcGridReader
 
     return null;
   }
-
+/*
   private WritableRaster preprocessRaster(WritableRaster dest, float min, float max) {
     if (dest == null) {
       return dest;
@@ -481,7 +479,7 @@ public class ArcGridReader
     dest=newRaster;
     return dest;
   }
-
+*/
   /** Gets the coordinate system that will be associated to the GridCoverage.
    * Gets the coordinate system that will be associated to the GridCoverage.
    * The WGS84 coordinate system is used by default.
