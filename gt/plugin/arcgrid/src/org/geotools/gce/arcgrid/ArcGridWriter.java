@@ -152,7 +152,7 @@ public class ArcGridWriter implements GridCoverageWriter {
     }
 
     private void setEnvironment(GeneralParameterValue[] parameters)
-        throws InvalidParameterNameException, InvalidParameterValueException, 
+        throws InvalidParameterNameException, InvalidParameterValueException,
             IOException {
         //    	this.name = name;
         if (parameters == null) {
@@ -188,7 +188,7 @@ public class ArcGridWriter implements GridCoverageWriter {
             //
             ///////////////////////////////////////////////////////////////////////
             //getting the underlying raster
-            java.awt.image.Raster data = ((GridCoverage2D) gc).getRenderedImage()
+            java.awt.image.Raster data = ((GridCoverage2D) gc).geophysics(true).getRenderedImage()
                                           .getData();
 
             //getting the envelope
@@ -233,7 +233,7 @@ public class ArcGridWriter implements GridCoverageWriter {
     }
 
     private void writeCRSInfo(CoordinateReferenceSystem crs)
-        throws IOException, 
+        throws IOException,
             org.opengis.referencing.NoSuchAuthorityCodeException {
         //is it null?
         if (crs == null) {
