@@ -20,14 +20,15 @@
 package org.geotools.coverage;
 
 // Utilities
+import java.util.Set;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.logging.LogRecord;
-import javax.media.jai.util.Range;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -39,7 +40,7 @@ import javax.imageio.ImageReader;
 import javax.swing.event.EventListenerList;
 import javax.imageio.event.IIOReadWarningListener;
 import javax.imageio.event.IIOReadProgressListener;
-//import org.geotools.io.image.IIOReadProgressAdapter;
+import org.geotools.image.io.IIOReadProgressAdapter;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -48,6 +49,8 @@ import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.processing.GridCoverageProcessor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -61,13 +64,17 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.util.Cloneable;
 
 // Geotools dependencies
+import org.geotools.util.NumberRange;
+import org.geotools.factory.Hints;
 import org.geotools.coverage.SampleDimensionGT;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.gcs.ResourceKeys;
 
 
 /**
@@ -77,13 +84,12 @@ import org.geotools.resources.CRSUtilities;
  * manages the two-dimensional coverages as if the whole set was a huge three-dimensional coverage.
  * <br><br>
  * Each {@linkplain Element coverage element} in the stack usually covers the same
- * {@linkplain Coverage#getEnvelope geographic area}, but this is not a requirement.
- * However, current implementation requires that every coverage element uses the same
- * {@linkplain CoordinateReferenceSystem coordinate reference system}. Coverage elements
- * are often two-dimensional, but this is not a requirement neither; this stack will simply
- * append one more dimension to the coverage element's CRS dimensions. Coverage elements may
- * be other {@code CoverateStack} objects, thus allowing construction of coverages with four
- * or more dimensions.
+ * {@linkplain Coverage#getEnvelope geographic area} with the same
+ * {@linkplain CoordinateReferenceSystem coordinate reference system},
+ * but this is not a requirement. Coverage elements are often two-dimensional, but this is not
+ * a requirement neither; this stack will simply append one more dimension to the coverage
+ * element's CRS dimensions. Coverage elements may be other {@code CoverateStack} objects,
+ * thus allowing construction of coverages with four or more dimensions.
  * <br><br>
  * {@code GridCoverage2D} objects tend to be big. In order to keep memory usage raisonable, this
  * implementation doesn't requires all {@code GridCoverage} objects at once. Instead, it requires
@@ -91,7 +97,9 @@ import org.geotools.resources.CRSUtilities;
  * needed. This {@code CoverageStack} implementation remember the last coverage elements used;
  * it will not trig new data loading as long as consecutive calls to {@code evaluate(...)}
  * methods require the same coverage elements. Apart from this very simple caching mechanism,
- * caching is the responsability of {@link Element} implementations.
+ * caching is the responsability of {@link Element} implementations. Note that this simple
+ * caching mechanism is suffisient if {@code evaluate(...)} methods are invoked with increasing
+ * <var>z</var> values.
  * <br><br>
  * Each coverage element is expected to extends over a range of <var>z</var> values (the new
  * dimensions appended by this {@code CoverageStack}). If an {@code evaluate(...)} method is
@@ -103,27 +111,51 @@ import org.geotools.resources.CRSUtilities;
  */
 public abstract class CoverageStack extends AbstractCoverage {
     /**
+     * Implementation hints for factories (none for now).
+     */
+    private static Hints HINTS = null;
+
+    /**
      * An element in a {@linkplain CoverageStack coverage stack}. Each element is expected to
      * extends over a range of <var>z</var> values (the new dimensions appended by the
      * {@code CoverageStack} container). Implementations should be capable to returns
-     * {@linkplain #getMinimum minimum} and {@link #getMaximum maximum} <var>z</var> values
-     * without loading the coverage data. If an expensive loading is required, it should be
-     * performed only when {@link #getCoverage} is invoked. If this method is invoked more
-     * than once, caching (if desirable) is implementor responsability.
+     * {@linkplain #getZRange z value range} without loading the coverage data. If an expensive
+     * loading is required, it should be performed only when {@link #getCoverage} is invoked.
+     * If {@code getCoverage} is invoked more than once, caching (if desirable) is implementor
+     * responsability.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     public static interface Element {
         /**
-         * Returns the minimum <var>z</var> value for the coverage.
+         * Returns the minimum and maximum <var>z</var> value for the coverage.
+         * This information is mandatory.
          */
-        double getMinimum();
+        NumberRange getZRange();
 
         /**
-         * Returns the maximum <var>z</var> value for the coverage.
+         * The coverage envelope, or {@code null} if this information is too expensive to compute.
+         * This method should not load a large amount of data, since it will be invoked soon.
          */
-        double getMaximum();
+        Envelope getEnvelope();
+
+        /**
+         * The coverage coordinate reference system, or {@code null} if this information is too
+         * expensive to compute.
+         * This method should not load a large amount of data, since it will be invoked soon.
+         *
+         * @todo This information can be bundled in the envelope too. A future version may
+         *       deprecates this method and uses the envelope's CRS instead.
+         */
+        CoordinateReferenceSystem getCoordinateReferenceSystem();
+
+        /**
+         * The sample dimension for the coverage, or {@code null} if this information is too
+         * expensive to compute.
+         * This method should not load a large amount of data, since it will be invoked soon.
+         */
+        SampleDimension[] getSampleDimensions();
 
         /**
          * Returns the coverage.
@@ -145,9 +177,9 @@ public abstract class CoverageStack extends AbstractCoverage {
     private final Element[] elements;
     
     /**
-     * The sample dimensions for this coverage.
+     * The sample dimensions for this coverage, or {@code null} if unknown.
      */
-    private final SampleDimension[] bands;
+    private final SampleDimension[] sampleDimensions;
     
     /**
      * The envelope for this coverage. This is the union of all elements envelopes.
@@ -159,13 +191,12 @@ public abstract class CoverageStack extends AbstractCoverage {
     /**
      * <code>true</code> if interpolations are allowed.
      */
-    private boolean interpolationAllowed = true;
+    private boolean interpolationEnabled = true;
     
     /**
-     * Maximal interval between the {@linkplain Element#getMaximum upper bound} of a coverage and
-     * the {@linkplain Element#getMinimum lower bound} of the next one. If a greater difference
-     * if found, we will consider that there is a hole in the data and {@code evaluate(...)}
-     * methods will returns NaN for <var>z</var> values in this hole.
+     * Maximal interval between the upper z-value of a coverage and the lower z-value of the next
+     * one. If a greater difference is found, we will consider that there is a hole in the data
+     * and {@code evaluate(...)} methods will returns NaN for <var>z</var> values in this hole.
      */
     private final long lagTolerance = 0;
     
@@ -177,250 +208,252 @@ public abstract class CoverageStack extends AbstractCoverage {
     /**
      * Internal listener for logging image loading.
      */
-//    private transient Listeners readListener;
+    private transient Listeners readListener;
     
     /**
-     * Données dont la date de début est inférieure ou égale à la date demandée.
-     * Autant que possible, on essaiera de faire en sorte que la date du milieu
-     * soit inférieure ou égale à la date demandée (mais ce second aspect n'est
-     * pas garantie).
+     * Coverage with a minimum z-value lower than or equals to the requested <var>z</var> value.
+     * If possible, this class will tries to select a coverage with a middle value (not just the
+     * minimum value) lower than the requested <var>z</var> value.
      */
-//    private transient GridCoverage2D lower;
+    private transient Coverage lower;
     
     /**
-     * Données dont la date de fin  est supérieure ou égale à la date demandée.
-     * Autant que possible, on essaiera de faire en sorte que la date du milieu
-     * soit supérieure ou égale à la date demandée (mais ce second aspect n'est
-     * pas garantie).
+     * Coverage with a maximum z-value higher than or equals to the requested <var>z</var> value.
+     * If possible, this class will tries to select a coverage with a middle value (not just the
+     * maximum value) higher than the requested <var>z</var> value.
      */
-//    private transient GridCoverage2D upper;
+    private transient Coverage upper;
     
     /**
-     * L'image interpolée lors du dernier appel de {@link #getGridCoverage2D}. Mémorisée ici
-     * afin d'éviter de reconstruire cette image plusieurs fois lors d'appels successifs de
-     * {@link #getGridCoverage2D} avec la même date.
+     * The coverage interpolated by the last call to {@link #getGridCoverage}. This coverage is
+     * retained in order to avoid to constructs it many time if the same coverage is requested
+     * more than once for the same <var>z</var> value.
      */
-//    private transient GridCoverage2D interpolated;
+    private transient GridCoverage interpolated;
     
     /**
-     * Date et heure du milieu des données {@link #lower} et {@link #upper},
-     * en nombre de millisecondes écoulées depuis le 1er janvier 1970 UTC.
+     * <var>Z</var> values in the middle of {@link #lower} and {@link #upper} envelope.
      */
-//    private transient long lowerTime=Long.MAX_VALUE, upperTime=Long.MIN_VALUE;
+    private transient double lowerZ=Double.POSITIVE_INFINITY, upperZ=Double.NEGATIVE_INFINITY;
     
     /**
-     * La date et heure (en nombre de millisecondes depuis le 1er janvier 1970 UTC)
-     * à laquelle a été interpolée l'image {@link #interpolated}.
+     * <var>Z</var> value for the {@link #interpolated} coverage.
      */
-//    private transient long timeInterpolated = Long.MIN_VALUE;
+    private transient double interpolatedZ = Double.NaN;
     
     /**
-     * Plage de temps des données {@link #lower} et {@link #upper}.
+     * Range for {@link #lower} and {@link #upper}.
      */
-//    private transient Range lowerTimeRange, upperTimeRange;
+    private transient NumberRange lowerRange, upperRange;
     
     /**
-     * L'objet à utiliser pour effectuer des opérations sur les images
-     * (notamment modifier les interpolations). Ne sera construit que
-     * la première fois où il sera nécessaire.
+     * The grid coverage processor to uses for interpolations.
+     * Will be created only when first needed.
      */
-//    private transient GridCoverageProcessor2D processor;
+    private transient GridCoverageProcessor processor;
     
     /**
      * Initialize fields after deserialization.
      */
-//    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-//        in.defaultReadObject();
-//        lowerTime = Long.MAX_VALUE;
-//        upperTime = Long.MIN_VALUE;
-//        timeInterpolated = Long.MIN_VALUE;
-//    }
-    
-    /**
-     * Construit une couverture à partir des données de la table spécifiée.
-     * Les entrées {@link Element} seront mémorisées immediatement.
-     * Toute modification faite à la table après la construction de cet objet
-     * <code>GridCoverage3D</code> (incluant la fermeture de la table) n'auront
-     * aucun effet sur cet objet.
-     *
-     * @param  table Table d'où proviennent les données.
-     * @throws RemoteException si l'interrogation du catalogue a échouée.
-     * @throws TransformException si une transformation de coordonnées était nécessaire et a échoué.
-     */
-//    public CoverageStack(final CoverageTable table) throws RemoteException, TransformException {
-//        this(table, table.getCoordinateReferenceSystem());
-//    }
-    
-    /**
-     * Construit une couverture à partir des données de la table spécifiée et utilisant
-     * le système de référence des coordonnées spécifié.
-     *
-     * @param  table Table d'où proviennent les données.
-     * @param  crs Le système de référence des coordonnées à utiliser pour cet obet {@link Coverage}.
-     *         Ce système doit obligatoirement comprendre un axe temporel.
-     * @throws RemoteException si l'interrogation du catalogue a échouée.
-     * @throws TransformException si une transformation de coordonnées était nécessaire et a échoué.
-     */
-//    public CoverageStack(final CoverageTable table, final CoordinateReferenceSystem crs) 
-//            throws RemoteException, TransformException 
-//    {
-//        super(table.getSeries().getName(), crs);
-//        /*
-//         * Obtient la liste des images en ordre chronologiques, et
-//         * vérifie au passage qu'elles ont toutes les mêmes bandes.
-//         */
-//        final List<Element> entryList = table.getEntries();
-//        this.elements = entryList.toArray(new Element[entryList.size()]);
-//        this.bands   = (elements.length!=0) ? elements[0].getSampleDimensions() : new SampleDimensionGT[0];
-//        for (int i=1; i<elements.length; i++) {
-//            if (!Arrays.equals(bands, elements[i].getSampleDimensions())) {
-//                throw new CatalogException(Resources.format(ResourceKeys.ERROR_CATEGORIES_MITMATCH));
-//            }
-//        }
-//        try {
-//            Arrays.sort(elements, COMPARATOR);
-//        } catch (UndeclaredThrowableException exception) {
-//            rethrow(exception);
-//        }
-//        /*
-//         * Calcule l'enveloppe englobant celles de toutes les images.
-//         * Les coordonnées seront transformées si nécessaires.
-//         */
-//        Envelope                        envelope    = null;
-//        CoordinateOperation             transform   = null;
-//        CoordinateOperationFactory      factory     = null;
-//        for (int i=0; i<elements.length; i++) {
-//            Element               entry       = elements[i];
-//            Envelope                    candidate   = entry.getEnvelope();
-//            CoordinateReferenceSystem   sourceCRS   = entry.getCoordinateReferenceSystem();
-//            if (!CRSUtilities.equalsIgnoreMetadata(crs, sourceCRS)) {
-//                if (transform==null || !CRSUtilities.equalsIgnoreMetadata(transform.getSourceCRS(), sourceCRS)) {
-//                    if (factory == null) {
-//                        factory = FactoryFinder.getCoordinateOperationFactory(null);
-//                    }
-//                    try {
-//                        transform = factory.createOperation(sourceCRS, crs);
-//                    } catch (FactoryException exception) {
-//                        throw new TransformException(exception.getLocalizedMessage(), exception);
-//                    }
-//                }
-//                candidate = CRSUtilities.transform(transform.getMathTransform(), candidate);
-//            }
-//            if (envelope == null) {
-//                envelope = candidate;
-//            } else {
-//                final GeneralEnvelope ge = wrap(envelope);
-//                ge.add(wrap(candidate));
-//                envelope = ge;
-//            }
-//        }
-//        if (envelope == null) {
-//            envelope = CRSUtilities.getEnvelope(crs);
-//        }
-//        this.envelope = envelope;
-//    }
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        lowerZ        = Double.POSITIVE_INFINITY;
+        upperZ        = Double.NEGATIVE_INFINITY;
+        interpolatedZ = Double.NaN;
+    }
 
     /**
-     * If the specified object is already a {@code GeneralEnvelope}, returns it unchanged.
-     * Otherwise, converts it into a {@code GeneralEnvelope}. This method is usefull for
-     * accessing Geotools-specific methods.
+     * Constructs a new coverage stack with all the supplied elements.
+     *
+     * @param  name     The name for this coverage.
+     * @param  crs      The coordinate reference system for this coverage.
+     * @param  elements All coverage {@link Element Element}s for this stack.
      */
-    private static GeneralEnvelope wrap(final Envelope envelope) {
-        if (envelope instanceof GeneralEnvelope) {
-            return (GeneralEnvelope) envelope;
+    public CoverageStack(final CharSequence name, final CoordinateReferenceSystem crs, final Set elements) {
+        super(name, crs, null, null);
+        this.elements = (Element[]) elements.toArray(new Element[elements.size()]);
+        try {
+            Arrays.sort(this.elements, COMPARATOR);
+        } catch (UndeclaredThrowableException exception) {
+            rethrow(exception);
         }
-        return new GeneralEnvelope(envelope);
+        final int dimension = crs.getCoordinateSystem().getDimension();
+        boolean      sampleDimensionMismatch = false;
+        SampleDimension[]   sampleDimensions = null;
+        GeneralEnvelope            envelope  = null;
+        CoordinateOperation        transform = null;
+        CoordinateOperationFactory factory   = null;
+        for (int j=0; j<this.elements.length; j++) {
+            final Element element = this.elements[j];
+            if (true) {
+                /*
+                 * Ensures that all coverages uses the same number of sample dimension.
+                 * To be strict, we should ensure that all sample dimensions are identical.
+                 * However, this is not needed for proper working of this class, so we will
+                 * ensure this condition only in 'getSampleDimension' method.
+                 */
+                final SampleDimension[] candidate = element.getSampleDimensions();
+                if (candidate != null) {
+                    if (sampleDimensions == null) {
+                        sampleDimensions = candidate;
+                    } else {
+                        if (sampleDimensions.length != candidate.length) {
+                            throw new IllegalArgumentException( // TODO: localize
+                                        "Inconsistent number of sample dimensions.");
+                        }
+                        if (!Arrays.equals(sampleDimensions, candidate)) {
+                            sampleDimensionMismatch = true;
+                        }
+                    }
+                }
+            }
+            /*
+             * Computes an envelope for all coverage elements. If a coordinate reference system
+             * information is bundled with the envelope, it will be used in order to reproject
+             * the envelope on the fly (if needed). Otherwise, CRS are assumed the same than the
+             * one specified at construction time.
+             */
+            Envelope candidate = element.getEnvelope();
+            if (candidate == null) {
+                continue;
+            }
+            final CoordinateReferenceSystem sourceCRS = element.getCoordinateReferenceSystem();
+            if (sourceCRS != null) {
+                final CoordinateReferenceSystem targetCRS = CRSUtilities.getSubCRS(crs, 0,
+                                                sourceCRS.getCoordinateSystem().getDimension());
+                if (targetCRS == null) {
+                    // TODO: localize
+                    throw new IllegalArgumentException("An element uses an incompatible CRS");
+                }
+                if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
+                    /*
+                     * The envelope needs to be reprojected. Gets the transform
+                     * if it was not already done, and applies the reprojection.
+                     */
+                    if (transform==null ||
+                        !CRSUtilities.equalsIgnoreMetadata(transform.getSourceCRS(), sourceCRS))
+                    {
+                        if (factory == null) {
+                            factory = FactoryFinder.getCoordinateOperationFactory(HINTS);
+                        }
+                        try {
+                            transform = factory.createOperation(sourceCRS, targetCRS);
+                        } catch (FactoryException exception) {
+                            final IllegalArgumentException e = // TODO: localize the message below.
+                                    new IllegalArgumentException("An element uses an incompatible CRS");
+                            e.initCause(exception); // TODO: uses J2SE 1.5 constructor instead.
+                            throw e;
+                        }
+                    }
+                    try {
+                        candidate = CRSUtilities.transform(transform.getMathTransform(), candidate);
+                    } catch (TransformException exception) {
+                        final IllegalArgumentException e = // TODO: localize the message below.
+                                new IllegalArgumentException("An element uses an incompatible CRS");
+                        e.initCause(exception); // TODO: uses J2SE 1.5 constructor instead.
+                        throw e;
+                    }
+                }
+            }
+            /*
+             * Increase the envelope in order to contains 'candidate'.
+             * The range of z-values will be included in the envelope.
+             */
+            final boolean set = (envelope == null);
+            if (set) {
+                envelope = new GeneralEnvelope(dimension);
+            }
+            final int dim = candidate.getDimension();
+            for (int i=0; i<dimension; i++) {
+                double min = envelope.getMinimum(i);
+                double max = envelope.getMaximum(i);
+                final double minimum, maximum;
+                if (i < dim) {
+                    minimum = candidate.getMinimum(i);
+                    maximum = candidate.getMaximum(i);
+                } else if (i == dimension-1) {
+                    final NumberRange range = element.getZRange();
+                    minimum = range.getMinimum();
+                    maximum = range.getMaximum();
+                } else {
+                    minimum = Double.NEGATIVE_INFINITY;
+                    maximum = Double.POSITIVE_INFINITY;
+                }
+                if (set || minimum<min) min=minimum;
+                if (set || maximum>max) max=maximum;
+                envelope.setRange(i, min, max);
+            }
+        }
+        this.sampleDimensions = sampleDimensionMismatch ? null : sampleDimensions;
+        this.envelope = (envelope!=null) ? envelope : CRSUtilities.getEnvelope(crs);
     }
     
     /**
-     * Construit une couverture utilisant les mêmes paramètres que la couverture spécifiée.
+     * Constructs a new coverage using the same elements than the specified coverage stack.
      */
     protected CoverageStack(final CharSequence name, final CoverageStack source) {
         super(name, source);
         elements             = source.elements;
-        bands                = source.bands;
+        sampleDimensions     = source.sampleDimensions;
         envelope             = source.envelope;
-        interpolationAllowed = source.interpolationAllowed;
+        interpolationEnabled = source.interpolationEnabled;
     }
     
     /**
-     * Comparateur à utiliser pour classer les images et effectuer des recherches rapides.
-     * Ce comparateur utilise la date du milieu comme critère. Il doit accepter aussi bien
-     * des objets {@link Date} que {@link Element} étant donné que les recherches
-     * combineront ces deux types d'objets.
+     * A comparator for {@link Element} sorting and binary search. This comparator uses the
+     * middle <var>z</var> value as criterion. It must accepts {@link Double} objects as well
+     * as {@link Element}, because binary search will mix those two kinds of object.
      */
-//    private static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
-//        public int compare(final Object entry1, final Object entry2) {
-//            try {
-//                final long time1 = getTime(entry1);
-//                final long time2 = getTime(entry2);
-//                if (time1 < time2) return -1;
-//                if (time1 > time2) return +1;
-//                return 0;
-//            } catch (RemoteException exception) {
-//                // Will be catch are rethrow as RemoteException in caller block.
-//                throw new UndeclaredThrowableException(exception);
-//            }
-//        }
-//    };
+    private static final Comparator COMPARATOR = new Comparator() {
+        public int compare(final Object entry1, final Object entry2) {
+            return Double.compare(zFromObject(entry1),
+                                  zFromObject(entry2));
+        }
+    };
     
     /**
-     * Rethrows the exception in {@link #COMPARATOR} as a {@link RemoteException}.
+     * Returns the <var>z</var> value of the specified object. The specified
+     * object may be a {@link Double} or an {@link Element} instance.
      */
-//    private static void rethrow(final UndeclaredThrowableException exception) throws RemoteException {
-//        final Throwable cause = exception.getCause();
-//        if (cause instanceof RemoteException) {
-//            throw (RemoteException) cause;
-//        }
-//        if (cause instanceof RuntimeException) {
-//            throw (RuntimeException) cause;
-//        }
-//        throw exception;
-//    }
+    private static double zFromObject(final Object object) {
+        if (object instanceof Double) {
+            return ((Double) object).doubleValue();
+        }
+        if (object instanceof Element) {
+            return getZ((Element) object);
+        }
+        return Double.NaN;
+    }
     
     /**
-     * Retourne la date de l'objet spécifiée. Si l'argument est un objet
-     * {@link Date}, alors la date sera extraite avec {@link #getTime}.
+     * Returns the middle <var>z</var> value. If the element has no <var>z</var> value
+     * (for example if the <var>z</var> value is the time and the coverage is constant
+     * over the time), then this method returns {@link Double#NaN}.
      */
-//    private static long getTime(final Object object) throws RemoteException {
-//        if (object instanceof Date) {
-//            return ((Date) object).getTime();
-//        }
-//        if (object instanceof Element) {
-//            return getTime((Element) object);
-//        }
-//        return Long.MIN_VALUE;
-//    }
+    private static double getZ(final Element entry) {
+        return getZ(entry.getZRange());
+    }
     
     /**
-     * Retourne la date du milieu de l'image spécifiée.  Si l'image ne couvre aucune
-     * plage de temps (par exemple s'il s'agit de données qui ne varient pas avec le
-     * temps, comme la bathymétrie), alors cette méthode retourne {@link Long#MIN_VALUE}.
+     * Returns the <var>z</var> value in the middle of the specified range.
+     * If the range is null, then this method returns {@link Double#NaN}.
      */
-//    private static long getTime(final Element entry) throws RemoteException {
-//        return getTime(entry.getTimeRange());
-//    }
-    
-    /**
-     * Retourne la date du milieu de la plage spécifiée. Si la plage de temps
-     * est nul, alors cette méthode retourne {@link Long#MIN_VALUE}.
-     */
-//    private static long getTime(final Range timeRange) {
-//        if (timeRange != null) {
-//            final Date startTime = (Date) timeRange.getMinValue();
-//            final Date   endTime = (Date) timeRange.getMaxValue();
-//            if (startTime != null) {
-//                if (endTime != null) {
-//                    return (endTime.getTime()+startTime.getTime())/2;
-//                } else {
-//                    return startTime.getTime();
-//                }
-//            } else if (endTime != null) {
-//                return endTime.getTime();
-//            }
-//        }
-//        return Long.MIN_VALUE;
-//    }
+    private static double getZ(final NumberRange range) {
+        if (range != null) {
+            final Number lower = (Number) range.getMinValue();
+            final Number upper = (Number) range.getMaxValue();
+            if (lower != null) {
+                if (upper != null) {
+                    return 0.5 * (lower.doubleValue() + upper.doubleValue());
+                } else {
+                    return lower.doubleValue();
+                }
+            } else if (upper != null) {
+                return upper.doubleValue();
+            }
+        }
+        return Double.NaN;
+    }
     
     /**
      * Returns the bounding box for the coverage domain in coordinate system coordinates.
@@ -433,7 +466,12 @@ public abstract class CoverageStack extends AbstractCoverage {
      * Returns the number of sample dimension in this coverage.
      */
     public int getNumSampleDimensions() {
-        return bands.length;
+        if (sampleDimensions != null) {
+            return sampleDimensions.length;
+        } else {
+            // TODO: provides a localized message.
+            throw new IllegalStateException("Sample dimensions unknow");
+        }
     }
     
     /**
@@ -444,7 +482,12 @@ public abstract class CoverageStack extends AbstractCoverage {
      * with the dimension.
      */
     public SampleDimension getSampleDimension(final int index) {
-        return bands[index];
+        if (sampleDimensions != null) {
+            return sampleDimensions[index];
+        } else {
+            // TODO: provides a localized message.
+            throw new IllegalStateException("Sample dimensions unknow");
+        }
     }
     
     /**
@@ -494,11 +537,11 @@ public abstract class CoverageStack extends AbstractCoverage {
 //                    if (index == 0) {
 //                        return; // No elements in this coverage
 //                    }
-//                    time = getTime(elements[--index]);
+//                    time = getZ(elements[--index]);
 //                } else if (index>=1) {
 //                    time = date.getTime();
-//                    final long lowerTime = getTime(elements[index-1]);
-//                    final long upperTime = getTime(elements[index])-1; // Long.MIN_VALUE-1 == Long.MAX_VALUE
+//                    final long lowerTime = getZ(elements[index-1]);
+//                    final long upperTime = getZ(elements[index])-1; // Long.MIN_VALUE-1 == Long.MAX_VALUE
 //                    assert (time>lowerTime && time<upperTime);
 //                    if (time-lowerTime < upperTime-time) {
 //                        index--;
@@ -507,7 +550,7 @@ public abstract class CoverageStack extends AbstractCoverage {
 //                        time = upperTime+1;
 //                    }
 //                } else {
-//                    time = getTime(elements[index]);
+//                    time = getZ(elements[index]);
 //                }
 //                if (time!=Long.MIN_VALUE && time!=Long.MAX_VALUE) {
 //                    date.setTime(time);
@@ -574,7 +617,7 @@ public abstract class CoverageStack extends AbstractCoverage {
      */
 //    private GridCoverage2D load(final Element entry) throws IOException {
 //        GridCoverage2D coverage = entry.getGridCoverage2D(listeners);
-//        if (!interpolationAllowed) {
+//        if (!interpolationEnabled) {
 //            final GridCoverageProcessor2D processor = getGridCoverageProcessor2D();
 //            coverage = (GridCoverage2D) processor.doOperation("Interpolate", coverage, "Type", "NearestNeighbor");
 //        }
@@ -590,9 +633,9 @@ public abstract class CoverageStack extends AbstractCoverage {
 //    private void load(final int index) throws IOException {
 //        final Element entry = elements[index];
 //        final Range timeRange = entry.getTimeRange();
-//        log(ResourceKeys.LOADING_IMAGE_$1, new Object[]{entry});
+//        logLoading(ResourceKeys.LOADING_IMAGE_$1, new Object[]{entry});
 //        lower          = upper          = load(entry);
-//        lowerTime      = upperTime      = getTime(timeRange);
+//        lowerTime      = upperTime      = getZ(timeRange);
 //        lowerTimeRange = upperTimeRange = timeRange;
 //    }
     
@@ -604,7 +647,7 @@ public abstract class CoverageStack extends AbstractCoverage {
 //    private void load(final Element lowerEntry, final Element upperEntry)
 //            throws IOException
 //    {
-//        log(ResourceKeys.LOADING_IMAGES_$2, new Object[]{lowerEntry, upperEntry});
+//        logLoading(ResourceKeys.LOADING_IMAGES_$2, new Object[]{lowerEntry, upperEntry});
 //        final Range lowerTimeRange = lowerEntry.getTimeRange();
 //        final Range upperTimeRange = upperEntry.getTimeRange();
 //        final GridCoverage2D lower = load(lowerEntry);
@@ -612,8 +655,8 @@ public abstract class CoverageStack extends AbstractCoverage {
 //        
 //        this.lower          = lower; // Set only when BOTH images are OK.
 //        this.upper          = upper;
-//        this.lowerTime      = getTime(lowerTimeRange);
-//        this.upperTime      = getTime(upperTimeRange);
+//        this.lowerTime      = getZ(lowerTimeRange);
+//        this.upperTime      = getZ(upperTimeRange);
 //        this.lowerTimeRange = lowerTimeRange;
 //        this.upperTimeRange = upperTimeRange;
 //    }
@@ -693,13 +736,13 @@ public abstract class CoverageStack extends AbstractCoverage {
 //                final Element upperEntry = elements[index  ];
 //                final Range lowerRange = lowerEntry.getTimeRange();
 //                final Range upperRange = upperEntry.getTimeRange();
-//                final long  lowerEnd   = getTime(lowerRange.getMaxValue());
-//                final long  upperStart = getTime(upperRange.getMinValue())-1; // MIN_VALUE-1 == MAX_VALUE
+//                final long  lowerEnd   = zFromObject(lowerRange.getMaxValue());
+//                final long  upperStart = zFromObject(upperRange.getMinValue())-1; // MIN_VALUE-1 == MAX_VALUE
 //                if (lowerEnd+lagTolerance >= upperStart) {
-//                    if (interpolationAllowed) {
+//                    if (interpolationEnabled) {
 //                        load(lowerEntry, upperEntry);
 //                    } else {
-//                        if (Math.abs(getTime(upperRange)-time) > Math.abs(time-getTime(lowerRange))) {
+//                        if (Math.abs(getZ(upperRange)-time) > Math.abs(time-getZ(lowerRange))) {
 //                            index--;
 //                        }
 //                        load(index);
@@ -751,7 +794,7 @@ public abstract class CoverageStack extends AbstractCoverage {
 //        final double ratio = (double)(timeMillis-lowerTime) / (double)(upperTime-lowerTime);
 //        if (Math.abs(  ratio) <= EPS) return lower;
 //        if (Math.abs(1-ratio) <= EPS) return upper;
-//        if (interpolationAllowed) {
+//        if (interpolationEnabled) {
 //            final GridCoverageProcessor2D processor = getGridCoverageProcessor2D();
 //            final Operation operation = processor.getOperation("Combine");
 //            final ParameterValueGroup param = operation.getParameters();
@@ -765,6 +808,19 @@ public abstract class CoverageStack extends AbstractCoverage {
 //            return (ratio <= 0.5) ? lower : upper;
 //        }
 //    }
+    
+    /**
+     * Rethrows the exception in {@link #COMPARATOR} as a {@link RuntimeException}.
+     * It gives an opportunity for implementations of {@link Element} to uses some
+     * checked exception like {@link IOException}.
+     */
+    private static void rethrow(final UndeclaredThrowableException exception) {
+        final Throwable cause = exception.getCause();
+        if (cause instanceof RuntimeException) {
+            throw (RuntimeException) cause;
+        }
+        throw exception;
+    }
     
     /**
      * Projète un point du système de coordonnées de cette couverture vers le système
@@ -949,103 +1005,104 @@ public abstract class CoverageStack extends AbstractCoverage {
 //    }
     
     /**
-     * Indique si cet objet est autorisé à interpoller dans l'espace et dans le temps.
-     * La valeur par défaut est <code>true</code>.
+     * Returns <code>true</code> if interpolation are enabled in the <var>z</var> value dimension.
+     * Interpolations are enabled by default.
      */
-//    public boolean isInterpolationAllowed() {
-//        return interpolationAllowed;
-//    }
+    public boolean isInterpolationEnabled() {
+        return interpolationEnabled;
+    }
     
     /**
-     * Spécifie si cet objet est autorisé à interpoller dans l'espace et dans le temps.
-     * La valeur par défaut est <code>true</code>.
+     * Enable or disable interpolations in the <var>z</var> value dimension.
      */
-//    public synchronized void setInterpolationAllowed(final boolean flag) {
-//        lower     = null;
-//        upper     = null;
-//        lowerTime = Long.MAX_VALUE;
-//        upperTime = Long.MIN_VALUE;
-//        interpolationAllowed = flag;
-//    }
+    public synchronized void setInterpolationEnabled(final boolean flag) {
+        lower                = null;
+        upper                = null;
+        interpolated         = null;
+        lowerZ               = Double.POSITIVE_INFINITY;
+        upperZ               = Double.NEGATIVE_INFINITY;
+        interpolatedZ        = Double.NaN;
+        interpolationEnabled = flag;
+    }
     
     /**
-     * Adds an {@link IIOReadWarningListener} to
-     * the list of registered warning listeners.
+     * Adds an {@link IIOReadWarningListener} to the list of registered warning listeners.
      */
     public void addIIOReadWarningListener(final IIOReadWarningListener listener) {
         listeners.add(IIOReadWarningListener.class, listener);
     }
     
     /**
-     * Removes an {@link IIOReadWarningListener} from
-     * the list of registered warning listeners.
+     * Removes an {@link IIOReadWarningListener} from the list of registered warning listeners.
      */
     public void removeIIOReadWarningListener(final IIOReadWarningListener listener) {
         listeners.remove(IIOReadWarningListener.class, listener);
     }
     
     /**
-     * Adds an {@link IIOReadProgressListener} to
-     * the list of registered progress listeners.
+     * Adds an {@link IIOReadProgressListener} to the list of registered progress listeners.
      */
     public void addIIOReadProgressListener(final IIOReadProgressListener listener) {
         listeners.add(IIOReadProgressListener.class, listener);
     }
     
     /**
-     * Removes an {@link IIOReadProgressListener} from
-     * the list of registered progress listeners.
+     * Removes an {@link IIOReadProgressListener} from the list of registered progress listeners.
      */
     public void removeIIOReadProgressListener(final IIOReadProgressListener listener) {
         listeners.remove(IIOReadProgressListener.class, listener);
     }
     
     /**
-     * Enregistre un message vers le journal des événements.
+     * Invoked automatically when an image is about to be loaded. The default implementation
+     * logs the message in the {@code "org.geotools.coverage"} logger. Subclasses can override
+     * this method if they wants a different logging.
+     *
+     * @param record The log record. The message contains information about the images to load.
      */
-//    protected void log(final LogRecord record) {
-//        CoverageDataBase.LOGGER.log(record);
-//    }
+    protected void logLoading(final LogRecord record) {
+        Logger.getLogger("org.geotools.coverage").log(record);
+    }
     
     /**
-     * Prépare un enregistrement pour le journal.
+     * Prepares a log record about an image to be loaded, and put the log record in a stack.
+     * The record will be effectively logged only when image loading really beging.
      */
-//    private void log(final int clé, final Object[] parameters) {
-//        final Locale locale = null;
-//        final LogRecord record = Resources.getResources(locale).getLogRecord(Level.INFO, clé);
-//        record.setSourceClassName("GridCoverage3D");
-//        record.setSourceMethodName("evaluate");
-//        record.setParameters(parameters);
-//        if (readListener == null) {
-//            readListener = new Listeners();
-//            addIIOReadProgressListener(readListener);
-//        }
-//        readListener.record = record;
-//    }
+    private void logLoading(final int key, final Object[] parameters) {
+        final Locale locale = null;
+        final LogRecord record = Resources.getResources(locale).getLogRecord(Level.INFO, key);
+        record.setSourceClassName("CoverageStack");
+        record.setSourceMethodName("evaluate");
+        record.setParameters(parameters);
+        if (readListener == null) {
+            readListener = new Listeners();
+            addIIOReadProgressListener(readListener);
+        }
+        readListener.record = record;
+    }
     
     /**
-     * Objet ayant la charge de suivre le chargement d'une image. Cet objet sert
-     * surtout à enregistrer dans le journal un enregistrement indiquant que la
-     * lecture d'une image a commencé.
+     * A listener for monitoring image loading. The purpose for this listener is to
+     * log a message when an image is about to be loaded.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
-//    private final class Listeners extends IIOReadProgressAdapter {
-//        /**
-//         * The record to log.
-//         */
-//        public LogRecord record;
-//        
-//        /**
-//         * Reports that an image read operation is beginning.
-//         */
-//        public void imageStarted(ImageReader source, int imageIndex) {
-//            if (record != null) {
-//                log(record);
-//                source.removeIIOReadProgressListener(this);
-//                record = null;
-//            }
-//        }
-//    }
+    private final class Listeners extends IIOReadProgressAdapter {
+        /**
+         * The record to log.
+         */
+        public LogRecord record;
+        
+        /**
+         * Reports that an image read operation is beginning.
+         */
+        public void imageStarted(ImageReader source, int imageIndex) {
+            if (record != null) {
+                logLoading(record);
+                source.removeIIOReadProgressListener(this);
+                record = null;
+            }
+        }
+    }
 }

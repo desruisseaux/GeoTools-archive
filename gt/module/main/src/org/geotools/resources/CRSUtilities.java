@@ -253,14 +253,15 @@ public final class CRSUtilities {
      * Returns the first horizontal coordinate reference system found in the given CRS,
      * or {@code null} if there is none.
      */
-    public static SingleCRS getHorizontalCRS(CoordinateReferenceSystem crs) {
-        while (crs instanceof GeneralDerivedCRS) {
-            crs = ((GeneralDerivedCRS) crs).getBaseCRS();
-        }
-        // No need to test for ProjectedCRS, since the code above unwrap it.
-        if (crs instanceof GeographicCRS) {
-            if (crs.getCoordinateSystem().getDimension() == 2) {
-                return (SingleCRS) crs;
+    public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
+        if (crs instanceof SingleCRS && crs.getCoordinateSystem().getDimension()==2) {
+            CoordinateReferenceSystem base = crs;
+            while (base instanceof GeneralDerivedCRS) {
+                base = ((GeneralDerivedCRS) base).getBaseCRS();
+            }
+            // No need to test for ProjectedCRS, since the code above unwrap it.
+            if (base instanceof GeographicCRS) {
+                return (SingleCRS) crs; // Really returns 'crs', not 'base'.
             }
         }
         if (crs instanceof CompoundCRS) {

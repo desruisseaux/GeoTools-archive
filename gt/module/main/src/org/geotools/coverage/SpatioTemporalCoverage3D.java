@@ -34,6 +34,8 @@ import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -59,12 +61,19 @@ import org.geotools.resources.geometry.XRectangle2D;
 
 
 /**
- * Convenience view of an other coverage with <var>x</var>, <var>y</var> and time axis.
+ * Convenience view of an other coverage with <var>x</var>, <var>y</var> and <var>time</var> axis.
  * This class provides {@code evaluate} methods in two versions: the usual one expecting
  * a complete {@linkplain DirectPosition direct position}, and an other one expecting the
  * {@linkplain Point2D spatial position} and the {@linkplain Date date} as separated arguments.
+ * This class will detects by itself which dimension is the time axis. It will also tries to uses
+ * the {@code Point2D}'s {@linkplain java.awt.geom.Point2D.Double#x x} value for
+ * {@linkplain AxisDirection#EAST east} or west direction, and the
+ * {@linkplain java.awt.geom.Point2D.Double#y y} value for {@linkplain AxisDirection#NORTH north}
+ * or south direction. The dimension mapping can be examined with the {@link #toSourceDimension}
+ * method.
  * <br><br>
- * <strong>Note:</strong> This simple implementation is not thread safe.
+ * <strong>Note:</strong> This class is not thread safe for performance reasons. If desired,
+ * users should create one instance of {@code SpatioTemporalCoverage3D} for each thread.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -75,6 +84,19 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
      * The default coordinate operation factory should be suffisient.
      */
     private static final Hints HINTS = null;
+
+    /**
+     * A set of usual axis directions for <var>x</var> and <var>y</var> values (opposite directions
+     * not required). If an ordinate value is orientated toward one of those directions, it will be
+     * interpreted as the {@link java.awt.geom.Point2D.Double#x} value if the direction was found at
+     * an even index, or as the {@link java.awt.geom.Point2D.Double#y} value if the direction was
+     * found at an odd index.
+     */
+    private static final AxisDirection[] DIRECTIONS = {
+        AxisDirection.EAST,             AxisDirection.NORTH, 
+        AxisDirection.DISPLAY_RIGHT,    AxisDirection.DISPLAY_UP,
+        AxisDirection.COLUMN_POSITIVE,  AxisDirection.ROW_POSITIVE
+    };
 
     /**
      * The wrapped coverage.
@@ -123,7 +145,8 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
             throws IllegalArgumentException
     {
         super(name, coverage);
-        final int dimension = crs.getCoordinateSystem().getDimension();
+        final CoordinateSystem cs = crs.getCoordinateSystem();
+        final int dimension = cs.getDimension();
         if (dimension != 3) {
             throw new MismatchedDimensionException(org.geotools.resources.cts.Resources.format(
                       org.geotools.resources.cts.ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
@@ -136,6 +159,7 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
             this.temporalDimension = source.temporalDimension;
             this.xDimension        = source.xDimension;
             this.yDimension        = source.yDimension;
+            this.boundingBox       = source.boundingBox;
         } else {
             this.coverage = coverage;
             temporalCRS = TemporalCRS.wrap(CRSUtilities.getTemporalCRS(crs));
@@ -144,11 +168,34 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
                         /*Resources.format(ResourceKeys.ERROR_BAD_COORDINATE_SYSTEM)*/);
             }
             temporalDimension = CRSUtilities.getDimensionOf(crs, temporalCRS.getClass());
-            xDimension = (temporalDimension!=0) ? 0 : 1;
-            yDimension = (temporalDimension!=2) ? 2 : 1;
+            final int  xDimension = (temporalDimension!=0) ? 0 : 1;
+            final int  yDimension = (temporalDimension!=2) ? 2 : 1;
+            Boolean swap = null; // 'null' if unknown, otherwise TRUE or FALSE.
+control:    for (int p=0; p<=1; p++) {
+                final AxisDirection direction;
+                direction = cs.getAxis(p==0 ? xDimension : yDimension).getDirection().absolute();
+                for (int i=0; i<DIRECTIONS.length; i++) {
+                    if (direction.equals(DIRECTIONS[i])) {
+                        final boolean needSwap = (i & 1) != p;
+                        if (swap == null) {
+                            swap = Boolean.valueOf(needSwap);
+                        } else if (swap.booleanValue() != needSwap) {
+                            swap = null; // Found an ambiguity; stop the search.
+                            break control;
+                        }
+                    }
+                }
+            }
+            if (swap!=null && swap.booleanValue()) {
+                this.xDimension = yDimension;
+                this.yDimension = xDimension;
+            } else {
+                this.xDimension = xDimension;
+                this.yDimension = yDimension;
+            }
         }
         assert temporalDimension>=0 && temporalDimension<dimension : temporalDimension;
-        coordinate = new GeneralDirectPosition(dimension);
+        coordinate = new GeneralDirectPosition(dimension); // Each instance must have its own.
     }
 
     /**
@@ -216,6 +263,28 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
         final Envelope envelope = getEnvelope();
         return new Range(Date.class, temporalCRS.toDate(envelope.getMinimum(temporalDimension)),
                                      temporalCRS.toDate(envelope.getMaximum(temporalDimension)));
+    }
+
+    /**
+     * Returns the dimension in the wrapped coverage for the specified dimension in this coverage.
+     * The {@code evaluate(Point2D, Date)} methods expect ordinates in the
+     * (<var>x</var>,&nbsp;<var>y</var>,&nbsp;<var>t</var>) order.
+     * The {@code evaluate(DirectPosition)} methods and the wrapped coverage way uses a different
+     * order.
+     *
+     * @param  dimension A dimension in this coverage:
+     *         0 for <var>x</var>,
+     *         1 for <var>y</var> or
+     *         2 for <var>t</var>.
+     * @return The corresponding dimension in the wrapped coverage.
+     */
+    public final int toSourceDimension(final int dimension) {
+        switch (dimension) {
+            case 0:  return xDimension;
+            case 1:  return yDimension;
+            case 2:  return temporalDimension;
+            default: throw new IllegalArgumentException();
+        }
     }
 
     /**

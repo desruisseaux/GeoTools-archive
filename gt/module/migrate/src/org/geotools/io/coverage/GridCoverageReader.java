@@ -16,19 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
 package org.geotools.io.coverage;
 
@@ -63,7 +50,7 @@ import org.geotools.gc.GridCoverage;
 import org.geotools.gc.GridRange;
 import org.geotools.io.LineWriter;
 import org.geotools.io.TableWriter;
-import org.geotools.io.image.RawBinaryImageReadParam;
+import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.pt.Envelope;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;

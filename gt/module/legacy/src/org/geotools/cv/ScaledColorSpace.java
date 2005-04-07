@@ -16,10 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.cv;
 
@@ -33,7 +29,7 @@ import org.geotools.resources.Utilities;
  * Espace de couleurs pour les images dont les valeurs
  * de pixels se situent entre deux nombre réels.
  *
- * NOTE: Actual implementation is a copy of org.geotools.io.image.ScaledColorSpace.
+ * NOTE: Actual implementation is a copy of org.geotools.image.io.ScaledColorSpace.
  *       Future implementation will be differents (interpolate in a color table
  *       instead of computing grayscales).
  *

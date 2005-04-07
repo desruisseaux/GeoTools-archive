@@ -16,21 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.io.image;
+package org.geotools.image.io;
 
 // Images
 import java.awt.Point;
@@ -212,7 +199,7 @@ public class TextRecordImageReader extends TextImageReader {
         super(provider, rawImageType);
         clear();
         if (rawImageType == DataBuffer.TYPE_DOUBLE) {
-            Logger.getLogger("org.geotools.io.image").warning("Type double is deprecated.");
+            Logger.getLogger("org.geotools.image.io").warning("Type double is deprecated.");
         }
     }
     
@@ -852,7 +839,7 @@ public class TextRecordImageReader extends TextImageReader {
                 throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_NEGATIVE_COLUMN_$2, "y", new Integer(yColumn)));
             }
-            pluginClassName = "org.geotools.io.image.TextRecordImageReader";
+            pluginClassName = "org.geotools.image.io.TextRecordImageReader";
         }
         
         /**

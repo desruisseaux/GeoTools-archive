@@ -2,7 +2,7 @@
 
 <HTML>
   <HEAD>
-    <TITLE>package org.geotools.io.image</TITLE>
+    <TITLE>package org.geotools.image.io</TITLE>
   </HEAD>
   <BODY>
     Extensions to {@link javax.imageio.ImageReader}
@@ -20,23 +20,23 @@
         <TH>MIME type</TH>
       </TR>
       <TR>
-        <TD>{@link org.geotools.io.image.RawBinaryImageReader}</TD>
+        <TD>{@link org.geotools.image.io.RawBinaryImageReader}</TD>
         <TD>raw</TD>
         <TD>image/raw</TD>
       </TR>
       <TR>
-        <TD>{@link org.geotools.io.image.TextMatrixImageReader}</TD>
+        <TD>{@link org.geotools.image.io.TextMatrixImageReader}</TD>
         <TD>matrix</TD>
         <TD>text/matrix</TD>
       </TR>
       <TR>
-        <TD>{@link org.geotools.io.image.TextRecordImageReader}</TD>
+        <TD>{@link org.geotools.image.io.TextRecordImageReader}</TD>
         <TD>gridded records</TD>
         <TD>text/x-grid</TD>
       </TR>
     </TABLE>
 
-    <P ALIGN="justify">{@link org.geotools.io.image.SimpleImageReader} is
+    <P ALIGN="justify">{@link org.geotools.image.io.SimpleImageReader} is
     the base class for image decoders reading stream with few (if any)
     meta-data. Examples of such streams are matrix containing the pixels
     values in a binary form (RAW images), or ASCII files containing values
@@ -45,7 +45,7 @@
     temperature in Celsius degrees, elevation in metres, etc.) better
     represented as floating point numbers than integers. For example,
     a user may want to read an ASCII file containing gridded elevation
-    on the ocean floor (left side below). {@link org.geotools.io.image.TextRecordImageReader}
+    on the ocean floor (left side below). {@link org.geotools.image.io.TextRecordImageReader}
     can read such file, detect automatically minimum and maximum values (in order
     to scale the grayscale palette) and produce the image below:</P>
 
@@ -76,7 +76,7 @@ Longitude Latitude Altitude
       </TR>
     </TABLE>
 
-    <P ALIGN="justify">By default, {@link org.geotools.io.image.SimpleImageReader}
+    <P ALIGN="justify">By default, {@link org.geotools.image.io.SimpleImageReader}
     store decoded image using data type {@link java.awt.image.DataBuffer#TYPE_FLOAT}
     and a grayscale color space. This politic produce image matching closely the
     original data, i.e. it involves as few transformations as possible. But

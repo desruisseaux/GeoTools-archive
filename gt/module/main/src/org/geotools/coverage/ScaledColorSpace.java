@@ -16,10 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.coverage;
 
@@ -34,7 +30,7 @@ import org.geotools.resources.Utilities;
  * Color space for raster backed by floating point numbers ranging between two arbitrary values.
  *
  * <strong>NOTE:</strong>
- *       Current implementation is a copy of {@code org.geotools.io.image.ScaledColorSpace}.
+ *       Current implementation is a copy of {@code org.geotools.image.io.ScaledColorSpace}.
  *       Future implementation will be differents (interpolate in a color table instead of
  *       computing grayscales).
  *
