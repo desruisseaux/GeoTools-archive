@@ -56,7 +56,7 @@ public class LiteRendererStyleMapPaneDemo {
 
 	public static void main(String[] args) throws Exception {
 
-		ShapefileDataStore ds=new ShapefileDataStore(TestData.getResource(LiteRendererStyledMapPane.class,"bc_2m_border.shp"), true, true);
+		ShapefileDataStore ds=new ShapefileDataStore(TestData.getResource(LiteRendererStyleMapPaneDemo.class,"bc_2m_border.shp"), true, true);
 		FeatureSource featureSource=ds.getFeatureSource();
 		
 		MapContext context=new DefaultMapContext();
@@ -67,11 +67,11 @@ public class LiteRendererStyleMapPaneDemo {
         
         layers[0] = new DefaultMapLayer(featureSource, createLineStyle(featureSource.getSchema().getTypeName(), Color.BLUE), featureSource.getSchema().getTypeName());
 
-        ds=new ShapefileDataStore(TestData.getResource(LiteRendererStyledMapPane.class,"bc_2m_lakes.shp"), true, true);
+        ds=new ShapefileDataStore(TestData.getResource(LiteRendererStyleMapPaneDemo.class,"bc_2m_lakes.shp"), true, true);
 		featureSource=ds.getFeatureSource();
         layers[1] = new DefaultMapLayer(featureSource, createLineStyle(featureSource.getSchema().getTypeName(), Color.GREEN), featureSource.getSchema().getTypeName());
 		
-		ds=new ShapefileDataStore(TestData.getResource(LiteRendererStyledMapPane.class,"bc_2m_rivers.shp"), true, true);
+		ds=new ShapefileDataStore(TestData.getResource(LiteRendererStyleMapPaneDemo.class,"bc_2m_rivers.shp"), true, true);
 		featureSource=ds.getFeatureSource();
         layers[2] = new DefaultMapLayer(featureSource, createLineStyle(featureSource.getSchema().getTypeName(), Color.RED), featureSource.getSchema().getTypeName());
 		

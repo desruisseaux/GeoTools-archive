@@ -325,39 +325,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      *       CoordinateSystem and if so, then transform the coordinates.
      */
     public void paint( Graphics2D graphics, Rectangle paintArea, AffineTransform transform ) {
-        error = 0;
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        if ((graphics == null) || (paintArea == null)) {
-            LOGGER.info("renderer passed null arguments");
-
-            return;
-        }
-
-        // reset the abort flag
-        renderingStopRequested = false;
-
-        AffineTransform at = transform;
-
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Affine Transform is " + at);
-        }
-
-        /*
-         * If we are rendering to a component which has already set up some form of transformation
-         * then we can concatenate our transformation to it. An example of this is the ZoomPane
-         * component of the swinggui module.
-         */
-        if (concatTransforms) {
-            AffineTransform atg = graphics.getTransform();
-            atg.concatenate(at);
-            at = atg;
-        }
-
-        // graphics.setTransform(at);
-        setScaleDenominator(1 / at.getScaleX());
-
-        MapLayer[] layers = context.getLayers();
-
         // Consider the geometries, they should lay inside or
         // overlap with the bbox indicated by the painting area.
         // First, create the bbox in real world coordinates
@@ -381,6 +348,46 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         Envelope envelope = new Envelope(Math.min(x1, x2), Math.max(x1, x2), Math.min(y1, y2), Math
                 .max(y1, y2));
 
+
+        paint(graphics, paintArea, envelope);
+    }
+
+    /**
+     * TODO summary sentence for paint ...
+     * 
+     * @param graphics
+     * @param paintArea
+     * @param transform
+     * @param envelope
+     */
+    public void paint( Graphics2D graphics, Rectangle paintArea, Envelope envelope ) {
+        AffineTransform transform=worldToScreenTransform(envelope, paintArea);
+        error = 0;
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if ((graphics == null) || (paintArea == null)) {
+            LOGGER.info("renderer passed null arguments");
+
+            return;
+        }
+        // reset the abort flag
+        renderingStopRequested = false;
+        AffineTransform at = transform;
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Affine Transform is " + at);
+        }
+        /*
+         * If we are rendering to a component which has already set up some form of transformation
+         * then we can concatenate our transformation to it. An example of this is the ZoomPane
+         * component of the swinggui module.
+         */
+        if (concatTransforms) {
+            AffineTransform atg = graphics.getTransform();
+            atg.concatenate(at);
+            at = atg;
+        }
+        // graphics.setTransform(at);
+        setScaleDenominator(1 / at.getScaleX());
+        MapLayer[] layers = context.getLayers();
         // get detstination CRS
         CoordinateReferenceSystem destinationCrs = context.getCoordinateReferenceSystem();
         labelCache.start();
@@ -411,12 +418,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
             labelCache.endLayer(graphics, screenSize);
         }
-
         labelCache.end(graphics, paintArea);
-
         LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio() + " , hits "
                 + styleFactory.getHits() + ", requests " + styleFactory.getRequests());
-
         if (error > 0) {
             LOGGER.warning("Number of Errors during paint(Graphics2D, AffineTransform) = " + error);
         }
@@ -878,8 +882,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 										            LOGGER.finer("applying rule: " + r.toString());
 										        }
 
-                            // if this rule applies
-                            if (isWithInScale(r) && !r.hasElseFilter()) {
+//                            // if this rule applies
+//                            if (isWithInScale(r) && !r.hasElseFilter()) {
 												        if (LOGGER.isLoggable(Level.FINER)) {
 												            LOGGER.finer("this rule applies ...");
 												        }
@@ -903,7 +907,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 																        }
 		                                }
                             		// }
-                            }
+//                            }
                         }
 
                         if (doElse) {
@@ -1258,7 +1262,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     public void setMemoryPreloadingEnabled( boolean enabled ) {
         this.memoryPreloadingEnabled = enabled;
-
+        if( !enabled )
+            indexedFeatureResults=null;
     }
     
     /**

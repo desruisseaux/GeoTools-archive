@@ -916,7 +916,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
                         Rule r = (Rule) it.next();
 
                         // if this rule applies
-                        if (isWithInScale(r) && !r.hasElseFilter()) {
                             Filter filter = r.getFilter();
 
                             if ((filter == null) || filter.contains(feature)) {
@@ -925,7 +924,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
                                 Symbolizer[] symbolizers = r.getSymbolizers();
                                 processSymbolizers(feature, symbolizers);
                             }
-                        }
                     }
 
                     if (doElse) {
