@@ -29,17 +29,63 @@ import javax.imageio.event.IIOReadProgressListener;
  * The methods in this class are empty. This class exists as
  * convenience for creating listener objects.
  *
- * @version 1.0
  * @author Martin Desruisseaux
+ * @version $Id$
  */
 public class IIOReadProgressAdapter implements IIOReadProgressListener {
-    public void sequenceStarted  (ImageReader source, int minIndex)                       {}
-    public void sequenceComplete (ImageReader source)                                     {}
-    public void imageStarted     (ImageReader source, int imageIndex)                     {}
-    public void imageProgress    (ImageReader source, float percentageDone)               {}
-    public void imageComplete    (ImageReader source)                                     {}
-    public void thumbnailStarted (ImageReader source, int imageIndex, int thumbnailIndex) {}
-    public void thumbnailProgress(ImageReader source, float percentageDone)               {}
-    public void thumbnailComplete(ImageReader source)                                     {}
-    public void readAborted      (ImageReader source)                                     {}
+    /**
+     * Reports that a sequence of read operations is beginning.
+     */
+    public void sequenceStarted(ImageReader source, int minIndex) {
+    }
+    
+    /**
+     * Reports that a sequence of read operationshas completed.
+     */
+    public void sequenceComplete(ImageReader source) {
+    }
+    
+    /**
+     * Reports that an image read operation is beginning.
+     */
+    public void imageStarted(ImageReader source, int imageIndex) {
+    }
+    
+    /**
+     * Reports the approximate degree of completion of the current
+     * <code>read</code> call of the associated <code>ImageReader</code>.
+     */
+    public void imageProgress(ImageReader source, float percentageDone) {
+    }
+    
+    /**
+     * Reports that the current image read operation has completed.
+     */
+    public void imageComplete(ImageReader source) {
+    }
+    
+    /**
+     * Reports that a thumbnail read operation is beginning.
+     */
+    public void thumbnailStarted(ImageReader source, int imageIndex, int thumbnailIndex) {
+    }
+    
+    /**
+     * Reports the approximate degree of completion of the current <code>getThumbnail</code>
+     * call within the associated <code>ImageReader</code>.
+     */
+    public void thumbnailProgress(ImageReader source, float percentageDone) {
+    }
+    
+    /**
+     * Reports that a thumbnail read operation has completed.
+     */
+    public void thumbnailComplete(ImageReader source) {
+    }
+    
+    /**
+     * Reports that a read has been aborted via the reader's <code>abort</code> method.
+     */
+    public void readAborted(ImageReader source) {
+    }
 }

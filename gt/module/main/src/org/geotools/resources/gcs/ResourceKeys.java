@@ -42,6 +42,8 @@ public interface ResourceKeys
     public static final int INDEXED                              =    16;
     public static final int LIGHTNESS                            =    17;
     public static final int LINE_$1                              =    18;
+    public static final int LOADING_IMAGES_$2                    =    84;
+    public static final int LOADING_IMAGE_$1                     =    85;
     public static final int MAGENTA                              =    19;
     public static final int NAME                                 =    20;
     public static final int NATIVE_ACCELERATION_STATE_$2         =    81;
