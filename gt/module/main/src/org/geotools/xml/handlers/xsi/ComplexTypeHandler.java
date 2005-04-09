@@ -898,6 +898,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
         }
 
         public Element[] getChildElements(ElementGrouping child11) {
+        	if(child11 == null)
+        		return new Element[0];
             switch (child11.getGrouping()) {
             case ElementGrouping.ALL:
                 return ((All) child11).getElements();
@@ -927,7 +929,8 @@ public class ComplexTypeHandler extends XSIElementHandler {
             case ElementGrouping.GROUP:
 
                 ElementGrouping c = ((Group) child11).getChild();
-
+                if(c == null)
+                	return new Element[0];
                 return getChildElements(c);
 
             case ElementGrouping.SEQUENCE:
