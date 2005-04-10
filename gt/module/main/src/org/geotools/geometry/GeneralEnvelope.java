@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 // OpenGIS dependencies
+import org.opengis.util.Cloneable;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;

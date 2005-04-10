@@ -23,6 +23,7 @@ package org.geotools.geometry;
 import java.awt.geom.Rectangle2D;
 
 // OpenGIS dependencies
+import org.opengis.util.Cloneable;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -39,7 +40,7 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Envelope2D extends Rectangle2D.Double implements Envelope {
+public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneable {
     /**
      * Serial number for interoperability with different versions.
      */

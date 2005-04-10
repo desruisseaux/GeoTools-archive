@@ -22,6 +22,7 @@ package org.geotools.geometry;
 // J2SE dependencies
 import java.io.Serializable;
 
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;

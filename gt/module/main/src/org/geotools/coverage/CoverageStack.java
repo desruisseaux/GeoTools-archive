@@ -21,7 +21,6 @@ package org.geotools.coverage;
 
 // J2SE dependencies
 import java.util.Set;
-import java.util.List;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
@@ -39,35 +38,25 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.coverage.PointOutsideCoverageException;
-import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.processing.GridCoverageProcessor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.util.Cloneable;
 
 // Geotools dependencies
-import org.geotools.factory.Hints;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.IIOReadProgressAdapter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.FactoryFinder;
 import org.geotools.coverage.processing.GridCoverageProcessor2D;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -113,7 +102,7 @@ import org.geotools.util.NumberRange;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class CoverageStack extends AbstractCoverage {
+public class CoverageStack extends AbstractCoverage {
     /**
      * An element in a {@linkplain CoverageStack coverage stack}. Each element is expected to
      * extents over a range of <var>z</var> values (the new dimensions appended by the
@@ -195,11 +184,6 @@ public abstract class CoverageStack extends AbstractCoverage {
      * Small number for floating point comparaisons.
      */
     private static final double EPS = 1E-6;
-
-    /**
-     * The {@link #crs} without the last dimension.
-     */
-    private final CoordinateReferenceSystem reducedCRS;
     
     /**
      * Coverage elements in this stack. Elements may be shared by more than one
@@ -211,13 +195,25 @@ public abstract class CoverageStack extends AbstractCoverage {
      * The sample dimensions for this coverage, or {@code null} if unknown.
      */
     private final SampleDimension[] sampleDimensions;
+
+    /**
+     * The number of sample dimensions for this coverage, or 0 is unknow.
+     * Note: this attribute may be non-null even if {@link #sampleDimensions} is null.
+     */
+    private final int numSampleDimensions;
     
     /**
      * The envelope for this coverage. This is the union of all elements envelopes.
      *
      * @see #getEnvelope
      */
-    private final Envelope envelope;
+    private final GeneralEnvelope envelope;
+
+    /**
+     * A direct position with {@link #zDimension} dimensions. will be created only
+     * when first needed.
+     */
+    private transient GeneralDirectPosition reducedPosition;
 
     /**
      * The dimension of the <var>z</var> ordinate (the last value in coordinate points).
@@ -288,6 +284,30 @@ public abstract class CoverageStack extends AbstractCoverage {
      * Will be created only when first needed.
      */
     private transient GridCoverageProcessor processor;
+
+    /**
+     * Sample byte values. Allocated when first needed, in order to avoid allocating
+     * thel again everytime an {@code evaluate(...)} method is invoked.
+     */
+    private transient byte[] byteBuffer;
+
+    /**
+     * Sample integer values. Allocated when first needed, in order to avoid allocating
+     * thel again everytime an {@code evaluate(...)} method is invoked.
+     */
+    private transient int[] intBuffer;
+
+    /**
+     * Sample float values. Allocated when first needed, in order to avoid allocating
+     * thel again everytime an {@code evaluate(...)} method is invoked.
+     */
+    private transient float[] floatBuffer;
+
+    /**
+     * Sample double values. Allocated when first needed, in order to avoid allocating
+     * thel again everytime an {@code evaluate(...)} method is invoked.
+     */
+    private transient double[] doubleBuffer;
     
     /**
      * Initialize fields after deserialization.
@@ -399,9 +419,10 @@ public abstract class CoverageStack extends AbstractCoverage {
                 envelope.setRange(i, min, max);
             }
         }
+        this.numSampleDimensions = (sampleDimensions!=null) ? sampleDimensions.length : 0;
         this.sampleDimensions = sampleDimensionMismatch ? null : sampleDimensions;
-        this.envelope = (envelope!=null) ? envelope : CRSUtilities.getEnvelope(crs);
-        this.reducedCRS = CRSUtilities.getSubCRS(crs, 0, zDimension);
+        this.envelope = (envelope!=null) ? envelope : new GeneralEnvelope(CRSUtilities.getEnvelope(crs));
+        this.envelope.setCoordinateReferenceSystem(crs);
     }
     
     /**
@@ -411,9 +432,9 @@ public abstract class CoverageStack extends AbstractCoverage {
         super(name, source);
         elements             = source.elements;
         sampleDimensions     = source.sampleDimensions;
+        numSampleDimensions  = source.numSampleDimensions;
         envelope             = source.envelope;
         zDimension           = source.zDimension;
-        reducedCRS           = source.reducedCRS;
         interpolationEnabled = source.interpolationEnabled;
     }
     
@@ -497,20 +518,27 @@ public abstract class CoverageStack extends AbstractCoverage {
         }
         return Double.NaN;
     }
+
+    /**
+     * Returns {@code true} if the specified z-value is inside the specified range.
+     */
+    private static boolean contains(final NumberRange range, final double z) {
+        return z>=range.getMinimum() && z<=range.getMaximum();
+    }
     
     /**
      * Returns the bounding box for the coverage domain in coordinate system coordinates.
      */
     public Envelope getEnvelope() {
-        return (Envelope) ((Cloneable) envelope).clone();
+        return (Envelope) envelope.clone();
     }
     
     /**
      * Returns the number of sample dimension in this coverage.
      */
     public int getNumSampleDimensions() {
-        if (sampleDimensions != null) {
-            return sampleDimensions.length;
+        if (numSampleDimensions != 0) {
+            return numSampleDimensions;
         } else {
             // TODO: provides a localized message.
             throw new IllegalStateException("Sample dimensions are undetermined.");
@@ -531,20 +559,6 @@ public abstract class CoverageStack extends AbstractCoverage {
             // TODO: provides a localized message.
             throw new IllegalStateException("Sample dimensions are undetermined.");
         }
-    }
-    
-    /**
-     * Check if the given coordinate reference system is compatible with this coverage's
-     * {@link #crs}. This method is used for assertions.
-     *
-     * @param  sourceCRS The coordinate reference system to test.
-     * @return <code>true</code> if the specified crs is compatible.
-     *
-     * @todo Inspects the axis information provided in GridGeometry2D.
-     */
-    private boolean isCompatibleCRS(final CoordinateReferenceSystem sourceCRS) {
-        return CRSUtilities.equalsIgnoreMetadata(sourceCRS,
-               CRSUtilities.getSubCRS(crs, 0, sourceCRS.getCoordinateSystem().getDimension()));
     }
     
     /**
@@ -646,7 +660,12 @@ public abstract class CoverageStack extends AbstractCoverage {
      * @throws IOException if an error occured while loading image.
      */
     private Coverage load(final Element element) throws IOException {
-        return element.getCoverage(listeners);
+        final Coverage coverage = element.getCoverage(listeners);
+        final CoordinateReferenceSystem sourceCRS;
+        assert CRSUtilities.equalsIgnoreMetadata((sourceCRS=coverage.getCoordinateReferenceSystem()),
+               CRSUtilities.getSubCRS(crs, 0, sourceCRS.getCoordinateSystem().getDimension())) : sourceCRS;
+        assert coverage.getNumSampleDimensions() == numSampleDimensions : coverage;
+        return coverage;
     }
     
     /**
@@ -697,6 +716,7 @@ public abstract class CoverageStack extends AbstractCoverage {
      * @throws CannotEvaluateException if the operation failed for some other reason.
      */
     private boolean seek(final double z) throws CannotEvaluateException {
+        assert Thread.holdsLock(this);
         /*
          * Check if currently loaded coverages
          * are valid for the requested z value.
@@ -805,9 +825,7 @@ public abstract class CoverageStack extends AbstractCoverage {
             // No interpolation needed.
             return lower;
         }
-        assert isCompatibleCRS(lower.getCoordinateReferenceSystem()) : lower;
-        assert isCompatibleCRS(upper.getCoordinateReferenceSystem()) : upper;
-        assert (z>=lowerZ && z<=upperZ) : z;
+        assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         if (interpolated!=null && Math.abs(z-interpolatedZ)<=EPS) {
             return interpolated;
         }
@@ -834,156 +852,240 @@ public abstract class CoverageStack extends AbstractCoverage {
     }
     
     /**
-     * Returns a sequence of integer values for a given point in the coverage.
-     * A value for each sample dimension is included in the sequence. The interpolation
-     * type used when accessing grid values for points which fall between grid cells is
-     * inherited from {@link CoverageTable}:  usually bicubic for spatial axis, and
-     * linear for temporal axis.
+     * Returns a point with the same number of dimensions than the specified coverage.
+     * The number of dimensions must be {@link #zDimensions} or {@code zDimensions+1}.
+     */
+    private final DirectPosition reduce(DirectPosition coord, final Coverage coverage) {
+        final CoordinateReferenceSystem targetCRS = coverage.getCoordinateReferenceSystem();
+        final int dimension = targetCRS.getCoordinateSystem().getDimension();
+        if (dimension == zDimension) {
+            if (reducedPosition == null) {
+                reducedPosition = new GeneralDirectPosition(zDimension);
+            }
+            for (int i=0; i<dimension; i++) {
+                reducedPosition.ordinates[i] = coord.getOrdinate(i);
+            }
+            coord = reducedPosition;
+        } else {
+            assert CRSUtilities.equalsIgnoreMetadata(crs, targetCRS) : targetCRS;
+        }
+        return coord;
+    }
+    
+    /**
+     * Returns a sequence of values for a given point in the coverage. The default implementation
+     * delegates to the {@link #evaluate(DirectPosition, double[])} method.
      *
-     * @param  point The coordinate point where to evaluate.
-     * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  coord The coordinate point where to evaluate.
+     * @return The value at the specified point.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-//    public synchronized int[] evaluate(final Point2D point, final Date time, int[] dest)
-//            throws CannotEvaluateException
-//    {
-//        if (!seek(time)) {
-//            // Missing data
-//            if (dest == null) {
-//                dest = new int[bands.length];
-//            }
-//            Arrays.fill(dest, 0, bands.length, 0);
-//            return dest;
-//        }
-//        if (lower == upper) {
-//            return lower.evaluate(point, dest);
-//        }
-//        int[] last=null;
-//        last = upper.evaluate(project(point, upper), last);
-//        dest = lower.evaluate(project(point, lower), dest);
-//        final long timeMillis = time.getTime();
-//        assert (timeMillis>=lowerTime && timeMillis<=upperTime) : time;
-//        final double ratio = (double)(timeMillis-lowerTime) / (double)(upperTime-lowerTime);
-//        for (int i=0; i<last.length; i++) {
-//            dest[i] = (int)Math.round(dest[i] + ratio*(last[i]-dest[i]));
-//        }
-//        return dest;
-//    }
+    public synchronized Object evaluate(final DirectPosition coord)
+            throws CannotEvaluateException
+    {
+        return evaluate(coord, (double[]) null);
+    }
+    
+    /**
+     * Returns a sequence of boolean values for a given point in the coverage.
+     *
+     * @param  coord The coordinate point where to evaluate.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public synchronized boolean[] evaluate(final DirectPosition coord, boolean[] dest)
+            throws CannotEvaluateException
+    {
+        final double z = coord.getOrdinate(zDimension);
+        if (!seek(z)) {
+            // Missing data
+            if (dest == null) {
+                dest = new boolean[numSampleDimensions];
+            } else {
+                Arrays.fill(dest, 0, numSampleDimensions, false);
+            }
+            return dest;
+        }
+        if (lower == upper) {
+            return lower.evaluate(reduce(coord, lower), dest);
+        }
+        assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
+        final Coverage coverage = (z >= 0.5*(lowerZ+upperZ)) ? upper : lower;
+        return coverage.evaluate(reduce(coord, coverage), dest);
+    }
+    
+    /**
+     * Returns a sequence of byte values for a given point in the coverage.
+     *
+     * @param  coord The coordinate point where to evaluate.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public synchronized byte[] evaluate(final DirectPosition coord, byte[] dest)
+            throws CannotEvaluateException
+    {
+        final double z = coord.getOrdinate(zDimension);
+        if (!seek(z)) {
+            // Missing data
+            if (dest == null) {
+                dest = new byte[numSampleDimensions];
+            } else {
+                Arrays.fill(dest, 0, numSampleDimensions, (byte)0);
+            }
+            return dest;
+        }
+        if (lower == upper) {
+            return lower.evaluate(reduce(coord, lower), dest);
+        }
+        byteBuffer = upper.evaluate(reduce(coord, upper), byteBuffer);
+        dest       = lower.evaluate(reduce(coord, lower), dest);
+        assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
+        final double ratio = (z-lowerZ) / (upperZ-lowerZ);
+        for (int i=0; i<byteBuffer.length; i++) {
+            dest[i] = (byte)Math.round(dest[i] + ratio*(byteBuffer[i]-dest[i]));
+        }
+        return dest;
+    }
+    
+    /**
+     * Returns a sequence of integer values for a given point in the coverage.
+     *
+     * @param  coord The coordinate point where to evaluate.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
+     */
+    public synchronized int[] evaluate(final DirectPosition coord, int[] dest)
+            throws CannotEvaluateException
+    {
+        final double z = coord.getOrdinate(zDimension);
+        if (!seek(z)) {
+            // Missing data
+            if (dest == null) {
+                dest = new int[numSampleDimensions];
+            } else {
+                Arrays.fill(dest, 0, numSampleDimensions, 0);
+            }
+            return dest;
+        }
+        if (lower == upper) {
+            return lower.evaluate(reduce(coord, lower), dest);
+        }
+        intBuffer = upper.evaluate(reduce(coord, upper), intBuffer);
+        dest      = lower.evaluate(reduce(coord, lower), dest);
+        assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
+        final double ratio = (z-lowerZ) / (upperZ-lowerZ);
+        for (int i=0; i<intBuffer.length; i++) {
+            dest[i] = (int)Math.round(dest[i] + ratio*(intBuffer[i]-dest[i]));
+        }
+        return dest;
+    }
     
     /**
      * Returns a sequence of float values for a given point in the coverage.
-     * A value for each sample dimension is included in the sequence. The interpolation
-     * type used when accessing grid values for points which fall between grid cells is
-     * inherited from {@link CoverageTable}:  usually bicubic for spatial axis, and
-     * linear for temporal axis.
      *
-     * @param  point The coordinate point where to evaluate.
-     * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  coord The coordinate point where to evaluate.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-//    public synchronized float[] evaluate(final Point2D point, final Date time, float[] dest)
-//            throws CannotEvaluateException 
-//    {
-//        if (!seek(time)) {
-//            // Missing data
-//            if (dest == null) {
-//                dest = new float[bands.length];
-//            }
-//            Arrays.fill(dest, 0, bands.length, Float.NaN);
-//            return dest;
-//        }
-//        if (lower == upper) {
-//            return lower.evaluate(point, dest);
-//        }
-//        float[] last=null;
-//        last = upper.evaluate(project(point, upper), last);
-//        dest = lower.evaluate(project(point, lower), dest);
-//        final long timeMillis = time.getTime();
-//        assert (timeMillis>=lowerTime && timeMillis<=upperTime) : time;
-//        final double ratio = (double)(timeMillis-lowerTime) / (double)(upperTime-lowerTime);
-//        for (int i=0; i<last.length; i++) {
-//            final float lower = dest[i];
-//            final float upper = last[i];
-//            float value = (float)(lower + ratio*(upper-lower));
-//            if (Float.isNaN(value)) {
-//                if (!Float.isNaN(lower)) {
-//                    assert Float.isNaN(upper) : upper;
-//                    if (lowerTimeRange.contains(time)) {
-//                        value = lower;
-//                    }
-//                } else if (!Float.isNaN(upper)) {
-//                    assert Float.isNaN(lower) : lower;
-//                    if (upperTimeRange.contains(time)) {
-//                        value = upper;
-//                    }
-//                }
-//            }
-//            dest[i] = value;
-//        }
-//        return dest;
-//    }
+    public synchronized float[] evaluate(final DirectPosition coord, float[] dest)
+            throws CannotEvaluateException
+    {
+        final double z = coord.getOrdinate(zDimension);
+        if (!seek(z)) {
+            // Missing data
+            if (dest == null) {
+                dest = new float[numSampleDimensions];
+            }
+            Arrays.fill(dest, 0, numSampleDimensions, Float.NaN);
+            return dest;
+        }
+        if (lower == upper) {
+            return lower.evaluate(reduce(coord, lower), dest);
+        }
+        floatBuffer = upper.evaluate(reduce(coord, upper), floatBuffer);
+        dest        = lower.evaluate(reduce(coord, lower), dest);
+        assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
+        final double ratio = (z-lowerZ) / (upperZ-lowerZ);
+        for (int i=0; i<floatBuffer.length; i++) {
+            final float lower = dest[i];
+            final float upper = floatBuffer[i];
+            float value = (float)(lower + ratio*(upper-lower));
+            if (Float.isNaN(value)) {
+                if (!Float.isNaN(lower)) {
+                    assert Float.isNaN(upper) : upper;
+                    if (contains(lowerRange, z)) {
+                        value = lower;
+                    }
+                } else if (!Float.isNaN(upper)) {
+                    assert Float.isNaN(lower) : lower;
+                    if (contains(upperRange, z)) {
+                        value = upper;
+                    }
+                }
+            }
+            dest[i] = value;
+        }
+        return dest;
+    }
     
     /**
      * Returns a sequence of double values for a given point in the coverage.
-     * A value for each sample dimension is included in the sequence. The interpolation
-     * type used when accessing grid values for points which fall between grid cells is
-     * inherited from {@link CoverageTable}:  usually bicubic for spatial axis, and
-     * linear for temporal axis.
      *
-     * @param  point The coordinate point where to evaluate.
-     * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  coord The coordinate point where to evaluate.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-//    public synchronized double[] evaluate(final Point2D point, final Date time, double[] dest)
-//            throws CannotEvaluateException 
-//    {
-//        if (!seek(time)) {
-//            // Missing data
-//            if (dest == null) {
-//                dest = new double[bands.length];
-//            }
-//            Arrays.fill(dest, 0, bands.length, Double.NaN);
-//            return dest;
-//        }
-//        if (lower == upper) {
-//            return lower.evaluate(point, dest);
-//        }
-//        double[] last=null;
-//        last = upper.evaluate(project(point, upper), last);
-//        dest = lower.evaluate(project(point, lower), dest);
-//        final long timeMillis = time.getTime();
-//        assert (timeMillis>=lowerTime && timeMillis<=upperTime) : time;
-//        final double ratio = (double)(timeMillis-lowerTime) / (double)(upperTime-lowerTime);
-//        for (int i=0; i<last.length; i++) {
-//            final double lower = dest[i];
-//            final double upper = last[i];
-//            double value = (lower + ratio*(upper-lower));
-//            if (Double.isNaN(value)) {
-//                if (!Double.isNaN(lower)) {
-//                    assert Double.isNaN(upper) : upper;
-//                    if (lowerTimeRange.contains(time)) {
-//                        value = lower;
-//                    }
-//                } else if (!Double.isNaN(upper)) {
-//                    assert Double.isNaN(lower) : lower;
-//                    if (upperTimeRange.contains(time)) {
-//                        value = upper;
-//                    }
-//                }
-//            }
-//            dest[i] = value;
-//        }
-//        return dest;
-//    }
+    public synchronized double[] evaluate(final DirectPosition coord, double[] dest)
+            throws CannotEvaluateException
+    {
+        final double z = coord.getOrdinate(zDimension);
+        if (!seek(z)) {
+            // Missing data
+            if (dest == null) {
+                dest = new double[numSampleDimensions];
+            }
+            Arrays.fill(dest, 0, numSampleDimensions, Double.NaN);
+            return dest;
+        }
+        if (lower == upper) {
+            return lower.evaluate(reduce(coord, lower), dest);
+        }
+        doubleBuffer = upper.evaluate(reduce(coord, upper), doubleBuffer);
+        dest         = lower.evaluate(reduce(coord, lower), dest);
+        assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
+        final double ratio = (z-lowerZ) / (upperZ-lowerZ);
+        for (int i=0; i<doubleBuffer.length; i++) {
+            final double lower = dest[i];
+            final double upper = floatBuffer[i];
+            double value = lower + ratio*(upper-lower);
+            if (Double.isNaN(value)) {
+                if (!Double.isNaN(lower)) {
+                    assert Double.isNaN(upper) : upper;
+                    if (contains(lowerRange, z)) {
+                        value = lower;
+                    }
+                } else if (!Double.isNaN(upper)) {
+                    assert Double.isNaN(lower) : lower;
+                    if (contains(upperRange, z)) {
+                        value = upper;
+                    }
+                }
+            }
+            dest[i] = value;
+        }
+        return dest;
+    }
     
     /**
      * Returns <code>true</code> if interpolation are enabled in the <var>z</var> value dimension.
