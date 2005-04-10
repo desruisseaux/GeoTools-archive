@@ -78,6 +78,7 @@ public interface ResourceKeys
     public static final int ERROR_CANT_REPROJECT_$1              =    47;
     public static final int ERROR_CANT_TRANSFORM_ENVELOPE        =    48;
     public static final int ERROR_COVERAGE_ALREADY_BOUND_$2      =    49;
+    public static final int ERROR_DATE_OUTSIDE_COVERAGE_$1       =    86;
     public static final int ERROR_EMPTY_ENVELOPE                 =    50;
     public static final int ERROR_FILE_HAS_TOO_FEW_DATA          =    51;
     public static final int ERROR_INCOMPATIBLE_GRID_GEOMETRY     =    52;
@@ -109,4 +110,5 @@ public interface ResourceKeys
     public static final int ERROR_UNSPECIFIED_COORDINATE_SYSTEM  =    78;
     public static final int ERROR_UNSPECIFIED_IMAGE_SIZE         =    79;
     public static final int ERROR_UNSUPPORTED_DATA_TYPE          =    80;
+    public static final int ERROR_ZVALUE_OUTSIDE_COVERAGE_$1     =    87;
 }

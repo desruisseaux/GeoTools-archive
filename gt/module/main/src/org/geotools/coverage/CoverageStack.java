@@ -44,6 +44,7 @@ import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.processing.Operation;
 import org.opengis.coverage.processing.GridCoverageProcessor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -53,6 +54,7 @@ import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.util.Cloneable;
@@ -64,6 +66,7 @@ import org.geotools.image.io.IIOReadProgressAdapter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.Resources;
@@ -78,12 +81,17 @@ import org.geotools.util.NumberRange;
  * manages the two-dimensional coverages as if the whole set was a huge three-dimensional coverage.
  * <br><br>
  * Each {@linkplain Element coverage element} in the stack usually covers the same
- * {@linkplain Coverage#getEnvelope geographic area} with the same
- * {@linkplain CoordinateReferenceSystem coordinate reference system},
- * but this is not a requirement. Coverage elements are often two-dimensional, but this is not
- * a requirement neither; this stack will simply append one more dimension to the coverage
- * element's CRS dimensions. Coverage elements may be other {@code CoverateStack} objects,
- * thus allowing construction of coverages with four or more dimensions.
+ * {@linkplain Coverage#getEnvelope geographic area}, but this is not a requirement. However,
+ * they must use the same {@linkplain CoordinateReferenceSystem coordinate reference system}.
+ * For performance reason, the later condition will not be checked except at construction time
+ * if the CRS is provided in the envelope, and at evaluation time if Java assertion are enabled.
+ * If the CRS of coverage elements is uncertain, consider wrapping them in a
+ * {@link TransformedCoverage} object.
+ * <br><br>
+ * Coverage elements are often two-dimensional, but this is not a requirement. This stack will
+ * simply append one more dimension to the coverage element's CRS dimensions. Coverage elements
+ * may be other {@code CoverateStack} objects, thus allowing construction of coverages with four
+ * or more dimensions.
  * <br><br>
  * {@code GridCoverage2D} objects tend to be big. In order to keep memory usage raisonable, this
  * implementation doesn't requires all {@code GridCoverage} objects at once. Instead, it requires
@@ -107,32 +115,27 @@ import org.geotools.util.NumberRange;
  */
 public abstract class CoverageStack extends AbstractCoverage {
     /**
-     * Implementation hints for factories (none for now).
-     */
-    private static Hints HINTS = null;
-
-    /**
      * An element in a {@linkplain CoverageStack coverage stack}. Each element is expected to
-     * extends over a range of <var>z</var> values (the new dimensions appended by the
-     * {@code CoverageStack} container). Implementations should be capable to returns
-     * {@linkplain #getZRange z value range} without loading the coverage data. If an expensive
-     * loading is required, it should be performed only when {@link #getCoverage} is invoked.
-     * If {@code getCoverage} is invoked more than once, caching (if desirable) is implementor
-     * responsability.
+     * extents over a range of <var>z</var> values (the new dimensions appended by the
+     * {@code CoverageStack} container). Implementations should be capable to returns coverage's
+     * {@linkplain #getZRange range of z-values} without loading the coverage's data. If an
+     * expensive loading is required, it should be delayed until the {@link #getCoverage} method
+     * is invoked. If {@code getCoverage} is invoked more than once, caching (if desirable) is
+     * implementor's responsability.
      * <br><br>
      * All methods declares {@link IOException} in their throws cause in case I/O operations are
      * required. Subclasses of {@code IOException} include {@link javax.imageio.IIOException} for
-     * I/O operations that apply to images, or {@link java.rmi.RemoteOperation} for I/O operations
-     * that apply to remote method invocation (which may be useful for large images database backed
-     * by a distant server).
+     * image I/O operations, or {@link java.rmi.RemoteOperation} for remote method invocation
+     * (which may be useful for large images database backed by a distant server).
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     public static interface Element {
         /**
-         * Returns a name for the coverage. This method should not load a large
-         * amount of data, since it may be invoked soon.
+         * Returns a name for the coverage. This method should not load a large amount of data,
+         * since it may be invoked soon. This method is invoked just before {@link #getCoverage}
+         * in order to log a "Loading data..." message.
          */
         String getName() throws IOException;
         
@@ -147,30 +150,20 @@ public abstract class CoverageStack extends AbstractCoverage {
         NumberRange getZRange() throws IOException;
 
         /**
-         * The coverage envelope, or {@code null} if this information is too expensive to compute.
-         * The envelope may or may not contains an extra dimension for the {@linkplain #getZRange
-         * range of z values}, since the {@link CoverageStack} class is tolerant in this regard.
-         * This method should not load a large amount of data, since it may be invoked soon.
+         * Returns the coverage envelope, or {@code null} if this information is too expensive to
+         * compute. The envelope may or may not contains an extra dimension for the
+         * {@linkplain #getZRange range of z values}, since the {@link CoverageStack} class is
+         * tolerant in this regard. This method should not load a large amount of data, since it
+         * may be invoked soon.
          *
          * @throws IOException if an I/O operation was required but failed.
          */
         Envelope getEnvelope() throws IOException;
 
         /**
-         * The coverage coordinate reference system, or {@code null} if this information is too
-         * expensive to compute. The CRS may or may not contains an extra dimension for the
-         * {@linkplain #getZRange range of z values}, since the {@link CoverageStack} class
-         * is tolerant in this regard. This method should not load a large amount of data,
-         * since it may be invoked soon.
-         *
-         * @throws IOException if an I/O operation was required but failed.
-         */
-        CoordinateReferenceSystem getCoordinateReferenceSystem() throws IOException;
-
-        /**
-         * The coverage grid geometry, or {@code null} if this information is too expensive to
-         * compute. This method should not load a large amount of data, since it may be invoked
-         * soon.
+         * The coverage grid geometry, or {@code null} if this information do not applies or is too
+         * expensive to compute. This method should not load a large amount of data, since it may be
+         * invoked soon.
          *
          * @throws IOException if an I/O operation was required but failed.
          */
@@ -202,6 +195,11 @@ public abstract class CoverageStack extends AbstractCoverage {
      * Small number for floating point comparaisons.
      */
     private static final double EPS = 1E-6;
+
+    /**
+     * The {@link #crs} without the last dimension.
+     */
+    private final CoordinateReferenceSystem reducedCRS;
     
     /**
      * Coverage elements in this stack. Elements may be shared by more than one
@@ -323,8 +321,6 @@ public abstract class CoverageStack extends AbstractCoverage {
         boolean      sampleDimensionMismatch = false;
         SampleDimension[]   sampleDimensions = null;
         GeneralEnvelope            envelope  = null;
-        CoordinateOperation        transform = null;
-        CoordinateOperationFactory factory   = null;
         for (int j=0; j<this.elements.length; j++) {
             final Element element = this.elements[j];
             if (true) {
@@ -355,46 +351,23 @@ public abstract class CoverageStack extends AbstractCoverage {
              * the envelope on the fly (if needed). Otherwise, CRS are assumed the same than the
              * one specified at construction time.
              */
-            Envelope candidate = element.getEnvelope();
+            final Envelope candidate = element.getEnvelope();
             if (candidate == null) {
                 continue;
             }
-            final CoordinateReferenceSystem sourceCRS = element.getCoordinateReferenceSystem();
+            final CoordinateReferenceSystem sourceCRS;
+            // TODO: use a more direct way if we add an accessor for that in GeoAPI.
+            sourceCRS = candidate.getLowerCorner().getCoordinateReferenceSystem();
             if (sourceCRS != null) {
-                final CoordinateReferenceSystem targetCRS = CRSUtilities.getSubCRS(crs, 0,
-                                                sourceCRS.getCoordinateSystem().getDimension());
-                if (targetCRS == null) {
+                final int dim = sourceCRS.getCoordinateSystem().getDimension();
+                if (dim<zDimension || dim>zDimension+1) {
+                    // TODO: localize
+                    throw new MismatchedDimensionException("An element uses an incompatible CRS");
+                }
+                final CoordinateReferenceSystem targetCRS = CRSUtilities.getSubCRS(crs, 0, dim);
+                if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
                     // TODO: localize
                     throw new IllegalArgumentException("An element uses an incompatible CRS");
-                }
-                if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
-                    /*
-                     * The envelope needs to be reprojected. Gets the transform
-                     * if it was not already done, and applies the reprojection.
-                     */
-                    if (transform == null ||
-                        !CRSUtilities.equalsIgnoreMetadata(transform.getSourceCRS(), sourceCRS))
-                    {
-                        if (factory == null) {
-                            factory = FactoryFinder.getCoordinateOperationFactory(HINTS);
-                        }
-                        try {
-                            transform = factory.createOperation(sourceCRS, targetCRS);
-                        } catch (FactoryException exception) {
-                            final IllegalArgumentException e = // TODO: localize the message below.
-                                    new IllegalArgumentException("An element uses an incompatible CRS");
-                            e.initCause(exception); // TODO: uses J2SE 1.5 constructor instead.
-                            throw e;
-                        }
-                    }
-                    try {
-                        candidate = CRSUtilities.transform(transform.getMathTransform(), candidate);
-                    } catch (TransformException exception) {
-                        final IllegalArgumentException e = // TODO: localize the message below.
-                                new IllegalArgumentException("An element uses an incompatible CRS");
-                        e.initCause(exception); // TODO: uses J2SE 1.5 constructor instead.
-                        throw e;
-                    }
                 }
             }
             /*
@@ -428,6 +401,7 @@ public abstract class CoverageStack extends AbstractCoverage {
         }
         this.sampleDimensions = sampleDimensionMismatch ? null : sampleDimensions;
         this.envelope = (envelope!=null) ? envelope : CRSUtilities.getEnvelope(crs);
+        this.reducedCRS = CRSUtilities.getSubCRS(crs, 0, zDimension);
     }
     
     /**
@@ -439,7 +413,24 @@ public abstract class CoverageStack extends AbstractCoverage {
         sampleDimensions     = source.sampleDimensions;
         envelope             = source.envelope;
         zDimension           = source.zDimension;
+        reducedCRS           = source.reducedCRS;
         interpolationEnabled = source.interpolationEnabled;
+    }
+    
+    /**
+     * Rethrows the exception in {@link #COMPARATOR} as a {@link RuntimeException}.
+     * It gives an opportunity for implementations of {@link Element} to uses some
+     * checked exception like {@link IOException}.
+     */
+    private static IOException rethrow(final UndeclaredThrowableException exception) {
+        final Throwable cause = exception.getCause();
+        if (cause instanceof IOException) {
+            return (IOException) cause;
+        }
+        if (cause instanceof RuntimeException) {
+            throw (RuntimeException) cause;
+        }
+        throw exception;
     }
     
     /**
@@ -607,14 +598,9 @@ public abstract class CoverageStack extends AbstractCoverage {
          * Now that we know the coverage element,
          * snap the spatial coordinate point.
          */
-        try {
-            final Element element = elements[index];
-            final CoordinateReferenceSystem sourceCRS = element.getCoordinateReferenceSystem();
-            if (!CRSUtilities.equalsIgnoreMetadata(crs, sourceCRS)) {
-                // TODO: Implement coordinate operation.
-                throw new CannotEvaluateException("Incompatible CRS.");
-            }
-            final GridGeometry  geometry  = element .getGridGeometry();
+        final Element element = elements[index];
+        final GridGeometry geometry = element.getGridGeometry();
+        if (geometry != null) {
             final GridRange     range     = geometry.getGridRange();
             final MathTransform transform = geometry.getGridToCoordinateSystem();
             final int           dimension = transform.getSourceDimensions();
@@ -623,19 +609,21 @@ public abstract class CoverageStack extends AbstractCoverage {
                 // Copy only the first dimensions (may not be up to crs.dimension)
                 position.setOrdinate(i, point.getOrdinate(i));
             }
-            position = transform.inverse().transform(position, position);
-            for (int i=dimension; --i>=0;) {
-                position.setOrdinate(i, Math.max(range.getLower(i),
-                                        Math.min(range.getUpper(i)-1,
-                                   (int)Math.rint(position.getOrdinate(i)))));
+            try {
+                position = transform.inverse().transform(position, position);
+                for (int i=dimension; --i>=0;) {
+                    position.setOrdinate(i, Math.max(range.getLower(i),
+                                            Math.min(range.getUpper(i)-1,
+                                       (int)Math.rint(position.getOrdinate(i)))));
+                }
+                position = transform.transform(position, position);
+                for (int i=Math.min(dimension, zDimension); --i>=0;) {
+                    // Do not touch the z-value, copy the other ordinates.
+                    point.setOrdinate(i, position.getOrdinate(i));
+                }
+            } catch (TransformException exception) {
+                throw new CannotEvaluateException(cannotEvaluate(point), exception);
             }
-            position = transform.transform(position, position);
-            for (int i=Math.min(dimension, zDimension); --i>=0;) {
-                // Do not touch the z-value, copy the other ordinates.
-                point.setOrdinate(i, position.getOrdinate(i));
-            }
-        } catch (TransformException exception) {
-            throw new CannotEvaluateException(cannotEvaluate(point), exception);
         }
     }
     
@@ -708,178 +696,142 @@ public abstract class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if the <var>z</var> value is outside the allowed range.
      * @throws CannotEvaluateException if the operation failed for some other reason.
      */
-//    private boolean seek(final double z) throws CannotEvaluateException {
-//        /*
-//         * Check if currently loaded coverages
-//         * are valid for the requested z value.
-//         */
-//        if ((z>=lowerZ && z<=upperZ) || (Double.isNaN(z) && Double.isNaN(lowerZ) && Double.isNaN(upperZ))) {
-//            return true;
-//        }
-//        /*
-//         * Currently loaded coverages are not valid for the requested z value.
-//         * Search for the coverage to use as upper bounds ({@link #upper}).
-//         */
-//        int index;
-//        try {
-//            index = Arrays.binarySearch(elements, new Double(z), COMPARATOR);
-//        } catch (UndeclaredThrowableException exception) {
-//            // TODO: localize
-//            throw new CannotEvaluateException("Can't fetch coverage properties.", rethrow(exception));
-//        }
-//        try {
-//            if (index >= 0) {
-//                /*
-//                 * An exact match has been found.
-//                 * Load only this coverage and exit.
-//                 */
-//                load(index);
-//                return true;
-//            }
-//            index = ~index; // Insertion point (note: ~ is NOT the minus sign).
-//            if (index == elements.length) {
-//                if (--index>=0) { // Does this coverage has at least 1 image?
-//                    /*
-//                     * The requested date is after the last image's central time.
-//                     * Maybe it is not after the last image's *end* time. Check...
-//                     */
-//                    if (elements[index].getTimeRange().contains(date)) {
-//                        load(index);
-//                        return true;
-//                    }
-//                }
-//                // fall through the exception at this method's end.
-//            } else if (index == 0) {
-//                /*
-//                 * The requested date is before the first image's central time.
-//                 * Maybe it is not before the first image's *start* time. Check...
-//                 */
-//                if (elements[index].getTimeRange().contains(date)) {
-//                    load(index);
-//                    return true;
-//                }
-//                // fall through the exception at this method's end.
-//            } else {
-//                /*
-//                 * An interpolation between two image seems possible.
-//                 * Checks if there is not a time lag between both.
-//                 */
-//                final Element lowerEntry = elements[index-1];
-//                final Element upperEntry = elements[index  ];
-//                final Range lowerRange = lowerEntry.getTimeRange();
-//                final Range upperRange = upperEntry.getTimeRange();
-//                final long  lowerEnd   = zFromObject(lowerRange.getMaxValue());
-//                final long  upperStart = zFromObject(upperRange.getMinValue())-1; // MIN_VALUE-1 == MAX_VALUE
-//                if (lowerEnd+lagTolerance >= upperStart) {
-//                    if (interpolationEnabled) {
-//                        load(lowerEntry, upperEntry);
-//                    } else {
-//                        if (Math.abs(getZ(upperRange)-time) > Math.abs(time-getZ(lowerRange))) {
-//                            index--;
-//                        }
-//                        load(index);
-//                    }
-//                    return true;
-//                }
-//                if (lowerRange.contains(date)) {
-//                    load(index-1);
-//                    return true;
-//                }
-//                if (upperRange.contains(date)) {
-//                    load(index);
-//                    return true;
-//                }
-//                return false; // Missing data.
-//            }
-//        } catch (IOException exception) {
-//            throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
-//        }
-//        throw new PointOutsideCoverageException(Resources.format(ResourceKeys.ERROR_DATE_OUTSIDE_COVERAGE_$1, date));
-//    }
-    
-    /**
-     * Returns a 2 dimensional grid coverage for the given date.
-     *
-     * @param  time The date where to evaluate.
-     * @return The grid coverage at the specified time, or <code>null</code>
-     *         if the requested date fall in a hole in the data.
-     * @throws PointOutsideCoverageException if <code>time</code> is outside coverage.
-     * @throws CannotEvaluateException if the computation failed for some other reason.
-     */
-//    public synchronized GridCoverage2D getGridCoverage(final Date time) throws CannotEvaluateException {
-//        if (!seek(time)) {
-//            // Missing data
-//            return null;
-//        }
-//        if (lower == upper) {
-//            // No interpolation needed.
-//            return lower;
-//        }
-//        assert isCompatibleCRS(lower.getCoordinateReferenceSystem()) : lower;
-//        assert isCompatibleCRS(upper.getCoordinateReferenceSystem()) : upper;
-//        
-//        final long timeMillis = time.getTime();
-//        assert (timeMillis>=lowerTime && timeMillis<=upperTime) : time;
-//        if (timeMillis==timeInterpolated && interpolated!=null) {
-//            return interpolated;
-//        }
-//        final double ratio = (double)(timeMillis-lowerTime) / (double)(upperTime-lowerTime);
-//        if (Math.abs(  ratio) <= EPS) return lower;
-//        if (Math.abs(1-ratio) <= EPS) return upper;
-//        if (interpolationEnabled) {
-//            final GridCoverageProcessor processor = getGridCoverageProcessor2D();
-//            final Operation operation = processor.getOperation("Combine");
-//            final ParameterValueGroup param = operation.getParameters();
-//            param.parameter("source0").setValue(lower);
-//            param.parameter("source1").setValue(upper);
-//            param.parameter("matrix").setValue(new double[][]{{1-ratio, ratio, 0}});
-//            interpolated = (GridCoverage2D) processor.doOperation(operation, param);
-//            timeInterpolated = timeMillis; // Set only if previous line has been successfull.
-//            return interpolated;
-//        } else {
-//            return (ratio <= 0.5) ? lower : upper;
-//        }
-//    }
-    
-    /**
-     * Rethrows the exception in {@link #COMPARATOR} as a {@link RuntimeException}.
-     * It gives an opportunity for implementations of {@link Element} to uses some
-     * checked exception like {@link IOException}.
-     */
-    private static IOException rethrow(final UndeclaredThrowableException exception) {
-        final Throwable cause = exception.getCause();
-        if (cause instanceof IOException) {
-            return (IOException) cause;
+    private boolean seek(final double z) throws CannotEvaluateException {
+        /*
+         * Check if currently loaded coverages
+         * are valid for the requested z value.
+         */
+        if ((z>=lowerZ && z<=upperZ) || (Double.isNaN(z) && Double.isNaN(lowerZ) && Double.isNaN(upperZ))) {
+            return true;
         }
-        if (cause instanceof RuntimeException) {
-            throw (RuntimeException) cause;
+        /*
+         * Currently loaded coverages are not valid for the requested z value.
+         * Search for the coverage to use as upper bounds ({@link #upper}).
+         */
+        final Number Z = new Double(z);
+        int index;
+        try {
+            index = Arrays.binarySearch(elements, Z, COMPARATOR);
+        } catch (UndeclaredThrowableException exception) {
+            // TODO: localize
+            throw new CannotEvaluateException("Can't fetch coverage properties.", rethrow(exception));
         }
-        throw exception;
+        try {
+            if (index >= 0) {
+                /*
+                 * An exact match has been found.
+                 * Load only this coverage and exit.
+                 */
+                load(index);
+                return true;
+            }
+            index = ~index; // Insertion point (note: ~ is NOT the minus sign).
+            if (index == elements.length) {
+                if (--index >= 0) { // Does this stack has at least 1 coverage?
+                    /*
+                     * The requested z is after the last coverage's central z.
+                     * Maybe it is not after the last coverage's upper z. Check...
+                     */
+                    if (elements[index].getZRange().contains(Z)) {
+                        load(index);
+                        return true;
+                    }
+                }
+                // fall through the exception at this method's end.
+            } else if (index == 0) {
+                /*
+                 * The requested z is before the first coverage's central z.
+                 * Maybe it is not before the first coverage's lower z. Check...
+                 */
+                if (elements[index].getZRange().contains(Z)) {
+                    load(index);
+                    return true;
+                }
+                // fall through the exception at this method's end.
+            } else {
+                /*
+                 * An interpolation between two coverages seems possible.
+                 * Checks if there is not a z lag between both.
+                 */
+                final Element     lowerElement = elements[index-1];
+                final Element     upperElement = elements[index  ];
+                final NumberRange lowerRange   = lowerElement.getZRange();
+                final NumberRange upperRange   = upperElement.getZRange();
+                final double      lowerEnd     = lowerRange.getMaximum();
+                final double      upperStart   = upperRange.getMinimum();
+                if (lowerEnd+lagTolerance >= upperStart) {
+                    if (interpolationEnabled) {
+                        load(lowerElement, upperElement);
+                    } else {
+                        if (Math.abs(getZ(upperRange)-z) > Math.abs(z-getZ(lowerRange))) {
+                            index--;
+                        }
+                        load(index);
+                    }
+                    return true;
+                }
+                if (lowerRange.contains(Z)) {
+                    load(index-1);
+                    return true;
+                }
+                if (upperRange.contains(Z)) {
+                    load(index);
+                    return true;
+                }
+                return false; // Missing data.
+            }
+        } catch (IOException exception) {
+            throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
+        }
+        throw new OrdinateOutsideCoverageException(Resources.format(
+                  ResourceKeys.ERROR_ZVALUE_OUTSIDE_COVERAGE_$1, Z), zDimension);
     }
     
     /**
-     * Projète un point du système de coordonnées de cette couverture vers le système
-     * de l'image spécifiée. Cette méthode doit être utilisée avant d'appeller une
-     * méthode <code>evaluate(...)</code> sur la couverture spécifiée.
+     * Returns a coverage for the given <var>z</var> value.
      *
-     * @param  point Le point à transformer. Ce point ne sera jamais modifié.
-     * @return Le point transformé.
-     * @throws CannotEvaluateException si la transformation n'a pas pu être faites.
+     * @param  z The <var>z</var> value where to evaluate.
+     * @return The coverage at the specified value, or {@code null} if the requested date fall in
+     *         a hole in the data.
+     * @throws PointOutsideCoverageException if <var>z</var> is outside coverage.
+     * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-//    private Point2D project(final Point2D point, final GridCoverage2D coverage) throws CannotEvaluateException {
-//        // TODO: On ne prend que les deux première dimensions parce que, pour une raison non
-//        //       élucidée, l'opération "NodataFilter" retourne un système de coordonnées 2D.
-//        try {
-//            final CoordinateReferenceSystem targetCS = CRSUtilities.getCRS2D(coverage.getCoordinateReferenceSystem());
-//            if (CRSUtilities.equalsIgnoreMetadata(CRSUtilities.getCRS2D(crs), targetCS)) {
-//                return point;
-//            }
-//            // TODO: Implémenter la transformation de coordonnées.
-//            throw new CannotEvaluateException("Système de coordonnées incompatibles.");
-//        } catch (TransformException exception) {
-//            throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
-//        }
-//    }
+    public synchronized Coverage getGridCoverage(final double z) throws CannotEvaluateException {
+        if (!seek(z)) {
+            // Missing data
+            return null;
+        }
+        if (lower == upper) {
+            // No interpolation needed.
+            return lower;
+        }
+        assert isCompatibleCRS(lower.getCoordinateReferenceSystem()) : lower;
+        assert isCompatibleCRS(upper.getCoordinateReferenceSystem()) : upper;
+        assert (z>=lowerZ && z<=upperZ) : z;
+        if (interpolated!=null && Math.abs(z-interpolatedZ)<=EPS) {
+            return interpolated;
+        }
+        final double ratio = (z-lowerZ) / (upperZ-lowerZ);
+        if (Math.abs(  ratio) <= EPS) return lower;
+        if (Math.abs(1-ratio) <= EPS) return upper;
+        if (interpolationEnabled) {
+            if (processor == null) {
+                // TODO: We should fetch this processor using some factory.
+                processor = GridCoverageProcessor2D.getDefault();
+            }
+            // TODO: we should work with an arbitrary processor instead.
+            final GridCoverageProcessor2D processor = (GridCoverageProcessor2D) this.processor;
+            final Operation operation = processor.getOperation("Combine");
+            final ParameterValueGroup param = operation.getParameters();
+            param.parameter("source0").setValue(lower);
+            param.parameter("source1").setValue(upper);
+            param.parameter("matrix").setValue(new double[][]{{1-ratio, ratio, 0}});
+            interpolated  = processor.doOperation(operation, param);
+            interpolatedZ = z; // Set only if previous line has been successfull.
+            return interpolated;
+        }
+        return (ratio <= 0.5) ? lower : upper;
+    }
     
     /**
      * Returns a sequence of integer values for a given point in the coverage.

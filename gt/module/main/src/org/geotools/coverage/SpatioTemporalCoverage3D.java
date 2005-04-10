@@ -49,15 +49,15 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.factory.Hints;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.crs.TemporalCRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.resources.CRSUtilities;
 
 
 /**
@@ -235,14 +235,14 @@ control:    for (int p=0; p<=1; p++) {
                     envelope.getMinimum(yDimension),
                     envelope.getMaximum(xDimension),
                     envelope.getMaximum(yDimension));
-            final CoordinateReferenceSystem sourceCS = CRSUtilities.getHorizontalCRS(crs);
-            final CoordinateReferenceSystem targetCS = GeographicCRS.WGS84;
-            if (!CRSUtilities.equalsIgnoreMetadata(targetCS, sourceCS)) {
+            final CoordinateReferenceSystem sourceCRS = CRSUtilities.getHorizontalCRS(crs);
+            final CoordinateReferenceSystem targetCRS = GeographicCRS.WGS84;
+            if (!CRSUtilities.equalsIgnoreMetadata(targetCRS, sourceCRS)) {
                 final CoordinateOperation      transform;
                 final CoordinateOperationFactory factory;
                 factory = FactoryFinder.getCoordinateOperationFactory(HINTS);
                 try {
-                    transform = factory.createOperation(sourceCS, targetCS);
+                    transform = factory.createOperation(sourceCRS, targetCRS);
                 } catch (FactoryException exception) {
                     throw new TransformException(exception.getLocalizedMessage(), exception);
                 }
@@ -316,7 +316,14 @@ control:    for (int p=0; p<=1; p++) {
     public final boolean[] evaluate(final Point2D point, final Date time, boolean[] dest)
             throws CannotEvaluateException
     {
-        return evaluate(toDirectPosition(point, time), dest);
+        try {
+            return evaluate(toDirectPosition(point, time), dest);
+        } catch (OrdinateOutsideCoverageException exception) {
+            if (exception.getOutOfBoundsDimension() == temporalDimension) {
+                exception = new OrdinateOutsideCoverageException(exception, time);
+            }
+            throw exception;
+        }
     }
 
     /**
@@ -332,7 +339,14 @@ control:    for (int p=0; p<=1; p++) {
     public final byte[] evaluate(final Point2D point, final Date time, byte[] dest)
             throws CannotEvaluateException
     {
-        return evaluate(toDirectPosition(point, time), dest);
+        try {
+            return evaluate(toDirectPosition(point, time), dest);
+        } catch (OrdinateOutsideCoverageException exception) {
+            if (exception.getOutOfBoundsDimension() == temporalDimension) {
+                exception = new OrdinateOutsideCoverageException(exception, time);
+            }
+            throw exception;
+        }
     }
 
     /**
@@ -348,7 +362,14 @@ control:    for (int p=0; p<=1; p++) {
     public final int[] evaluate(final Point2D point, final Date time, int[] dest)
             throws CannotEvaluateException
     {
-        return evaluate(toDirectPosition(point, time), dest);
+        try {
+            return evaluate(toDirectPosition(point, time), dest);
+        } catch (OrdinateOutsideCoverageException exception) {
+            if (exception.getOutOfBoundsDimension() == temporalDimension) {
+                exception = new OrdinateOutsideCoverageException(exception, time);
+            }
+            throw exception;
+        }
     }
 
     /**
@@ -364,7 +385,14 @@ control:    for (int p=0; p<=1; p++) {
     public final float[] evaluate(final Point2D point, final Date time, float[] dest)
             throws CannotEvaluateException
     {
-        return evaluate(toDirectPosition(point, time), dest);
+        try {
+            return evaluate(toDirectPosition(point, time), dest);
+        } catch (OrdinateOutsideCoverageException exception) {
+            if (exception.getOutOfBoundsDimension() == temporalDimension) {
+                exception = new OrdinateOutsideCoverageException(exception, time);
+            }
+            throw exception;
+        }
     }
 
     /**
@@ -380,7 +408,14 @@ control:    for (int p=0; p<=1; p++) {
     public final double[] evaluate(final Point2D point, final Date time, double[] dest)
             throws CannotEvaluateException
     {
-        return evaluate(toDirectPosition(point, time), dest);
+        try {
+            return evaluate(toDirectPosition(point, time), dest);
+        } catch (OrdinateOutsideCoverageException exception) {
+            if (exception.getOutOfBoundsDimension() == temporalDimension) {
+                exception = new OrdinateOutsideCoverageException(exception, time);
+            }
+            throw exception;
+        }
     }
 
     /**

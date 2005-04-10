@@ -114,15 +114,20 @@ import org.geotools.util.WeakHashSet;
 
 
 /**
- * Basic access to grid data values backed by a two-dimensional {@linkplain RenderedImage
- * rendered image}. Each band in an image is represented as a sample dimension.
+ * Basic access to grid data values backed by a two-dimensional
+ * {@linkplain RenderedImage rendered image}. Each band in an image is represented as a
+ * {@linkplain SampleDimensionGT sample dimension}.
  * <br><br>
- * Grid coverages are usually two-dimensional. However, their envelope may
- * have more than two dimensions.  For example, a remote sensing image may
- * be valid only over some time range (the time of satellite pass over the
- * observed area). Envelope for such grid coverage may have three dimensions:
- * the two usual ones (horizontal extends along <var>x</var> and <var>y</var>),
- * and a third one for start time and end time (time extends along <var>t</var>).
+ * Grid coverages are usually two-dimensional. However, {@linkplain #getEnvelope their envelope}
+ * may have more than two dimensions. For example, a remote sensing image may be valid only over
+ * some time range (the time of satellite pass over the observed area). Envelopes for such grid
+ * coverage can have three dimensions: the two usual ones (horizontal extent along <var>x</var>
+ * and <var>y</var>), and a third one for start time and end time (time extent along <var>t</var>).
+ * However, the {@linkplain GridRangeGT grid range} for all extra-dimension <strong>must</strong>
+ * have a {@linkplain GridRangeGT#getLength size} not greater than 1. In other words, a
+ * {@code GridCoverage2D} can be a slice in a 3 dimensional grid coverage. Each slice can have an
+ * arbitrary width and height (like any two-dimensional images), but only 1 voxel depth (a "voxel"
+ * is a three-dimensional pixel).
  * <br><br>
  * <strong>Serialization note:</strong><br>
  * Because it is serializable, {@code GridCoverage2D} can be included as method argument or as
@@ -198,10 +203,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     protected final GridGeometry2D gridGeometry;
     
     /**
-     * The image's envelope. This envelope must have at least two
-     * dimensions. It may have more dimensions if the image have
-     * some extend in other dimensions (for example a depth, or
-     * a start and end time).
+     * The coverage's envelope. This envelope must have at least two dimensions. It may have more
+     * dimensions if the coverage has some extent in other dimensions (for example a depth, or a
+     * start and end time).
      */
     private final GeneralEnvelope envelope;
     
@@ -746,17 +750,17 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
 
     /**
      * Returns the bounding box for the coverage domain in coordinate reference system coordinates.
+     * The returned envelope have at least two dimensions. It may have more dimensions if the
+     * coverage has some extent in other dimensions (for example a depth, or a start and end time).
      */
     public Envelope getEnvelope() {
-        if (envelope instanceof Cloneable) {
-            return (Envelope) ((Cloneable) envelope).clone();
-        }
-        return envelope;
+        return (Envelope) envelope.clone();
     }
 
     /**
      * Returns the two-dimensional bounding box for the coverage domain in coordinate reference
-     * system coordinates.
+     * system coordinates. If the coverage envelope has more than two dimensions, only the
+     * dimensions used in the underlying rendered image are returned.
      */
     public Envelope2D getEnvelope2D() {
         return new Envelope2D(crs2D,

@@ -93,13 +93,16 @@ public final class CRSUtilities {
      * @return <code>true</code> if both objects are equals.
      */
     public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
+        if (object1 == object2) {
+            return true;
+        }
         if (object1 instanceof org.geotools.referencing.IdentifiedObject &&
             object2 instanceof org.geotools.referencing.IdentifiedObject)
         {
             return ((org.geotools.referencing.IdentifiedObject) object1).equals(
                    ((org.geotools.referencing.IdentifiedObject) object2), false);
         }
-        return Utilities.equals(object1, object2);
+        return object1!=null && object1.equals(object2);
     }
     
     /**

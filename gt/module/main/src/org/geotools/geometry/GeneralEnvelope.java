@@ -50,7 +50,7 @@ import org.geotools.resources.geometry.XRectangle2D;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeneralEnvelope implements Envelope, Serializable {
+public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -195,6 +195,7 @@ public class GeneralEnvelope implements Envelope, Serializable {
 
     /**
      * Set the coordinate reference system in which the coordinate are given.
+     * Note: this method <strong>do not</strong> reproject the envelope.
      *
      * @param crs The new coordinate reference system, or <code>null</code>.
      */
