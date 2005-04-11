@@ -90,7 +90,7 @@ public class Rendering2DTest extends TestCase {
      * The logger for the rendering module.
      */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
-    private static final boolean INTERACTIVE=false;
+    public static boolean INTERACTIVE=false;
     private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
     private Object transform;
     static final String LINE = "linefeature";

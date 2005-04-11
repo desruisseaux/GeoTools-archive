@@ -94,21 +94,11 @@ public final class GridCoverageRenderer {
      */
     public GridCoverageRenderer(GridCoverage gridCoverage) {
         this.gridCoverage = gridCoverage;
-
         if (gridCoverage instanceof GridCoverage2D) {
-        	image = ((GridCoverage2D) gridCoverage).getRenderedImage();
-        }
-
-        if (gridCoverage instanceof RenderedCoverage) {
+        	image = ((GridCoverage2D) gridCoverage).geophysics(false).getRenderedImage();
+        }else if (gridCoverage instanceof RenderedCoverage) {
             image = ((RenderedCoverage) gridCoverage).getRenderedImage();
         } 
-//  FIXME
-//        try {
-//            image = gridCoverage.geophysics(false).getRenderedImage();
-//        } catch (Exception e) {
-//            System.out.println("Using geophysics image");
-//            image = gridCoverage.getRenderedImage();
-//        }
 
         if (USE_PYRAMID) {
             AffineTransform at = AffineTransform.getScaleInstance(
