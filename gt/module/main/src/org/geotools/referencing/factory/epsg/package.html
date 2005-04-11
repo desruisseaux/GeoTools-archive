@@ -8,7 +8,7 @@
   {@linkplain org.opengis.referencing.AuthorityFactory Authority factories} for
   the <A HREF="http://www.epsg.org">EPSG</A> database.
 
-  <H2>Windows installation</H2>
+  <H2>Windows installation with MS-Access database</H2>
   <P ALIGN="justify">The EPSG database is available in MS-Access format. Installing this database
   is the easiest way to get the EPSG factory running, since the MS-Access database can be copied
   on yours local machine. You don't need the MS-Access software; only the ODBC driver for MS-Access
@@ -25,29 +25,51 @@
         <code>EPSG_v6.mdb</code> file.</li>
   </ul>
 
-  <h2>Other installation</h2>
+  <h2>Any platform installation with JNDI (usually J2EE)</h2>
   <P ALIGN="justify">Installation on Unix systems typically has a database software running on some
   server rather than the local machine. The administrator will probably have to download the SQL
   scripts from <A HREF="http://www.epsg.org">http://www.epsg.org</A> and executes it in whatever database
-  software is in use (PostgreSQL, MySQL, Oracle, <cite>etc.</cite>). The connection parameters (server URL,
+  software they use (PostgreSQL, MySQL, Oracle, <cite>etc.</cite>). The connection parameters (server URL,
   user name, <cite>etc.</cite>) can be specified as a {@link javax.sql.DataSource} registered with a naming
-  service based on Java Naming and Directory (JNDI) interfaces. Like the database, the naming service too
+  service based on Java Naming and Directory (JNDI) interfaces. Like databases, the naming service
   is typically located on some server. The data source name for the connection to the EPSG database is
-  {@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}.</P>
+  <code>{@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}</code>.</P>
 
   <UL>
-    <LI><P>For setting up a naming service (LDAP, NIS, <cite>etc.</cite>), see the
+    <LI><P ALIGN="justify">For setting up a naming service (LDAP, NIS, <cite>etc.</cite>), see the
         <A HREF="http://java.sun.com/products/jndi/tutorial/trailmap.html">JNDI tutorial</A>.</P></LI>
         
-    <LI><P>For an example of {@link javax.sql.DataSource} creation with different connection parameters
-        than the default ones, see <A HREF="http://java.sun.com/j2se/1.5/docs/guide/jdbc/bridge.html">New
-        data source implementations in the JDBC-ODBC bridge</A>.</P></LI>
-        
-    <LI><P>For getting the EPSG factory to work without a naming directory, run
-        <code>java org.geotools.referencing.factory.epsg.DefaultFactory -datasource <var>classname</var></code>
-        once where <var>classname</var> is the class name of a {@link javax.sql.DataSource} implementation
-        to use. The default class name is "{@code sun.jdbc.odbc.ee.DataSource}". An example of alternative
-        implementation is "{@code org.postgresql.jdbc2.optional.SimpleDataSource}".</P>
+    <LI><P ALIGN="justify">For an example of {@link javax.sql.DataSource} creation with different connection parameters
+        than the default ones, see <A HREF="http://java.sun.com/j2se/1.5/docs/guide/jdbc/bridge.html">New data source
+        implementations in the JDBC-ODBC bridge</A>.</P></LI>
+
+    <LI><P ALIGN="justify">For {@link javax.sql.DataSource} implementations targeting other database softwares, see
+        their JDBC documentation. For example the <A HREF="http://jdbc.postgresql.org">PostgreSQL JDBC</A> provides
+        an {@code org.postgresql.ds.PGSimpleDataSource} basic implementation.</P></LI>
   </UL>
+
+  <h2>Any platform without JNDI (usually J2SE)</h2>
+  <P ALIGN="justify">For getting the EPSG factory to pickup a custom {@link javax.sql.DataSource} without a naming directory
+  (JNDI), create some subclass that implements Geotools's {@link org.geotools.referencing.factory.epsg.DataSource}
+  marker interface. For example:</P>
+  <BLOCKQUOTE><TABLE border="2" width="100%"><TR><TD><PRE><B>import</B> org.postgresql.ds.PGSimpleDataSource;
+<B>import</B> org.geotools.referencing.factory.epsg.DataSource;
+
+<B>public</B> MyDataSource <B>extends</B> PGSimpleDataSource <B>implements</B> DataSource {
+    <B>public</B> MyDataSource() {
+        setServerName("myserver.com");
+        setDatabaseName("mydatabase");
+    }
+
+    <B>public</B> <B>boolean</B> isPreferred() {
+        <B>return</B> <B>true</B>;
+    }
+}</PRE></TD></TR></TABLE></BLOCKQUOTE>
+  <P ALIGN="justify">Then, declare this custom implementation in the following file
+  (for uses by {@link org.geotools.factory.FactoryRegistry}):</P>
+  <BLOCKQUOTE><PRE>META-INF/services/org.geotools.referencing.factory.epsg.DataSource</PRE></BLOCKQUOTE>
+  <P ALIGN="justify">Just providing a JAR file with the above-cited {@link org.geotools.referencing.factory.epsg.DataSource}
+  implementation and {@code META-INF/services/} registration is suffisient for connecting automatically an application to
+  an arbitrary server (providing that the relevant JDBC driver is present, of course).</P></LI>
   </BODY>
 </HTML>

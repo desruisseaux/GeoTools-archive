@@ -5,7 +5,7 @@
   <name>geotools-epsg</name>
   <id>epsg</id>
   <currentVersion>2.1.x</currentVersion>
-  <package>org.geotools.cs</package>
+  <package>org.geotools.referencing</package>
   <shortDescription>EPSG Authoriy Service</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>
