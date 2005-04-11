@@ -11,6 +11,15 @@
   </description>
   <developers>
      <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>simboss_ml@tiscali.it</email>
+      <organization></organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>  
+     <developer>
       <name>Alessio Fabiani</name>
       <id>alfa</id>
       <email>alessio.fabiani@gmail.com</email>
@@ -19,16 +28,7 @@
         <role>Java Developer</role>
       </roles>
     </developer>   
-     <developer>
-      <name>Simone Giannecchini</name>
-      <id>simboss</id>
-      <email>simboss_ml@tiscali.it</email>
-      <organization></organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>   
-  </developers>
+   </developers>
   <dependencies>
     <dependency>
       <artifactId>main</artifactId>
