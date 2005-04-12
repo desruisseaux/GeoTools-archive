@@ -22,6 +22,8 @@ package org.geotools.referencing;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -126,6 +128,34 @@ public class CRS {
             }
         }
         return list;
+    }
+    
+    /**
+     *   Get list of the codes that are supported by the authority.
+     *   For example, "EPSG" -->   "EPSG:2000", "EPSG:2001", "EPSG:2002" because we know what
+     *   they mean.
+     * 
+     * @param authority - list of supported codes 
+     * @return
+     */
+    public static Set getSupportedCodes(String AUTHORITY)
+    {
+    	 TreeSet result = new TreeSet();
+    	 for( Iterator i = FactoryFinder.getCRSAuthorityFactories().iterator(); i.hasNext(); )  //for each authority factory
+    	 {        
+            CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();  //grab a factory
+            try {
+                Citation authority = factory.getAuthority();  // what authorities does this factory produce?
+                if( !authority.getIdentifiers().contains( AUTHORITY  ) ) continue;
+                Set s = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
+                result.addAll(s);
+            }
+            catch (Exception e)
+			{
+            	e.printStackTrace(); // we hid errors - hopefully another factory will do the work for us.
+			}
+    	 }
+    	 return result;
     }
 
     /**
