@@ -70,6 +70,11 @@ public final class Interpolator2D extends GridCoverage2D {
     private static final float ONE_EPSILON = 0.99999994f;
 
     /**
+     * Default interpolations, in preference order. Will be constructed only when first needed.
+     */
+    private static Interpolation[] DEFAULTS;
+
+    /**
      * Transform from "real world" coordinates to grid coordinates.
      * This transform maps coordinates to pixel <em>centers</em>.
      */
@@ -120,6 +125,23 @@ public final class Interpolator2D extends GridCoverage2D {
      * This array will be constructed only when first needed.
      */
     private transient int[][] ints;
+
+    /**
+     * Constructs a new interpolator using default interpolations.
+     *
+     * @param  coverage The coverage to interpolate.
+     */
+    public static GridCoverage2D create(final GridCoverage2D coverage) {
+        // No need to synchronize: not a big deal if two arrays are created.
+        if (DEFAULTS == null) {
+            DEFAULTS = new Interpolation[] {
+                Interpolation.getInstance(Interpolation.INTERP_BICUBIC),
+                Interpolation.getInstance(Interpolation.INTERP_BILINEAR),
+                Interpolation.getInstance(Interpolation.INTERP_NEAREST)
+            };
+        }
+        return create(coverage, DEFAULTS);
+    }
     
     /**
      * Constructs a new interpolator for a single interpolation.

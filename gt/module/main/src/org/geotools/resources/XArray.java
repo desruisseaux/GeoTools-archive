@@ -910,7 +910,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in increasing order.
+     * Returns {@code true} if all elements in the specified array are in increasing order.
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final char[] array) {
@@ -921,7 +921,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in increasing order.
+     * Returns {@code true} if all elements in the specified array are in increasing order.
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final byte[] array) {
@@ -932,7 +932,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in increasing order.
+     * Returns {@code true} if all elements in the specified array are in increasing order.
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final short[] array) {
@@ -943,7 +943,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in increasing order.
+     * Returns {@code true} if all elements in the specified array are in increasing order.
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final int[] array) {
@@ -954,7 +954,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in increasing order.
+     * Returns {@code true} if all elements in the specified array are in increasing order.
      * This method is usefull in assertions.
      */
     public static boolean isSorted(final long[] array) {
@@ -965,7 +965,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in increasing order.
+     * Returns {@code true} if all elements in the specified array are in increasing order.
      * Since <code>NaN</code> values are unordered, they may appears anywhere in the array; they
      * will be ignored. This method is usefull in assertions.
      */
@@ -984,7 +984,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in increasing order.
+     * Returns {@code true} if all elements in the specified array are in increasing order.
      * Since <code>NaN</code> values are unordered, they may appears anywhere in the array; they
      * will be ignored. This method is usefull in assertions.
      */
@@ -1003,7 +1003,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if all elements in the specified array are in strictly increasing order.
+     * Returns {@code true} if all elements in the specified array are in strictly increasing order.
      * This method is usefull in assertions.
      */
     public static boolean isStrictlySorted(final int[] array) {
@@ -1014,7 +1014,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if the specified array contains at least one
+     * Returns {@code true} if the specified array contains at least one
      * {@link Double#NaN NaN} value.
      */
     public static boolean hasNaN(final double[] array) {
@@ -1027,7 +1027,7 @@ public final class XArray {
     }
 
     /**
-     * Returns {code true} if the specified array contains at least one
+     * Returns {@code true} if the specified array contains at least one
      * {@link Float#NaN NaN} value.
      */
     public static boolean hasNaN(final float[] array) {

@@ -19,7 +19,7 @@
  */
 package org.geotools.coverage;
 
-// J2SE dependencies
+// J2SE and JAI dependencies
 import java.util.List;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -36,6 +36,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.event.IIOReadWarningListener;
 import javax.imageio.event.IIOReadProgressListener;
 import java.lang.reflect.UndeclaredThrowableException;
+import javax.media.jai.InterpolationNearest;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -44,9 +45,6 @@ import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.processing.Operation;
-import org.opengis.coverage.processing.GridCoverageProcessor;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -58,9 +56,10 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.IIOReadProgressAdapter;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.operation.Interpolator2D;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -295,11 +294,6 @@ public class CoverageStack extends AbstractCoverage {
             return coverage;
         }
     }
-
-    /**
-     * Small number for floating point comparaisons.
-     */
-    private static final double EPS = 1E-6;
     
     /**
      * Coverage elements in this stack. Elements may be shared by more than one
@@ -374,32 +368,14 @@ public class CoverageStack extends AbstractCoverage {
     private transient Coverage upper;
     
     /**
-     * The coverage interpolated by the last call to {@link #getGridCoverage}. This coverage is
-     * retained in order to avoid to constructs it many time if the same coverage is requested
-     * more than once for the same <var>z</var> value.
-     */
-    private transient GridCoverage interpolated;
-    
-    /**
      * <var>Z</var> values in the middle of {@link #lower} and {@link #upper} envelope.
      */
     private transient double lowerZ=Double.POSITIVE_INFINITY, upperZ=Double.NEGATIVE_INFINITY;
     
     /**
-     * <var>Z</var> value for the {@link #interpolated} coverage.
-     */
-    private transient double interpolatedZ = Double.NaN;
-    
-    /**
      * Range for {@link #lower} and {@link #upper}.
      */
     private transient NumberRange lowerRange, upperRange;
-    
-    /**
-     * The grid coverage processor to uses for interpolations.
-     * Will be created only when first needed.
-     */
-    private transient GridCoverageProcessor processor;
 
     /**
      * Sample byte values. Allocated when first needed, in order to avoid allocating
@@ -430,9 +406,8 @@ public class CoverageStack extends AbstractCoverage {
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        lowerZ        = Double.POSITIVE_INFINITY;
-        upperZ        = Double.NEGATIVE_INFINITY;
-        interpolatedZ = Double.NaN;
+        lowerZ = Double.POSITIVE_INFINITY;
+        upperZ = Double.NEGATIVE_INFINITY;
     }
 
     /**
@@ -843,7 +818,16 @@ public class CoverageStack extends AbstractCoverage {
      * @throws IOException if an error occured while loading image.
      */
     private Coverage load(final Element element) throws IOException {
-        final Coverage coverage = element.getCoverage(listeners);
+        Coverage coverage = element.getCoverage(listeners);
+        if (interpolationEnabled && coverage instanceof GridCoverage2D) {
+            final GridCoverage2D coverage2D = (GridCoverage2D) coverage;
+            if (coverage2D.getInterpolation() instanceof InterpolationNearest) {
+                coverage = Interpolator2D.create(coverage2D);
+            }
+        }
+        /*
+         * CRS assertions (for debugging purpose).
+         */
         final CoordinateReferenceSystem sourceCRS;
         assert CRSUtilities.equalsIgnoreMetadata((sourceCRS=coverage.getCoordinateReferenceSystem()),
                CRSUtilities.getSubCRS(crs, 0, sourceCRS.getCoordinateSystem().getDimension())) : sourceCRS;
@@ -988,50 +972,6 @@ public class CoverageStack extends AbstractCoverage {
         }
         throw new OrdinateOutsideCoverageException(Resources.format(
                   ResourceKeys.ERROR_ZVALUE_OUTSIDE_COVERAGE_$1, Z), zDimension);
-    }
-    
-    /**
-     * Returns a coverage for the given <var>z</var> value.
-     *
-     * @param  z The <var>z</var> value where to evaluate.
-     * @return The coverage at the specified value, or {@code null} if the requested date fall in
-     *         a hole in the data.
-     * @throws PointOutsideCoverageException if <var>z</var> is outside coverage.
-     * @throws CannotEvaluateException if the computation failed for some other reason.
-     */
-    public synchronized Coverage getGridCoverage(final double z) throws CannotEvaluateException {
-        if (!seek(z)) {
-            // Missing data
-            return null;
-        }
-        if (lower == upper) {
-            // No interpolation needed.
-            return lower;
-        }
-        assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
-        if (interpolated!=null && Math.abs(z-interpolatedZ)<=EPS) {
-            return interpolated;
-        }
-        final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        if (Math.abs(  ratio) <= EPS) return lower;
-        if (Math.abs(1-ratio) <= EPS) return upper;
-        if (interpolationEnabled) {
-            if (processor == null) {
-                // TODO: We should fetch this processor using some factory.
-                processor = GridCoverageProcessor2D.getDefault();
-            }
-            // TODO: we should work with an arbitrary processor instead.
-            final GridCoverageProcessor2D processor = (GridCoverageProcessor2D) this.processor;
-            final Operation operation = processor.getOperation("Combine");
-            final ParameterValueGroup param = operation.getParameters();
-            param.parameter("source0").setValue(lower);
-            param.parameter("source1").setValue(upper);
-            param.parameter("matrix").setValue(new double[][]{{1-ratio, ratio, 0}});
-            interpolated  = processor.doOperation(operation, param);
-            interpolatedZ = z; // Set only if previous line has been successfull.
-            return interpolated;
-        }
-        return (ratio <= 0.5) ? lower : upper;
     }
     
     /**
@@ -1284,10 +1224,8 @@ public class CoverageStack extends AbstractCoverage {
     public synchronized void setInterpolationEnabled(final boolean flag) {
         lower                = null;
         upper                = null;
-        interpolated         = null;
         lowerZ               = Double.POSITIVE_INFINITY;
         upperZ               = Double.NEGATIVE_INFINITY;
-        interpolatedZ        = Double.NaN;
         interpolationEnabled = flag;
     }
     

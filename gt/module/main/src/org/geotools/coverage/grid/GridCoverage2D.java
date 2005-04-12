@@ -806,7 +806,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Returns the interpolation used for all {code evaluate(...)} methods.
+     * Returns the interpolation used for all {@code evaluate(...)} methods.
      * The default implementation returns {@link InterpolationNearest}.
      *
      * @return The interpolation.

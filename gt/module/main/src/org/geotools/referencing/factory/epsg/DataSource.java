@@ -65,6 +65,15 @@ public interface DataSource extends javax.sql.DataSource {
     /**
      * Returns {@code true} if the database uses standard SQL syntax, or {@code false} if it
      * uses the MS-Access syntax.
+     *
+     * @todo We should remove this method and lets DefaultFactory tries different
+     *       SELECT instructions. For example we could try a SQL statement like
+     *       "SELECT id FROM epsg_sometable WHERE ID=0" (we don't mind if the result
+     *       set contains no record) and use {@link FactoryForSQL} if the above didn't
+     *       threw a SQLException. An alternative is to define a 'getFactory' method
+     *       instead, and lets the DataSource built its own EPSG factory. But in this
+     *       case, it will be hard to avoid creating a real subclass of
+     *       {@code sun.jdbc.odbc.ee.DataSource}.
      */
     boolean isStandardSQL();
 }
