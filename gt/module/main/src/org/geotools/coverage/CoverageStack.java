@@ -20,8 +20,11 @@
 package org.geotools.coverage;
 
 // J2SE dependencies
-import java.util.Set;
+import java.util.List;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -50,6 +53,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.image.io.IIOListeners;
@@ -60,6 +64,7 @@ import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
 
 
@@ -126,7 +131,7 @@ public class CoverageStack extends AbstractCoverage {
          * since it may be invoked soon. This method is invoked just before {@link #getCoverage}
          * in order to log a "Loading data..." message.
          */
-        String getName() throws IOException;
+        InternationalString getName() throws IOException;
         
         /**
          * Returns the minimum and maximum <var>z</var> value for the coverage.
@@ -178,6 +183,117 @@ public class CoverageStack extends AbstractCoverage {
          * @throws IOException if a data loading was required but failed.
          */
         Coverage getCoverage(IIOListeners listeners) throws IOException;
+    }
+
+    /**
+     * A convenience adapter class for wrapping a pre-loaded {@link Coverage} into an
+     * {@link Element} object. This adapter provides basic implementation for all methods,
+     * but they a require a fully constructed {@link Coverage} object. Subclasses are strongly
+     * encouraged to provides alternative implementation loading only the minimum amount of data
+     * required for each method.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    public static class Adapter implements Element {
+        /**
+         * The wrapped coverage, or {@code null} if not yet loaded.
+         * If null, the loading must be performed by the {@link #getCoverage} method.
+         */
+        protected Coverage coverage;
+
+        /**
+         * Minimum and maximum <var>z</var> values for this element, or {@code null} if not yet
+         * determined. If {@code null}, the range must be computed by the {@link #getZRange} method.
+         */
+        protected NumberRange range;
+
+        /**
+         * Constructs a new adapter for the specified coverage and <var>z</var> values.
+         *
+         * @param coverage The coverage to wrap. Can be {@code null} only if this constructor
+         *                 is invoked from a sub-class constructor.
+         * @param range    The Minimum and maximum <var>z</var> values for this element, or
+         *                 {@code null} to infers it from the last dimension in the coverage's
+         *                 envelope.
+         */
+        public Adapter(final Coverage coverage, final NumberRange range) {
+            this.coverage = coverage;
+            this.range    = range;
+            if (getClass() == Adapter.class) {
+                if (coverage == null) {
+                    throw new NullPointerException(); // TODO: provides a localized message.
+                }
+            }
+        }
+
+        /**
+         * Returns the coverage name. The default implementation delegates to the
+         * {@linkplain #getCoverage underlying coverage} if it is an instance of
+         * {@link AbstractCoverage}.
+         */
+        public InternationalString getName() throws IOException {
+            final Coverage coverage = getCoverage(null);
+            return (coverage instanceof AbstractCoverage) ? ((AbstractCoverage) coverage).getName()
+                    : new SimpleInternationalString(coverage.toString());
+        }
+        
+        /**
+         * Returns the minimum and maximum <var>z</var> values for the coverage. If the range was
+         * not explicitly specified to the constructor, then the default implementation infers it
+         * from the last dimension in the coverage's envelope.
+         */
+        public NumberRange getZRange() throws IOException {
+            if (range == null) {
+                final Envelope envelope = getEnvelope();
+                final int zDimension = envelope.getDimension() - 1;
+                range = new NumberRange(envelope.getMinimum(zDimension),
+                                        envelope.getMaximum(zDimension));
+            }
+            return range;
+        }
+
+        /**
+         * Returns the coverage envelope. The default implementation delegates to the
+         * {@linkplain #getCoverage underlying coverage}.
+         */
+        public Envelope getEnvelope() throws IOException {
+            return getCoverage(null).getEnvelope();
+        }
+
+        /**
+         * Returns the coverage grid geometry. The default implementation delegates to the
+         * {@linkplain #getCoverage underlying coverage} if it is an instance of
+         * {@link GridCoverage}.
+         */
+        public GridGeometry getGridGeometry() throws IOException {
+            final Coverage coverage = getCoverage(null);
+            return (coverage instanceof GridCoverage) ?
+                    ((GridCoverage) coverage).getGridGeometry() : null;
+        }
+
+        /**
+         * Returns the sample dimension for the coverage. The default implementation delegates to the
+         * {@linkplain #getCoverage underlying coverage}.
+         */
+        public SampleDimension[] getSampleDimensions() throws IOException {
+            final Coverage coverage = getCoverage(null);
+            final SampleDimension[] sd = new SampleDimension[coverage.getNumSampleDimensions()];
+            for (int i=0; i<sd.length; i++) {
+                sd[i] = coverage.getSampleDimension(i);
+            }
+            return sd;
+        }
+
+        /**
+         * Returns the coverage. Implementors can overrides this method if they want to load
+         * {@link #coverage} only when first needed. However, they are strongly encouraged to
+         * override all other methods as well in order to load the minimum amount of data,
+         * since all default implementations invoke {@code getCoverage(null)}.
+         */
+        public Coverage getCoverage(final IIOListeners listeners) throws IOException {
+            return coverage;
+        }
     }
 
     /**
@@ -320,6 +436,72 @@ public class CoverageStack extends AbstractCoverage {
     }
 
     /**
+     * Constructs a new coverage stack with all the supplied elements. All coverages must uses the
+     * same coordinate reference system. Additionnaly, all coverages must specify their <var>z</var>
+     * value in the last dimension of their envelope. The example below constructs two dimensional
+     * grid coverages (to be given as the {@code coverages} argument) for the same area, but at
+     * different times:
+     *
+     * <blockquote><pre>
+     * CoordinateReferenceSystem crs2D = ...;  // Yours horizontal CRS.
+     * TemporalCRS             timeCRS = ...;  // Yours CRS for time measurement.
+     * CoordinateReferenceSystem crs3D = new CompoundCRS(crs3D, timeCRS);
+     *
+     * List           coverages = new ArrayList();
+     * GeneralEnvelope envelope = new GeneralEnvelope(3); // A <strong>3-dimensional</strong> envelope.
+     * envelope.setRange(...);                            // Set the horizontal part.
+     * for (int i=0; i<...; i++) {
+     *     envelope.setRange(2, startTime, endTime);
+     *     coverages.add(new GridCoverage2D(..., crs, envelope, ...);
+     * }
+     * </pre></blockquote>
+     * 
+     * This convenience constructor wraps all coverage intos a {@link Adapter Adapter} object.
+     * Users with a significant amount of data are encouraged to uses the constructor expecting
+     * {@link Element Element} objects instead, in order to provides their own implementation
+     * loading data only when needed.
+     *
+     * @param  name      The name for this coverage.
+     * @param  coverages All {@link Coverage} elements for this stack.
+     * @throws IOException if an I/O operation was required and failed.
+     */
+    public CoverageStack(final CharSequence name,
+                         final Collection/*<Coverage>*/ coverages) throws IOException
+    {
+        this(name, getCoordinateReferenceSystem(coverages), toElements(coverages));
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors").
+     */
+    private static CoordinateReferenceSystem getCoordinateReferenceSystem(final Collection coverages) {
+        CoordinateReferenceSystem crs = null;
+        for (final Iterator it=coverages.iterator(); it.hasNext();) {
+            final CoordinateReferenceSystem candidate = ((Coverage) it.next()).getCoordinateReferenceSystem();
+            if (crs == null) {
+                crs = candidate;
+            } else if (!crs.equals(candidate)) {
+                // TODO: localize
+                throw new IllegalArgumentException("Inconsistent coordinate reference system");
+            }
+        }
+        return crs;
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors").
+     */
+    private static Collection/*<Element>*/ toElements(final Collection/*<Coverage>*/ coverages) {
+        final List elements = new ArrayList(coverages.size());
+        for (final Iterator it=coverages.iterator(); it.hasNext();) {
+            elements.add(new Adapter((Coverage) it.next(), null));
+        }
+        return elements;
+    }
+
+    /**
      * Constructs a new coverage stack with all the supplied elements.
      *
      * @param  name     The name for this coverage.
@@ -327,8 +509,9 @@ public class CoverageStack extends AbstractCoverage {
      * @param  elements All coverage {@link Element Element}s for this stack.
      * @throws IOException if an I/O operation was required and failed.
      */
-    public CoverageStack(final CharSequence name, final CoordinateReferenceSystem crs,
-                         final Set elements) throws IOException
+    public CoverageStack(final CharSequence             name,
+                         final CoordinateReferenceSystem crs,
+                         final Collection/*<Element>*/ elements) throws IOException
     {
         super(name, crs, null, null);
         this.elements = (Element[]) elements.toArray(new Element[elements.size()]);
@@ -677,7 +860,7 @@ public class CoverageStack extends AbstractCoverage {
     private void load(final int index) throws IOException {
         final Element    element = elements[index];
         final NumberRange zRange = element.getZRange();
-        logLoading(ResourceKeys.LOADING_IMAGE_$1, new String[]{element.getName()});
+        logLoading(ResourceKeys.LOADING_IMAGE_$1, new InternationalString[]{element.getName()});
         lower      = upper      = load(element);
         lowerZ     = upperZ     = getZ(zRange);
         lowerRange = upperRange = zRange;
@@ -689,8 +872,8 @@ public class CoverageStack extends AbstractCoverage {
      * @throws IOException if an error occured while loading images.
      */
     private void load(final Element lowerElement, final Element upperElement) throws IOException {
-        logLoading(ResourceKeys.LOADING_IMAGES_$2, new String[]{lowerElement.getName(),
-                                                                upperElement.getName()});
+        logLoading(ResourceKeys.LOADING_IMAGES_$2, new InternationalString[]{lowerElement.getName(),
+                                                                             upperElement.getName()});
         final NumberRange lowerRange = lowerElement.getZRange();
         final NumberRange upperRange = upperElement.getZRange();
         final Coverage lower = load(lowerElement);

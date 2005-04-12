@@ -55,13 +55,16 @@
   <BLOCKQUOTE><TABLE border="2" width="100%"><TR><TD><PRE><B>import</B> org.postgresql.ds.PGSimpleDataSource;
 <B>import</B> org.geotools.referencing.factory.epsg.DataSource;
 
-<B>public</B> MyDataSource <B>extends</B> PGSimpleDataSource <B>implements</B> DataSource {
+<B>public</B> MyDataSource <B>extends</B> PGSimpleDataSource <B>implements</B> {@linkplain org.geotools.referencing.factory.epsg.DataSource} {
     <B>public</B> MyDataSource() {
         setServerName("myserver.com");
         setDatabaseName("mydatabase");
     }
 
-    <B>public</B> <B>boolean</B> isPreferred() {
+    <B>public</B> <B>int</B> getPriority() {
+        <B>return</B> MAXIMUM_PRIORITY - 200;
+
+    <B>public</B> <B>boolean</B> isStandardSQL() {
         <B>return</B> <B>true</B>;
     }
 }</PRE></TD></TR></TABLE></BLOCKQUOTE>

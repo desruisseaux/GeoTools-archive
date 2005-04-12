@@ -19,6 +19,9 @@
  */
 package org.geotools.referencing.factory.epsg;
 
+// Geotools dependencies
+import org.geotools.factory.AbstractFactory;
+
 
 /**
  * A marker interface for data source to an EPSG database. This sub-interface of J2SE's
@@ -37,8 +40,31 @@ package org.geotools.referencing.factory.epsg;
  */
 public interface DataSource extends javax.sql.DataSource {
     /**
-     * Returns {@code true} if this data source is preferred over the default JDBC-ODBC bridge,
-     * or {@code false} if it is just a fallback.
+     * The minimum priority for a data source, which is {@value}.
+     * Data sources with lowest priority will be used only if there is no other source available.
      */
-    boolean isPreferred();
+    int MINIMUM_PRIORITY = AbstractFactory.MINIMUM_PRIORITY;
+
+    /**
+     * The default priority, which is {@value}.
+     */
+    int NORMAL_PRIORITY = AbstractFactory.NORMAL_PRIORITY;
+
+    /**
+     * The maximum priority for a data source, which is {@value}.
+     * Data sources with highest priority will be preferred to any other data sources.
+     */
+    int MAXIMUM_PRIORITY = AbstractFactory.MAXIMUM_PRIORITY;
+
+    /**
+     * Returns the priority for this data source, as a number between
+     * {@link #MINIMUM_PRIORITY} and {@link #MAXIMUM_PRIORITY} inclusive.
+     */
+    int getPriority();
+
+    /**
+     * Returns {@code true} if the database uses standard SQL syntax, or {@code false} if it
+     * uses the MS-Access syntax.
+     */
+    boolean isStandardSQL();
 }

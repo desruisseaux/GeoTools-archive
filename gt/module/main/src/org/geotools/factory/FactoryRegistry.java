@@ -21,9 +21,12 @@ package org.geotools.factory;
 // J2SE dependencies
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -477,6 +480,51 @@ public class FactoryRegistry extends ServiceRegistry {
             record.setSourceMethodName("scanForPlugins");
             Logger.getLogger("org.opengis.factory").log(record);
         }
+    }
+
+    /**
+     * Set pairwise ordering between all services according a comparator. Calls to
+     * <code>{@linkplain Comparator#compare compare}(factory1, factory2)</code> should returns:
+     * <ul>
+     *   <li>{@code -1} if {@code factory1} is preferred to {@code factory2}</li>
+     *   <li>{@code +1} if {@code factory2} is preferred to {@code factory1}</li>
+     *   <li>{@code 0} if there is no preferred order between {@code factory1} and
+     *       {@code factory2}</li>
+     * </ul>
+     *
+     * @param  category   The category to set ordering.
+     * @param  comparator The comparator to use for ordering.
+     * @return {@code true} if at least one ordering setting has been modified as a consequence
+     *         of this call.
+     */
+    public boolean setOrdering(final Class category, final Comparator comparator) {
+        boolean set = false;
+        final List previous = new ArrayList();
+        for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
+            final Object f1 = it.next();
+            for (int i=previous.size(); --i>=0;) {
+                final Object f2 = previous.get(i);
+                final int c;
+                try {
+                    c = comparator.compare(f1, f2);
+                } catch (ClassCastException exception) {
+                    /*
+                     * This exception is expected if the user-supplied comparator follows strictly
+                     * the java.util.Comparator specification and has determined that it can't
+                     * compare the supplied factories. From ServiceRegistry point of view, it just
+                     * means that the ordering between those factories will stay undeterminated.
+                     */
+                    continue;
+                }
+                if (c > 0) {
+                    set |= setOrdering(category, f1, f2);
+                } else if (c < 0) {
+                    set |= setOrdering(category, f2, f1);
+                }
+            }
+            previous.add(f1);
+        }
+        return set;
     }
 
     /**

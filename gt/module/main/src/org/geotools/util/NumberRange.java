@@ -330,9 +330,9 @@ public class NumberRange extends Range {
      * Returns the union of this range with the given range.
      * Widening conversions will be applied as needed.
      *
-     * @task TODO: The return type will be changed to <code>NumberRange</code> when J2SE 1.5
-     *             will be available. We should then search for NumberRange.warp(...) in all
-     *             client classes; some 'warp' may no longeur be needed.
+     * @todo The return type will be changed to <code>NumberRange</code> when J2SE 1.5
+     *       will be available. We should then search for NumberRange.warp(...) in all
+     *       client classes; some 'warp' may no longer be needed.
      */
     public Range union(final Range range) {
         final Class type = ClassChanger.getWidestClass(getElementClass(), range.getElementClass());
@@ -350,9 +350,9 @@ public class NumberRange extends Range {
      * Returns the intersection of this range with the given range.
      * Widening conversions will be applied as needed.
      *
-     * @task TODO: The return type will be changed to <code>NumberRange</code> when J2SE 1.5
-     *             will be available. We should then search for NumberRange.warp(...) in all
-     *             client classes; some 'warp' may no longeur be needed.
+     * @todo The return type will be changed to <code>NumberRange</code> when J2SE 1.5
+     *       will be available. We should then search for NumberRange.warp(...) in all
+     *       client classes; some 'warp' may no longer be needed.
      */
     public Range intersect(final Range range) {
         Class type = ClassChanger.getWidestClass(getElementClass(), range.getElementClass());

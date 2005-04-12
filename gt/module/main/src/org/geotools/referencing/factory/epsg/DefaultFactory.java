@@ -178,6 +178,9 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             datasources = new FactoryRegistry(Arrays.asList(new Class[] {category, toLoad}));
             for (final Iterator it=datasources.getServiceProviders(toLoad); it.hasNext();) {
                 datasources.registerServiceProvider(it.next(), category);
+                // Loads only the 'toLoad' category, then copy to the final 'category'
+                // in order to allow the inclusion of JDBC-ODBC bridge, which doesn't
+                // implements our org.geotools...DataSource interface.
             }
             /*
              * After scaning any user-specified data source, add the Sun's JDBC-ODBC one as the
@@ -192,16 +195,6 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 classe.getMethod("setDatabaseName", new Class[] {String.class})
                       .invoke(source, new Object[] {"EPSG"});
                 datasources.registerServiceProvider(source, category);
-                for (Iterator it=datasources.getServiceProviders(toLoad, false); it.hasNext();) {
-                    final Object other = it.next();
-                    if (other instanceof org.geotools.referencing.factory.epsg.DataSource &&
-                        ((org.geotools.referencing.factory.epsg.DataSource) other).isPreferred())
-                    {
-                        datasources.setOrdering(category, other, source);
-                    } else {
-                        datasources.setOrdering(category, source, other);
-                    }
-                }
             } catch (Exception exception) {
                 /*
                  * Catching all exceptions is not really recommended,
@@ -218,8 +211,23 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 record.setSourceMethodName("createDataSource");
                 LOGGER.log(record);
             }
+            datasources.setOrdering(category, new Comparator());
         }
         return datasources.getServiceProviders(category, true);
+    }
+
+    /**
+     * The comparator for sorting data sources in priority order.
+     */
+    private static final class Comparator implements java.util.Comparator {
+        public int compare(final Object f1, final Object f2) {
+            return getPriority(f2) - getPriority(f1);
+        }
+        private static int getPriority(final Object f) {
+            return (f instanceof org.geotools.referencing.factory.epsg.DataSource)
+                             ? ((org.geotools.referencing.factory.epsg.DataSource) f).getPriority()
+                             :   org.geotools.referencing.factory.epsg.DataSource.NORMAL_PRIORITY;
+        }
     }
 
     /**
@@ -241,6 +249,9 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      */
     private Connection getConnection() throws SQLException {
         assert Thread.holdsLock(this);
+        if (datasource != null) {
+            return datasource.getConnection();
+        }
         /*
          * Try to gets the DataSource from JNDI. In case of success, it will be tried
          * for a connection before any DataSource declared in META-INF/services/.
@@ -328,12 +339,6 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      *
      * @todo Do may need some standard way (in Geotools) for fetching an {@link InitialContext}
      *       for the whole Geotools library?
-     *
-     * @todo Needs a better was to know which {@link EPSGFactory} implementation to use.
-     *       Instead of relying on the product name (which is hardly generic), we should
-     *       try a SQL statement like "SELECT id FROM epsg_sometable WHERE ID=0" (we don't
-     *       mind if the result set contains no record) and use {@link FactoryForSQL} if
-     *       the above didn't threw a SQLException.
      */
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         final Connection connection;
@@ -368,12 +373,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         // TODO: Provide a localized message including the database version.
         LOGGER.config("Connected to EPSG database \"" + url + "\".");
         final EPSGFactory epsg;
-        /*
-         * TODO: Hard-coded product names for now. We will need to implement a
-         *       better way later (see the @todo comment in the method javadoc).
-         */
-        if (product.equalsIgnoreCase("PostgreSQL") ||
-            product.equalsIgnoreCase("MySQL"))
+        if ((datasource instanceof org.geotools.referencing.factory.epsg.DataSource) &&
+            ((org.geotools.referencing.factory.epsg.DataSource) datasource).isStandardSQL())
         {
             epsg = new FactoryForSQL(factories, connection);
         } else {
