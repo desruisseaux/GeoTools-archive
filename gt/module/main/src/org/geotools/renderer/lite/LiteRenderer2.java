@@ -615,6 +615,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
         for( int j = 0; j < attributes.length; j++ ) {
             AttributeType attType = schema.getAttributeType(attributes[j]);
+            
+            //DJB: added this for better error messages!
+            if (attType == null)
+            	throw new IllegalFilterException("Could not find '"+attributes[j]+"' in the FeatureType ("+schema.getTypeName()+")");
 
             if (attType.isGeometry()) {
                 GeometryFilter gfilter = filterFactory.createGeometryFilter(Filter.GEOMETRY_BBOX);
