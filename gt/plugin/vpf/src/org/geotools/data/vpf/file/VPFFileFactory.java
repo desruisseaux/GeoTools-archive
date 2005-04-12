@@ -140,4 +140,11 @@ public class VPFFileFactory implements DataStoreFactorySpi {
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
     }
+
+    /**
+     * Close all currently open files.
+     */
+    public void reset() {
+        store.reset();
+    }
 }

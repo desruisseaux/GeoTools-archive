@@ -288,5 +288,6 @@ public class VPFFeatureReader
             VPFFile file = (VPFFile) featureType.getFeatureClass()
                     .getFileList().get(0);
             file.reset();
+            VPFFileFactory.getInstance().reset();
     }
 }
