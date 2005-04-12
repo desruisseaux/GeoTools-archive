@@ -82,7 +82,7 @@ public class LabelingTest extends TestCase {
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-//        Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
+        Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
 	}
 
 	private Style loadStyle(String sldFilename) throws IOException {
@@ -139,7 +139,7 @@ public class LabelingTest extends TestCase {
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-//        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
+        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection createLineFeatureCollection() throws Exception {
@@ -187,7 +187,7 @@ public class LabelingTest extends TestCase {
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-//        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
+        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection createPolyFeatureCollection() throws Exception {
