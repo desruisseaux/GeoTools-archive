@@ -62,7 +62,7 @@ public class ChoiceAttributeType implements AttributeType {
         min = copy.getMinOccurs();
         max = copy.getMaxOccurs();
         name = copy.getName();
-        children = copy.getAttributeTypes();
+        this.children = copyChildren(copy.getAttributeTypes());
         restriction = copy.getRestriction();
     }
 
@@ -73,7 +73,8 @@ public class ChoiceAttributeType implements AttributeType {
         this.min = min;
         this.max = max;
         this.name = name;
-        this.children = children;
+        //ensure immutable.
+        this.children = copyChildren(children);
         this.restriction = restriction;
     }
 
@@ -84,6 +85,14 @@ public class ChoiceAttributeType implements AttributeType {
     public Filter getRestriction() {
         return restriction;
     }
+
+    protected AttributeType[] copyChildren(AttributeType[] attributes) {
+	int length = attributes.length;
+	AttributeType[] returnArray = new AttributeType[length];
+	System.arraycopy(attributes, 0, returnArray, 0, length);
+	return returnArray;
+    }
+
 
     /* (non-Javadoc)
      * @see org.geotools.feature.AttributeType#getName()
