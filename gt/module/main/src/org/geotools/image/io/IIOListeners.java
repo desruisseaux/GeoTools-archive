@@ -20,10 +20,14 @@
 package org.geotools.image.io;
 
 // J2SE dependencies
+import java.util.EventListener;
 import javax.swing.event.EventListenerList;
 import javax.imageio.ImageReader;
 import javax.imageio.event.IIOReadWarningListener;
 import javax.imageio.event.IIOReadProgressListener;
+
+// Geotools dependencies
+import org.geotools.resources.XArray;
 
 
 /**
@@ -38,7 +42,15 @@ import javax.imageio.event.IIOReadProgressListener;
  *
  * @todo Add other listener types.
  */
-public class IIOListeners {    
+public class IIOListeners {
+    /**
+     * The listener categories for read operations.
+     */
+    private static final Class[] READ = {
+        IIOReadProgressListener.class,
+        IIOReadWarningListener .class
+    };
+
     /**
      * List of listeners.
      */
@@ -48,6 +60,20 @@ public class IIOListeners {
      * Creates a new instance of {@code IIOListeners}.
      */
     public IIOListeners() {
+    }
+    
+    /**
+     * Adds an {@code IIOReadProgressListener} to the list of registered progress listeners.
+     */
+    public void addIIOReadProgressListener(final IIOReadProgressListener listener) {
+        listeners.add(IIOReadProgressListener.class, listener);
+    }
+    
+    /**
+     * Removes an {@code IIOReadProgressListener} from the list of registered progress listeners.
+     */
+    public void removeIIOReadProgressListener(final IIOReadProgressListener listener) {
+        listeners.remove(IIOReadProgressListener.class, listener);
     }
         
     /**
@@ -63,19 +89,43 @@ public class IIOListeners {
     public void removeIIOReadWarningListener(final IIOReadWarningListener listener) {
         listeners.remove(IIOReadWarningListener.class, listener);
     }
-    
+
     /**
-     * Adds an {@code IIOReadProgressListener} to the list of registered progress listeners.
+     * Returns all {@linkplain IIOReadProgressListener read progress} and
+     * {@linkplain IIOReadWarningListener read warning} listeners.
      */
-    public void addIIOReadProgressListener(final IIOReadProgressListener listener) {
-        listeners.add(IIOReadProgressListener.class, listener);
+    public EventListener[] getReadListeners() {
+        return getListeners(READ);
     }
-    
+
     /**
-     * Removes an {@code IIOReadProgressListener} from the list of registered progress listeners.
+     * Returns all listeners of the given classes.
      */
-    public void removeIIOReadProgressListener(final IIOReadProgressListener listener) {
-        listeners.remove(IIOReadProgressListener.class, listener);
+    private EventListener[] getListeners(final Class[] categories) {
+        int   count = 0;
+        final Object[] list = listeners.getListenerList();
+        final EventListener[] listeners = new EventListener[list.length/2];
+   add: for (int i=0; i<list.length; i+=2) {
+            final Class type = (Class) list[i];
+            for (int j=categories.length; --j>=0;) {
+                if (type.equals(categories[i])) {
+                    /*
+                     * Found a listener in one of the specified categories.
+                     * Ensure that it was not already added in the list.
+                     */
+                    final EventListener candidate = (EventListener)list[i+1];
+                    for (int k=count; --k>=0;) {
+                        if (listeners[k] == candidate) {
+                            // Avoid duplication.
+                            continue add;
+                        }
+                    }
+                    listeners[count++] = candidate;
+                    continue add;
+                }
+            }
+        }
+        return (EventListener[]) XArray.resize(listeners, count);
     }
 
     /**

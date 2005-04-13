@@ -51,7 +51,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.image.io.IIOListeners;
@@ -130,7 +129,7 @@ public class CoverageStack extends AbstractCoverage {
          * since it may be invoked soon. This method is invoked just before {@link #getCoverage}
          * in order to log a "Loading data..." message.
          */
-        InternationalString getName() throws IOException;
+        String getName() throws IOException;
         
         /**
          * Returns the minimum and maximum <var>z</var> value for the coverage.
@@ -231,10 +230,12 @@ public class CoverageStack extends AbstractCoverage {
          * {@linkplain #getCoverage underlying coverage} if it is an instance of
          * {@link AbstractCoverage}.
          */
-        public InternationalString getName() throws IOException {
-            final Coverage coverage = getCoverage(null);
-            return (coverage instanceof AbstractCoverage) ? ((AbstractCoverage) coverage).getName()
-                    : new SimpleInternationalString(coverage.toString());
+        public String getName() throws IOException {
+            Object coverage = getCoverage(null);
+            if (coverage instanceof AbstractCoverage)  {
+                coverage = ((AbstractCoverage) coverage).getName();
+            }
+            return coverage.toString();
         }
         
         /**
@@ -844,7 +845,7 @@ public class CoverageStack extends AbstractCoverage {
     private void load(final int index) throws IOException {
         final Element    element = elements[index];
         final NumberRange zRange = element.getZRange();
-        logLoading(ResourceKeys.LOADING_IMAGE_$1, new InternationalString[]{element.getName()});
+        logLoading(ResourceKeys.LOADING_IMAGE_$1, new String[]{element.getName()});
         lower      = upper      = load(element);
         lowerZ     = upperZ     = getZ(zRange);
         lowerRange = upperRange = zRange;
@@ -856,8 +857,8 @@ public class CoverageStack extends AbstractCoverage {
      * @throws IOException if an error occured while loading images.
      */
     private void load(final Element lowerElement, final Element upperElement) throws IOException {
-        logLoading(ResourceKeys.LOADING_IMAGES_$2, new InternationalString[]{lowerElement.getName(),
-                                                                             upperElement.getName()});
+        logLoading(ResourceKeys.LOADING_IMAGES_$2, new String[]{lowerElement.getName(),
+                                                                upperElement.getName()});
         final NumberRange lowerRange = lowerElement.getZRange();
         final NumberRange upperRange = upperElement.getZRange();
         final Coverage lower = load(lowerElement);
