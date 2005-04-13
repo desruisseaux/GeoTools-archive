@@ -40,10 +40,12 @@ import org.geotools.feature.type.AnnotationFeatureType;
  * Created on 13. april 2004, 14:35
  *
  * @author  <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
+ * @author Chris Holmes, Fulbright.
  */
 public class VPFFeatureReader
     implements FeatureReader, FCode {
     private boolean hasNext = true;
+    private boolean nextCalled = true;
     private Feature currentFeature = null;
     private final VPFFeatureType featureType;
 
@@ -110,14 +112,17 @@ public class VPFFeatureReader
      * @see org.geotools.data.FeatureReader#hasNext()
      */
     public boolean hasNext() throws IOException {
-        Object[] values = new Object[featureType.getAttributeCount()];
-        try {
-            currentFeature = featureType.create(values);
-        } catch (IllegalAttributeException exc) {
-            // This really shouldn't happen since everything should be nillable
-            exc.printStackTrace();
-        }
-        while(readNext());
+        if (nextCalled) {
+	    Object[] values = new Object[featureType.getAttributeCount()];
+            try {
+                currentFeature = featureType.create(values);
+            } catch (IllegalAttributeException exc) {
+                // This shouldn't happen since everything should be nillable
+                exc.printStackTrace();
+            }
+            while(readNext());
+	    nextCalled = false;
+	}
         return hasNext;
     }
 
@@ -126,6 +131,7 @@ public class VPFFeatureReader
      */
     public Feature next() throws IOException, IllegalAttributeException, 
                                  NoSuchElementException {
+        nextCalled = true;
         return currentFeature;
     }
     /**
