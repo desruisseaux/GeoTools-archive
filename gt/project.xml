@@ -24,7 +24,7 @@
   <siteAddress>modules.geotools.org</siteAddress>
   <siteDirectory>/seis/raid1/Apache/htdocs/software/geotools/${pom.artifactId}</siteDirectory>
   <distributionDirectory>/public/html/geotools</distributionDirectory>
-  <distributionSite>login.ibiblio.org</distributionSite>
+  <distributionSite>beaver.codehaus.org</distributionSite>
   <!-- <distributionDirectory>/seis/raid1/Apache/htdocs/software/mavenRepository</distributionDirectory> -->
   <!-- <distributionSite>www.seis.sc.edu</distributionSite> -->
   <repository>
