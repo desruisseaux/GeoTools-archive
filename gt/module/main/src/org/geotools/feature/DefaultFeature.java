@@ -519,6 +519,16 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
         }
     }
 
+    /**
+     * This class will wrap a DefaultFeature (which is a {@link SimpleFeature}
+     * into a Feature with multiplicity - which is to say it will always
+     * return a List of its attributes when they are requested.  These will
+     * always be singleton Lists, since the min/max of attributes in a
+     * DefaultFeature is 1.  But this is important so that clients can deal
+     * with all Features in the same way - always expecting Lists.
+     *
+     * @author Chris Holmes, Fulbright
+     */
     static final class ComplexWrapper extends DefaultFeature
          {
         /**
@@ -551,12 +561,27 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
                 feature.getAttributes(null), feature.getID());
         }
 
-        /*public Object getAttribute(String name) {
-           return wrapInList(super.getAttribute(name));
-           }
-           public Object getAttribute(int index) {
-               return wrapInList(super.getAttribute(index));
-               }*/
+        /**
+         * Sets the attribute Object at the given index.  As this is a complex
+         * feature - one with multiplicity - then all attributes passed in
+         * must be Lists.  Since this is just a wrapped SimpleFeature, the
+         * List passed in will only ever be a singleton, but we must abide by
+         * the contract of a ComplexFeature.
+         *
+         * @param index The attribute to set.
+         * @param value A Singleton List of the attribute to set.
+         *
+         * @throws IllegalAttributeException If the value is not a singleton
+         *         List.
+         *
+         * @task REVISIT: Make List explicit in Java 1.5
+         * @task REVISIT: We could consider accepting none list objects, and
+         *       justify it as part of the parse method - that is to say that
+         *       most calls to setAttribute will turn the Object into the
+         *       proper form, so why not here? For a true Complex Feature this
+         *       has implications of letting people blow away their  multiple
+         *       attributes, but for here there are no such dangers. -ch
+         */
         public void setAttribute(int index, Object value)
             throws IllegalAttributeException {
             checkList(value);
@@ -580,20 +605,7 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
             }
         }
 
-        /*public Object[] getAttributes(Object[] array) {
-           Object[] retArray;
-           if (array == null) {
-               retArray = new Object[super.getNumberOfAttributes()];
-           } else {
-               retArray = array;
-           }
-           for (int i = 0; i < array.length; i++) {
-               retArray[i] = wrapInList(array[i]);
-           }
-        
-           return retArray;
-           }*/
-        public void checkList(Object value) throws IllegalAttributeException {
+        private void checkList(Object value) throws IllegalAttributeException {
             if (value instanceof List) {
                 List valList = (List) value;
                 int listSize = valList.size();
