@@ -250,6 +250,11 @@ public class FeatureTransformer extends TransformerBase {
 
             return pre;
         }
+
+	public String toString() {
+	    return "FeatureTypeNamespaces[Default: " + defaultPrefix + 
+		", lookUp: " + lookup;
+	}
     }
 
     /**
@@ -540,7 +545,8 @@ public class FeatureTransformer extends TransformerBase {
                 if (currentPrefix == null) {
                     throw new RuntimeException(
                         "Could not locate namespace for FeatureType : "
-                        + type.getTypeName());
+                        + type.getTypeName() + ":" + type.getNamespace() + 
+                        "look up in: " + types);
                 }
 
                 if (currentPrefix != null) {
