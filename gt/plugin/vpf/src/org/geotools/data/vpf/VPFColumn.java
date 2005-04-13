@@ -318,4 +318,12 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
 	public int getMaxOccurs() {
 		return 1;
 	}
+
+    public boolean equals(Object obj) {
+	return attribute.equals(obj);
+    }
+
+    public int hashCode() {
+	return attribute.hashCode();
+    }
 }

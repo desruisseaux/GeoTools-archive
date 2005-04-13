@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.net.URI;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.FeatureReader;
@@ -84,6 +85,21 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      */
     private boolean loggedCRSException = false;
 
+    static URI DEFAULT_NAMESPACE;
+
+    static {
+        try {
+            DEFAULT_NAMESPACE = new URI("http://www.vpf.org/default");
+        } catch (java.net.URISyntaxException urise) {
+	    throw new RuntimeException("programmer error making default uri");
+        }
+    }
+  
+    /**
+     * The namespace to create FeatureTypes with.  Set with a reasonable 
+     * default of http://vpf.org/default.
+     */
+    private URI namespace = DEFAULT_NAMESPACE;
     
     /**
      * Complete constructor
@@ -102,19 +118,33 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
         directory = new File(dir, libraryName);
         setCoverages();
     }
+
+    /**
+     * Constructor that adds a namespace to the File only constructor.  If
+     * using another constructor then use {@link #setNamespace(URI)}
+     * @param dir the containing directory
+     * @throws IOException
+     * @throws SchemaException for problems making a featureType.
+     */
+    public VPFLibrary(File dir) throws IOException, SchemaException{
+	this(dir, DEFAULT_NAMESPACE);
+    }
+
     /**
      * Constructor which defaults the containing database to null and looks up the first
      * (and presumably only) entry in the library 
      * attribute table
      * @param dir the containing directory
+     * @param namespace the namespace to create features with.
      * @throws IOException
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
      */
-    public VPFLibrary(File dir) throws IOException, SchemaException {
+    public VPFLibrary(File dir, URI namespace) throws IOException, SchemaException {
         // read libraries info
         String vpfTableName = new File(dir, LIBRARY_HEADER_TABLE).toString();
         VPFFile lhtFile = VPFFileFactory.getInstance().getFile(vpfTableName);
         lhtFile.reset();
+	this.namespace = namespace;
         try {
             lhtFile.readFeature(); // check for errors
         } catch (IllegalAttributeException exc) {
@@ -150,7 +180,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
             while (iter.hasNext()){
                 feature = (Feature)iter.next();
                 directoryName = directory.getPath();
-                coverage = new VPFCoverage(this, feature, directoryName);
+                coverage = new VPFCoverage(this, feature, directoryName, namespace);
                 coverages.add(coverage);
                 // Find the Tileref coverage, if any
                 if (coverage.getName().toLowerCase().equals("tileref")){

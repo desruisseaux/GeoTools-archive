@@ -266,7 +266,17 @@ public class VPFFeatureType implements FeatureType {
 	/* (non-Javadoc)
 	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
 	 */
-	public int find(String attName) {
-		return featureClass.find(attName);
-	}
+    public int find(String attName) {
+        return featureClass.find(attName);
+    }
+
+    public boolean equals(Object obj) {
+        return featureClass.equals(obj);
+    }
+    
+    public int hashCode() {
+        return featureClass.hashCode();
+    }
+
+
 }

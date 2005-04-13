@@ -85,6 +85,9 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     /** The name of the feature class */
     private final String typeName;
 
+    /** The uri of the namespace in which features should be created */
+    private final URI namespace;
+
     /**
      * The geometry factory for this feature class
      */
@@ -105,9 +108,30 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
      */
     public VPFFeatureClass(VPFCoverage cCoverage, String cName,
         String cDirectoryName) throws SchemaException{
+        this(cCoverage, cName, cDirectoryName, null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param cCoverage the owning coverage
+     * @param cName the name of the class
+     * @param cDirectoryName the directory containing the class
+     * @param cNamespace the namespace to create features with.  If null then
+     *        a default from VPFLibrary.DEFAULTNAMESPACE is assigned.
+     * @throws SchemaException For problems making one of the feature classes as a FeatureType.
+     */
+    public VPFFeatureClass(VPFCoverage cCoverage, String cName,
+        String cDirectoryName, URI cNamespace) throws SchemaException{
         coverage = cCoverage;
         directoryName = cDirectoryName;
         typeName = cName;
+        if (cNamespace == null) {
+            namespace = VPFLibrary.DEFAULT_NAMESPACE;
+        } else {
+            namespace = cNamespace;
+        }
+	    
 
         String fcsFileName = directoryName + File.separator + TABLE_FCS;
 
@@ -151,7 +175,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
                 superTypes.add( AnnotationFeatureType.ANNOTATION );
             }
             
-            featureType = new DefaultFeatureType(cName, "VPF", columns,
+            featureType = new DefaultFeatureType(cName, namespace, columns,
                     superTypes, gat);
         } catch (IOException exp) {
             //We've already searched the FCS file once successfully
@@ -443,10 +467,18 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
         return geometryFactory;
     }
 
-	/* (non-Javadoc)
-	 * @see org.geotools.feature.FeatureType#find(java.lang.String)
-	 */
-	public int find(String attName) {
-		return featureType.find(attName);
-	}
+    /* (non-Javadoc)
+     * @see org.geotools.feature.FeatureType#find(java.lang.String)
+     */
+    public int find(String attName) {
+        return featureType.find(attName);
+    }
+    
+    public boolean equals(Object obj) {
+        return featureType.equals(obj);
+    }
+
+    public int hashCode() {
+        return featureType.hashCode();
+    }
 }

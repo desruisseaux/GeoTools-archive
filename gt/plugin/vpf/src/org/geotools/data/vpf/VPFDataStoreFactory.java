@@ -18,8 +18,11 @@ package org.geotools.data.vpf;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.Collections;
 import java.util.Map;
+import java.net.URL;
+import java.net.URI;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
@@ -51,9 +54,14 @@ import org.geotools.feature.SchemaException;
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project OneMap
- * @version 2.0.0
+ * @author Chris Holmes, Fulbright
+ * @version 2.1.0
  */
 public class VPFDataStoreFactory implements DataStoreFactorySpi {
+    /** The logger for the vpf module. */
+    protected static final Logger LOGGER = Logger.getLogger(
+            "org.geotools.data.vpf");
+
     /**
      * Default Constructor
      *
@@ -81,15 +89,13 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
     public boolean canProcess(Map params ) {
         boolean result = false;
         try {
-            File file = (File) DIR.lookUp( params );
-            File lhtFile;
-            if( (file.exists() && file.isDirectory()) ){
-                lhtFile = new File(file, FileConstants.LIBRARY_HEADER_TABLE);
-                if(lhtFile.exists()){
-                    result = true;
-                }
-            }
+             
+            File file = getLhtFile(params);
+            //if getLhtFile didn't throw an exception then we're good.
+            result = true;
+            
         } catch (IOException exc) {
+	    //catch io exception, false will return
         }
         return result;
     }
@@ -100,19 +106,7 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
     public DataStore createDataStore(Map params) throws IOException {
         return create(params);
     }
-    /*
-     *  (non-Javadoc)
-     * @see org.geotools.data.DataStoreFactorySpi#createMetadata(java.util.Map)
-     */
-//    public DataSourceMetadataEnity createMetadata( Map params ) throws IOException {
-//        if( !canProcess( params )){
-//            throw new IOException( "Provided params cannot be used to connect");
-//        }
-//        File dir = (File) DIR.lookUp( params );
-//        String parent = dir.getParent();
-//        String name = dir.getName();        
-//        return new DataSourceMetadataEnity( parent, name, "VPF data source access for " + dir );
-//    }
+
     /**
      * Creates a data store.
      * @param params A <code>Map</code> of parameters which must be verified and 
@@ -121,20 +115,55 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
      */
     private DataStore create(Map params) throws IOException {
         DataStore result = null;
-        File file = (File) DIR.lookUp( params );
-        File lhtFile;
-        if( (file.exists() && file.isDirectory()) ){
-            lhtFile = new File(file, "lht");
-            if(lhtFile.exists()){
-                try {
-                    result = new VPFLibrary( file );
-                } catch (SchemaException exc) {
-                    throw new IOException("There was a problem making one of the feature classes as a FeatureType.");
-                }
+        File file = getLhtFile(params);
+        URI namespace = (URI) NAMESPACEP.lookUp(params); //null if not exist
+        LOGGER.finer("creating new vpf datastore with params: " + params);
+            try {
+                result = new VPFLibrary( file, namespace );
+            } catch (SchemaException exc) {
+                throw new IOException("There was a problem making one of " +
+                		      "the feature classes as a FeatureType.");
             }
-        }
+            
         return result;
     }
+
+    /*
+     * private method to get the lht file from the map of params, to avoid
+     * code duplication in canProcess and create, since they both need the
+     * file - canProcess just returns true if it's there, and eats the 
+     * exception, create makes the store.
+     */
+    private File getLhtFile(Map params) throws IOException {
+        URL url = (URL) DIR.lookUp(params);
+        File file = null;
+        if (url.getProtocol().equals("file")){
+     
+            if(url.getHost()!=null && !url.getHost().equals("")) {
+                //win
+                file = new File(url.getHost()+":"+url.getFile());
+            }else {
+                //linux
+                file = new File(url.getFile());
+            }
+            File lhtFile;
+            if (file.isDirectory()) {
+                lhtFile = new File(file, FileConstants.LIBRARY_HEADER_TABLE);
+            } else {
+                lhtFile = file;
+            }
+            if (!lhtFile.exists() || !file.canRead()) {
+        	throw new IOException(
+                  "File either doesn't exist or is unreadable : " + file);
+            }
+        } else {
+            throw new IOException("only file protocol supported");
+        }
+        return file;
+    }
+
+    
+
     /*
      * 
      *  (non-Javadoc)
@@ -146,7 +175,13 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
     /**
      * A parameter which is the directory containing the LHT file
      */
-    public static final Param DIR = new Param( "dir", File.class, "Directory containing lht file", true );
+    public static final Param DIR = new Param( "url", URL.class, 
+                                               "Directory containing lht file",
+                                               true );
+
+    public static final Param NAMESPACEP = new Param("namespace", URI.class,
+    "uri to a the namespace",false); //not required
+ 
     /*
      *  (non-Javadoc)
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
@@ -162,6 +197,7 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
         return true;
     }
 
+
     /**
      * Returns the implementation hints. The default implementation returns en empty map.
      */
@@ -169,3 +205,4 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
         return Collections.EMPTY_MAP;
     }
 }
+

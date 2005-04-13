@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.net.URI;
 
 import org.geotools.data.vpf.file.VPFFile;
 import org.geotools.data.vpf.file.VPFFileFactory;
@@ -61,6 +62,11 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
     private final int topologyLevel;
 
     /**
+     * The namespace to create features with.
+     */
+    private final URI namespace;
+
+    /**
      * Constructor
      *
      * @param cModule the owning module (needed for navigability to tiles)
@@ -72,9 +78,26 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
      */
     public VPFCoverage(VPFLibrary cLibrary, Feature feature, String cDirectoryName)
         throws IOException, SchemaException {
+	this(cLibrary, feature, cDirectoryName, null);
+    }
+
+    /**
+     * Constructor with namespace
+     *
+     * @param cModule the owning module (needed for navigability to tiles)
+     * @param cDirectoryName path to directory containing coverage
+     * @param cTopologyLevel the topology level (0-3)
+     *
+     * @throws IOException if the directory does not contain a valid FCS file
+     * @throws SchemaException For problems making one of the feature classes as a FeatureType.
+     */
+    public VPFCoverage(VPFLibrary cLibrary, Feature feature, 
+                       String cDirectoryName, URI namespace)
+        throws IOException, SchemaException {
         topologyLevel = Short.parseShort(feature.getAttribute(FIELD_LEVEL).toString());
         library = cLibrary;
         description = feature.getAttribute(VPFCoverageIfc.FIELD_DESCRIPTION).toString();
+	this.namespace = namespace;
         pathName = cDirectoryName.concat(File.separator).concat(feature.getAttribute(FIELD_COVERAGE_NAME).toString());
         discoverFeatureClasses();
         discoverFeatureTypes();
@@ -99,12 +122,11 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
         // We might want to grab the FCS list and pass it to the feature class
         // constructor just to save time.
         Iterator iter = file.readAllRows().iterator();
-
         while (iter.hasNext()) {
             Feature row = (Feature) iter.next();
             featureClassName = row.getAttribute("feature_class").toString().trim();
             featureClass = new VPFFeatureClass(this, featureClassName,
-                    pathName);
+                    pathName, namespace);
             featureClasses.add(featureClass);
         }
     }
