@@ -183,6 +183,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     private boolean memoryPreloadingEnabled;
 
     private IndexedFeatureResults indexedFeatureResults;
+    
+    private ListenerList renderListeners= new ListenerList();
+
+    private RenderingHints hints;
+    
 
     /**
      * Creates a new instance of LiteRenderer without a context. Use it only to gain access to
@@ -256,8 +261,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         outputGraphics = (Graphics2D) g;
         screenSize = bounds;
     }
-    ListenerList renderListeners= new ListenerList();
-    
     /**
      * adds a listener that responds to error events of feature rendered events.
      * 
@@ -363,7 +366,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     public void paint( Graphics2D graphics, Rectangle paintArea, Envelope envelope ) {
         AffineTransform transform=worldToScreenTransform(envelope, paintArea);
         error = 0;
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if ( hints != null )
+            graphics.setRenderingHints(hints);
         if ((graphics == null) || (paintArea == null)) {
             LOGGER.info("renderer passed null arguments");
 
@@ -1268,6 +1272,18 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         this.memoryPreloadingEnabled = enabled;
         if( !enabled )
             indexedFeatureResults=null;
+    }
+    
+    public void setRenderingHints(RenderingHints hints){
+        this.hints=hints;
+    }
+    
+    
+    public void setRenderingHint(RenderingHints.Key key, Object value){
+        if( hints==null )
+            hints=new RenderingHints( key, value);
+        else
+            hints.put(key, value);
     }
     
     /**

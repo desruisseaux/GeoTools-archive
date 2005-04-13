@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
