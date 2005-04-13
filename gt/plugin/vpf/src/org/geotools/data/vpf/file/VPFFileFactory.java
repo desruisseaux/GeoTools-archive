@@ -35,7 +35,7 @@ import org.geotools.data.DataStoreFactorySpi;
  * @author jeff yutzler
  */
 public class VPFFileFactory implements DataStoreFactorySpi {
-    private final DataStore store = new VPFFileStore();
+    private final VPFFileStore store = new VPFFileStore();
     private static VPFFileFactory instance = null;
     /**
      * Default constructor. Does nothing!
