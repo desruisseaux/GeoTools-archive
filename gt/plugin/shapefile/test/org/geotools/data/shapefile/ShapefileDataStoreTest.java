@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
@@ -414,6 +415,26 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         
         
         tmpFile.delete();
+    }
+    
+    public void testGetCount() throws Exception{
+        ShapefileDataStore store=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(getTestResource(STREAM));
+        int count=0;
+        FeatureReader reader=store.getFeatureReader();
+        try{
+        while (reader.hasNext() ){
+            count++;
+            reader.next();
+        }
+        
+        assertEquals(count, store.getCount(Query.ALL));
+        
+        
+        }catch (Exception e) {
+            throw new Exception(e);
+        }finally{
+            reader.close();
+        }
     }
     
     public static void main(java.lang.String[] args) throws Exception {

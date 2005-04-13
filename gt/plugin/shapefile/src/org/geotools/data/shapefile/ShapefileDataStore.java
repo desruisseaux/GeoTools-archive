@@ -819,6 +819,30 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
     
     /**
+     * @see org.geotools.data.AbstractDataStore#getCount(org.geotools.data.Query)
+     */
+    protected int getCount( Query query ) throws IOException {
+        if( query.getFilter()==Filter.NONE ){
+            ShapefileReader reader=new ShapefileReader(getReadChannel(shpURL));
+            int count=-1;
+            try{
+                count = reader.getCount(count);
+            }catch (IOException e) {
+                throw e;
+            } finally {
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException ioe) {
+                    // do nothing
+                }
+            }
+            return count;
+        }
+        return super.getCount(query);
+    }
+    /**
      * An AttributeReader implementation for Shapefile. Pretty straightforward.
      * <BR/>The default geometry is at position 0, and all dbf columns follow.
      * <BR/>The dbf file may not be necessary, if not, just pass null as the DbaseFileReader

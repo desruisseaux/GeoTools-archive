@@ -28,6 +28,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
+import org.geotools.data.DataSourceException;
 import org.geotools.resources.NIOUtilities;
 
 /**
@@ -401,7 +402,83 @@ public class ShapefileReader {
     }
     throw new UnsupportedOperationException("Random Access not enabled");
   }
-   
+  
+  /**
+   * Parses the shpfile counting the records.
+   * @return the number of non-null records in the shapefile
+   */
+  public int getCount( int count ) throws DataSourceException {
+      try {
+          if ( channel==null )
+              return -1;
+          count=0;
+          
+          for( int tmp=readRecord(); tmp!=-1; tmp=readRecord() )
+              count+=tmp;
+          
+      } catch (IOException ioe) {
+          count=-1;
+          // What now? This seems arbitrarily appropriate !
+          throw new DataSourceException("Problem reading shapefile record", ioe);
+      }
+      return count;
+  }
+  
+  /**
+   * Reads a record and returns 1 if the record is not null.
+   * 
+   * @param channel the io channel
+   * @param buffer
+   * @return 0 if null feature; 1 if valid feature; -1 if end of file reached.
+   * @throws IOException
+   */
+  private int readRecord() throws IOException {
+          if( !fillBuffer( ) )
+              return -1;
+          int recordnumber=buffer.getInt();
+          if( !fillBuffer() )
+              return -1;
+          int recordlength=buffer.getInt()*2;
+          //Going to read the first 4 bytes of the record so 
+          // subtract that from the record length
+          recordlength-=4;
+          if( !fillBuffer() )
+              return -1;
+          
+          //read record type (used to determine if record is a null record)
+          int type=buffer.getInt();
+          // go to end of record
+          while( buffer.limit()<buffer.position()+recordlength){
+              recordlength-=buffer.limit()-buffer.position();
+              buffer.clear();
+              if( channel.read(buffer)<1 ){
+                  return -1;
+              }
+          }
+          buffer.position(buffer.position()+recordlength);
+          
+          //return 0 if record is null.  Null records should be counted.
+          if( type==0){
+              //this is a null feature
+              return 0;
+          }
+          return 1;
+  }
+
+  /**
+   * Ensures that there is at least 1 integer (4 bytes) is in the buffer.
+   * @return true if there is data in the buffer, false less than a byte is in the buffer. 
+   * @throws IOException if exception during reading occurs.
+   */
+  private boolean fillBuffer() throws IOException {
+      int result=1;
+      if( buffer.limit()<= buffer.position()+4 ){
+          result=fill(buffer, channel);
+      }
+      return result>0;
+  }
+
+  
   public static void main(String[] args) throws Exception {
     FileChannel channel = new FileInputStream(args[0]).getChannel();
     ShapefileReader reader = new ShapefileReader(channel);
