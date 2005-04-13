@@ -112,6 +112,11 @@
 			</ant:fileset>
 		</ant:copy>
 	</postGoal>
+        <goal name="CCTimeStampRelease">
+            <j:set var="release.version" value="${cctimestamp}"/>
+            <attainGoal name="createRelease"/>
+        </goal>
+        
 	<goal name="createRelease">
 		<fail unless="release.version" message="release.version not set"/>
 		<j:set var="release.report" value="releaseReport-${release.version}.txt"/>
@@ -313,9 +318,9 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
   -->
 
   <goal name="xjavadoc">
-
+    <echo>${basedir}</echo>
     <maven:reactor basedir="${basedir}"
-      includes="**/project.xml"
+      includes="module/*/project.xml"
       excludes="**/target/**,**/test/project.xml,project.xml,site/**"
       banner="Site Prep:"
       ignoreFailures="false"
@@ -380,4 +385,5 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
 
     </ant:javadoc>
   </goal>
+ 
 </project>
