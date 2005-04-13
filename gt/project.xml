@@ -23,7 +23,7 @@
   <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10270</issueTrackingUrl>
   <siteAddress>modules.geotools.org</siteAddress>
   <siteDirectory>/seis/raid1/Apache/htdocs/software/geotools/${pom.artifactId}</siteDirectory>
-  <distributionDirectory>/public/html/geotools</distributionDirectory>
+  <distributionDirectory>/home/projects/geotools/dist</distributionDirectory>
   <distributionSite>beaver.codehaus.org</distributionSite>
   <!-- <distributionDirectory>/seis/raid1/Apache/htdocs/software/mavenRepository</distributionDirectory> -->
   <!-- <distributionSite>www.seis.sc.edu</distributionSite> -->
