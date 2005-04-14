@@ -48,6 +48,7 @@ import org.geotools.renderer.style.TextStyle2D;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -111,31 +112,46 @@ public class StyledShapePainter {
 //            LOGGER.fine("Graphics transform: " + graphics.getTransform());
 //        }
 
-        if (style instanceof MarkStyle2D) {
+        if (style instanceof MarkStyle2D) 
+        {
+        	//DJB: changed this to handle multi* geometries and line and polygon geometries better
+        	GeometryCollection gc;
+        	if (shape.getGeometry() instanceof GeometryCollection)
+        		 gc = (GeometryCollection) shape.getGeometry();
+        	else
+        	{
+        		Geometry[] gs = new Geometry[1];
+        		gs[0] = shape.getGeometry();
+        		gc = shape.getGeometry().getFactory().createGeometryCollection(gs); //make a Point,Line, or Poly into a GC
+        	}
+        	GeomCollectionIterator citer = new GeomCollectionIterator(gc,shape.getAffineTransform(),false,1.0);
+        	        	
             // get the point onto the shape has to be painted
             float[] coords = new float[2];
-            PathIterator iter = shape.getPathIterator(IDENTITY_TRANSFORM);
-            iter.currentSegment(coords);
-
             MarkStyle2D ms2d = (MarkStyle2D) style;
-            Shape transformedShape = ms2d.getTransformedShape(coords[0],
-                    coords[1]);
+            
+            while (!(citer.isDone()))
+            {
+            	 citer.currentSegment(coords);
+            	 Shape transformedShape = ms2d.getTransformedShape(coords[0],coords[1]);
+            	 if (transformedShape != null) {
+                    if (ms2d.getFill() != null) {
+                        graphics.setPaint(ms2d.getFill());
+                        graphics.setComposite(ms2d.getFillComposite());
+                        graphics.fill(transformedShape);
+                    }
 
-            if (transformedShape != null) {
-                if (ms2d.getFill() != null) {
-                    graphics.setPaint(ms2d.getFill());
-                    graphics.setComposite(ms2d.getFillComposite());
-                    graphics.fill(transformedShape);
-                }
-
-                if (ms2d.getContour() != null) {
-                    graphics.setPaint(ms2d.getContour());
-                    graphics.setStroke(ms2d.getStroke());
-                    graphics.setComposite(ms2d.getContourComposite());
-                    graphics.draw(transformedShape);
+                    if (ms2d.getContour() != null) {
+                        graphics.setPaint(ms2d.getContour());
+                        graphics.setStroke(ms2d.getStroke());
+                        graphics.setComposite(ms2d.getContourComposite());
+                        graphics.draw(transformedShape);
+                    }
+                    citer.next();
                 }
             }
-        } else if (style instanceof GraphicStyle2D) {
+         } else if (style instanceof GraphicStyle2D) {
+         	// DJB:  TODO: almost certainly you want to do the same here as with the MarkStyle2D (above)
             // get the point onto the shape has to be painted
             float[] coords = new float[2];
             PathIterator iter = shape.getPathIterator(IDENTITY_TRANSFORM);
@@ -208,16 +224,28 @@ public class StyledShapePainter {
         }
     }
 
-    private void debugShape( Shape shape ) {
-        //HACK
+    public  void debugShape( Shape shape ) 
+    {
+    	float[]  pt = new float[2];
         PathIterator iter=shape.getPathIterator(null);
-//        for( int i=0; i<5; i++){
-//            double[] coords=new double[2];
-//            iter.currentSegment(coords);
-////            System.out.print(coords[0]+" "+coords[1]+",");
-//            iter.next();
-//        }
-//        System.out.println();
+        while (!(iter.isDone()))
+        {
+        	
+        	int type = iter.currentSegment(pt);
+        	String event ="unknown";
+	        	if (type == PathIterator.SEG_CLOSE )
+	        		 event= "SEG_CLOSE";
+	        	if (type == PathIterator.SEG_CUBICTO )
+	       		 	event= "SEG_CUBIC";
+	        	if (type == PathIterator.SEG_LINETO )
+	       		 	event= "SEG_LINETO";
+	        	if (type == PathIterator.SEG_MOVETO )
+	       		 	event= "SEG_MOVETO";
+	        	if (type == PathIterator.SEG_QUADTO )
+	       		 	event= "SEG_QUADTO";
+        	System.out.println(event +" "+pt[0]+","+pt[1]);
+        	iter.next();
+        }
     }
 
 
