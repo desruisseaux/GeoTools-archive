@@ -62,11 +62,11 @@ class GeomCollectionIterator extends AbstractLiteIterator {
     
     private LineIterator lineIterator = new LineIterator();
 
-    
-    GeomCollectionIterator() {
+    public GeomCollectionIterator()
+    {
     	
     }
-
+    
     /**
 	 * @param gc
 	 * @param at
