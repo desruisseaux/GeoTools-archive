@@ -76,6 +76,7 @@ import org.opengis.referencing.operation.TransformException;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -1118,26 +1119,37 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             geom = (com.vividsolutions.jts.geom.Geometry) f.getAttribute(geomName);
         }
 
-        // if the symbolizer is a point or text symbolizer generate a suitable location to place the
+        // if the symbolizer is a point symbolizer generate a suitable location to place the
         // point in order to avoid recomputing that location at each rendering step
-        if ((s instanceof PointSymbolizer 
-//        		|| s instanceof TextSymbolizer
-        		)
-                && !((geom instanceof Point) || (geom instanceof MultiPoint))) {
-            if (geom instanceof LineString && !(geom instanceof LinearRing)) {
-                // use the mid point to represent the point/text symbolizer anchor
-                Coordinate[] coordinates = geom.getCoordinates();
-                Coordinate start = coordinates[0];
-                Coordinate end = coordinates[1];
-                Coordinate mid = new Coordinate((start.x + end.x) / 2, (start.y + end.y) / 2);
-                geom = geom.getFactory().createPoint(mid);
-            } else {
-                // otherwise use the centroid of the polygon
-                geom = geom.getCentroid();
-            }
-        }
+        if (s instanceof PointSymbolizer)
+        	geom = getCentroid(geom); // djb: major simpificatioN
 
         return geom;
+    }
+    
+    /**
+     *  Finds the centroid of the input geometry
+     *    if input = point, line, polygon  --> return a point that represents the centroid of that geom
+     *    if input = geometry collection --> return a multipoint that represents the centoid of each sub-geom
+     * @param g 
+     * @return
+     */
+    public Geometry getCentroid(Geometry g)
+    {
+    	if (g instanceof GeometryCollection)
+    	{
+    		GeometryCollection gc = (GeometryCollection) g;
+    		Coordinate[] pts = new Coordinate[gc.getNumGeometries()];
+    		for (int t=0;t<gc.getNumGeometries();t++)
+    		{
+    			pts[t] = gc.getGeometryN(t).getCentroid().getCoordinate();
+    		}
+    		return g.getFactory().createMultiPoint(pts);    		
+    	}
+    	else
+    	{
+    		return g.getCentroid();
+    	}
     }
 
     /**
