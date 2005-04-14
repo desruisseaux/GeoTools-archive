@@ -42,9 +42,8 @@ public class GridCoverageRendererTest extends TestCase {
     private static final long TIMEOUT = 3000;
     
     public void testPaint() throws Exception {
-        URL url=TestData.getResource(
-                this, FILENAME);
-        FileInputStream inTest = new FileInputStream(url.getFile());
+       
+        FileInputStream inTest = new FileInputStream(TestData.file(this, FILENAME));
 
         BufferedImage imageTest = ImageIO.read(inTest);
 
