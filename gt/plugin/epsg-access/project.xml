@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-epsg-access</name>
+  <id>epsg-access</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools.referencing</package>
+  <shortDescription>EPSG Authoriy Service</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>
+  Connection to EPSG database in MS-Access format. This is the primary format
+  released by EPSG, so it should be understood as the most "official" one.
+  This plugin is very short and contains nothing else than connection parameters.
+  Users wanting a connection to an other database (e.g. a PostgreSQL one) can
+  look at this plugin and create a modified copy for their need.</description>
+  <developers>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+  </dependencies>
+</project>

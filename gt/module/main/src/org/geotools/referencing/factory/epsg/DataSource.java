@@ -19,21 +19,28 @@
  */
 package org.geotools.referencing.factory.epsg;
 
+// J2SE dependencies
+import java.sql.SQLException;
+
 // Geotools dependencies
 import org.geotools.factory.AbstractFactory;
+import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 
 /**
  * A marker interface for data source to an EPSG database. This sub-interface of J2SE's
  * {@code DataSource} is used as a category for {@link javax.imageio.spi.ServiceRegistry}.
- * EPSG data sources can be registered in the following file:
+ * EPSG data sources should be registered in the following file:
  *
  * <blockquote><pre>
  * META-INF/services/org.geotools.referencing.factory.epsg.DataSource
  * </pre></blockquote>
  *
- * An example of registered EPSG data source in the EPSG plugin backed by an
- * embedded HSQL database.
+ * For an example, see {@link org.geotools.referencing.factory.epsg.AccessDataSource}
+ * and its {@code META-INF/services/} registration in the {@code plugin/epsg-access}
+ * module. This is a very small module which can be used as a starting point for custom
+ * EPSG data sources.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -63,17 +70,15 @@ public interface DataSource extends javax.sql.DataSource {
     int getPriority();
 
     /**
-     * Returns {@code true} if the database uses standard SQL syntax, or {@code false} if it
-     * uses the MS-Access syntax.
+     * Open a connection and creates an EPSG factory for it. This method may returns a
+     * sub-class of {@link EPSGFactory} if they wants to uses slightly different SQL
+     * queries.
      *
-     * @todo We should remove this method and lets DefaultFactory tries different
-     *       SELECT instructions. For example we could try a SQL statement like
-     *       "SELECT id FROM epsg_sometable WHERE ID=0" (we don't mind if the result
-     *       set contains no record) and use {@link FactoryForSQL} if the above didn't
-     *       threw a SQLException. An alternative is to define a 'getFactory' method
-     *       instead, and lets the DataSource built its own EPSG factory. But in this
-     *       case, it will be hard to avoid creating a real subclass of
-     *       {@code sun.jdbc.odbc.ee.DataSource}.
+     * @param  factories The low-level factories to use for CRS creation. This argument
+     *         should be given unchanged to {@code EPSGFactory} constructor.
+     * @return The {@linkplain EPSGFactory EPSG factory} using SQL queries appropriate
+     *         for this data source.
+     * @throws SQLException if connection to the database failed.
      */
-    boolean isStandardSQL();
+    AbstractAuthorityFactory createFactory(final FactoryGroup factories) throws SQLException;
 }

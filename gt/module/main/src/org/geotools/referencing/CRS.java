@@ -136,7 +136,6 @@ public class CRS {
      *   they mean.
      * 
      * @param authority - list of supported codes 
-     * @return
      */
     public static Set getSupportedCodes(String AUTHORITY)
     {

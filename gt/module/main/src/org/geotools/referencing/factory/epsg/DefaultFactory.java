@@ -25,16 +25,15 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Comparator;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.prefs.Preferences;
 import javax.imageio.spi.ServiceRegistry;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
-import javax.sql.DataSource;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -45,6 +44,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
+import org.geotools.factory.JNDI;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.referencing.FactoryFinder;
@@ -59,22 +59,18 @@ import org.geotools.util.MonolineFormatter;
  * The default EPSG factory to be registered in {@link FactoryFinder}. This factory works as a
  * proxy for 1) select an appropriate {@link EPSGFactory} subclass at runtime and 2) cache CRS
  * objects for better performances. The database connection is specified through a
- * {@link DataSource} binded to the <code>{@value #DATASOURCE_NAME}</code> name.
- * If no binding is found under that name, a default binding using the JDBC-ODBC bridge
- * is created. This default binding expects a "{@code EPSG}" database registered as an
- * ODBC data source. See the package javadoc for installation instructions.
+ * {@link DataSource} binded to the <code>{@value #DATASOURCE_NAME}</code> name in <cite>Java
+ * Naming and Directory Interfaces</cite> (JNDI). If no binding is found under that name, data
+ * sources are searched in the following directory:
  *
- * <P>The {@code EPSGFactory} subclass is selected on the basis of the
- * {@linkplain DatabaseMetaData#getDatabaseProductName database product name}:</P>
+ * <BLOCKQUOTE><PRE>META-INF/services/org.geotools.referencing.factory.epsg.DataSource</PRE></BLOCKQUOTE>
  *
- * <ul>
- *   <li>(...todo...)</li>
- *   <li>Otherwise, the default {@link EPSGFactory} implementation is used.
- *       This implementation is designed for the EPSG database in MS-Access
- *       format, which is the primary format distributed by EPSG.</li>
- * </ul>
+ * The {@code plugin/epsg-access} contains a default binding using the JDBC-ODBC bridge. This
+ * default binding expects an "{@code EPSG}" database registered as an ODBC data source. See
+ * the {@linkplain org.geotools.referencing.factory.epsg package javadoc} for installation
+ * instructions.
  *
- * <P>Users should not creates instance of this class directly. They should invokes one of
+ * <P>Users should not creates instance of this class directly. They should invoke one of
  * <code>{@linkplain FactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.</P>
  *
  * @version $Id$
@@ -90,6 +86,11 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      * The factory registry for EPSG data sources. Will be created only when first needed.
      */
     private static FactoryRegistry datasources;
+
+    /**
+     * The hints for this factory. Null for now, but may be different in a future version.
+     */
+    private static final Hints HINTS = null;
 
     /**
      * The data source, or {@code null} if the connection has not yet been etablished.
@@ -127,9 +128,12 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      */
     public final synchronized DataSource getDataSource() throws SQLException {
         if (datasource == null) {
-            // Gets the connection and close it. This is inneficient (unless the data
-            // source pools connections), but will force the creation of DataSource.
-            getConnection().close();
+            // Force the creation of the underlying backing store. It will invokes
+            // (indirectly) createBackingStore, which will fetch the DataSource.
+            if (!super.isReady()) {
+                // Connection failed, but the exception is not available.
+                throw new SQLException("No data source found."); // TODO: localize;
+            }
         }
         return datasource;
     }
@@ -165,92 +169,44 @@ public class DefaultFactory extends DeferredAuthorityFactory {
 
     /**
      * Returns a data source from the factory registry. This method is invoked by
-     * {@link #createDataSource} only if no EPSG data source was found in the JNDI
+     * {@link #createFactory} only if no EPSG data source was found in the JNDI
      * (Java Naming and Directory). This method scans for plugins the first time it
      * is invoked, and add a default JDBC-ODBC bridge in addition.
      *
      * @return All registered data sources.
      */
     private static synchronized Iterator getDataSources() {
-        final Class toLoad   = org.geotools.referencing.factory.epsg.DataSource.class;
         final Class category = DataSource.class;
         if (datasources == null) {
-            datasources = new FactoryRegistry(Arrays.asList(new Class[] {category, toLoad}));
-            for (final Iterator it=datasources.getServiceProviders(toLoad); it.hasNext();) {
-                datasources.registerServiceProvider(it.next(), category);
-                // Loads only the 'toLoad' category, then copy to the final 'category'
-                // in order to allow the inclusion of JDBC-ODBC bridge, which doesn't
-                // implements our org.geotools...DataSource interface.
-            }
-            /*
-             * After scaning any user-specified data source, add the Sun's JDBC-ODBC one as the
-             * default fallback. We use reflection in order to avoid direct dependency to Sun's
-             * internal class. This JDBC-ODBC connection will be set as the preferred one since
-             * 1) the "official" EPSG database is in Access format and  2) the HSQL database is
-             * just a fallback to use if no "real" database was found.
-             */
-            try {
-                final Class classe = Class.forName("sun.jdbc.odbc.ee.DataSource");
-                final DataSource source = (DataSource) classe.newInstance();
-                classe.getMethod("setDatabaseName", new Class[] {String.class})
-                      .invoke(source, new Object[] {"EPSG"});
-                datasources.registerServiceProvider(source, category);
-            } catch (Exception exception) {
-                /*
-                 * Catching all exceptions is not really recommended,
-                 * but there is a lot of them in the previous lines:
-                 *
-                 *     ClassNotFoundException, InstantiationException, IllegalAccessException,
-                 *     ClassCastException, NoSuchMethodException, SecurityException,
-                 *     IllegalArgumentException and InvocationTargetException ...
-                 */
-                // TODO: localize
-                final LogRecord record = new LogRecord(Level.CONFIG, "Can't instantiate JDBC-ODBC bridge.");
-                record.setThrown(exception);
-                record.setSourceClassName(DefaultFactory.class.getName());
-                record.setSourceMethodName("createDataSource");
-                LOGGER.log(record);
-            }
-            datasources.setOrdering(category, new Comparator());
+            datasources = new FactoryRegistry(Collections.singleton(category));
+            datasources.scanForPlugins();
+            datasources.setOrdering(category, new Comparator() {
+                public int compare(final Object f1, final Object f2) {
+                    return ((DataSource) f2).getPriority() -
+                           ((DataSource) f1).getPriority();
+                }
+            });
         }
         return datasources.getServiceProviders(category, true);
     }
 
     /**
-     * The comparator for sorting data sources in priority order.
-     */
-    private static final class Comparator implements java.util.Comparator {
-        public int compare(final Object f1, final Object f2) {
-            return getPriority(f2) - getPriority(f1);
-        }
-        private static int getPriority(final Object f) {
-            return (f instanceof org.geotools.referencing.factory.epsg.DataSource)
-                             ? ((org.geotools.referencing.factory.epsg.DataSource) f).getPriority()
-                             :   org.geotools.referencing.factory.epsg.DataSource.NORMAL_PRIORITY;
-        }
-    }
-
-    /**
-     * Gets the connection to the EPSG database. This method is invoked automatically by
-     * {@link #createBackingStore}. The default implementation search for a {@link DataSource}
-     * registered in JNDI (Java Naming Directory) for the <code>{@value #DATASOURCE_NAME}</code>
-     * name. If no such data source is found, this method tries to create a data source for the
-     * JDBC-ODBC bridge (available and documented in Sun's J2SE distribution since 1.4, see
-     * <A HREF="http://java.sun.com/j2se/1.5/docs/guide/jdbc/bridge.html">New data source
-     * implementations in the JDBC-ODBC bridge</A>), and any supplemental data source declared in
-     * the following file:
+     * Gets the EPSG factory implementation connected to the database. This method is invoked
+     * automatically by {@link #createBackingStore}. The default implementation search for a
+     * {@link DataSource} registered in JNDI (Java Naming Directory) for the
+     * <code>{@value #DATASOURCE_NAME}</code> name. If no such data source is found, this method
+     * tries to create a data source for the JDBC-ODBC bridge, together with any data source
+     * declared in the following file:
      *
-     * <blockquote><pre>
-     * META-INF/services/org.geotools.referencing.factory.epsg.DataSource
-     * </pre></blockquote>
+     * <blockquote><pre>META-INF/services/org.geotools.referencing.factory.epsg.DataSource</pre></blockquote>
      *
      * @return The connection to the EPSG database.
      * @throws SQLException if this method failed to etablish a connection.
      */
-    private Connection getConnection() throws SQLException {
+    private AbstractAuthorityFactory createFactory() throws SQLException {
         assert Thread.holdsLock(this);
         if (datasource != null) {
-            return datasource.getConnection();
+            return datasource.createFactory(factories);
         }
         /*
          * Try to gets the DataSource from JNDI. In case of success, it will be tried
@@ -260,7 +216,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         DataSource     source   = null;
         boolean        register = false;
         try {
-            context = new InitialContext();
+            context = JNDI.getInitialContext(HINTS);
             source = (DataSource) context.lookup(DATASOURCE_NAME);
         } catch (NoInitialContextException exception) {
             // Fall back on 'getDataSources()' below.
@@ -279,12 +235,12 @@ public class DefaultFactory extends DeferredAuthorityFactory {
          * exception thrown by the first DataSource will be retrown, since it is usually
          * the main DataSource.
          */
-        Iterator      sources = null;
-        Connection connection = null;
-        SQLException  failure = null;
+        Iterator                 sources = null;
+        AbstractAuthorityFactory factory = null;
+        SQLException             failure = null;
         while (true) {
             if (source != null) try {
-                connection = source.getConnection();
+                factory = source.createFactory(factories);
                 break; // Found a successfull connection: stop the loop.
             } catch (SQLException exception) {
                 // Keep only the exception from the first data source.
@@ -305,7 +261,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             source = (DataSource) sources.next();
         };
         /*
-         * We now have a working data source. If a naming directory is running but didn't contains
+         * We now have a working connection. If a naming directory is running but didn't contains
          * the "jdbc/EPSG" entry, add it now. In such case, a message is prepared and logged.
          */
         LogRecord record;
@@ -320,68 +276,44 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 record.setThrown(exception);
             }
             record.setSourceMethodName(DefaultFactory.class.getName());
-            record.setSourceMethodName("getConnection");
+            record.setSourceMethodName("createBackingStore"); // The public caller.
             LOGGER.log(record);
         }
         this.datasource = source;
-        return connection;
+        return factory;
     }
 
     /**
      * Creates the backing store authority factory. This method try to connect to the EPSG
      * database from the <code>{@value #DATASOURCE_NAME}</code> data source. If no data
      * source were found for that name, implementation declared in {@code META-INF/services/}
-     * are tested. If none of them fit, the default JDBC-ODBC bridge is used.
+     * are tested.
      *
      * @return The backing store to uses in {@code createXXX(...)} methods.
      * @throws FactoryException if the constructor failed to connect to the EPSG database.
      *         This exception usually has a {@link SQLException} as its cause.
-     *
-     * @todo Do may need some standard way (in Geotools) for fetching an {@link InitialContext}
-     *       for the whole Geotools library?
      */
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
-        final Connection connection;
-        final DatabaseMetaData info;
-        final String product;
-        final String url;
+        final AbstractAuthorityFactory factory;
+        String product = "<unknow>"; // TODO: localize
+        String url     = "<unknow>";
         try {
-            connection = getConnection();
-            info       = connection.getMetaData();
-            product    = info.getDatabaseProductName();
-            url        = info.getURL();
+            factory = createFactory();
+            if (factory instanceof EPSGFactory) {
+                final DatabaseMetaData info = ((EPSGFactory) factory).connection.getMetaData();
+                product = info.getDatabaseProductName();
+                url     = info.getURL();
+            }
         } catch (SQLException exception) {
             // TODO: localize
             throw new FactoryException("Failed to connect to the EPSG database", exception);
-        } catch (RuntimeException exception) {
-            /*
-             * May happen in some unpolished JDBC drivers. For example the JDBC-ODBC bridge on
-             * Linux throws a NullPointerException when trying to log a warning to the tracer.
-             * Log a message, since many application will catch the FactoryException without
-             * looking further in its cause. Use a relatively low level for the warning, since
-             * this error may not be of interest in some configurations.
-             */
-            // TODO: localize
-            final LogRecord record = new LogRecord(Level.FINE,
-                    "Unexpected exception in JDBC data source.");
-            record.setSourceClassName(DefaultFactory.class.getName());
-            record.setSourceMethodName("createBackingStore");
-            record.setThrown(exception);
-            LOGGER.log(record);
-            throw new FactoryException("Failed to connect to the EPSG database", exception);
         }
         // TODO: Provide a localized message including the database version.
-        LOGGER.config("Connected to EPSG database \"" + url + "\".");
-        final EPSGFactory epsg;
-        if ((datasource instanceof org.geotools.referencing.factory.epsg.DataSource) &&
-            ((org.geotools.referencing.factory.epsg.DataSource) datasource).isStandardSQL())
-        {
-            epsg = new FactoryForSQL(factories, connection);
-        } else {
-            epsg = new EPSGFactory(factories, connection);
+        LOGGER.config("Connected to EPSG database \"" + url + "\" on " + product + '.');
+        if (factory instanceof EPSGFactory) {
+            ((EPSGFactory) factory).buffered = this;
         }
-        epsg.buffered = this;
-        return epsg;
+        return factory;
     }
 
     /**
@@ -455,7 +387,6 @@ public class DefaultFactory extends DeferredAuthorityFactory {
      *             An arbitrary number of codes can be specified on the command line.
      */
     public static void main(String[] args) {
-        final Hints hints = null;
         MonolineFormatter.initGeotools(); // Use custom logger.
         final Arguments arguments = new Arguments(args);
         final boolean     printMT = arguments.getFlag("-transform");
@@ -473,7 +404,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             try {
                 for (int i=0; i<args.length; i++) {
                     if (factory == null) {
-                        factory = FactoryFinder.getCRSAuthorityFactory("EPSG", hints);
+                        factory = FactoryFinder.getCRSAuthorityFactory("EPSG", HINTS);
                     }
                     final Object object = factory.createObject(args[i]);
                     arguments.out.println(object);
@@ -494,7 +425,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
          * If the user asked for math transforms, prints them now.
          */
         if (printMT) {
-            final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory(hints);
+            final CoordinateOperationFactory factory =
+                    FactoryFinder.getCoordinateOperationFactory(HINTS);
             for (int i=0; i<count; i++) {
                 for (int j=i+1; j<count; j++) {
                     try {
