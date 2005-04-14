@@ -2,8 +2,8 @@
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-epsg</name>
-  <id>epsg</id>
+  <name>geotools-epsg-wkt</name>
+  <id>epsg-wkt</id>
   <currentVersion>2.1.x</currentVersion>
   <package>org.geotools.referencing</package>
   <shortDescription>EPSG Authoriy Service</shortDescription>

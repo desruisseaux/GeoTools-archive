@@ -20,6 +20,7 @@
 package org.geotools.image.io;
 
 // J2SE dependencies
+import java.io.Serializable;
 import java.util.EventListener;
 import javax.swing.event.EventListenerList;
 import javax.imageio.ImageReader;
@@ -42,7 +43,12 @@ import org.geotools.resources.XArray;
  *
  * @todo Add other listener types.
  */
-public class IIOListeners {
+public class IIOListeners implements Serializable {
+    /**
+     * For compatibility with different versions.
+     */
+    private static final long serialVersionUID = 6944397966242054247L;
+
     /**
      * The listener categories for read operations.
      */

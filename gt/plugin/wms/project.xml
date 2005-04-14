@@ -34,7 +34,7 @@
       <version>2.1.x</version>
     </dependency>
     <dependency>
-      <id>epsg</id>
+      <id>epsg-wkt</id>
       <version>2.1.x</version>
       <groupId>gt2</groupId>
     </dependency>    

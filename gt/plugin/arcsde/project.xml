@@ -51,7 +51,7 @@
     </dependency>
     
     <dependency>
-      <artifactId>epsg</artifactId>
+      <artifactId>epsg-wkt</artifactId>
       <groupId>gt2</groupId>
       <version>2.1.x</version>
     </dependency>
