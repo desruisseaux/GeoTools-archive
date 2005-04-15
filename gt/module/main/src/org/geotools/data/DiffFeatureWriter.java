@@ -129,9 +129,14 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * @throws IOException
      *
      * @see org.geotools.data.FeatureWriter#write()
-     */
-    public void write() throws IOException {
-        if ((live != null) && !live.equals(current)) {
+     */ 
+    public void write() throws IOException 
+	{
+    	//DJB: I modified this so it doesnt throw an error if you
+    	//     do an update and you didnt actually change anything.
+    	//     (We do the work)
+        if ((live != null) ) 
+        {
             // We have a modification to record!
             //
             diff.put(live.getID(), current);
