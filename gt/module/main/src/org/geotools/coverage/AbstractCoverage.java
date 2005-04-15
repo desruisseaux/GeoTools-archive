@@ -725,10 +725,10 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
             /*
              * Compute some properties of the image to be created.
              */
-            final Dimension      tileSize = ImageUtilities.toTileSize(gridBounds.getSize());
-            final SampleDimensionGT  band = SampleDimensionGT.wrap(getSampleDimension(VISIBLE_BAND));
-            final ColorModel   colorModel = band.getColorModel(VISIBLE_BAND, getNumSampleDimensions());
-            final SampleModel sampleModel = colorModel.createCompatibleSampleModel(
+            final Dimension       tileSize = ImageUtilities.toTileSize(gridBounds.getSize());
+            final GridSampleDimension band = GridSampleDimension.wrap(getSampleDimension(VISIBLE_BAND));
+            final ColorModel    colorModel = band.getColorModel(VISIBLE_BAND, getNumSampleDimensions());
+            final SampleModel  sampleModel = colorModel.createCompatibleSampleModel(
                                                            tileSize.width, tileSize.height);
             /*
              * If the image can be created using the ImageFunction operation, do it.

@@ -209,8 +209,8 @@ public final class ResampleTest extends GridCoverageTest {
      * Tests the "Resample" operation with a "Crop" transform.
      */
     public void testCrop() {
-        assertEquals("Crop", projectTo(null,
-                             new GridGeometry2D(new GridRangeGT(new Rectangle(50,50,200,200)), null)));
+        assertEquals("Crop", projectTo(null, new GridGeometry2D(
+                             new GeneralGridRange(new Rectangle(50,50,200,200)), null)));
     }
 
     /**

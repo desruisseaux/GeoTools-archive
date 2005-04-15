@@ -86,7 +86,7 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @see org.opengis.cv.CV_SampleDimension
  *
- * @deprecated Replaced by {@link org.geotools.coverage.SampleDimensionGT}
+ * @deprecated Replaced by {@link org.geotools.coverage.GridSampleDimension}
  *             in the <code>org.geotools.coverage</code> package.
  */
 public class SampleDimension implements Serializable {

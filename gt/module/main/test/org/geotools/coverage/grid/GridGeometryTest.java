@@ -77,13 +77,13 @@ public class GridGeometryTest extends TestCase {
         final MathTransform identity = factory.createAffineTransform(new GeneralMatrix(4));
         GridGeometry2D gg;
         try {
-            gg = new GridGeometry2D(new GridRangeGT(lower,upper), identity);
+            gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity);
             fail();
         } catch (IllegalArgumentException e) {
             // This is the expected dimension.
         }
         upper[2] = 3;
-        gg = new GridGeometry2D(new GridRangeGT(lower,upper), identity);
+        gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity);
         assertTrue(identity.isIdentity());
         assertTrue(gg.getGridToCoordinateSystem().isIdentity());
         assertTrue(gg.getGridToCoordinateSystem2D().isIdentity());
@@ -100,7 +100,7 @@ public class GridGeometryTest extends TestCase {
         final int[]    upper   = new int[]    {  90,  45,  5};
         final double[] minimum = new double[] {-180, -90,  9};
         final double[] maximum = new double[] {+180, +90, 10};
-        final GridGeometry2D gg = new GridGeometry2D(new GridRangeGT(lower,upper),
+        final GridGeometry2D gg = new GridGeometry2D(new GeneralGridRange(lower,upper),
                                                      new GeneralEnvelope(minimum, maximum), null);
         final AffineTransform tr = (AffineTransform) gg.getGridToCoordinateSystem2D();
         assertEquals(AffineTransform.TYPE_UNIFORM_SCALE |

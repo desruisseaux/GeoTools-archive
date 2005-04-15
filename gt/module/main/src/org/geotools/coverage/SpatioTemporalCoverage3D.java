@@ -494,9 +494,9 @@ control:    for (int p=0; p<=1; p++) {
         final InternationalString      name = getName();
         final CoordinateReferenceSystem crs = CRSUtilities.getHorizontalCRS(this.crs);
         final RenderedImage           image = getRenderableImage(time).createDefaultRendering();
-        final SampleDimensionGT[]     bands = new SampleDimensionGT[getNumSampleDimensions()];
+        final GridSampleDimension[]   bands = new GridSampleDimension[getNumSampleDimensions()];
         for (int i=0; i<getNumSampleDimensions(); i++){
-            bands[i] = SampleDimensionGT.wrap(getSampleDimension(i));
+            bands[i] = GridSampleDimension.wrap(getSampleDimension(i));
         }
         final MathTransform gridToCRS = ProjectiveTransform.create((AffineTransform)
                                         image.getProperty("gridToCoordinateSystem"));

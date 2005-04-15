@@ -39,7 +39,7 @@ import javax.media.jai.GraphicsJAI;
 import javax.media.jai.PlanarImage;
 
 // Geotools dependencies
-import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -63,7 +63,7 @@ public class Viewer extends JPanel {
      * The main sample dimension, or {@code null} if none.
      * Used by {@link #printPalette} for printing categories.
      */
-    private SampleDimensionGT categories;
+    private GridSampleDimension categories;
 
     /**
      * The transform from grid to coordinate system.
@@ -94,7 +94,7 @@ public class Viewer extends JPanel {
      */
     public Viewer(final GridCoverage2D coverage) {
         this(coverage.getRenderedImage());
-        categories = (SampleDimensionGT) coverage.getSampleDimension(0);
+        categories = (GridSampleDimension) coverage.getSampleDimension(0);
     }
 
     /**

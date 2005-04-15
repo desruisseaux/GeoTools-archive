@@ -43,7 +43,7 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CategoryListTest;
-import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 
@@ -71,7 +71,7 @@ public class SampleTranscoderTest extends TestCase {
     /**
      * A sample dimension for a band.
      */
-    private SampleDimensionGT band1;
+    private GridSampleDimension band1;
 
     /**
      * Run the suite from the command line.
@@ -99,7 +99,7 @@ public class SampleTranscoderTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        band1 = new SampleDimensionGT(new Category[] {
+        band1 = new GridSampleDimension(new Category[] {
             new Category("No data",     null, 0),
             new Category("Land",        null, 1),
             new Category("Clouds",      null, 2),
@@ -128,7 +128,7 @@ public class SampleTranscoderTest extends TestCase {
      */
     private RenderedImage testOneBand(final double scale, final double offset) throws TransformException {
         final Category category = new Category("Values", null, 0, 256, scale, offset);
-        return testOneBand(new SampleDimensionGT(new Category[] {category}, null));
+        return testOneBand(new GridSampleDimension(new Category[] {category}, null));
     }
 
     /**
@@ -137,7 +137,7 @@ public class SampleTranscoderTest extends TestCase {
      * @param  band The sample dimension for the only band.
      * @return The transformed image.
      */
-    private RenderedImage testOneBand(final SampleDimensionGT band) throws TransformException {
+    private RenderedImage testOneBand(final GridSampleDimension band) throws TransformException {
         final int SIZE = 64;
         /*
          * Constructs a 64x64 image with random values.
@@ -152,7 +152,7 @@ public class SampleTranscoderTest extends TestCase {
         final MathTransform identity = IdentityTransform.create(2);
         GridCoverage2D coverage;
         coverage = new GridCoverage2D("Test", source, GeographicCRS.WGS84, identity,
-                                      new SampleDimensionGT[]{band}, null, null);
+                                      new GridSampleDimension[]{band}, null, null);
         /*
          * Apply the operation. The SampleTranscoder class is suppose to transform our
          * integers into real-world values. Check if the result use floating-points.
@@ -176,7 +176,7 @@ public class SampleTranscoderTest extends TestCase {
          */
         RenderedImage back = PlanarImage.wrapRenderedImage(target).getAsBufferedImage();
         coverage = new GridCoverage2D("Test", back, GeographicCRS.WGS84, identity,
-                                    new SampleDimensionGT[]{band.geophysics(true)}, null, null);
+                                    new GridSampleDimension[]{band.geophysics(true)}, null, null);
 
         back = coverage.geophysics(false).getRenderedImage();
         assertEquals(DataBuffer.TYPE_BYTE, back.getSampleModel().getDataType());

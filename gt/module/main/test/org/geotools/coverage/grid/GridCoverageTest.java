@@ -49,7 +49,7 @@ import org.opengis.spatialschema.geometry.Envelope;
 // Geotools dependencies
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.coverage.Category;
-import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.operation.Resampler2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.TestData;
@@ -182,13 +182,13 @@ public class GridCoverageTest extends TestCase {
          * (longitude,latitude) coordinates, pixels of 0.25 degrees and a lower
          * left corner at 10°W 30°N.
          */
-        final GridCoverage2D coverage;  // The grid coverage.
-        final BufferedImage     image;  // The GridCoverage's data.
-        final WritableRaster   raster;  // The image's data as a raster.
-        final Rectangle2D      bounds;  // The GridCoverage's envelope.
-        final SampleDimensionGT  band;  // The only image's band.
+        final GridCoverage2D  coverage;  // The grid coverage.
+        final BufferedImage      image;  // The GridCoverage's data.
+        final WritableRaster    raster;  // The image's data as a raster.
+        final Rectangle2D       bounds;  // The GridCoverage's envelope.
+        final GridSampleDimension band;  // The only image's band.
 
-        band = new SampleDimensionGT(new Category[] {
+        band = new GridSampleDimension(new Category[] {
             new Category("No data",     null, 0),
             new Category("Land",        null, 1),
             new Category("Cloud",       null, 2),
@@ -210,7 +210,7 @@ public class GridCoverageTest extends TestCase {
             envelope.setRange(i, 10*i, 10*i+5);
         }
         coverage = transform(new GridCoverage2D("Test", image, crs, envelope,
-                                                new SampleDimensionGT[]{band}, null, null));
+                                                new GridSampleDimension[]{band}, null, null));
 
         /* ----------------------------------------------------------------------------------------
          *
@@ -327,8 +327,8 @@ public class GridCoverageTest extends TestCase {
                 break;
             }
         }
-        final SampleDimensionGT[] bands = new SampleDimensionGT[] {
-            new SampleDimensionGT(categories, null)
+        final GridSampleDimension[] bands = new GridSampleDimension[] {
+            new GridSampleDimension(categories, null)
         };
         final Envelope   envelope = new GeneralEnvelope(bounds);
         final RenderedImage image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));

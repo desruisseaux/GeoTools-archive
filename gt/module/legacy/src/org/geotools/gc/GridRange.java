@@ -48,7 +48,7 @@ import org.opengis.gc.GC_GridRange;
  *
  * @see GC_GridRange
  *
- * @deprecated Replaced by {@link org.geotools.coverage.grid.GridRangeGT}.
+ * @deprecated Replaced by {@link org.geotools.coverage.grid.GeneralGridRange}.
  */
 public class GridRange implements Dimensioned, Serializable {
     /**

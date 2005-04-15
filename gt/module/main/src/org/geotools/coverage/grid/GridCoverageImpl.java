@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
 
 import javax.media.jai.PropertySource;
 
-import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;
@@ -125,10 +125,10 @@ public class GridCoverageImpl extends AbstractGridCoverage
 	 */
 	public GridGeometry getGridGeometry() {
 
-		GridRange range = new GridRangeGT(image);
+		GridRange range = new GeneralGridRange(image);
 		boolean[] inverse = { false, false };
 		
-		return new GridGeometryGT(range, envelope, inverse);
+		return new GeneralGridGeometry(range, envelope, inverse);
 	}
 
 	/* (non-Javadoc)
@@ -392,7 +392,7 @@ public class GridCoverageImpl extends AbstractGridCoverage
 	 */
 	public SampleDimension getSampleDimension(int index) throws IndexOutOfBoundsException {
 		//TODO this is not right.
-		return new SampleDimensionGT(new String[] { "Alpha", "Red", "Green", "Blue" },
+		return new GridSampleDimension(new String[] { "Alpha", "Red", "Green", "Blue" },
 				new Color[] { new Color(0,0,0,0), Color.RED, Color.GREEN, Color.BLUE });
 	}
 

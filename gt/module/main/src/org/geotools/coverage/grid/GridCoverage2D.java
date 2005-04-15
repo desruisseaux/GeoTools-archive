@@ -97,7 +97,7 @@ import org.opengis.util.Cloneable;
 
 // Geotools dependencies
 import org.geotools.coverage.Category;
-import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.processing.AbstractGridCoverageProcessor;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
@@ -116,15 +116,15 @@ import org.geotools.util.WeakHashSet;
 /**
  * Basic access to grid data values backed by a two-dimensional
  * {@linkplain RenderedImage rendered image}. Each band in an image is represented as a
- * {@linkplain SampleDimensionGT sample dimension}.
+ * {@linkplain GridSampleDimension sample dimension}.
  * <br><br>
  * Grid coverages are usually two-dimensional. However, {@linkplain #getEnvelope their envelope}
  * may have more than two dimensions. For example, a remote sensing image may be valid only over
  * some time range (the time of satellite pass over the observed area). Envelopes for such grid
  * coverage can have three dimensions: the two usual ones (horizontal extent along <var>x</var>
  * and <var>y</var>), and a third one for start time and end time (time extent along <var>t</var>).
- * However, the {@linkplain GridRangeGT grid range} for all extra-dimension <strong>must</strong>
- * have a {@linkplain GridRangeGT#getLength size} not greater than 1. In other words, a
+ * However, the {@linkplain GeneralGridRange grid range} for all extra-dimension <strong>must</strong>
+ * have a {@linkplain GeneralGridRange#getLength size} not greater than 1. In other words, a
  * {@code GridCoverage2D} can be a slice in a 3 dimensional grid coverage. Each slice can have an
  * arbitrary width and height (like any two-dimensional images), but only 1 voxel depth (a "voxel"
  * is a three-dimensional pixel).
@@ -174,7 +174,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     private static final WeakHashSet pool = new WeakHashSet();
 
     /**
-     * A grid coverage using the sample dimensions {@code SampleDimensionGT.inverse}.
+     * A grid coverage using the sample dimensions {@code GridSampleDimension.inverse}.
      * This object is constructed and returned by {@link #geophysics}. Constructed when
      * first needed. May appears also in the {@link #sources} list.
      */
@@ -216,7 +216,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * the no data values, minimum and maximum values and a color table if one is associated
      * with the dimension. A coverage must have at least one sample dimension.
      */
-    private final SampleDimensionGT[] sampleDimensions;
+    private final GridSampleDimension[] sampleDimensions;
 
     /**
      * {@code true} is all sample in the image are geophysics values.
@@ -268,7 +268,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     public GridCoverage2D(final CharSequence             name, final ImageFunction  function,
                           final CoordinateReferenceSystem crs, final GridGeometry2D gridGeometry,
-                          final SampleDimensionGT[]     bands, final Map            properties)
+                          final GridSampleDimension[]     bands, final Map            properties)
             throws MismatchedDimensionException
     {
         this(name, getImage(function, gridGeometry),
@@ -385,7 +385,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             throws MismatchedDimensionException, IllegalArgumentException
     {
         this(name, raster, crs, null, new GeneralEnvelope(envelope),
-             GridSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
+             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
     }
 
     /**
@@ -431,7 +431,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             throws MismatchedDimensionException, IllegalArgumentException
     {
         this(name, raster, crs, new GridGeometry2D(null, gridToCRS), null,
-             GridSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
+             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
     }
 
     /**
@@ -445,7 +445,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                            final CoordinateReferenceSystem crs,
                            final GridGeometry2D   gridGeometry, // ONE and only one of those two
                            final GeneralEnvelope      envelope, // arguments should be non-null.
-                           final SampleDimensionGT[]     bands)
+                           final GridSampleDimension[]   bands)
             throws MismatchedDimensionException, IllegalArgumentException
     {
         this(name, PlanarImage.wrapRenderedImage(
@@ -509,7 +509,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     public GridCoverage2D(final CharSequence             name, final RenderedImage    image,
                           final CoordinateReferenceSystem crs, final Envelope      envelope,
-                          final SampleDimensionGT[]     bands, final GridCoverage[] sources,
+                          final GridSampleDimension[]   bands, final GridCoverage[] sources,
                           final Map properties)
             throws MismatchedDimensionException, IllegalArgumentException
     {
@@ -545,7 +545,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      */
     public GridCoverage2D(final CharSequence             name, final RenderedImage     image,
                           final CoordinateReferenceSystem crs, final MathTransform gridToCRS,
-                          final SampleDimensionGT[]     bands, final GridCoverage[]  sources,
+                          final GridSampleDimension[]   bands, final GridCoverage[]  sources,
                           final Map properties)
             throws MismatchedDimensionException, IllegalArgumentException
     {
@@ -564,7 +564,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                            final CoordinateReferenceSystem crs,
                                  GridGeometry2D   gridGeometry, // ONE and only one of those two
                                  GeneralEnvelope      envelope, // arguments should be non-null.
-                           final SampleDimensionGT[]   sdBands,
+                           final GridSampleDimension[] sdBands,
                            final GridCoverage[]        sources,
                            final Map                properties)
             throws MismatchedDimensionException, IllegalArgumentException
@@ -577,10 +577,10 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         this.image = image;
         /*
          * Checks sample dimensions. The number of SampleDimensions must matches the
-         * number of image's bands (this is checked by GridSampleDimension.create).
+         * number of image's bands (this is checked by Grid2DSampleDimension.create).
          */
-        sampleDimensions = new SampleDimensionGT[image.getNumBands()];
-        isGeophysics = GridSampleDimension.create(name, image, sdBands, sampleDimensions);
+        sampleDimensions = new GridSampleDimension[image.getNumBands()];
+        isGeophysics = Grid2DSampleDimension.create(name, image, sdBands, sampleDimensions);
         /*
          * Constructs the grid range and the envelope if they were not explicitly provided.
          * The envelope computation (if needed) requires a valid 'gridToCoordinateSystem'
@@ -595,7 +595,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         if (GCSUtilities.hasGridRange(gridGeometry)) {
             gridRange = gridGeometry.getGridRange();
         } else {
-            gridRange = new GridRangeGT(image, cs.getDimension());
+            gridRange = new GeneralGridRange(image, cs.getDimension());
             if (GCSUtilities.hasTransform(gridGeometry)) {
                 gridGeometry = new GridGeometry2D(gridRange, gridGeometry.getGridToCoordinateSystem());
             }
@@ -801,8 +801,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * Returns all sample dimensions for this grid coverage.
      */
-    public SampleDimensionGT[] getSampleDimensions() {
-        return (SampleDimensionGT[]) sampleDimensions.clone();
+    public GridSampleDimension[] getSampleDimensions() {
+        return (GridSampleDimension[]) sampleDimensions.clone();
     }
 
     /**
@@ -1114,7 +1114,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         values, or {@code false} to get the packed version.
      * @return The grid coverage. Never {@code null}, but may be {@code this}.
      *
-     * @see SampleDimensionGT#geophysics
+     * @see GridSampleDimension#geophysics
      * @see Category#geophysics
      * @see LookupDescriptor
      * @see RescaleDescriptor
@@ -1194,9 +1194,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             }
             image = op.getSourceImage(0);
         }
-        final int                    numBands = image.getNumBands();
-        final int                 visibleBand = GCSUtilities.getVisibleBand(image);
-        final SampleDimensionGT[] targetBands = (SampleDimensionGT[]) sampleDimensions.clone();
+        final int                      numBands = image.getNumBands();
+        final int                   visibleBand = GCSUtilities.getVisibleBand(image);
+        final GridSampleDimension[] targetBands = (GridSampleDimension[]) sampleDimensions.clone();
         assert targetBands.length == numBands : targetBands.length;
         for (int i=0; i<targetBands.length; i++) {
             targetBands[i] = targetBands[i].geophysics(geo);
@@ -1261,13 +1261,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
             double[]    offsets      = null; // The second argument for "Rescale".
             float[][][] breakpoints  = null; // The only   argument for "Piecewise".
 testLinear: for (int i=0; i<numBands; i++) {
-                final SampleDimensionGT  sd = sampleDimensions[i];
-                final List     categories = sd.getCategories();
-                final int   numCategories = categories.size();
-                float[] sourceBreakpoints = null;
-                float[] targetBreakpoints = null;
-                double expectedSource = Double.NaN;
-                double expectedTarget = Double.NaN;
+                final GridSampleDimension sd = sampleDimensions[i];
+                final List        categories = sd.getCategories();
+                final int      numCategories = categories.size();
+                float[]    sourceBreakpoints = null;
+                float[]    targetBreakpoints = null;
+                double        expectedSource = Double.NaN;
+                double        expectedTarget = Double.NaN;
                 int jbp = 0; // Break point index (vary with j)
                 for (int j=0; j<numCategories; j++) {
                     final Category category = (Category) categories.get(j);
@@ -1385,7 +1385,8 @@ testLinear: for (int i=0; i<numBands; i++) {
         }
         /*
          * STEP 5 - Transcode the image sample values. The "SampleTranscode" operation is
-         *          registered in the org.geotools.coverage package in the SampleDimensionGT class.
+         *          registered in the org.geotools.coverage package in the GridSampleDimension
+         *          class.
          */
         if (operation == null) {
             param = param.add(sampleDimensions);

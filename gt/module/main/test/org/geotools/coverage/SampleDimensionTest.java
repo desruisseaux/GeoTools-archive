@@ -37,8 +37,8 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test the {@link SampleDimensionGT} implementation. Since {@code SampleDimensionGT}
- * rely on {@link CategoryList} for many of its work, many {@code SampleDimensionGT}
+ * Test the {@link GridSampleDimension} implementation. Since {@code GridSampleDimension}
+ * rely on {@link CategoryList} for many of its work, many {@code GridSampleDimension}
  * tests are actually {@code CategoryList} tests.
  *
  * @version $Id$
@@ -88,7 +88,7 @@ public class SampleDimensionTest extends TestCase {
     /**
      * The sample dimension to test.
      */
-    private SampleDimensionGT test;
+    private GridSampleDimension test;
 
     /**
      * Random number generator for this test.
@@ -129,7 +129,7 @@ public class SampleDimensionTest extends TestCase {
             categories[i] = new Category(CATEGORIES[i], null, NO_DATA[i]);
         }
         categories[CATEGORIES.length] = new Category("SST", null, minimum, maximum, scale, offset);
-        test = new SampleDimensionGT(categories, null);
+        test = new GridSampleDimension(categories, null);
     }
 
     /**
@@ -147,7 +147,7 @@ public class SampleDimensionTest extends TestCase {
         assertEquals("minimum",   0,      test.getMinimumValue(), 0);
         assertEquals("maximum",   255,    test.getMaximumValue(), 0);
 
-        final SampleDimensionGT invt = test.geophysics(true);
+        final GridSampleDimension invt = test.geophysics(true);
         assertTrue(test != invt);
         assertTrue  ("identity", invt.getSampleToGeophysics().isIdentity());
         assertEquals("scale",    1,                       invt.getScale(),        0);
@@ -168,7 +168,7 @@ public class SampleDimensionTest extends TestCase {
         final BufferedImage       dummy = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
         final ParameterBlockJAI   param = new ParameterBlockJAI(SampleTranscoder.OPERATION_NAME);
         final ParameterListDescriptor d = param.getParameterListDescriptor();
-        assertTrue(d.getParamClasses()[0].equals(SampleDimensionGT[].class));
+        assertTrue(d.getParamClasses()[0].equals(GridSampleDimension[].class));
 
         try {
             JAI.create(SampleTranscoder.OPERATION_NAME, param);
@@ -185,16 +185,16 @@ public class SampleDimensionTest extends TestCase {
             // This is the expected exception: parameter required.
         }
 
-        param.setParameter("sampleDimensions", new SampleDimensionGT[] {test});
+        param.setParameter("sampleDimensions", new GridSampleDimension[] {test});
         final RenderedOp op = JAI.create(SampleTranscoder.OPERATION_NAME, param);
         assertTrue(op.getRendering() instanceof SampleTranscoder);
     }
 
     /**
-     * Test the {@link SampleDimensionGT#rescale} method.
+     * Test the {@link GridSampleDimension#rescale} method.
      */
     public void testRescale() {
-        SampleDimensionGT scaled;
+        GridSampleDimension scaled;
         scaled = test.geophysics(false).rescale(2, -6);
         assertEquals("Incorrect scale",     2, scaled.getScale(),        EPS);
         assertEquals("Incorrect offset",   -6, scaled.getOffset(),       EPS);

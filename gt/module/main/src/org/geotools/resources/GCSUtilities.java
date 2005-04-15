@@ -33,8 +33,8 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.coverage.SampleDimensionGT;
-import org.geotools.coverage.grid.GridRangeGT;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.coverage.grid.RenderedCoverage;
 import org.geotools.geometry.GeneralEnvelope;
@@ -126,7 +126,7 @@ public final class GCSUtilities {
             lower[i] = (int)Math.round(envelope.getMinimum(i));
             upper[i] = (int)Math.round(envelope.getMaximum(i));
         }
-        return new GridRangeGT(lower, upper);
+        return new GeneralGridRange(lower, upper);
     }
 
 
@@ -146,8 +146,8 @@ public final class GCSUtilities {
     public static boolean hasTransform(final SampleDimension[] sampleDimensions) {
         for (int i=sampleDimensions.length; --i>=0;) {
             SampleDimension sd = sampleDimensions[i];
-            if (sd instanceof SampleDimensionGT) {
-                sd = ((SampleDimensionGT) sd).geophysics(false);
+            if (sd instanceof GridSampleDimension) {
+                sd = ((GridSampleDimension) sd).geophysics(false);
             }
             MathTransform1D tr = sd.getSampleToGeophysics();
             return tr!=null && !tr.isIdentity();

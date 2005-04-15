@@ -54,7 +54,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridGeometryGT implements GridGeometry, Serializable {
+public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -89,7 +89,7 @@ public class GridGeometryGT implements GridGeometry, Serializable {
      * @param gridToCoordinateSystem The math transform which allows for the transformations
      *        from grid coordinates (pixel's <em>center</em>) to real world earth coordinates.
      */
-    public GridGeometryGT(final GridRange gridRange, final MathTransform gridToCoordinateSystem) {
+    public GeneralGridGeometry(final GridRange gridRange, final MathTransform gridToCoordinateSystem) {
         this.gridRange              = gridRange;
         this.gridToCoordinateSystem = gridToCoordinateSystem;
         if (gridRange!=null && gridToCoordinateSystem!=null) {
@@ -120,9 +120,9 @@ public class GridGeometryGT implements GridGeometry, Serializable {
      *                  of the last pixel.
      * @param reverse   Tells whatever or not reverse axis. A {@code null} value reverse no axis.
      */
-    public GridGeometryGT(final GridRange gridRange,
-                          final Envelope  userRange,
-                          final boolean[] reverse)
+    public GeneralGridGeometry(final GridRange gridRange,
+                               final Envelope  userRange,
+                               final boolean[] reverse)
     {
         this.gridRange = gridRange;
         /*
@@ -309,7 +309,7 @@ public class GridGeometryGT implements GridGeometry, Serializable {
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {
-            final GridGeometryGT that = (GridGeometryGT) object;
+            final GeneralGridGeometry that = (GeneralGridGeometry) object;
             return Utilities.equals(this.gridRange,              that.gridRange) &&
                    Utilities.equals(this.gridToCoordinateSystem, that.gridToCoordinateSystem);
         }

@@ -43,7 +43,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridRangeGT implements GridRange, Serializable {
+public class GeneralGridRange implements GridRange, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -78,7 +78,7 @@ public class GridRangeGT implements GridRange, Serializable {
     /**
      * Constructs an initially empty grid range of the specified dimension.
      */
-    private GridRangeGT(final int dimension) {
+    private GeneralGridRange(final int dimension) {
         index = new int[dimension*2];
     }
     
@@ -88,7 +88,7 @@ public class GridRangeGT implements GridRange, Serializable {
      * @param lower The minimal inclusive value.
      * @param upper The maximal exclusive value.
      */
-    public GridRangeGT(final int lower, final int upper) {
+    public GeneralGridRange(final int lower, final int upper) {
         index = new int[] {lower, upper};
         checkCoherence();
     }
@@ -107,7 +107,7 @@ public class GridRangeGT implements GridRange, Serializable {
      * @see #getLowers
      * @see #getUppers
      */
-    public GridRangeGT(final int[] lower, final int[] upper) {
+    public GeneralGridRange(final int[] lower, final int[] upper) {
         if (lower.length != upper.length) {
             throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
@@ -122,7 +122,7 @@ public class GridRangeGT implements GridRange, Serializable {
     /**
      * Constructs two-dimensional range defined by a {@link Rectangle}.
      */
-    public GridRangeGT(final Rectangle rect) {
+    public GeneralGridRange(final Rectangle rect) {
         index = new int[] {
             rect.x,            rect.y,
             rect.x+rect.width, rect.y+rect.height
@@ -133,7 +133,7 @@ public class GridRangeGT implements GridRange, Serializable {
     /**
      * Constructs two-dimensional range defined by a {@link Raster}.
      */
-    public GridRangeGT(final Raster raster) {
+    public GeneralGridRange(final Raster raster) {
         final int x = raster.getMinX();
         final int y = raster.getMinY();
         index = new int[] {
@@ -146,7 +146,7 @@ public class GridRangeGT implements GridRange, Serializable {
     /**
      * Constructs two-dimensional range defined by a {@link RenderedImage}.
      */
-    public GridRangeGT(final RenderedImage image) {
+    public GeneralGridRange(final RenderedImage image) {
         this(image, 2);
     }
     
@@ -157,7 +157,7 @@ public class GridRangeGT implements GridRange, Serializable {
      * @param dimension Number of dimensions for this grid range.
      *        Dimensions over 2 will be set to the [0..1] range.
      */
-    GridRangeGT(final RenderedImage image, final int dimension) {
+    GeneralGridRange(final RenderedImage image, final int dimension) {
         index = new int[dimension*2];
         final int x = image.getMinX();
         final int y = image.getMinY();
@@ -239,7 +239,7 @@ public class GridRangeGT implements GridRange, Serializable {
      * @return The subgrid range.
      * @throws IndexOutOfBoundsException if an index is out of bounds.
      */
-    public GridRangeGT getSubGridRange(final int lower, final int upper) {
+    public GeneralGridRange getSubGridRange(final int lower, final int upper) {
         final int curDim = index.length/2;
         final int newDim = upper-lower;
         if (lower<0 || lower>curDim) {
@@ -252,14 +252,14 @@ public class GridRangeGT implements GridRange, Serializable {
                     org.geotools.resources.cts.ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,
                     "upper", new Integer(upper)));
         }
-        final GridRangeGT gridRange = new GridRangeGT(newDim);
+        final GeneralGridRange gridRange = new GeneralGridRange(newDim);
         System.arraycopy(index, lower,        gridRange.index, 0,      newDim);
         System.arraycopy(index, lower+curDim, gridRange.index, newDim, newDim);
         return gridRange;
     }
     
     /**
-     * Returns a {@link Rectangle} with the same bounds as this {@code GridRangeGT}.
+     * Returns a {@link Rectangle} with the same bounds as this {@code GeneralGridRange}.
      * This is a convenience method for interoperability with Java2D.
      *
      * @throws IllegalStateException if this grid range is not two-dimensional.
@@ -294,8 +294,8 @@ public class GridRangeGT implements GridRange, Serializable {
      * this grid range for equality.
      */
     public boolean equals(final Object object) {
-        if (object instanceof GridRangeGT) {
-            final GridRangeGT that = (GridRangeGT) object;
+        if (object instanceof GeneralGridRange) {
+            final GeneralGridRange that = (GeneralGridRange) object;
             return Arrays.equals(this.index, that.index);
         }
         return false;

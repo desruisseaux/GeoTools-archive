@@ -64,7 +64,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridGeometry2D extends GridGeometryGT {
+public class GridGeometry2D extends GeneralGridGeometry {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -97,10 +97,10 @@ public class GridGeometry2D extends GridGeometryGT {
     private final MathTransform2D gridFromCoordinateSystem2D;
 
     /**
-     * Constructs a new grid geometry from a math transform. The argument are passed unchanged to the
-     * {@linkplain GridGeometryGT#GridGeometryGT(GridRange,MathTransform) super-class constructor}.
-     * However, they must obey to one additional constraint: only two dimensions in the grid range
-     * can have a width larger than 1.
+     * Constructs a new grid geometry from a math transform. The argument are passed unchanged to
+     * the {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange,MathTransform) super-class
+     * constructor}. However, they must obey to one additional constraint: only two dimensions in
+     * the grid range can have a width larger than 1.
      *
      * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
      *        The lowest valid grid coordinate is zero for {@link BufferedImage}, but may
@@ -131,9 +131,9 @@ public class GridGeometry2D extends GridGeometryGT {
 
     /**
      * Constructs a new grid geometry. The argument are passed unchanged to the
-     * {@linkplain GridGeometryGT#GridGeometryGT(GridRange,Envelope,boolean[]) super-class constructor}.
-     * However, they must obey to one additional constraint: only two dimensions in the grid range
-     * can have a width larger than 1.
+     * {@linkplain GeneralGridGeometry#GeneralGridGeometry(GridRange,Envelope,boolean[])
+     * super-class constructor}. However, they must obey to one additional constraint:
+     * only two dimensions in the grid range can have a width larger than 1.
      *
      * @param gridRange The valid coordinate range of a grid coverage.
      * @param userRange The corresponding coordinate range in user coordinate.
@@ -174,7 +174,7 @@ public class GridGeometry2D extends GridGeometryGT {
      *                  of the last pixel.
      */
     public GridGeometry2D(final Rectangle gridRange, final Rectangle2D userRange) {
-        this(new GridRangeGT(gridRange), getMathTransform(gridRange, userRange));
+        this(new GeneralGridRange(gridRange), getMathTransform(gridRange, userRange));
     }
 
     /**

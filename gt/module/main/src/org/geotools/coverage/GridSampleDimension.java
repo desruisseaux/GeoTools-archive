@@ -66,9 +66,9 @@ import org.geotools.util.NumberRange;
 /**
  * Describes the data values for a coverage as a list of {@linkplain Category categories}. For
  * a grid coverage a sample dimension is a band. Sample values in a band may be organized in
- * categories. This {@code SampleDimensionGT} implementation is capable to
- * differenciate <em>qualitative</em> and <em>quantitative</em> categories. For example
- * an image of sea surface temperature (SST) could very well defines the following categories:
+ * categories. This {@code GridSampleDimension} implementation is capable to differenciate
+ * <em>qualitative</em> and <em>quantitative</em> categories. For example an image of sea surface
+ * temperature (SST) could very well defines the following categories:
  *
  * <blockquote><pre>
  *   [0]       : no data
@@ -81,12 +81,16 @@ import org.geotools.util.NumberRange;
  * while all others categories are qualitative. The difference between those two kinds of category
  * is that the {@link Category#getSampleToGeophysics} method returns a non-null transform if and
  * only if the category is quantitative.
+ * <br><br>
+ * While this class can be used with arbitrary {@linkplain org.opengis.coverage.Coverage coverage},
+ * the primary target for this implementation is {@linkplain org.opengis.coverage.grid.GridCoverage
+ * grid coverage} storing their sample values as integers. This explain the "{@code Grid}" prefix
+ * in the class name.
  *
  * @version $Id$
- * @author <A HREF="www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
  */
-public class SampleDimensionGT implements SampleDimension, Serializable {
+public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -102,7 +106,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * This object is constructed and returned by {@link #geophysics}. Constructed when first
      * needed, but serialized anyway because it may be a user-supplied object.
      */
-    private SampleDimensionGT inverse;
+    private GridSampleDimension inverse;
 
     /**
      * The category list for this sample dimension, or {@code null} if this sample
@@ -167,7 +171,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
     /**
      * Constructs a sample dimension with no category.
      */
-    public SampleDimensionGT() {
+    public GridSampleDimension() {
         this((CategoryList) null);
     }
     
@@ -182,7 +186,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * @param names Sequence of category names for the values contained in a sample dimension,
      *              as {@link String} or {@link InternationalString} objects.
      */
-    public SampleDimensionGT(final CharSequence[] names) {
+    public GridSampleDimension(final CharSequence[] names) {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(names));
@@ -212,7 +216,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * @param colors Color to assign to each category. This array must have the same
      *               length than <code>names</code>.
      */
-    public SampleDimensionGT(final CharSequence[] names, final Color[] colors) {
+    public GridSampleDimension(final CharSequence[] names, final Color[] colors) {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(names, colors));
@@ -236,7 +240,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * which is not a {@code double} primitive can be {@code null}, and any {@linkplain CharSequence
      * char sequence} can be either a {@link String} or {@link InternationalString} object.
      * 
-     * This constructor allows the construction of a {@code SampleDimensionGT} without
+     * This constructor allows the construction of a {@code GridSampleDimension} without
      * explicit construction of {@link Category} objects. An heuristic approach is used for
      * dispatching the informations into a set of {@link Category} objects. However, this
      * constructor still less general and provides less fine-grain control than the constructor
@@ -279,17 +283,17 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      *
      * @throws IllegalArgumentException if the range {@code [minimum..maximum]} is not valid.
      */
-    public SampleDimensionGT(final CharSequence  description,
-                             final SampleDimensionType  type,
-                             final ColorInterpretation color,
-                             final Color[]           palette,
-                             final CharSequence[] categories,
-                             final double[]           nodata,
-                             final double            minimum,
-                             final double            maximum,
-                             final double              scale,
-                             final double             offset,
-                             final Unit                 unit)
+    public GridSampleDimension(final CharSequence  description,
+                               final SampleDimensionType  type,
+                               final ColorInterpretation color,
+                               final Color[]           palette,
+                               final CharSequence[] categories,
+                               final double[]           nodata,
+                               final double            minimum,
+                               final double            maximum,
+                               final double              scale,
+                               final double             offset,
+                               final Unit                 unit)
     {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").        
@@ -507,7 +511,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      *         categories. If may be the case for example if two or more categories have
      *         overlapping ranges of sample values.
      */
-    public SampleDimensionGT(Category[] categories, Unit units) throws IllegalArgumentException {
+    public GridSampleDimension(Category[] categories, Unit units) throws IllegalArgumentException {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
         //       ("Relax constraint on placement of this()/super() call in constructors").
         this(list(categories, units));
@@ -530,7 +534,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      *
      * @param list The list of categories, or {@code null}.
      */
-    private SampleDimensionGT(final CategoryList list) {
+    private GridSampleDimension(final CategoryList list) {
         MathTransform1D main = null;
         boolean  isMainValid = true;
         boolean  qualitative = false;
@@ -562,7 +566,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      *
      * @param other The other sample dimension, or {@code null}.
      */
-    protected SampleDimensionGT(final SampleDimensionGT other) {
+    protected GridSampleDimension(final GridSampleDimension other) {
         if (other != null) {
             inverse            = other.inverse;
             categories         = other.categories;
@@ -582,13 +586,13 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
 
     /**
      * Wrap the specified OpenGIS's sample dimension into a Geotools's implementation
-     * of {@code SampleDimensionGT}.
+     * of {@code GridSampleDimension}.
      *
      * @param sd The sample dimension to wrap into a Geotools implementation.
      */
-    public static SampleDimensionGT wrap(final SampleDimension sd) {
-        if (sd instanceof SampleDimensionGT) {
-            return (SampleDimensionGT) sd;
+    public static GridSampleDimension wrap(final SampleDimension sd) {
+        if (sd instanceof GridSampleDimension) {
+            return (GridSampleDimension) sd;
         }
         final int[][] palette = sd.getPalette();
         final Color[] colors;
@@ -602,17 +606,17 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
         } else {
             colors = null;
         }
-        return new SampleDimensionGT(sd.getDescription(),
-                                     sd.getSampleDimensionType(),
-                                     sd.getColorInterpretation(),
-                                     colors,
-                                     sd.getCategoryNames(),
-                                     sd.getNoDataValues(),
-                                     sd.getMinimumValue(),
-                                     sd.getMaximumValue(),
-                                     sd.getScale(),
-                                     sd.getOffset(),
-                                     sd.getUnits());
+        return new GridSampleDimension(sd.getDescription(),
+                                       sd.getSampleDimensionType(),
+                                       sd.getColorInterpretation(),
+                                       colors,
+                                       sd.getCategoryNames(),
+                                       sd.getNoDataValues(),
+                                       sd.getMinimumValue(),
+                                       sd.getMaximumValue(),
+                                       sd.getScale(),
+                                       sd.getOffset(),
+                                       sd.getUnits());
     }
 
     /**
@@ -935,7 +939,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      *         none.
      *
      * @todo What should we do when the value can't be formatted?
-     *       {@code SampleDimensionGT} returns {@code null} if there is no
+     *       {@code GridSampleDimension} returns {@code null} if there is no
      *       category or if an exception is thrown, but {@code CategoryList}
      *       returns "Untitled" if the value is an unknow NaN, and try to format
      *       the number anyway in other cases.
@@ -1091,7 +1095,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * other words, the range of sample values in all category maps directly the "real world"
      * values without the need for any transformation.
      * <br><br>
-     * {@code SampleDimensionGT} objects live by pair: a <cite>geophysics</cite> one
+     * {@code GridSampleDimension} objects live by pair: a <cite>geophysics</cite> one
      * (used for computation) and a <cite>non-geophysics</cite> one (used for packing data, usually
      * as integers). The {@code geo} argument specifies which object from the pair is wanted,
      * regardless if this method is invoked on the geophysics or non-geophysics instance of the
@@ -1107,13 +1111,13 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * @see Category#geophysics
      * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
      */
-    public SampleDimensionGT geophysics(final boolean geo) {
+    public GridSampleDimension geophysics(final boolean geo) {
         if (geo == isGeophysics) {
             return this;
         }
         if (inverse == null) {
             if (categories != null) {
-                inverse = new SampleDimensionGT(categories.inverse);
+                inverse = new GridSampleDimension(categories.inverse);
                 inverse.inverse = this;
             } else {
                 /*
@@ -1173,7 +1177,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * the value is {@link ColorInterpretation#UNDEFINED}.
      */
     public ColorInterpretation getColorInterpretation() {
-        // The 'GridSampleDimension' class overrides this method
+        // The 'Grid2DSampleDimension' class overrides this method
         // with better values for 'band' and 'numBands' constants.
         final int band     = 0;
         final int numBands = 1;
@@ -1184,11 +1188,10 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * Returns a color model for this sample dimension. The default implementation create a color
      * model with 1 band using each category's colors as returned by {@link Category#getColors}.
      * The returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
-     * {@code SampleDimensionGT} instance is "geophysics", or an integer data type
-     * otherwise.
+     * {@code GridSampleDimension} instance is "geophysics", or an integer data type otherwise.
      * <br><br>
      * Note that {@link org.geotools.coverage.grid.GridCoverage2D#getSampleDimension} returns
-     * special implementations of {@code SampleDimensionGT}. In this particular case,
+     * special implementations of {@code GridSampleDimension}. In this particular case,
      * the color model created by this {@code getColorModel()} method will have the same number of
      * bands than the grid coverage's {@link RenderedImage}.
      *
@@ -1197,7 +1200,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      *         sample dimension has no category.
      */
     public ColorModel getColorModel() {
-        // The 'GridSampleDimension' class overrides this method
+        // The 'Grid2DSampleDimension' class overrides this method
         // with better values for 'band' and 'numBands' constants.
         final int band     = 0;
         final int numBands = 1;
@@ -1208,8 +1211,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * Returns a color model for this sample dimension. The default implementation create the
      * color model using each category's colors as returned by {@link Category#getColors}. The
      * returned color model will typically use data type {@link DataBuffer#TYPE_FLOAT} if this
-     * {@code SampleDimensionGT} instance is "geophysics", or an integer data type
-     * otherwise.
+     * {@code GridSampleDimension} instance is "geophysics", or an integer data type otherwise.
      *
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
@@ -1271,7 +1273,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      * @see #getOffset
      * @see Category#rescale
      */
-    public SampleDimensionGT rescale(final double scale, final double offset) {
+    public GridSampleDimension rescale(final double scale, final double offset) {
         final MathTransform1D sampleToGeophysics = Category.createLinearTransform(scale, offset);
         final Category[] categories = (Category[]) getCategories().toArray();
         final Category[] reference  = (Category[]) categories.clone();
@@ -1284,7 +1286,7 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
         if (Arrays.equals(categories, reference)) {
             return this;
         }
-        return new SampleDimensionGT(categories, getUnits());
+        return new GridSampleDimension(categories, getUnits());
     }
 
     /**
@@ -1331,8 +1333,8 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
             // Slight optimization
             return true;
         }
-        if (object instanceof SampleDimensionGT) {
-            final SampleDimensionGT that = (SampleDimensionGT) object;
+        if (object instanceof GridSampleDimension) {
+            final GridSampleDimension that = (GridSampleDimension) object;
             return Utilities.equals(this.categories, that.categories);
             // Since everything is deduced from CategoryList, two sample dimensions
             // should be equal if they have the same list of categories.
@@ -1377,9 +1379,9 @@ public class SampleDimensionGT implements SampleDimension, Serializable {
      *       with {@link org.geotools.coverage.grid.GridCoverage2D}, which make extensive
      *       use of JAI. Peoples just working with {@link org.geotools.coverage.Coverage} are
      *       stuck with the overhead. Note that we register the image operation here because
-     *       the only operation's argument is of type {@code SampleDimensionGT[]}.
+     *       the only operation's argument is of type {@code GridSampleDimension[]}.
      *       Consequently, the image operation may be invoked at any time after class
-     *       loading of {@link SampleDimensionGT}.
+     *       loading of {@link GridSampleDimension}.
      *       <br><br>
      *       Additional note: moving the initialization into the
      *       {@code META-INF/registryFile.jai} file may not be the best idea neithter,

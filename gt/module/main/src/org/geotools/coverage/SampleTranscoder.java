@@ -145,13 +145,13 @@ final class SampleTranscoder extends PointOpImage {
     /////////////////////////////////////////////////////////////////////////////////
     /**
      * The operation descriptor for the "SampleTranscode" operation. This operation can apply the
-     * {@link SampleDimensionGT#getSampleToGeophysics sampleToGeophysics} transform on all pixels
+     * {@link GridSampleDimension#getSampleToGeophysics sampleToGeophysics} transform on all pixels
      * in all bands of an image. The transformations are supplied as a list of
-     * {@link SampleDimensionGT}s, one for each band. The supplied {@code SampleDimensionGT}
+     * {@link GridSampleDimension}s, one for each band. The supplied {@code GridSampleDimension}
      * objects describe the categories in the <strong>source</strong> image. The target image
      * will matches sample dimension
      *
-     *     <code>{@link SampleDimensionGT#geophysics geophysics}(!isGeophysics)</code>,
+     *     <code>{@link GridSampleDimension#geophysics geophysics}(!isGeophysics)</code>,
      *
      * where <code>isGeophysics</code> is the previous state of the sample dimension.
      */
@@ -167,9 +167,9 @@ final class SampleTranscoder extends PointOpImage {
                                  {"DocURL",      "http://www.geotools.org/"},
                                  {"Version",     "1.0"}},
                   new String[]   {RenderedRegistryMode.MODE_NAME}, 1,
-                  new String[]   {"sampleDimensions"},        // Argument names
-                  new Class []   {SampleDimensionGT[].class}, // Argument classes
-                  new Object[]   {NO_PARAMETER_DEFAULT},      // Default values for parameters,
+                  new String[]   {"sampleDimensions"},          // Argument names
+                  new Class []   {GridSampleDimension[].class}, // Argument classes
+                  new Object[]   {NO_PARAMETER_DEFAULT},        // Default values for parameters,
                   null // No restriction on valid parameter values.
             );
         }
@@ -191,7 +191,7 @@ final class SampleTranscoder extends PointOpImage {
                 return false;
             }
             final RenderedImage source = (RenderedImage) param.getSource(0);
-            final SampleDimensionGT[] bands = (SampleDimensionGT[]) param.getObjectParameter(0);
+            final GridSampleDimension[] bands = (GridSampleDimension[]) param.getObjectParameter(0);
             final int numBands = source.getSampleModel().getNumBands();
             if (numBands != bands.length) {
                 message.append(Resources.format(ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
@@ -221,7 +221,7 @@ final class SampleTranscoder extends PointOpImage {
                                     final RenderingHints hints)
         {
             final RenderedImage image = (RenderedImage) param.getSource(0);
-            final SampleDimensionGT[] bands = (SampleDimensionGT[]) param.getObjectParameter(0);
+            final GridSampleDimension[] bands = (GridSampleDimension[]) param.getObjectParameter(0);
             final CategoryList[] categories = new CategoryList[bands.length];
             for (int i=0; i<categories.length; i++) {
                 categories[i] = bands[i].categories;
@@ -257,7 +257,7 @@ final class SampleTranscoder extends PointOpImage {
     /**
      * Register the "SampleTranscode" image operation to the operation registry of
      * the specified JAI instance. This method is invoked by the static initializer
-     * of {@link SampleDimensionGT}.
+     * of {@link GridSampleDimension}.
      */
     public static void register(final JAI jai) {
         final OperationRegistry registry = jai.getOperationRegistry();
@@ -268,7 +268,7 @@ final class SampleTranscoder extends PointOpImage {
         } catch (IllegalArgumentException exception) {
             final LogRecord record = Resources.getResources(null).getLogRecord(Level.SEVERE,
                    ResourceKeys.ERROR_CANT_REGISTER_JAI_OPERATION_$1, OPERATION_NAME);
-            record.setSourceClassName("SampleDimensionGT");
+            record.setSourceClassName("GridSampleDimension");
             record.setSourceMethodName("<classinit>");
             record.setThrown(exception);
             AbstractGridCoverage.LOGGER.log(record);

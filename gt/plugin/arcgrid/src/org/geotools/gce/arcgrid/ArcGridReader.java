@@ -45,7 +45,7 @@ import javax.units.UnitFormat;
 import java.text.ParseException;
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
-import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.GridSampleDimension;
 import javax.units.Unit;
 
 /**
@@ -427,9 +427,9 @@ public class ArcGridReader
                             new NumberRange( (float) arcGridRaster.getMinValue(),
                                             (float) arcGridRaster.getMaxValue()));
       nan = new Category("nodata", new Color(0,0,0,1), 0);
-      SampleDimensionGT band =
-          new SampleDimensionGT(new Category[] {nan,
-                                values}, uom);
+      GridSampleDimension band =
+          new GridSampleDimension(new Category[] {nan,
+                                  values}, uom);
       band=band.geophysics(true);
       BufferedImage image = new BufferedImage(band.getColorModel(),
                                               raster,
@@ -439,7 +439,7 @@ public class ArcGridReader
                                 image,
                                 coordinateSystem,
                                 envelope,
-                                new SampleDimensionGT[] {band},
+                                new GridSampleDimension[] {band},
                                 null,
                                 null); //TODO SET THE METADATA AS SOON AS POSSIBLE!!!!
       //////////////////////////////////////////////////////////////////////////////////////////////////

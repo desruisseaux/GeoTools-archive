@@ -61,10 +61,10 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.coverage.SampleDimensionGT;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GridRangeGT;
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.coverage.processing.AbstractGridCoverageProcessor;
 import org.geotools.coverage.processing.CannotReprojectException;
@@ -466,7 +466,7 @@ public final class Resampler2D extends GridCoverage2D {
          * of "no data" categories. For geophysics image, it is usually NaN. For non-geophysics
          * image, it is usually 0.
          */
-        final SampleDimensionGT[] sampleDimensions = sourceCoverage.getSampleDimensions();
+        final GridSampleDimension[] sampleDimensions = sourceCoverage.getSampleDimensions();
         final double[] background = new double[sampleDimensions.length];
         for (int i=0; i<background.length; i++) {
             final NumberRange range = sampleDimensions[i].getBackground().getRange();
@@ -551,7 +551,7 @@ public final class Resampler2D extends GridCoverage2D {
             lower[1] = targetImage.getMinY();
             upper[0] = targetImage.getWidth()  + lower[0];
             upper[1] = targetImage.getHeight() + lower[1];
-            final GridRange actualGR = new GridRangeGT(lower, upper);
+            final GridRange actualGR = new GeneralGridRange(lower, upper);
             if (!targetGR.equals(actualGR)) {
                 MathTransform gridToCoordinateSystem = targetGG.getGridToCoordinateSystem();
                 if (false) {

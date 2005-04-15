@@ -499,7 +499,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * <br><br>
      * This method is to be overriden by {@link GeophysicsCategoryList}. The default implementation
      * returns {@code null} since sample values are not geophysics values as long as they have not
-     * been transformed. The {@link SampleDimensionGT} class will invoke
+     * been transformed. The {@link GridSampleDimension} class will invoke
      * {@code geophysics(true).getUnits()} in order to get a non-null unit.
      */
     public Unit getUnits() {

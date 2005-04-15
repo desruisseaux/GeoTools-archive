@@ -134,8 +134,6 @@ public class CRS {
      *   Get list of the codes that are supported by the authority.
      *   For example, "EPSG" -->   "EPSG:2000", "EPSG:2001", "EPSG:2002" because we know what
      *   they mean.
-     * 
-     * @param authority - list of supported codes 
      */
     public static Set getSupportedCodes(String AUTHORITY)
     {
