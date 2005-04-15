@@ -859,7 +859,7 @@ public class WFSFilterVisitor implements FilterVisitor {
                                         changed = true;
                                     }
                                     if(maxx > maxbbox.getMaxX()){
-                                        minx = maxbbox.getMaxX();
+                                        maxx = maxbbox.getMaxX();
                                         changed = true;
                                     }
                                     if(miny < maxbbox.getMinY()){

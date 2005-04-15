@@ -13,11 +13,18 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.BBoxExpression;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.GeometryFilter;
 import org.xml.sax.SAXException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * <p> 
@@ -141,4 +148,5 @@ public class WFSDataStoreReadTest extends TestCase {
             se.printStackTrace();
         }
     }
+    
 }
