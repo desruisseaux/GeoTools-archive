@@ -54,8 +54,6 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      * PNG is default output format.
      *
      */
-
-
     public static final ParameterDescriptor FORMAT = new ParameterDescriptor("Format",
             "Indicates the output format for this image", "png", true);
     public static final ParameterDescriptor CRS =new ParameterDescriptor("crs",
