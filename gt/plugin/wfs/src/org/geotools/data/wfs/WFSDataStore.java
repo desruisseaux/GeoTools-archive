@@ -195,11 +195,13 @@ public class WFSDataStore extends AbstractDataStore {
          * Maybe have a mechanism that would allow an authenticator to ask the 
          * datastore itself for a previously supplied user/pass.
          */
-//        synchronized (Authenticator.class) {
-//                Authenticator.setDefault(auth);
-//                connection.connect();
-//                Authenticator.setDefault(null);
-//        }
+        if (auth != null) {
+            synchronized (Authenticator.class) {
+                    Authenticator.setDefault(auth);
+                    connection.connect();
+                    Authenticator.setDefault(null);
+            }
+        }
         return connection;
     }
 
