@@ -190,11 +190,16 @@ public class WFSDataStore extends AbstractDataStore {
             connection.setRequestMethod("GET");
         }
         connection.setDoInput(true);
-        synchronized (Authenticator.class) {
-                Authenticator.setDefault(auth);
-                connection.connect();
-                Authenticator.setDefault(null);
-        }
+        /*
+         * FIXME this could breaks uDig. Not quite sure what to do otherwise.
+         * Maybe have a mechanism that would allow an authenticator to ask the 
+         * datastore itself for a previously supplied user/pass.
+         */
+//        synchronized (Authenticator.class) {
+//                Authenticator.setDefault(auth);
+//                connection.connect();
+//                Authenticator.setDefault(null);
+//        }
         return connection;
     }
 
