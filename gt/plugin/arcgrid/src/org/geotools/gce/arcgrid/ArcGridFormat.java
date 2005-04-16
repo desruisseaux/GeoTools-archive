@@ -18,27 +18,19 @@ package org.geotools.gce.arcgrid;
 
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.stream.IOExchange;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Envelope;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-
 import java.net.URL;
-
 import java.util.HashMap;
 
 /**A simple implementation of the Arc Grid Format.
