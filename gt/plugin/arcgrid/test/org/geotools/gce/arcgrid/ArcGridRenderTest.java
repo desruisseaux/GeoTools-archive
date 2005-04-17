@@ -22,13 +22,25 @@
  */
 package org.geotools.gce.arcgrid;
 
-import org.geotools.coverage.grid.GridCoverageImpl;
+import com.sun.media.jai.codecimpl.util.RasterFactory;
+import org.geotools.coverage.Category;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.operation.Resampler2D;
+import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.data.DataSourceException;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.filter.Filter;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterDescriptorGroup;
+
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -36,27 +48,34 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
+import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
-
-import java.awt.image.Raster;
-
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import java.lang.reflect.Array;
-
+import java.io.PrintWriter;
 import java.net.URL;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
+import javax.imageio.ImageIO;
+import javax.media.jai.PlanarImage;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.units.Unit;
+import javax.xml.parsers.FactoryConfigurationError;
+
 
 /**
  * DOCUMENT ME!
@@ -100,9 +119,76 @@ public class ArcGridRenderTest extends TestCaseSupport {
         System.out.println("get a reader " + reader);
     }
 
-    public void testRenderImage()
-        throws Exception {
-        renderImage("renderedArcGrid.jpg");
+    public void testRenderImage() throws Exception {
+        //declare a raster
+        /*WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
+                100, 150, 1, null);
+
+        //fill it
+        for (int i = 0; i < (raster.getHeight() - 10); i++)
+            for (int j = 0; j < (raster.getHeight() - 10); j++)
+                if ((i <= 20) && (i >= 10)) {
+                    raster.setSample(j, i, 0, (float) -9999.0);
+                } else {
+                    raster.setSample(j, i, 0, (float) (Math.random() * 10));
+                }
+
+        raster.setSample(0, 0, 0, (float) 10.0);
+
+        //use the raster to show a gridcoverage
+        Unit uom = null; //at this moment we have no info about the UoM
+
+        //try {
+        //    uom = unitFormat.parseUnit(UoM);
+        //} catch (ParseException ex1) {
+        //    uom = null;
+        //}
+        //IT WILL BECOME GRAYSCALE FOR THE MOMENT
+        Category values;
+
+        //try {
+        //    uom = unitFormat.parseUnit(UoM);
+        //} catch (ParseException ex1) {
+        //    uom = null;
+        //}
+        //IT WILL BECOME GRAYSCALE FOR THE MOMENT
+        Category nan;
+        values = new Category("values",
+                new Color[] { Color.BLUE, Color.GREEN, Color.RED },
+                new NumberRange(1, 255),new NumberRange(0.0f, 10.0f));
+        nan = new Category("nodata", new Color[]{new Color(0, 0, 0, 0)}, 
+        		new NumberRange(0, 0),
+        		new NumberRange(-9999.0f, -9999.0f));
+        GridSampleDimension band = new GridSampleDimension(new Category[] {
+                    nan, values},
+					uom);
+        band = band.geophysics(true);
+
+        BufferedImage image = new BufferedImage(band.getColorModel(), raster,
+                false, null); //properties????
+        GridCoverage2D gc = new GridCoverage2D("ArcGrid", //TODO SET THE NAME!!!
+                image, GeographicCRS.WGS84,
+                new GeneralEnvelope(new double[] { 0.0, 0.0 },
+                    new double[] { 10.0, 10.0 }),
+                new GridSampleDimension[] { band }, null, null);
+        
+        BufferedImage bufferedImage = ( (PlanarImage) gc.geophysics(false).getRenderedImage())
+        .getAsBufferedImage();
+    
+        ImageIO.write(bufferedImage,"tiff",new File("c:/a.tiff"));
+        
+        
+       
+        
+
+		//processor2D.print(new PrintWriter(System.out));
+        
+        //visualizing it
+        bufferedImage = ( (PlanarImage) gcOp.geophysics(false).getRenderedImage())
+            .getAsBufferedImage();
+        
+        ImageIO.write(bufferedImage,"tiff",new File("c:/b.tiff"));
+        //renderImage("renderedArcGrid.jpg");*/
     }
 
     private void renderImage(String filename)
@@ -157,22 +243,19 @@ public class ArcGridRenderTest extends TestCaseSupport {
         //        int h = raster.getWidth();
 
         /*
-        LiteRenderer renderer = new LiteRenderer(mapContext);
-        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        g.setColor(Color.white);
-        g.fillRect(0, 0, w, h);
-
-        Rectangle paintArea = new Rectangle(w, h);
-        Envelope dataArea = mapContext.getLayerBounds();
-        AffineTransform at = renderer.worldToScreenTransform(dataArea, paintArea);
-        renderer.paint(g, paintArea, at);
-
-        java.net.URL base = TestData.getResource( this, null );
-        File file = new File(java.net.URLDecoder.decode( base.getPath(), "UTF-8"), filename);
-        System.out.println("Writing to " + file.getAbsolutePath());
-
-        FileOutputStream out = new FileOutputStream(file);
-        ImageIO.write(image, "JPEG", out);*/
+           LiteRenderer renderer = new LiteRenderer(mapContext);
+           BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+           Graphics2D g = (Graphics2D) image.getGraphics();
+           g.setColor(Color.white);
+           g.fillRect(0, 0, w, h);
+           Rectangle paintArea = new Rectangle(w, h);
+           Envelope dataArea = mapContext.getLayerBounds();
+           AffineTransform at = renderer.worldToScreenTransform(dataArea, paintArea);
+           renderer.paint(g, paintArea, at);
+           java.net.URL base = TestData.getResource( this, null );
+           File file = new File(java.net.URLDecoder.decode( base.getPath(), "UTF-8"), filename);
+           System.out.println("Writing to " + file.getAbsolutePath());
+           FileOutputStream out = new FileOutputStream(file);
+           ImageIO.write(image, "JPEG", out);*/
     }
 }
