@@ -6,9 +6,7 @@ package org.geotools.gce.arcgrid;
 import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
+
 
 import java.net.URL;
 
