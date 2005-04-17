@@ -2,11 +2,7 @@ package org.geotools.gce.arcgrid;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.resources.TestData;
-import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.coverage.grid.GridCoverageWriter;
-import org.opengis.parameter.ParameterValueGroup;
 
 import javax.media.jai.PlanarImage;
 
@@ -16,25 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import java.awt.image.BufferedImage;
-import javax.media.jai.*;
 import java.io.File;
 
 import java.net.URL;
-import java.awt.image.RenderedImage;
-import javax.imageio.ImageIO;
-import java.io.IOException;
-import javax.media.jai.RenderedOp;
-import java.awt.image.WritableRaster;
-import java.awt.image.RescaleOp;
-import java.awt.image.ColorModel;
-import java.awt.color.ColorSpace;
-import java.awt.Transparency;
-import java.awt.image.DataBuffer;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import com.sun.media.jai.codec.TIFFEncodeParam;
-import com.sun.media.jai.codec.ImageEncoder;
-import com.sun.media.jai.codec.ImageCodec;
+
 
 /**
  * <p>Title: TestArcGridClass</p>
@@ -102,7 +83,7 @@ public class ArcGridVisualizationTest  extends TestCaseSupport {
     //reading the coverage
     GridCoverage2D gc = ((GridCoverage2D) reader.read(null)).geophysics(false);
 
-
+    //visualizing it
     BufferedImage bufferedImage = ( (PlanarImage) gc.getRenderedImage())
         .getAsBufferedImage();
     ImageIcon icon = new ImageIcon(bufferedImage);
@@ -111,7 +92,7 @@ public class ArcGridVisualizationTest  extends TestCaseSupport {
     frame.setTitle(
         testParam.fileName);
 
-    frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.getContentPane().add(new JScrollPane(label));
     frame.pack();
     frame.show();
