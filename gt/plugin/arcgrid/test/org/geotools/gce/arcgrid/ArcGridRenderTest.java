@@ -22,25 +22,15 @@
  */
 package org.geotools.gce.arcgrid;
 
-import com.sun.media.jai.codecimpl.util.RasterFactory;
-import org.geotools.coverage.Category;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.operation.Resampler2D;
-import org.geotools.coverage.processing.GridCoverageProcessor2D;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.filter.Filter;
-import org.geotools.geometry.GeneralEnvelope;
+
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterDescriptorGroup;
 
-import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.crs.GeographicCRS;
+
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -48,32 +38,17 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
-import org.geotools.util.NumberRange;
+
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.WritableRaster;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
-
-import javax.imageio.ImageIO;
-import javax.media.jai.PlanarImage;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.units.Unit;
 import javax.xml.parsers.FactoryConfigurationError;
 
 
