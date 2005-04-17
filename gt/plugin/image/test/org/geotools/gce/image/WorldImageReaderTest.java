@@ -55,7 +55,7 @@ public class WorldImageReaderTest extends TestCase {
             File file=null;
             InputStream in=null;
             //checking test data directory for all kind of inputs
-            File test_data_dir=testData.file(this,".");
+            File test_data_dir=TestData.file(this,".");
             String[] fileList=test_data_dir.list(new MyFileFilter());
             for(int i=0;i<fileList.length;i++)
             {
