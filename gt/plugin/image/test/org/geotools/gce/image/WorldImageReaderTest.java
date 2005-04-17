@@ -55,7 +55,7 @@ public class WorldImageReaderTest extends TestCase {
             File file=null;
             InputStream in=null;
             //checking test data directory for all kind of inputs
-            File test_data_dir=TestData.file(this,".");
+            File test_data_dir=TestData.file(this,null);
             String[] fileList=test_data_dir.list(new MyFileFilter());
             for(int i=0;i<fileList.length;i++)
             {
@@ -111,18 +111,4 @@ public class WorldImageReaderTest extends TestCase {
     }
 
 }
-class MyFileFilter implements FilenameFilter {
-    public boolean accept(File file, String name) {
 
-        if (name.endsWith(".gif") ||
-            name.endsWith(".jpg") ||
-            name.endsWith(".jpeg") ||
-            name.endsWith(".tif") ||
-            name.endsWith(".tiff") ||
-            name.endsWith(".png")) {
-
-            return true;
-        }
-        return false;
-    }
-}
