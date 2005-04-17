@@ -24,7 +24,6 @@ import org.geotools.coverage.processing.GridCoverageProcessor2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
