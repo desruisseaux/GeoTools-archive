@@ -30,8 +30,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.spatialschema.geometry.Envelope;
 
 /**
