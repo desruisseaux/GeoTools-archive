@@ -44,23 +44,27 @@ import java.util.Map;
  * In addition, it is recommended that implementations provide a constructor expecting
  * a single {@link Hints} argument. This optional argument gives to the user some control
  * of the factory's low-level details. The amount of control is factory specific. The geotools
- * library defines a globat class called Hints that is ment as API (ie you can assume these
+ * library defines a global class called {@link Hints} that is ment as API (ie you can assume these
  * hints are supported), factories may also provide information on their own custom hints
  * as part of their javadoc class description.
  * </p>
+ * <strong>Examples:</strong>
  * <ul>
- * Examples:
- * <li>the {@linkplain org.opengis.referencing.datum.DatumFactory datum factory} backing an
- * {@linkplain org.opengis.referencing.datum.DatumAuthorityFactory datum authority factory}).
- * <li>an application supplied FeatureFactory (ensuring all constructed features support the
- * IAdatpable interface), being passed to a FeatureTypeFactory so that all FeatureTypes
- * constructed will produce features supporting the indicated interface.
+ * <li>An application supplied a {@linkplain org.opengis.referencing.datum.DatumFactory datum
+ * factory} hint, being passed to a {@linkplain org.opengis.referencing.datum.DatumAuthorityFactory
+ * datum authority factory} so that all datum created from an authority code will come from the
+ * supplied datum factory.</li>
+ *
+ * <li>An application supplied {@link org.geotools.feature.FeatureFactory} (ensuring all
+ * constructed features support the {@code IAdatpable} interface), being passed to a
+ * {@link org.geotools.feature.FeatureTypeFactory} so that all {@code FeatureTypes}
+ * constructed will produce features supporting the indicated interface.</li>
  * </ul>
- * As seen in the second example this concept opf a hint becomes more interesting when
+ * <p>
+ * As seen in those examples this concept of a hint becomes more interesting when
  * the opperation being controlled is discovery of other services used by the Factory.
  * By supplying appropriate hints one can chain together several factories and retarget
  * them to an application specific task.
- * <p>
  * </p>
  * @author Ian Schneider
  * @author Martin Desruisseaux
@@ -92,7 +96,7 @@ public interface Factory {
      * uses an ordinary {@linkplain org.opengis.referencing.datum.DatumFactory datum factory},
      * its method could be implemented as below (note that we should <U>not</U> check if the
      * datum factory is null, since key with null value is the expected behaviour in this case):
-     * <p>
+     * </p>
      * Example:<pre><code>
      * Map hints = new HashMap();
      * hints.put({@linkplain Hints#DATUM_FACTORY}, datumFactory);

@@ -53,10 +53,47 @@ import org.geotools.resources.cts.ResourceKeys;
  * This implies that the ordering is unspecified between all factories created with the
  * {@linkplain #AbstractFactory() default constructor}, since they all have the same
  * {@linkplain #NORMAL_PRIORITY default priority} level.
+ * <br><br>
+ * <h3>How hints are set</h3>
+ * The lack of constructor expecting a {@link Map} argument is intentional. Implementations should
+ * not copy blindly all user-supplied hints into the {@link #hints} field. Instead, they should
+ * pickup only the relevant hints and {@linkplain Map#put put} them in the {@link #hints} field.
+ * <strong>Example:</strong> Lets two factories, A and B. Factory A need an instance of Factory B.
+ * Factory A can be implemented as below:
+ *
+ * <blockquote><pre>
+ * class FactoryA extends AbstractFactory {
+ *     FactoryB fb;
+ *
+ *     FactoryA(Hints userHints) {
+ *         fb = FactoryFinder.getFactoryB(userHints);
+ *         this.hints.put(Hints.FACTORY_B, fb);
+ *     }
+ * }
+ * </pre></blockquote>
+ *
+ * Key points:
+ *
+ * <ul>
+ *   <li>User-supplied map is never modified.</li>
+ *   <li>All hints relevant to other factories is used in the constructor.
+ *       In the example above, hints relevant to factory B were used when
+ *       <code>FactoryFinder.getFactoryB(...)</code> is invoked.</li>
+ *   <li>The {@code FactoryA} constructor stores only the hints
+ *       relevant to {@code FactoryA}. Other hints can be find indirectly by
+ *       fetching <code>hints.get(Hints.FACTORY_B)</code> and looking at the {@code FactoryB}'s
+ *       hints recursively. This is what {@link FactoryRegistry} do.</li>
+ * </ul>
+ *
  * <p>
  * Q: Can we make some convience methods for hint setup and handling? I am sure subclass
  *    implementators will tell us what is needed.
  * </p>
+ * <p>
+ * A: It was not the intend. The hints was supposed to be set by subclass's constructor
+ *    using directly Map methods. Added an example in the Javadoc (see above).
+ * </p>
+ *
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -94,24 +131,49 @@ public class AbstractFactory implements Factory, RegisterableService {
     /**
      * The {@linkplain Factory#getImplementationHints implementation hints}. This map should be
      * filled by subclasses at construction time. Constructors should <strong>not</strong> copy
-     * blindly all user-provided hints. The should select only the relevant hints and resolve them
-     * as of {@linkplain Factory#getImplementationHints implementation hints} contract.
+     * blindly all user-provided hints. They should select only the relevant hints and resolve
+     * them as of {@linkplain Factory#getImplementationHints implementation hints} contract.
      * <p>
      * Once the hints are accessibles to the user, this map should not change anymore.
      * </p>
+     *
+     *
      * Q: "Once hints are accessable to the user", I though the user gave us these hints (in order
      * to control what we are doing). I don't think any client code needs to know or access the
      * getImplementationHints method (we use those values as we construct our helper classes.
-     * A: Awaiting a response.
+     * <br>
+     * A: Yes, hints are provided by the users. But I suggest that the constructor "digest" them
+     *    (i.e. they need to inspect them and process them in some place; I suggest to do that
+     *    right in the constructor), and this.hints is the result of this "digestion". 
+     *    The only class using getImplementationHints at this time is FactoryFinder.
+     *
+     * <br><br>
+     *
      * Q: "Constructors should not copy blindly all user-provided hints"
      * A: This is *wrong*, constructors must copy thise hints because they must be passed on when
      * we discouver access other factories. The whole point is to pass these hints along so that
      * other factories (and application supplied factories) can make use of them.
      * (Don't presume to know what the user is doing).
+     * <br><br>
+     * (Martin): I disagree. Hints are consumed in the constructor (see the example in class
+     * javadoc). They are passed to all dependencies at construction time. Once the construction
+     * is completed, user-hints are totally exploited and there is no need to keep them anymore.
+     * What is remaining in AbstractFactory.hints is what the factory actually *uses*.
+     * FactoryRegistry need this information.
+     *
      * Q: Can we force this issue? By leaving this final and forcing subclasses to set this value
      * during the constructor. This pattern would force the above contract to be true.
+     * <br>
      * A: We can only do this easily when we simply pass along application supplied hints. When
      * Martin aggress to that, we should remove the noargument constructor.
+     * <br><br>
+     * (Martin): No, it will go against the original intend. AbstractFactory.hints is needed by
+     * FactoryRegistry, which care about which hints are *used*, not which hints were supplied.
+     * The distinction is important. If AbstractFactory.hints doesn't limit itself to relevant
+     * hints only, some very costly factories like EPSG ones will be created way too often. I
+     * realize that 'getImplementationHints()' name is probably misleading. Maybe 'getUsedHints()'
+     * would be a better one? The contract is that each factory care about itself only. If a
+     * factory uses an other factory, FactoryRegistry automatically inspect the hints recursively.
      */
     protected final Map/*<RenderingHints.Key,Object>*/ hints; //= new LinkedHashMap();
 

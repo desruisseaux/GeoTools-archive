@@ -60,10 +60,10 @@ import org.geotools.resources.Utilities;
  * Iterator providers = registry.getProviders(MathTransformProvider.class)
  * </code></pre>
  * </p>
- * <P>
+ * <p>
  * <strong>NOTE: This class is not thread safe</strong>. Users are responsable
  * for synchronisation. This is usually done in an utility class wrapping this
- * service registry (e.g. {@link org.geotools.referencing.FactoryFinder}).</P>
+ * service registry (e.g. {@link org.geotools.referencing.FactoryFinder}).
  * </p>
  * @version $Id$
  * @author Martin Desruisseaux
