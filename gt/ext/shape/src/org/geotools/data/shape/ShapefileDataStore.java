@@ -69,6 +69,8 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
@@ -1185,7 +1187,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             for (int i = 0, ii = featureType.getAttributeCount(); i < ii;
                     i++) {
                 // if its a geometry, we don't want to write it to the dbf...
-                if (!featureType.getAttributeType(i).isGeometry()) {
+                if (!(featureType.getAttributeType(i) instanceof GeometryAttributeType)) {
                     cnt++;
                     writeFlags[i] = (byte) 1;
                 }
@@ -1267,8 +1269,8 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
                 Class colType = type.getType();
                 String colName = type.getName();
-                int fieldLen = type.getFieldLength();
-
+                int fieldLen = FeatureTypes.getFieldLength( type );
+               
                 if (fieldLen <= 0) {
                     fieldLen = 255;
                 }
