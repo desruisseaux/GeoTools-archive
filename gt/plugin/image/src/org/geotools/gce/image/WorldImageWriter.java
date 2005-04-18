@@ -30,6 +30,7 @@ import javax.imageio.ImageIO;
 import javax.media.jai.IHSColorSpace;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 
@@ -40,6 +41,7 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferDouble;
 import java.awt.image.DataBufferFloat;
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
@@ -259,9 +261,9 @@ public class WorldImageWriter implements GridCoverageWriter {
             if (sourceCoverage.getSampleDimension(0).getColorInterpretation()
                               .name().equals("GRAY_INDEX")) {
                 //getting rendered image
-                RenderedImage image = ((GridCoverage2D) sourceCoverage)
-                    .getRenderedImage();
-
+            	surrogateImage = ((PlanarImage)((GridCoverage2D) sourceCoverage).geophysics(false)
+                    .getRenderedImage());
+                /*
                 //image dimensions
                 int width = image.getWidth();
                 int height = image.getHeight();
@@ -376,7 +378,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 
                 /**
                  * RESCALING SOURCE IMAGE
-                 */
+                 
                 double[] subtract = new double[1];
 
                 subtract[0] = minValue;
@@ -402,7 +404,7 @@ public class WorldImageWriter implements GridCoverageWriter {
                 surrogateImage = JAI.create("format", pbConvert);
 
                 //TODO check this if it is needed
-                surrogateImage = JAI.create("invert", surrogateImage);
+                surrogateImage = JAI.create("invert", surrogateImage);*/
             }
             else {
                 /**
@@ -411,15 +413,44 @@ public class WorldImageWriter implements GridCoverageWriter {
                 surrogateImage = (PlanarImage) ((GridCoverage2D) sourceCoverage)
                     .getRenderedImage();
             }
-
+            
+         
+            
+            if(surrogateImage.getColorModel() instanceof ComponentColorModel
+            		&&
+            		((String) (this.format.getWriteParameters().parameter("format")
+                            .getValue())).compareToIgnoreCase("gif")==0)
+            {
+			     //extrema to get the dynamic of this image
+                ParameterBlock pbMaxMin = new ParameterBlock();
+                pbMaxMin.addSource(surrogateImage);
+                RenderedOp extrema = JAI.create("extrema", pbMaxMin);
+                // Must get the extrema of all bands !
+                double[] allMin = (double[]) extrema.getProperty("minimum");
+                double[] allMax = (double[]) extrema.getProperty("maximum");
+            	
+                
+                //rescale the image
+            //    double scale=255.0/(allMax[0]-allMin[0]);
+          //      ParameterBlock pb = new ParameterBlock();
+          //      pb.addSource(surrogateImage);
+          //      pb.add(scale);
+          //      pb.add(0);
+           //     RenderedImage dst = JAI.create("rescale", pb);
+                
+      }
+     
+            	
+            	
             /** WRITE TO OUTPUTBUFER */
-            ImageIO.write(surrogateImage,
+            ImageIO.write (surrogateImage,
                 (String) (this.format.getWriteParameters().parameter("format")
                                      .getValue()), output);
             output.flush();
             output.close();
         }
         catch (Exception e) {
+        	System.err.println(e.getMessage());
             IOException ioe = new IOException();
             ioe.initCause(e);
             throw ioe;
