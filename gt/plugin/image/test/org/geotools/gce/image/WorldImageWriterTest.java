@@ -59,7 +59,7 @@ public class WorldImageWriterTest extends TestCase {
 			e.printStackTrace();
 		}
 		String[] fileList=test_data_dir.list(new MyFileFilter());
-        for(int i=0;i<fileList.length;i++)
+        for(int i=0;i<fileList.length;i++)//i<fileList.length
         {
 
         	
@@ -149,7 +149,7 @@ public class WorldImageWriterTest extends TestCase {
         //writing png
         File tempFile=null;
 		try {
-			tempFile = TestData.temp(this,"png");
+			tempFile = TestData.temp(this,"temp");
 			System.err.println(tempFile.getAbsolutePath());
 			assertTrue(tempFile.exists());
 		} catch (IOException e1) {
@@ -163,11 +163,11 @@ public class WorldImageWriterTest extends TestCase {
 
         //writing parameters for png
         Format writerParams=wiWriter.getFormat();
-        writerParams.getWriteParameters().parameter("Format").setValue("png");
+        writerParams.getWriteParameters().parameter("Format").setValue("gif");
 
         try {
 			//writing
-			wiWriter.write(coverage,null);
+			wiWriter.write(coverage.geophysics(false),null);
 		} catch (IllegalArgumentException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace(System.err);
