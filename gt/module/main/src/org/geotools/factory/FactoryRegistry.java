@@ -38,32 +38,33 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * A registry for factories. Factories are registered by categories, which are identified
- * by <strong>interface</strong> class (<U>not</U> implementation class). For example
- * <code>{@link org.opengis.referencing.crs.CRSFactory}.class</code> is a category,
+ * A registry for factories, organized by categories (usualy by <strong>interface</strong>).
+ * <p>
+ * For example <code>{@link org.opengis.referencing.crs.CRSFactory}.class</code> is a category,
  * and <code>{@link org.opengis.referencing.operation.MathTransformFactory}.class</code>
  * is an other category.
- * <BR><BR>
+ * </p>
+ * <p>
  * For each category, implementations are registered in a file placed in the
  * {@code META-INF/services/} directory, as specified in the {@link ServiceRegistry}
  * javadoc. Those files are usually bundled into the JAR file distributed by the vendor.
  * If the same {@code META-INF/services/} file appears many time in different JARs,
  * they are processed as if their content were merged.
- * <BR><BR>
- * 
- * Example use:
- * <pre>
+ * </p>
+ * <p>
+ * Example use: <pre><code>
  * Set categories = Collections.singleton(new Class[] {MathTransformProvider.class});
  * FactoryRegistry registry = new FactoryRegistry(categories);
  * 
  * // get the providers
  * Iterator providers = registry.getProviders(MathTransformProvider.class)
- * </pre>
- *
- * <P><strong>NOTE: This class is not thread safe</strong>. Users are responsable
+ * </code></pre>
+ * </p>
+ * <P>
+ * <strong>NOTE: This class is not thread safe</strong>. Users are responsable
  * for synchronisation. This is usually done in an utility class wrapping this
  * service registry (e.g. {@link org.geotools.referencing.FactoryFinder}).</P>
- *
+ * </p>
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Richard Gould

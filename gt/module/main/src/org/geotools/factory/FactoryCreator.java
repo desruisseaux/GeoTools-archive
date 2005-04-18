@@ -30,16 +30,19 @@ import org.geotools.resources.Utilities;
 
 /**
  * A {@linkplain FactoryRegistry factory registry} capable to creates factories if no appropriate
- * instance was found in the registry. Factory created "on the fly" are not cached; all invocation
- * to {@link #getServiceProvider getServiceProvider(...)} will creates them again if no registered
- * factory matches the requirements ({@linkplain javax.imageio.spi.ServiceRegistry.Filter filter}
- * and/or {@linkplain Hints hints}). If caching is wanted, the instances to cache should be declared
+ * instance was found in the registry.
+ * <p>
+ * Factory created "on the fly" are not cached; all invocation to {@link #getServiceProvider getServiceProvider(...)}
+ * will creates them again if no registered factory matches the requirements
+ * ({@linkplain javax.imageio.spi.ServiceRegistry.Filter filter} and/or {@linkplain Hints hints}).
+ * </p>
+ * <p>If caching is wanted, the instances to cache should be declared
  * likes all other services in the {@code META-INF/services/} directory. For the caching to be
  * effective, their no-argument constructor shall setup the factory with
  * {@linkplain Factory#getImplementationHints implementation hints} matching the hints that the
  * application is expected to ask for. It is preferable that such custom implementation
  * {@linkplain ServiceRegistry#setOrdering order} itself after the default implementations.
- *
+ * </p>
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett

@@ -53,7 +53,10 @@ import org.geotools.resources.cts.ResourceKeys;
  * This implies that the ordering is unspecified between all factories created with the
  * {@linkplain #AbstractFactory() default constructor}, since they all have the same
  * {@linkplain #NORMAL_PRIORITY default priority} level.
- *
+ * <p>
+ * Q: Can we make some convience methods for hint setup and handling? I am sure subclass
+ *    implementators will tell us what is needed.
+ * </p>
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -93,23 +96,40 @@ public class AbstractFactory implements Factory, RegisterableService {
      * filled by subclasses at construction time. Constructors should <strong>not</strong> copy
      * blindly all user-provided hints. The should select only the relevant hints and resolve them
      * as of {@linkplain Factory#getImplementationHints implementation hints} contract.
-     *
+     * <p>
      * Once the hints are accessibles to the user, this map should not change anymore.
+     * </p>
+     * Q: "Once hints are accessable to the user", I though the user gave us these hints (in order
+     * to control what we are doing). I don't think any client code needs to know or access the
+     * getImplementationHints method (we use those values as we construct our helper classes.
+     * A: Awaiting a response.
+     * Q: "Constructors should not copy blindly all user-provided hints"
+     * A: This is *wrong*, constructors must copy thise hints because they must be passed on when
+     * we discouver access other factories. The whole point is to pass these hints along so that
+     * other factories (and application supplied factories) can make use of them.
+     * (Don't presume to know what the user is doing).
+     * Q: Can we force this issue? By leaving this final and forcing subclasses to set this value
+     * during the constructor. This pattern would force the above contract to be true.
+     * A: We can only do this easily when we simply pass along application supplied hints. When
+     * Martin aggress to that, we should remove the noargument constructor.
      */
-    protected final Map/*<RenderingHints.Key,Object>*/ hints = new LinkedHashMap();
+    protected final Map/*<RenderingHints.Key,Object>*/ hints; //= new LinkedHashMap();
 
     /**
      * An unmodifiable view of {@link #hints}. This is the actual map to be returned
      * by {@link #getImplementationHints}. Its content reflects the {@link #hints}
      * map even if the later is modified.
      */
-    private final Map unmodifiableHints = Collections.unmodifiableMap(hints);
+    private final Map unmodifiableHints; //=Collections.unmodifiableMap(hints);
     
     /**
      * Creates a new factory with the {@linkplain #NORMAL_PRIORITY default priority}.
      */
     protected AbstractFactory() {
         this(NORMAL_PRIORITY);
+    }
+    protected AbstractFactory( Map hints ){
+    	this( hints, NORMAL_PRIORITY );
     }
 
     /**
@@ -119,13 +139,17 @@ public class AbstractFactory implements Factory, RegisterableService {
      *        {@link #MINIMUM_PRIORITY} and {@link #MAXIMUM_PRIORITY} inclusive.
      */
     protected AbstractFactory(final int priority) {
-        this.priority = priority;
+    	this( Collections.EMPTY_MAP, priority );
+    }
+    protected AbstractFactory( Map hints, final int priority ){
+    	this.hints = hints;
+    	unmodifiableHints = Collections.unmodifiableMap(hints);
+    	this.priority = priority;
         if (priority<MINIMUM_PRIORITY || priority>MAXIMUM_PRIORITY) {
             throw new IllegalArgumentException(Resources.format(
-                      ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "priority", new Integer(priority)));
+                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "priority", new Integer(priority)));
         }
     }
-
     /**
      * Returns an {@linkplain java.util.Collections#unmodifiableMap unmodifiable} view of
      * {@linkplain #hints}.

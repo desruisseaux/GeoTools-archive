@@ -43,17 +43,30 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * A set of hints providing some control on factories to be used. Those hints are typically used
- * by renderers or {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
+ * A set of hints providing control on factories to be used. 
+ * <p>
+ * Those hints are typically used by renderers or {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
  * processors} for example. They provides a way to control low-level details. Implementations may
  * use the hints or ignore them. Example:
- *
+ * </p>
  * <blockquote><pre>
  * CoordinateOperationFactory myFactory = &hellip;
  * RenderingHints hints = new RenderingHints(Hints.{@link #COORDINATE_OPERATION_FACTORY}, myFactory);
  * GridCoverageProcessor processor = new GridCoverageProcessor2D(hints);
  * </pre></blockquote>
- *
+ * <p>
+ * Any hint mentioned by this interface is considered to be API, failure to make use of a hint by
+ * a geotools factory implementation is considered a bug (as it will prevent the use of this library
+ * for application specific tasks).
+ * </p>
+ * <p>
+ * When hints are used in conjuction with the Factory service discouvery mechanism we have the complete
+ * geotools plugin system. By using hints to allow application code to effect service discovery we allow
+ * client code to retarget the geotools library for their needs.
+ * </p>
+ * <p>
+ * While this works in practice for services which we control (like Feature creation), we also make
+ * use of other services
  * @version $Id$
  * @author Martin Desruisseaux
  */
