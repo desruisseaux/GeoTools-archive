@@ -83,15 +83,15 @@ import org.geotools.referencing.datum.GeodeticDatum;
  *                                                    {@linkplain CartesianCS#GENERIC_2D});
  * <FONT color='#008000'>//
  * // Constructs the grid coverage using the grid coordinate system (not the "real world"
- * // one). It is usefull to display the coverage in its native CS before we resample it.
- * // Note that if the grid of localization does not define the geographic location  for
- * // all pixels, then we need to specify some affine transform in place of the IDENTITY
- * // argument. For example if the grid of localization defines the location of 1 pixel,
- * // then skip 3, then defines the location of 1 pixel, etc., then the affine transform
- * // should be AffineTransform.getScaleInstance(0.25, 0.25).
+ * // one). It is usefull to display the coverage in its native CRS before we resample it.
+ * // Note that if the grid of localization does not define the geographic location for
+ * // all pixels, then we need to specify some affine transform in place of the call to
+ * // IdentityTransform. For example if the grid of localization defines the location of
+ * // 1 pixel, then skip 3, then defines the location of 1 pixel, etc., then the affine
+ * // transform should be AffineTransform.getScaleInstance(0.25, 0.25).
  * //</FONT>
  * GridCoverage coverage;
- * coverage = new GridCoverage("The grid coverage", theRaster, gridCRS, MathTransform2D.IDENTITY, ...);
+ * coverage = new GridCoverage("The grid coverage", theRaster, gridCRS, IdentityTransform.create(2), ...);
  * FrameFactory.show(coverage);
  * <FONT color='#008000'>//
  * // Project the coverage from its current 'gridCS' to the 'realCS'. If the grid of

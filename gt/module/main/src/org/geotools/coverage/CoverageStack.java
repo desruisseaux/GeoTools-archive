@@ -1195,7 +1195,7 @@ public class CoverageStack extends AbstractCoverage {
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
         for (int i=0; i<doubleBuffer.length; i++) {
             final double lower = dest[i];
-            final double upper = floatBuffer[i];
+            final double upper = doubleBuffer[i];
             double value = lower + ratio*(upper-lower);
             if (Double.isNaN(value)) {
                 if (!Double.isNaN(lower)) {

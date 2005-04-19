@@ -94,29 +94,30 @@ public class Parser extends MathTransformParser {
     /**
      * A list of predefined coordinate system axis. Returning a pre-defined constant
      * help to compare successfully two CS using {@code equalsIgnoreMetadata} method.
+     * Axis appears in preferred order for WKT.
      */
     private static final CoordinateSystemAxis[] GEOTOOLS_AXIS = {
         org.geotools.referencing.cs.CoordinateSystemAxis.LONGITUDE,
         org.geotools.referencing.cs.CoordinateSystemAxis.LATITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.ALTITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.DEPTH,
         org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LONGITUDE,
         org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LATITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.EASTING,
+        org.geotools.referencing.cs.CoordinateSystemAxis.WESTING,
+        org.geotools.referencing.cs.CoordinateSystemAxis.NORTHING,
+        org.geotools.referencing.cs.CoordinateSystemAxis.SOUTHING,
+        org.geotools.referencing.cs.CoordinateSystemAxis.X,
+        org.geotools.referencing.cs.CoordinateSystemAxis.Y,
+        org.geotools.referencing.cs.CoordinateSystemAxis.Z,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_X,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Y,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Z,
+        org.geotools.referencing.cs.CoordinateSystemAxis.ALTITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.DEPTH,
         org.geotools.referencing.cs.CoordinateSystemAxis.ELLIPSOIDAL_HEIGHT,
         org.geotools.referencing.cs.CoordinateSystemAxis.GRAVITY_RELATED_HEIGHT,
         org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LONGITUDE,
         org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LATITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_RADIUS,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_X,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Y,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Z,
-        org.geotools.referencing.cs.CoordinateSystemAxis.X,
-        org.geotools.referencing.cs.CoordinateSystemAxis.Y,
-        org.geotools.referencing.cs.CoordinateSystemAxis.Z,
-        org.geotools.referencing.cs.CoordinateSystemAxis.EASTING,
-        org.geotools.referencing.cs.CoordinateSystemAxis.WESTING,
-        org.geotools.referencing.cs.CoordinateSystemAxis.NORTHING,
-        org.geotools.referencing.cs.CoordinateSystemAxis.SOUTHING
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_RADIUS
     };
 
     /**
