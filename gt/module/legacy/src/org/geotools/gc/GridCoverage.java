@@ -96,6 +96,7 @@ import org.geotools.units.Unit;
 import org.geotools.util.NumberRange;
 import org.geotools.util.WeakHashSet;
 import org.geotools.coverage.AbstractCoverage;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.gc.GC_GridCoverage;
 import org.opengis.gc.GC_GridGeometry;
@@ -103,6 +104,7 @@ import org.opengis.gc.GC_GridPacking;
 import org.opengis.gc.GC_GridRange;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
 
 
 /**
@@ -1279,7 +1281,7 @@ testLinear: for (int i=0; i<numBands; i++) {
          */
         if (operation == null) {
             param = param.add(sampleDimensions);
-            operation = "org.geotools.SampleTranscode";
+            operation = "org.geotools.legacy.SampleTranscode";
         }
         final Logger logger = Logger.getLogger("org.geotools.gc");
         if (logger.isLoggable(Level.FINE)) {
@@ -1666,9 +1668,24 @@ testLinear: for (int i=0; i<numBands; i++) {
      * Mimic a GeoAPI interface as a legacy implementation. This method is provided
      * as a temporary bridge for using new CRS object with J2D-Renderer for example.
      */
-    public static GridCoverage fromGeoAPI(final org.opengis.coverage.grid.GridCoverage gc) {
+    public static GridCoverage fromGeoAPI(org.opengis.coverage.grid.GridCoverage gc) {
         if (gc instanceof GridCoverage) {
             return (GridCoverage) gc;
+        }
+        final org.opengis.referencing.crs.CoordinateReferenceSystem crs;
+        final org.opengis.referencing.operation.MathTransform gridToCRS;
+        final boolean isGeo;
+        if (gc instanceof GridCoverage2D) {
+            final GridCoverage2D gc2D = (GridCoverage2D) gc;
+            gc = gc2D.geophysics(false);
+            isGeo = (gc != gc2D);
+            crs = gc2D.getCoordinateReferenceSystem2D();
+            gridToCRS = ((org.geotools.coverage.grid.GridGeometry2D) gc2D.getGridGeometry())
+                        .getGridToCoordinateSystem2D();
+        } else {
+            isGeo = false;
+            crs = gc.getCoordinateReferenceSystem();
+            gridToCRS = gc.getGridGeometry().getGridToCoordinateSystem();
         }
         final SampleDimension[] sd = new SampleDimension[gc.getNumSampleDimensions()];
         for (int i=0; i<sd.length; i++) {
@@ -1680,11 +1697,15 @@ testLinear: for (int i=0; i<numBands; i++) {
         } else {
             name = gc;
         }
-        return new GridCoverage(
+        GridCoverage legacyGC = new GridCoverage(
                 name.toString(),
                 gc.getRenderableImage(0,1).createDefaultRendering(),
-                CoordinateSystem.fromGeoAPI(gc.getCoordinateReferenceSystem()),
-                AbstractMathTransform.fromGeoAPI(gc.getGridGeometry().getGridToCoordinateSystem()),
+                CoordinateSystem.fromGeoAPI(crs),
+                AbstractMathTransform.fromGeoAPI(gridToCRS),
                 sd, null, null);
+        if (isGeo) {
+            legacyGC = legacyGC.geophysics(true);
+        }
+        return legacyGC;
     }
 }

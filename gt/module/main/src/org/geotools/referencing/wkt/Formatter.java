@@ -168,6 +168,10 @@ public class Formatter {
     public Formatter(final Symbols symbols, final int indentation) {
         this.symbols     = symbols;
         this.indentation = indentation;
+        if (symbols == null) {
+            throw new IllegalArgumentException(Resources.format(
+                      ResourceKeys.ERROR_NULL_ARGUMENT_$1, "symbols"));
+        }
         if (indentation < 0) {
             throw new IllegalArgumentException(Resources.format(
                                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2,

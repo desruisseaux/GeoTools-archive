@@ -38,6 +38,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.wkt.Symbols;
 import org.geotools.resources.Formattable;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -220,7 +221,7 @@ final class AffineTransform2D extends XAffineTransform
         } catch (SecurityException ignore) {
             // Ignore. Will fallback on the default indentation.
         }
-        final Formatter formatter = new Formatter(null, indentation);
+        final Formatter formatter = new Formatter(Symbols.DEFAULT, indentation);
         formatter.append(this);
         return formatter.toString();
     }

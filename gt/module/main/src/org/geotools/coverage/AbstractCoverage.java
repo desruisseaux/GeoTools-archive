@@ -531,9 +531,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /////////////////////////////////////////////////////////////////////////
     
     /**
-     * Base class for renderable image view of a coverage. Renderable images allow interoperability
-     * with <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>  for a two-dimensional
-     * view of a coverage (which may or may not be a
+     * A view of a {@linkplain AbstractCoverage coverage} as a renderable image. Renderable images
+     * allow interoperability with <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>
+     * for a two-dimensional slice of a coverage (which may or may not be a
      * {@linkplain org.geotools.coverage.grid.GridCoverage2D grid coverage}).
      *
      * @version $Id$
@@ -570,7 +570,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         protected final GeneralDirectPosition coordinate = new GeneralDirectPosition(getDimension());
 
         /**
-         * Construct a renderable image.
+         * Constructs a renderable image.
          *
          * @param  xAxis Dimension to use for <var>x</var> axis.
          * @param  yAxis Dimension to use for <var>y</var> axis.
@@ -704,7 +704,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * @return A rendered image containing the rendered data
          */
         public RenderedImage createRendering(final RenderContext context) {
-            final AffineTransform csToGrid = context.getTransform();
+            final AffineTransform crsToGrid = context.getTransform();
             final Shape area = context.getAreaOfInterest();
             final Rectangle gridBounds;
             if (true) {
@@ -714,7 +714,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                  * computing a box which contains fully the Rectangle2D. But in our particular
                  * case, we really want to round toward the nearest integer.
                  */
-                final Rectangle2D bounds = XAffineTransform.transform(csToGrid,
+                final Rectangle2D bounds = XAffineTransform.transform(crsToGrid,
                                            (area!=null) ? area.getBounds2D() : this.bounds, null);
                 final int xmin = (int)Math.round(bounds.getMinX());
                 final int ymin = (int)Math.round(bounds.getMinY());
@@ -723,7 +723,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                 gridBounds = new Rectangle(xmin, ymin, xmax-xmin, ymax-ymin);
             }
             /*
-             * Compute some properties of the image to be created.
+             * Computes some properties of the image to be created.
              */
             final Dimension       tileSize = ImageUtilities.toTileSize(gridBounds.getSize());
             final GridSampleDimension band = GridSampleDimension.wrap(getSampleDimension(VISIBLE_BAND));
@@ -736,17 +736,17 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
              */
             final PlanarImage image;
             if ((area==null || area instanceof Rectangle2D) &&
-                csToGrid.getShearX()==0 && csToGrid.getShearY()==0)
+                crsToGrid.getShearX()==0 && crsToGrid.getShearY()==0)
             {
                 image = JAI.create("ImageFunction",
                        new ParameterBlock()
-                                .add(this)                          // The functional description
-                                .add(gridBounds.width)                    // The image width
-                                .add(gridBounds.height)                   // The image height
-                                .add((float)(1/csToGrid.getScaleX()))     // The X scale factor
-                                .add((float)(1/csToGrid.getScaleY()))     // The Y scale factor
-                                .add((float)   csToGrid.getTranslateX())  // The X translation
-                                .add((float)   csToGrid.getTranslateY()), // The Y translation
+                                .add(this)                           // The functional description
+                                .add(gridBounds.width)                     // The image width
+                                .add(gridBounds.height)                    // The image height
+                                .add((float)(1/crsToGrid.getScaleX()))     // The X scale factor
+                                .add((float)(1/crsToGrid.getScaleY()))     // The Y scale factor
+                                .add((float)   crsToGrid.getTranslateX())  // The X translation
+                                .add((float)   crsToGrid.getTranslateY()), // The Y translation
                        new RenderingHints(JAI.KEY_IMAGE_LAYOUT, new ImageLayout()
                                 .setMinX       (gridBounds.x)
                                 .setMinY       (gridBounds.y)
@@ -779,7 +779,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                             int x=gridBounds.x; do {
                                 point2D.x = x;
                                 point2D.y = y;
-                                csToGrid.inverseTransform(point2D, point2D);
+                                crsToGrid.inverseTransform(point2D, point2D);
                                 if (area==null || area.contains(point2D)) {
                                     coordinate.ordinates[xAxis] = point2D.x;
                                     coordinate.ordinates[yAxis] = point2D.y;
@@ -809,7 +809,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
              * information for constructing a GridCoverage from this image later.
              */
             try {
-                image.setProperty("gridToCoordinateSystem", csToGrid.createInverse());
+                image.setProperty("gridToCoordinateSystem", crsToGrid.createInverse());
             } catch (NoninvertibleTransformException exception) {
                 // Can't add the property. Too bad, the image has been created anyway.
                 // Maybe the user know what he is doing...
@@ -846,7 +846,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                     cs.getAxis(yAxis).getDirection()
                 };
                 final AxisDirection[] normalized = (AxisDirection[]) axis.clone();
-                if (true) {
+                if (false) {
                     // Normalize axis: Is it really a good idea?
                     // We should provide a rendering hint for configuring that.
                     Arrays.sort(normalized);

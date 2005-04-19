@@ -220,7 +220,8 @@ public class CoverageStack extends AbstractCoverage {
             this.range    = range;
             if (getClass() == Adapter.class) {
                 if (coverage == null) {
-                    throw new NullPointerException(); // TODO: provides a localized message.
+                    // TODO: provides a localized message.
+                    throw new IllegalArgumentException("coverage");
                 }
             }
         }
@@ -820,10 +821,12 @@ public class CoverageStack extends AbstractCoverage {
      */
     private Coverage load(final Element element) throws IOException {
         Coverage coverage = element.getCoverage(listeners);
-        if (interpolationEnabled && coverage instanceof GridCoverage2D) {
+        if (coverage instanceof GridCoverage2D) {
             final GridCoverage2D coverage2D = (GridCoverage2D) coverage;
-            if (coverage2D.getInterpolation() instanceof InterpolationNearest) {
-                coverage = Interpolator2D.create(coverage2D);
+            if (interpolationEnabled) {
+                if (coverage2D.getInterpolation() instanceof InterpolationNearest) {
+                    coverage = Interpolator2D.create(coverage2D);
+                }
             }
         }
         /*
@@ -831,7 +834,8 @@ public class CoverageStack extends AbstractCoverage {
          */
         final CoordinateReferenceSystem sourceCRS;
         assert CRSUtilities.equalsIgnoreMetadata((sourceCRS=coverage.getCoordinateReferenceSystem()),
-               CRSUtilities.getSubCRS(crs, 0, sourceCRS.getCoordinateSystem().getDimension())) : sourceCRS;
+               CRSUtilities.getSubCRS(crs, 0, sourceCRS.getCoordinateSystem().getDimension())) :
+               sourceCRS + "\n\n" + crs;
         assert coverage.getNumSampleDimensions() == numSampleDimensions : coverage;
         return coverage;
     }

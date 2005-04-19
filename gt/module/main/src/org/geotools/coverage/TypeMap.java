@@ -217,10 +217,10 @@ public final class TypeMap {
         switch (model.getDataType()) {
             case DataBuffer.TYPE_DOUBLE: return SampleDimensionType.REAL_64BITS;
             case DataBuffer.TYPE_FLOAT:  return SampleDimensionType.REAL_32BITS;
-            case DataBuffer.TYPE_USHORT: signed=false; // Fall through
+            case DataBuffer.TYPE_USHORT: // Fall through
+            case DataBuffer.TYPE_BYTE:   signed=false; // Fall through
             case DataBuffer.TYPE_INT:
-            case DataBuffer.TYPE_SHORT:
-            case DataBuffer.TYPE_BYTE: {
+            case DataBuffer.TYPE_SHORT: {
                 switch (model.getSampleSize(band)) {
                     case  1: return SampleDimensionType.UNSIGNED_1BIT;
                     case  2: return SampleDimensionType.UNSIGNED_2BITS;

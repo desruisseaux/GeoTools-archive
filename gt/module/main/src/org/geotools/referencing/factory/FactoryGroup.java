@@ -483,6 +483,14 @@ public class FactoryGroup {
 search:     for (int i=0; i<sources.length; i++) {
                 final CoordinateReferenceSystem source = sources[i];
                 final int upperDimension = lowerDimension + source.getCoordinateSystem().getDimension();
+                /*
+                 * 'source' CRS applies to dimension 'lowerDimension' inclusive to 'upperDimension'
+                 * exclusive. Now search the smallest range in the user-specified 'dimensions' that
+                 * cover the [lowerDimension .. upperDimension] range.
+                 */
+                if (lowerIndex == dimensions.length) {
+                    break search;
+                }
                 while (dimensions[lowerIndex] < lowerDimension) {
                     if (++lowerIndex == dimensions.length) {
                         break search;

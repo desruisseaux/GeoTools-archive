@@ -92,6 +92,39 @@ import org.geotools.resources.cts.Resources;
  */
 public class Parser extends MathTransformParser {
     /**
+     * A list of predefined coordinate system axis. Returning a pre-defined constant
+     * help to compare successfully two CS using {@code equalsIgnoreMetadata} method.
+     */
+    private static final CoordinateSystemAxis[] GEOTOOLS_AXIS = {
+        org.geotools.referencing.cs.CoordinateSystemAxis.LONGITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.LATITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.ALTITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.DEPTH,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LONGITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LATITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.ELLIPSOIDAL_HEIGHT,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GRAVITY_RELATED_HEIGHT,
+        org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LONGITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LATITUDE,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_RADIUS,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_X,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Y,
+        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Z,
+        org.geotools.referencing.cs.CoordinateSystemAxis.X,
+        org.geotools.referencing.cs.CoordinateSystemAxis.Y,
+        org.geotools.referencing.cs.CoordinateSystemAxis.Z,
+        org.geotools.referencing.cs.CoordinateSystemAxis.EASTING,
+        org.geotools.referencing.cs.CoordinateSystemAxis.WESTING,
+        org.geotools.referencing.cs.CoordinateSystemAxis.NORTHING,
+        org.geotools.referencing.cs.CoordinateSystemAxis.SOUTHING
+    };
+
+    /**
+     * A predefined empty axis array.
+     */
+    private static final CoordinateSystemAxis[] NO_AXIS = new CoordinateSystemAxis[0];
+
+    /**
      * The mapping between WKT element name and the object class to be created.
      * Will be created by {@link #getClassOf} only when first needed.
      */
@@ -123,6 +156,11 @@ public class Parser extends MathTransformParser {
      * The list of {@linkplain AxisDirection axis directions} from their name.
      */
     private final Map directions;
+
+    /**
+     * A set of predefined axis (usually the {@code AXIS} constant array).
+     */
+    private final CoordinateSystemAxis[] predefinedAxis;
     
     /**
      * Constructs a parser using the default set of symbols and factories.
@@ -188,6 +226,7 @@ public class Parser extends MathTransformParser {
         for (int i=0; i<values.length; i++) {
             directions.put(values[i].name().trim().toUpperCase(), values[i]);
         }
+        predefinedAxis = Citation.GEOTOOLS.equals(csFactory.getVendor()) ? GEOTOOLS_AXIS : NO_AXIS;
     }
 
     /**
@@ -365,7 +404,9 @@ public class Parser extends MathTransformParser {
     }
 
     /**
-     * Creates an axis.
+     * Creates an axis. If the name matches one of pre-defined axis, the pre-defined one
+     * will be returned. This replacement help to get more success when comparing a CS
+     * built from WKT against a CS built from one of Geotools's constants.
      *
      * @param  name The axis name.
      * @param  direction The axis direction.
@@ -378,6 +419,16 @@ public class Parser extends MathTransformParser {
                                             final Unit          unit)
             throws FactoryException
     {
+        for (int i=0; i<predefinedAxis.length; i++) {
+            final CoordinateSystemAxis candidate = predefinedAxis[i];
+            if (direction.equals(candidate.getDirection()) && unit.equals(candidate.getUnit())) {
+                if (name.equalsIgnoreCase(candidate.getName().getCode()) ||
+                    name.equals(candidate.getAbbreviation())) // Case matter for abbreviation.
+                {
+                    return candidate;
+                }
+            }
+        }
         return csFactory.createCoordinateSystemAxis(Collections.singletonMap(
                IdentifiedObject.NAME_PROPERTY, name), name, direction, unit);
     }

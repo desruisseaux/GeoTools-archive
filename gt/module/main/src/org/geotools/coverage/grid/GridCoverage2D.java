@@ -43,6 +43,7 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.awt.image.WritableRenderedImage;
 import java.awt.image.renderable.ParameterBlock;
+import java.awt.image.renderable.RenderableImage;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.InvalidObjectException;
@@ -98,6 +99,7 @@ import org.opengis.util.Cloneable;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.processing.AbstractGridCoverageProcessor;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
@@ -1071,6 +1073,58 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
     
     /**
+     * Returns 2D view of this grid coverage as a renderable image.
+     * This method allows interoperability with Java2D.
+     *
+     * @param  xAxis Dimension to use for <var>x</var> axis.
+     * @param  yAxis Dimension to use for <var>y</var> axis.
+     * @return A 2D view of this grid coverage as a renderable image.
+     */
+    public RenderableImage getRenderableImage(final int xAxis, final int yAxis) {
+        if (xAxis == gridGeometry.axisDimensionX  &&  yAxis == gridGeometry.axisDimensionY) {
+            return new Renderable();
+        } else {
+            return super.getRenderableImage(xAxis, yAxis);
+        }
+    }
+
+    /**
+     * A view of a {@linkplain GridCoverage2D grid coverage} as a renderable image. Renderable images
+     * allow interoperability with <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>
+     * for a two-dimensional slice of a grid coverage.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     *
+     * @see AbstractCoverage#getRenderableImage
+     *
+     * @todo Override {@link #createRendering} and use the affine transform operation.
+     *       Also uses the JAI's "Transpose" operation is x and y axis are interchanged.
+     */
+    protected class Renderable extends AbstractCoverage.Renderable {
+        /**
+         * Constructs a renderable image.
+         */
+        public Renderable() {
+            super(gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
+        }
+        
+        /**
+         * Returns a rendered image with a default width and height in pixels.
+         *
+         * @return A rendered image containing the rendered data
+         */
+        public RenderedImage createDefaultRendering() {
+            if (xAxis == gridGeometry.axisDimensionX &&
+                yAxis == gridGeometry.axisDimensionY)
+            {
+                return getRenderedImage();
+            }
+            return super.createDefaultRendering();
+        }
+    }
+    
+    /**
      * Hints that the given area may be needed in the near future. Some implementations
      * may spawn a thread or threads to compute the tiles while others may ignore the hint.
      *
@@ -1158,12 +1212,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *       much faster sample model is PixelInterleavedSampleModel,  which is the sample
      *       model used by BufferedImage for TYPE_BYTE_INDEXED. We should check if this is
      *       fixed in future J2SE release.
-     *
-     * @todo This method provides an optimisation for the case of a linear transformations:
-     *       it use the JAI's "Rescale" or "Piecewise" operations, which may be hardware
-     *       accelerated. Unfortunatly, bug #4726416 prevent us to use this optimisation
-     *       with JAI 1.1.1. The optimisation is enabled only if we are running JAI 1.1.2.
-     *       This hack should be removed when JAI 1.1.2 will be widely available.
      *
      * @todo The "Piecewise" operation is disabled because javac 1.4.1_01 generate illegal
      *       bytecode. This bug is fixed in javac 1.4.2-beta. However, we still have an

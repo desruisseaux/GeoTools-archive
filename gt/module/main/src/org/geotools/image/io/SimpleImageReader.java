@@ -178,7 +178,7 @@ public abstract class SimpleImageReader extends ImageReader {
      * @throws IOException if an error occurs reading the information from the input source.
      */
     public int getNumImages(final boolean allowSearch) throws IllegalStateException, IOException {
-        if (input!=null) {
+        if (input != null) {
             return 1;
         }
         throw new IllegalStateException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_INPUT));

@@ -655,7 +655,7 @@ public final class Interpolator2D extends GridCoverage2D {
                                              final RenderingHints hints)
         {
             final GridCoverage2D source = (GridCoverage2D)parameters.parameter("Source").getValue();
-            final Object         type =                   parameters.parameter("Type"  );
+            final Object         type =                   parameters.parameter("Type"  ).getValue();
             final Interpolation[] interpolations;
             if (type.getClass().isArray()) {
                 interpolations = new Interpolation[Array.getLength(type)];

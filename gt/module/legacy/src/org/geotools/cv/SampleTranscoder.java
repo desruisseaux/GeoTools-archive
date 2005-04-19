@@ -56,7 +56,7 @@ import org.geotools.resources.image.DualRectIter;
  * transformation to geophyics values, or the converse. Images are created using the
  * <code>SampleTranscoder.CRIF</code> inner class, where "CRIF" stands for
  * {@link java.awt.image.renderable.ContextualRenderedImageFactory}. The image
- * operation name is "org.geotools.SampleTranscode".
+ * operation name is "org.geotools.legacy.SampleTranscode".
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -69,7 +69,7 @@ final class SampleTranscoder extends PointOpImage {
      * The operation name. <strong>NOTE:</strong> Class {@link org.geotools.gc.GridCoverage}
      * uses this name, but can't refer to this constant since it is in an other package.
      */
-    public static final String OPERATION_NAME = "org.geotools.SampleTranscode";
+    public static final String OPERATION_NAME = "org.geotools.legacy.SampleTranscode";
 
     /**
      * Ensemble des catégories qui donnent une signification aux pixels de l'image. La

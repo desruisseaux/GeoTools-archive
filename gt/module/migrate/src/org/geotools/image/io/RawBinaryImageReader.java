@@ -171,7 +171,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
      */
     public int getWidth(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
-        if (imageSize!=null) {
+        if (imageSize != null) {
             return imageSize.width;
         }
         throw new IIOException(Resources.format(ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
@@ -185,7 +185,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
      */
     public int getHeight(final int imageIndex) throws IOException {
         checkImageIndex(imageIndex);
-        if (imageSize!=null) {
+        if (imageSize != null) {
             return imageSize.height;
         }
         throw new IIOException(Resources.format(ResourceKeys.ERROR_UNSPECIFIED_IMAGE_SIZE));
@@ -745,7 +745,7 @@ public class RawBinaryImageReader extends SimpleImageReader {
      * can gain more control by creating subclasses of {@link RawBinaryImageReader}
      * <strong>and</strong> <code>Spi</code> and overriding some of their methods.
      *
-     * @version 1.0
+     * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Spi extends ImageReaderSpi {
