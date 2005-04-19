@@ -181,7 +181,7 @@ public class WorldImageWriterTest extends TestCase {
 
         //reading again
 		assertTrue(tempFile.exists());
-       /* wiReader= new WorldImageReader(tempFile);
+        wiReader= new WorldImageReader(tempFile);
         try {
 			coverage=(GridCoverage2D) wiReader.read(null);
 		} catch (IllegalArgumentException e3) {
@@ -193,16 +193,16 @@ public class WorldImageWriterTest extends TestCase {
 			e3.printStackTrace(System.err);
 			assertTrue(false);
 		}
-*/
+
 
         //displaying
-    /*    JFrame frame = new JFrame();
+        JFrame frame = new JFrame();
         JLabel label = new JLabel(new ImageIcon(((PlanarImage) coverage.
                 getRenderedImage()).getAsBufferedImage()));
         frame.getContentPane().add(label, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        frame.show();*/
+        frame.show();
     }
 
 }
