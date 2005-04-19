@@ -15,9 +15,6 @@
  *
  */
 package org.geotools.gce.arcgrid;
-
-import com.vividsolutions.jts.geom.*;
-import javax.media.jai.RasterFactory;
 import org.geotools.coverage.grid.*;
 import org.geotools.data.*;
 import org.geotools.data.coverage.grid.stream.*;
@@ -30,10 +27,10 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.*;
 import org.opengis.referencing.crs.*;
 
-import javax.media.jai.*;
+
 
 import java.awt.*;
-import java.awt.color.*;
+
 import java.awt.image.*;
 
 import java.io.*;
@@ -41,8 +38,7 @@ import java.io.*;
 import java.net.*;
 
 import java.util.*;
-import javax.units.UnitFormat;
-import java.text.ParseException;
+
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
@@ -576,26 +572,6 @@ public class ArcGridReader
     return this.coordinateSystem;
   }
 
-  /**
-   * Gets the bounding box of this datasource using the default speed of this
-   * datasource as set by the implementer.
-   *
-   * @return The bounding box of the datasource or null if unknown and too
-   *         expensive for the method to calculate.
-   */
-  private Envelope getBounds() {
-    com.vividsolutions.jts.geom.Envelope env = null;
-    double xmin = arcGridRaster.getXlCorner();
-    double ymin = arcGridRaster.getYlCorner();
-    double xmax = xmin
-        + (arcGridRaster.getNCols() * arcGridRaster.getCellSize());
-    double ymax = ymin
-        + (arcGridRaster.getNRows() * arcGridRaster.getCellSize());
-
-    env = new com.vividsolutions.jts.geom.Envelope(xmin, xmax, ymin, ymax);
-
-    return env;
-  }
 
   /**
    * Gets the default color ramp used to depict the GridCoverage
@@ -606,23 +582,7 @@ public class ArcGridReader
     return demColors;
   }
 
-  /**
-   * Converts a JTS Envelope into an org.geotools.pt.Envelope
-   *
-   * @param source
-   *            the jts envelope
-   *
-   * @return the equivalent geotools envelope
-   */
-  private org.opengis.spatialschema.geometry.Envelope convertEnvelope(
-      com.vividsolutions.jts.geom.Envelope source) {
-    double[] min = new double[] {
-        source.getMinX(), source.getMinY()};
-    double[] max = new double[] {
-        source.getMaxX(), source.getMaxY()};
 
-    return new GeneralEnvelope(min, max);
-  }
 
   /*
    * (non-Javadoc)

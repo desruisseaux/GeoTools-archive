@@ -36,6 +36,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+
 import java.awt.image.Raster;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,6 +45,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import java.net.URL;
+
 
 /**
  * ArcGridWriter Supports writing of an ArcGrid GridCoverage to an Desination
@@ -198,19 +200,21 @@ public class ArcGridWriter implements GridCoverageWriter {
             //getting the envelope
             GeneralEnvelope env = (GeneralEnvelope) ((GridCoverage2D) gc)
                 .getEnvelope();
-
+        	//check if the coverage needs to be resampled
+        	gc=reShapeData(((GridCoverage2D) gc),
+        			data,
+					env.getLength(0),//W
+					env.getLength(1)//H
+        	);
+        	env = (GeneralEnvelope) ((GridCoverage2D) gc)
+            .getEnvelope();        	
             long height = data.getHeight();
             long width = data.getWidth();
 
             double xl = env.getLowerCorner().getOrdinate(0);
             double yl = env.getLowerCorner().getOrdinate(1);
 
-        	//check if the coverage needs to be resampled
-        	reShapeData(((GridCoverage2D) gc),
-        			data,
-					env.getLength(0),//W
-					env.getLength(1)//H
-        	);
+
         	
         	
         	
@@ -251,7 +255,7 @@ public class ArcGridWriter implements GridCoverageWriter {
      * @param H
      * @param W
 	 */
-	private void reShapeData(GridCoverage2D gc, Raster raster, double W, double H) {
+	private GridCoverage2D reShapeData(GridCoverage2D gc, Raster raster, double W, double H) {
 		
 
 		 //resampling the image if needed
@@ -259,45 +263,44 @@ public class ArcGridWriter implements GridCoverageWriter {
         int Ny=raster.getHeight();
         double dx=W/Nx;
         double dy=H/Ny;      
-        GeneralEnvelope envelope=(GeneralEnvelope) gc.getEnvelope();
+        GeneralEnvelope envelope=(GeneralEnvelope) gc.getEnvelope(),newEnvelope=null;
         
         if(Math.abs(dx-dy)<=ArcGridWriter.EPS)
-        	return;
+        	return gc;
         
         double _Nx=0.0,_Ny=0.0;
         if(dx-dy>ArcGridWriter.EPS)
         {
-        	/**
+           	/**
         	 * we have higher resolution on the Y axis we have to increase it on the X axis as well.
         	 */
         	//new number of columns
-        	_Nx=W/H*dy;
+        	_Nx=W/dy;
         	double residual=_Nx-Math.floor(_Nx);
+        	double newLongitudeOfUpperCorner=0.0;
         	//check to see if we need to adjust the envelope
-        	if((int)Math.ceil(_Nx)-(int)Math.floor(_Nx)>0)
+        	if((int)Math.round(_Nx)-(int)Math.floor(_Nx)>0)
         	{
         		//residual >0.5 we need to increase a bit the envelope
          		//add the residual to the evelope which means extend the envelope
         		//of the original gc
-        		double newLongitudeOfUpperCorner=envelope.getUpperCorner().getOrdinate(0)+dy*(1-residual);
-        		envelope= new GeneralEnvelope(
-        				new double[]{envelope.getLowerCorner().getOrdinate(0),
-        						envelope.getLowerCorner().getOrdinate(1)},
-						new double[]{newLongitudeOfUpperCorner,
-        						envelope.getLowerCorner().getOrdinate(1)});
+        		 newLongitudeOfUpperCorner=envelope.getUpperCorner().getOrdinate(0)+dy*(1-residual);
+        		
         		
         		
         	}else{
         		//residual <0.5 we need to decrease the envelope by the residual
-        		double newLongitudeOfUpperCorner=envelope.getUpperCorner().getOrdinate(0)-dy*(residual);
-        		envelope= new GeneralEnvelope(
-        				new double[]{envelope.getLowerCorner().getOrdinate(0),
-        						envelope.getLowerCorner().getOrdinate(1)},
-						new double[]{newLongitudeOfUpperCorner,
-        						envelope.getLowerCorner().getOrdinate(1)});
+        		 newLongitudeOfUpperCorner=envelope.getUpperCorner().getOrdinate(0)-dy*(residual);
+        		
+        		
         	}
-        	
-        	Nx=(int)Math.round(_Nx);
+        	newEnvelope= new GeneralEnvelope(
+    				new double[]{envelope.getLowerCorner().getOrdinate(0),
+    						envelope.getLowerCorner().getOrdinate(1)},
+					new double[]{newLongitudeOfUpperCorner,
+    						envelope.getUpperCorner().getOrdinate(1)});
+    		newEnvelope.setCoordinateReferenceSystem(envelope.getCoordinateReferenceSystem());        	
+        	Nx=(int)Math.round(_Nx);  
         }
         else
         {
@@ -305,33 +308,33 @@ public class ArcGridWriter implements GridCoverageWriter {
         	 * we have higher resolution on the X axis we have to increase it on the Y axis as well.
         	 */        	
         	//new number of rows
-        	_Ny=H/W*dx;
+        	_Ny=H/dx;
         	double residual=_Ny-Math.floor(_Ny);
+        	double newLatitudeOfLowerCorner=0.0;
           	//check to see if we need to adjust the envelope
-        	if((int)Math.ceil(_Ny)-(int)Math.floor(_Ny)>0)
+        	if((int)Math.round(_Ny)-(int)Math.floor(_Ny)>0)
         	{
         		//residual >0.5 we need to increase a bit the envelope
          		//add the residual to the evelope which means extend the envelope
         		//of the original gc
-        		double newLatitudeOfLowerCorner=envelope.getUpperCorner().getOrdinate(1)+dx*(1-residual);
-        		envelope= new GeneralEnvelope(
-        				new double[]{envelope.getLowerCorner().getOrdinate(0),
-        						newLatitudeOfLowerCorner},
-						new double[]{envelope.getLowerCorner().getOrdinate(0),
-        						envelope.getLowerCorner().getOrdinate(1)});
+        		 newLatitudeOfLowerCorner=envelope.getUpperCorner().getOrdinate(1)+dx*(1-residual);
+ 
         		
         		
         	}else{
         		//residual <0.5 we need to decrease the envelope by the residual
-        		double newLatitudeOfLowerCorner=envelope.getUpperCorner().getOrdinate(1)+dx*(residual);
-        		envelope= new GeneralEnvelope(
-        				new double[]{envelope.getLowerCorner().getOrdinate(0),
-        						envelope.getLowerCorner().getOrdinate(1)},
-						new double[]{newLatitudeOfLowerCorner,
-        						envelope.getLowerCorner().getOrdinate(1)});
+        		 newLatitudeOfLowerCorner=envelope.getUpperCorner().getOrdinate(1)+dx*(residual);
+
         	}
-        	
-        	Ny=(int)Math.round(_Ny);
+       		newEnvelope= new GeneralEnvelope(
+    				new double[]{envelope.getLowerCorner().getOrdinate(0),
+    						newLatitudeOfLowerCorner},
+					new double[]{envelope.getUpperCorner().getOrdinate(0),
+    						envelope.getUpperCorner().getOrdinate(1)});
+    		newEnvelope.setCoordinateReferenceSystem(envelope.getCoordinateReferenceSystem());        	
+        	Ny=(int)Math.round(_Ny);        	
+       
+  
         }
        
         //new grid range
@@ -339,7 +342,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 				new int[]{Nx,Ny});
         GridGeometry2D newGridGeometry= new GridGeometry2D(
         		newGridrange,
-        		envelope,
+        		newEnvelope,
 				new boolean[]{false,true}
 				);        
         
@@ -354,9 +357,9 @@ public class ArcGridWriter implements GridCoverageWriter {
 		group.parameter("GridGeometry").setValue(newGridGeometry);
         GridCoverageProcessor2D processor2D=GridCoverageProcessor2D.getDefault();
         GridCoverage2D gcOp=(GridCoverage2D)processor2D.doOperation(op,group);	
-        raster= gc.geophysics(true).getRenderedImage()
-        .getData();
-		
+        return gcOp;
+
+    		
 	}
 
 	private void writeCRSInfo(CoordinateReferenceSystem crs)
