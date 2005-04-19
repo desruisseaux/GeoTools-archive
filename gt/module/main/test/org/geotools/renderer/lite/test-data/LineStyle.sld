@@ -9,20 +9,8 @@
 <Title>urban_places_label</Title>
 <FeatureTypeStyle> 
 <Name>Label_Style_1</Name> 
-<Rule>
-<LineSymbolizer>
-	<geometry>
-		<ogc:PropertyName>line</ogc:PropertyName>
-	</geometry>
-		<Stroke>
-		<CssParameter name="stroke">#999999</CssParameter>
-		<CssParameter name="stroke-width">3</CssParameter>
-	</Stroke>
-</LineSymbolizer>
-</Rule>
 <Rule> 
 <Name>Label</Name> 
-
 <TextSymbolizer> 
 <Label> <ogc:PropertyName>name</ogc:PropertyName> </Label> 
 <Font> 

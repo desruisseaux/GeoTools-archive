@@ -9,20 +9,6 @@
 <Title>urban_places_label</Title>
 <FeatureTypeStyle> 
 <Name>Label_Style_1</Name> 
-<Rule>
-<PolygonSymbolizer>
-	<geometry>
-		<ogc:PropertyName>polygon</ogc:PropertyName>
-	</geometry>
-		<Fill>
-			<CssParameter name="fill">#aaaaff</CssParameter>
-		</Fill>
-	<Stroke>
-		<CssParameter name="stroke">#999999</CssParameter>
-		<CssParameter name="stroke-width">3</CssParameter>
-	</Stroke>
-</PolygonSymbolizer>
-</Rule>
 <Rule> 
 <Name>Label</Name> 
 

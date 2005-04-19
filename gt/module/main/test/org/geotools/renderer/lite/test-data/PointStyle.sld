@@ -9,21 +9,6 @@
 <Title>urban_places_label</Title>
 <FeatureTypeStyle> 
 <Name>Label_Style_1</Name> 
-<Rule>
-<PointSymbolizer>
-	<geometry>
-		<ogc:PropertyName>point</ogc:PropertyName>
-	</geometry>
-	<Mark>
-		<Fill>
-			<CssParameter name="fill">#aaaaff</CssParameter>
-		</Fill>
-		<Stroke>
-			<CssParameter name="stroke">#0000aa</CssParameter>
-		</Stroke>
-	</Mark>
-	</PointSymbolizer>
-</Rule>
 <Rule> 
 <Name>Label</Name> 
 
