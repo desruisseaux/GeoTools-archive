@@ -114,7 +114,7 @@ public class LabelCacheDefault implements LabelCache {
 				paintPointLabel(glyphVector, labelItem, tempTransform, displayGeom);
 			
 			if( labelItem.getGeometry() instanceof MultiPoint )
-				paintPointLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				paintMultiPointLabel(glyphVector, labelItem, tempTransform, displayGeom);
 			
 			if( (labelItem.getGeometry() instanceof LineString )
 					&& !(labelItem.getGeometry() instanceof LinearRing))
@@ -231,6 +231,22 @@ public class LabelCacheDefault implements LabelCache {
 		tempTransform.translate(displacementX, displacementY);
 	}
 
+    private void paintMultiPointLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) {
+        MultiPoint points=(MultiPoint) labelItem.getGeometry();
+        
+        int numOnscreen=0;
+        Point[] onscreenPoints=new Point[points.getNumGeometries()];
+        for( int i=0; i<points.getNumGeometries(); i++){
+            if( points.getGeometryN(i).intersects(displayGeom) ){
+                onscreenPoints[numOnscreen]=(Point) points.getGeometryN(i);
+                numOnscreen++;
+            }
+        }
+        for( int i = 0; i < numOnscreen; i++ ) {
+            paintPointLabel(glyphVector, new LabelCacheItem(labelItem.getTextStyle(), new LiteShape2(onscreenPoints[i], null, false)), tempTransform, displayGeom);
+        }
+    }
+    
 	private void paintPointLabel(GlyphVector glyphVector, LabelCacheItem labelItem, AffineTransform tempTransform, Geometry displayGeom) {
 		//    	 get the point onto the shape has to be painted
 		Point point=(Point) labelItem.getGeometry();
