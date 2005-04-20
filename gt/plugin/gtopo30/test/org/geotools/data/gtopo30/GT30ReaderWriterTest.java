@@ -14,12 +14,6 @@
  *    Lesser General Public License for more details.
  *
  */
-/*
- * Created on Apr 13, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.geotools.data.gtopo30;
 
 import org.geotools.coverage.grid.GridCoverage2D;
