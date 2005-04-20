@@ -38,6 +38,7 @@ import java.util.zip.*;
  * DOCUMENT ME!
  *
  * @author Ian Schneider
+ * @author Simone Giannecchini
  */
 public abstract class TestCaseSupport extends TestCase {
     /**
