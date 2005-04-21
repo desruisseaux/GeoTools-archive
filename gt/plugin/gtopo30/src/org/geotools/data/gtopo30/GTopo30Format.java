@@ -23,12 +23,18 @@
 package org.geotools.data.gtopo30;
 
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterDescriptor;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+
 
 
 /**
@@ -44,6 +50,32 @@ public class GTopo30Format extends AbstractGridFormat implements Format {
      */
     private GTopo30DataSource source = null;
     private Object input = null;
+    
+    /**
+     * Creates an instance and sets the metadata.
+     */    
+    public GTopo30Format(){
+    	setInfo();
+    }
+    /**
+     * Sets the metadata information.
+     */
+    private void setInfo() {
+        HashMap info = new HashMap();
+
+        info.put("name", "Gtopo30");
+        info.put("description", "Gtopo30 Coverage Format");
+        info.put("vendor", "Geotools");
+        info.put("docURL", "http://edcdaac.usgs.gov/gtopo30/gtopo30.asp");
+        info.put("version", "1.0");
+        mInfo = info;
+
+        //reading parameters
+        readParameters = null;
+
+        //reading parameters
+        writeParameters = null;
+    }
 
     /* (non-Javadoc)
      * @see org.geotools.data.coverage.grid.Format#getReader(java.lang.Object)
@@ -66,7 +98,6 @@ public class GTopo30Format extends AbstractGridFormat implements Format {
      * @see org.geotools.data.coverage.grid.Format#getWriter(java.lang.Object)
      */
     public GridCoverageWriter getWriter(Object destination) {
-        // TODO Auto-generated method stub
         return new GTopo30Writer(destination);
     }
 
@@ -107,7 +138,9 @@ public class GTopo30Format extends AbstractGridFormat implements Format {
                     return false;
                 }
             }
-        } else {
+        }
+
+        else {
             return false;
         }
 
