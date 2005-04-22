@@ -16,7 +16,11 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
@@ -143,10 +147,22 @@ public class LabelCacheDefault implements LabelCache {
 
 			        // graphics.translate(radious, radious);
 			    }
-
-			    if (labelItem.getTextStyle().getFill() != null) {
-			        graphics.setPaint(labelItem.getTextStyle().getFill());
-			        graphics.setComposite(labelItem.getTextStyle().getComposite());
+			    //DJB: added this because several people were using
+			    //     "font-color" instead of fill
+			    //     It legal to have a label w/o fill (which means dont render it)
+			    //     This causes people no end of trouble.
+			    //     If they dont want to colour it, then they should use a filter
+			    //     DEFAULT (no <Fill>) --> BLACK
+                Paint fill = labelItem.getTextStyle().getFill();
+                Composite comp = labelItem.getTextStyle().getComposite();
+                if (fill == null)
+                {
+                	fill = Color.BLACK;
+                	comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f); //100% opaque
+                }
+			    if (fill != null) {
+			        graphics.setPaint(fill);
+			        graphics.setComposite(comp);
 			        graphics.drawGlyphVector(glyphVector, 0, 0);
 			        glyphs.add(glyphVector.getPixelBounds(new FontRenderContext(tempTransform, true, false), 0,0));
 			    }

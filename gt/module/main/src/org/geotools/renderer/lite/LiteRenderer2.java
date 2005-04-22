@@ -980,8 +980,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
     	LiteShape2 shape=createPath(null, at);
         for( int m = 0; m < symbolizers.length; m++ ) {
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("applying symbolizer " + symbolizers[m]);
+            if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.finer("applying symbolizer " + symbolizers[m]);
             }
 
             if (symbolizers[m] instanceof RasterSymbolizer) {
