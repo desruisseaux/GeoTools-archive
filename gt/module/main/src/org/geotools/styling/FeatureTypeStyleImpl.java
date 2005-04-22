@@ -20,6 +20,8 @@
 package org.geotools.styling;
 
 // OpenGIS dependencies
+import java.util.logging.Logger;
+
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -35,6 +37,8 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
     private String title = "title";
     private String abstractStr = "abstract";
 
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.styling");
+    
     /** Creates a new instance of FeatureTypeStyleImpl */
     protected FeatureTypeStyleImpl() {
     }
@@ -72,7 +76,10 @@ public class FeatureTypeStyleImpl implements FeatureTypeStyle, Cloneable {
         ruleList.add(rule);
     }
 
-    public void setFeatureTypeName(String name) {
+    public void setFeatureTypeName(String name) 
+    {
+    	if (name.equals("feature"))
+    		LOGGER.warning("FeatureTypeStyle with typename 'feature' - you probably meant to say 'Feature' (capital F) for the 'generic' FeatureType");
         featureTypeName = name;
     }
 
