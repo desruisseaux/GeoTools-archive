@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004 Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,6 @@
  */
 package org.geotools.gce.image;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.*;
@@ -31,41 +27,37 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+
 
 /**
- * @author rgould
+ * DOCUMENT ME!
  *
- * A Format to allow discovery of Readers/Writers for raster images
- * that support world files containing information about the image.
- *
- * Supports .gif+.gfw, .jpg/.jpeg+.jgw, .tif/.tiff+.tfw and .png+.pgw.
- * .wld may be used in place of the format specific extension (.jpg+.wld, etc)
- *
- * Designed to be used with GridCoverageExchange.
+ * @author rgould A Format to allow discovery of Readers/Writers for raster
+ *         images that support world files containing information about the
+ *         image. Supports .gif+.gfw, .jpg/.jpeg+.jgw, .tif/.tiff+.tfw and
+ *         .png+.pgw. .wld may be used in place of the format specific
+ *         extension (.jpg+.wld, etc) Designed to be used with
+ *         GridCoverageExchange.
  */
 public class WorldImageFormat extends AbstractGridFormat implements Format {
-    /**Format writing  parameter.
-     *
-     * When writing a world image we need to provide an output format in which we want
-     * to encode the image itself.
-     *
-     * PNG is default output format.
-     *
+    /**
+     * Format writing  parameter. When writing a world image we need to provide
+     * an output format in which we want to encode the image itself. PNG is
+     * default output format.
      */
     public static final ParameterDescriptor FORMAT = new ParameterDescriptor("Format",
             "Indicates the output format for this image", "png", true);
-    public static final ParameterDescriptor CRS =new ParameterDescriptor("crs",
+    public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //calss of the object we will pass
             null, //list of valid values not provided
             getDefaultCRS() //default value
         );
-
     public static final ParameterDescriptor ENVELOPE = new ParameterDescriptor("envelope",
             Envelope.class, null,
             new GeneralEnvelope(new double[] { 0, 0 }, new double[] { 1, 1 })); //default envelope to avoid exceptions in GridCoverage2D
-
-
-
 
     /**
      * WorldImageFormat
@@ -100,10 +92,11 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      */
 
     /**
-     * Call the accepts() method before asking for a reader to determine
-     * if the current object is supported.
+     * Call the accepts() method before asking for a reader to determine if the
+     * current object is supported.
      *
      * @param source The source object to read a WorldImage from
+     *
      * @return a new WorldImageReader for the source
      */
     public GridCoverageReader getReader(Object source) {
@@ -115,10 +108,11 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      */
 
     /**
-     * Call the accepts() method before asking for a writer to determine
-     * if the current object is supported.
+     * Call the accepts() method before asking for a writer to determine if the
+     * current object is supported.
      *
      * @param destination the destination object to write a WorldImage to
+     *
      * @return a new WorldImageWriter for the destination
      */
     public GridCoverageWriter getWriter(Object destination) {
@@ -135,6 +129,7 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      * read/write to it.
      *
      * @param input The object to check for acceptance.
+     *
      * @return true if the input is acceptable, false otherwise
      */
     public boolean accepts(Object input) {
@@ -153,8 +148,8 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
         }
 
         if (pathname.endsWith(".gif") || pathname.endsWith(".jpg")
-            || pathname.endsWith(".jpeg") || pathname.endsWith(".tif")
-            || pathname.endsWith(".tiff") || pathname.endsWith(".png")) {
+                || pathname.endsWith(".jpeg") || pathname.endsWith(".tif")
+                || pathname.endsWith(".tiff") || pathname.endsWith(".png")) {
             return true;
         }
 
@@ -166,6 +161,7 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      * returns it's corresponding world file extension (such as .gfw).
      *
      * @param fileExtension an image file extension, including the '.'
+     *
      * @return a corresponding world file extension, including the '.'
      */
     public static String getWorldExtension(String fileExtension) {
@@ -199,5 +195,4 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
 
         return null;
     }
-
 }

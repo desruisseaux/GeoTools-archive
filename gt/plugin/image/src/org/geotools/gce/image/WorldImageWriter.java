@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, 2004 Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,13 +25,8 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.spatialschema.geometry.Envelope;
 
-import javax.imageio.ImageIO;
-
-import javax.media.jai.IHSColorSpace;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
+import com.sun.media.jai.codecimpl.util.DataBufferDouble;
+import com.sun.media.jai.codecimpl.util.DataBufferFloat;
 
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -40,37 +35,43 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-
 import java.net.URL;
+import javax.imageio.ImageIO;
+import javax.media.jai.IHSColorSpace;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
+
 
 /**
- * @author rgould
- * @author alessio fabiani (alessio.fabiani@gmail.com)
- * @author simone giannecchini (simboss_ml@tiscali.it)
+ * DOCUMENT ME!
  *
- * Writes a GridCoverage to a raster image file and an accompanying world file.
- * The destination specified must point to the location of the raster file to
- * write to, as this is how the format is determined. The directory that file is
- * located in must also already exist.
+ * @author rgould
+ * @author alessio
+ * @author simone  Writes a GridCoverage to a raster image file and an
+ *         accompanying world file. The destination specified must point to
+ *         the location of the raster file to write to, as this is how the
+ *         format is determined. The directory that file is located in must
+ *         also already exist.
  */
 public class WorldImageWriter implements GridCoverageWriter {
     /*format for this writer*/
     private Format format = new WorldImageFormat();
 
-    /**Destination to write to*/
+    /** Destination to write to */
     private Object destination;
 
     /**
-     * Destination must be a File. The directory it resides in must already exist.
-     * It must point to where the raster image is to be located. The world image will
-     * be derived from there.
+     * Destination must be a File. The directory it resides in must already
+     * exist. It must point to where the raster image is to be located. The
+     * world image will be derived from there.
      *
      * @param destination
      */
@@ -83,7 +84,10 @@ public class WorldImageWriter implements GridCoverageWriter {
      */
 
     /**
-     * Returns the format supported by this WorldImageWriter, a new WorldImageFormat
+     * Returns the format supported by this WorldImageWriter, a new
+     * WorldImageFormat
+     *
+     * @return DOCUMENT ME!
      */
     public Format getFormat() {
         return format;
@@ -94,7 +98,10 @@ public class WorldImageWriter implements GridCoverageWriter {
      */
 
     /**
-     * Returns the location of the raster that the GridCoverage will be written to.
+     * Returns the location of the raster that the GridCoverage will be written
+     * to.
+     *
+     * @return DOCUMENT ME!
      */
     public Object getDestination() {
         return destination;
@@ -106,6 +113,8 @@ public class WorldImageWriter implements GridCoverageWriter {
 
     /**
      * Metadata is not supported. Returns null.
+     *
+     * @return DOCUMENT ME!
      */
     public String[] getMetadataNames() {
         return null;
@@ -117,6 +126,12 @@ public class WorldImageWriter implements GridCoverageWriter {
 
     /**
      * Metadata not supported, does nothing.
+     *
+     * @param name DOCUMENT ME!
+     * @param value DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
+     * @throws MetadataNameNotFoundException DOCUMENT ME!
      */
     public void setMetadataValue(String name, String value)
         throws IOException, MetadataNameNotFoundException {
@@ -128,9 +143,12 @@ public class WorldImageWriter implements GridCoverageWriter {
 
     /**
      * Raster images don't support names. Does nothing.
+     *
+     * @param name DOCUMENT ME!
+     *
+     * @throws IOException DOCUMENT ME!
      */
-    public void setCurrentSubname(String name)
-        throws IOException {
+    public void setCurrentSubname(String name) throws IOException {
     }
 
     /* (non-Javadoc)
@@ -138,13 +156,16 @@ public class WorldImageWriter implements GridCoverageWriter {
      */
 
     /**
-     * Takes a GridCoverage and writes the image to the destination file.
-     * It then reads the format of the file and writes an accompanying world file.
-     * It will throw a FileFormatNotCompatibleWithGridCoverageException if Destination
-     * is not a File (URL is a read-only format!).
+     * Takes a GridCoverage and writes the image to the destination file. It
+     * then reads the format of the file and writes an accompanying world
+     * file. It will throw a FileFormatNotCompatibleWithGridCoverageException
+     * if Destination is not a File (URL is a read-only format!).
      *
      * @param coverage the GridCoverage to write.
      * @param parameters no parameters are accepted. Currently ignored.
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
      */
     public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
         throws IllegalArgumentException, IOException {
@@ -161,14 +182,12 @@ public class WorldImageWriter implements GridCoverageWriter {
         //output stream due to the fact that the latter requires no world file.
         if (this.destination instanceof String) {
             destination = new File((String) destination);
-        }
-        else if (this.destination instanceof URL) {
+        } else if (this.destination instanceof URL) {
             destination = new File(((URL) destination).getPath());
-        }
-        else
+        } else
         //OUTPUT STREAM HANDLING
         if (destination instanceof OutputStream) {
-            this.encode(coverage, (OutputStream) destination);
+            this.encode((GridCoverage2D) coverage, (OutputStream) destination);
         }
 
         if (destination instanceof File) {
@@ -219,7 +238,7 @@ public class WorldImageWriter implements GridCoverageWriter {
             BufferedOutputStream outBuf = new BufferedOutputStream(new FileOutputStream(
                         imageFile));
 
-            this.encode(coverage, outBuf);
+            this.encode((GridCoverage2D) coverage, outBuf);
         }
     }
 
@@ -229,16 +248,22 @@ public class WorldImageWriter implements GridCoverageWriter {
 
     /**
      * Cleans up the writer. Currently does nothing.
+     *
+     * @throws IOException DOCUMENT ME!
      */
     public void dispose() throws IOException {
     }
 
-    /**Encode.
+    /**
+     * Encode.
      *
+     * @param sourceCoverage DOCUMENT ME!
      * @param output OutputStream
+     *
      * @throws IOException
+     * @throws IllegalArgumentException DOCUMENT ME!
      */
-    private void encode(GridCoverage sourceCoverage, OutputStream output)
+    private void encode(GridCoverage2D sourceCoverage, OutputStream output)
         throws IOException {
         //do we have a source coverage?
         if (sourceCoverage == null) {
@@ -255,23 +280,21 @@ public class WorldImageWriter implements GridCoverageWriter {
              * BYTE DATABUFFER FOR DISPLAYING.
              */
             if (sourceCoverage.getSampleDimension(0).getColorInterpretation()
-                              .name().equals("GRAY_INDEX")) {
+                                  .name().equals("GRAY_INDEX")) {
                 //getting rendered image
-            	surrogateImage = ((PlanarImage)((GridCoverage2D) sourceCoverage).geophysics(false)
-                    .getRenderedImage());
-                /*
+                surrogateImage = ((PlanarImage) ((GridCoverage2D) sourceCoverage).geophysics(false)
+                                                 .getRenderedImage());
+
                 //image dimensions
-                int width = image.getWidth();
-                int height = image.getHeight();
-
-                double[] dpixel = new double[image.getSampleModel().getNumBands()];
-
+                int width = surrogateImage.getWidth();
+                int height = surrogateImage.getHeight();
+                double[] dpixel = new double[surrogateImage.getSampleModel().getNumBands()];
+                
                 // Which are the max and min of the image ? We need to know to create the
                 // surrogate image.
                 // Let's use the extrema operator to get them.
                 ParameterBlock pbMaxMin = new ParameterBlock();
-
-                pbMaxMin.addSource(image);
+                pbMaxMin.addSource(surrogateImage);
 
                 RenderedOp extrema = JAI.create("extrema", pbMaxMin);
 
@@ -285,26 +308,22 @@ public class WorldImageWriter implements GridCoverageWriter {
                 //TODO convert this code into a cycle
                 if (!Double.isNaN(allMins[0])) {
                     minValue = allMins[0];
-                }
-                else {
+                } else {
                     Double[] buffer = null;
 
-                    if (image.getData().getDataBuffer() instanceof DataBufferFloat) {
-                        float[] tmp = ((DataBufferFloat) image.getData()
+                    if (surrogateImage.getData().getDataBuffer() instanceof DataBufferFloat) {
+                        float[] tmp = ((DataBufferFloat) surrogateImage.getData()
                                                               .getDataBuffer())
                             .getData();
-
                         buffer = new Double[tmp.length];
 
                         for (int i = 0; i < tmp.length; i++) {
                             buffer[i] = new Double(tmp[i]);
                         }
-                    }
-                    else if (image.getData().getDataBuffer() instanceof DataBufferDouble) {
-                        double[] tmp = ((DataBufferDouble) image.getData()
+                    } else if (surrogateImage.getData().getDataBuffer() instanceof DataBufferDouble) {
+                        double[] tmp = ((DataBufferDouble) surrogateImage.getData()
                                                                 .getDataBuffer())
                             .getData();
-
                         buffer = new Double[tmp.length];
 
                         for (int i = 0; i < tmp.length; i++) {
@@ -323,26 +342,22 @@ public class WorldImageWriter implements GridCoverageWriter {
                 //TODO convert this code into a cycle
                 if (!Double.isNaN(allMaxs[0])) {
                     maxValue = allMaxs[0];
-                }
-                else {
+                } else {
                     Double[] buffer = null;
 
-                    if (image.getData().getDataBuffer() instanceof DataBufferFloat) {
-                        float[] tmp = ((DataBufferFloat) image.getData()
+                    if (surrogateImage.getData().getDataBuffer() instanceof DataBufferFloat) {
+                        float[] tmp = ((DataBufferFloat) surrogateImage.getData()
                                                               .getDataBuffer())
                             .getData();
-
                         buffer = new Double[tmp.length];
 
                         for (int i = 0; i < tmp.length; i++) {
                             buffer[i] = new Double(tmp[i]);
                         }
-                    }
-                    else if (image.getData().getDataBuffer() instanceof DataBufferDouble) {
-                        double[] tmp = ((DataBufferDouble) image.getData()
+                    } else if (surrogateImage.getData().getDataBuffer() instanceof DataBufferDouble) {
+                        double[] tmp = ((DataBufferDouble) surrogateImage.getData()
                                                                 .getDataBuffer())
                             .getData();
-
                         buffer = new Double[tmp.length];
 
                         for (int i = 0; i < tmp.length; i++) {
@@ -372,81 +387,118 @@ public class WorldImageWriter implements GridCoverageWriter {
                 //    double minValue = sourceCoverage.getSampleDimension(0).getMinimumValue();
                 //    double maxValue = sourceCoverage.getSampleDimension(0).getMinimumValue();
 
-                /**
-                 * RESCALING SOURCE IMAGE
-                 
+                /** RESCALING SOURCE IMAGE */
                 double[] subtract = new double[1];
-
                 subtract[0] = minValue;
 
                 double[] divide = new double[1];
-
                 divide[0] = 255.0 / (maxValue - minValue);
 
                 // Now we can rescale the pixels gray levels:
                 ParameterBlock pbRescale = new ParameterBlock();
-
                 pbRescale.add(divide);
                 pbRescale.add(subtract);
-                pbRescale.addSource(image);
+                pbRescale.addSource(surrogateImage);
                 surrogateImage = (PlanarImage) JAI.create("rescale", pbRescale,
                         null);
 
                 // Let's convert the data type for displaying.
                 ParameterBlock pbConvert = new ParameterBlock();
-
                 pbConvert.addSource(surrogateImage);
                 pbConvert.add(DataBuffer.TYPE_BYTE);
                 surrogateImage = JAI.create("format", pbConvert);
 
                 //TODO check this if it is needed
-                surrogateImage = JAI.create("invert", surrogateImage);*/
-            }
-            else {
+                surrogateImage = JAI.create("invert", surrogateImage);
+            } else {
                 /**
                  * WORKING ON A COLORED IMAGE
                  */
                 surrogateImage = (PlanarImage) ((GridCoverage2D) sourceCoverage)
                     .getRenderedImage();
+
+                //trying to write a GIF
+
+                /*          if (surrogateImage.getColorModel() instanceof ComponentColorModel
+                   && (((String) (this.format.getWriteParameters()
+                                                 .parameter("format")
+                                                 .getValue()))
+                   .compareToIgnoreCase("gif") == 0)) {
+                   //parameter block
+                   ParameterBlock pb = new ParameterBlock();
+                   //check the number of bands looking for alpha band
+                   if (surrogateImage.getSampleModel().getNumBands() > 3) {
+                
+                
+                
+                
+                           javax.media.jai.RenderedOp bandSelect=JAI.create("BanDSelect",surrogateImage,new int[]{0,1,2});
+                
+                       //removing alpha band
+                       int w = surrogateImage.getWidth();
+                       int h = surrogateImage.getHeight();
+                       BufferedImage bi = new BufferedImage(w, h,
+                               BufferedImage.TYPE_3BYTE_BGR);
+                       WritableRaster wr = bi.getWritableTile(0, 0);
+                       WritableRaster wr3 = wr.createWritableChild(0, 0, w, h,
+                               0, 0, new int[] { 0, 1, 2 });
+                       wr3.setRect(surrogateImage.getData());
+                       bi.releaseWritableTile(0, 0);
+                       surrogateImage = PlanarImage.wrapRenderedImage(bi);
+                       //PARAMETER BLOCK
+                       pb.removeParameters();
+                       pb.removeSources();
+                       //color map
+                       pb.addSource(surrogateImage);
+                       pb.add(ColorQuantizerDescriptor.MEDIANCUT);
+                       pb.add(255);
+                       LookupTableJAI colorMap = (LookupTableJAI)JAI.create("ColorQuantizer", pb).getProperty("LUT");
+                       KernelJAI ditherMask = KernelJAI.ERROR_FILTER_FLOYD_STEINBERG;
+                
+                       //building final color model
+                       int bitsNum = 8;
+                       ColorModel cm = new IndexColorModel(bitsNum, colorMap.getByteData()[0].length,
+                                       colorMap.getByteData()[0], colorMap.getByteData()[1], colorMap.getByteData()[2], Transparency.OPAQUE);
+                       PlanarImage op = PlanarImage.wrapRenderedImage(new BufferedImage(
+                                       w, h, BufferedImage.TYPE_BYTE_INDEXED,(IndexColorModel) cm));
+                       //layout for the final image
+                       ImageLayout layout = new ImageLayout();
+                       layout.setMinX(op.getMinX());
+                       layout.setMinY(op.getMinY());
+                       layout.setHeight(op.getHeight());
+                       layout.setWidth(op.getWidth());
+                       layout.setTileWidth(op.getTileWidth());
+                       layout.setTileHeight(op.getTileHeight());
+                       layout.setTileGridXOffset(op.getTileGridXOffset());
+                       layout.setTileGridYOffset(op.getTileGridYOffset());
+                       layout.setColorModel(cm);
+                       layout.setSampleModel(op.getSampleModel());
+                       RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+                               layout);
+                
+                       //error diffusion
+                       pb.removeParameters();
+                       pb.removeSources();
+                       pb.addSource(surrogateImage);
+                       pb.add(colorMap);
+                       pb.add(ditherMask);
+                       javax.media.jai.RenderedOp op1= JAI.create("errordiffusion",pb,rh);
+                       surrogateImage=(PlanarImage)op1.getRendering() ;
+                   }
+                   }*/
             }
-            
-         
-            
-            if(surrogateImage.getColorModel() instanceof ComponentColorModel
-            		&&
-            		((String) (this.format.getWriteParameters().parameter("format")
-                            .getValue())).compareToIgnoreCase("gif")==0)
-            {
-			     //extrema to get the dynamic of this image
-                ParameterBlock pbMaxMin = new ParameterBlock();
-                pbMaxMin.addSource(surrogateImage);
-                RenderedOp extrema = JAI.create("extrema", pbMaxMin);
-                // Must get the extrema of all bands !
-                double[] allMin = (double[]) extrema.getProperty("minimum");
-                double[] allMax = (double[]) extrema.getProperty("maximum");
-            	
-                
-                //rescale the image
-            //    double scale=255.0/(allMax[0]-allMin[0]);
-          //      ParameterBlock pb = new ParameterBlock();
-          //      pb.addSource(surrogateImage);
-          //      pb.add(scale);
-          //      pb.add(0);
-           //     RenderedImage dst = JAI.create("rescale", pb);
-                
-      }
-     
-            	
-            	
-            /** WRITE TO OUTPUTBUFER */
-            ImageIO.write (surrogateImage,
+
+            /**
+             * WRITE TO OUTPUTBUFER
+             */
+            ImageIO.write(surrogateImage,
                 (String) (this.format.getWriteParameters().parameter("format")
                                      .getValue()), output);
             output.flush();
             output.close();
-        }
-        catch (Exception e) {
-        	System.err.println(e.getMessage());
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+
             IOException ioe = new IOException();
             ioe.initCause(e);
             throw ioe;
