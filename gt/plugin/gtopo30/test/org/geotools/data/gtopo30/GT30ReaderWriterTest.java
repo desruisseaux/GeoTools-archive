@@ -21,8 +21,11 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.zip.ZipOutputStream;
+
 import javax.media.jai.PlanarImage;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -33,7 +36,7 @@ import javax.swing.JScrollPane;
 /**
  * DOCUMENT ME!
  *
- * @author giannecchini 
+ * @author giannecchini
  */
 public class GT30ReaderWriterTest extends TestCaseSupport {
     private String fileName = "W020N90";
@@ -53,25 +56,25 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
     protected void setUp() throws Exception {
         super.setUp();
 
-        File file = this.getFile(this.fileName + ".zip");
-        assertTrue(file.exists());
+     //   File file = this.getFile(this.fileName + ".zip");
+      //  assertTrue(file.exists());
 
-        String outPath = getFile(".").getAbsolutePath();
-        this.unzipFile(file.getAbsolutePath(),
-            outPath.substring(0, outPath.length() - 1));
+      //  String outPath = getFile(".").getAbsolutePath();
+     //   this.unzipFile(file.getAbsolutePath(),
+        //    outPath.substring(0, outPath.length() - 1));
     }
 
     /*
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
-        deleteAll();
+        //deleteAll();
         super.tearDown();
     }
 
     /**
-     *	Deleting all the file we created during tests.
-     *	Since gtopo files are big we try to save space on the disk!!!
+     * Deleting all the file we created during tests.     Since gtopo files are
+     * big we try to save space on the disk!!!
      */
     private void deleteAll() {
         File testDir = getFile("");
@@ -91,8 +94,8 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
      * @throws IllegalArgumentException
      * @throws IOException
      */
-    public void testReaderWriter() throws IllegalArgumentException, IOException {
-    	//getting a resource to test
+ /*   public void testReaderWriter() throws IllegalArgumentException, IOException {
+        //getting a resource to test
         URL statURL = getTestResource(this.fileName + ".DEM");
         AbstractGridFormat format = (AbstractGridFormat) new GTopo30FormatFactory()
             .createFormat();
@@ -103,16 +106,19 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
 
             //get a grid coverage
             GridCoverage2D gc = ((GridCoverage2D) reader.read(null)); //.geophysics(false);
+
             //show the coverage
-            ImageIcon icon = new ImageIcon(((PlanarImage) gc.geophysics(false).getRenderedImage())
+            ImageIcon icon = new ImageIcon(((PlanarImage) gc.geophysics(false)
+                                                            .getRenderedImage())
                     .getAsBufferedImage());
-            JLabel label = new JLabel(icon);
-            JFrame frame = new JFrame();
-            frame.setTitle(statURL.toString());
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.getContentPane().add(new JScrollPane(label));
-            frame.pack();
-            frame.show();
+            JLabel label = null; // new JLabel(icon);
+            JFrame frame = null; //new JFrame();
+
+            //  frame.setTitle(statURL.toString());
+            // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            // frame.getContentPane().add(new JScrollPane(label));
+            //frame.pack();
+            // frame.show();
             //delete all files and write them again to test
             deleteAll();
 
@@ -138,5 +144,29 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
             frame.pack();
             frame.show();
         }
+    }*/
+
+    public void testReaderWriterZip()
+        throws IllegalArgumentException, IOException {
+        URL statURL =getTestResource(this.fileName + ".DEM");
+        AbstractGridFormat format = (AbstractGridFormat) new GTopo30FormatFactory()
+            .createFormat();
+
+     //   if (format.accepts(statURL)) {
+            //    	get a reader
+            GridCoverageReader reader = format.getReader(statURL);
+
+            //get a grid coverage
+            GridCoverage2D gc = ((GridCoverage2D) reader.read(null)); //.geophysics(false);
+            File zipFile = getFile("test.zip");
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(
+                        zipFile));
+
+            GridCoverageWriter writer = format.getWriter(out);
+            writer.write(gc, null);
+            out.flush();
+            out.close();
+
+       // }
     }
 }
