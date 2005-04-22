@@ -18,31 +18,46 @@
  */
 package org.geotools.factory;
 
+// J2SE dependencies
+import javax.imageio.spi.ServiceRegistry; // For javadoc
+
 
 /**
  * A factory that may not be available in all configurations.
- * <p>
- * Such factories often need some external resources like a big file or a connection
- * to a database. Those resources may not be available at JVM starting time, but become
- * available later.
- * </p>
- * <p>
- * The {@link #isReady} method queries the status of this factory. If an optional factory
- * was aimed to be the primary factory (for example a factory backed by a connection to
- * a database), then {@link FactoryRegistry} will uses fallbacks (for example a factory
- * backed by an ASCII file) as long as the {@code isReady()} method in the primary factory
- * returns {@code false}.
- * </p>
- * Q: Is this wise? If you need to control factory order then a complete plugin system
- * would *know* about start up dependency and not allow an application to get into this
- * mess.
- * A: This really starts to look like you need an API for an ExternalService
- * (or ExternalFactgory), to complete this picture you need a callback mechanism. Something
- * that client code can "give" to the factory, that it will call when ready. If it is ready
- * it will be called immeditely. The above advice about "alternatives" could really be
- * managed by such a factory (especially if it allowed to notify client code more then once.
- * (And yes events would also serve this purpose).
- * </p>
+ *
+ * <p>Such factories often need some resources to download separatly, like a big file or a
+ * database. Those resources may not be installed in all configurations. The {@link #isReady}
+ * method tells if this factory has found every resources it needs in order to run.</p>
+ *
+ * <p>{@link FactoryRegistry#getServiceProvider} iterates over all registered factories. If an
+ * {@linkplain ServiceRegistry#setOrdering ordering is set}, it is taken in account. If no suitable
+ * factory was found before the iterator reachs this optional factory, then {@code FactoryRegistry}
+ * invokes {@link #isReady}. If the later returns {@code true}, then this optional factory is
+ * processed like any other factories. Otherwise it is ignored.</p>
+ *
+ * <p>Optional factories are useful when the preferred factory requires resources that are not
+ * guaranteed to be installed on the client machine (e.g. the <A HREF="http://www.epsg.org">EPSG
+ * database</A>) and some fallback exists (e.g. an EPSG factory based on a WKT file).</p>
+ *
+ * <p>Ignored factories are not deregistered; they will be queried again every time
+ * {@code getServiceProvider(...)} is invoked and the iterator reachs this optional factory.
+ * This means that if a resource was not available at startup time but become available later,
+ * it may be selected the next time {@code getServiceProvider(...)} is invoked. It will have no
+ * impact on previous results of {@code getServiceProvider(...)} however.</p>
+ * 
+ * <p>{@code OptionalFactory} is not designed for factories with intermittent state (i.e. return
+ * value of {@link #isReady} varying in an unpredictable way). While {@code FactoryRegistry} can
+ * provides some deterministic behavior when the {@code isReady()} return value become {@code true}
+ * as explained in the previous paragraphe, the converse (when the value was {@code true} and become
+ * {@code false}) is unsafe. This is because factories returned by previous calls to
+ * {@code getServiceProvider(...)} would stop to work in an unexpected way for clients.</p>
+ *
+ * @todo This interface is like a tiny skeleton of external service API. To complete the picture
+ *       we would need a callback mechanism. A listener that that client code can give to the
+ *       factory, that it will call when ready. If it is ready it will be called immeditely.
+ *       The above advice about alternatives could really be managed by such a factory (especially
+ *       if it allowed to notify client code more then once.
+ *
  * @author Martin Desruisseaux
  * @version $Id$
  */
@@ -50,6 +65,7 @@ public interface OptionalFactory extends Factory {
     /**
      * Returns {@code true} if this factory is ready for use.
      * An optional factory may returns {@code false} for now but returns {@code true} later.
+     * However, the converse is not recommended.
      */
     public boolean isReady();
 }
