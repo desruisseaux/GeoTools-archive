@@ -19,13 +19,16 @@
 package org.geotools.gce.geotiff;
 
 // Geotools dependencies
-import org.geotools.data.coverage.grid.Format;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+
+
+// GeoAPI dependencies 
+import org.opengis.coverage.grid.Format ; 
 
 /**
  * The <CODE>GeoTiffFormatFactorySpi</CODE> should never be instantiated
- * directly by user code.  It is registered with the
- * <CODE>GridFactoryFinder</CODE> for automatic discovery.  Use the
+ * directly by user code.  It is discovered by the 
+ * <CODE>GridFormatFinder</CODE> for automatic discovery.  Use the
  * standard Geotools method of discovering a factory in order to create
  * a format.
  * <p>

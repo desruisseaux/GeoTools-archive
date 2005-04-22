@@ -26,18 +26,37 @@ import java.util.Map;
 
 import javax.media.jai.ParameterList;
 
+// JSR-108 (units) dependencies
+import javax.units.NonSI ; 
+import javax.units.SI ; 
+import javax.units.Unit ; 
+
+// GeoAPI dependencies
+import org.opengis.referencing.crs.CoordinateReferenceSystem ; 
+import org.opengis.referencing.crs.CRSAuthorityFactory ; 
+import org.opengis.referencing.cs.CSAuthorityFactory ; 
+import org.opengis.referencing.datum.DatumAuthorityFactory ; 
+import org.opengis.referencing.datum.DatumFactory ; 
+import org.opengis.referencing.crs.CRSFactory ; 
+import org.opengis.referencing.cs.CSFactory ; 
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.Ellipsoid ; 
+import org.opengis.referencing.datum.PrimeMeridian ;  
+import org.opengis.referencing.crs.GeographicCRS ; 
+import org.opengis.referencing.cs.AxisDirection ; 
+
+// geotools dependencies
+import org.geotools.referencing.FactoryFinder ; 
+import org.geotools.factory.FactoryRegistryException ; 
+import org.geotools.factory.Hints ; 
+
 import org.geotools.cs.AxisInfo;
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CoordinateSystemAuthorityFactory;
 import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.Ellipsoid;
-import org.geotools.cs.GeographicCoordinateSystem;
 import org.geotools.cs.HorizontalDatum;
 import org.geotools.cs.PrimeMeridian;
 import org.geotools.cs.ProjectedCoordinateSystem;
 import org.geotools.cs.Projection;
-import org.geotools.units.Unit;
-import org.opengis.referencing.FactoryException;
+
 
 
 /**
@@ -59,7 +78,7 @@ import org.opengis.referencing.FactoryException;
  * created the reader.  The image specific metadata should then
  * be set with the appropriate accessor methods.  Finally, the
  * <code>createCoordinateSystem()</code> method is called to
- * produce the <code>CoordinateSystem</code> object specified
+ * produce the <code>CoordinateReferenceSystem</code> object specified
  * by the metadata.
  * @author Bryce Nordgren / USDA Forest Service
  */
@@ -96,8 +115,19 @@ public class GeoTiffCoordinateSystemAdapter {
     public static final short CT_VanDerGrinten                      = 25 ; 
     public static final short CT_NewZealandMapGrid                  = 26 ; 
     public static final short CT_TransvMercator_SouthOriented       = 27 ; 
+
+    // code from GeoTIFF spec section 6.3.2.4
+    private static final String PM_Greenwich = "8901" ; 
     
-    private CoordinateSystemAuthorityFactory factory = null ;
+    // authority factory objects
+    private CRSAuthorityFactory   crsFactory      = null ; 
+    private CSAuthorityFactory    csFactory       = null ;
+    private DatumAuthorityFactory datumFactory    = null ; 
+
+    // factories to construct CRS/CS/Datum objects directly.
+    private DatumFactory          datumObjFactory = null ; 
+    private CRSFactory            crsObjFactory   = null ;
+    private CSFactory             csObjFactory    = null ; 
     
     /**
      * Holds value of property metadata.
@@ -107,8 +137,8 @@ public class GeoTiffCoordinateSystemAdapter {
     // Default values of GeoTiff angular and linear units.
     // these will be modified if the appropriate GeoKeys are 
     // set in the file
-    private Unit linearUnit  = Unit.METRE ; 
-    private Unit angularUnit = Unit.DEGREE ; 
+    private Unit linearUnit  = SI.METER ; 
+    private Unit angularUnit = NonSI.DEGREE_ANGLE ; 
     
     private static final Map mapCoordTrans = new HashMap();
     
@@ -124,31 +154,66 @@ public class GeoTiffCoordinateSystemAdapter {
         mapCoordTrans.put(new Short(CT_ObliqueStereographic), "Oblique_Stereographic") ; 
     }
     
-    /** Creates a new instance of GeoTiffCoordinateSystemAdapter */
-    public GeoTiffCoordinateSystemAdapter(CoordinateSystemAuthorityFactory factory) {
-        this.factory = factory ; 
+    /** Creates a new instance of GeoTiffCoordinateSystemAdapter 
+     * @param hints a map of hints to locate the authority and object factories. (can be null)
+     */
+    public GeoTiffCoordinateSystemAdapter(Hints hints) {
+      csFactory = FactoryFinder.getCSAuthorityFactory("EPSG", hints) ; 
+      crsFactory = FactoryFinder.getCRSAuthorityFactory("EPSG", hints) ; 
+      datumFactory = FactoryFinder.getDatumAuthorityFactory("EPSG", hints) ; 
+
+      datumObjFactory = FactoryFinder.getDatumFactory(hints) ; 
+      crsObjFactory = FactoryFinder.getCRSFactory(hints) ; 
+      csObjFactory = FactoryFinder.getCSFactory(hints) ; 
     }
+
+    /**
+     * Returns the CSAuthorityFactory instance used by this 
+     * object.
+     * @return CSAuthorityFactory in use.
+     */
+    public CSAuthorityFactory getCSFactory() { 
+      return csFactory ; 
+    } 
     
     /**
-     * This method creates a <code>CoordinateSystem</code> object
-     * from the metadata and factory which have been set earlier.  If it
-     * cannot create the <code>CoordinateSystem</code>, then one of
+     * Returns the CRSAuthorityFactory instance used by this 
+     * object.
+     * @return CRSAuthorityFactory in use.
+     */
+    public CRSAuthorityFactory getCRSFactory() { 
+      return crsFactory ; 
+    } 
+    
+    /**
+     * Returns the DatumAuthorityFactory instance used by this 
+     * object.
+     * @return DatumAuthorityFactory in use.
+     */
+    public DatumAuthorityFactory getDatumFactory() { 
+      return datumFactory ; 
+    } 
+    
+    /**
+     * This method creates a <code>CoordinateReferenceSystem</code> object
+     * from the metadata which has been set earlier.  If it
+     * cannot create the <code>CoordinateReferenceSystem</code>, then one of
      * three exceptions is thrown to indicate the error.
-     * @return the <code>CoordinateSystem</code> object representing the
+     * @return the <code>CoordinateReferenceSystem</code> object representing the
      * file data
      * @throws StreamCorruptedException if there is unexpected data in the GeoKey tags.
-     * @throws NullPointerException if the <code>factory</code> or <code>metadata</code> are
-     * uninitialized
+     * @throws NullPointerException if the <code>csFactory</code>, <code>datumFactory</code>,
+     *          <code>crsFactory</code> or <code>metadata</code> are uninitialized
      * @throws UnsupportedOperationException if the coordinate system specified by the GeoTiff file
      * is not supported.
      */    
-    public CoordinateSystem createCoordinateSystem() throws IOException {
+    public CoordinateReferenceSystem createCoordinateSystem() throws IOException {
         // check if the prerequsite data are set.
-        if ((factory==null) || (metadata==null)) {
-            throw new NullPointerException("EPSG factory and metadata must be set!") ; 
+        if ((crsFactory==null) || (metadata==null) || (csFactory==null) || (datumFactory==null)) {
+            throw new NullPointerException("EPSG factories and metadata must be set!") ; 
         }
         
-        CoordinateSystem cs = null ;  
+        CoordinateReferenceSystem cs = null ;  
         
         
         // the first thing to check is the Model Type.
@@ -189,7 +254,7 @@ public class GeoTiffCoordinateSystemAdapter {
         // coordinate system
         } else {
             try { 
-                pcs = factory.createProjectedCoordinateSystem(projCode) ;
+                pcs = crsFactory.createProjectedCRS(projCode) ;
             } catch (FactoryException fe) {
                 throw new UnsupportedOperationException("Invalid EPSG code in ProjectedCSTypeGeoKey") ;
             }
@@ -198,8 +263,8 @@ public class GeoTiffCoordinateSystemAdapter {
         return pcs ; 
     }
     
-    private GeographicCoordinateSystem createGeographicCoordinateSystem() throws IOException {
-        GeographicCoordinateSystem gcs = null ; 
+    private GeographicCRS createGeographicCoordinateSystem() throws IOException {
+        GeographicCRS gcs = null ; 
 
         // get the projection code
         String geogCode = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeographicTypeGeoKey) ; 
@@ -212,7 +277,7 @@ public class GeoTiffCoordinateSystemAdapter {
         // coordinate system
         } else {
             try { 
-                gcs = factory.createGeographicCoordinateSystem(geogCode) ;
+                gcs = crsFactory.createGeographicCRS(geogCode) ;
             } catch (FactoryException fe) {
                 throw new UnsupportedOperationException("Invalid EPSG code in GeographicTypeGeoKey") ;
             }
@@ -266,7 +331,7 @@ public class GeoTiffCoordinateSystemAdapter {
             // 2] Determine the linear units specified in the GEOTIFF file.
             // 3] Build the Projection to be applied to the data
             // 4] Build the Projected Coordinate System from the components
-            GeographicCoordinateSystem gcs = createGeographicCoordinateSystem() ; 
+            GeographicCRS gcs = createGeographicCoordinateSystem() ; 
             linearUnit = createUnit(GeoTiffIIOMetadataAdapter.ProjLinearUnitsGeoKey,
                 GeoTiffIIOMetadataAdapter.ProjLinearUnitSizeGeoKey, Unit.METRE, Unit.METRE) ; 
             Projection proj = createUserDefinedProjection(gcs) ;
@@ -283,7 +348,7 @@ public class GeoTiffCoordinateSystemAdapter {
         // coordinate system
         } else {
             try { 
-                pcs = factory.createProjectedCoordinateSystem(projCode) ;
+                pcs = crsFactory.createProjectedCRS(projCode) ;
             } catch (FactoryException fe) {
                 throw new UnsupportedOperationException("Invalid EPSG code in ProjectedCSTypeGeoKey") ;
             }
@@ -291,56 +356,117 @@ public class GeoTiffCoordinateSystemAdapter {
         
         return pcs ; 
     }
-    
-    private GeographicCoordinateSystem createUserDefinedGCS() throws IOException {
-        // lookup the angular units used in this file
-        angularUnit = createUnit(GeoTiffIIOMetadataAdapter.GeogAngularUnitsGeoKey,
-            GeoTiffIIOMetadataAdapter.GeogAngularUnitSizeGeoKey, Unit.RADIAN, Unit.DEGREE) ; 
-        
-        // lookup the datum, error if "user defined"
-        HorizontalDatum datum = null ; 
+
+
+    private PrimeMeridian createPrimeMeridian() throws IOException { 
+        // look up the prime meridian:
+        // + could be an EPSG code
+        // + could be user defined
+        // + not defined = greenwich 
+        String pmCode = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogPrimeMeridianGeoKey) ;
+        PrimeMeridian pm = null ; 
+        if (pmCode != null) { 
+          if (pmCode.equals(USER_DEFINED)) { 
+            try {
+                String pmValue = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogPrimeMeridianLongGeoKey) ;
+                double pmNumeric = Double.parseDouble(pmValue) ; 
+                Map props = new HashMap() ; 
+                props.put("name", "User Defined GEOTIFF Prime Meridian") ; 
+                pm = datumObjFactory.createPrimeMeridian(props, pmNumeric, angularUnit) ; 
+            } catch (NumberFormatException nfe) { 
+                IOException io = new GeoTiffException(metadata, "Invalid user-defined prime meridian spec.") ;
+                io.initCause(nfe) ; 
+                throw io ; 
+            }            
+          } else { 
+            try {
+                pm = datumFactory.createPrimeMeridian(pmCode) ; 
+            } catch (FactoryException fe) { 
+                throw new GeoTiffException(metadata, "Invalid Prime Meridian EPSG code") ; 
+            }
+          }
+        } else { 
+          pm = datumFactory.createPrimeMeridian(PM_Greenwich) ; 
+        }
+      return pm ; 
+    }
+
+    /**
+     * Looks up the Geodetic Datum as specified in the GeoTIFF file.  
+     * The geotools definition of the geodetic datum includes both 
+     * an ellipsoid and a prime meridian, but the code in the GeoTIFF
+     * file does NOT include the prime meridian, as it is specified 
+     * separately.
+     * 
+     * This code currently does not support user defined datum.
+     */
+    private GeodeticDatum createGeodeticDatum() throws IOException { 
+
+        // lookup the datum (w/o PrimeMeridian), error if "user defined"
+        GeodeticDatum datum = null ; 
         String datumCode = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogGeodeticDatumGeoKey) ;
         if ((datumCode == null) || (datumCode.equals(USER_DEFINED))) { 
             throw new GeoTiffException(metadata, "A user defined Geographic Coordinate system "+
                 "must include a predefined datum!") ; 
         }
         try { 
-            datum = (HorizontalDatum)(factory.createDatum(datumCode)) ; 
+            datum = (GeodeticDatum)(datumFactory.createDatum(datumCode)) ; 
         } catch (FactoryException fe) { 
             throw new GeoTiffException(metadata, "Problem creating datum.") ; 
         } catch (ClassCastException cce) { 
             throw new GeoTiffException(metadata, "Datum code ("+datumCode+") must be a horizontal datum!") ; 
         }
+
+        return datum ; 
+    }
         
-        // look up the prime meridian, accept a user defined PM, but error if not
-        // defined
-        String pmCode = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogPrimeMeridianGeoKey) ;
-        PrimeMeridian pm = null ; 
-        if (pmCode == null) { 
-            throw new GeoTiffException(metadata, "User defined GCS must include specification of Prime Meridian") ; 
-        } else if (pmCode.equals(USER_DEFINED)) { 
-            try {
-                String pmValue = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogPrimeMeridianLongGeoKey) ;
-                double pmNumeric = Double.parseDouble(pmValue) ; 
-                pm = new PrimeMeridian("User Defined GEOTIFF Prime Meridian", angularUnit, pmNumeric) ; 
-            } catch (NumberFormatException nfe) { 
-                IOException io = new GeoTiffException(metadata, "Invalid user-defined prime meridian spec.") ;
-                io.initCause(nfe) ; 
-                throw io ; 
-            }            
-        } else { 
-            try {
-                pm = factory.createPrimeMeridian(pmCode) ; 
-            } catch (FactoryException fe) { 
-                throw new GeoTiffException(metadata, "Invalid Prime Meridian EPSG code") ; 
-            }
-        }
+
+    /**
+     * The GeoTIFF spec requires that a user defined GCS be comprised
+     * of the following: 
+     * <ul>
+     * <li> a citation
+     * <li> a datum definition
+     * <li> a prime meridian definition (if not Greenwich)
+     * <li> an angular unit definition (if not degrees)
+     * </ul>
+     */
+    private GeographicCRS createUserDefinedGCS() throws IOException {
+
+        // lookup the angular units used in this file
+        angularUnit = createUnit(GeoTiffIIOMetadataAdapter.GeogAngularUnitsGeoKey,
+            GeoTiffIIOMetadataAdapter.GeogAngularUnitSizeGeoKey, Unit.RADIAN, Unit.DEGREE) ; 
         
-        GeographicCoordinateSystem gcs = null ; 
+        // lookup the Prime Meridian.
+        PrimeMeridian pm = createPrimeMeridian() ; 
+
+        // lookup the Geodetic datum
+        GeodeticDatum datum = createGeodeticDatum() ; 
+
+        GeographicCRS gcs = null ; 
         try {
-            gcs = CoordinateSystemFactory.getDefault().createGeographicCoordinateSystem(
-                "[GeoTiff] User defined GCS", angularUnit, datum, pm, 
-                AxisInfo.LONGITUDE, AxisInfo.LATITUDE) ;  
+            // property map is reused
+            Map props = new HashMap() ;
+
+            // ensure the Datum contains the PrimeMeridian specified in the file.
+            props.put("name", "[GeoTIFF] Datum for GCS") ; 
+            datum = datumObjFactory.createGeodeticDatum(props, datum.getEllipsoid(), pm) ; 
+
+            // make a lat/lon Ellipsoidal CS
+            props.put("name", "Latitude") ; 
+            CoordinateSystemAxis lat = 
+              csObjFactory.createCoordinateSystemAxis(props, "lat", 
+                AxisDirection.NORTH, angularUnit) ; 
+            props.put("name", "Longitude") ; 
+            CoordinateSystemAxis lon = 
+              csObjFactory.createCoordinateSystemAxis(props, "lon", 
+                AxisDirection.EAST, angularUnit) ; 
+            props.put("name", "[GeoTIFF] Lat/Lon CS") ; 
+            EllipsoidalCS ecs = csObjFactory.createEllipsoidalCS(props, lon, lat) ; 
+
+            // make the user defined GCS from all the components...
+            props.put("name", "[GeoTIFF] User defined GCS") ; 
+            gcs = crsObjFactory.createGeographicCRS(props, datum, ecs) ; 
         } catch (FactoryException fe) { 
             IOException io = new GeoTiffException(metadata, "Error constructing user defined GCS") ; 
             io.initCause(fe)  ;
@@ -350,7 +476,10 @@ public class GeoTiffCoordinateSystemAdapter {
         return gcs ; 
     }
     
-    private Projection createUserDefinedProjection(GeographicCoordinateSystem gcs) throws IOException {
+    private Projection createUserDefinedProjection(GeographicCRS gcs) throws IOException {
+        throw new GeoTiffException(metadata, 
+          "User Defined Projection not supported!") ; 
+        /*
         String coordTrans = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.ProjCoordTransGeoKey) ; 
         
         // throw descriptive exception if ProjCoordTransGeoKey not defined
@@ -392,6 +521,7 @@ public class GeoTiffCoordinateSystemAdapter {
         
         
         return proj ; 
+        */
     }
     
     /**
@@ -428,7 +558,7 @@ public class GeoTiffCoordinateSystemAdapter {
                       "defined unit") ; 
                 }
                 double sz = Double.parseDouble(unitSize) ; 
-                retval = base.scale(sz) ; 
+                retval = base.multiply(sz) ; 
             } catch (NumberFormatException nfe) {
                 IOException ioe = new GeoTiffException(metadata, "Bad user defined unit size.") ; 
                 ioe.initCause(nfe) ; 
@@ -448,13 +578,13 @@ public class GeoTiffCoordinateSystemAdapter {
     }
     
     private ParameterList createCoordTransformParameterList(Short code, 
-        String classification, GeographicCoordinateSystem gcs) throws IOException {
+        String classification, GeographicCRS gcs) throws IOException {
         // initialize the parameter list
         ParameterList params = 
             CoordinateSystemFactory.getDefault().createProjectionParameterList(classification) ; 
         
         // get the semimajor and semiminor axes from the gcs
-        Ellipsoid e = gcs.getHorizontalDatum().getEllipsoid() ; 
+        Ellipsoid e = gcs.getDatum().getEllipsoid() ; 
         params.setParameter("semi_minor", e.getSemiMinorAxis()) ; 
         params.setParameter("semi_major", e.getSemiMajorAxis()) ; 
         

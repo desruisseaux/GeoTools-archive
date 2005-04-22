@@ -18,96 +18,78 @@
  */
 package org.geotools.gce.geotiff;
 
-//Geotools dependencies
-import java.io.File;
-import java.net.URL;
+// J2SE dependencies
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap ; 
+import java.io.File ; 
 
-import org.geotools.cs.CoordinateSystemAuthorityFactory;
+
+// GeoAPI dependencies
+import org.opengis.coverage.grid.Format ; 
+import org.opengis.coverage.grid.GridCoverageReader ; 
+import org.opengis.coverage.grid.GridCoverageWriter ; 
+
+// Geotools dependencies
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.data.coverage.grid.GridCoverageWriter;
 
 /**
+ * Provides basic information about the GeoTIFF format IO.  
+ * This is currently an extension of the Geotools AbstractGridFormat because
+ * the stream and file GCEs will pick it up if it extends AbstractGridFormat.
  *
  * @author Bryce Nordgren, USDA Forest Service
  */
-public class GeoTiffFormat extends AbstractGridFormat {
-    
-    /**
-     * Holds value of property factory.
-     */
-    private CoordinateSystemAuthorityFactory factory;
+public class GeoTiffFormat extends AbstractGridFormat { 
     
     /** Creates a new instance of GeoTiffFormat */
     public GeoTiffFormat() {
-        
-        // set up the format information map
-        mInfo = new HashMap() ; 
-        mInfo.put("name", "GeoTIFF") ; 
-        mInfo.put("description", "Tagged Image File Format with Geographic information") ; 
-        mInfo.put("docURL", "http://FIX ME") ; 
-        mInfo.put("version", "1.0") ; 
-        mInfo.put("vendor", "Geotools") ; 
-        
-        factory = org.geotools.cs.CoordinateSystemEPSGFactoryCache.getDefault();
+      readParameters = null ; 
+      writeParameters = null ; 
+      mInfo = new HashMap() ; 
+      mInfo.put("name", "GeoTIFF") ; 
+      mInfo.put("description", 
+        "Tagged Image File Format with Geographic information") ; 
+      mInfo.put("vendor", "Geotools") ; 
+      mInfo.put("version", "1.1") ; 
+      mInfo.put("docURL", 
+        "http://www.remotesensing.org:16080/websites/geotiff/geotiff.html") ; 
     }
-    
-    public boolean accepts(Object input) {
-        
-        // If the object is some version of a filename, check the extension
-        // for "tif"
-        String pathname = null;
-        
-        if (input instanceof String) {
-            pathname = (new File((String)input)).getName() ; 
-        }
-        if (input instanceof File) {
-            pathname = ((File)input).getName();
-        }
-        if (input instanceof URL) {
-            URL url = (URL) input;
-            pathname = url.getFile();
-        }
 
-        if (pathname != null && 
-            ((pathname.endsWith(".tif")) || (pathname.endsWith(".TIF")))) {
-            return true;
-        } else {
-            return false;
-        }
+    /**
+     * Currently, we only accept files, and we do not open the file to 
+     * verify the correct format.  If the file format is wrong, we deal with
+     * that when we try to read it.
+     * @param o the source object to test for compatibility with this 
+     *   format.
+     * @return true if "o" is a file.
+     */
+    public boolean accepts(Object o) { 
+      return o instanceof File ; 
     }
-    
+
+    /**
+     * If <CODE>source</CODE> is a file, this will return a reader object.
+     */
     public GridCoverageReader getReader(Object source) {
-        return new GeoTiffReader(this, source) ; 
-    }
-    
-    /**
-     * Writing not currently supported.  Always returns null.
-     * @return null
-     */    
-    public GridCoverageWriter getWriter(Object destination) {
-        return null ; 
-    }
-    
-    /**
-     * Getter for property factory.
-     * @return Value of property factory.
-     */
-    public CoordinateSystemAuthorityFactory getFactory() {
-        return this.factory;
-    }
-    
-    /**
-     * Setter for property factory.
-     * @param factory New value of property factory.
-     */
-    public void setFactory(CoordinateSystemAuthorityFactory factory) {
-        this.factory = factory;
+      GridCoverageReader reader = null ; 
+      if (accepts(source)) { 
+        reader = new GeoTiffReader(this, source) ; 
+      }
+
+      return reader ; 
     }
 
+
+    /**
+     * Always returns null. 
+     * @return null, always.
+     */
+    public GridCoverageWriter getWriter(Object source) { 
+      return null ; 
+    } 
+      
+    
     /**
      * Returns the implementation hints. The default implementation returns en empty map.
      */

@@ -41,7 +41,16 @@
       <groupId>gt2</groupId>
       <version>2.1.x</version>
     </dependency>
-    
+    <dependency>
+      <artifactId>geoapi</artifactId>
+      <groupId>geoapi</groupId>
+      <version>SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <id>units</id>
+      <url>http://jsr-108.sourceforge.net</url>
+      <version>0.01</version>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>${basedir}/src</sourceDirectory>

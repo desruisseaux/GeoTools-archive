@@ -21,23 +21,29 @@ package org.geotools.gce.geotiff;
 //J2SE dependencies
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
-
 import javax.imageio.metadata.IIOMetadata;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cs.CoordinateSystemAuthorityFactory;
-import org.geotools.ct.MathTransform;
-import org.geotools.ct.MathTransformFactory;
-import org.geotools.data.coverage.grid.Format;
-import org.geotools.data.coverage.grid.GridCoverageReader;
-import org.geotools.gc.GridCoverage;
+// Geotools dependencies 
+import org.geotools.coverage.grid.GridCoverage2D ; 
+
+// Geoapi dependencies
+import org.opengis.coverage.grid.GridCoverage ; 
+import org.opengis.coverage.grid.Format ; 
+import org.opengis.coverage.grid.GridCoverageReader ; 
+import org.opengis.referencing.crs.CRSAuthorityFactory ; 
+import org.opengis.referencing.operation.MathTransformFactory ; 
+import org.opengis.referencing.operation.MathTransform ; 
+import org.opengis.referencing.crs.CoordinateReferenceSystem ; 
 import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 
+//JAI ImageIO Tools dependencies
 import com.sun.media.jai.operator.ImageReadDescriptor;
+
+// JAI dependencies
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 
 
 /**
@@ -73,7 +79,8 @@ public class GeoTiffReader implements GridCoverageReader {
         this.source  = source ; 
         this.image = JAI.create("ImageRead", source); 
         
-        IIOMetadata temp = (IIOMetadata)(image.getProperty(ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE));
+        IIOMetadata temp = (IIOMetadata)(image.getProperty(
+          ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE));
         metadata = new GeoTiffIIOMetadataAdapter(temp);
     }
     
@@ -121,17 +128,24 @@ public class GeoTiffReader implements GridCoverageReader {
         return null ; 
     }
 
-    public GridCoverage read(ParameterValueGroup params) throws IllegalArgumentException, IOException {
+    /**
+     * This method reads in the TIFF image, constructs an appropriate CRS,
+     * determines the math transform from raster to the CRS model, and 
+     * constructs a GridCoverage.
+     */
+    public GridCoverage read(GeneralParameterValue params) 
+      throws IllegalArgumentException, IOException {
         // get the raster -> model transformation
         MathTransform r2m = getRasterToModel() ; 
         
         // get the coordinate reference system
         GeoTiffCoordinateSystemAdapter gtcs = 
-          new GeoTiffCoordinateSystemAdapter(creater.getFactory()) ; 
+          new GeoTiffCoordinateSystemAdapter() ; 
         gtcs.setMetadata(metadata) ; 
-        CoordinateSystem cs = gtcs.createCoordinateSystem() ; 
-        
-        return new GridCoverage("dummy", image, cs, r2m, null, null, null) ; 
+        CoordinateReferenceSystem crs = gtcs.createCoordinateSystem() ; 
+
+        return new GridCoverage2D(source.toString(), image, crs, r2m,
+            null, null, null) ; 
     }
     
     
@@ -155,49 +169,21 @@ public class GeoTiffReader implements GridCoverageReader {
             // translate, but that functionality isn't quite tied in with the 
             // Geotools framework.  For now we put in an AffineTransform that 
             // doesn't rotate.
-            AffineTransform at = new AffineTransform(pixScales[0], 0., 0., pixScales[1], tiePoints[3], tiePoints[4]);
-            xform = MathTransformFactory.getDefault().createAffineTransform(at) ; 
+            try { 
+              MathTransformFactory xformFactory = (MathTransformFactory)
+                FactoryFinder.getFactory(
+                  "org.opengis.referencing.operation.MathTransformFactory", 
+                  null) ; 
+              xform =xformFactory.createAffineTransform(at) ; 
+            } catch (FactoryConfigurationError fce) { 
+              GeoTiffException gte = new GeoTiffException(
+                metadata, "No math transform factories registered!") ; 
+              gte.initCause(fce) ; 
+              throw gte ; 
+            }
         } else {
             throw new GeoTiffException(metadata, "Unknown Raster to Model configuration.") ;
         }
         return xform ; 
     }
-    
-    private CoordinateSystem getEPSGCoordinateSystem() throws IOException {
-        // make the EPSG factory
-        CoordinateSystemAuthorityFactory epsgFactory = creater.getFactory() ; 
-
-        // get the projection code 
-        String projectionCode = 
-           metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeographicTypeGeoKey) ; 
-        System.out.println("Projection code =" + projectionCode);
-
-        if (projectionCode==null) {
-          projectionCode = metadata.getGeoKey(
-              GeoTiffIIOMetadataAdapter.ProjectedCSTypeGeoKey);
-        }
-
-        // make the coordinate system with the EPSG factory
-        CoordinateSystem cs = null ; 
-        if (projectionCode != null) { 
-            try { 
-                cs = epsgFactory.createCoordinateSystem(projectionCode) ; 
-            } catch (UnsupportedOperationException uso) { 
-                // if the EPSG factory errored while constructing the code
-                // report it as a GeoTIFF exception
-                GeoTiffException gte = new GeoTiffException(metadata) ; 
-                gte.initCause(uso) ; 
-                throw gte ; 
-            } catch (FactoryException fe) {
-                // if the EPSG factory errored while constructing the code
-                // report it as a GeoTIFF exception
-                GeoTiffException gte = new GeoTiffException(metadata) ; 
-                gte.initCause(fe) ; 
-                throw gte ; 
-            } 
-        }
-
-        return cs ; 
-    }
-    
 }
