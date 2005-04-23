@@ -37,25 +37,27 @@ import org.opengis.referencing.crs.CRSAuthorityFactory ;
 import org.opengis.referencing.cs.CSAuthorityFactory ; 
 import org.opengis.referencing.datum.DatumAuthorityFactory ; 
 import org.opengis.referencing.datum.DatumFactory ; 
+import org.opengis.referencing.datum.GeodeticDatum ; 
 import org.opengis.referencing.crs.CRSFactory ; 
 import org.opengis.referencing.cs.CSFactory ; 
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.datum.Ellipsoid ; 
 import org.opengis.referencing.datum.PrimeMeridian ;  
 import org.opengis.referencing.crs.GeographicCRS ; 
+import org.opengis.referencing.crs.ProjectedCRS ; 
 import org.opengis.referencing.cs.AxisDirection ; 
+import org.opengis.referencing.cs.CoordinateSystemAxis ; 
+import org.opengis.referencing.cs.EllipsoidalCS ; 
+import org.opengis.referencing.operation.OperationMethod ;
 
 // geotools dependencies
 import org.geotools.referencing.FactoryFinder ; 
 import org.geotools.factory.FactoryRegistryException ; 
 import org.geotools.factory.Hints ; 
 
-import org.geotools.cs.AxisInfo;
-import org.geotools.cs.CoordinateSystemFactory;
-import org.geotools.cs.HorizontalDatum;
-import org.geotools.cs.PrimeMeridian;
-import org.geotools.cs.ProjectedCoordinateSystem;
-import org.geotools.cs.Projection;
+// Technically, this is mapped to OperationMethod, but it's complicated,
+// and it's only relevant when I re-enable user defined projections.
+//import org.geotools.cs.Projection;
 
 
 
@@ -240,8 +242,8 @@ public class GeoTiffCoordinateSystemAdapter {
         
     }
     
-    private ProjectedCoordinateSystem createProjectedCoordinateSystem() throws IOException {
-        ProjectedCoordinateSystem pcs = null ; 
+    private ProjectedCRS createProjectedCoordinateSystem() throws IOException {
+        ProjectedCRS pcs = null ; 
 
         // get the projection code
         String projCode = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.ProjectedCSTypeGeoKey) ; 
@@ -284,7 +286,7 @@ public class GeoTiffCoordinateSystemAdapter {
         }
         
         // set the angular unit specified by this GeoTIFF file
-        angularUnit = gcs.getUnits(0) ; 
+        angularUnit = gcs.getCoordinateSystem().getAxis(0).getUnit() ; 
         
         return gcs ; 
     }
@@ -318,14 +320,16 @@ public class GeoTiffCoordinateSystemAdapter {
         this.metadata = metadata;
     }
     
-    private ProjectedCoordinateSystem createUserDefinedPCS() throws IOException {
-        ProjectedCoordinateSystem pcs = null ; 
+    private ProjectedCRS createUserDefinedPCS() throws IOException {
+        ProjectedCRS pcs = null ; 
 
         // get the projection code
         String projCode = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.ProjectionGeoKey) ; 
 
         // if it's user defined, there's a lot of work to do
         if (projCode.equals(USER_DEFINED)) {
+          throw new GeoTiffException(metadata, "User defined projections not supported") ;
+          /*
             // the order of the following calls is important!!
             // 1] Build the GCS and define the angular units.
             // 2] Determine the linear units specified in the GEOTIFF file.
@@ -343,6 +347,7 @@ public class GeoTiffCoordinateSystemAdapter {
                 io.initCause(fe) ; 
                 throw io ; 
             }
+          */
         
         // if it's not user defined, just use the EPSG factory to create the
         // coordinate system
@@ -365,28 +370,30 @@ public class GeoTiffCoordinateSystemAdapter {
         // + not defined = greenwich 
         String pmCode = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogPrimeMeridianGeoKey) ;
         PrimeMeridian pm = null ; 
-        if (pmCode != null) { 
-          if (pmCode.equals(USER_DEFINED)) { 
-            try {
-                String pmValue = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogPrimeMeridianLongGeoKey) ;
-                double pmNumeric = Double.parseDouble(pmValue) ; 
-                Map props = new HashMap() ; 
-                props.put("name", "User Defined GEOTIFF Prime Meridian") ; 
-                pm = datumObjFactory.createPrimeMeridian(props, pmNumeric, angularUnit) ; 
-            } catch (NumberFormatException nfe) { 
-                IOException io = new GeoTiffException(metadata, "Invalid user-defined prime meridian spec.") ;
-                io.initCause(nfe) ; 
-                throw io ; 
-            }            
-          } else { 
-            try {
-                pm = datumFactory.createPrimeMeridian(pmCode) ; 
-            } catch (FactoryException fe) { 
-                throw new GeoTiffException(metadata, "Invalid Prime Meridian EPSG code") ; 
+        try { 
+          if (pmCode != null) { 
+            if (pmCode.equals(USER_DEFINED)) { 
+              try {
+                  String pmValue = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.GeogPrimeMeridianLongGeoKey) ;
+                  double pmNumeric = Double.parseDouble(pmValue) ; 
+                  Map props = new HashMap() ; 
+                  props.put("name", "User Defined GEOTIFF Prime Meridian") ; 
+                  pm = datumObjFactory.createPrimeMeridian(props, pmNumeric, angularUnit) ; 
+              } catch (NumberFormatException nfe) { 
+                  IOException io = new GeoTiffException(metadata, "Invalid user-defined prime meridian spec.") ;
+                  io.initCause(nfe) ; 
+                  throw io ; 
+              }            
+            } else { 
+              pm = datumFactory.createPrimeMeridian(pmCode) ; 
             }
+          } else { 
+            pm = datumFactory.createPrimeMeridian(PM_Greenwich) ; 
           }
-        } else { 
-          pm = datumFactory.createPrimeMeridian(PM_Greenwich) ; 
+        } catch (FactoryException fe) { 
+          IOException io = new GeoTiffException(metadata, "[GeoTIFF] Invalid prime meridian spec.") ;
+          io.initCause(fe) ;
+          throw io ;
         }
       return pm ; 
     }
@@ -435,7 +442,7 @@ public class GeoTiffCoordinateSystemAdapter {
 
         // lookup the angular units used in this file
         angularUnit = createUnit(GeoTiffIIOMetadataAdapter.GeogAngularUnitsGeoKey,
-            GeoTiffIIOMetadataAdapter.GeogAngularUnitSizeGeoKey, Unit.RADIAN, Unit.DEGREE) ; 
+            GeoTiffIIOMetadataAdapter.GeogAngularUnitSizeGeoKey, SI.RADIAN, NonSI.DEGREE_ANGLE) ; 
         
         // lookup the Prime Meridian.
         PrimeMeridian pm = createPrimeMeridian() ; 
@@ -476,7 +483,7 @@ public class GeoTiffCoordinateSystemAdapter {
         return gcs ; 
     }
     
-    private Projection createUserDefinedProjection(GeographicCRS gcs) throws IOException {
+    private OperationMethod createUserDefinedProjection(GeographicCRS gcs) throws IOException {
         throw new GeoTiffException(metadata, 
           "User Defined Projection not supported!") ; 
         /*
@@ -566,7 +573,7 @@ public class GeoTiffCoordinateSystemAdapter {
             }
         } else {
             try {
-                retval = factory.createUnit(unitCode) ; 
+                retval = csFactory.createUnit(unitCode) ; 
             } catch (FactoryException fe) { 
                 IOException io = new GeoTiffException(metadata, "Error with EPSG Unit specification.") ; 
                 io.initCause(fe) ;
@@ -577,6 +584,7 @@ public class GeoTiffCoordinateSystemAdapter {
         return retval ; 
     }
     
+/*
     private ParameterList createCoordTransformParameterList(Short code, 
         String classification, GeographicCRS gcs) throws IOException {
         // initialize the parameter list
@@ -660,7 +668,9 @@ public class GeoTiffCoordinateSystemAdapter {
         }
         return params ; 
     }
-    
+*/
+
+   /* 
     private void addGeoKeyToParameterList(String name, ParameterList params, 
                                 int key, boolean mandatory, Unit base, Unit from) throws IOException {
         try {
@@ -682,5 +692,6 @@ public class GeoTiffCoordinateSystemAdapter {
             throw ioe ; 
         } 
     }
+   */
     
 }

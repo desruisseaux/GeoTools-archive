@@ -37,6 +37,11 @@
   </developers>
   <dependencies>
     <dependency>
+      <id>vecmath</id>
+      <version>1.3</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>
+    <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
       <version>2.1.x</version>

@@ -25,6 +25,9 @@ import javax.imageio.metadata.IIOMetadata;
 
 // Geotools dependencies 
 import org.geotools.coverage.grid.GridCoverage2D ; 
+import org.geotools.referencing.operation.transform.ProjectiveTransform ; 
+import org.geotools.referencing.operation.GeneralMatrix ; 
+import org.geotools.factory.Hints ; 
 
 // Geoapi dependencies
 import org.opengis.coverage.grid.GridCoverage ; 
@@ -72,12 +75,14 @@ public class GeoTiffReader implements GridCoverageReader {
     
     private RenderedOp image = null ; 
     private GeoTiffIIOMetadataAdapter metadata = null ; 
+    private Hints hints = null ;
     
     /** Creates a new instance of GeoTiffReader */
-    public GeoTiffReader(Format creater, Object source) {
+    public GeoTiffReader(Format creater, Object source, Hints hints) {
         this.creater = (GeoTiffFormat)creater ; 
         this.source  = source ; 
         this.image = JAI.create("ImageRead", source); 
+        this.hints = hints ; 
         
         IIOMetadata temp = (IIOMetadata)(image.getProperty(
           ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE));
@@ -133,14 +138,14 @@ public class GeoTiffReader implements GridCoverageReader {
      * determines the math transform from raster to the CRS model, and 
      * constructs a GridCoverage.
      */
-    public GridCoverage read(GeneralParameterValue params) 
+    public GridCoverage read(GeneralParameterValue []params) 
       throws IllegalArgumentException, IOException {
         // get the raster -> model transformation
         MathTransform r2m = getRasterToModel() ; 
         
         // get the coordinate reference system
         GeoTiffCoordinateSystemAdapter gtcs = 
-          new GeoTiffCoordinateSystemAdapter() ; 
+          new GeoTiffCoordinateSystemAdapter(hints) ; 
         gtcs.setMetadata(metadata) ; 
         CoordinateReferenceSystem crs = gtcs.createCoordinateSystem() ; 
 
@@ -165,22 +170,27 @@ public class GeoTiffReader implements GridCoverageReader {
         MathTransform xform = null ;
         
         if (numTiePoints == 1) { 
-            // we would really like a Linear transform for just a scale and a
+            // we would really like two independent Linear transforms for just a 
+            // scale and a
             // translate, but that functionality isn't quite tied in with the 
             // Geotools framework.  For now we put in an AffineTransform that 
             // doesn't rotate.
-            try { 
-              MathTransformFactory xformFactory = (MathTransformFactory)
-                FactoryFinder.getFactory(
-                  "org.opengis.referencing.operation.MathTransformFactory", 
-                  null) ; 
-              xform =xformFactory.createAffineTransform(at) ; 
-            } catch (FactoryConfigurationError fce) { 
-              GeoTiffException gte = new GeoTiffException(
-                metadata, "No math transform factories registered!") ; 
-              gte.initCause(fce) ; 
-              throw gte ; 
-            }
+            GeneralMatrix gm = new GeneralMatrix(3) ; // identity
+            double scaleX = pixScales[0] ; 
+            double scaleY = pixScales[1] ; 
+            double x = tiePoints[3] ;     // "model" space coordinates
+            double y = tiePoints[4] ; 
+            double i = tiePoints[0] ;     // "raster" space coordinates (indicies)
+            double j = tiePoints[1] ; 
+
+            // compute an "offset and scale" matrix
+            gm.setElement(0,0, scaleX) ; 
+            gm.setElement(0,2, x - scaleX*i) ; 
+            gm.setElement(1,1, scaleY) ; 
+            gm.setElement(1,2, y - scaleY*j) ; 
+            
+            // make it a LinearTransform
+            xform = ProjectiveTransform.create(gm) ; 
         } else {
             throw new GeoTiffException(metadata, "Unknown Raster to Model configuration.") ;
         }

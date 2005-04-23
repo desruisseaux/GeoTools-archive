@@ -19,8 +19,6 @@
 package org.geotools.gce.geotiff;
 
 // J2SE dependencies
-import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap ; 
 import java.io.File ; 
 
@@ -70,11 +68,12 @@ public class GeoTiffFormat extends AbstractGridFormat {
 
     /**
      * If <CODE>source</CODE> is a file, this will return a reader object.
+     * This file does not use hints in the construction of the geotiff reader.
      */
     public GridCoverageReader getReader(Object source) {
       GridCoverageReader reader = null ; 
       if (accepts(source)) { 
-        reader = new GeoTiffReader(this, source) ; 
+        reader = new GeoTiffReader(this, source, null) ; 
       }
 
       return reader ; 
@@ -89,11 +88,4 @@ public class GeoTiffFormat extends AbstractGridFormat {
       return null ; 
     } 
       
-    
-    /**
-     * Returns the implementation hints. The default implementation returns en empty map.
-     */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
-    }
 }

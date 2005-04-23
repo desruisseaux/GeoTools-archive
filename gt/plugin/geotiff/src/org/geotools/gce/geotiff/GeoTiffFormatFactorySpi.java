@@ -18,6 +18,10 @@
  */
 package org.geotools.gce.geotiff;
 
+// J2SE Dependencies
+import java.util.Collections;  
+import java.util.Map ; 
+
 // Geotools dependencies
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 
@@ -80,5 +84,13 @@ public class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {
         
         return available ; 
     }
+
+    /**
+     * Returns the implementation hints. The default implementation returns en empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
+
     
 }
