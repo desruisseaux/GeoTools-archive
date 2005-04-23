@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.factory.AbstractFactory;
 
 /**
  * Creates a Geometryless JDBC based on the conection params.
@@ -40,7 +41,7 @@ import org.geotools.data.jdbc.ConnectionPool;
  *
  * @author Rob Atkinson, Social Change Online
  */
-public class JDBCDataStoreFactory
+public class JDBCDataStoreFactory extends AbstractFactory
     implements org.geotools.data.DataStoreFactorySpi {
     	
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
@@ -115,7 +116,8 @@ public class JDBCDataStoreFactory
     /**
      * Creates a new instance of PostgisDataStoreFactory
      */
-    public JDBCDataStoreFactory() {
+    public JDBCDataStoreFactory( Map hints ) {
+    	super( hints );
     }
 
     /**

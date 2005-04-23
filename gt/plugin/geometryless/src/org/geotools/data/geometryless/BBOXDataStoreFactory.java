@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.ConnectionPool;
+import org.geotools.factory.AbstractFactory;
 
 /**
  * Creates a Geometryless JDBC based on the conection params.
@@ -50,13 +51,13 @@ import org.geotools.data.jdbc.ConnectionPool;
  * @author Chris Holmes, TOPP
  * @version $Id$
  */
-public class BBOXDataStoreFactory
+public class BBOXDataStoreFactory extends AbstractFactory 
     implements org.geotools.data.DataStoreFactorySpi {
     	
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.geometryless");
 
     private static final String GEOM_NAME_DEFAULT = "the_geom";
-
+    
     /** Specified JDBC driver class. */
     static final Param  DRIVER = new Param("driver", String.class,
             "Java Class name of installed driver", true, "");
@@ -142,14 +143,19 @@ public class BBOXDataStoreFactory
     };
 
     /**
-     * Creates a new instance of PostgisDataStoreFactory
+     * Creates a new instance of PostgisDataStoreFactory.
+     * <p>
+     * Note: the map of thins is used when constructing datastore instandces,
+     * as such it needs to be passed onto the datastores so that they can make use of this
+     * information when creating content.
+     * </p>
      */
-    public BBOXDataStoreFactory() {
+    public BBOXDataStoreFactory( Map hints) {
+    	super( hints );
     }
 
     /**
      * Checks to see if all the postgis params are there.
-     * 
      * <p>
      * Should have:
      * </p>
@@ -355,4 +361,11 @@ public class BBOXDataStoreFactory
             DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE, DRIVER, URLPREFIX, MINXCOLUMN, MINYCOLUMN
 ,MAXXCOLUMN, MAXYCOLUMN        };
     }
+
+	/* (non-Javadoc)
+	 * @see org.geotools.factory.Factory#getImplementationHints()
+	 */
+	public Map getImplementationHints() {
+		return hints;
+	}
 }
