@@ -118,10 +118,71 @@ import java.net.URI;
  * </li>
  * </ol>
  *
- * 
+ * <h2>Redesign Notes (feature-exp2)</h2>
+ * The main design goal of this is to have FeatureType extend AttributeType.  
+ * This allows us to nesting of features much more nicely.  We already are
+ * going in this direction, with the FeatureAttributeType buried in 
+ * DefaultAttribute.  This is just making it explicit, so it works with 
+ * the complex objects GML can return a lot more sensible.  So much of the
+ * work in this class is figuring out what concepts are the same.  Some stuff
+ * may need to be rethought a bit, as there are a few subtle assumptions 
+ * that we are working with flat files.  We will revisit this when we 
+ * implement choice and multiplicity.
+ * <ul>
+ * <li>
+ * got rid of deprecated getNamespace() method that returned a string,
+ * replaced it with a URI return.  This has been deprecated for a bit, 
+ * and was done out of a desire to keep backwards compatibility with 2.0,
+ * but that mission failed, so we're just moving on.  This change will
+ * break a few things, but is a good one, people just need to update
+ * their client code a bit.
  *
+ * <li>Deprecated getTypeName() to be getName().  They are the same thing,
+ * would be nice to get rid of getTypeName, but it's used super extensively.
+ * Though perhaps we could consider keeping it as a convenience, a bit more
+ * explicit, but it seems like overkill.
+ * 
+ * <li>Updated comments of the AttributeType operations that are inhierited
+ * to say what they mean in the context of a FeatureType.
+ * </ul>
+ * 
+ * <h2>Redesign Notes (factory-hints)</h2>
+ * The factory-hints design is finally coming through on the promiss
+ * of the great geotools factory design. This design is actualy placing
+ * the factory system under application (rather than 'default') control,
+ * as such it is really showing every last place where we did not follow
+ * our architecture.
+ * <ul>Use Cases:
+ * <li>Custom Feature:
+ * <br>Application spedcifies the use of a custom feature implementation.
+ *     This is used so an application interface is supported by each and
+ *     every feature created.
+ * <li>optiomized coordinate storage
+ * <br>LiteRenderer2 wants Shape2d specific CoordinateSequenceFactory used
+ *     for all Geometry creation. The point is to allow
+ *     only the xy information to be retrieved, and in a format suitable
+ *     for rapid reprojection and coversion to a Java2D Shape. Any OpenGL
+ *     (or Java3D) based renderer would also run into this need.
+ * </ul>
+ * The second use case is interesting in that LiteRenderer2 will be using
+ * the Datastore at the same time as other threads that want the normal 
+ * coordinate sequence.  So this is a per Query hint.
+ * </ul>
+ * <p>    
+ * Consequence: Since FeatureType is immutable, and CoordianteSequence is
+ * specified by the GeometryFactory of the DefaultGeometryAttribute this
+ * implys that we have a per Query SchemaType.
+ * </p>
+ * <p>
+ * It strikes me that this is a bad separation of concerns the "schema"
+ * should be exactly the same, it is just the GeometryFactory that controls
+ * construction that is in the wrong spot. It should be a hint, not attached
+ * to GeomtryAttributeType.
+ * </p>
  * @author Rob Hranac, VFNY
  * @author Chris Holmes, TOPP
+ * @author David Zwiers, Refractions
+ * @author Jody Garnett, Refractions
  * @version $Id: FeatureType.java,v 1.13 2004/01/09 22:29:31 jive Exp $
  *
  *
@@ -131,34 +192,6 @@ import java.net.URI;
  * @see org.geotools.feature.DefaultFeatureType
  */
 public interface FeatureType extends FeatureFactory {
-
-	
-    /* feature-exp2 redesign notes:
-     * The main design goal of this is to have FeatureType extend AttributeType.  
-     * This allows us to nesting of features much more nicely.  We already are
-     * going in this direction, with the FeatureAttributeType buried in 
-     * DefaultAttribute.  This is just making it explicit, so it works with 
-     * the complex objects GML can return a lot more sensible.  So much of the
-     * work in this class is figuring out what concepts are the same.  Some stuff
-     * may need to be rethought a bit, as there are a few subtle assumptions 
-     * that we are working with flat files.  We will revisit this when we 
-     * implement choice and multiplicity.
-     *
-     * 1) got rid of deprecated getNamespace() method that returned a string,
-     * replaced it with a URI return.  This has been deprecated for a bit, 
-     * and was done out of a desire to keep backwards compatibility with 2.0,
-     * but that mission failed, so we're just moving on.  This change will
-     * break a few things, but is a good one, people just need to update
-     * their client code a bit.
-     *
-     * 2) Deprecated getTypeName() to be getName().  They are the same thing,
-     * would be nice to get rid of getTypeName, but it's used super extensively.
-     * Though perhaps we could consider keeping it as a convenience, a bit more
-     * explicit, but it seems like overkill.
-     * 
-     * 3) Updated comments of the AttributeType operations that are inhierited
-     * to say what they mean in the context of a FeatureType.
-     */
   
     /**
      * Gets the global schema namespace.
@@ -292,4 +325,50 @@ public interface FeatureType extends FeatureFactory {
      public AttributeType[] getAttributeTypes();
      
      public Feature duplicate(Feature feature) throws IllegalAttributeException;
+     
+     /**
+      * Creates a new feature, with a generated unique featureID.
+      * 
+      * <p>This is less than ideal, as a FeatureID should be persistant over
+      * time, generally created by a datasource.
+      * This method is more for testing that doesn't need featureID.
+      * <p>
+      * This method has been transfered from the 2.0 version of FeatureFactory
+      * to preserved backwards compatability. This api is changing to make better
+      * use of the Geotools FactoryFinder system, and to allow construction based
+      * on a parent FeatureCollection.
+      * </p>
+      * <p>
+      * If this is really only for JUnit tests we should change visibility
+      * to package. The question is really do we want DataStores to provide us with
+      * an ID at creation time.
+      * </p>
+      * 
+      * @param attributes the array of attribute values
+      *
+      * @return The created feature
+      *
+      * @throws IllegalAttributeException if the FeatureType does not validate
+      *         the attributes.
+      */
+     Feature create(Object[] attributes) throws IllegalAttributeException;
+
+     /**
+      * Creates a new feature, with the proper featureID.
+      * <p>
+      * This method has been transfered from the 2.0 version of FeatureFactory
+      * to preserved backwards compatability. This api is changing to make better
+      * use of the Geotools FactoryFinder system, and to allow construction based
+      * on a parent FeatureCollection.
+      * </p>
+      * @param attributes the array of attribute values.
+      * @param featureID the feature ID.
+      *
+      * @return the created feature.
+      *
+      * @throws IllegalAttributeException if the FeatureType does not validate
+      *         the attributes.
+      */
+     Feature create(Object[] attributes, String featureID)
+         throws IllegalAttributeException;
 }
