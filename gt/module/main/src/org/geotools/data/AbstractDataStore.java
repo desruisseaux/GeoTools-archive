@@ -425,13 +425,13 @@ METADATA:   for( Iterator m=entry.metadata().values().iterator(); m.hasNext(); )
         //
         FeatureReader reader = getFeatureReader(typeName, query);
 
-        if (!filter.equals( Filter.NONE ) ) {
-            reader = new FilteringFeatureReader(reader, filter);
-        }
-
         if (transaction != Transaction.AUTO_COMMIT) {
             Map diff = state(transaction).diff(typeName);
             reader = new DiffFeatureReader(reader, diff);
+        }
+
+        if (!filter.equals( Filter.NONE ) ) {
+            reader = new FilteringFeatureReader(reader, filter);
         }
 
         if (!featureType.equals(reader.getFeatureType())) {
