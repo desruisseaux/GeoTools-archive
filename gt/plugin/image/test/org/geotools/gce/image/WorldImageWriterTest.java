@@ -31,7 +31,8 @@ import javax.swing.JLabel;
 
 
 /**
- * DOCUMENT ME!
+ * Test class for WorldImageWriter. This test tries to read, writer and re-read successive images
+ * checking for errors.
  *
  * @author giannecchini
  * @author rgould
@@ -75,72 +76,36 @@ public class WorldImageWriterTest extends TestCase {
 
         //checking test data directory for all kind of inputs
         File test_data_dir = null;
-        try {
-            test_data_dir = TestData.file(this, null);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        }
+        test_data_dir = TestData.file(this, null);
         String[] fileList = test_data_dir.list(new MyFileFilter());
-        for (int i = 0; i < fileList.length; i++) 
-         {
+
+        for (int i = 0; i < fileList.length; i++) {
             //url
             url = TestData.getResource(this, fileList[i]);
             assertTrue(url != null);
             this.write(url);
 
-            try {
-                //getting file
-                file = TestData.file(this, fileList[i]);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-            	e.printStackTrace(System.err);
-            	throw e;                
-            }
+            //getting file
+            file = TestData.file(this, fileList[i]);
 
             assertTrue(file != null);
+
             //starting write test
             this.write(file);
 
-            try {
-                //inputstream
-                in = new FileInputStream(TestData.file(this, fileList[i]));
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                throw e;
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace(System.err);
-                throw e;
-            }
+            //inputstream
+            in = new FileInputStream(TestData.file(this, fileList[i]));
 
             this.write(in);
         }
 
-        try {
-            //checking an http link
-            url = new URL("http://www.sun.com/im/homepage-powered_by_sun.gif");
-        } catch (MalformedURLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace(System.err);
-        }
+        //checking an http link
+        url = new URL("http://www.sun.com/im/homepage-powered_by_sun.gif");
 
         this.write(url);
 
-        try {
-            in = new URL("http://www.sun.com/im/homepage-powered_by_sun.gif")
-                .openStream();
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw e;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        }
+        in = new URL("http://www.sun.com/im/homepage-powered_by_sun.gif")
+            .openStream();
 
         this.write(in);
     }
@@ -149,7 +114,8 @@ public class WorldImageWriterTest extends TestCase {
      * write
      *
      * @param source Object
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     private void write(Object source) throws IOException {
         wiReader = new WorldImageReader(source);
@@ -160,19 +126,8 @@ public class WorldImageWriterTest extends TestCase {
         //setting crs
         GridCoverage2D coverage = null;
 
-        try {
-            coverage = (GridCoverage2D) wiReader.read(null);
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        }
+        coverage = (GridCoverage2D) wiReader.read(null);
 
-        //(GeneralParameterValue[]) paramsRead.values().toArray(new GeneralParameterValue[paramsRead.values().size()]));
         assertNotNull(coverage);
         assertNotNull(((GridCoverage2D) coverage).getRenderedImage());
         assertNotNull(coverage.getEnvelope());
@@ -180,17 +135,11 @@ public class WorldImageWriterTest extends TestCase {
         //writing png
         File tempFile = null;
 
-        try {
-        	//remember to provide a valid name, it wil be mde unique by the helper function
-        	//temp
-            tempFile = TestData.temp(this, "temp.png");
-            System.err.println(tempFile.getAbsolutePath());
-            assertTrue(tempFile.exists());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        }
+        //remember to provide a valid name, it wil be mde unique by the helper function
+        //temp
+        tempFile = File.createTempFile("temp", ".png");
+        tempFile.deleteOnExit();
+        assertTrue(tempFile.exists());
 
         //writer
         wiWriter = new WorldImageWriter(tempFile);
@@ -199,34 +148,14 @@ public class WorldImageWriterTest extends TestCase {
         Format writerParams = wiWriter.getFormat();
         writerParams.getWriteParameters().parameter("Format").setValue("png");
 
-        try {
-            //writing
-            wiWriter.write(coverage.geophysics(false), null);
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        }
+        //writing
+        wiWriter.write(coverage.geophysics(false), null);
 
         //reading again
         assertTrue(tempFile.exists());
         wiReader = new WorldImageReader(tempFile);
 
-        try {
-            coverage = (GridCoverage2D) wiReader.read(null);
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace(System.err);
-            throw e;
-        }
+        coverage = (GridCoverage2D) wiReader.read(null);
 
         //displaying
         JFrame frame = new JFrame();

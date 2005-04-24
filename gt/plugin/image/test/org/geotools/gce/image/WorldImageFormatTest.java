@@ -28,8 +28,7 @@ import junit.framework.TestCase;
 /**
  * DOCUMENT ME!
  *
- * @author rgould TODO To change the template for this generated type comment
- *         go to Window - Preferences - Java - Code Style - Code Templates
+ * @author rgoulds
  */
 public class WorldImageFormatTest extends TestCase {
     private WorldImageFormatTest format;
