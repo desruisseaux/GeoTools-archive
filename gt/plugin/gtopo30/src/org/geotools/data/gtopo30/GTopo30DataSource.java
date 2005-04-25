@@ -358,7 +358,7 @@ class GTopo30DataSource {
         }
 
         Category values = new Category("values", this.getColors(),
-                new NumberRange(1, 255), new NumberRange(min, max));
+                new NumberRange(1, 255), new NumberRange((double)min,(double) max));
         Category nan = new Category("nodata", new Color(0, 0, 0), 0);
 
         GridSampleDimension band = new GridSampleDimension(new Category[] {
@@ -366,9 +366,11 @@ class GTopo30DataSource {
                 }, uom);
         band = band.geophysics(true);
 
+        //switch from -999 to NaN to keep transparency informations
+        //for the gridcoverage
         BufferedImage img = new BufferedImage(band.getColorModel(),
-                (WritableRaster) image.createSnapshot().getAsBufferedImage()
-                                      .getData(), false, null); // properties????
+                getAdjustedRaster((WritableRaster) image.createSnapshot().getAsBufferedImage()
+                        .getData()), false, null); // properties????
 
         //setting metadata
         Map metadata = new HashMap();
@@ -399,6 +401,34 @@ class GTopo30DataSource {
     }
 
     /**
+	 * @param raster
+	 * @return
+	 */
+	private WritableRaster getAdjustedRaster(WritableRaster raster) {
+		return raster;/*
+		int W=raster.getWidth();
+		int H=raster.getHeight();
+		WritableRaster returnedRaster= javax.media.jai.RasterFactory.createBandedRaster(
+				DataBuffer.TYPE_FLOAT,
+				W,
+				H,
+				raster.getNumBands(),//1
+				null);
+		int sample=0;
+		for(int i=0;i<H;i++)
+			for(int j=0;j<W;j++)
+			{
+				sample=raster.getSample(j,i,0);
+				if(sample==-9999)
+					returnedRaster.setSample(j,i,0,Float.NaN);
+				else
+					returnedRaster.setSample(j,i,0,(float)sample);
+			}
+		raster=null;
+		return returnedRaster;*/
+	}
+
+	/**
      * Convenience method to wrap a GridCoverage in a feature for inclusion in
      * a FeatureCollection
      *
