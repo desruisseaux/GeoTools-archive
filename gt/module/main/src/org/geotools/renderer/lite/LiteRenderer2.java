@@ -588,8 +588,10 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         for( int i = 0; i < attTypes.length; i++ ) {
             attName = attTypes[i].getName();
 
-            //if (attTypes[i].isGeometry() && !atts.contains(attName)) {
-            if (!atts.contains(attName)) {
+            //DJB: This geometry check was commented out.  I think it should actually be back in or
+            //     you get ALL the attributes back, which isnt what you want.
+            if (attTypes[i].isGeometry() && !atts.contains(attName)) {
+           // if (!atts.contains(attName)) {
                 atts.add(attName);
                 LOGGER.fine("added attribute " + attName);
             }

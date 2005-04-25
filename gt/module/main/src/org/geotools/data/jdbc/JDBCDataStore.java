@@ -753,10 +753,14 @@ METADATA:
         String[] requestedNames = propertyNames(query);
         String[] propertyNames;
 
-        if (requestedNames.length == featureType.getAttributeCount()) {
+        	// DJB: changed to account for miss-ordered queries
+        if (allSameOrder(requestedNames,featureType)) 
+        {
             // because we have everything, the filter can run
             propertyNames = requestedNames;
-        } else if (requestedNames.length < featureType.getAttributeCount()) {
+        } 
+        else if (requestedNames.length <= featureType.getAttributeCount()) 
+        {
             // we will need to reType this :-)
             //
             // check to make sure we have enough for the filter
@@ -780,9 +784,9 @@ METADATA:
             } catch (SchemaException e1) {
                 throw new DataSourceException("Could not create subtype", e1);
             }
-        } else {
+        } else { //too many requested (duplicates?)
             throw new DataSourceException(typeName
-                + " does not contain requested proeprties:" + query);
+                + " does not contain requested properties:" + query);
         }
 
         AttributeType[] attrTypes = null;
@@ -1707,5 +1711,24 @@ METADATA:
     public void setFIDMapperFactory(FIDMapperFactory fmFactory)
         throws UnsupportedOperationException {
         typeHandler.setFIDMapperFactory(fmFactory);
+    }
+    
+    /**
+     * returns true if the requested names list all the attributes in the correct order.
+     * 
+     * @param requestedNames
+     * @param ft
+     * @return
+     */
+    public boolean allSameOrder(String[] requestedNames,FeatureType ft)
+    {
+    	if (requestedNames.length != ft.getAttributeCount())
+    		return false; //incorrect # of attribute 
+    	for (int t=0;t<requestedNames.length;t++)
+    	{
+    		if (!(requestedNames[t].equals(ft.getAttributeType(t).getName() )))
+    			return false; // name doesnt match
+    	}
+    	return true;
     }
 }
