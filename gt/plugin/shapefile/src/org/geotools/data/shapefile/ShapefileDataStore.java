@@ -31,6 +31,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collections;
@@ -343,6 +344,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             channel = raf.getChannel();
+            FileLock lock=((FileChannel)channel).lock();
         } else {
             OutputStream out = url.openConnection().getOutputStream();
             channel = Channels.newChannel(out);

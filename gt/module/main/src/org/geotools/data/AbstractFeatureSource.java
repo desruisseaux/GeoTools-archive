@@ -212,7 +212,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
         if (query.getFilter() == Filter.ALL) {
             return 0;
         }
-
+        
         DataStore dataStore = getDataStore();
         if ((dataStore == null) || !(dataStore instanceof AbstractDataStore)) {
             // too expensive

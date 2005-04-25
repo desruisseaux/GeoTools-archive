@@ -7,6 +7,9 @@
 package org.geotools.data.shapefile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -64,6 +67,59 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
     if (errors.length() > 0) {
         fail( errors.toString(), bad );      
     }
+  
+  }
+  
+  boolean readStarted=false;
+  Exception exception=null;
+  
+  public void testConcurrentReadWrite() throws Exception{
+      final File file=getTempFile();
+      final Boolean bool;
+      Runnable reader=new Runnable(){
+          public void run(){
+              int cutoff=0;
+              try {
+                FileInputStream fr=new FileInputStream(file);
+                try {
+                    fr.read();
+                } catch (IOException e1) {
+                    exception=e1;
+                    return;
+                }
+                System.out.println("locked");
+                readStarted=true;
+                while( cutoff<10 ){
+                    synchronized (this) {
+                        try {
+                            try {
+                                fr.read();
+                            } catch (IOException e) {
+                                exception=e;
+                                return;
+                            }
+                            wait(500);
+                            cutoff++;
+                        } catch (InterruptedException e) {
+                            cutoff=10;
+                        }
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                assertTrue(false);
+            }
+              
+          }
+      };
+      Thread readThread=new Thread(reader);
+      readThread.start();
+      while(!readStarted){
+          if (exception!=null )
+              throw exception;
+          Thread.yield();
+      }
+      
+      test(files[0]);
   }
   
 /**
@@ -145,7 +201,7 @@ public void fail(String message, Throwable cause ) throws Throwable {
     }
     
   }
-  
+
   public static final void main(String[] args) throws Exception {
     junit.textui.TestRunner.run(suite(ShapefileReadWriteTest.class));
   }

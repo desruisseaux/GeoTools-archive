@@ -17,6 +17,7 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -49,6 +50,8 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
     Feature next; // next value aquired by hasNext()
     Feature live; // live value supplied by FeatureReader
     Feature current; // duplicate provided to user
+    private static final String FID_INDEX_KEY = "fidIndex";
+    int nextfidIndex=-1;
 
     /**
      * DiffFeatureWriter construction.
@@ -59,6 +62,22 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
     public DiffFeatureWriter(FeatureReader reader, Map diff) {
         this.reader = reader;
         this.diff = diff;
+        if( !diff.isEmpty() ){
+            for( Iterator iter = diff.keySet().iterator(); iter.hasNext(); ) {
+                String string = (String) iter.next();
+                String number=string.substring(3);
+                try{
+                    int tmp=Integer.parseInt(number);
+                    if( tmp>nextfidIndex){
+                        nextfidIndex=tmp;
+                    }
+                }catch( Exception e){
+                    //continue;
+                }
+            }
+            
+        }
+        nextfidIndex++;
     }
 
     /**
@@ -77,7 +96,6 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      */
     public Feature next() throws IOException {
         FeatureType type = getFeatureType();
-
         if (hasNext()) {
             // hasNext() will take care recording
             // any modifications to current
@@ -98,8 +116,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
                 live = null;
                 next = null;
                 current = type.create(new Object[type.getAttributeCount()],
-                        "new");
-
+                        "new"+nextfidIndex);
                 return current;
             } catch (IllegalAttributeException e) {
                 throw new IOException("Could not create new content");
