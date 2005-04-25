@@ -325,50 +325,5 @@ public interface FeatureType extends FeatureFactory {
      public AttributeType[] getAttributeTypes();
      
      public Feature duplicate(Feature feature) throws IllegalAttributeException;
-     
-     /**
-      * Creates a new feature, with a generated unique featureID.
-      * 
-      * <p>This is less than ideal, as a FeatureID should be persistant over
-      * time, generally created by a datasource.
-      * This method is more for testing that doesn't need featureID.
-      * <p>
-      * This method has been transfered from the 2.0 version of FeatureFactory
-      * to preserved backwards compatability. This api is changing to make better
-      * use of the Geotools FactoryFinder system, and to allow construction based
-      * on a parent FeatureCollection.
-      * </p>
-      * <p>
-      * If this is really only for JUnit tests we should change visibility
-      * to package. The question is really do we want DataStores to provide us with
-      * an ID at creation time.
-      * </p>
-      * 
-      * @param attributes the array of attribute values
-      *
-      * @return The created feature
-      *
-      * @throws IllegalAttributeException if the FeatureType does not validate
-      *         the attributes.
-      */
-     Feature create(Object[] attributes) throws IllegalAttributeException;
 
-     /**
-      * Creates a new feature, with the proper featureID.
-      * <p>
-      * This method has been transfered from the 2.0 version of FeatureFactory
-      * to preserved backwards compatability. This api is changing to make better
-      * use of the Geotools FactoryFinder system, and to allow construction based
-      * on a parent FeatureCollection.
-      * </p>
-      * @param attributes the array of attribute values.
-      * @param featureID the feature ID.
-      *
-      * @return the created feature.
-      *
-      * @throws IllegalAttributeException if the FeatureType does not validate
-      *         the attributes.
-      */
-     Feature create(Object[] attributes, String featureID)
-         throws IllegalAttributeException;
 }
