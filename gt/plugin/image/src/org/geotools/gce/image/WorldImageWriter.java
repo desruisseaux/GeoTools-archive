@@ -24,10 +24,6 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.spatialschema.geometry.Envelope;
-
-import com.sun.media.jai.codecimpl.util.DataBufferDouble;
-import com.sun.media.jai.codecimpl.util.DataBufferFloat;
-
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -43,26 +39,27 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import javax.imageio.ImageIO;
+import javax.media.jai.ColorCube;
 import javax.media.jai.IHSColorSpace;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.KernelJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 
 
 /**
- * DOCUMENT ME!
+ * Writes a GridCoverage to a raster image file and an accompanying world file.
+ * The destination specified must point to the location of the raster file to
+ * write to, as this is how the format is determined. The directory that file
+ * is located in must also already exist.
  *
+ * @author simone giannecchini
  * @author rgould
- * @author alessio
- * @author simone  Writes a GridCoverage to a raster image file and an
- *         accompanying world file. The destination specified must point to
- *         the location of the raster file to write to, as this is how the
- *         format is determined. The directory that file is located in must
- *         also already exist.
+ * @author alessio fabiani
  */
 public class WorldImageWriter implements GridCoverageWriter {
-    /*format for this writer*/
+    /**format for this writer*/
     private Format format = new WorldImageFormat();
 
     /** Destination to write to */
@@ -276,140 +273,13 @@ public class WorldImageWriter implements GridCoverageWriter {
             PlanarImage surrogateImage = null;
 
             /**
-             * ARE WE DEALING WITH A GRAYSCALE IMAGE? LET'S RESCALE AND GO TO
-             * BYTE DATABUFFER FOR DISPLAYING.
+             * ARE WE DEALING WITH A GRAYSCALE IMAGE?
              */
             if (sourceCoverage.getSampleDimension(0).getColorInterpretation()
                                   .name().equals("GRAY_INDEX")) {
                 //getting rendered image
                 surrogateImage = ((PlanarImage) ((GridCoverage2D) sourceCoverage).geophysics(false)
                                                  .getRenderedImage());
-
-                //image dimensions
-                int width = surrogateImage.getWidth();
-                int height = surrogateImage.getHeight();
-                double[] dpixel = new double[surrogateImage.getSampleModel().getNumBands()];
-                
-                // Which are the max and min of the image ? We need to know to create the
-                // surrogate image.
-                // Let's use the extrema operator to get them.
-                ParameterBlock pbMaxMin = new ParameterBlock();
-                pbMaxMin.addSource(surrogateImage);
-
-                RenderedOp extrema = JAI.create("extrema", pbMaxMin);
-
-                // Must get the extrema of all bands !
-                double[] allMins = (double[]) extrema.getProperty("minimum");
-                double[] allMaxs = (double[]) extrema.getProperty("maximum");
-                double minValue = Double.MAX_VALUE;
-                double maxValue = Double.MIN_VALUE;
-
-                //looking for the minimum sample
-                //TODO convert this code into a cycle
-                if (!Double.isNaN(allMins[0])) {
-                    minValue = allMins[0];
-                } else {
-                    Double[] buffer = null;
-
-                    if (surrogateImage.getData().getDataBuffer() instanceof DataBufferFloat) {
-                        float[] tmp = ((DataBufferFloat) surrogateImage.getData()
-                                                              .getDataBuffer())
-                            .getData();
-                        buffer = new Double[tmp.length];
-
-                        for (int i = 0; i < tmp.length; i++) {
-                            buffer[i] = new Double(tmp[i]);
-                        }
-                    } else if (surrogateImage.getData().getDataBuffer() instanceof DataBufferDouble) {
-                        double[] tmp = ((DataBufferDouble) surrogateImage.getData()
-                                                                .getDataBuffer())
-                            .getData();
-                        buffer = new Double[tmp.length];
-
-                        for (int i = 0; i < tmp.length; i++) {
-                            buffer[i] = new Double(tmp[i]);
-                        }
-                    }
-
-                    for (int i = 0; i < buffer.length; i++) {
-                        if (minValue > buffer[i].doubleValue()) {
-                            minValue = buffer[i].doubleValue();
-                        }
-                    }
-                }
-
-                //looking for the maximum sample
-                //TODO convert this code into a cycle
-                if (!Double.isNaN(allMaxs[0])) {
-                    maxValue = allMaxs[0];
-                } else {
-                    Double[] buffer = null;
-
-                    if (surrogateImage.getData().getDataBuffer() instanceof DataBufferFloat) {
-                        float[] tmp = ((DataBufferFloat) surrogateImage.getData()
-                                                              .getDataBuffer())
-                            .getData();
-                        buffer = new Double[tmp.length];
-
-                        for (int i = 0; i < tmp.length; i++) {
-                            buffer[i] = new Double(tmp[i]);
-                        }
-                    } else if (surrogateImage.getData().getDataBuffer() instanceof DataBufferDouble) {
-                        double[] tmp = ((DataBufferDouble) surrogateImage.getData()
-                                                                .getDataBuffer())
-                            .getData();
-                        buffer = new Double[tmp.length];
-
-                        for (int i = 0; i < tmp.length; i++) {
-                            buffer[i] = new Double(tmp[i]);
-                        }
-                    }
-
-                    for (int i = 0; i < buffer.length; i++) {
-                        if (maxValue < buffer[i].doubleValue()) {
-                            maxValue = buffer[i].doubleValue();
-                        }
-                    }
-                }
-
-                //looking for the max and the min
-                //TODO use max function
-                for (int v = 1; v < allMins.length; v++) {
-                    if (allMins[v] < minValue) {
-                        minValue = allMins[v];
-                    }
-
-                    if (allMaxs[v] > maxValue) {
-                        maxValue = allMaxs[v];
-                    }
-                }
-
-                //    double minValue = sourceCoverage.getSampleDimension(0).getMinimumValue();
-                //    double maxValue = sourceCoverage.getSampleDimension(0).getMinimumValue();
-
-                /** RESCALING SOURCE IMAGE */
-                double[] subtract = new double[1];
-                subtract[0] = minValue;
-
-                double[] divide = new double[1];
-                divide[0] = 255.0 / (maxValue - minValue);
-
-                // Now we can rescale the pixels gray levels:
-                ParameterBlock pbRescale = new ParameterBlock();
-                pbRescale.add(divide);
-                pbRescale.add(subtract);
-                pbRescale.addSource(surrogateImage);
-                surrogateImage = (PlanarImage) JAI.create("rescale", pbRescale,
-                        null);
-
-                // Let's convert the data type for displaying.
-                ParameterBlock pbConvert = new ParameterBlock();
-                pbConvert.addSource(surrogateImage);
-                pbConvert.add(DataBuffer.TYPE_BYTE);
-                surrogateImage = JAI.create("format", pbConvert);
-
-                //TODO check this if it is needed
-                surrogateImage = JAI.create("invert", surrogateImage);
             } else {
                 /**
                  * WORKING ON A COLORED IMAGE
@@ -418,74 +288,13 @@ public class WorldImageWriter implements GridCoverageWriter {
                     .getRenderedImage();
 
                 //trying to write a GIF
-
-                /*          if (surrogateImage.getColorModel() instanceof ComponentColorModel
-                   && (((String) (this.format.getWriteParameters()
-                                                 .parameter("format")
-                                                 .getValue()))
-                   .compareToIgnoreCase("gif") == 0)) {
-                   //parameter block
-                   ParameterBlock pb = new ParameterBlock();
-                   //check the number of bands looking for alpha band
-                   if (surrogateImage.getSampleModel().getNumBands() > 3) {
-                
-                
-                
-                
-                           javax.media.jai.RenderedOp bandSelect=JAI.create("BanDSelect",surrogateImage,new int[]{0,1,2});
-                
-                       //removing alpha band
-                       int w = surrogateImage.getWidth();
-                       int h = surrogateImage.getHeight();
-                       BufferedImage bi = new BufferedImage(w, h,
-                               BufferedImage.TYPE_3BYTE_BGR);
-                       WritableRaster wr = bi.getWritableTile(0, 0);
-                       WritableRaster wr3 = wr.createWritableChild(0, 0, w, h,
-                               0, 0, new int[] { 0, 1, 2 });
-                       wr3.setRect(surrogateImage.getData());
-                       bi.releaseWritableTile(0, 0);
-                       surrogateImage = PlanarImage.wrapRenderedImage(bi);
-                       //PARAMETER BLOCK
-                       pb.removeParameters();
-                       pb.removeSources();
-                       //color map
-                       pb.addSource(surrogateImage);
-                       pb.add(ColorQuantizerDescriptor.MEDIANCUT);
-                       pb.add(255);
-                       LookupTableJAI colorMap = (LookupTableJAI)JAI.create("ColorQuantizer", pb).getProperty("LUT");
-                       KernelJAI ditherMask = KernelJAI.ERROR_FILTER_FLOYD_STEINBERG;
-                
-                       //building final color model
-                       int bitsNum = 8;
-                       ColorModel cm = new IndexColorModel(bitsNum, colorMap.getByteData()[0].length,
-                                       colorMap.getByteData()[0], colorMap.getByteData()[1], colorMap.getByteData()[2], Transparency.OPAQUE);
-                       PlanarImage op = PlanarImage.wrapRenderedImage(new BufferedImage(
-                                       w, h, BufferedImage.TYPE_BYTE_INDEXED,(IndexColorModel) cm));
-                       //layout for the final image
-                       ImageLayout layout = new ImageLayout();
-                       layout.setMinX(op.getMinX());
-                       layout.setMinY(op.getMinY());
-                       layout.setHeight(op.getHeight());
-                       layout.setWidth(op.getWidth());
-                       layout.setTileWidth(op.getTileWidth());
-                       layout.setTileHeight(op.getTileHeight());
-                       layout.setTileGridXOffset(op.getTileGridXOffset());
-                       layout.setTileGridYOffset(op.getTileGridYOffset());
-                       layout.setColorModel(cm);
-                       layout.setSampleModel(op.getSampleModel());
-                       RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
-                               layout);
-                
-                       //error diffusion
-                       pb.removeParameters();
-                       pb.removeSources();
-                       pb.addSource(surrogateImage);
-                       pb.add(colorMap);
-                       pb.add(ditherMask);
-                       javax.media.jai.RenderedOp op1= JAI.create("errordiffusion",pb,rh);
-                       surrogateImage=(PlanarImage)op1.getRendering() ;
-                   }
-                   }*/
+                if (surrogateImage.getColorModel() instanceof ComponentColorModel
+                        && (((String) (this.format.getWriteParameters()
+                                                      .parameter("format")
+                                                      .getValue()))
+                        .compareToIgnoreCase("gif") == 0)) {
+                    surrogateImage = componentColorModel2GIF(surrogateImage);
+                }
             }
 
             /**
@@ -494,8 +303,6 @@ public class WorldImageWriter implements GridCoverageWriter {
             ImageIO.write(surrogateImage,
                 (String) (this.format.getWriteParameters().parameter("format")
                                      .getValue()), output);
-            output.flush();
-            output.close();
         } catch (Exception e) {
             System.err.println(e.getMessage());
 
@@ -503,6 +310,79 @@ public class WorldImageWriter implements GridCoverageWriter {
             ioe.initCause(e);
             throw ioe;
         }
+    }
+
+    /**
+     * Convert the image to a GIF-compliant image.  This method has been
+     * created in order to convert the input image to  a form that is
+     * compatible with the GIF model.  It first remove the information about
+     * transparency since the error diffusion and the error dither operations
+     * are unable to process images with more than 3 bands.  Sfterwards the
+     * image is processed with an error diffusion operator in order to reduce
+     * the number of bands from 3 to 1 and the number of color to 216.  A
+     * suitable layout is used for the final image via the RenderingHints in
+     * order to take into account the different layout model for the final
+     * image.
+     *
+     * @param surrogateImage image to convert
+     *
+     * @return PlanarImage image converted
+     */
+    private PlanarImage componentColorModel2GIF(PlanarImage surrogateImage) {
+        {
+            //parameter block
+            ParameterBlock pb = new ParameterBlock();
+            RenderedOp bandSelect = null;
+
+            //check the number of bands looking for alpha band
+            if (surrogateImage.getSampleModel().getNumBands() > 3) {
+                bandSelect = JAI.create("bandSelect", surrogateImage,
+                        new int[] { 0, 1, 2 });
+                surrogateImage = bandSelect.createInstance();
+            }
+
+            //removing alpha band
+            int w = surrogateImage.getWidth();
+            int h = surrogateImage.getHeight();
+            KernelJAI ditherMask = KernelJAI.ERROR_FILTER_FLOYD_STEINBERG; //KernelJAI.DITHER_MASK_443;
+            ColorCube colorMap = ColorCube.BYTE_496;
+
+            //PARAMETER BLOCK
+            pb.removeParameters();
+            pb.removeSources();
+
+            //color map
+            pb.addSource(surrogateImage);
+            pb.add(colorMap);
+            pb.add(ditherMask);
+
+            //building final color model
+            //     int bitsNum = 8;
+            //      ColorModel cm = new IndexColorModel(bitsNum,
+            //              colorMap.getByteData()[0].length,
+            ////              colorMap.getByteData()[0], colorMap.getByteData()[1],
+            //              colorMap.getByteData()[2], Transparency.OPAQUE);
+            // PlanarImage op = PlanarImage.wrapRenderedImage(new BufferedImage(
+            //           w, h, BufferedImage.TYPE_BYTE_INDEXED,
+            //    (IndexColorModel) cm));
+            //layout for the final image
+            //      ImageLayout layout = new ImageLayout();
+            ////  layout.setMinX(op.getMinX());
+            //  layout.setMinY(op.getMinY());
+            //  layout.setHeight(op.getHeight());
+            //  layout.setWidth(op.getWidth());
+            //   layout.setTileWidth(surrogateImage.getTileWidth());
+            //   layout.setTileHeight(surrogateImage.getTileHeight());
+            //   layout.setTileGridXOffset(surrogateImage.getTileGridXOffset());
+            //  layout.setTileGridYOffset(surrogateImage.getTileGridYOffset());
+            //  layout.setColorModel(cm);
+            //  layout.setSampleModel(op.getSampleModel());
+            //        RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+            RenderedOp op1 = JAI.create("errordiffusion", pb, null);
+            surrogateImage = (PlanarImage) op1.getRendering();
+        }
+
+        return surrogateImage;
     }
 
     private RenderedImage highlightImage(RenderedImage stillImg) {

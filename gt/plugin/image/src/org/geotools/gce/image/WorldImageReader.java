@@ -43,15 +43,15 @@ import java.net.URL;
 import java.util.NoSuchElementException;
 
 /**
+ * 
+ * @author simone giannecchini 
+ * @author alessio fabiani 
  * @author rgould
- * @author simone giannecchini (simboss_ml@tiscali.it)
- * @author alessio fabiani (alessio.fabiani@gmail.com)
- *
  * Reads a GridCoverage from a given source. WorldImage sources
  * only support one GridCoverage so hasMoreGridCoverages() will
  * return true until the only GridCoverage is read.
  *
- * No metadata is currently supported, so all those methods return null.
+ * No metadata is currently supported, so all related methods return null.
  */
 public class WorldImageReader implements GridCoverageReader {
     public static int WORLD_WLD = 1;
