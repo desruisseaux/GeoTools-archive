@@ -89,7 +89,7 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
     }
 
     /**
-     * Testin reader and writer for gtopo.
+     * Testing reader and writer for gtopo.
      *
      * @throws IllegalArgumentException
      * @throws IOException
