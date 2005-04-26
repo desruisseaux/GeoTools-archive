@@ -55,7 +55,6 @@
       <version>1.3</version>
       <url>http://java.sun.com/products/java-media/3D/</url>
     </dependency>
-    <dependency>
   </dependencies>
   <build>
     <unitTest>
