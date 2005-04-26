@@ -449,7 +449,7 @@ public class GTopo30Writer implements GridCoverageWriter {
 
         if (!(dest instanceof File)) {
             ((ZipOutputStream) dest).closeEntry();
-            ((ZipOutputStream) dest).close();
+       
         }
 
         out.flush();
