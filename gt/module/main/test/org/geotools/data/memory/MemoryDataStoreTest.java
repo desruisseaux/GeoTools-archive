@@ -356,7 +356,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertEquals(roadFeatures.length, count(reader));
 
         reader = data.getFeatureReader(new DefaultQuery( "road", rd1Filter ), t);
-        assertTrue(reader instanceof DiffFeatureReader);
+        //assertTrue(reader instanceof DiffFeatureReader);//Currently wrapped by a filtering feature reader
         assertEquals(type, reader.getFeatureType());
         assertEquals(1, count(reader));
 
