@@ -137,7 +137,7 @@ public class WorldImageWriterTest extends TestCase {
 
         //remember to provide a valid name, it wil be mde unique by the helper function
         //temp
-        tempFile = File.createTempFile("temp", ".png");
+        tempFile = File.createTempFile("temp", ".gif");
         tempFile.deleteOnExit();
         assertTrue(tempFile.exists());
 
@@ -146,7 +146,7 @@ public class WorldImageWriterTest extends TestCase {
 
         //writing parameters for png
         Format writerParams = wiWriter.getFormat();
-        writerParams.getWriteParameters().parameter("Format").setValue("png");
+        writerParams.getWriteParameters().parameter("Format").setValue("gif");
 
         //writing
         wiWriter.write(coverage.geophysics(false), null);
