@@ -199,7 +199,7 @@ public class GTopo30Writer implements GridCoverageWriter {
 
         //write world file
         if (this.destination instanceof File) {
-            dest = new File(fileName + ".DEM");
+            dest = new File(fileName + ".DMW");
         }
 
         this.writeWorldFile(coverage, dest);

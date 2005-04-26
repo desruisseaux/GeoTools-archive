@@ -229,7 +229,8 @@ class GTopo30DataSource {
         try {
             header = new GT30Header(demHeaderURL);
         } catch (Exception e) {
-            throw new DataSourceException("Unexpected exception"+ e.getMessage());
+            throw new DataSourceException("Unexpected exception"
+                + e.getMessage());
         }
 
         // get information from the header
@@ -246,7 +247,8 @@ class GTopo30DataSource {
         try {
             stats = new GT30Stats(statsURL);
         } catch (Exception e) {
-            throw new DataSourceException("Unexpected exception "+e.getMessage());
+            throw new DataSourceException("Unexpected exception "
+                + e.getMessage());
         }
 
         int max = stats.getMax();
@@ -358,19 +360,26 @@ class GTopo30DataSource {
         }
 
         Category values = new Category("values", this.getColors(),
-                new NumberRange(1, 255), new NumberRange((double)min,(double) max));
-        Category nan = new Category("nodata", new Color(0, 0, 0), 0);
+                new NumberRange(1, 255), new NumberRange(min, max));
+        Category nan = new Category("nodata",
+                new Color[] { new Color(0, 0, 0, 1) }, new NumberRange(0, 0),
+                new NumberRange(-9999, -9999));
+        ; //new Category("nodata", new Color(0, 0, 0), 0);
 
+        //  GridSampleDimension band = new GridSampleDimension(new Category[] {
+        //     nan, values
+        // }, uom);
+        // band = band.geophysics(true);
         GridSampleDimension band = new GridSampleDimension(new Category[] {
-                    nan, values
+                    values.geophysics(true), nan.geophysics(true)
                 }, uom);
-        band = band.geophysics(true);
 
         //switch from -999 to NaN to keep transparency informations
         //for the gridcoverage
         BufferedImage img = new BufferedImage(band.getColorModel(),
-                getAdjustedRaster((WritableRaster) image.createSnapshot().getAsBufferedImage()
-                        .getData()), false, null); // properties????
+                (WritableRaster) this.getAdjustedRaster(
+                    (WritableRaster) image.createSnapshot().getAsBufferedImage()
+                                          .getData()), false, null); // properties????
 
         //setting metadata
         Map metadata = new HashMap();
@@ -401,34 +410,37 @@ class GTopo30DataSource {
     }
 
     /**
-	 * @param raster
-	 * @return
-	 */
-	private WritableRaster getAdjustedRaster(WritableRaster raster) {
-		return raster;/*
-		int W=raster.getWidth();
-		int H=raster.getHeight();
-		WritableRaster returnedRaster= javax.media.jai.RasterFactory.createBandedRaster(
-				DataBuffer.TYPE_FLOAT,
-				W,
-				H,
-				raster.getNumBands(),//1
-				null);
-		int sample=0;
-		for(int i=0;i<H;i++)
-			for(int j=0;j<W;j++)
-			{
-				sample=raster.getSample(j,i,0);
-				if(sample==-9999)
-					returnedRaster.setSample(j,i,0,Float.NaN);
-				else
-					returnedRaster.setSample(j,i,0,(float)sample);
-			}
-		raster=null;
-		return returnedRaster;*/
-	}
+     * DOCUMENT ME!
+     *
+     * @param raster
+     *
+     * @return
+     */
+    private WritableRaster getAdjustedRaster(WritableRaster raster) {
+        return raster; /*
+           int W=raster.getWidth();
+           int H=raster.getHeight();
+           WritableRaster returnedRaster= javax.media.jai.RasterFactory.createBandedRaster(
+                           DataBuffer.TYPE_FLOAT,
+                           W,
+                           H,
+                           raster.getNumBands(),//1
+                           null);
+           int sample=0;
+           for(int i=0;i<H;i++)
+                   for(int j=0;j<W;j++)
+                   {
+                           sample=raster.getSample(j,i,0);
+                           if(sample==-9999)
+                                   returnedRaster.setSample(j,i,0,Float.NaN);
+                           else
+                                   returnedRaster.setSample(j,i,0,(float)sample);
+                   }
+           raster=null;//free initial raster
+           return returnedRaster;*/
+    }
 
-	/**
+    /**
      * Convenience method to wrap a GridCoverage in a feature for inclusion in
      * a FeatureCollection
      *
