@@ -590,8 +590,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
             //DJB: This geometry check was commented out.  I think it should actually be back in or
             //     you get ALL the attributes back, which isnt what you want.
-            if (attTypes[i].isGeometry() && !atts.contains(attName)) {
-           // if (!atts.contains(attName)) {
+	    //ALX: For rasters I need even the "grid" attribute.
+            if ((attTypes[i].isGeometry() || attTypes[i].getName().equalsIgnoreCase("grid")) && !atts.contains(attName)) {
                 atts.add(attName);
                 LOGGER.fine("added attribute " + attName);
             }
