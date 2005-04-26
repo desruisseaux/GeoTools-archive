@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002,2004 Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,24 +16,23 @@
  */
 package org.geotools.gce.arcgrid;
 
-import javax.media.jai.RasterFactory;
-
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-
 import java.net.URL;
+import javax.media.jai.RasterFactory;
+
 
 /**
  * ArcGridRaster sub-instance that handles the "ArcGrid" format that GRASS
  * outputs (a variation of the original format...)
  *
  * @author aaime
- * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
+ *         (simboss)</a>
  */
 public class GRASSArcGridRaster extends ArcGridRaster {
     /** Column number tag in the header file */
@@ -62,8 +61,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public GRASSArcGridRaster(URL srcURL)
-        throws IOException {
+    public GRASSArcGridRaster(URL srcURL) throws IOException {
         super(srcURL);
     }
 
@@ -72,13 +70,11 @@ public class GRASSArcGridRaster extends ArcGridRaster {
         super(reader, compress);
     }
 
-    public GRASSArcGridRaster(PrintWriter writer)
-        throws IOException {
+    public GRASSArcGridRaster(PrintWriter writer) throws IOException {
         super(writer);
     }
 
-    protected void parseHeader(StreamTokenizer st)
-        throws IOException {
+    protected void parseHeader(StreamTokenizer st) throws IOException {
         // make sure tokenizer is set up right
         st.resetSyntax();
         st.eolIsSignificant(true);
@@ -112,23 +108,17 @@ public class GRASSArcGridRaster extends ArcGridRaster {
 
                 if (COLS.equalsIgnoreCase(key)) {
                     nCols = (int) val;
-                }
-                else if (ROWS.equalsIgnoreCase(key)) {
+                } else if (ROWS.equalsIgnoreCase(key)) {
                     nRows = (int) val;
-                }
-                else if (NORTH.equalsIgnoreCase(key)) {
+                } else if (NORTH.equalsIgnoreCase(key)) {
                     north = readHeaderDouble(st);
-                }
-                else if (SOUTH.equalsIgnoreCase(key)) {
+                } else if (SOUTH.equalsIgnoreCase(key)) {
                     south = readHeaderDouble(st);
-                }
-                else if (EAST.equalsIgnoreCase(key)) {
+                } else if (EAST.equalsIgnoreCase(key)) {
                     east = readHeaderDouble(st);
-                }
-                else if (WEST.equalsIgnoreCase(key)) {
+                } else if (WEST.equalsIgnoreCase(key)) {
                     west = readHeaderDouble(st);
-                }
-                else {
+                } else {
                     // ignore extra fields for now
                     // are there ever any?
                 }
@@ -136,8 +126,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
                 if (st.nextToken() != StreamTokenizer.TT_EOL) {
                     throw new IOException("Expected new line, not " + st.sval);
                 }
-            }
-            else {
+            } else {
                 throw new IOException("Exected word token");
             }
         }
@@ -156,8 +145,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public WritableRaster readRaster()
-        throws IOException {
+    public WritableRaster readRaster() throws IOException {
         // open reader and make tokenizer
         Reader reader = openReader();
         StreamTokenizer st = new StreamTokenizer(reader);
@@ -242,8 +230,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
                 st.nextToken();
 
                 return Double.NaN;
-            }
-            else {
+            } else {
                 throw new IOException("Unknown token " + st.ttype);
             }
         }
@@ -294,8 +281,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
      * @throws IOException DOCUMENT ME!
      */
     public void writeRaster(Raster raster, double xl, double yl,
-        double cellsize, boolean compress)
-        throws IOException {
+        double cellsize, boolean compress) throws IOException {
         // open writer
         PrintWriter out = openWriter(compress);
 
@@ -338,8 +324,7 @@ public class GRASSArcGridRaster extends ArcGridRaster {
                 // no data masking
                 if (Double.isNaN(v)) {
                     buffer.append(NO_DATA_MARKER);
-                }
-                else {
+                } else {
                     buffer.append(v);
                 }
 

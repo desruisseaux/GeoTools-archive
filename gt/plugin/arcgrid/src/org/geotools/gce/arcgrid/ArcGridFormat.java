@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, 2004 Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -33,18 +33,19 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.HashMap;
 
-/**A simple implementation of the Arc Grid Format.
+
+/**
+ * A simple implementation of the Arc Grid Format.
  *
- *
- *  @author jeichar
- *  @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini (simboss)</a>
+ * @author jeichar
+ * @author <a href="mailto:simboss_ml@tiscali.it">Simone Giannecchini
+ *         (simboss)</a>
  */
 public class ArcGridFormat extends AbstractGridFormat implements Format {
-
     public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //calss of the object we will pass
             null, //list of valid values not provided
-            getDefaultCRS()//default value
+            getDefaultCRS() //default value
         );
 
     /** Indicates whether the arcgrid data is compressed with GZIP */
@@ -56,16 +57,15 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
     public static final ParameterDescriptor GRASS = new ParameterDescriptor("GRASS",
             "Indicates whether arcgrid is in GRASS format", Boolean.FALSE, true);
 
-    /**Creates an instance and sets the metadata.
-     *
+    /**
+     * Creates an instance and sets the metadata.
      */
     public ArcGridFormat() {
         setInfo();
     }
 
-    /**Sets the metadata information.
-     *
-     *
+    /**
+     * Sets the metadata information.
      */
     private void setInfo() {
         HashMap info = new HashMap();
@@ -88,21 +88,24 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object source)
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object
+     *      source)
      */
     public GridCoverageReader getReader(Object source) {
         return new ArcGridReader(source);
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object destination)
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object
+     *      destination)
      */
     public GridCoverageWriter getWriter(Object destination) {
         return new ArcGridWriter(destination);
     }
 
     /**
-     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object input)
+     * @see org.geotools.data.coverage.grid.AbstractGridFormat#accepts(Object
+     *      input)
      */
     public boolean accepts(Object input) {
         boolean compress = false;
@@ -115,16 +118,13 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 
         if (input instanceof String) {
             pathname = (new File((String) input)).getName();
-        }
-        else if (input instanceof File) {
+        } else if (input instanceof File) {
             pathname = ((File) input).getName();
-        }
-        else if (input instanceof URL) {
+        } else if (input instanceof URL) {
             URL url = (URL) input;
 
             pathname = url.getFile();
-        }
-        else { //not acceptable!
+        } else { //not acceptable!
 
             return false;
         }
@@ -135,12 +135,10 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 
             //it is compressed
             compress = true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             //if I get here I hope it is not compressed
             compress = false;
-        }
-        finally {
+        } finally {
             fakeReader = null;
         }
 
@@ -150,8 +148,7 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
                 if (i < 2) {
                     if (compress) {
                         fakeReader = mExchange.getGZIPReader(input);
-                    }
-                    else {
+                    } else {
                         fakeReader = mExchange.getReader(input);
                     }
                 }
@@ -184,8 +181,7 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
                 default:
                     return false;
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 fakeReader = null;
             }
         }
@@ -241,6 +237,4 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
     public ParameterValueGroup getWriteParameters() {
         return writeParameters;
     }
-
-
 }
