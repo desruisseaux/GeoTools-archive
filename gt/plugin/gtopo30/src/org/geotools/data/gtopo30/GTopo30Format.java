@@ -26,6 +26,8 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -82,7 +84,7 @@ public class GTopo30Format extends AbstractGridFormat implements Format {
             if ((this.input != null) && this.input.equals(source)) {
                 return new GTopo30Reader(this.source);
             } else {
-                new GTopo30Reader(source);
+                return new GTopo30Reader(source);
             }
         } catch (Exception e) {
         }
