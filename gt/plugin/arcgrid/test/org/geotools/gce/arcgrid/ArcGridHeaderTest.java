@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * ArcGridHeader.java
  * JUnit based test
  *
@@ -7,10 +23,12 @@
 package org.geotools.gce.arcgrid;
 
 import org.geotools.resources.TestData;
-
 import java.net.URL;
 
+
 /**
+ * DOCUMENT ME!
+ *
  * @author Christiaan ten Klooster
  */
 public class ArcGridHeaderTest extends TestCaseSupport {
@@ -22,8 +40,7 @@ public class ArcGridHeaderTest extends TestCaseSupport {
         junit.textui.TestRunner.run(suite(ArcGridHeaderTest.class));
     }
 
-    public void testHeaderSource()
-        throws Exception {
+    public void testHeaderSource() throws Exception {
         URL url = TestData.getResource(this, "ArcGrid.asc");
         ArcGridRaster header = new ArcGridRaster(url);
 

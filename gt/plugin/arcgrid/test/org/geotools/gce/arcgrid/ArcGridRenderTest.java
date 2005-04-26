@@ -22,15 +22,11 @@
  */
 package org.geotools.gce.arcgrid;
 
-
 import org.geotools.data.DataSourceException;
 import org.geotools.filter.Filter;
-
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-
-
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.RasterSymbolizer;
@@ -38,7 +34,6 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
-
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -96,74 +91,68 @@ public class ArcGridRenderTest extends TestCaseSupport {
 
     public void testRenderImage() throws Exception {
         //declare a raster
+
         /*WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
-                100, 150, 1, null);
-
-        //fill it
-        for (int i = 0; i < (raster.getHeight() - 10); i++)
-            for (int j = 0; j < (raster.getHeight() - 10); j++)
-                if ((i <= 20) && (i >= 10)) {
-                    raster.setSample(j, i, 0, (float) -9999.0);
-                } else {
-                    raster.setSample(j, i, 0, (float) (Math.random() * 10));
-                }
-
-        raster.setSample(0, 0, 0, (float) 10.0);
-
-        //use the raster to show a gridcoverage
-        Unit uom = null; //at this moment we have no info about the UoM
-
-        //try {
-        //    uom = unitFormat.parseUnit(UoM);
-        //} catch (ParseException ex1) {
-        //    uom = null;
-        //}
-        //IT WILL BECOME GRAYSCALE FOR THE MOMENT
-        Category values;
-
-        //try {
-        //    uom = unitFormat.parseUnit(UoM);
-        //} catch (ParseException ex1) {
-        //    uom = null;
-        //}
-        //IT WILL BECOME GRAYSCALE FOR THE MOMENT
-        Category nan;
-        values = new Category("values",
-                new Color[] { Color.BLUE, Color.GREEN, Color.RED },
-                new NumberRange(1, 255),new NumberRange(0.0f, 10.0f));
-        nan = new Category("nodata", new Color[]{new Color(0, 0, 0, 0)}, 
-        		new NumberRange(0, 0),
-        		new NumberRange(-9999.0f, -9999.0f));
-        GridSampleDimension band = new GridSampleDimension(new Category[] {
-                    nan, values},
-					uom);
-        band = band.geophysics(true);
-
-        BufferedImage image = new BufferedImage(band.getColorModel(), raster,
-                false, null); //properties????
-        GridCoverage2D gc = new GridCoverage2D("ArcGrid", //TODO SET THE NAME!!!
-                image, GeographicCRS.WGS84,
-                new GeneralEnvelope(new double[] { 0.0, 0.0 },
-                    new double[] { 10.0, 10.0 }),
-                new GridSampleDimension[] { band }, null, null);
+           100, 150, 1, null);
+           //fill it
+           for (int i = 0; i < (raster.getHeight() - 10); i++)
+               for (int j = 0; j < (raster.getHeight() - 10); j++)
+                   if ((i <= 20) && (i >= 10)) {
+                       raster.setSample(j, i, 0, (float) -9999.0);
+                   } else {
+                       raster.setSample(j, i, 0, (float) (Math.random() * 10));
+                   }
+           raster.setSample(0, 0, 0, (float) 10.0);
+           //use the raster to show a gridcoverage
+           Unit uom = null; //at this moment we have no info about the UoM
+           //try {
+           //    uom = unitFormat.parseUnit(UoM);
+           //} catch (ParseException ex1) {
+           //    uom = null;
+           //}
+           //IT WILL BECOME GRAYSCALE FOR THE MOMENT
+           Category values;
+           //try {
+           //    uom = unitFormat.parseUnit(UoM);
+           //} catch (ParseException ex1) {
+           //    uom = null;
+           //}
+           //IT WILL BECOME GRAYSCALE FOR THE MOMENT
+           Category nan;
+           values = new Category("values",
+                   new Color[] { Color.BLUE, Color.GREEN, Color.RED },
+                   new NumberRange(1, 255),new NumberRange(0.0f, 10.0f));
+           nan = new Category("nodata", new Color[]{new Color(0, 0, 0, 0)},
+                           new NumberRange(0, 0),
+                           new NumberRange(-9999.0f, -9999.0f));
+           GridSampleDimension band = new GridSampleDimension(new Category[] {
+                       nan, values},
+                                           uom);
+           band = band.geophysics(true);
+           BufferedImage image = new BufferedImage(band.getColorModel(), raster,
+                   false, null); //properties????
+           GridCoverage2D gc = new GridCoverage2D("ArcGrid", //TODO SET THE NAME!!!
+                   image, GeographicCRS.WGS84,
+                   new GeneralEnvelope(new double[] { 0.0, 0.0 },
+                       new double[] { 10.0, 10.0 }),
+                   new GridSampleDimension[] { band }, null, null);
         
-        BufferedImage bufferedImage = ( (PlanarImage) gc.geophysics(false).getRenderedImage())
-        .getAsBufferedImage();
-    
-        ImageIO.write(bufferedImage,"tiff",new File("c:/a.tiff"));
+           BufferedImage bufferedImage = ( (PlanarImage) gc.geophysics(false).getRenderedImage())
+           .getAsBufferedImage();
+        
+           ImageIO.write(bufferedImage,"tiff",new File("c:/a.tiff"));
         
         
-       
         
-
-		//processor2D.print(new PrintWriter(System.out));
         
-        //visualizing it
-        bufferedImage = ( (PlanarImage) gcOp.geophysics(false).getRenderedImage())
-            .getAsBufferedImage();
+                   //processor2D.print(new PrintWriter(System.out));
         
-        ImageIO.write(bufferedImage,"tiff",new File("c:/b.tiff"));
-        //renderImage("renderedArcGrid.jpg");*/
+           //visualizing it
+           bufferedImage = ( (PlanarImage) gcOp.geophysics(false).getRenderedImage())
+               .getAsBufferedImage();
+        
+           ImageIO.write(bufferedImage,"tiff",new File("c:/b.tiff"));
+           //renderImage("renderedArcGrid.jpg");*/
     }
 
     private void renderImage(String filename)

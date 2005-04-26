@@ -1,4 +1,20 @@
 /*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+/*
  * ArcGridReadWriteTest.java
  *
  * Created on September 2, 2004, 9:26 PM
@@ -13,30 +29,31 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.ParameterValueGroup;
-
-
 import java.awt.image.Raster;
-
 import java.io.File;
-
 import java.net.URL;
+
 
 /**
  * Test reading and writing arcgrid grid coverages.
  *
- * @author  rschulz
+ * @author rschulz
  */
 public class ArcGridReadWriteTest extends TestCaseSupport {
     private Format f = null;
 
-    /** ArcGrid files (and associated parameters) to test*/
+    /** ArcGrid files (and associated parameters) to test */
     final TestParams[] params = new TestParams[] {
             new TestParams("spearfish_dem.asc.gz", true, true),
             new TestParams("ArcGrid.asc", false, false),
             new TestParams("vandem.asc.gz", true, false)
         };
 
-    /** Creates a new instance of ArcGridReadWriteTest */
+    /**
+     * Creates a new instance of ArcGridReadWriteTest
+     *
+     * @param name DOCUMENT ME!
+     */
     public ArcGridReadWriteTest(String name) {
         super(name);
     }
@@ -51,8 +68,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         for (int i = 0; i < params.length; i++) {
             try {
                 test(params[i]);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 errors.append("\nFile " + params[i].fileName + " : "
                     + e.getMessage());
@@ -64,16 +80,14 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         }
     }
 
-    void test(TestParams testParam)
-        throws Exception {
+    void test(TestParams testParam) throws Exception {
         //create a temporary output file
         //temporary file to use
         File tmpFile = null;
 
         if (testParam.compressed) {
             tmpFile = File.createTempFile("temp", ".gz");
-        }
-        else {
+        } else {
             tmpFile = File.createTempFile("temp", ".asc");
         }
 
@@ -155,26 +169,30 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
     /**
      * Compares 2 grid covareages, throws an exception if they are not the
      * same.
+     *
+     * @param gc1 DOCUMENT ME!
+     * @param gc2 DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
      */
-    void compare(GridCoverage gc1, GridCoverage gc2)
-        throws Exception {
+    void compare(GridCoverage gc1, GridCoverage gc2) throws Exception {
         GeneralEnvelope e1 = (GeneralEnvelope) gc1.getEnvelope();
         GeneralEnvelope e2 = (GeneralEnvelope) gc2.getEnvelope();
 
         if ((e1.getLowerCorner().getOrdinate(0) != e1.getLowerCorner()
-                                                     .getOrdinate(0))
-            || (e1.getLowerCorner().getOrdinate(1) != e1.getLowerCorner()
-                                                        .getOrdinate(1))
-            || (e1.getUpperCorner().getOrdinate(0) != e1.getUpperCorner()
-                                                        .getOrdinate(0))
-            || (e1.getUpperCorner().getOrdinate(1) != e1.getUpperCorner()
-                                                        .getOrdinate(1))) {
+                                                         .getOrdinate(0))
+                || (e1.getLowerCorner().getOrdinate(1) != e1.getLowerCorner()
+                                                                .getOrdinate(1))
+                || (e1.getUpperCorner().getOrdinate(0) != e1.getUpperCorner()
+                                                                .getOrdinate(0))
+                || (e1.getUpperCorner().getOrdinate(1) != e1.getUpperCorner()
+                                                                .getOrdinate(1))) {
             throw new Exception("GridCoverage Envelopes are not equal"
                 + e1.toString() + e2.toString());
         }
 
         if (e1.getCoordinateReferenceSystem().toWKT().compareToIgnoreCase(e2.getCoordinateReferenceSystem()
-                                                                            .toWKT()) != 0) {
+                                                                                .toWKT()) != 0) {
             throw new Exception("GridCoverage Envelopes are not equal"
                 + e1.getCoordinateReferenceSystem().toWKT()
                 + e2.getCoordinateReferenceSystem().toWKT());
@@ -192,7 +210,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
 
                 for (int k = 0; k < values1.length; k++) {
                     if (!(Double.isNaN(values1[k]) && Double.isNaN(values2[k]))
-                        && (values1[k] != values2[k])) {
+                            && (values1[k] != values2[k])) {
                         throw new Exception(
                             "GridCoverage Values are not equal: " + values1[k]
                             + ", " + values2[k]);
@@ -202,8 +220,7 @@ public class ArcGridReadWriteTest extends TestCaseSupport {
         }
     }
 
-    public static final void main(String[] args)
-        throws Exception {
+    public static final void main(String[] args) throws Exception {
         junit.textui.TestRunner.run(suite(ArcGridReadWriteTest.class));
     }
 }
