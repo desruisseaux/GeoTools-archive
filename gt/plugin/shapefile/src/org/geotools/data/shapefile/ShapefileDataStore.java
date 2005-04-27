@@ -287,7 +287,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      *
      * @throws IOException DOCUMENT ME!
      */
-    private ReadableByteChannel getReadChannel(URL url)
+    protected ReadableByteChannel getReadChannel(URL url)
     throws IOException {
         ReadableByteChannel channel = null;
 

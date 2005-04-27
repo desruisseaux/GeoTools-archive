@@ -92,7 +92,7 @@ public class ShapefileReader {
   private ShapeHandler handler;
   private ShapefileHeader header;
   private ReadableByteChannel channel;
-  private ByteBuffer buffer;
+  ByteBuffer buffer;
   private ShapeType fileShapeType = ShapeType.UNDEFINED;
   private ByteBuffer headerTransfer;
   private final Record record = new Record();
@@ -142,7 +142,7 @@ public class ShapefileReader {
   // ensure the capacity of the buffer is of size by doubling the original
   // capacity until it is big enough
   // this may be naiive and result in out of MemoryError as implemented...
-  private ByteBuffer ensureCapacity(ByteBuffer buffer,int size) {
+  public static ByteBuffer ensureCapacity(ByteBuffer buffer,int size) {
     // This sucks if you accidentally pass is a MemoryMappedBuffer of size 80M
     // like I did while messing around, within moments I had 1 gig of swap...
     if (buffer.isReadOnly()) {
@@ -165,7 +165,7 @@ public class ShapefileReader {
   }
   
   // for filling a ReadableByteChannel
-  private static int fill(ByteBuffer buffer,ReadableByteChannel channel) throws IOException {
+  public static int fill(ByteBuffer buffer,ReadableByteChannel channel) throws IOException {
     int r = buffer.remaining();
     // channel reads return -1 when EOF or other error
     // because they a non-blocking reads, 0 is a valid return value!!
@@ -287,7 +287,7 @@ public class ShapefileReader {
         bounds[i] = buffer.getDouble();
       }
     } 
-    else if (recordType != recordType.NULL) {
+    else if (recordType != ShapeType.NULL) {
       bounds[0] = bounds[1] = buffer.getDouble();
       bounds[2] = bounds[3] = buffer.getDouble();
     }
@@ -373,7 +373,7 @@ public class ShapefileReader {
       record.maxX = buffer.getDouble();
       record.maxY = buffer.getDouble();
     } 
-    else if (recordType != recordType.NULL) {
+    else if (recordType != ShapeType.NULL) {
       record.minX = record.maxX = buffer.getDouble();
       record.minY = record.minY = buffer.getDouble();
     }
