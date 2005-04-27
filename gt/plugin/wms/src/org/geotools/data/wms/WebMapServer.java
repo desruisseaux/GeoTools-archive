@@ -561,6 +561,14 @@ public class WebMapServer implements Discovery {
                 //TODO HACK 3005 and 42102 are close enough
                 if (epsgCode.equals("EPSG:3005") && tempBBox == null) {
                     tempBBox = (BoundingBox) parentLayer.getBoundingBoxes().get("EPSG:42102");
+                    try {
+                        new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
+                                new double[] { tempBBox.getMaxX(), tempBBox.getMaxY() });
+                    } catch (IllegalArgumentException e) {
+                        //TODO LOG here
+                        //log("Layer "+layer.getName()+" has invalid bbox declared: "+tempBbox.toString());
+                        tempBBox = null;
+                    }
                 }
                 parentLayer = parentLayer.getParent();
             }
@@ -576,7 +584,15 @@ public class WebMapServer implements Discovery {
                 while (latLonBBox == null && parentLayer != null) {
                     latLonBBox = parentLayer.getLatLonBoundingBox();
                     if (latLonBBox != null) {
-                        break;
+                        try {
+                            new GeneralEnvelope(new double[] {latLonBBox.getMinX(), latLonBBox.getMinY()}, 
+                                    new double[] { latLonBBox.getMaxX(), latLonBBox.getMaxY() });
+                            break;
+                        } catch (IllegalArgumentException e) {
+                            //TODO LOG here
+                            //log("Layer "+layer.getName()+" has invalid bbox declared: "+tempBbox.toString());
+                            latLonBBox = null;
+                        }
                     }
                     parentLayer = layer.getParent();
                 }
