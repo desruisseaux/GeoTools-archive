@@ -54,7 +54,7 @@ public class ArcGridReader implements GridCoverageReader {
     private Reader mReader;
 
     /** Format of the source to read from. */
-    private Format format = null;
+    private Format format = new ArcGridFormat();
     private IOExchange mExchange = IOExchange.getIOExchange();
 
     /** Default color ramp */
