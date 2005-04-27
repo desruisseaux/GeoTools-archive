@@ -17,6 +17,8 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.geotools.filter.Filter;
@@ -60,7 +62,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public abstract class AbstractFeatureSource implements FeatureSource {
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
-
+    
     /**
      * Retrieve the Transaction this FeatureSource is opperating against.
      *
@@ -73,7 +75,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
     public Transaction getTransaction() {
         return Transaction.AUTO_COMMIT;
     }
-
+    
     /**
      * Provides an interface to for the Resutls of a Query.
      *
@@ -90,7 +92,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
     public FeatureResults getFeatures(Query query) {
         return new DefaultFeatureResults(this, query);
     }
-
+    
     /**
      * Retrieve all Feature matching the Filter.
      *
@@ -103,7 +105,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
     public FeatureResults getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
-
+    
     /**
      * Retrieve all Features.
      *
@@ -114,7 +116,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
     public FeatureResults getFeatures() throws IOException {
         return getFeatures(Filter.NONE);
     }
-
+    
     /**
      * Retrieve Bounds of all Features.
      *
@@ -132,9 +134,9 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      */
     public Envelope getBounds() throws IOException {
 //        return getBounds(Query.ALL); // DZ should this not return just the bounds for this type?
-    	return getBounds(getSchema()==null?Query.ALL:new DefaultQuery(getSchema().getTypeName()));
+        return getBounds(getSchema()==null?Query.ALL:new DefaultQuery(getSchema().getTypeName()));
     }
-
+    
     /**
      * Retrieve Bounds of Query results.
      *
@@ -156,9 +158,9 @@ public abstract class AbstractFeatureSource implements FeatureSource {
         if (query.getFilter() == Filter.ALL) {
             return new Envelope();
         }
-
+        
         DataStore dataStore = getDataStore();
-
+        
         if ((dataStore == null) || !(dataStore instanceof AbstractDataStore)) {
             // too expensive
             return null;
@@ -181,18 +183,18 @@ public abstract class AbstractFeatureSource implements FeatureSource {
         String typeName = getSchema().getTypeName();
         if( query.getTypeName() == null ||
                 !query.getTypeName().equals( typeName )){
-
+            
             return new DefaultQuery(
                     typeName,
                     query.getFilter(),
                     query.getMaxFeatures(),
                     query.getPropertyNames(),
                     query.getHandle()
-            );
+                    );
         }
         return query;
     }
-
+    
     /**
      * Retrieve total number of Query results.
      *
@@ -219,7 +221,25 @@ public abstract class AbstractFeatureSource implements FeatureSource {
             return -1;
         } else {
             // ask the abstract data store
-            return ((AbstractDataStore) dataStore).getCount( namedQuery(query));
+            Transaction t = getTransaction();
+            //State state = t.getState(dataStore);
+            int delta = 0;
+            if(t != Transaction.AUTO_COMMIT){
+                Map diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
+                Iterator it = diff.keySet().iterator();
+                
+                while(it.hasNext()){
+                    Object fid = it.next();
+                    if(fid.toString().startsWith("new")){
+                        delta++;
+                    } else{
+                        if(diff.get(fid)==null){
+                            delta--;
+                        }
+                    }
+                }
+            }
+            return ((AbstractDataStore) dataStore).getCount( namedQuery(query))+delta;
         }
     }
 }
