@@ -20,7 +20,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -199,7 +198,7 @@ public class ShapeRenderer {
 
 			ShapefileDataStore ds = ((ShapefileDataStore) currLayer
 					.getFeatureSource().getDataStore());
-			ReadableByteChannel channel=ShapefileUtil.getShpReadChannel(ds);
+			ShapefileReader shpreader = ShapefileUtil.getShpReader(ds);
 
 			while (true) {
 				try {
