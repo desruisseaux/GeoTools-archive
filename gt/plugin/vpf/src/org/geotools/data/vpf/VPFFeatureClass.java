@@ -446,8 +446,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
      */
     public Feature create(Object[] attributes) throws IllegalAttributeException {
         // Fixes GEOT-497
-        // Note that in VPF, the feature ID tends to be the first attribute, called "id"
-        if(attributes.length >= 0){
+        if(attributes.length > 0){
             return create(attributes, attributes[0].toString());
         }else return featureType.create(attributes);
     }
