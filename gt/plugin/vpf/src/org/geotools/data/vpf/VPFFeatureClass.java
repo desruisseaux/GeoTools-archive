@@ -158,7 +158,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
             while (iter.hasNext()) {
                 geometryColumn = (AttributeType) iter.next();
 
-                if (geometryColumn.isGeometry()) {
+                if (geometryColumn instanceof Geometry) {
                     if(geometryColumn instanceof GeometryAttributeType){
                         gat = (GeometryAttributeType)geometryColumn;
                     }else if (geometryColumn instanceof VPFColumn){
