@@ -113,16 +113,9 @@ public class VPFFeatureReader
      */
     public boolean hasNext() throws IOException {
         if (nextCalled) {
-	    Object[] values = new Object[featureType.getAttributeCount()];
-            try {
-                currentFeature = featureType.create(values);
-            } catch (IllegalAttributeException exc) {
-                // This shouldn't happen since everything should be nillable
-                exc.printStackTrace();
-            }
             while(readNext());
-	    nextCalled = false;
-	}
+    	    nextCalled = false;
+    	}
         return hasNext;
     }
 
@@ -198,15 +191,39 @@ public class VPFFeatureReader
      */ 
     private void retrieveObject(VPFFile file, Feature row) throws IOException{
         VPFFile secondFile = null;
+        VPFColumn column = null;
         Map rows = generateFileRowMap(file, row);
         AttributeType[] attributes = featureType.getFeatureClass()
                 .getAttributeTypes();
-        Object[] values = new Object[attributes.length];
+        Object[] values = new Object[featureType.getAttributeCount()];
+        Object value = null;
+        String featureId = null;
+        // Pass 1 - identify the feature identifier
         for(int inx = 0; inx < attributes.length; inx++){
-            VPFColumn column = null;
+            // I am thinking it is probably safer to look this up 
+            // by column name than by position, but if it breaks,
+            // it is easy enough to change
+            if (attributes[inx].getName().equals("id")) {
+                value = row.getAttribute(inx);
+                if(value != null) {
+                    featureId = value.toString(); 
+                }
+                break;
+            }
+        }
+        try {
+            currentFeature = featureType.create(values, featureId);
+        } catch (IllegalAttributeException exc) {
+            // This shouldn't happen since everything should be nillable
+            exc.printStackTrace();
+        }
+        
+        // Pass 2 - get the attributes, including the geometry
+        for(int inx = 0; inx < attributes.length; inx++){
             try {
                 if (attributes[inx].getName().equals(AnnotationFeatureType.ANNOTATION_ATTRIBUTE_NAME)) {
                     try{
+                        //TODO: are we sure this is the intended action? Hard-coding an attribute to "nam"?
                         currentFeature.setAttribute(inx, "nam");
                     } catch (IllegalAttributeException exc) {
                         exc.printStackTrace();
@@ -214,7 +231,7 @@ public class VPFFeatureReader
                     continue;
                 }
                 column = (VPFColumn) attributes[inx];
-                Object value = null;
+                value = null;
                 secondFile = getVPFFile(column); 
                 Feature tempRow = (Feature) rows.get(secondFile);
                 if(tempRow != null){
