@@ -23,18 +23,11 @@ package org.geotools.data.vpf;
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.io.TripletId;
 import org.geotools.data.vpf.util.DataUtils;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.LengthFunction;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -231,7 +224,7 @@ public class VPFColumn implements AttributeType, DataTypesDefinition {
      * @see org.geotools.feature.AttributeType#isGeometry()
      */
     public boolean isGeometry() {
-        return attribute.isGeometry();
+        return attribute instanceof Geometry;
     }
 
     // no longer needed

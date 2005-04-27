@@ -158,13 +158,11 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
             while (iter.hasNext()) {
                 geometryColumn = (AttributeType) iter.next();
 
-                if (geometryColumn instanceof Geometry) {
-                    if(geometryColumn instanceof GeometryAttributeType){
-                        gat = (GeometryAttributeType)geometryColumn;
-                    }else if (geometryColumn instanceof VPFColumn){
-                        gat = ((VPFColumn)geometryColumn).getGeometryAttributeType();
-                    }
-
+                if(geometryColumn instanceof GeometryAttributeType){
+                    gat = (GeometryAttributeType)geometryColumn;
+                    break;
+                }else if (geometryColumn instanceof VPFColumn){
+                    gat = ((VPFColumn)geometryColumn).getGeometryAttributeType();
                     break;
                 }
             }
@@ -181,9 +179,6 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
             //We've already searched the FCS file once successfully
             //So this should never happen
             exp.printStackTrace();
-//        } catch (SchemaException exc) {
-//            // TODO Auto-generated catch block
-//            exc.printStackTrace();
         }
     }
 
