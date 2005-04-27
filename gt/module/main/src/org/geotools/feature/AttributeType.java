@@ -18,8 +18,6 @@ package org.geotools.feature;
 
 import org.geotools.filter.Filter;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 /**
  * <p>
  * Stores metadata about a single attribute object. 
