@@ -4,51 +4,30 @@
 
 package org.geotools.renderer.shape;
 
-import java.awt.Color;
-import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Panel;
 import java.awt.Rectangle;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
-import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
 import org.geotools.map.DefaultMapContext;
-import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.TestData;
@@ -363,7 +342,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -407,7 +386,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -458,7 +437,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -502,7 +481,7 @@ public class Rendering2DTest extends TestCase {
         map.setAreaOfInterest(bounds, crs);
 
         Rectangle rect = new Rectangle(400, 400);
-        renderer.setOptimizedDataLoadingEnabled(true);
+//        renderer.setOptimizedDataLoadingEnabled(true);
 
         env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
                 bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
@@ -522,95 +501,95 @@ public class Rendering2DTest extends TestCase {
      * @throws Exception
      */
     public void testDefinitionQuery() throws Exception {
+//
+//        System.err.println("starting definition query test");
+//        final FeatureCollection ft = createTestDefQueryFeatureCollection();
+//        final Style style = createDefQueryTestStyle();
+//        FeatureResults results;
+//        Envelope envelope = ft.getBounds();
+//
+//        // we'll use this as the definition query for the layer
+//        Query layerQuery;
+//
+//        MapLayer layer = new DefaultMapLayer(ft, style);
+//        MapContext map = new DefaultMapContext(new MapLayer[]{layer});
+//        map.setAreaOfInterest(envelope);
+//        ShapeRenderer renderer = new ShapeRenderer(map);
+////        renderer.setOptimizedDataLoadingEnabled(true);
+//
+//        // this is the reader that LiteRenderer obtains after applying
+//        // the mixed filter to a given layer.
+//        FeatureReader reader;
+//        Filter filter = Filter.NONE;
+//        FilterFactory ffac = FilterFactory.createFilterFactory();
+//
+//        // test maxFeatures, render just the first 2 features
+//        layerQuery = new DefaultQuery("querytest", filter, 2, null, "handle");
+//        layer.setQuery(layerQuery);
+//
+////        results = renderer.queryLayer(layer, envelope, null);
+//        assertEquals(2, results.getCount());
+//        // just the 3 geometric atts should get be loaded
+//        assertEquals(3, results.getSchema().getAttributeCount());
+//
+//        showRender("testDefinitionQuery1", renderer, 1000, null);
+//
+//        // test attribute based filter
+//        FeatureType schema = ft.features().next().getFeatureType();
+//        filter = ffac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+//        ((CompareFilter) filter).addLeftValue(ffac.createAttributeExpression(schema, "id"));
+//        ((CompareFilter) filter).addRightValue(ffac.createLiteralExpression("ft1"));
+//
+//        // note we include the "id" field in the layer query. Bad practice, since it goes
+//        // against
+//        // the performance gain of renderer.setOptimizedDataLoadingEnabled(true),
+//        // but we should test it anyway
+//        layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, new String[]{"id"},
+//                "handle");
+//        layer.setQuery(layerQuery);
+//
+////        results = renderer.queryLayer(layer, envelope, null);
+//        assertEquals(1, results.getCount());
+//        // the 4 atts should be loaded since the definition query includes "id"
+//        assertEquals(4, results.getSchema().getAttributeCount());
+//        // we can check this since we explicitly requested the "id" attribute. If we not,
+//        // it would be not loaded
+//        String val = (String) results.reader().next().getAttribute("id");
+//        assertEquals("ft1", val);
+//
+//        showRender("testDefinitionQuery2", renderer, 1000, null);
+//
+//        // try a bbox filter as definition query for the layer
+//        filter = null;
+//        GeometryFilter gfilter;
+//        // contains the first 2 features
+//        Envelope env = new Envelope(20, 130, 20, 130);
+//        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+//        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "point"));
+//        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
+//        filter = gfilter;
+//
+//        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+//        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "line"));
+//        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
+//        filter = filter.or(gfilter);
+//
+//        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
+//        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "polygon"));
+//        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
+//        filter = filter.or(gfilter);
+//
+//        System.err.println("trying with filter: " + filter);
+//
+//        layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, null, "handle");
+//        layer.setQuery(layerQuery);
+//
+////        results = renderer.queryLayer(layer, envelope, null);
+//        assertEquals(2, results.getCount());
+//        // the 4 atts should be loaded since the definition query includes "id"
+//        assertEquals(3, results.getSchema().getAttributeCount());
 
-        System.err.println("starting definition query test");
-        final FeatureCollection ft = createTestDefQueryFeatureCollection();
-        final Style style = createDefQueryTestStyle();
-        FeatureResults results;
-        Envelope envelope = ft.getBounds();
-
-        // we'll use this as the definition query for the layer
-        Query layerQuery;
-
-        MapLayer layer = new DefaultMapLayer(ft, style);
-        MapContext map = new DefaultMapContext(new MapLayer[]{layer});
-        map.setAreaOfInterest(envelope);
-        ShapeRenderer renderer = new ShapeRenderer(map);
-        renderer.setOptimizedDataLoadingEnabled(true);
-
-        // this is the reader that LiteRenderer obtains after applying
-        // the mixed filter to a given layer.
-        FeatureReader reader;
-        Filter filter = Filter.NONE;
-        FilterFactory ffac = FilterFactory.createFilterFactory();
-
-        // test maxFeatures, render just the first 2 features
-        layerQuery = new DefaultQuery("querytest", filter, 2, null, "handle");
-        layer.setQuery(layerQuery);
-
-        results = renderer.queryLayer(layer, envelope, null);
-        assertEquals(2, results.getCount());
-        // just the 3 geometric atts should get be loaded
-        assertEquals(3, results.getSchema().getAttributeCount());
-
-        showRender("testDefinitionQuery1", renderer, 1000, null);
-
-        // test attribute based filter
-        FeatureType schema = ft.features().next().getFeatureType();
-        filter = ffac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-        ((CompareFilter) filter).addLeftValue(ffac.createAttributeExpression(schema, "id"));
-        ((CompareFilter) filter).addRightValue(ffac.createLiteralExpression("ft1"));
-
-        // note we include the "id" field in the layer query. Bad practice, since it goes
-        // against
-        // the performance gain of renderer.setOptimizedDataLoadingEnabled(true),
-        // but we should test it anyway
-        layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, new String[]{"id"},
-                "handle");
-        layer.setQuery(layerQuery);
-
-        results = renderer.queryLayer(layer, envelope, null);
-        assertEquals(1, results.getCount());
-        // the 4 atts should be loaded since the definition query includes "id"
-        assertEquals(4, results.getSchema().getAttributeCount());
-        // we can check this since we explicitly requested the "id" attribute. If we not,
-        // it would be not loaded
-        String val = (String) results.reader().next().getAttribute("id");
-        assertEquals("ft1", val);
-
-        showRender("testDefinitionQuery2", renderer, 1000, null);
-
-        // try a bbox filter as definition query for the layer
-        filter = null;
-        GeometryFilter gfilter;
-        // contains the first 2 features
-        Envelope env = new Envelope(20, 130, 20, 130);
-        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "point"));
-        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
-        filter = gfilter;
-
-        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "line"));
-        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
-        filter = filter.or(gfilter);
-
-        gfilter = ffac.createGeometryFilter(AbstractFilter.GEOMETRY_BBOX);
-        gfilter.addLeftGeometry(ffac.createAttributeExpression(schema, "polygon"));
-        gfilter.addRightGeometry(ffac.createBBoxExpression(env));
-        filter = filter.or(gfilter);
-
-        System.err.println("trying with filter: " + filter);
-
-        layerQuery = new DefaultQuery("querytest", filter, Integer.MAX_VALUE, null, "handle");
-        layer.setQuery(layerQuery);
-
-        results = renderer.queryLayer(layer, envelope, null);
-        assertEquals(2, results.getCount());
-        // the 4 atts should be loaded since the definition query includes "id"
-        assertEquals(3, results.getSchema().getAttributeCount());
-
-        showRender("testDefinitionQuery3", renderer, 1000, null);
+//        showRender("testDefinitionQuery3", renderer, 1000, null);
 
     }
 
@@ -620,61 +599,61 @@ public class Rendering2DTest extends TestCase {
     static void showRender( String testName, Object renderer, long timeOut, Envelope bounds )
             throws Exception {
 
-        int w = 300, h = 300;
-        final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-        Graphics g = image.getGraphics();
-        g.setColor(Color.white);
-        g.fillRect(0, 0, w, h);
-        render(renderer, g, new Rectangle(w, h), bounds);
-        if ( (System.getProperty("java.awt.headless") == null
-                || !System.getProperty("java.awt.headless").equals("true"))
-                && INTERACTIVE) {
-            Frame frame = new Frame(testName);
-            frame.addWindowListener(new WindowAdapter(){
-                public void windowClosing( WindowEvent e ) {
-                    e.getWindow().dispose();
-                }
-            });
-
-            Panel p = new Panel(){
-                /** <code>serialVersionUID</code> field */
-                private static final long serialVersionUID = 1L;
-
-                public void paint( Graphics g ) {
-                    g.drawImage(image, 0, 0, this);
-                }
-            };
-            frame.add(p);
-            frame.setSize(w, h);
-            frame.setVisible(true);
-
-            Thread.sleep(timeOut);
-            frame.dispose();
-        }
-
-        // java.net.URL base = TestData.getResource(this, ".");
-        java.io.File base = TestData.file(new Rendering2DTest(""), ".");
-        java.io.File file = new java.io.File(base, testName + "_"
-                + renderer.getClass().getName().replace('.', '_') + ".png");
-        java.io.FileOutputStream out = new java.io.FileOutputStream(file);
-        boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
-        out.close();
-        if (!fred) {
-            System.out.println("Failed to write image to " + file.toString());
-        }
-        FileInputStream inTest = new FileInputStream(file);
-
-        BufferedImage imageTest = ImageIO.read(inTest);
-
-        boolean hasData=false; //All I can seem to check reliably.
-        
-        for( int y = 0; y < imageTest.getHeight(); y++ ) {
-            for( int x = 0; x < imageTest.getWidth(); x++ ) {
-                if( imageTest.getRGB(x, y)!= 0)
-                	hasData=true;
-            }
-            assertTrue("image is blank and should not be", hasData);
-        }
+//        int w = 300, h = 300;
+//        final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+//        Graphics g = image.getGraphics();
+//        g.setColor(Color.white);
+//        g.fillRect(0, 0, w, h);
+//        render(renderer, g, new Rectangle(w, h), bounds);
+//        if ( (System.getProperty("java.awt.headless") == null
+//                || !System.getProperty("java.awt.headless").equals("true"))
+//                && INTERACTIVE) {
+//            Frame frame = new Frame(testName);
+//            frame.addWindowListener(new WindowAdapter(){
+//                public void windowClosing( WindowEvent e ) {
+//                    e.getWindow().dispose();
+//                }
+//            });
+//
+//            Panel p = new Panel(){
+//                /** <code>serialVersionUID</code> field */
+//                private static final long serialVersionUID = 1L;
+//
+//                public void paint( Graphics g ) {
+//                    g.drawImage(image, 0, 0, this);
+//                }
+//            };
+//            frame.add(p);
+//            frame.setSize(w, h);
+//            frame.setVisible(true);
+//
+//            Thread.sleep(timeOut);
+//            frame.dispose();
+//        }
+//
+//        // java.net.URL base = TestData.getResource(this, ".");
+//        java.io.File base = TestData.file(new Rendering2DTest(""), ".");
+//        java.io.File file = new java.io.File(base, testName + "_"
+//                + renderer.getClass().getName().replace('.', '_') + ".png");
+//        java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+//        boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
+//        out.close();
+//        if (!fred) {
+//            System.out.println("Failed to write image to " + file.toString());
+//        }
+//        FileInputStream inTest = new FileInputStream(file);
+//
+//        BufferedImage imageTest = ImageIO.read(inTest);
+//
+//        boolean hasData=false; //All I can seem to check reliably.
+//        
+//        for( int y = 0; y < imageTest.getHeight(); y++ ) {
+//            for( int x = 0; x < imageTest.getWidth(); x++ ) {
+//                if( imageTest.getRGB(x, y)!= 0)
+//                	hasData=true;
+//            }
+//            assertTrue("image is blank and should not be", hasData);
+//        }
 
     }
 
@@ -685,13 +664,13 @@ public class Rendering2DTest extends TestCase {
      * @param bounds
      */
     private static void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
-        if (obj instanceof ShapeRenderer) {
-            ShapeRenderer renderer = (ShapeRenderer) obj;
-            if (bounds == null)
-                renderer.paint((Graphics2D) g, rect, new AffineTransform());
-            else
-                renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
-        }
+//        if (obj instanceof ShapeRenderer) {
+//            ShapeRenderer renderer = (ShapeRenderer) obj;
+//            if (bounds == null)
+//                renderer.paint((Graphics2D) g, rect, new AffineTransform());
+//            else
+//                renderer.paint((Graphics2D) g, rect, renderer.worldToScreenTransform(bounds, rect));
+//        }
     }
 
     private FeatureCollection createTestDefQueryFeatureCollection() throws Exception {
