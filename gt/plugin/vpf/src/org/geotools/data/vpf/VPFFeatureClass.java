@@ -446,7 +446,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
      */
     public Feature create(Object[] attributes) throws IllegalAttributeException {
         // Fixes GEOT-497
-        if(attributes.length > 0){
+        if((attributes.length > 0) && (attributes[0] != null)){
             return create(attributes, attributes[0].toString());
         }else return featureType.create(attributes);
     }
