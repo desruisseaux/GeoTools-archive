@@ -207,6 +207,7 @@ public class DefaultFeature implements SimpleFeature, Cloneable {
         AttributeType type = schema.getAttributeType(position);
 
         try {
+            if ((val == null) && !type.isNillable()) val = type.createDefaultValue(); 
             Object parsed = type.parse(val);
             type.validate(parsed);
             setAttributeValue(position, parsed);
