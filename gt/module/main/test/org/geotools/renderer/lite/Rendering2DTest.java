@@ -621,7 +621,7 @@ public class Rendering2DTest extends TestCase {
             throws Exception {
 
         int w = 300, h = 300;
-        final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics g = image.getGraphics();
         g.setColor(Color.white);
         g.fillRect(0, 0, w, h);
@@ -652,29 +652,17 @@ public class Rendering2DTest extends TestCase {
             frame.dispose();
         }
 
-        // java.net.URL base = TestData.getResource(this, ".");
-        java.io.File base = TestData.file(new Rendering2DTest(""), ".");
-        java.io.File file = new java.io.File(base, testName + "_"
-                + renderer.getClass().getName().replace('.', '_') + ".png");
-        java.io.FileOutputStream out = new java.io.FileOutputStream(file);
-        boolean fred = javax.imageio.ImageIO.write(image, "PNG", out);
-        out.close();
-        if (!fred) {
-            System.out.println("Failed to write image to " + file.toString());
-        }
-        FileInputStream inTest = new FileInputStream(file);
-
-        BufferedImage imageTest = ImageIO.read(inTest);
-
         boolean hasData=false; //All I can seem to check reliably.
-        
-        for( int y = 0; y < imageTest.getHeight(); y++ ) {
-            for( int x = 0; x < imageTest.getWidth(); x++ ) {
-                if( imageTest.getRGB(x, y)!= 0)
-                	hasData=true;
+
+        for( int y=0; y<h;y++ ){
+            for( int x=0; x<w;x++ ){
+            	if( image.getRGB(x,y)!=-1 ){
+            		hasData=true;
+            	}
             }
-            assertTrue("image is blank and should not be", hasData);
         }
+        assertTrue("image is blank and should not be", hasData);
+
 
     }
 
