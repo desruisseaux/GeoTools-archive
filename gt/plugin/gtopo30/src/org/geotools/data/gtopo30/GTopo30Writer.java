@@ -41,6 +41,7 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStreamImpl;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
@@ -441,7 +442,7 @@ public class GTopo30Writer implements GridCoverageWriter {
                     .toString() + ".SRC");
             outZ.putNextEntry(e);
 
-            out = new MemoryCacheImageOutputStream(outZ);
+            out = new FileCacheImageOutputStream(outZ,null);
         }
 
         out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
@@ -480,7 +481,7 @@ public class GTopo30Writer implements GridCoverageWriter {
                     .toString() + ".GIF");
             outZ.putNextEntry(e);
 
-            out = new MemoryCacheImageOutputStream(outZ);        	
+            out = new FileCacheImageOutputStream(outZ,null);       	
         }
         ImageIO.write(gc.geophysics(false).getRenderedImage(),"GIF",out);
         if (file instanceof File) {
@@ -690,7 +691,7 @@ public class GTopo30Writer implements GridCoverageWriter {
                     .toString() + ".DEM");
             outZ.putNextEntry(e);
 
-            out = new MemoryCacheImageOutputStream(outZ);
+            out = new FileCacheImageOutputStream(outZ,null);
         }
 
         out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
@@ -701,6 +702,7 @@ public class GTopo30Writer implements GridCoverageWriter {
             out.close();
         } else {
             ((ZipOutputStream) dest).closeEntry();
+            
         }
     }
 
