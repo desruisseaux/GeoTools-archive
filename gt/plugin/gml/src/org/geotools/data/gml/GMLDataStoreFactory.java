@@ -107,7 +107,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
         }
     }
     public boolean testURL( URL f ) throws IOException {
-        if( f.getProtocol() == "file"){        
+        if("file".equals(f.getProtocol())){        
             if(f.getFile().toUpperCase().endsWith(".XML")){
                 return true;
             }
@@ -116,7 +116,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
             }
             throw new IOException("*.xml or *.gml file required");
         }
-        if( f.getProtocol() == "http"){
+        if("http".equals(f.getProtocol())){
             URLConnection conn = f.openConnection();
             if( "text/xml".equals( conn.getContentType() )){
                 return true;
