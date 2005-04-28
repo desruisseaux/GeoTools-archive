@@ -51,8 +51,8 @@ public interface GeometryAttributeType extends AttributeType, PrimativeAttribute
     /**
      * Retrieve the CS_CoordinateSystem used by this GeometryAttributeType.
      * <p>
-     * The class CoordinateSystem holds a GeometryFactory that is used for
-     * creating new content. By extension this includes the SRID,
+     * OUT OF DATE: The class CoordinateSystem holds a GeometryFactory
+     * that is used for creating new content. By extension this includes the SRID,
      * PercisionModel and CoordinateSequenceFactory information.
      * </p>
      * 
@@ -62,9 +62,18 @@ public interface GeometryAttributeType extends AttributeType, PrimativeAttribute
     
     /**
      * The Geometryfactory used for creating new content.
+     * <p>
+     * Replace with the following code:<pre><code>
+     * Map hints = new HashMap();
+     * hints.put( CoordinateReferneceSystem.class, type.getCoordinateSystem() ); 
+     * GeometryFactory gf = FactoryFinder.getGeometryFactory( Map hints );
+     * 
+     * // You can now use gf create methods
+     * </code></pre>
      * 
      * @return GeometryFactory used for new Content
+     * @deprecated Please use GeometrFactory associated with your FeatureFactory
+     * using the hinting system.
      */
-    public GeometryFactory getGeometryFactory();    
-
+    public GeometryFactory getGeometryFactory();        
 }
