@@ -24,6 +24,8 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.spatialschema.geometry.Envelope;
+
+import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedWriter;
@@ -440,7 +442,6 @@ public class GTopo30Writer implements GridCoverageWriter {
             outZ.putNextEntry(e);
 
             out = new MemoryCacheImageOutputStream(outZ);
-            out.flush();
         }
 
         out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
@@ -486,6 +487,7 @@ public class GTopo30Writer implements GridCoverageWriter {
             out.close();
         } else {
             ((ZipOutputStream) file).closeEntry();
+   
         }    
       
     }
@@ -531,28 +533,23 @@ public class GTopo30Writer implements GridCoverageWriter {
     private void writeStats(GridCoverage coverage, Object file)
         throws IOException {
         GridCoverage2D gc = (GridCoverage2D) coverage;
-
-        //we need to evaluate stats first using jai
         ParameterBlock pb = new ParameterBlock();
-        pb.addSource((PlanarImage) gc.getRenderedImage());
-        pb.add(null); //no roi
-        pb.add(1);
-        pb.add(1);
-
-        //getting histogram back
-        RenderedOp op = JAI.create("extrema", pb);
-
-        double[][] extrema = (double[][]) op.getProperty("extrema");
-
+        //we need to evaluate stats first using jai
+        double[] Max=new double[]{gc.getSampleDimension(0).getMaximumValue()};
+        double[] Min=new double[]{gc.getSampleDimension(0).getMinimumValue()};
+        	
+        
+        
+        
+       
         //histogram
-        pb = new ParameterBlock();
         pb.addSource((PlanarImage) gc.getRenderedImage());
         pb.add(null); //no roi
         pb.add(1);
         pb.add(1);
-        pb.add(new int[] { (int) (extrema[1][0] - extrema[0][0] + 1) });
-        pb.add(extrema[0]);
-        pb.add(extrema[1]);
+        pb.add(new int[] { (int) (Max[0] - Min[0] + 1) });
+        pb.add(Min);
+        pb.add(Max);
         pb.add(1);
 
         Histogram hist = (Histogram) ((PlanarImage) JAI.create("histogram", pb,
@@ -569,9 +566,9 @@ public class GTopo30Writer implements GridCoverageWriter {
                         ((File) file)));
             out.print(1);
             out.print(" ");
-            out.print((int) extrema[0][0]);
+            out.print((int) Min[0]);
             out.print(" ");
-            out.print((int) extrema[1][0]);
+            out.print((int) Max[0]);
             out.print(" ");
             out.print(hist.getMean()[0]);
             out.print(" ");
@@ -586,9 +583,9 @@ public class GTopo30Writer implements GridCoverageWriter {
             //          writing world file
             outZ.write("1".getBytes());
             outZ.write(" ".getBytes());
-            outZ.write(new Integer((int) extrema[0][0]).toString().getBytes());
+            outZ.write(new Integer((int) Min[0]).toString().getBytes());
             outZ.write(" ".getBytes());
-            outZ.write(new Integer((int) extrema[1][0]).toString().getBytes());
+            outZ.write(new Integer((int) Max[0]).toString().getBytes());
             outZ.write(" ".getBytes());
             outZ.write(new Double(hist.getMean()[0]).toString().getBytes());
             outZ.write(" ".getBytes());
@@ -666,6 +663,7 @@ public class GTopo30Writer implements GridCoverageWriter {
             outZ.write("\n".getBytes());
 
             ((ZipOutputStream) worldFile).closeEntry();
+ 
         }
     }
 
@@ -698,7 +696,6 @@ public class GTopo30Writer implements GridCoverageWriter {
         out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
         ImageIO.write(((PlanarImage) gc.getRenderedImage()).getAsBufferedImage(),
             "raw", out);
-        out.flush();
 
         if (dest instanceof File) {
             out.close();

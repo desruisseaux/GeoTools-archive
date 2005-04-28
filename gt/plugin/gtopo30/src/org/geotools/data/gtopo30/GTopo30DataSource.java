@@ -308,7 +308,7 @@ class GTopo30DataSource {
         // using NIO and these tiles are very big and fill up rapidly the cache:
         // better use it to avoid operations down the rendering chaing
         RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
-        hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
+        //hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
         RenderedOp image = JAI.create("ImageRead", pbj, hints);
 
