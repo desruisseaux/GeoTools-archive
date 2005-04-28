@@ -20,19 +20,16 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.nio.channels.ReadableByteChannel;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureReader;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileUtil;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.feature.Feature;
-import org.geotools.filter.Filter;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.renderer.lite.LabelCache;
@@ -42,7 +39,6 @@ import org.geotools.renderer.lite.RenderListener;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
-import org.geotools.styling.Symbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -157,7 +153,7 @@ public class ShapeRenderer {
 
 	private void processStylers(Graphics2D graphics, MapLayer currLayer,
 			FeatureTypeStyle[] featureStylers, AffineTransform at,
-			CoordinateReferenceSystem destinationCrs) {
+			CoordinateReferenceSystem destinationCrs) throws IOException {
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("processing " + featureStylers.length + " stylers");
 		}
@@ -201,116 +197,117 @@ public class ShapeRenderer {
 			ShapefileReader shpreader = ShapefileUtil.getShpReader(ds);
 
 			while (true) {
-				try {
-
-					if (renderingStopRequested) {
-						break;
-					}
-
-					if (!shpreader.hasNext()) {
-						break;
-					}
-
-					boolean doElse = true;
-
-					if (LOGGER.isLoggable(Level.FINER)) {
-						LOGGER.fine("trying to read Feature ...");
-					}
+//				try {
+//
+//					if (renderingStopRequested) {
+//						break;
+//					}
+//
+//					if (!shpreader.hasNext()) {
+//						break;
+//					}
+//
+//					boolean doElse = true;
+//
+//					if (LOGGER.isLoggable(Level.FINER)) {
+//						LOGGER.fine("trying to read Feature ...");
+//					}
+//					
+//					ShapefileReader.Record record=shpreader.nextRecord();
 					
-					ShapefileReader.Record record=shpreader.nextRecord();
-					
-					Feature feature = reader.next();
+//					record.
 
-					if (LOGGER.isLoggable(Level.FINEST)) {
-						LOGGER.finest("... done: " + feature.toString());
-					}
-
-					String typeName = feature.getFeatureType().getTypeName();
-
-					if (LOGGER.isLoggable(Level.FINER)) {
-						LOGGER.fine("... done: " + typeName);
-					}
-
-					if ((typeName != null)
-							&& (feature.getFeatureType().isDescendedFrom(null,
-									fts.getFeatureTypeName()) || typeName
-									.equalsIgnoreCase(fts.getFeatureTypeName()))) {
-						// applicable rules
-						for (Iterator it = ruleList.iterator(); it.hasNext();) {
-
-							Rule r = (Rule) it.next();
-
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("applying rule: " + r.toString());
-							}
-
-							//                            // if this rule applies
-							//                            if (isWithInScale(r) && !r.hasElseFilter()) {
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("this rule applies ...");
-							}
-
-							// if( r != null ) {
-							Filter filter = r.getFilter();
-
-							if ((filter == null) || filter.contains(feature)) {
-								doElse = false;
-
-								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("processing Symobolizer ...");
-								}
-
-								Symbolizer[] symbolizers = r.getSymbolizers();
-								processSymbolizers(graphics, feature,
-										symbolizers, scaleRange, at,
-										destinationCrs);
-
-								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("... done!");
-								}
-							}
-							// }
-							//                            }
-						}
-
-						if (doElse) {
-							// rules with an else filter
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("rules with an else filter");
-							}
-
-							for (Iterator it = elseRuleList.iterator(); it
-									.hasNext();) {
-								Rule r = (Rule) it.next();
-								Symbolizer[] symbolizers = r.getSymbolizers();
-
-								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("processing Symobolizer ...");
-								}
-
-								processSymbolizers(graphics, feature,
-										symbolizers, scaleRange, at,
-										destinationCrs);
-
-								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("... done!");
-								}
-							}
-						}
-					}
-
-					if (LOGGER.isLoggable(Level.FINER)) {
-						LOGGER.finer("feature rendered event ...");
-					}
-
-					fireFeatureRenderedEvent(feature);
-				} catch (Exception e) {
-					fireErrorEvent(e);
-				}
-			}
-
-			reader.close();
-
+//					if (LOGGER.isLoggable(Level.FINEST)) {
+////						LOGGER.finest("... done: " + feature.toString());
+//					}
+//
+//					String typeName = feature.getFeatureType().getTypeName();
+//
+//					if (LOGGER.isLoggable(Level.FINER)) {
+//						LOGGER.fine("... done: " + typeName);
+//					}
+//
+//					if ((typeName != null)
+//							&& (feature.getFeatureType().isDescendedFrom(null,
+//									fts.getFeatureTypeName()) || typeName
+//									.equalsIgnoreCase(fts.getFeatureTypeName()))) {
+//						// applicable rules
+//						for (Iterator it = ruleList.iterator(); it.hasNext();) {
+//
+//							Rule r = (Rule) it.next();
+//
+//							if (LOGGER.isLoggable(Level.FINER)) {
+//								LOGGER.finer("applying rule: " + r.toString());
+//							}
+//
+//							//                            // if this rule applies
+//							//                            if (isWithInScale(r) && !r.hasElseFilter()) {
+//							if (LOGGER.isLoggable(Level.FINER)) {
+//								LOGGER.finer("this rule applies ...");
+//							}
+//
+//							// if( r != null ) {
+//							Filter filter = r.getFilter();
+//
+//							if ((filter == null) || filter.contains(feature)) {
+//								doElse = false;
+//
+//								if (LOGGER.isLoggable(Level.FINER)) {
+//									LOGGER.finer("processing Symobolizer ...");
+//								}
+//
+//								Symbolizer[] symbolizers = r.getSymbolizers();
+//								processSymbolizers(graphics, feature,
+//										symbolizers, scaleRange, at,
+//										destinationCrs);
+//
+//								if (LOGGER.isLoggable(Level.FINER)) {
+//									LOGGER.finer("... done!");
+//								}
+//							}
+//							// }
+//							//                            }
+//						}
+//
+//						if (doElse) {
+//							// rules with an else filter
+//							if (LOGGER.isLoggable(Level.FINER)) {
+//								LOGGER.finer("rules with an else filter");
+//							}
+//
+//							for (Iterator it = elseRuleList.iterator(); it
+//									.hasNext();) {
+//								Rule r = (Rule) it.next();
+//								Symbolizer[] symbolizers = r.getSymbolizers();
+//
+//								if (LOGGER.isLoggable(Level.FINER)) {
+//									LOGGER.finer("processing Symobolizer ...");
+//								}
+//
+//								processSymbolizers(graphics, feature,
+//										symbolizers, scaleRange, at,
+//										destinationCrs);
+//
+//								if (LOGGER.isLoggable(Level.FINER)) {
+//									LOGGER.finer("... done!");
+//								}
+//							}
+//						}
+//					}
+//
+//					if (LOGGER.isLoggable(Level.FINER)) {
+//						LOGGER.finer("feature rendered event ...");
+//					}
+//
+//					fireFeatureRenderedEvent(feature);
+//				} catch (Exception e) {
+//					fireErrorEvent(e);
+//				}
+//			}
+//
+//			reader.close();
+//
+		}
 		}
 	}
 
