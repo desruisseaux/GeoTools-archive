@@ -26,6 +26,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -82,7 +83,7 @@ public class DOMParserTest extends FilterTestSupport {
     public void setUp() throws SchemaException, IllegalAttributeException {
         super.setUp();
 
-        FeatureTypeFactory feaTypeFactory = FeatureTypeFactory.createTemplate(testSchema);
+        FeatureTypeBuilder feaTypeFactory = FeatureTypeFactory.createTemplate(testSchema);
         AttributeType doubleAttribute2 = attFactory.newAttributeType("testZeroDouble",
                 Double.class);
         feaTypeFactory.addType(doubleAttribute2);

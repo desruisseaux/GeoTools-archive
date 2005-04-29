@@ -97,7 +97,7 @@ public class FeatureTypeTest extends DataTestCase {
   }
   
   public void testEquals() throws Exception {
-    FeatureTypeFactory at = FeatureTypeFactory.newInstance("Thing");
+    FeatureTypeBuilder at = FeatureTypeFactory.newInstance("Thing");
     at.setNamespace(new URI("http://www.nowhereinparticular.net"));
     at.addType(AttributeTypeFactory.newAttributeType("X",String.class));
     final FeatureType ft = at.getFeatureType();
