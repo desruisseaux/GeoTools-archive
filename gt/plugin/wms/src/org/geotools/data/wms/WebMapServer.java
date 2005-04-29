@@ -594,7 +594,7 @@ public class WebMapServer implements Discovery {
                             latLonBBox = null;
                         }
                     }
-                    parentLayer = layer.getParent();
+                    parentLayer = parentLayer.getParent();
                 }
                 
                 if (latLonBBox == null) {
