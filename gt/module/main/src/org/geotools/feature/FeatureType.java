@@ -20,8 +20,14 @@ import java.net.URI;
 
 /**
  * <p>
- * A metadata template for a feature of arbitrary complexity.  Note that this
- * documentation should be read in conjunction with the {@link Feature} API.
+ * A metadata template for a Feature of arbitrary complexity.
+ * <p>
+ * Notes:
+ * <ul>
+ * <li>that this documentation should be read in conjunction with the
+ * {@link Feature} API.
+ * <li>the attributes described by this FeatureType <b>and its ancestors</b>
+ * define the complete schema for a Feature
  * </p>
  * 
  * <p>
@@ -49,7 +55,7 @@ import java.net.URI;
  * </p>
  * 
  * <p>
- * With one exception, the type of an attribute is considered to be its
+ * With oneexceptions, the type of an attribute is considered to be its
  * cannonical definition by the FeatureType.  For example, an attribute type
  * might be a <code>javax.sound.midi.Sequence</code> object, which contains a
  * <code>float</code> public field called PPQ.  The fact that this attribute
@@ -59,13 +65,22 @@ import java.net.URI;
  * <code>javax.sound.midi.Sequence</code>, but not that this attribute has a
  * sub-attribute (field) called PPQ.  It is the responsibility of the callers
  * to understand the objects it is asking for and manipulate them
- * appropriately. The sole exception is if the type stored in the
- * <code>FeatureType</code> is a <code>org.geotools.datasource.Feature</code>
- * type.  In this case, all information about sub-attributes are stored and
+ * appropriately.
+ * </p>
+ * <p>
+ * The exceptions is for:
+ * <ul>
+ * <li>if the type stored in the <code>FeatureType</code> is a
+ * <code>org.geotools.datasource.Feature</code> type.<br>
+ * In this case, all information about sub-attributes are stored and
  * passed to calling classes upon request.  The style of reference (XPath) is
  * defined in and mediated by <code>FeatureType</code> implementations.
+ * </ul>
+ * Question: how does one determine the schema for the attribute defined
+ * as a FeatureType? I suspect that FeatureType may be a valid AttributeType?
+ * (One needs this schema information before xpath can be used to query the
+ * Feature value.
  * </p>
- * 
  * <p>
  * It is the responsibility of the implementing class to ensure that the
  * <code>FeatureType</code> is always in a valid state.  This means that each
@@ -260,8 +275,14 @@ public interface FeatureType extends FeatureFactory {
      */    
      public abstract boolean isAbstract();
     
-    /** Obtain an array of this FeatureTypes ancestors. Implementors should return a
+    /**
+     * Obtain an array of this FeatureTypes ancestors. Implementors should return a
      * non-null array (may be of length 0).
+     * <p>
+     * It is assumed that this ancestor list represents a single inheirtence system
+     * where getAncestors().get(0) is this schema's direct parent. By returning
+     * a list we avoid the need for recursion.
+     * </p>
      * @return An array of ancestors.
      */    
      public abstract FeatureType[] getAncestors();
@@ -314,16 +335,53 @@ public interface FeatureType extends FeatureFactory {
      public int find(String attName);
 
      /**
-      * Gets the attributeType at the specified index.
-      *
+      * Gets the schema attributeType at the specified index.
+      * <p>
+      * The index is specified with respect to the entire
+      * Schema (as defined by this FeatureType and it's
+      * ancestors).
+      * <p>
+      * <ul>
+      * The index value should not be used with either:
+      * <li>FeatureType.getAttributeTypes()[index] - as it defines only attributes
+      * contributed by this FeatureType
+      * <li>Feature.getAttribute( index ) - as attributes order may
+      * or may not be in sequence
+      * </ul>
+      * </p>
       * @param position the position of the attribute to check.
       *
       * @return The attribute type at the specified position.
       */
      public AttributeType getAttributeType(int position);
 
+     /**
+      * AttributeTypes for this schema.
+      * <p>
+      * The provided array of AttributeTypes should be considerde
+      * with respect to the AttribtueTypes defined by this Feature's
+      * ancestors.
+      * </p>
+      * <p>
+      * Note Well: Client code should not consider the index provided
+      * by the find ( attName ) method as a valid index into the
+      * returned array.
+      * </p>
+      * @return Array of AttributeType describing this schema.
+      */
      public AttributeType[] getAttributeTypes();
      
+     /**
+      * Create a duplicate of the provided feature, must delegate to an appropriate FeatureFactory
+      * create method.
+      * <p>
+      * The implementation is assumed to make use of AttributeType duplicate
+      * as required for a deep copy.
+      * </p>
+      * 
+      * @param feature
+      * @return a deep copy of feature
+      * @throws IllegalAttributeException
+      */
      public Feature duplicate(Feature feature) throws IllegalAttributeException;
-
 }
