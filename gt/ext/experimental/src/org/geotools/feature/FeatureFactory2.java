@@ -20,5 +20,39 @@ package org.geotools.feature;
  * @author Jody Garnett
  */
 public interface FeatureFactory2 {
+	/**
+	 * AttributeType typesafe Feature creations.
+	 * <p>
+	 * This is option one, it works for both FeatureType and FlatFeatureType.
+	 * Duplicate AttributeType are of course allowed (as long as the
+	 * provided FeatureType supports this).
+	 * </p>
+	 * @param type List of AttributeType in creation order
+	 * @param value List of attribute value in creation order
+	 * @return Feature create according to the provided schema.
+	 */
+	Feature create( FeatureType schema, AttributeType type[], Object value[] );
 
+	/**
+	 * Convience method for FlatFeatureType for feature creation.
+	 * <p>
+	 * This is a convience method to ease the transition phase for developers
+	 * making use of a FlatFeatureType.
+	 * </p>
+	 * <p>
+	 * The use of this method should be considered to be *exactly* the same as:
+	 * <pre><code>
+	 * factory.create( flatSchema, flatSchema.getAttributeTypes(), values ); 
+	 * </code></pre>
+	 * A you can see this is only valid for FlatFeature schema in which the
+	 * results of getAttributeTypes() describes all the parameters required
+	 * for creation. For most shape and database base content this is a valid
+	 * assumption.
+	 * </p>
+	 * @param type List of AttributeType in creation order
+	 * @param value List of attribute value in creation order
+	 * @return Feature create according to the provided schema.
+	 */
+	Feature create( FeatureType flatSchema, Object values[] );
+	
 }

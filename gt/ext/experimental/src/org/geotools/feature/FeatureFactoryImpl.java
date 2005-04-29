@@ -62,23 +62,19 @@ package org.geotools.feature;
  * @author Jody Garnett
  * @since 0.6.0
  */
-public class FeatureFactoryImpl implements FeatureFactory {
+public class FeatureFactoryImpl implements FeatureFactory2 {
 
 	/* (non-Javadoc)
-	 * @see org.geotools.feature.FeatureFactory#create(java.lang.Object[])
+	 * @see org.geotools.feature.FeatureFactory2#create(org.geotools.feature.FeatureType, org.geotools.feature.AttributeType[], java.lang.Object[])
 	 */
-	public Feature create(Object[] attributes) throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-		return null;
+	public Feature create(FeatureType schema, AttributeType[] type, Object[] value) {
+		return null; // implementation of FeatureImpl is required
 	}
 
 	/* (non-Javadoc)
-	 * @see org.geotools.feature.FeatureFactory#create(java.lang.Object[], java.lang.String)
+	 * @see org.geotools.feature.FeatureFactory2#create(org.geotools.feature.FeatureType, java.lang.Object[])
 	 */
-	public Feature create(Object[] attributes, String featureID)
-			throws IllegalAttributeException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	public Feature create(FeatureType flatSchema, Object[] values) {
+		return null; // implementation of DefaultFeature would work fine!		
+	}	
 }
