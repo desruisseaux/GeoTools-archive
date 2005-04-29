@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -334,6 +333,8 @@ public class WebMapServer implements Discovery {
         URL finalURL = request.getFinalURL();
 
         URLConnection connection = finalURL.openConnection();
+        
+        connection.addRequestProperty("Accept-Encoding", "gzip");
 
         InputStream inputStream = connection.getInputStream();
         
