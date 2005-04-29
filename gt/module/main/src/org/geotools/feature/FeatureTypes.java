@@ -16,12 +16,18 @@
  */
 package org.geotools.feature;
 
+import java.net.URI;
+import java.util.Arrays;
+
+import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.factory.FactoryFinder;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.JTS;
+import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -157,5 +163,164 @@ public class FeatureTypes {
 		}
 		return feature;
 	}
+
+	/**
+     * The most specific way to create a new FeatureType.
+     *
+     * @param types The AttributeTypes to create the FeatureType with.
+     * @param name The typeName of the FeatureType. Required, may not be null.
+     * @param ns The namespace of the FeatureType. Optional, may be null.
+     * @param isAbstract True if this created type should be abstract.
+     * @param superTypes A Collection of types the FeatureType will inherit
+     *        from. Currently, all types inherit from feature in the opengis
+     *        namespace.
+     *
+     * @return A new FeatureType created from the given arguments.
+     *
+     * @throws FactoryConfigurationError If there are problems creating a
+     *         factory.
+     * @throws SchemaException If the AttributeTypes provided are invalid in
+     *         some way.
+     */
+    public static FeatureType newFeatureType(AttributeType[] types,
+        String name, URI ns, boolean isAbstract, FeatureType[] superTypes) 
+        throws FactoryConfigurationError, SchemaException { 
+            return newFeatureType(types, name, ns, isAbstract, superTypes, null);
+    }
+    
+    /**
+     * The most specific way to create a new FeatureType.
+     *
+     * @param types The AttributeTypes to create the FeatureType with.
+     * @param name The typeName of the FeatureType. Required, may not be null.
+     * @param ns The namespace of the FeatureType. Optional, may be null.
+     * @param isAbstract True if this created type should be abstract.
+     * @param superTypes A Collection of types the FeatureType will inherit
+     *        from. Currently, all types inherit from feature in the opengis
+     *        namespace.
+     *
+     * @return A new FeatureType created from the given arguments.
+     *
+     * @throws FactoryConfigurationError If there are problems creating a
+     *         factory.
+     * @throws SchemaException If the AttributeTypes provided are invalid in
+     *         some way.
+     */
+    public static FeatureType newFeatureType(AttributeType[] types,
+        String name, URI ns, boolean isAbstract, FeatureType[] superTypes, AttributeType defaultGeometry)
+        throws FactoryConfigurationError, SchemaException {
+        FeatureTypeFactory factory = FeatureTypeFactory.newInstance(name);
+        factory.addTypes(types);
+        factory.setNamespace(ns);
+        factory.setAbstract(isAbstract);
+        if(defaultGeometry != null)
+            factory.setDefaultGeometry((GeometryAttributeType) defaultGeometry);
+
+        if (superTypes != null) {
+            factory.setSuperTypes(Arrays.asList(superTypes));
+        }
+
+        return factory.getFeatureType();
+    }
+    
+    /**
+         * The most specific way to create a new FeatureType.
+         *
+         * @param types The AttributeTypes to create the FeatureType with.
+         * @param name The typeName of the FeatureType. Required, may not be null.
+         * @param ns The namespace of the FeatureType. Optional, may be null.
+         * @param isAbstract True if this created type should be abstract.
+         * @param superTypes A Collection of types the FeatureType will inherit
+         *        from. Currently, all types inherit from feature in the opengis
+         *        namespace.
+         *
+         * @return A new FeatureType created from the given arguments.
+         *
+         * @throws FactoryConfigurationError If there are problems creating a
+         *         factory.
+         * @throws SchemaException If the AttributeTypes provided are invalid in
+         *         some way.
+         */
+        public static FeatureType newFeatureType(AttributeType[] types,
+            String name, URI ns, boolean isAbstract, FeatureType[] superTypes, GeometryAttributeType defaultGeometry)
+            throws FactoryConfigurationError, SchemaException {
+            FeatureTypeFactory factory = FeatureTypeFactory.newInstance(name);
+            factory.addTypes(types);
+            factory.setNamespace(ns);
+            factory.setAbstract(isAbstract);
+
+            if (superTypes != null) {
+                factory.setSuperTypes(Arrays.asList(superTypes));
+            }
+            
+            if(defaultGeometry != null) {
+                factory.setDefaultGeometry(defaultGeometry);
+            }
+
+            return factory.getFeatureType();
+        }
+
+    /**
+     * Create a new FeatureType with the given AttributeTypes. A short cut for
+     * calling <code>newFeatureType(types,name,ns,isAbstract,null)</code>.
+     *
+     * @param types The AttributeTypes to create the FeatureType with.
+     * @param name The typeName of the FeatureType. Required, may not be null.
+     * @param ns The namespace of the FeatureType. Optional, may be null.
+     * @param isAbstract True if this created type should be abstract.
+     *
+     * @return A new FeatureType created from the given arguments.
+     *
+     * @throws FactoryConfigurationError If there are problems creating a
+     *         factory.
+     * @throws SchemaException If the AttributeTypes provided are invalid in
+     *         some way.
+     */
+    public static FeatureType newFeatureType(AttributeType[] types,
+        String name, URI ns, boolean isAbstract)
+        throws FactoryConfigurationError, SchemaException {
+        return newFeatureType(types, name, ns, isAbstract, null);
+    }
+
+    /**
+     * Create a new FeatureType with the given AttributeTypes. A short cut for
+     * calling <code>newFeatureType(types,name,ns,false,null)</code>.
+     *
+     * @param types The AttributeTypes to create the FeatureType with.
+     * @param name The typeName of the FeatureType. Required, may not be null.
+     * @param ns The namespace of the FeatureType. Optional, may be null.
+     *
+     * @return A new FeatureType created from the given arguments.
+     *
+     * @throws FactoryConfigurationError If there are problems creating a
+     *         factory.
+     * @throws SchemaException If the AttributeTypes provided are invalid in
+     *         some way.
+     */
+    public static FeatureType newFeatureType(AttributeType[] types,
+        String name, URI ns)
+        throws FactoryConfigurationError, SchemaException {
+        return newFeatureType(types, name, ns, false);
+    }
+
+    /**
+     * Create a new FeatureType with the given AttributeTypes. A short cut for
+     * calling <code>newFeatureType(types,name,null,false,null)</code>. Useful
+     * for test cases or datasources which may not allow a namespace.
+     *
+     * @param types The AttributeTypes to create the FeatureType with.
+     * @param name The typeName of the FeatureType. Required, may not be null.
+     *
+     * @return A new FeatureType created from the given arguments.
+     *
+     * @throws FactoryConfigurationError If there are problems creating a
+     *         factory.
+     * @throws SchemaException If the AttributeTypes provided are invalid in
+     *         some way.
+     */
+    public static FeatureType newFeatureType(AttributeType[] types, String name)
+        throws FactoryConfigurationError, SchemaException {
+        return newFeatureType(types, name, GMLSchema.NAMESPACE, false);
+    }       
 
 }

@@ -19,7 +19,6 @@ package org.geotools.feature;
 import java.net.URI;
 
 /**
- * <p>
  * A metadata template for a Feature of arbitrary complexity.
  * <p>
  * Notes:
@@ -206,7 +205,7 @@ import java.net.URI;
  * @see org.geotools.feature.type.NestedAttributeType
  * @see org.geotools.feature.DefaultFeatureType
  */
-public interface FeatureType extends FeatureFactory {
+public interface FeatureType {
   
     /**
      * Gets the global schema namespace.
@@ -236,13 +235,17 @@ public interface FeatureType extends FeatureFactory {
      public String getTypeName();
 
     /**
-     * Gets the default geometry AttributeType.  If the FeatureType has more
-     * one geometry it is up to the implementor to determine which geometry is
-     * the default.  If working with multiple geometries it is best to get the
-     * attributeTypes and iterate through them, checking isGeometry on each.
+     * Gets the default geometry AttributeType.
+     * <p>
+     * If the FeatureType has more one geometry it is up to the implementor
+     * to determine which geometry is the default.  If working with multiple
+     * geometries it is best to get the attributeTypes and iterate through
+     * them, checking for instances of GeometryAttribtueType.
+     * </p>
+     * <p>
      * This should just be used a convenience method when it is known that the
-     * features are flat.
-     *
+     * features do not have multiple geometries.
+     * </p>
      * @return The attribute type of the default geometry, which will contain
      *         the position.
      */
@@ -250,8 +253,8 @@ public interface FeatureType extends FeatureFactory {
     
     /**
      * Test to determine whether this FeatureType is descended from the given
-     * FeatureType. Think of this relationship likes the "extends" relationship in
-     * java.
+     * FeatureType. Think of this relationship likes the "extends" relationship
+     * in java.
      * 
      * @param nsURI The namespace URI to use.
      * @param typeName The typeName.
@@ -265,12 +268,21 @@ public interface FeatureType extends FeatureFactory {
      * FeatureType f2;
      * f1.isDescendedFrom(f2.getNamespace(),f2.getName());
      * </pre></code>
+     * <p>
+     * Question: this method duplicates the information provided
+     * by getAncestors().
+     * </p>
      * @param type The type to compare to.
      * @return true if descendant, false otherwise.
      */    
      public abstract boolean isDescendedFrom(FeatureType type);
     
-    /** Is this FeatureType an abstract type?
+    /**
+     * Is this FeatureType an abstract type?
+     * <p>
+     * When true is returned instances of this Feature cannot be created, instead
+     * a child FeatureType must use this FeatureType as its ancestor.
+     * </p>
      * @return true if abstract, false otherwise.
      */    
      public abstract boolean isAbstract();
@@ -279,48 +291,74 @@ public interface FeatureType extends FeatureFactory {
      * Obtain an array of this FeatureTypes ancestors. Implementors should return a
      * non-null array (may be of length 0).
      * <p>
-     * It is assumed that this ancestor list represents a single inheirtence system
+     * Question (we need to resolve before 2.1.0):
+     * <ul>
+     * <li>single  - implys this ancestor list represents an ordered list, with 
      * where getAncestors().get(0) is this schema's direct parent. By returning
      * a list we avoid the need for recursion.
+     * <li>multiple - imply that getAncestors() is just the direct parents of this
+     * FeatureType.
      * </p>
      * @return An array of ancestors.
      */    
      public abstract FeatureType[] getAncestors();
      
-
      /**
       * This is only used twice in the whole geotools code base, and  one of
       * those is for a test, so we're removing it from the interface. If
       * getAttributeType does not have the AttributeType it will just return
       * null.  Gets the number of occurrences of this attribute.
       *
+      * <p>
+      * Question: the comment says we are removing this, but it is not depricated?
+      * And how the heck can the number of occurances out of a boolean.
+      * </p>
+      * @deprecated It seems this method is ill concieved,
+      *             use getAttributeType( xpath ) != null as a replacement
       * @param xPath XPath pointer to attribute type.
-      *
+      * 
       * @return Number of occurrences.
       */
      public boolean hasAttributeType(String xPath);
 
      /**
       * Returns the number of attributes at the first 'level' of the schema.
-      *
-      * @return equivalent value to getAttributeTypes().length
+      * <p>
+      * Question: what does 'level' mean? I would like this method to allow
+      * acess to the complete schema as defined by this FeatureType and its
+      * ancestors, in sharp contrast to getAttributeTypes which is limited
+      * to this FeatureType.
+      * </p>
+      * <p>
+      * For a FlatFeature this value is the the same as getAttributeTypes().length.
+      * </p>
+      * @return number of distinct attributeTypes available, taking ancestors
+      *         and taking overrides into account.
       */
      public int getAttributeCount();
      
-
      /**
       * Gets the attributeType at this xPath, if the specified attributeType
       * does not exist then null is returned.
-      *
+      * <p>
+      * Question: it is unclear how this interacts with the complete schema
+      * defined by this FeatureType and its ancestors (in which a given
+      * xpath may refer to several AttributeTypes as restrictions are
+      * applied.
+      * </p>
+      * <p>
+      * Perhaps this method should be restricted to a FlatFeatureType?
+      * Or should have the option of returning an array of matching
+      * AttributeType in order of inheiritence?
+      * </p>
       * @param xPath XPath pointer to attribute type.
-      *
-      * @return True if attribute exists.
+      * @return AttributeType, or null if unavaialble
       */
      public AttributeType getAttributeType(String xPath);
 
      /**
       * Find the position of a given AttributeType.
-      *
+      * 
       * @param type The type to search for.
       *
       * @return -1 if not found, a zero-based index if found.
@@ -329,6 +367,12 @@ public interface FeatureType extends FeatureFactory {
      
      /**
       * Find the position of an AttributeType which matches the given String.
+      * <p>
+      * This index may be used with getAttributeType( index ), the search
+      * space is the entire schema defined by this FeatureType and its
+      * ancestors.
+      * </p>
+      * 
       * @param attName the name to look for
       * @return -1 if not found, zero-based index otherwise
       */
@@ -349,8 +393,8 @@ public interface FeatureType extends FeatureFactory {
       * or may not be in sequence
       * </ul>
       * </p>
-      * @param position the position of the attribute to check.
-      *
+      * @param index Index into the complete schema represented by this
+      *        FeatureType and its ancestors.
       * @return The attribute type at the specified position.
       */
      public AttributeType getAttributeType(int position);
@@ -358,13 +402,13 @@ public interface FeatureType extends FeatureFactory {
      /**
       * AttributeTypes for this schema.
       * <p>
-      * The provided array of AttributeTypes should be considerde
-      * with respect to the AttribtueTypes defined by this Feature's
-      * ancestors.
+      * The provided array of AttributeTypes should be considered as
+      * adding to (or overriding) the the AttribtueTypes defined by
+      * this FeatureTypes ancestors.
       * </p>
       * <p>
       * Note Well: Client code should not consider the index provided
-      * by the find ( attName ) method as a valid index into the
+      * by the find( attName ) method as a valid index into the
       * returned array.
       * </p>
       * @return Array of AttributeType describing this schema.
@@ -378,10 +422,48 @@ public interface FeatureType extends FeatureFactory {
       * The implementation is assumed to make use of AttributeType duplicate
       * as required for a deep copy.
       * </p>
-      * 
+      * @deprecated This method will be removed in 2.2, please use
+      *             FeatureFactory obtained from FactoryFinder
       * @param feature
       * @return a deep copy of feature
       * @throws IllegalAttributeException
       */
      public Feature duplicate(Feature feature) throws IllegalAttributeException;
+     
+     /**
+      * Scheduled for removal in Geotools 2.2, please use FeatureFactory.
+      * <p>
+      * Creates a new feature, with a generated unique featureID.
+      * This is less than ideal, as a FeatureID should be persistant over time,
+      * generally created by a datasource.  This method is more for testing that
+      * doesn't need featureID.
+      * </p>
+      * 
+      * @deprecated This method will be remove in 2.2, please use
+      *             FeatureFactory obtained from FactoryFinder
+      * @param attributes the array of attribute values
+      * @return The created feature
+      *
+      * @throws IllegalAttributeException if the FeatureType does not validate
+      *         the attributes.
+      */
+     Feature create(Object[] attributes) throws IllegalAttributeException;
+
+     /**
+      * Scheduled for removal in Geotools 2.2, please use FeatureFactory.
+      * <p>
+      * Creates a new feature, with the proper featureID.
+      * </p>
+      * @deprecated This method will be remove in 2.2, please use
+      *             FeatureFactory obtained from FactoryFinder
+      * 
+      * @param attributes the array of attribute values.
+      * @param featureID the feature ID.
+      *
+      * @return the created feature.
+      * @throws IllegalAttributeException if the FeatureType does not validate
+      *         the attributes.
+      */
+     Feature create(Object[] attributes, String featureID)
+         throws IllegalAttributeException;
 }

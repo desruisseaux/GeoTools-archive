@@ -75,7 +75,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Utility functions for use when implementing working with data classes.
- *
+ * <p>
+ * TODO: Move FeatureType manipulation to feature package
+ * </p>
  * @author Jody Garnett, Refractions Research
  */
 public class DataUtilities {
