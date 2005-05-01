@@ -25,16 +25,34 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.util.Arrays;
 
+import javax.media.jai.PlanarImage;
+import javax.media.jai.WarpPolynomial;
+
 // OpenGIS dependencies
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry; // For javadoc
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.spatialschema.geometry.primitive.SurfaceInterpolation;
 
 // Geotools dependencies
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.DerivedCRS;
+import org.geotools.referencing.crs.EngineeringCRS;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.referencing.datum.GeodeticDatum;
+import org.geotools.referencing.operation.Operation;
 
 
 /**
@@ -81,6 +99,7 @@ import org.geotools.referencing.datum.GeodeticDatum;
  * CoordinateReferenceSystem gridCRS = new {@linkplain DerivedCRS}("The grid CRS",
  *                                                    grid.{@linkplain #getMathTransform()}.inverse(),
  *                                                    {@linkplain CartesianCS#GENERIC_2D});
+ *
  * <FONT color='#008000'>//
  * // Constructs the grid coverage using the grid coordinate system (not the "real world"
  * // one). It is usefull to display the coverage in its native CRS before we resample it.
@@ -104,9 +123,82 @@ import org.geotools.referencing.datum.GeodeticDatum;
  * FrameFactory.show(coverage);
  * </pre></blockquote>
  *
+ * <br><br>
+ * <strong>Non-Affine Trasform</strong>
+ * <br>
+ * The example below goes through the steps of constructing a coordinate reference system for a grid
+ * coverage from its grid of localization. This example assumes that the "real world" coordinates
+ * are longitudes and latitudes on the {@linkplain GeodeticDatum#WGS84 WGS84} ellipsoid.
+ *
+ * <blockquote><pre>
+ * <FONT color='#008000'>//
+ * // Constructs a localization grid of size 10&times;10.
+ * //</FONT>
+ * LocalizationGrid grid = new LocalizationGrid(10,10);
+ * for (int j=0; j<10; j++) {
+ *     for (int i=0; i<10; i++) {
+ *         double x = ...; <FONT color='#008000'>// Set longitude here</FONT>
+ *         double y = ...; <FONT color='#008000'>// Set latitude here</FONT>
+ *         grid.{@linkplain #setLocalizationPoint(int,int,double,double) setLocalizationPoint}(i,j,x,y);
+ *     }
+ * }
+ * <FONT color='#008000'>//
+ * // Constructs the grid coordinate reference system.
+ * //</FONT>
+ * CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
+ * CoordinateReferenceSystem realCRS = GeographicCRS.WGS84;
+ * CoordinateOperation operation = opFactory.createOperation(EngineeringCRS.GENERIC_2D, GeographicCRS.WGS84);
+ * 
+ * CoordinateReferenceSystem gridCRS = new {@linkplain DerivedCRS}(
+ *			"The grid CRS",
+ *			((Operation) operation).getMethod(),
+ *			{@linkplain EngineeringCRS.GENERIC_2D},
+ *			grid{@linkplain #getMathTransform(SurfaceInterpolation.POLYNOMIAL_SPLINE)}.inverse(),
+ *			{@linkplain CartesianCS#GENERIC_2D});
+ *
+ * <FONT color='#008000'>//
+ * // Constructs the grid coverage using the grid coordinate system (not the "real world"
+ * // one). It is usefull to display the coverage in its native CRS before we resample it.
+ * // Note that if the grid of localization does not define the geographic location for
+ * // all pixels, then we need to specify some affine transform in place of the call to
+ * // IdentityTransform. For example if the grid of localization defines the location of
+ * // 1 pixel, then skip 3, then defines the location of 1 pixel, etc., then the affine
+ * // transform should be AffineTransform.getScaleInstance(0.25, 0.25).
+ * //</FONT>
+ * GridCoverage coverage;
+ * ColorModel cm = PlanarImage.createColorModel(outSampleModel);
+ * BufferedImage bImage= new BufferedImage(
+ * 					cm,
+ * 					outDataCube,false,null
+ * );
+ * 
+ * coverage = new GridCoverage2D(
+ * 					(CharSequence) "The Grid Coverage",
+ * 					(RenderedImage) bImage, 
+ * 					gridCRS,
+ * 					IdentityTransform.create(2),
+ * 					null,
+ * 					null,
+ * 					null
+ * );
+ * <FONT color='#008000'>//
+ * // Project the coverage from its current 'gridCS' to the 'realCS'. If the grid of
+ * // localization was built from the orbit of some satellite, then the projected
+ * // coverage will tpypically have a curved aspect.
+ * //</FONT>
+ * GridCoverageProcessor2D processor = GridCoverageProcessor2D.getDefault();
+ * coverage = processor.doOperation( 
+ * 					"Resample", coverage,
+ * 					"CoordinateReferenceSystem", realCRS
+ * );
+ * 
+ * outDataCube = (WritableRaster) ((GridCoverage2D) coverage).getRenderedImage().getData();
+ * </pre></blockquote>
+ *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ * @author Alessio Fabiani
  *
  * @see DerivedCRS
  *
@@ -516,6 +608,10 @@ public class LocalizationGrid {
         return (AffineTransform) global.clone();
     }
 
+    public synchronized WarpPolynomial getPolynomialTransform() {
+    	return fitPolynomial2DPlane();
+    }
+
     /**
      * Fit a plane through the longitude or latitude values. More specifically, find
      * coefficients <var>c</var>, <var>cx</var> and <var>cy</var> for the following
@@ -585,6 +681,65 @@ public class LocalizationGrid {
         coeff[4 + offset] = c;
     }
 
+    private WarpPolynomial fitPolynomial2DPlane() {
+    	float[] destCoords = new float[this.grid.length];
+    	float[] srcCoords = new float[this.grid.length];
+    	
+    	int polyDegree = 2;
+    	
+    	double periodX = 0.0;
+    	double periodY = 0.0;
+    	double lonMax = 0.0;
+    	double latMax = 0.0;
+    	double lonMin = Double.POSITIVE_INFINITY;
+    	double latMin = Double.POSITIVE_INFINITY;
+    	
+    	for( int i = 0; i < this.grid.length; i+=2 ) {
+    		lonMin = (grid[i] <= lonMin ? grid[i] : lonMin);
+    		lonMax = (grid[i] >= lonMax ? grid[i] : lonMax);
+    		latMin = (grid[i + 1] <= latMin ? grid[i + 1] : latMin);
+    		latMax = (grid[i + 1] >= latMax ? grid[i + 1] : latMax);
+    	}
+    	
+    	periodX = (lonMax - lonMin) / this.width;
+    	periodY = (latMax - latMin) / this.height;
+    	
+    	int counter = 0;
+    	for (int yi=0; yi < this.height; yi++) {
+    		for (int xi=0; xi < this.width; xi++) {
+    			srcCoords[counter] = xi;
+    			destCoords[counter] = new Double((grid[computeOffset(xi,yi) + X_OFFSET] - lonMin) / periodX).floatValue();
+    			srcCoords[counter+1] = yi;
+    			destCoords[counter+1] = new Double((grid[computeOffset(xi,yi) + Y_OFFSET] - latMin) / periodY).floatValue();
+    			counter+=2;
+    		}
+    	}
+        
+        /*
+         * Source Coordinates
+         * Source Offset
+         * Dest Coordinates
+         * Dest Offset
+         * Num Coords
+         * PreScale x
+         * PreScale y
+         * PostScale x
+         * PostScale y
+         * Pol. Degree
+         */
+    	WarpPolynomial pol = 
+    		WarpPolynomial.createWarp(
+    				srcCoords, 0, 
+					destCoords, 0, 
+					srcCoords.length / 2, 
+					1.0f / this.width, 1.0f / this.height, 
+					(float) this.width, (float) this.height, 
+					polyDegree
+			);
+    	
+    	return pol;
+    }
+    
     /**
      * Returns a math transform from grid to "real world" coordinates.
      *
@@ -597,6 +752,28 @@ public class LocalizationGrid {
             //       after the math transform creation.
             transform = new LocalizationGridTransform2D(width, height, grid, getAffineTransform());
         }
+        return transform;
+    }
+    
+    public synchronized MathTransform2D getMathTransform(SurfaceInterpolation interpolation) throws IllegalArgumentException {
+    	if( interpolation.equals(SurfaceInterpolation.PLANAR) ) {
+            if (transform == null) {
+                // Note: 'grid' is not cloned. This GridLocalization's grid
+                //       will need to be cloned if a "set" method is invoked
+                //       after the math transform creation.
+                transform = new LocalizationGridTransform2D(width, height, grid, getAffineTransform());
+            }
+    	} else if( interpolation.equals(SurfaceInterpolation.POLYNOMIAL_SPLINE) ) {
+            if (transform == null) {
+                // Note: 'grid' is not cloned. This GridLocalization's grid
+                //       will need to be cloned if a "set" method is invoked
+                //       after the math transform creation.
+                transform = new LocalizationGridPolynomialTransform2D(width, height, grid, getPolynomialTransform());
+            }    		
+    	} else {
+    		throw new IllegalArgumentException("Unhandled Interpolation type.");
+    	}
+    	
         return transform;
     }
 }
