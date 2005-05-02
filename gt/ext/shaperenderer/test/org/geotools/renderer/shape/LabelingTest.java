@@ -20,7 +20,9 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.FeatureSource;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -71,7 +73,7 @@ public class LabelingTest extends TestCase {
 		super.tearDown();
 	}
 	
-	public void testPointLabeling() throws Exception{
+	public void disabletestPointLabeling() throws Exception{
 		FeatureCollection collection=createPointFeatureCollection();
 		Style style=loadStyle("PointStyle.sld");
 		assertNotNull(style);
@@ -82,14 +84,14 @@ public class LabelingTest extends TestCase {
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
+//        Rendering2DTest.INTERACTIVE=INTERACTIVE;
         Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
 	}
 
-	private Style loadStyle(String sldFilename) throws IOException {
+	static Style loadStyle(String sldFilename) throws IOException {
         StyleFactory factory = StyleFactory.createStyleFactory();
 
-        java.net.URL surl = TestData.getResource(this, sldFilename);
+        java.net.URL surl = TestData.getResource(LabelingTest.class, sldFilename);
         SLDParser stylereader = new SLDParser(factory, surl);
 
         Style style = stylereader.readXML()[0];
@@ -130,18 +132,18 @@ public class LabelingTest extends TestCase {
 
    
 	public void testLineLabeling() throws Exception{		
-		FeatureCollection collection=createLineFeatureCollection();
+        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getLines();
 		Style style=loadStyle("LineStyle.sld");
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
-        map.addLayer(collection, style);
+        map.addLayer(ds.getFeatureSource(), style);
         ShapeRenderer renderer = new ShapeRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         Rendering2DTest.INTERACTIVE=INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
+//        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection createLineFeatureCollection() throws Exception {
@@ -178,18 +180,20 @@ public class LabelingTest extends TestCase {
 		
 		return pointFeature;
 	}
-	public void testPolyLabeling() throws Exception{		
-		FeatureCollection collection=createPolyFeatureCollection();
+	public void disabletestPolyLabeling() throws Exception{		
+        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getPolygons();
+        FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
+
 		Style style=loadStyle("PolyStyle.sld");
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
-        map.addLayer(collection, style);
+        map.addLayer(ds.getFeatureSource(), style);
         ShapeRenderer renderer = new ShapeRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
+//        Rendering2DTest.INTERACTIVE=INTERACTIVE;
         Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
 	}
 

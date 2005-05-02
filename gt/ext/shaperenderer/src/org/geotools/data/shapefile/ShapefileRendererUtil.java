@@ -20,7 +20,12 @@ import java.io.IOException;
 import java.nio.channels.ReadableByteChannel;
 
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
+import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
+import org.geotools.renderer.shape.MultiLineHandler;
+import org.opengis.referencing.operation.MathTransform;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * 
@@ -29,9 +34,13 @@ import org.geotools.data.shapefile.shp.ShapefileReader;
  * @author jeichar
  * @since 2.1.x
  */
-public class ShapefileUtil {
-	public static ShapefileReader getShpReader(ShapefileDataStore ds) throws IOException{
-		return new ShapefileReader(ds.getReadChannel(ds.shpURL));
+public class ShapefileRendererUtil {
+	public static ShapefileReader getShpReader(ShapefileDataStore ds, Envelope bbox, MathTransform mt) throws IOException{
+		ShapefileReader reader=new ShapefileReader(ds.getReadChannel(ds.shpURL));
+		ShapeType type=reader.getHeader().getShapeType();
+		if( type==ShapeType.ARC || type==ShapeType.ARCM || type==ShapeType.ARCZ )
+			reader.setHandler(new MultiLineHandler(type, bbox, mt));
+		return reader;
 	}
 	public static DbaseFileReader getDBFReader(ShapefileDataStore ds) throws IOException{
 		return new DbaseFileReader(ds.getReadChannel(ds.dbfURL));

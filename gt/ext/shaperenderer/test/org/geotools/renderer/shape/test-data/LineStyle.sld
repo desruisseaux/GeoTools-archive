@@ -9,10 +9,11 @@
 <Title>urban_places_label</Title>
 <FeatureTypeStyle> 
 <Name>Label_Style_1</Name> 
+<FeatureTypeName>streams</FeatureTypeName> 
 <Rule> 
 <Name>Label</Name> 
 <TextSymbolizer> 
-<Label> <ogc:PropertyName>name</ogc:PropertyName> </Label> 
+<Label> <ogc:PropertyName>LINE</ogc:PropertyName> </Label> 
 <Font> 
 <CssParameter name="font-family">Serif</CssParameter>
 <CssParameter name="font-style">italic</CssParameter>

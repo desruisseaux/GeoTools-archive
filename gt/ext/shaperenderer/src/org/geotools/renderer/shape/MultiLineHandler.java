@@ -1,0 +1,211 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.renderer.shape;
+
+import java.nio.ByteBuffer;
+
+import org.geotools.data.shapefile.shp.ShapeHandler;
+import org.geotools.data.shapefile.shp.ShapeType;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Envelope;
+
+/**
+ * Creates Geometry line objects for use by the ShapeRenderer.
+ * 
+ * @author jeichar
+ * @since 2.1.x
+ */
+public class MultiLineHandler implements ShapeHandler {
+
+	private ShapeType type;
+	private Envelope bbox;
+	private MathTransform mt;
+
+	/**
+	 * Create new instance
+	 * @param type the type of shape.
+	 * @param env the area that is visible.  If shape is not in area then skip.
+	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
+	 */
+	public MultiLineHandler(ShapeType type, Envelope env, MathTransform mt) {
+		this.type=type;
+		this.bbox=env;
+		this.mt=mt;
+	}
+	
+	/**
+	 * @see org.geotools.data.shapefile.shp.ShapeHandler#getShapeType()
+	 */
+	public ShapeType getShapeType() {
+		return type;
+	}
+
+	/**
+	 * @see org.geotools.data.shapefile.shp.ShapeHandler#read(java.nio.ByteBuffer, org.geotools.data.shapefile.shp.ShapeType)
+	 */
+	public Object read(ByteBuffer buffer, ShapeType type) {
+		if (type == ShapeType.NULL) {
+            return null;
+        }
+        
+        int dimensions = (type == ShapeType.ARCZ) ? 3 : 2;
+        // read bounding box
+        double[] tmpbbox=new double[4];
+        tmpbbox[0] = buffer.getDouble();
+        tmpbbox[1]= buffer.getDouble();
+        tmpbbox[2]= buffer.getDouble();
+        tmpbbox[3]= buffer.getDouble();
+        
+        if( !mt.isIdentity())
+			try {
+				mt.transform(tmpbbox,0,tmpbbox, 0, tmpbbox.length/2);
+			} catch (TransformException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1], tmpbbox[3]);
+
+//        if (!bbox.intersects(geomBBox)) {
+//            skipMultiLineGeom(buffer, dimensions);
+//            return null;
+//        }
+
+        int numParts = buffer.getInt();
+        int numPoints = buffer.getInt(); // total number of points
+
+        int[] partOffsets = new int[numParts];
+
+        // points = new Coordinate[numPoints];
+        for( int i = 0; i < numParts; i++ ) {
+            partOffsets[i] = buffer.getInt();
+        }
+        double[][] coords = new double[numParts][];
+        double[][] transformed=new double[numParts][];
+        // if needed in future otherwise all references to a z are commented out.
+        // if( dimensions==3 )
+        // z=new double[numParts][];
+
+        int finish, start = 0;
+        int length = 0;
+        // boolean clonePoint = false;
+        for( int part = 0; part < numParts; part++ ) {
+            start = partOffsets[part];
+
+            if (part == (numParts - 1)) {
+                finish = numPoints;
+            } else {
+                finish = partOffsets[part + 1];
+            }
+
+            length = finish - start;
+            // if (length == 1) {
+            // length = 2;
+            // clonePoint = true;
+            // } else {
+            // clonePoint = false;
+            // }
+            coords[part] = new double[length * 2];
+            transformed[part] = new double[length * 2];
+            for( int i = 0; i < length*2;  ) {
+                coords[part][i] = buffer.getDouble();
+                i++;
+                coords[part][i] = buffer.getDouble();
+                i++;
+            }
+            if( !mt.isIdentity() ){
+	            try {
+	                mt.transform(coords[part], 0, transformed[part], 0, length);
+	            } catch (Exception e) {
+	                ShapeRenderer.LOGGER.severe("could not transform coordinates"
+	                        + e.getLocalizedMessage());
+	            }
+            }else
+            	transformed[part]=coords[part];
+            // if(clonePoint) {
+            // builder.setOrdinate(builder.getOrdinate(0, 0), 0, 1);
+            // builder.setOrdinate(builder.getOrdinate(1, 0), 1, 1);
+            // }
+
+        }
+
+        // if we have another coordinate, read and add to the coordinate
+        // sequences
+        if (dimensions == 3) {
+            // z min, max
+            buffer.position(buffer.position() + 2 * 8 + 8 * numPoints);
+            // for (int part = 0; part < numParts; part++) {
+            // start = partOffsets[part];
+            //
+            // if (part == (numParts - 1)) {
+            // finish = numPoints;
+            // } else {
+            // finish = partOffsets[part + 1];
+            // }
+            //
+            // length = finish - start;
+            // // if (length == 1) {
+            // // length = 2;
+            // // clonePoint = true;
+            // // } else {
+            // // clonePoint = false;
+            // // }
+            //
+            // for (int i = 0; i < length; i++) {
+            // builder.setOrdinate(lines[part], buffer.getDouble(), 2, i);
+            // }
+            //
+            // }
+        }
+        return new Geometry(type, transformed, geomBBox);
+	}
+
+    private void skipMultiLineGeom( ByteBuffer buffer, int dimensions ) {
+        int numParts = buffer.getInt();
+        int numPoints = buffer.getInt(); // total number of points
+
+        // skip partOffsets
+        buffer.position(buffer.position() + numParts * 4);
+
+        // skip x y points;
+        buffer.position(buffer.position() + numPoints * 4);
+
+        // if we have another coordinate, read and add to the coordinate
+        // sequences
+        if (dimensions == 3) {
+            // skip z min, max and z points
+            buffer.position(buffer.position() + 2 * 8 + 8 * numPoints);
+        }
+    }
+	/**
+	 * @see org.geotools.data.shapefile.shp.ShapeHandler#write(java.nio.ByteBuffer, java.lang.Object)
+	 */
+	public void write(ByteBuffer buffer, Object geometry) {
+		// This handler doesnt write
+		throw new UnsupportedOperationException("This handler is only for reading");
+	}
+
+	/**
+	 * @see org.geotools.data.shapefile.shp.ShapeHandler#getLength(java.lang.Object)
+	 */
+	public int getLength(Object geometry) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}
