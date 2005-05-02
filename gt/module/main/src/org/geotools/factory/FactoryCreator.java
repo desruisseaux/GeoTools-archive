@@ -106,7 +106,7 @@ public class FactoryCreator extends FactoryRegistry {
                         // have been accepted by 'getServiceProvider(...)'.
                     }
                     if (type!=null && category.isAssignableFrom(type)) {
-                        return createServiceProvider(type, hints);
+                        return createServiceProvider(category, type, hints);
                     }
                 }
             }
@@ -123,7 +123,7 @@ public class FactoryCreator extends FactoryRegistry {
                 // No public constructor with the expected argument.
                 continue;
             }
-            return createServiceProvider(implementation, hints);
+            return createServiceProvider(category, implementation, hints);
         }
         throw notFound;
     }
@@ -137,12 +137,15 @@ public class FactoryCreator extends FactoryRegistry {
      *   <li>No-argument constructor.</li>
      * </ul>
      *
+     * @param  category The category to instantiate.
      * @param  implementation The factory class to instantiate.
      * @param  hints The implementation hints.
      * @return The factory.
      * @throws FactoryRegistryException if the factory creation failed.
      */
-    protected Object createServiceProvider(final Class implementation, final Hints hints)
+    protected Object createServiceProvider(final Class category,
+                                           final Class implementation,
+                                           final Hints hints)
             throws FactoryRegistryException
     {
         Throwable cause;

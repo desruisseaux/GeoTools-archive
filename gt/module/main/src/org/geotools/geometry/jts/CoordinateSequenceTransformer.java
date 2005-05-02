@@ -25,7 +25,6 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 /**
  * Interface that should be implemented by classes able to apply the provided 
  * transformation to a coordinate sequence.
- * Use with care for the moment, since it depends on deprecated objects.
  *
  * @author Andrea Aime
  */

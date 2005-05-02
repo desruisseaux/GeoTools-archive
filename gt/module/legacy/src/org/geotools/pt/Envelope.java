@@ -508,4 +508,8 @@ public class Envelope implements org.opengis.spatialschema.geometry.Envelope,
         return new Envelope(envelope.getLowerCorner().getCoordinates(),
                             envelope.getUpperCorner().getCoordinates());
     }
+
+    public org.opengis.referencing.crs.CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return null;
+    }
 }

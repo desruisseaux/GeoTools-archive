@@ -98,7 +98,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * {@linkplain #scanForPlugins scan for plugins} the first time it is invoked for the
      * given category.
      *
-     * @param category The category to look for. Must be an interface class
+     * @param category The category to look for. Usually an interface class
      *                 (not the actual implementation class).
      * @return Factories ready to use for the specified category.
      */
@@ -125,7 +125,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * created by the default implementation of this method. The {@link FactoryCreator} class
      * change this behavior however.
      *
-     * @param  category The category to look for. Must be an interface class
+     * @param  category The category to look for. Usually an interface class
      *                  (not the actual implementation class).
      * @param  filter   An optional filter, or {@code null} if none. This is used for example in
      *                  order to select the first factory for some {@linkplain
@@ -197,7 +197,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * Search the first implementation in the registery matching the specified conditions.
      * This method do not creates new instance if no matching factory is found.
      *
-     * @param  category       The category to look for. Must be an interface class.
+     * @param  category       The category to look for. Usually an interface class.
      * @param  implementation The desired class for the implementation, or {@code null} if none.
      * @param  filter         An optional filter, or {@code null} if none.
      * @param  hints          A {@linkplain Hints map of hints}, or {@code null} if none.
@@ -216,11 +216,11 @@ public class FactoryRegistry extends ServiceRegistry {
             }
             if (hints != null) {
                 if (candidate instanceof Factory) {
-                    if (!isAcceptable((Factory) candidate, hints, null)) {
+                    if (!isAcceptable((Factory) candidate, category, hints, null)) {
                         continue;
                     }
                 }
-                if (!isAcceptable(candidate, hints)) {
+                if (!isAcceptable(candidate, category, hints)) {
                     continue;
                 }
             }
@@ -234,11 +234,16 @@ public class FactoryRegistry extends ServiceRegistry {
      * map of {@code hints}.
      *
      * @param factory     The factory to checks.
+     * @param category    The factory's category. Usually be an interface class.
      * @param hints       The user requirements.
      * @param alreadyDone Should be {@code null} except on recursive calls (for internal use only).
      * @return {@code true} if the {@code factory} meets the user requirements.
      */
-    private boolean isAcceptable(final Factory factory, final Hints hints, Set alreadyDone) {
+    private boolean isAcceptable(final Factory factory,
+                                 final Class   category,
+                                 final Hints   hints,
+                                       Set     alreadyDone)
+    {
         for (final Iterator it=factory.getImplementationHints().entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
             final Object    value = entry.getValue();
@@ -262,7 +267,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
             }
             // User check (overridable).
-            if (!isAcceptable(value, hints)) {
+            if (!isAcceptable(value, category, hints)) {
                 return false;
             }
             /*
@@ -275,7 +280,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
                 if (!alreadyDone.contains(value)) {
                     alreadyDone.add(factory);
-                    if (!isAcceptable((Factory) value, hints, alreadyDone)) {
+                    if (!isAcceptable((Factory) value, category, hints, alreadyDone)) {
                         return false;
                     }
                 }
@@ -296,10 +301,11 @@ public class FactoryRegistry extends ServiceRegistry {
      * {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory}.
      *
      * @param provider The provider to checks.
+     * @param category The factory's category. Usually an interface class.
      * @param hints    The user requirements.
      * @return {@code true} if the {@code provider} meets the user requirements.
      */
-    protected boolean isAcceptable(final Object provider, final Hints hints) {
+    protected boolean isAcceptable(final Object provider, final Class category, final Hints hints) {
         return true;
     }
 

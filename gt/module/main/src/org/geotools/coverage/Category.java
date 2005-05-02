@@ -615,11 +615,13 @@ public class Category implements Serializable {
         final double maxSample = doubleValue(sType,     sampleValueRange.getMaxValue(), sMaxInc);
         final double minValue  = doubleValue(gType, geophysicsValueRange.getMinValue(), gMinInc);
         final double maxValue  = doubleValue(gType, geophysicsValueRange.getMaxValue(), gMaxInc);
-        double scale     = (maxValue-minValue) / (maxSample-minSample);
-	  if(Double.isNaN(scale)&& 
-		!Double.isNaN(maxValue-minValue)&& 
-		!Double.isNaN(maxSample-minSample))
-			scale=1.0;
+        double scale = (maxValue-minValue) / (maxSample-minSample);
+        if (Double.isNaN(scale) &&
+           !Double.isNaN(maxValue  - minValue) &&
+           !Double.isNaN(maxSample - minSample))
+        {
+            scale = 1.0;
+        }
         final double offset    = minValue - scale*minSample;
         return createLinearTransform(scale, offset);
     }

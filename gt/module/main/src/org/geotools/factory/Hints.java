@@ -73,6 +73,30 @@ import org.geotools.resources.Utilities;
  */
 public final class Hints extends RenderingHints {
     /**
+     * Hint for the {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
+     */
+    public static final Key JTS_GEOMETRY_FACTORY =
+            new Key("com.vividsolutions.jts.geom.GeometryFactory");
+
+    /**
+     * Hint for the {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory} instance to use.
+     */
+    public static final Key JTS_COORDINATE_SEQUENCE_FACTORY =
+            new Key("com.vividsolutions.jts.geom.CoordinateSequenceFactory");
+
+    /**
+     * Hint for the {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
+     */
+    public static final Key JTS_PRECISION_MODEL =
+            new Key("com.vividsolutions.jts.geom.PrecisionModel");
+
+    /**
+     * The spatial reference ID for {@link com.vividsolutions.jts.geom.GeometryFactory}.
+     */
+    public static final Key JTS_SRID =
+            new Key("java.lang.Integer");
+
+    /**
      * Hint for the {@link CRSAuthorityFactory} instance to use.
      */
     public static final Key CRS_AUTHORITY_FACTORY =
@@ -212,6 +236,9 @@ public final class Hints extends RenderingHints {
 
         /**
          * Returns the hint key for the specified category.
+         *
+         * @deprecated This method need to be removed. The key should be explicitly specified
+         *             as an argument to {@link FactoryRegistry#getServiceProvider} instead.
          */
         static Key getKeyForCategory(final Class type) {
             return (Key) byClassName.get(type.getName());
