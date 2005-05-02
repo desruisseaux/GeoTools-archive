@@ -124,13 +124,17 @@ public class DbaseFileHeader {
         typeClass = String.class;
         break;
         
-      case 'N': 
-        if (fields[i].decimalCount == 0) {
-          typeClass = Integer.class;
-        } else {
-          typeClass = Double.class;
-        }
-        break;
+        case 'N':
+            if (fields[i].decimalCount == 0) {
+                if (fields[i].fieldLength<10) {
+                    typeClass = Integer.class;
+                } else {
+                    typeClass = Long.class;
+                }
+            } else {
+                typeClass = Double.class;
+            }
+            break;
         
       case 'F': 
         typeClass = Double.class;
