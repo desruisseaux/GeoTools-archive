@@ -23,11 +23,14 @@
 package org.geotools.gce.geotiff;
 
 import junit.framework.TestCase;
+
+import org.esa.beam.util.geotiff.GeoTIFFMetadata;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.gce.arcgrid.ArcGridReader;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
+import org.geotools.referencing.wkt.ParseWKT2GeoTiffMetadata;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import java.awt.BorderLayout;
@@ -35,6 +38,8 @@ import java.awt.Color;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+
 import javax.media.jai.PlanarImage;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -64,7 +69,7 @@ public class GeoTiffReaderWriterTest { // extends TestCase {
     public static void main(String[] args)
         throws IllegalArgumentException, IOException {
         //junit.textui.TestRunner.run(GeoTiffReaderTest.class);
-        GeoTiffReaderWriterTest.testReader();
+        GeoTiffReaderWriterTest.testWriter();
     }
 
     /*
@@ -128,25 +133,56 @@ public class GeoTiffReaderWriterTest { // extends TestCase {
 
     public static void testWriter()
         throws IllegalArgumentException, IOException {
-        File file = new File(
-                "D:\\Program Files\\Apache Software Foundation\\Tomcat 5.0\\webapps\\geoserver\\data\\coverages\\arc_sample\\a.asc");
-
-        //getting a reader
-        AbstractGridFormat format = new GeoTiffFormat();
-
-        if (format.accepts(file)) {
-            GridCoverageReader reader = new ArcGridReader( file);
-
-            if (reader != null) {
-                //reading the coverage
-                GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-
-                if (gc != null) {
-                    GridCoverageWriter writer = new GeoTiffWriter(new File(
-                                "c:\\a.tiff"));
-                    writer.write(gc, null);
-                }
-            }
-        }
+//        File file = new File(
+//                "c:\\Programmi\\Apache Software Foundation\\Tomcat 5.0\\webapps\\geoserver\\data\\coverages\\arc_sample\\a.asc");
+//
+//        //getting a reader
+//        AbstractGridFormat format = new GeoTiffFormat();
+//
+//        if (format.accepts(file)) {
+//            GridCoverageReader reader = new ArcGridReader( file);
+//
+//            if (reader != null) {
+//                //reading the coverage
+//                GridCoverage2D gc = (GridCoverage2D) reader.read(null);
+//
+//                if (gc != null) {
+//                    GridCoverageWriter writer = new GeoTiffWriter(new File(
+//                                "c:\\a.tiff"));
+//                    writer.write(gc, null);
+//                }
+//				}
+//        }
+    	String wkt = "PROJCS[\"UTM_Zone_10N\", "
+            + "GEOGCS[\"WGS84\", "
+                + "DATUM[\"WGS84\", "
+                + "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], "
+                + "PRIMEM[\"Greenwich\", 0.0], "
+                + "UNIT[\"degree\",0.017453292519943295], "
+                + "AXIS[\"Longitude\",EAST], "
+                + "AXIS[\"Latitude\",NORTH]], "
+            + "PROJECTION[\"Transverse_Mercator\"], "
+            + "PARAMETER[\"semi_major\", 6378137.0], "
+            + "PARAMETER[\"semi_minor\", 6356752.314245179], "
+            + "PARAMETER[\"central_meridian\", -123.0], "
+            + "PARAMETER[\"latitude_of_origin\", 0.0], "
+            + "PARAMETER[\"scale_factor\", 0.9996], "
+            + "PARAMETER[\"false_easting\", 500000.0], "
+            + "PARAMETER[\"false_northing\", 0.0], "
+            + "UNIT[\"metre\",1.0], "
+            + "AXIS[\"x\",EAST], "
+            + "AXIS[\"y\",NORTH]]";
+    	GeoTIFFMetadata metadata=new GeoTIFFMetadata();
+    	ParseWKT2GeoTiffMetadata parser=new ParseWKT2GeoTiffMetadata(
+    			wkt,
+    			metadata);
+    	try {
+			parser.parseCoordinateReferenceSystem();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	System.out.println(metadata.getAsXML());
     }
 }
