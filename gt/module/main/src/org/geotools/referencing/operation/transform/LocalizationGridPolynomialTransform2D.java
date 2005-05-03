@@ -1,7 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
+ * (C) 2005, Geotools Project Management Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -49,31 +48,26 @@ import org.opengis.referencing.operation.MathTransform2D;
  * @author Alessio Fabiani
  */
 final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
-                                     implements MathTransform2D, Serializable
+                                               implements MathTransform2D, Serializable
 {
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = 1067560328828441289L;
-
     /**
      * <var>x</var> (usually longitude) offset relative to an entry.
      * Points are stored in {@link #grid} as <code>(x,y)</code> pairs.
      */
     private static final int X_OFFSET = LocalizationGridTransform2D.X_OFFSET;
-
+    
     /**
      * <var>y</var> (usually latitude) offset relative to an entry.
      * Points are stored in {@link #grid} as <code>(x,y)</code> pairs.
      */
     private static final int Y_OFFSET = LocalizationGridTransform2D.Y_OFFSET;
-
+    
     /**
      * Length of an entry in the {@link #grid} array. This lenght
      * is equals to the dimension of output coordinate points.
      */
     private static final int CP_LENGTH = LocalizationGridTransform2D.CP_LENGTH;
-
+    
     /**
      * Number of grid's columns.
      */
@@ -83,23 +77,18 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
      * Number of grid's rows.
      */
     private final int height;
-               
+    
     /**
      * Grid of coordinate points.
      * Points are stored as <code>(x,y)</code> pairs.
      */
     private final double[] grid;
-
+    
     /**
      * The warp polynomial.
      */
     private final WarpPolynomial pol;
-
-    /**
-     * The direct math transform.
-     */
-    private transient MathTransform transform;
-
+    
     /**
      * The inverse math transform. Will be constructed only when first requested.
      */
@@ -134,36 +123,35 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
      * @param global A global affine transform for the whole grid.
      */
     protected LocalizationGridPolynomialTransform2D(final int width, final int height, final double[] grid,
-                                          final WarpPolynomial pol)
-    {
+            final WarpPolynomial pol) {
         this.width  = width;
         this.height = height;
         this.grid   = grid;
         this.pol = pol;
     }
-
+    
     /**
      * Returns the dimension of input points.
-     */    
+     */
     public int getSourceDimensions() {
         return 2;
     }
     
     /**
      * Returns the dimension of output points.
-     */    
+     */
     public int getTargetDimensions() {
         return 2;
     }
     
     /**
      * Tests if this transform is the identity transform.
-     */    
+     */
     public boolean isIdentity() {
         return false;
     }
-
-    /** 
+    
+    /**
      * Transforme des coordonnées sources (généralement des index de pixels) en coordonnées
      * destinations (généralement des degrés de longitude et latitude). Les transformations
      * feront intervenir des interpolations linéaires si les coordonnées sources ne sont pas
@@ -174,14 +162,13 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
      * @param  dstPts  Points de sortie.
      * @param  dstOff  Index du premier point de sortie.
      * @param  numPts  Nombre de points à transformer.
-     */    
+     */
     public void transform(final float[] srcPts, int srcOff,
-                          final float[] dstPts, int dstOff, int numPts)
-    {
+            final float[] dstPts, int dstOff, int numPts) {
         transform(srcPts, null, srcOff, dstPts, null, dstOff, numPts);
     }
-
-    /** 
+    
+    /**
      * Transforme des coordonnées sources (généralement des index de pixels) en coordonnées
      * destinations (généralement des degrés de longitude et latitude). Les transformations
      * feront intervenir des interpolations linéaires si les coordonnées sources ne sont pas
@@ -192,19 +179,17 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
      * @param  dstPts  Points de sortie.
      * @param  dstOff  Index du premier point de sortie.
      * @param  numPts  Nombre de points à transformer.
-     */    
+     */
     public void transform(final double[] srcPts, int srcOff,
-                          final double[] dstPts, int dstOff, int numPts)
-    {
+            final double[] dstPts, int dstOff, int numPts) {
         transform(null, srcPts, srcOff, null, dstPts, dstOff, numPts);
     }
-
+    
     /**
      * Implementation of direct transformation.
      */
     private void transform(final float[] srcPts1, final double[] srcPts2, int srcOff,
-                           final float[] dstPts1, final double[] dstPts2, int dstOff, int numPts)
-    {
+            final float[] dstPts1, final double[] dstPts2, int dstOff, int numPts) {
         final int minCol = 0;
         final int minRow = 0;
         final int maxCol = width  - 2;
@@ -218,32 +203,31 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
             }
         }
         
+        float[] dstCoords = new float[2];
         int ptCnt = numPts;
         while (--ptCnt >= 0) {
             final double xi, yi;
             if (srcPts2 != null) {
-            	xi = srcPts2[srcOff++];
-            	yi = srcPts2[srcOff++];
-            	
-            	float[] dstCoords = new float[2];
-            	this.pol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
-            	
-            	dstPts2[dstOff++] = dstCoords[0];
-            	dstPts2[dstOff++] = dstCoords[1];
+                xi = srcPts2[srcOff++];
+                yi = srcPts2[srcOff++];
+                
+                this.pol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
+                
+                dstPts2[dstOff++] = dstCoords[0];
+                dstPts2[dstOff++] = dstCoords[1];
             } else {
-            	xi = srcPts1[srcOff++];
-            	yi = srcPts1[srcOff++];
-            	
-            	float[] dstCoords = new float[2];
-            	this.pol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
-            	
-            	dstPts1[dstOff++] = dstCoords[0];
-            	dstPts1[dstOff++] = dstCoords[1];
+                xi = srcPts1[srcOff++];
+                yi = srcPts1[srcOff++];
+                
+                this.pol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
+                
+                dstPts1[dstOff++] = dstCoords[0];
+                dstPts1[dstOff++] = dstCoords[1];
             }
         }
     }
-
-    /** 
+    
+    /**
      * Returns the inverse transform.
      */
     public MathTransform inverse() {
@@ -252,7 +236,7 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
         }
         return inverse;
     }
-
+    
     /**
      * The inverse transform. This inner class is
      * the inverse of the enclosing math transform.
@@ -261,18 +245,17 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
      * @author Alessio Fabiani
      */
     private final class Inverse extends AbstractMathTransform.Inverse implements MathTransform2D,
-                                                                                 Serializable
-    {
+            Serializable {
         /**
          * Serial number for interoperability with different versions.
          */
         private static final long serialVersionUID = 4876426825123740967L;
-
+        
         /**
          * The warp polynomial.
          */
         private final WarpPolynomial invPol;
-
+        
         /**
          * Default constructor.
          */
@@ -280,104 +263,103 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
             LocalizationGridPolynomialTransform2D.this.super();
             this.invPol = this.fitPolynomial2DPlane();
         }
-
+        
         /**
          * Transform a "real world" coordinate into a grid coordinate.
          */
         public void transform(final float[] srcPts, int srcOff,
-        		final float[] dstPts, int dstOff, int numPts)
+                              final float[] dstPts, int dstOff, int numPts)
         {
-        	transform(srcPts, null, srcOff, dstPts, null, dstOff, numPts);
+            transform(srcPts, null, srcOff, dstPts, null, dstOff, numPts);
         }
         
         public void transform(final double[] srcPts, int srcOff,
-        		final double[] dstPts, int dstOff, int numPts)
+                              final double[] dstPts, int dstOff, int numPts)
         {
-        	transform(null, srcPts, srcOff, null, dstPts, dstOff, numPts);
+            transform(null, srcPts, srcOff, null, dstPts, dstOff, numPts);
         }
         
         /**
          * Implementation of inverse transformation.
          */
         private void transform(final float[] srcPts1, final double[] srcPts2, int srcOff,
-        		final float[] dstPts1, final double[] dstPts2, int dstOff, int numPts)
-        {
-        	
-        	final int minCol = 0;
-        	final int minRow = 0;
-        	final int maxCol = width  - 2;
-        	final int maxRow = height - 2;
-        	int postIncrement = 0;
-        	if (srcOff < dstOff) {
-        		if ((srcPts2!=null) ? srcPts2==dstPts2 : srcPts1==dstPts1) {
-        			srcOff += (numPts-1)*2;
-        			dstOff += (numPts-1)*2;
-        			postIncrement = -4;
-        		}
-        	}
-        	
+                final float[] dstPts1, final double[] dstPts2, int dstOff, int numPts) {
+            
+            final int minCol = 0;
+            final int minRow = 0;
+            final int maxCol = width  - 2;
+            final int maxRow = height - 2;
+            int postIncrement = 0;
+            if (srcOff < dstOff) {
+                if ((srcPts2!=null) ? srcPts2==dstPts2 : srcPts1==dstPts1) {
+                    srcOff += (numPts-1)*2;
+                    dstOff += (numPts-1)*2;
+                    postIncrement = -4;
+                }
+            }
+            
             int ptCnt = numPts;
             while (--ptCnt >= 0) {
                 final double xi, yi;
                 if (srcPts2 != null) {
-                	xi = srcPts2[srcOff++];
-                	yi = srcPts2[srcOff++];
-                	
-                	float[] dstCoords = new float[2];
-                	this.invPol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
-                	
-                	dstPts2[dstOff++] = dstCoords[0];
-                	dstPts2[dstOff++] = dstCoords[1];
+                    xi = srcPts2[srcOff++];
+                    yi = srcPts2[srcOff++];
+                    
+                    float[] dstCoords = new float[2];
+                    this.invPol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
+                    
+                    dstPts2[dstOff++] = dstCoords[0];
+                    dstPts2[dstOff++] = dstCoords[1];
                 } else {
-                	xi = srcPts1[srcOff++];
-                	yi = srcPts1[srcOff++];
-                	
-                	float[] dstCoords = new float[2];
-                	this.invPol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
-                	
-                	dstPts1[dstOff++] = dstCoords[0];
-                	dstPts1[dstOff++] = dstCoords[1];
+                    xi = srcPts1[srcOff++];
+                    yi = srcPts1[srcOff++];
+                    
+                    float[] dstCoords = new float[2];
+                    this.invPol.warpPoint((int) Math.round(Math.floor(xi)), (int) Math.round(Math.floor(yi)), dstCoords);
+                    
+                    dstPts1[dstOff++] = dstCoords[0];
+                    dstPts1[dstOff++] = dstCoords[1];
                 }
             }
         }
-
+        
         private WarpPolynomial fitPolynomial2DPlane() {
-        	
-        	final int polyDegree = 2;
-        	final int numNeededPoints = (polyDegree + 1)*(polyDegree + 2)/2;
-        	final int imageWidth = LocalizationGridPolynomialTransform2D.this.width;
-        	final int imageHeight = LocalizationGridPolynomialTransform2D.this.height;
-        	float[] destCoords = new float[2 * imageWidth * imageHeight];
-        	float[] srcCoords = new float[2 * imageWidth * imageHeight];
-
-        	double periodX = 0.0;
-        	double periodY = 0.0;
-        	double lonMax = - Double.MAX_VALUE;
-        	double latMax = - Double.MAX_VALUE;
-        	double lonMin = Double.MAX_VALUE;
-        	double latMin = Double.MAX_VALUE;
-
-        	for( int i = 0; i < LocalizationGridPolynomialTransform2D.this.grid.length; i+=2 ) {
-        		lonMin = (LocalizationGridPolynomialTransform2D.this.grid[i] <= lonMin ? LocalizationGridPolynomialTransform2D.this.grid[i] : lonMin);
-        		lonMax = (LocalizationGridPolynomialTransform2D.this.grid[i] >= lonMax ? LocalizationGridPolynomialTransform2D.this.grid[i] : lonMax);
-        		latMin = (LocalizationGridPolynomialTransform2D.this.grid[i + 1] <= latMin ? LocalizationGridPolynomialTransform2D.this.grid[i + 1] : latMin);
-        		latMax = (LocalizationGridPolynomialTransform2D.this.grid[i + 1] >= latMax ? LocalizationGridPolynomialTransform2D.this.grid[i + 1] : latMax);
-        	}
-
-        	periodX = (lonMax - lonMin) / imageWidth;
-        	periodY = (latMax - latMin) / imageHeight;
-        	
-        	int counter = 0;
-        	for (int yi=0; yi < imageHeight; yi++) {
-        		for (int xi=0; xi < imageWidth; xi++) {
-        			destCoords[counter] = xi;
-        			srcCoords[counter] = (float) ((grid[LocalizationGridPolynomialTransform2D.this.computeOffset(xi,yi) + LocalizationGridPolynomialTransform2D.this.X_OFFSET] - lonMin) / periodX);
-        			destCoords[counter+1] = yi;
-        			srcCoords[counter+1] = (float) ((grid[LocalizationGridPolynomialTransform2D.this.computeOffset(xi,yi) + LocalizationGridPolynomialTransform2D.this.Y_OFFSET] - latMin) / periodY);
-        			counter+=2;
-        		}
-        	}
-
+            
+            final int polyDegree = 2;
+            final int numNeededPoints = (polyDegree + 1)*(polyDegree + 2)/2;
+            final int imageWidth = LocalizationGridPolynomialTransform2D.this.width;
+            final int imageHeight = LocalizationGridPolynomialTransform2D.this.height;
+            float[] destCoords = new float[2 * imageWidth * imageHeight];
+            float[] srcCoords = new float[2 * imageWidth * imageHeight];
+            
+            double periodX = 0.0;
+            double periodY = 0.0;
+            double lonMax = - Double.MAX_VALUE;
+            double latMax = - Double.MAX_VALUE;
+            double lonMin = Double.MAX_VALUE;
+            double latMin = Double.MAX_VALUE;
+            
+            for( int i = 0; i < LocalizationGridPolynomialTransform2D.this.grid.length; i+=2 ) {
+                lonMin = (LocalizationGridPolynomialTransform2D.this.grid[i] <= lonMin ? LocalizationGridPolynomialTransform2D.this.grid[i] : lonMin);
+                lonMax = (LocalizationGridPolynomialTransform2D.this.grid[i] >= lonMax ? LocalizationGridPolynomialTransform2D.this.grid[i] : lonMax);
+                latMin = (LocalizationGridPolynomialTransform2D.this.grid[i + 1] <= latMin ? LocalizationGridPolynomialTransform2D.this.grid[i + 1] : latMin);
+                latMax = (LocalizationGridPolynomialTransform2D.this.grid[i + 1] >= latMax ? LocalizationGridPolynomialTransform2D.this.grid[i + 1] : latMax);
+            }
+            
+            periodX = (lonMax - lonMin) / imageWidth;
+            periodY = (latMax - latMin) / imageHeight;
+            
+            int counter = 0;
+            for (int yi=0; yi < imageHeight; yi++) {
+                for (int xi=0; xi < imageWidth; xi++) {
+                    destCoords[counter] = xi;
+                    srcCoords[counter] = (float) ((grid[LocalizationGridPolynomialTransform2D.this.computeOffset(xi,yi) + LocalizationGridPolynomialTransform2D.this.X_OFFSET] - lonMin) / periodX);
+                    destCoords[counter+1] = yi;
+                    srcCoords[counter+1] = (float) ((grid[LocalizationGridPolynomialTransform2D.this.computeOffset(xi,yi) + LocalizationGridPolynomialTransform2D.this.Y_OFFSET] - latMin) / periodY);
+                    counter+=2;
+                }
+            }
+            
             /*
              * Source Coordinates
              * Source Offset
@@ -390,17 +372,17 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
              * PostScale y
              * Pol. Degree
              */
-        	WarpPolynomial pol = 
-        		WarpPolynomial.createWarp(
-        				srcCoords, 0, 
-						destCoords, 0, 
-						srcCoords.length / 2, 
-						1.0f / imageWidth, 1.0f / imageHeight, 
-						(float) imageWidth, (float) imageHeight, 
-						polyDegree
-				);
-        	
-        	return pol;
+            WarpPolynomial pol =
+                    WarpPolynomial.createWarp(
+                    srcCoords, 0,
+                    destCoords, 0,
+                    srcCoords.length / 2,
+                    1.0f / imageWidth, 1.0f / imageHeight,
+                    (float) imageWidth, (float) imageHeight,
+                    polyDegree
+                    );
+            
+            return pol;
         }
         
         /**
@@ -411,7 +393,7 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
             LocalizationGridPolynomialTransform2D.this.inverse = this;
         }
     }
-
+    
     
     /**
      * Returns a hash value for this transform.
@@ -419,7 +401,7 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
     public int hashCode() {
         return super.hashCode() ^ this.pol.hashCode();
     }
-
+    
     /**
      * Compare this transform with the specified object for equality.
      */
@@ -427,9 +409,9 @@ final class LocalizationGridPolynomialTransform2D extends AbstractMathTransform
         if (super.equals(object)) {
             final LocalizationGridPolynomialTransform2D that = (LocalizationGridPolynomialTransform2D) object;
             return this.width  == that.width   &&
-                   this.height == that.height  &&
-                   Utilities.equals(this.pol, that.pol) &&
-                   Arrays   .equals(this.grid,   that.grid);
+                    this.height == that.height  &&
+                    Utilities.equals(this.pol, that.pol) &&
+                    Arrays   .equals(this.grid,   that.grid);
         }
         return false;
     }

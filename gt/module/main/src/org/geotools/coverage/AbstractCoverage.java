@@ -41,6 +41,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
+// AWT
+import java.awt.Frame;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
+
 // Miscellaneous
 import java.util.Map;
 import java.util.Vector;
@@ -64,6 +69,7 @@ import javax.media.jai.util.CaselessStringKey;           // For Javadoc
 import javax.media.jai.operator.ImageFunctionDescriptor; // For Javadoc
 import javax.media.jai.iterator.RectIterFactory;
 import javax.media.jai.iterator.WritableRectIter;
+import javax.media.jai.widget.ScrollingImagePanel;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -513,8 +519,8 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * Returns 2D view of this grid coverage as a renderable image.
      * This method allows interoperability with Java2D.
      *
-     * @param  xAxis Dimension to use for <var>x</var> axis.
-     * @param  yAxis Dimension to use for <var>y</var> axis.
+     * @param  xAxis Dimension to use for the <var>x</var> display axis.
+     * @param  yAxis Dimension to use for the <var>y</var> display axis.
      * @return A 2D view of this grid coverage as a renderable image.
      */
     public RenderableImage getRenderableImage(final int xAxis, final int yAxis) {
@@ -928,6 +934,35 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                 coordinate.ordinates[1] += deltaY;
             }
         }
+    }
+
+    /**
+     * Display this coverage in a windows. This convenience method is used for debugging purpose.
+     * The exact appareance of the windows and the tools provided may changes in future versions.
+     *
+     * @param  xAxis Dimension to use for the <var>x</var> display axis.
+     * @param  yAxis Dimension to use for the <var>y</var> display axis.
+     */
+    public void show(final int xAxis, final int yAxis) {
+        final RenderedImage image = getRenderableImage(xAxis, yAxis).createDefaultRendering();
+        final Frame frame = new Frame(String.valueOf(getName()));
+        frame.add(new ScrollingImagePanel(image, Math.max(Math.min(image.getWidth(),  640), 24),
+                                                 Math.max(Math.min(image.getHeight(), 640), 24)));
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                frame.dispose();
+            }
+        });
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Display this coverage in a windows. This convenience method is used for debugging purpose.
+     * The exact appareance of the windows and the tools provided may changes in future versions.
+     */
+    public void show() {
+        show(0,1);
     }
 
     /**

@@ -368,6 +368,22 @@ public class CoordinateSystemAxis extends IdentifiedObject
             ResourceKeys.TIME, "t", AxisDirection.FUTURE, NonSI.DAY);
 
     /**
+     * A default axis for column indices in a {@linkplain org.opengis.coverage.grid.GridCoverage
+     * grid coverage}. Increasing values go toward {@linkplain AxisDirection#COLUMN_POSITIVE
+     * positive column number}. The abbreviation is lower case "i".
+     */
+    public static final CoordinateSystemAxis COLUMN = new CoordinateSystemAxis(
+            ResourceKeys.COLUMN, "i", AxisDirection.COLUMN_POSITIVE, Unit.ONE);
+
+    /**
+     * A default axis for row indices in a {@linkplain org.opengis.coverage.grid.GridCoverage grid
+     * coverage}. Increasing values go toward {@linkplain AxisDirection#ROW_POSITIVE positive row
+     * number}. The abbreviation is lower case "j".
+     */
+    public static final CoordinateSystemAxis ROW = new CoordinateSystemAxis(
+            ResourceKeys.ROW, "j", AxisDirection.ROW_POSITIVE, Unit.ONE);
+
+    /**
      * The abbreviation used for this coordinate system axes. This abbreviation is also
      * used to identify the ordinates in coordinate tuple. Examples are "<var>X</var>"
      * and "<var>Y</var>".

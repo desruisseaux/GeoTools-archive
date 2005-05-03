@@ -730,7 +730,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @throws InvalidParameterValueException if <code>object</code> is null.
      */
     protected static void ensureNonNull(final String name, final Object object)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         if (object == null) {
             throw new InvalidParameterValueException(Resources.format(
@@ -748,7 +748,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @throws InvalidParameterValueException if <code>array[i]</code> is null.
      */
     protected static void ensureNonNull(final String name, final Object[] array, final int index)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         if (array[index] == null) {
             throw new InvalidParameterValueException(Resources.format(

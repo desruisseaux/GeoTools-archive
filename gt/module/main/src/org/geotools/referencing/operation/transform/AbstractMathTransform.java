@@ -46,6 +46,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -170,13 +171,12 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * using a temporary array of doubles.
      *
      * @param ptSrc the specified coordinate point to be transformed.
-     * @param ptDst the specified coordinate point that stores the
-     *              result of transforming <code>ptSrc</code>, or
-     *              <code>null</code>.
-     * @return the coordinate point after transforming <code>ptSrc</code>
-     *         and stroring the result in <code>ptDst</code>.
-     * @throws MismatchedDimensionException if this transform
-     *         doesn't map two-dimensional coordinate systems.
+     * @param ptDst the specified coordinate point that stores the result of transforming
+     *              {@code ptSrc}, or {@code null}.
+     * @return      the coordinate point after transforming {@code ptSrc} and storing the result in
+     *              {@code ptDst}.
+     * @throws MismatchedDimensionException if this transform doesn't map two-dimensional
+     *         coordinate systems.
      * @throws TransformException if the point can't be transformed.
      *
      * @see MathTransform2D#transform(Point2D,Point2D)
@@ -264,7 +264,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      */
     public void transform(final float[] srcPts, final int srcOff,
                           final float[] dstPts, final int dstOff, final int numPts)
-        throws TransformException
+            throws TransformException
     {
         final int dimSource = getSourceDimensions();
         final int dimTarget = getTargetDimensions();
@@ -319,7 +319,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                                        final AffineTransform preTr,
                                        final AffineTransform postTr,
                                        final int quadDir)
-        throws TransformException
+            throws TransformException
     {
         int dim;
         if ((dim=getSourceDimensions())!=2 || (dim=getTargetDimensions())!=2) {
@@ -617,6 +617,23 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
             formatter.append(parameters);
         }
         return "PARAM_MT";
+    }
+    
+    /**
+     * Makes sure that an argument is non-null. This is a
+     * convenience method for subclass constructors.
+     *
+     * @param  name   Argument name.
+     * @param  object User argument.
+     * @throws InvalidParameterValueException if {@code object} is null.
+     */
+    protected static void ensureNonNull(final String name, final Object object)
+            throws IllegalArgumentException
+    {
+        if (object == null) {
+            throw new InvalidParameterValueException(Resources.format(
+                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name), name, object);
+        }
     }
 
     /**

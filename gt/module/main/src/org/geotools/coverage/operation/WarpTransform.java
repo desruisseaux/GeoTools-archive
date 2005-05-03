@@ -37,15 +37,18 @@ import org.opengis.util.InternationalString;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
+import org.geotools.referencing.operation.transform.WarpTransform2D;
 
 
 /**
- * An image warp using {@link MathTransform2D}.
+ * Wraps an arbitrary {@link MathTransform2D} into an image warp operation.
+ * This warp operation is used by {@link Resampler2D} when no standard warp
+ * operation has been found applicable.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class WarpTransform extends Warp {
+public final class WarpTransform extends Warp {
     /**
      * The coverage name. Used for formatting error message.
      */
@@ -58,15 +61,37 @@ final class WarpTransform extends Warp {
     private final MathTransform2D inverse;
     
     /**
-     * Constructs a new <code>WarpTransform</code>.
+     * Constructs a new <code>WarpTransform</code> using the given transform.
      *
      * @param name    The coverage name. Used for formatting error message.
-     * @param inverse The <strong>inverse</strong> of the transformation
-     *                to apply from source to target image.
+     * @param inverse The <strong>inverse</strong> of the transformation to apply.
+     *                This inverse transform maps destination pixels to source pixels.
      */
-    public WarpTransform(final InternationalString name, final MathTransform2D inverse) {
+    private WarpTransform(final InternationalString name, final MathTransform2D inverse) {
         this.name    = name;
         this.inverse = inverse;
+    }
+    
+    /**
+     * Constructs a new <code>WarpTransform</code> using the given transform.
+     *
+     * @param name    The coverage name. Used for formatting error message.
+     * @param inverse The <strong>inverse</strong> of the transformation to apply.
+     *                This inverse transform maps destination pixels to source pixels.
+     */
+    public static Warp create(final InternationalString name, final MathTransform2D inverse) {
+        if (inverse instanceof WarpTransform2D) {
+            return ((WarpTransform2D) inverse).getWarp();
+        }
+        return new WarpTransform(name, inverse);
+    }
+    
+
+    /**
+     * Returns the transform from destination pixels to source pixels.
+     */
+    public MathTransform2D getTransform() {
+        return inverse;
     }
 
     /**

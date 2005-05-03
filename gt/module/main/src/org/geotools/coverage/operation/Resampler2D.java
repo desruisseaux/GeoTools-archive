@@ -532,7 +532,7 @@ public final class Resampler2D extends GridCoverage2D {
              * target grid coverage. The trick was to initialize the target image with a null
              * operation, and change the operation here.
              */
-            paramBlk.add(new WarpTransform(sourceCoverage.getName(), (MathTransform2D)transform));
+            paramBlk.add(WarpTransform.create(sourceCoverage.getName(), (MathTransform2D)transform));
             paramBlk.add(interpolation).add(background);
             targetImage.setParameterBlock(paramBlk); // Must be invoked before setOperationName
             targetImage.setOperationName("Warp");

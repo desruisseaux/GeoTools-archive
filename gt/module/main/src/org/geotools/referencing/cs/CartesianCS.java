@@ -118,6 +118,18 @@ public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.
                     org.geotools.referencing.cs.CoordinateSystemAxis.Z);
 
     /**
+     * A two-dimensional cartesian CS with
+     * <var>{@linkplain CoordinateSystemAxis#COLUMN column}</var>,
+     * <var>{@linkplain CoordinateSystemAxis#ROW row}</var>
+     * axis.
+     *
+     * @todo Localize name.
+     */
+    public static CartesianCS GRID = new CartesianCS("Grid",
+                    org.geotools.referencing.cs.CoordinateSystemAxis.COLUMN,
+                    org.geotools.referencing.cs.CoordinateSystemAxis.ROW);
+
+    /**
      * Converters from {@linkplain CoordinateSystemAxis#getUnit axis units} to
      * {@linkplain #getDistanceUnit distance unit}. Will be constructed only when
      * first needed.

@@ -1089,6 +1089,14 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
+     * Display this coverage in a windows. This convenience method is used for debugging purpose.
+     * The exact appareance of the windows and the tools provided may changes in future versions.
+     */
+    public void show() {
+        show(gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
+    }
+
+    /**
      * A view of a {@linkplain GridCoverage2D grid coverage} as a renderable image. Renderable images
      * allow interoperability with <A HREF="http://java.sun.com/products/java-media/2D/">Java2D</A>
      * for a two-dimensional slice of a grid coverage.

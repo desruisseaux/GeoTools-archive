@@ -29,6 +29,7 @@ public interface ResourceKeys
     public static final int BURSA_WOLF_PARAMETERS_REQUIRED              =     5;
     public static final int CARTESIAN                                   =     6;
     public static final int CLASSIC                                     =     7;
+    public static final int COLUMN                                      =   140;
     public static final int CONVERSION                                  =     8;
     public static final int CONVERSION_AND_TRANSFORMATION               =     9;
     public static final int CYLINDRICAL_MERCATOR_PROJECTION             =    10;
@@ -72,6 +73,7 @@ public interface ResourceKeys
     public static final int OTHER                                       =    47;
     public static final int OUTSIDE                                     =    48;
     public static final int PAST                                        =    49;
+    public static final int ROW                                         =   141;
     public static final int SOUTH                                       =    50;
     public static final int SOUTHING                                    =    51;
     public static final int SPHERICAL_LATITUDE                          =    52;

@@ -30,14 +30,17 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -142,7 +145,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     private transient MathTransform inverse;
     
     /**
-     * Construct a localization grid using the specified data.
+     * Constructs a localization grid using the specified data.
      *
      * @param width  Number of grid's columns.
      * @param height Number of grid's rows.
@@ -580,14 +583,13 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     }
 
     /**
-     * The inverse transform. This inner class is
-     * the inverse of the enclosing math transform.
+     * The inverse transform. This inner class is the inverse of the enclosing math transform.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private final class Inverse extends AbstractMathTransform.Inverse implements MathTransform2D,
-                                                                                 Serializable
+    private final class Inverse extends AbstractMathTransform.Inverse
+                             implements MathTransform2D, Serializable
     {
         /**
          * Serial number for interoperability with different versions.
@@ -598,7 +600,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * Default constructor.
          */
         public Inverse() {
-        	LocalizationGridTransform2D.this.super();
+            LocalizationGridTransform2D.this.super();
         }
 
         /**
@@ -711,7 +713,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      * Returns a hash value for this transform.
      */
     public int hashCode() {
-        return super.hashCode() ^ global.hashCode();
+        return (int)serialVersionUID ^ super.hashCode() ^ global.hashCode();
     }
 
     /**
