@@ -25,6 +25,7 @@ package org.geotools.gce.geotiff;
 import junit.framework.TestCase;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.gce.arcgrid.ArcGridReader;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -128,13 +129,13 @@ public class GeoTiffReaderWriterTest { // extends TestCase {
     public static void testWriter()
         throws IllegalArgumentException, IOException {
         File file = new File(
-                "D:\\Work\\data\\geotiff\\po_168213_0000000\\po_168213_nir_0000000.tif");
+                "D:\\Program Files\\Apache Software Foundation\\Tomcat 5.0\\webapps\\geoserver\\data\\coverages\\arc_sample\\a.asc");
 
         //getting a reader
         AbstractGridFormat format = new GeoTiffFormat();
 
         if (format.accepts(file)) {
-            GridCoverageReader reader = new GeoTiffReader(format, file, null);
+            GridCoverageReader reader = new ArcGridReader( file);
 
             if (reader != null) {
                 //reading the coverage
