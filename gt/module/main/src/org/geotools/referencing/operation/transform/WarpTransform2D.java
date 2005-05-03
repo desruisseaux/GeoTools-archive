@@ -24,6 +24,7 @@ import java.io.Serializable;
 
 // JAI dependencies
 import javax.media.jai.Warp;
+import javax.media.jai.WarpPolynomial;
 
 // OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform;
@@ -40,13 +41,15 @@ import org.geotools.coverage.operation.WarpTransform;
  * Calls to {@linkplain #transform(float[],int,float[],int,int) transform} methods are forwarded to
  * the {@link Warp#warpPoint(int,int,float[]) Warp.warpPoint} method. This implies that the current
  * implementation of {@code WarpTransform2D} may round source coordinates to nearest integers before
- * to apply the transformation.
+ * to apply the transformation. This math transform can be created alone (by invoking its public
+ * constructors directly), or it can be created by a factory like {@link LocalizationGrid}.
  *
  * @version $Id$
  * @author Alessio Fabiani
  * @author Martin Desruisseaux
  *
  * @see Warp
+ * @see LocalizationGrid#getMathTransform(int)
  */
 public class WarpTransform2D extends AbstractMathTransform implements MathTransform2D, Serializable {
     /**
@@ -66,12 +69,59 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     private final WarpTransform2D inverse;
 
     /**
-     * Constructs a transform using the specified warp object. This private constructor is used
-     * for the construction of {@link #inverse} transform only.
+     * Constructs a warp transform that approximatively maps the given source coordinates to the
+     * given destination coordinates. The transformation is performed using some polynomial warp
+     * with the degree supplied in argument.
+     *
+     * @param  srcCoords Source coordinates.
+     * @param  srcOffset The inital entry of {@code srcCoords} to be used.
+     * @param destCoords Destination coordinates.
+     * @param destOffset The inital entry of {@code destCoords} to be used.
+     * @param numCoords  The number of coordinates from {@code srcCoords} and {@code destCoords}
+     *                   to be used.
+     * @param degree     The desired degree of the warp polynomials.
      */
-    private WarpTransform2D(final Warp warp, final WarpTransform2D inverse) {
-        this.warp    = warp;
-        this.inverse = inverse;
+    public WarpTransform2D(final Point2D[]  srcCoords, final int  srcOffset,
+                           final Point2D[] destCoords, final int destOffset,
+                           final int numCoords,        final int degree)
+    {
+        this(toFloat( srcCoords,  srcOffset, numCoords), 0,
+             toFloat(destCoords, destOffset, numCoords), 0, numCoords, degree);
+    }
+
+    /**
+     * Constructs a warp transform that approximatively maps the given source coordinates to the
+     * given destination coordinates. The transformation is performed using some polynomial warp
+     * with the degree supplied in argument.
+     *
+     * @param  srcCoords Source coordinates with <var>x</var> and <var>y</var> alternating.
+     * @param  srcOffset The inital entry of {@code srcCoords} to be used.
+     * @param destCoords Destination coordinates with <var>x</var> and <var>y</var> alternating.
+     * @param destOffset The inital entry of {@code destCoords} to be used.
+     * @param numCoords  The number of coordinates from {@code srcCoords} and {@code destCoords}
+     *                   to be used.
+     * @param degree     The desired degree of the warp polynomials.
+     */
+    public WarpTransform2D(final float[]  srcCoords, final int  srcOffset,
+                           final float[] destCoords, final int destOffset,
+                           final int numCoords,      final int degree)
+    {
+        /*
+         * Note: Warp semantic (transforms coordinates from destination to source) is the
+         *       opposite of MathTransform semantic (transforms coordinates from source to
+         *       destination). We have to interchange source and destination arrays for the
+         *       direct transform.
+         */
+        final float  preScaleX = getWidth( srcCoords, 0);
+        final float  preScaleY = getWidth( srcCoords, 1);
+        final float postScaleX = getWidth(destCoords, 0);
+        final float postScaleY = getWidth(destCoords, 1);
+        warp = WarpPolynomial.createWarp(destCoords, destOffset, srcCoords, srcOffset, numCoords,
+                                         1/preScaleX, 1/preScaleY, postScaleX, postScaleY, degree);
+        inverse = new WarpTransform2D(
+               WarpPolynomial.createWarp(srcCoords, srcOffset, destCoords, destOffset, numCoords,
+                                         1/postScaleX, 1/postScaleY, preScaleX, preScaleY, degree),
+               this);
     }
 
     /**
@@ -89,6 +139,15 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
     }
 
     /**
+     * Constructs a transform using the specified warp object. This private constructor is used
+     * for the construction of {@link #inverse} transform only.
+     */
+    private WarpTransform2D(final Warp warp, final WarpTransform2D inverse) {
+        this.warp    = warp;
+        this.inverse = inverse;
+    }
+
+    /**
      * Constructs a transform using the specified warp object. Transformations will be applied
      * using the {@link Warp#warpPoint(int,int,float[]) warpPoint} method or something equivalent.
      *
@@ -99,6 +158,34 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
             return ((WarpTransform) warp).getTransform();
         }
         return new WarpTransform2D(warp, (Warp)null);
+    }
+
+    /**
+     * Returns the maximum minus the minimum ordinate int the specifie array.
+     */
+    private static float getWidth(final float[] array, int offset) {
+        float min = Float.POSITIVE_INFINITY;
+        float max = Float.NEGATIVE_INFINITY;
+        while (offset < array.length) {
+            float value = array[offset];
+            if (value < min) min = value;
+            if (value > max) max = value;
+            offset += 2;
+        }
+        return max-min;
+    }
+
+    /**
+     * Converts an array of points into an array of floats.
+     */
+    private static float[] toFloat(final Point2D[] points, int offset, final int numCoords) {
+        final float[] array = new float[numCoords * 2];
+        for (int i=0; i<array.length;) {
+            final Point2D point = points[offset++];
+            array[i++] = (float) point.getX();
+            array[i++] = (float) point.getY();
+        }
+        return array;
     }
 
     /**

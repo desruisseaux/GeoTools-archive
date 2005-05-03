@@ -36,7 +36,6 @@ import javax.media.jai.RasterFactory; // For javadoc
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridGeometry;  // For javadoc
 import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.spatialschema.geometry.primitive.SurfaceInterpolation; // deprecated import
 
 // Geotools dependencies
 import org.geotools.referencing.crs.DerivedCRS;             // For javadoc
@@ -88,8 +87,10 @@ import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
  * }
  * <FONT color='#008000'>//
  * // Constructs the grid coordinate reference system.
+ * // <var>degree</var> is the polynomial degree (e.g. 2). A degree of 0 is a
+ * // special value meaning to use a transform backed by the whole grid.
  * //</FONT>
- * MathTransform2D        realToGrid = grid.{@linkplain #getMathTransform()}.inverse();
+ * MathTransform2D        realToGrid = grid.{@linkplain #getMathTransform(int) getMathTransform}(degree).inverse();
  * CoordinateReferenceSystem realCRS = GeographicCRS.WGS84;
  * CoordinateReferenceSystem gridCRS = new {@linkplain DerivedCRS}("The grid CRS",
  *         new {@linkplain OperationMethod#OperationMethod(MathTransform) OperationMethod}(realToGrid),
@@ -275,10 +276,7 @@ public class LocalizationGrid {
                                                   double targetX, double targetY)
     {
         final int offset = computeOffset(sourceX, sourceY);
-        if (transforms != null) {
-            transforms = null;
-            grid = (double[]) grid.clone();
-        }
+        notifyChange();
         global = null;
         grid[offset + X_OFFSET] = targetX;
         grid[offset + Y_OFFSET] = targetY;
@@ -308,10 +306,7 @@ public class LocalizationGrid {
         j = region.y + region.height; // Range check performed in the loop.
         while (--j >= region.y) {
             final int offset = computeOffset(region.x, j);
-            if (this.transforms != null) {
-                this.transforms = null;
-                grid = (double[]) grid.clone();
-            }
+            notifyChange();
             transform.transform(grid, offset, grid, offset, region.width);
         }
         global = null;
@@ -527,15 +522,6 @@ public class LocalizationGrid {
     }
 
     /**
-     * @deprecated This method name is not quite accurate since this method returns a Warp object,
-     *             not a MathTransform. Uses {@link WarpTransform2D#getWarp} on the transform
-     *             returned by {@link #getMathTransform(int)} instead.
-     */
-    public synchronized WarpPolynomial getPolynomialTransform() {
-        return (WarpPolynomial) getWarps(2)[0];
-    }
-
-    /**
      * Returns an affine transform for the whole grid. This transform is only an approximation
      * for this localization grid.  It is fitted (like "curve fitting") to grid data using the
      * "least squares" method.
@@ -640,8 +626,10 @@ public class LocalizationGrid {
             if (y < ymin) ymin = y;
             if (y > ymax) ymax = y;
     	}
-    	final double periodX = (xmax - xmin) / width;
-    	final double periodY = (ymax - ymin) / height;
+        final double rangeX  = xmax - xmin;
+        final double rangeY  = ymax - ymin;
+    	final double periodX = rangeX / width;
+    	final double periodY = rangeY / height;
     	float[] destCoords = new float[grid.length];
     	float[]  srcCoords = new float[grid.length];
         /*
@@ -649,36 +637,42 @@ public class LocalizationGrid {
          * are scaled in order to gets values similar to source coordinates (values will be
          * identical if all "real world" coordinates are grid indices multiplied by a constant).
          */
-        int gridOffset = 0;
-    	int destOffset = 0;
+        int offset = 0;
     	for (int yi=0; yi<height; yi++) {
             for (int xi=0; xi<width; xi++) {
-                srcCoords [destOffset  ] = xi;
-                srcCoords [destOffset+1] = yi;
-                destCoords[destOffset  ] = (float)((grid[gridOffset + X_OFFSET] - xmin) / periodX);
-                destCoords[destOffset+1] = (float)((grid[gridOffset + Y_OFFSET] - ymin) / periodY);
-                gridOffset += CP_LENGTH;
-                destOffset += 2;
+                assert offset == computeOffset(xi, yi);
+                srcCoords [offset  ] = xi;
+                srcCoords [offset+1] = yi;
+                destCoords[offset  ] = (float)((grid[offset + X_OFFSET] - xmin) / periodX);
+                destCoords[offset+1] = (float)((grid[offset + Y_OFFSET] - ymin) / periodY);
+                offset += 2;
             }
         }
+        offset /= 2; // To be used as 'numCoords'.
         return new Warp[] {
-            WarpPolynomial.createWarp(
-                 srcCoords, 0,          // Source Coordinates, Source Offset
-                destCoords, 0,          // Destination Coordinates, Destination Offset
-                destOffset / 2,         // Num Coords
-                (float) (1.0 / width),  // PreScale x
-                (float) (1.0 / height), // PreScale y
-                (float) width,          // PostScale x
-                (float) height,         // PostScale y
-                degree),                // Polynomials degree
+            /*
+             * Creates the direct warp (at [0]) and the inverse warp (at [1]).
+             * NOTE: Warp semantic (transforms coordinates from destination to source) is
+             * the opposite of MathTransform semantic (transforms coordinates from source to
+             * destination). Consequently, we need to interchange source and destination arrays.
+             */
             WarpPolynomial.createWarp(
                 destCoords, 0,          // Source Coordinates, Source Offset
                  srcCoords, 0,          // Destination Coordinates, Destination Offset
-                destOffset / 2,         // Num Coords
-                (float) width,          // PreScale x
-                (float) height,         // PreScale y
-                (float) (1.0 / width),  // PostScale x
-                (float) (1.0 / height), // PostScale y
+                offset,                 // Num Coordinates
+                (float) (1.0 / width),  // PreScale x
+                (float) (1.0 / height), // PreScale y
+                (float) rangeX,         // PostScale x
+                (float) rangeY,         // PostScale y
+                degree),                // Polynomials degree
+            WarpPolynomial.createWarp(
+                 srcCoords, 0,          // Source Coordinates, Source Offset
+                destCoords, 0,          // Destination Coordinates, Destination Offset
+                offset,                 // Num Coordinates
+                (float) (1.0 / rangeX), // PreScale x
+                (float) (1.0 / rangeY), // PreScale y
+                (float) width,          // PostScale x
+                (float) height,         // PostScale y
                 degree)                 // Polynomials degree
         };
     }
@@ -723,15 +717,17 @@ public class LocalizationGrid {
     }
 
     /**
-     * @deprecated Use {@link #getMathTransform(int)} instead.
+     * Notify this localization grid that a coordinate is about to be changed. This method
+     * invalidate any transforms previously created.
      */
-    public synchronized MathTransform2D getMathTransform(SurfaceInterpolation interpolation) throws IllegalArgumentException {
-        if (interpolation.equals(SurfaceInterpolation.PLANAR) ) {
-            return getMathTransform();
+    private void notifyChange() {
+        if (transforms != null) {
+            if (transforms[0] != null) {
+                // Clones is required only for the grid-backed transform.
+                grid = (double[]) grid.clone();
+            }
+            // Signal that all transforms need to be recomputed.
+            transforms = null;
         }
-        if (interpolation.equals(SurfaceInterpolation.POLYNOMIAL_SPLINE) ) {
-            return new LocalizationGridPolynomialTransform2D(width, height, grid, getPolynomialTransform());
-        }
-        throw new IllegalArgumentException("Unhandled Interpolation type.");
     }
 }
