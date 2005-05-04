@@ -548,7 +548,6 @@ public class ShapeRenderer {
 			DbaseFileReader dbfreader, String id) throws Exception {
 
 		if (type.getAttributeCount() == 1) {
-			dbfreader.skip();
 			return type.create(new Object[1], id);
 		} else {
 			DbaseFileHeader header = dbfreader.getHeader();
@@ -800,5 +799,8 @@ public class ShapeRenderer {
 	 */
 	public void setCaching(boolean caching) {
 		this.caching = caching;
+	}
+	MapContext getContext() {
+		return context;
 	}
 }

@@ -26,6 +26,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.feature.Feature;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
@@ -33,6 +34,7 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.renderer.lite.RenderListener;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -167,20 +169,15 @@ public class Rendering2DTest extends TestCase {
 
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
+        
+        ShapeRenderer renderer=createLineRenderer();
+        MapContext map=renderer.getContext();
 
-        ShapefileDataStore ds=getLines();
-        FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
-        Style style = createTestStyle();
-
-        MapContext map = new DefaultMapContext();
-        map.addLayer(source, style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
-        map.setAreaOfInterest(ds.getFeatureSource().getBounds(), ds.getSchema().getDefaultGeometry().getCoordinateSystem());
+        map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
-        map.setAreaOfInterest(env, ds.getSchema().getDefaultGeometry().getCoordinateSystem());
-//        INTERACTIVE=false;
+        map.setAreaOfInterest(env);
         showRender("testSimpleLineRender", renderer, 3000, env);
 
     }
@@ -247,17 +244,9 @@ public class Rendering2DTest extends TestCase {
     public void testLineReprojection() throws Exception {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
-
-        ShapefileDataStore ds=getLines();
-        FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
-        Style style = createTestStyle();
-
-        MapContext map = new DefaultMapContext();
-        map.addLayer(source, style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env
-                .getMaxY());
+        
+        ShapeRenderer renderer=createLineRenderer();
+        Envelope env=renderer.getContext().getAreaOfInterest();
 //        INTERACTIVE=true;
         showRender("testSimpleLineRender", renderer, 3000, env);
 
@@ -426,5 +415,67 @@ public class Rendering2DTest extends TestCase {
     	ShapefileDataStoreFactory factory=new ShapefileDataStoreFactory();
     	return (ShapefileDataStore) factory.createDataStore(url);
     }
+    
+    public void testEnvelopePerformance() throws Exception{
+    	ShapeRenderer renderer=createLineRenderer();
+    	MapContext context=renderer.getContext();
+    	
+    	context.setAreaOfInterest(context.getLayerBounds());
+    	CountingRenderListener l1=new CountingRenderListener();
+    	renderer.addRenderListener(l1);
+    	BufferedImage image=new BufferedImage(300,300,BufferedImage.TYPE_3BYTE_BGR);
+    	renderer.paint(image.createGraphics(),new Rectangle(300,300), context.getAreaOfInterest());
+    	renderer.removeRenderListener(l1);
+    	
+    	CountingRenderListener l2=new CountingRenderListener();
+    	renderer.addRenderListener(l2);
+    	Envelope old=context.getAreaOfInterest();
+    	Envelope env=new Envelope(old.getMinX()+old.getWidth()/2,
+    			old.getMaxX()-old.getWidth()/2,
+				old.getMinY()+old.getHeight()/2,
+				old.getMaxY()-old.getHeight()/2);
+    	renderer.paint(image.createGraphics(),new Rectangle(300,300), env);
+    	assertTrue( l1.i>l2.i);
+    }
+
+    private class CountingRenderListener implements RenderListener{
+
+    	public int i=0;
+    	
+		/* (non-Javadoc)
+		 * @see org.geotools.renderer.lite.RenderListener#featureRenderer(org.geotools.feature.Feature)
+		 */
+		public void featureRenderer(Feature feature) {
+			i++;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.geotools.renderer.lite.RenderListener#errorOccurred(java.lang.Exception)
+		 */
+		public void errorOccurred(Exception e) {
+			// TODO Auto-generated method stub
+			
+		}
+    	
+    }
+    
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	private ShapeRenderer createLineRenderer() throws Exception {
+		ShapefileDataStore ds=getLines();
+        FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
+        Style style = createTestStyle();
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(source, style);
+        ShapeRenderer renderer = new ShapeRenderer(map);
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env
+                .getMaxY());
+        map.setAreaOfInterest(env);
+		return renderer;
+	}
     
 }

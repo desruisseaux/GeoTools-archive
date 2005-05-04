@@ -81,10 +81,10 @@ public class MultiLineHandler implements ShapeHandler {
 			}
         Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1], tmpbbox[3]);
 
-//        if (!bbox.intersects(geomBBox)) {
-//            skipMultiLineGeom(buffer, dimensions);
-//            return null;
-//        }
+        if (!bbox.intersects(geomBBox)) {
+            skipMultiLineGeom(buffer, dimensions);
+            return null;
+        }
 
         int numParts = buffer.getInt();
         int numPoints = buffer.getInt(); // total number of points

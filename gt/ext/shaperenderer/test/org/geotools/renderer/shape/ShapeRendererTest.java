@@ -32,9 +32,7 @@ import org.geotools.styling.Style;
  */
 public class ShapeRendererTest extends TestCase {
 
-	public void testPaint() {
-	}
-
+	
 	public void testCreateFeature() throws Exception{
 		ShapeRenderer renderer=new ShapeRenderer(null);
 		Style style=LabelingTest.loadStyle("LineStyle.sld");
