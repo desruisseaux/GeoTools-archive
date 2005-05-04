@@ -22,6 +22,7 @@ package org.geotools.referencing.operation.transform;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.util.Random;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -49,7 +50,12 @@ public class WarpTransformTest extends TestCase {
     /**
      * Small numbers for floating point comparaisons.
      */
-    private static final float EPS = 1E-8f;
+    private static final float EPS = 1E-7f;
+
+    /**
+     * Width and height of a pseudo-image.
+     */
+    private static final int WIDTH=1000, HEIGHT=2000;
 
     /**
      * Runs the tests with the textual test runner.
@@ -85,19 +91,15 @@ public class WarpTransformTest extends TestCase {
      * (by the caller).
      */
     private static WarpPolynomial executeTest(final Formula formula, final int degree) {
-        final Rectangle bounds = new Rectangle(0, 0, 1, 1); // Prevent scaling in Warp creation.
-        final Point[] sources = {
-            new Point(0,0),
-            new Point(0,1),
-            new Point(1,1),
-//            new Point(3,4),
-//            new Point(5,2),
-//            new Point(2,1),
-//            new Point(6,4)
-        };
-        final Point[] dest = new Point[sources.length];
+        final Random    random = new Random(-854734760285695284L);
+        final Rectangle bounds = new Rectangle(0, 0, 1, 1);
+        final Point[]  sources = new Point[100];
+        final Point[]     dest = new Point[sources.length];
         for (int i=0; i<dest.length; i++) {
-            formula.transform(dest[i] = new Point(sources[i]));
+            Point p;
+            sources[i] = p = new Point(random.nextInt(WIDTH), random.nextInt(HEIGHT));
+            dest   [i] = p = new Point(p);
+            formula.transform(p);
         }
         final WarpTransform2D transform = new WarpTransform2D(
                 bounds, sources, 0, bounds, dest, 0, sources.length, degree);
@@ -105,20 +107,41 @@ public class WarpTransformTest extends TestCase {
         assertTrue("Expected a polynomial warp but got "+Utilities.getShortClassName(warp),
                    warp instanceof WarpPolynomial);
         final WarpPolynomial poly = (WarpPolynomial) warp;
-        assertEquals("Unexpected X scaling", 1, poly.getPreScaleX(),  0);
-        assertEquals("Unexpected Y scaling", 1, poly.getPreScaleY(),  0);
-        assertEquals("Unexpected X scaling", 1, poly.getPostScaleX(), 0);
-        assertEquals("Unexpected Y scaling", 1, poly.getPostScaleY(), 0);
+        if (bounds.width==1 && bounds.height==1) {
+            assertEquals("Unexpected X scaling", 1, poly.getPreScaleX(),  0);
+            assertEquals("Unexpected Y scaling", 1, poly.getPreScaleY(),  0);
+            assertEquals("Unexpected X scaling", 1, poly.getPostScaleX(), 0);
+            assertEquals("Unexpected Y scaling", 1, poly.getPostScaleY(), 0);
+        }
         /*
          * Compares transformations to the expected points.
-         * Uses the transform(Point2D, ...) method.
          */
         for (int i=0; i<sources.length; i++) {
             final String message = "Point #" + i;
-            Point2D point = new Point2D.Double(sources[i].x, sources[i].y);
-            point = transform.transform(point, point);
-            assertEquals(message, dest[i].x, point.getX(), EPS);
-            assertEquals(message, dest[i].y, point.getY(), EPS);
+            final Point   source   = sources[i];
+            final Point   expected = dest   [i];
+            final Point2D computed = new Point2D.Double(source.x, source.y);
+            assertSame  (message, computed, transform.transform(computed, computed));
+            assertEquals(message, expected.x, computed.getX(), EPS*expected.x);
+            assertEquals(message, expected.y, computed.getY(), EPS*expected.y);
+            //
+            // Try using transform(float[], ...)
+            //
+            if (false) {
+                final float[] array = new float[] {source.x, source.y};
+                transform.transform(array, 0, array, 0, 1);
+                assertEquals(message, expected.x, array[0], EPS*expected.x);
+                assertEquals(message, expected.y, array[1], EPS*expected.y);
+            }
+            //
+            // Try using transform(double[], ...)
+            //
+            if (false) {
+                final double[] array = new double[] {source.x, source.y};
+                transform.transform(array, 0, array, 0, 1);
+                assertEquals(message, expected.x, array[0], EPS*expected.x);
+                assertEquals(message, expected.y, array[1], EPS*expected.y);
+            }
         }
         return poly;
     }
@@ -127,25 +150,39 @@ public class WarpTransformTest extends TestCase {
      * Tests an affine warp.
      */
     public void testAffine() {
-        if (true) {
-            // Disabled for now, since the test doesn't pass yet.
-            return;
+        final int[] scalesX = {1,2,3,4,5,6,  2,7,3,1,8};
+        final int[] scalesY = {1,2,3,4,5,6,  6,2,5,9,1};
+        for (int i=0; i<scalesX.length; i++) {
+            final int scaleX = scalesX[i];
+            final int scaleY = scalesY[i];
+            final WarpPolynomial warp = executeTest(new Formula() {
+                public void transform(final Point point) {
+                    point.x *= scaleX;
+                    point.y *= scaleY;
+                }
+            }, 1);
+            assertTrue("Expected an affine warp but got "+Utilities.getShortClassName(warp),
+                       warp instanceof WarpAffine);
         }
-        final int scaleX = 1;
-        final int scaleY = 1;
-        final WarpPolynomial warp = executeTest(new Formula() {
-            public void transform(final Point point) {
-                point.x *= scaleX;
-                point.y *= scaleY;
-            }
-        }, 1);
-        assertTrue("Expected an affine warp but got "+Utilities.getShortClassName(warp),
-                   warp instanceof WarpAffine);
-        final float[] xCoeffs = warp.getXCoeffs();
-        final float[] yCoeffs = warp.getYCoeffs();
-        assertEquals("Unexpected X translation", 0, xCoeffs[0], EPS);
-        assertEquals("Unexpected Y translation", 0, yCoeffs[0], EPS);
-        assertEquals("Unexpected X scale",  scaleX, xCoeffs[1], EPS);
-        assertEquals("Unexpected X scale",  scaleY, yCoeffs[1], EPS);
+    }
+
+    /**
+     * Tests a quadratic warp.
+     */
+    public void testQuadratic() {
+        final int[] scalesX = {1,2,3,4,5,6,  2,7,3,1,8};
+        final int[] scalesY = {1,2,3,4,5,6,  6,2,5,9,1};
+        for (int i=0; i<scalesX.length; i++) {
+            final int scaleX = scalesX[i];
+            final int scaleY = scalesY[i];
+            final WarpPolynomial warp = executeTest(new Formula() {
+                public void transform(final Point point) {
+                    point.x *= scaleX*point.x;
+                    point.y *= scaleY;
+                }
+            }, 2);
+            assertTrue("Expected a quatratic warp but got "+Utilities.getShortClassName(warp),
+                       warp instanceof WarpQuadratic);
+        }
     }
 }

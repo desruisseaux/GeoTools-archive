@@ -316,13 +316,27 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * @return the coordinate point after transforming {@code ptSrc} and storing the result in
      *         {@code ptDst}.
      */
-    public Point2D transform(final Point2D ptSrc, final Point2D ptDst) {
+    public Point2D transform(Point2D ptSrc, final Point2D ptDst) {
+        /*
+         * We have to copy the coordinate in a temporary point object because we don't know
+         * neither the ptSrc or ptDst type. Since mapDestPoint returns a clone of the point
+         * given in argument,  giving ptSrc directly would result in a lost of precision if
+         * its type is java.awt.Point (for example), even if ptDst had a greater precision.
+         *
+         * There is also an other reason for creating a temporary object:
+         * JAI's Warp is designed for mapping pixel coordinates in J2SE's image. In JAI, pixel
+         * coordinates map by definition to the pixel's upper left corner. But for interpolation
+         * purpose, JAI need to maps pixel's center. This introduce a shift of 0.5, which is
+         * documented (for example) in WarpAffine.mapDestPoint(Point2D).
+         */
+        ptSrc = new Point2D.Double(ptSrc.getX()-0.5, ptSrc.getY()-0.5);
         final Point2D result = warp.mapDestPoint(ptSrc);
+        result.setLocation(result.getX()+0.5, result.getY()+0.5);
         if (ptDst == null) {
             return result;
         } else {
             ptDst.setLocation(result);
-            return result;
+            return ptDst;
         }
     }
 
@@ -345,9 +359,9 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         while (--numPts >= 0) {
             final float xi = srcPts[srcOff++];
             final float yi = srcPts[srcOff++];
-            warp.warpPoint(Math.round(xi), Math.round(yi), dstCoords);
-            dstPts[dstOff++] = dstCoords[0];
-            dstPts[dstOff++] = dstCoords[1];
+            warp.warpPoint((int)Math.floor(xi), (int)Math.floor(yi), dstCoords);
+            dstPts[dstOff++] = dstCoords[0] + 0.5f;  // See the comment in transform(Point2D...)
+            dstPts[dstOff++] = dstCoords[1] + 0.5f;  // for an explanation about the 0.5 shift.
             dstOff += postIncrement;
         }
     }
@@ -371,9 +385,9 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         while (--numPts >= 0) {
             final double xi = srcPts[srcOff++];
             final double yi = srcPts[srcOff++];
-            warp.warpPoint((int)Math.round(xi), (int)Math.round(yi), dstCoords);
-            dstPts[dstOff++] = dstCoords[0];
-            dstPts[dstOff++] = dstCoords[1];
+            warp.warpPoint((int)Math.floor(xi), (int)Math.floor(yi), dstCoords);
+            dstPts[dstOff++] = dstCoords[0] + 0.5;  // See the comment in transform(Point2D...)
+            dstPts[dstOff++] = dstCoords[1] + 0.5;  // for an explanation about the 0.5 shift.
             dstOff += postIncrement;
         }
     }

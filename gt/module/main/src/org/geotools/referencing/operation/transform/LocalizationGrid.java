@@ -479,7 +479,7 @@ public class LocalizationGrid {
             }            
         }        
     }         
-       
+
     /**
      * Replace consecutive singularity by linear values in sub-array.
      *
@@ -604,74 +604,32 @@ public class LocalizationGrid {
 
     /**
      * Returns this localization grid and its inverse as warp objects. This method tries to fit a
-     * {@linkplain WarpPolynomial polynomial warp} to the gridded coordinates. The inverse warp is
-     * also computed by interchanging source and destination points. This is used for creating the
-     * inverse transform.
+     * {@linkplain WarpPolynomial polynomial warp} to the gridded coordinates. The resulting Warp
+     * is wrapped into a {@link WarpTransform2D}.
      */
-    private Warp[] getWarps(final int degree) {
-    	double xmin = Double.POSITIVE_INFINITY;
-    	double ymin = Double.POSITIVE_INFINITY;
-    	double xmax = Double.NEGATIVE_INFINITY;
-    	double ymax = Double.NEGATIVE_INFINITY;
-    	for (int i=0; i<grid.length;) {
-            final double x = grid[i++];
-            final double y = grid[i++];
-            if (x < xmin) xmin = x;
-            if (x > xmax) xmax = x;
-            if (y < ymin) ymin = y;
-            if (y > ymax) ymax = y;
-    	}
-        final double rangeX  = xmax - xmin;
-        final double rangeY  = ymax - ymin;
-    	final double periodX = rangeX / width;
-    	final double periodY = rangeY / height;
-    	float[] destCoords = new float[grid.length];
-    	float[]  srcCoords = new float[grid.length];
-        /*
-         * Copy source and destination coordinates into float arrays. The destination coordinates
-         * are scaled in order to gets values similar to source coordinates (values will be
-         * identical if all "real world" coordinates are grid indices multiplied by a constant).
-         */
-        int offset = 0;
-    	for (int yi=0; yi<height; yi++) {
+    private MathTransform2D fitWarps(final int degree) {
+        final float[] srcCoords = new float[width*height*2];
+        final float[] dstCoords = new float[srcCoords.length];
+        int gridOffset = 0;
+        int warpOffset = 0;
+        for (int yi=0; yi<height; yi++) {
             for (int xi=0; xi<width; xi++) {
-                assert offset == computeOffset(xi, yi);
-                srcCoords [offset  ] = xi;
-                srcCoords [offset+1] = yi;
-                destCoords[offset  ] = (float)((grid[offset + X_OFFSET] - xmin) / periodX);
-                destCoords[offset+1] = (float)((grid[offset + Y_OFFSET] - ymin) / periodY);
-                offset += 2;
+                assert gridOffset == computeOffset(xi, yi);
+                final float x = (float) grid[gridOffset + X_OFFSET];
+                final float y = (float) grid[gridOffset + Y_OFFSET];
+                if (!Float.isNaN(x) && !Float.isNaN(y)) {
+                    srcCoords[warpOffset  ] = xi;
+                    srcCoords[warpOffset+1] = yi;
+                    dstCoords[warpOffset  ] = x;
+                    dstCoords[warpOffset+1] = y;
+                    warpOffset += 2;
+                }
+                gridOffset += CP_LENGTH;
             }
         }
-        offset /= 2; // To be used as 'numCoords'.
-        return new Warp[] {
-            /*
-             * Creates the direct warp (at [0]) and the inverse warp (at [1]).
-             * NOTE: Warp semantic (transforms coordinates from destination to source) is
-             * the opposite of MathTransform semantic (transforms coordinates from source to
-             * destination). Consequently, we need to interchange source and destination arrays.
-             */
-            WarpPolynomial.createWarp(
-                destCoords, 0,          // Source Coordinates, Source Offset
-                 srcCoords, 0,          // Destination Coordinates, Destination Offset
-                offset,                 // Num Coordinates
-                (float) (1.0 / rangeX), // PreScale x
-                (float) (1.0 / rangeY), // PreScale y
-                (float) width,          // PostScale x
-                (float) height,         // PostScale y
-                degree),                // Polynomials degree
-            WarpPolynomial.createWarp(
-                 srcCoords, 0,          // Source Coordinates, Source Offset
-                destCoords, 0,          // Destination Coordinates, Destination Offset
-                offset,                 // Num Coordinates
-                (float) (1.0 / width),  // PreScale x
-                (float) (1.0 / height), // PreScale y
-                (float) rangeX,         // PostScale x
-                (float) rangeY,         // PostScale y
-                degree)                 // Polynomials degree
-        };
+        return new WarpTransform2D(null, srcCoords, 0, null, dstCoords, 0, warpOffset/2, degree);
     }
-    
+
     /**
      * Returns a math transform from grid to "real world" coordinates using the default degree.
      */
@@ -704,8 +662,7 @@ public class LocalizationGrid {
                 transforms[degree] = new LocalizationGridTransform2D(width, height, grid,
                                                                      getAffineTransform());
             } else {
-                final Warp[] warps = getWarps(degree);
-                transforms[degree] = new WarpTransform2D(warps[0], warps[1]);
+                transforms[degree] = fitWarps(degree);;
             }
         }
         return transforms[degree];
