@@ -1,20 +1,4 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
-/*
  * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
  *
  * This work was created by employees of the USDA Forest Service's
@@ -182,10 +166,21 @@ public class GeoTiffCoordinateSystemAdapter {
      *        factories. (can be null)
      */
     public GeoTiffCoordinateSystemAdapter(Hints hints) {
-        csFactory = FactoryFinder.getCSAuthorityFactory("EPSG", hints);
+        // CRS factory is the only one which _has_ to exist.
         crsFactory = FactoryFinder.getCRSAuthorityFactory("EPSG", hints);
-        datumFactory = FactoryFinder.getDatumAuthorityFactory("EPSG", hints);
 
+        // these are optional, but will reduce the functionality if they are
+        // not found.
+        csFactory = null ; 
+        datumFactory = null ; 
+        try { 
+            csFactory = FactoryFinder.getCSAuthorityFactory("EPSG", hints);
+            datumFactory = FactoryFinder.getDatumAuthorityFactory("EPSG", hints);
+        } catch (FactoryRegistryException fre) { 
+            ; // do nothing.  Leave them set to null!
+        }
+
+        // These should always exist!
         datumObjFactory = FactoryFinder.getDatumFactory(hints);
         crsObjFactory = FactoryFinder.getCRSFactory(hints);
         csObjFactory = FactoryFinder.getCSFactory(hints);
@@ -228,8 +223,7 @@ public class GeoTiffCoordinateSystemAdapter {
      *         the file data
      *
      * @throws IOException if there is unexpected data in the GeoKey tags.
-     * @throws NullPointerException if the <code>csFactory</code>,
-     *         <code>datumFactory</code>, <code>crsFactory</code> or
+     * @throws NullPointerException if the <code>crsFactory</code> or
      *         <code>metadata</code> are uninitialized
      * @throws UnsupportedOperationException if the coordinate system specified
      *         by the GeoTiff file is not supported.
@@ -237,10 +231,9 @@ public class GeoTiffCoordinateSystemAdapter {
     public CoordinateReferenceSystem createCoordinateSystem()
         throws IOException {
         // check if the prerequsite data are set.
-        if ((crsFactory == null) || (metadata == null) || (csFactory == null)
-                || (datumFactory == null)) {
+        if ((crsFactory == null) || (metadata == null)) {
             throw new NullPointerException(
-                "EPSG factories and metadata must be set!");
+                "EPSG CRS factory and metadata must be set!");
         }
 
         CoordinateReferenceSystem cs = null;
@@ -430,9 +423,17 @@ public class GeoTiffCoordinateSystemAdapter {
                         throw io;
                     }
                 } else {
+                    if (datumFactory == null) { 
+                        throw new GeoTiffException(metadata, 
+                            "This geotiff file requires a DatumAuthorityFactory");
+                    }
                     pm = datumFactory.createPrimeMeridian(pmCode);
                 }
             } else {
+                if (datumFactory == null) { 
+                    throw new GeoTiffException(metadata, 
+                        "This geotiff file requires a DatumAuthorityFactory");
+                }
                 pm = datumFactory.createPrimeMeridian(PM_Greenwich);
             }
         } catch (FactoryException fe) {
@@ -466,6 +467,12 @@ public class GeoTiffCoordinateSystemAdapter {
             throw new GeoTiffException(metadata,
                 "A user defined Geographic Coordinate system "
                 + "must include a predefined datum!");
+        }
+
+        // The DatumAuthorityFactory must exist.
+        if (datumFactory == null) { 
+            throw new GeoTiffException(metadata, 
+                "This geotiff file requires a DatumAuthorityFactory");
         }
 
         try {
@@ -653,6 +660,11 @@ public class GeoTiffCoordinateSystemAdapter {
             }
         } else {
             try {
+                // first check that the csFactory exists.
+                if (csFactory == null) {
+                    throw new GeoTiffException(metadata, 
+                        "This GeoTIFF file requires a CSAuthorityFactory.");
+                }
                 retval = csFactory.createUnit(unitCode);
             } catch (FactoryException fe) {
                 IOException io = new GeoTiffException(metadata,
