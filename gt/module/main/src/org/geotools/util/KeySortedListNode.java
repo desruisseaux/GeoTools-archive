@@ -1,5 +1,6 @@
 package org.geotools.util;
 
+
 class KeySortedListNode implements Comparable {
     Object element;
     Comparable key;
