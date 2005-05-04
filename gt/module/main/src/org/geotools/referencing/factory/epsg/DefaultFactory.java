@@ -69,12 +69,14 @@ import org.geotools.util.MonolineFormatter;
  * default binding expects an "{@code EPSG}" database registered as an ODBC data source. See
  * the {@linkplain org.geotools.referencing.factory.epsg package javadoc} for installation
  * instructions.
- *
- * <P>Users should not creates instance of this class directly. They should invoke one of
- * <code>{@linkplain FactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.</P>
+ * <p>
+ * Users should not creates instance of this class directly. They should invoke one of
+ * <code>{@linkplain FactoryFinder}.getFooAuthorityFactory("EPSG")</code> methods instead.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see DataSource
  */
 public class DefaultFactory extends DeferredAuthorityFactory {
     /**

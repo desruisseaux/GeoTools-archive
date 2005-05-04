@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.coverage.operation;
+package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
 import java.awt.Rectangle;
@@ -31,64 +31,47 @@ import javax.media.jai.Warp;
 // OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
-import org.geotools.referencing.operation.transform.WarpTransform2D;
 
 
 /**
  * Wraps an arbitrary {@link MathTransform2D} into an image warp operation.
- * This warp operation is used by {@link Resampler2D} when no standard warp
- * operation has been found applicable.
+ * This warp operation is used by {@link org.geotools.coverage.operation.Resampler2D}
+ * when no standard warp operation has been found applicable.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class WarpTransform extends Warp {
+final class WarpAdapter extends Warp {
     /**
      * The coverage name. Used for formatting error message.
      */
-    private final InternationalString name;
+    private final CharSequence name;
 
     /**
-     * The <strong>inverse</strong> of the transform to apply.
+     * The <strong>inverse</strong> of the transform to apply for projecting an image.
      * This transform maps destination pixels to source pixels.
      */
     private final MathTransform2D inverse;
     
     /**
-     * Constructs a new <code>WarpTransform</code> using the given transform.
+     * Constructs a new <code>WarpAdapter</code> using the given transform.
      *
      * @param name    The coverage name. Used for formatting error message.
-     * @param inverse The <strong>inverse</strong> of the transformation to apply.
-     *                This inverse transform maps destination pixels to source pixels.
+     * @param inverse The <strong>inverse</strong> of the transformation to apply for projecting
+     *                an image. This inverse transform maps destination pixels to source pixels.
      */
-    private WarpTransform(final InternationalString name, final MathTransform2D inverse) {
+    public WarpAdapter(final CharSequence name, final MathTransform2D inverse) {
         this.name    = name;
         this.inverse = inverse;
-    }
-    
-    /**
-     * Constructs a new <code>WarpTransform</code> using the given transform.
-     *
-     * @param name    The coverage name. Used for formatting error message.
-     * @param inverse The <strong>inverse</strong> of the transformation to apply.
-     *                This inverse transform maps destination pixels to source pixels.
-     */
-    public static Warp create(final InternationalString name, final MathTransform2D inverse) {
-        if (inverse instanceof WarpTransform2D) {
-            return ((WarpTransform2D) inverse).getWarp();
-        }
-        return new WarpTransform(name, inverse);
-    }
-    
+    }    
 
     /**
-     * Returns the transform from destination pixels to source pixels.
+     * Returns the transform from image's destination pixels to source pixels.
      */
     public MathTransform2D getTransform() {
         return inverse;

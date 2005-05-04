@@ -24,6 +24,7 @@ import java.sql.SQLException;
 
 // Geotools dependencies
 import org.geotools.factory.AbstractFactory;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
@@ -33,14 +34,23 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * {@code DataSource} is used as a category for {@link javax.imageio.spi.ServiceRegistry}.
  * EPSG data sources should be registered in the following file:
  *
- * <blockquote><pre>
- * META-INF/services/org.geotools.referencing.factory.epsg.DataSource
- * </pre></blockquote>
+ * <blockquote><pre>META-INF/services/org.geotools.referencing.factory.epsg.DataSource</pre></blockquote>
  *
  * For an example, see {@link org.geotools.referencing.factory.epsg.AccessDataSource}
  * and its {@code META-INF/services/} registration in the {@code plugin/epsg-access}
  * module. This is a very small module which can be used as a starting point for custom
  * EPSG data sources.
+ * <p>
+ * <h3>How EPSG factory are found</h3>
+ * By default, only one {@link DefaultFactory} is registered and returned by {@link FactoryFinder}.
+ * We don't need to register any other implementation for an EPSG factory backed by a SQL database.
+ * However, {@code DefaultFactory} alone is not suffisient for querying the database. It needs one
+ * more "plugable" information: the <cite>connection</cite> to the EPSG database. This
+ * {@code DataSource} interface is there for providing such connection to {@code DefaultFactory}.
+ * <p>
+ * Some time after {@code DefaultFactory} is registered as an EPSG factory, it looks for a
+ * {@code DataSource} using the same plugins mechanism than for factories. In other words,
+ * {@code DataSource} is a second level of plugins used internally by {@link DefaultFactory}.
  *
  * @version $Id$
  * @author Martin Desruisseaux

@@ -110,7 +110,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Gets the dimension of output points.
      */
     public abstract int getTargetDimensions();
-    
+
     /**
      * Returns the parameter descriptors for this math transform,
      * or <code>null</code> if unknow. This method is similar to

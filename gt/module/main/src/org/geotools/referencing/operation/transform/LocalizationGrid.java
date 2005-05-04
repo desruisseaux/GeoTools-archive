@@ -136,11 +136,6 @@ import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
  */
 public class LocalizationGrid {
     /**
-     * The maximal polynomial degree allowed.
-     */
-    private static final int MAX_DEGREE = 7;
-
-    /**
      * <var>x</var> (usually longitude) offset relative to an entry.
      * Points are stored in {@link #grid} as <code>(x,y)</code> pairs.
      */
@@ -660,19 +655,19 @@ public class LocalizationGrid {
                 destCoords, 0,          // Source Coordinates, Source Offset
                  srcCoords, 0,          // Destination Coordinates, Destination Offset
                 offset,                 // Num Coordinates
-                (float) (1.0 / width),  // PreScale x
-                (float) (1.0 / height), // PreScale y
-                (float) rangeX,         // PostScale x
-                (float) rangeY,         // PostScale y
+                (float) (1.0 / rangeX), // PreScale x
+                (float) (1.0 / rangeY), // PreScale y
+                (float) width,          // PostScale x
+                (float) height,         // PostScale y
                 degree),                // Polynomials degree
             WarpPolynomial.createWarp(
                  srcCoords, 0,          // Source Coordinates, Source Offset
                 destCoords, 0,          // Destination Coordinates, Destination Offset
                 offset,                 // Num Coordinates
-                (float) (1.0 / rangeX), // PreScale x
-                (float) (1.0 / rangeY), // PreScale y
-                (float) width,          // PostScale x
-                (float) height,         // PostScale y
+                (float) (1.0 / width),  // PreScale x
+                (float) (1.0 / height), // PreScale y
+                (float) rangeX,         // PostScale x
+                (float) rangeY,         // PostScale y
                 degree)                 // Polynomials degree
         };
     }
@@ -694,12 +689,12 @@ public class LocalizationGrid {
      *        whole grid.
      */
     public synchronized MathTransform2D getMathTransform(final int degree) {
-        if (degree < 0  ||  degree >= MAX_DEGREE+1) {
+        if (degree < 0  ||  degree >= WarpTransform2D.MAX_DEGREE+1) {
             // TODO: provides a localized error message.
             throw new IllegalArgumentException();
         }
         if (transforms == null) {
-            transforms = new MathTransform2D[MAX_DEGREE + 1];
+            transforms = new MathTransform2D[WarpTransform2D.MAX_DEGREE + 1];
         }
         if (transforms[degree] == null) {
             if (degree == 0) {
