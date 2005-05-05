@@ -86,6 +86,18 @@ public class XMLSAXHandler extends DefaultHandler {
 		    return new InputSource(new StringReader(""));
 		}
 		try{
+            if (false) {
+                /*
+                 * HACK: This dead code exists only in order to make J2SE 1.4 compiler happy.
+                 * This hack is needed because there is a slight API change between J2SE 1.4
+                 * and 1.5: the 'resolveEntity()' method didn't declared IOException in its
+                 * throw clause in J2SE 1.4. Compare the two following links:
+                 *
+                 * http://java.sun.com/j2se/1.5/docs/api/org/xml/sax/helpers/DefaultHandler.html#resolveEntity(java.lang.String,%20java.lang.String)
+                 * http://java.sun.com/j2se/1.4/docs/api/org/xml/sax/helpers/DefaultHandler.html#resolveEntity(java.lang.String,%20java.lang.String)
+                 */
+                throw new IOException();
+            }
             return super.resolveEntity(pubId,sysId);
 		}catch(IOException e){
 			SAXException se = new SAXException(e.getLocalizedMessage());
