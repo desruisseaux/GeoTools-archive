@@ -23,34 +23,31 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
 
 
 /**
- * A factory that may not be available in all configurations.
- *
- * <p>Such factories often need some resources to download separatly, like a big file or a
- * database. Those resources may not be installed in all configurations. The {@link #isReady}
- * method tells if this factory has found every resources it needs in order to run.</p>
- *
- * <p>{@link FactoryRegistry#getServiceProvider} iterates over all registered factories. If an
- * {@linkplain ServiceRegistry#setOrdering ordering is set}, it is taken in account. If no suitable
- * factory was found before the iterator reachs this optional factory, then {@code FactoryRegistry}
- * invokes {@link #isReady}. If the later returns {@code true}, then this optional factory is
- * processed like any other factories. Otherwise it is ignored.</p>
- *
- * <p>Optional factories are useful when the preferred factory requires resources that are not
- * guaranteed to be installed on the client machine (e.g. the <A HREF="http://www.epsg.org">EPSG
- * database</A>) and some fallback exists (e.g. an EPSG factory based on a WKT file).</p>
- *
- * <p>Ignored factories are not deregistered; they will be queried again every time
- * {@code getServiceProvider(...)} is invoked and the iterator reachs this optional factory.
- * This means that if a resource was not available at startup time but become available later,
- * it may be selected the next time {@code getServiceProvider(...)} is invoked. It will have no
- * impact on previous results of {@code getServiceProvider(...)} however.</p>
- * 
- * <p>{@code OptionalFactory} is not designed for factories with intermittent state (i.e. return
- * value of {@link #isReady} varying in an unpredictable way). While {@code FactoryRegistry} can
- * provides some deterministic behavior when the {@code isReady()} return value become {@code true}
- * as explained in the previous paragraphe, the converse (when the value was {@code true} and become
- * {@code false}) is unsafe. This is because factories returned by previous calls to
- * {@code getServiceProvider(...)} would stop to work in an unexpected way for clients.</p>
+ * An optional factory that may not be available in all configurations.
+ * <p>
+ * Such factories often need some external resources. For example the default
+ * {@linkplain org.geotools.referencing.factory.epsg.EPSGFactory EPSG factory} need a
+ * MS-Access database installed on the client machine. This database is not bundle in
+ * Geotools distribution; if the user have not installed it, the factory can't work.
+ * <p>
+ * This interface is <strong>not</strong> a manager for automatic download of external resources.
+ * It is just a way to tell to {@link FactoryFinder} that this factory exists, but can't do its
+ * job for whatever reasons (usually a missing resource that the user shall download and install
+ * himself), so {@code FactoryFinder} has to choose an other factory. In other words, the
+ * {@code OptionalFactory} interface is used as a filter, nothing else. The process is as follows:
+ * <p>
+ * <ul>
+ *   <li>When {@link FactoryRegistry#getServiceProvider} is invoked, it starts to iterate over all
+ *       registered factories. If an {@linkplain ServiceRegistry#setOrdering ordering is set}, it
+ *       is taken in account for the iteration order.</li>
+ *   <li>If no suitable factory was found before the iterator reachs this optional factory, then
+ *       {@link #isReady} is invoked. If it returns {@code true}, then this optional factory is
+ *       processed like any other factories. Otherwise it is ignored.</li>
+ * </ul>
+ * <p>
+ * <strong>NOTE:</strong> {@code OptionalFactory} is not designed for factories with intermittent
+ * state (i.e. return value of {@link #isReady} varying in an unpredictable way). The behavior is
+ * undetermined if the {@code isReady()} state changes with time.
  *
  * @todo This interface is like a tiny skeleton of external service API. To complete the picture
  *       we would need a callback mechanism. A listener that that client code can give to the

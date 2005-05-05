@@ -31,13 +31,24 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
+import org.geotools.metadata.citation.Citation;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterGroup;
+import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -61,6 +72,10 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @todo This class should extends {@link WarpTransform2D} and constructs a
+ *       {@link javax.media.jai.WarpGrid} the first time the {@link WarpTransform2D#getWarp()}
+ *       method is invoked (GEOT-522).
  */
 final class LocalizationGridTransform2D extends AbstractMathTransform
                                      implements MathTransform2D, Serializable
@@ -162,6 +177,13 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         this.height = height;
         this.grid   = grid;
         this.global = global;
+    }
+    
+    /**
+     * Returns the parameter descriptors for this math transform.
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
     }
 
     /**
@@ -728,5 +750,53 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
                    Arrays   .equals(this.grid,   that.grid);
         }
         return false;
+    }
+
+    /**
+     * The provider for the {@link LocalizationGridTransform2D}.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     *
+     * @todo Not yet fully implemented. Once it is implemented, we need to add a
+     *       getParameterValues() method in LocalizationGridTransform2D.
+     */
+    private static class Provider extends MathTransformProvider {
+        /** Serial number for interoperability with different versions. */
+        private static final long serialVersionUID = -8263439392080019340L;
+
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+                new Identifier(Citation.GEOTOOLS, "WarpPolynomial")
+            }, new ParameterDescriptor[] {});
+
+        /**
+         * Create a provider for warp transforms.
+         */
+        public Provider() {
+            super(2, 2, PARAMETERS);
+        }
+
+        /**
+         * Returns the operation type.
+         */
+        protected Class getOperationType() {
+            return Transformation.class;
+        }
+
+        /**
+         * Creates a warp transform from the specified group of parameter values.
+         *
+         * @param  values The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup values)
+                throws ParameterNotFoundException
+        {
+            throw new UnsupportedOperationException("Not yet implemented");
+        }
     }
 }

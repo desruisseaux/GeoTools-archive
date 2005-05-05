@@ -29,9 +29,10 @@ import java.awt.image.WritableRaster;  // For javadoc
 import java.util.Arrays;
 
 // JAI dependencies
-import javax.media.jai.Warp;
-import javax.media.jai.WarpPolynomial;
-import javax.media.jai.RasterFactory; // For javadoc
+import javax.media.jai.Warp;           // For javadoc
+import javax.media.jai.WarpGrid;       // For javadoc
+import javax.media.jai.WarpPolynomial; // For javadoc
+import javax.media.jai.RasterFactory;  // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridGeometry;  // For javadoc
@@ -86,11 +87,13 @@ import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
  *     }
  * }
  * <FONT color='#008000'>//
- * // Constructs the grid coordinate reference system.
- * // <var>degree</var> is the polynomial degree (e.g. 2). A degree of 0 is a
- * // special value meaning to use a transform backed by the whole grid.
+ * // Constructs the grid coordinate reference system. <var>degree</var> is the polynomial
+ * // degree (e.g. 2) for a math transform that approximately map the grid of localization.
+ * // For a more accurate (but not always better) math transform backed by the whole grid,
+ * // invokes {@linkplain #getMathTransform()} instead, or use the special value of 0 for the degree
+ * // argument.
  * //</FONT>
- * MathTransform2D        realToGrid = grid.{@linkplain #getMathTransform(int) getMathTransform}(degree).inverse();
+ * MathTransform2D        realToGrid = grid.{@linkplain #getPolynomialTransform(int) getPolynomialTransform}(degree).inverse();
  * CoordinateReferenceSystem realCRS = GeographicCRS.WGS84;
  * CoordinateReferenceSystem gridCRS = new {@linkplain DerivedCRS}("The grid CRS",
  *         new {@linkplain OperationMethod#OperationMethod(MathTransform) OperationMethod}(realToGrid),
@@ -631,22 +634,16 @@ public class LocalizationGrid {
     }
 
     /**
-     * Returns a math transform from grid to "real world" coordinates using the default degree.
-     */
-    public MathTransform2D getMathTransform() {
-        return getMathTransform(0);
-    }
-
-    /**
      * Returns a math transform from grid to "real world" coordinates using a polynomial fitting
-     * of the specified degree. By convention, a {@code degree} of 0 will returns a math transform
-     * backed by the whole grid. Greater values will uses a fitted polynomial (affine transform for
+     * of the specified degree. By convention, a {@code degree} of 0 will returns the
+     * {@linkplain #getMathTransform() math transform backed by the whole grid}. Greater values
+     * will use a fitted polynomial ({@linkplain #getAffineTransform affine transform} for
      * degree 1, quadratic transform for degree 2, cubic transform for degree 3, etc.).
      *
      * @param degree The polynomial degree for the fitting, or 0 for a transform backed by the
      *        whole grid.
      */
-    public synchronized MathTransform2D getMathTransform(final int degree) {
+    public synchronized MathTransform2D getPolynomialTransform(final int degree) {
         if (degree < 0  ||  degree >= WarpTransform2D.MAX_DEGREE+1) {
             // TODO: provides a localized error message.
             throw new IllegalArgumentException();
@@ -655,17 +652,31 @@ public class LocalizationGrid {
             transforms = new MathTransform2D[WarpTransform2D.MAX_DEGREE + 1];
         }
         if (transforms[degree] == null) {
-            if (degree == 0) {
-                // Note: 'grid' is not cloned. This GridLocalization's grid
-                //       will need to be cloned if a "set" method is invoked
-                //       after the math transform creation.
-                transforms[degree] = new LocalizationGridTransform2D(width, height, grid,
-                                                                     getAffineTransform());
-            } else {
-                transforms[degree] = fitWarps(degree);;
+            final MathTransform2D tr;
+            switch (degree) {
+                case 0: {
+                    // Note: 'grid' is not cloned. This GridLocalization's grid
+                    //       will need to be cloned if a "set" method is invoked
+                    //       after the math transform creation.
+                    tr = new LocalizationGridTransform2D(width, height, grid, getAffineTransform());
+                    break;
+                }
+                case 1:  tr = new AffineTransform2D(getAffineTransform()); break;
+                default: tr = fitWarps(degree); break;
             }
+            transforms[degree] = tr;
         }
         return transforms[degree];
+    }
+
+    /**
+     * Returns a math transform from grid to "real world" coordinates. The math transform is
+     * backed by the full grid of localization. In terms of JAI's {@linkplain Warp image warp}
+     * operations, this math transform is backed by a {@link WarpGrid} while the previous methods
+     * return math transforms backed by {@link WarpPolynomial}.
+     */
+    public final MathTransform2D getMathTransform() {
+        return getPolynomialTransform(0);
     }
 
     /**

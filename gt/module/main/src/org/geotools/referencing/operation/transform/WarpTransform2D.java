@@ -52,6 +52,8 @@ import org.geotools.metadata.citation.Citation;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.XArray;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 
 
 /**
@@ -77,7 +79,7 @@ import org.geotools.resources.XArray;
  * @author Martin Desruisseaux
  * @author Alessio Fabiani
  *
- * @see LocalizationGrid#getMathTransform(int)
+ * @see LocalizationGrid#getPolynomialTransform(int)
  * @see Warp
  * @see javax.media.jai.WarpOpImage
  * @see javax.media.jai.operator.WarpDescriptor
@@ -311,12 +313,23 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * image reprojection.
      *
      * @param name The image or {@linkplain org.geotools.coverage.grid.GridCoverage2D coverage}
-     *             name. Used only for formatting error message if needed.
+     *        name, or {@code null} in unknow. Used only for formatting error message if some
+     *        {@link TransformException} are thrown by the supplied transform.
      * @param transform The transform to returns as an image warp.
+     *
+     * @todo We should check for {@link ConcatenatedTransform}. If we detect that a
+     * {@code WarpTransform2D} is concatenated with {@link AffineTransform2D} only, and if the
+     * {@code AffineTransform} has scale factors only, then we can ommit the {@code AffineTransform}
+     * and merge the scale factors with {@link WarpPolynomial} preScaleX, preScaleY, postScaleX and
+     * postScaleY. Additionnaly, the translation term for the post-AffineTransform may also be
+     * merged with the first coefficients of WarpPolynomial.xCoeffs and yCoeffs. See GEOT-521.
      */
-    public static Warp getWarp(final InternationalString name, final MathTransform2D transform) {
+    public static Warp getWarp(CharSequence name, final MathTransform2D transform) {
         if (transform instanceof WarpTransform2D) {
             return ((WarpTransform2D) transform).getWarp();
+        }
+        if (name == null) {
+            name = Resources.formatInternational(ResourceKeys.UNKNOW);
         }
         return new WarpAdapter(name, transform);
     }
