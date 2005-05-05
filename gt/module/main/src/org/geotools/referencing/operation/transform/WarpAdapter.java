@@ -97,8 +97,8 @@ final class WarpAdapter extends Warp {
         int index = 0;
         for (int y=ymin; y<ymax; y+=periodY) {
             for (int x=xmin; x<xmax; x+=periodX) {
-                destRect[index++] = x;
-                destRect[index++] = y;
+                destRect[index++] = x + 0.5f;
+                destRect[index++] = y + 0.5f;
             }
         }
         try {
@@ -111,51 +111,10 @@ final class WarpAdapter extends Warp {
             e.initCause(exception);
             throw e;
         }
+        while (--index >= 0) {
+            destRect[index] -= 0.5f;
+        }
         return destRect;
-    }
-
-    /**
-     * Computes a rectangle that is guaranteed to enclose the region of the source
-     * that is required in order to produce a given rectangular output region.
-     */
-    public Rectangle mapDestRect(final Rectangle destRect) {
-        try {
-            // According OpenGIS specification, GridGeometry maps pixel's center. But
-            // the bounding box is for all pixels, not pixel's centers. Offset by
-            // -0.5 (use -0.5 for maximum too, not +0.5, since maximum is exclusive).
-            Rectangle2D bounds = new Rectangle2D.Double(
-                    destRect.x-0.5, destRect.y-0.5, destRect.width, destRect.height);
-            // TODO: This rectangle may be approximative. We should improve the algorithm.
-            bounds = CRSUtilities.transform(inverse, bounds, bounds);
-            return bounds.getBounds();
-        } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "destRect", destRect));
-            e.initCause(exception);
-            throw e;
-        }
-    }
-
-    /**
-     * Computes a rectangle that is guaranteed to enclose the region of the destination
-     * that can potentially be affected by the pixels of a rectangle of a given source.
-     */
-    public Rectangle mapSourceRect(final Rectangle sourceRect) {
-        try {
-            // According OpenGIS specification, GridGeometry maps pixel's center. But
-            // the bounding box is for all pixels, not pixel's centers. Offset by
-            // -0.5 (use -0.5 for maximum too, not +0.5, since maximum is exclusive).
-            Rectangle2D bounds = new Rectangle2D.Double(
-                    sourceRect.x-0.5, sourceRect.y-0.5, sourceRect.width, sourceRect.height);
-            // TODO: This rectangle may be approximative. We should improve the algorithm.
-            bounds = CRSUtilities.transform((MathTransform2D)inverse.inverse(), bounds, bounds);
-            return bounds.getBounds();
-        } catch (TransformException exception) {
-            IllegalArgumentException e = new IllegalArgumentException(Resources.format(
-                            ResourceKeys.ERROR_BAD_PARAMETER_$2, "sourceRect", sourceRect));
-            e.initCause(exception);
-            throw e;
-        }
     }
 
     /**
@@ -165,14 +124,17 @@ final class WarpAdapter extends Warp {
      *               to map to source image coordinates.
      */
     public Point2D mapDestPoint(final Point2D destPt) {
+        Point2D result = new Point2D.Double(destPt.getX()+0.5, destPt.getY()+0.5);
         try {
-            return inverse.transform(destPt, null);
+            result = inverse.transform(result, result);
         } catch (TransformException exception) {
             IllegalArgumentException e = new IllegalArgumentException(Resources.format(
                             ResourceKeys.ERROR_BAD_PARAMETER_$2, "destPt", destPt));
             e.initCause(exception);
             throw e;
         }
+        result.setLocation(result.getX()-0.5, result.getY()-0.5);
+        return result;
     }
 
     /**
@@ -182,13 +144,16 @@ final class WarpAdapter extends Warp {
      *                 to map to destination image coordinates.
      */
     public Point2D mapSourcePoint(final Point2D sourcePt) {
+        Point2D result = new Point2D.Double(sourcePt.getX()+0.5, sourcePt.getY()+0.5);
         try {
-            return ((MathTransform2D)inverse.inverse()).transform(sourcePt, null);
+            result = ((MathTransform2D)inverse.inverse()).transform(result, result);
         } catch (TransformException exception) {
             IllegalArgumentException e = new IllegalArgumentException(Resources.format(
                             ResourceKeys.ERROR_BAD_PARAMETER_$2, "sourcePt", sourcePt));
             e.initCause(exception);
             throw e;
         }
+        result.setLocation(result.getX()-0.5, result.getY()-0.5);
+        return result;
     }
 }

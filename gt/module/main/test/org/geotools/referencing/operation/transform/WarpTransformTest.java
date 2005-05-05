@@ -22,6 +22,7 @@ package org.geotools.referencing.operation.transform;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import java.util.Random;
 
 // JUnit dependencies
@@ -41,10 +42,11 @@ import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
 
 
 /**
- * Tests the {@link WarpTransform2D} class.
+ * Tests the {@link WarpTransform2D} and {@link WarpAdapter} classes.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -207,6 +209,37 @@ public class WarpTransformTest extends TestCase {
             }, 2, 1E-2f);
             assertTrue("Expected a quatratic warp but got "+Utilities.getShortClassName(warp),
                        warp instanceof WarpQuadratic);
+        }
+    }
+
+    /**
+     * Tests the {@link WarpAdapter} class using an affine transform.
+     */
+    public void testAdapter() {
+        final AffineTransform atr = AffineTransform.getScaleInstance(0.25, 0.5);
+        atr.translate(4, 2);
+        final AffineTransform2D transform = new AffineTransform2D(atr);
+        final WarpAffine        warp      = new WarpAffine       (atr);
+        final WarpAdapter       adapter   = new WarpAdapter("test", transform);
+        final Random            random    = new Random(-854734760285695284L);
+        for (int i=0; i<200; i++) {
+            Point2D source   = new Point2D.Double(random.nextDouble()*100, random.nextDouble()*100);
+            Point2D expected = warp   .mapDestPoint(source);
+            Point2D computed = adapter.mapDestPoint(source);
+            assertEquals("X", expected.getX(), computed.getX(), 1E-5);
+            assertEquals("Y", expected.getY(), computed.getY(), 1E-5);
+
+            // Try inverse transform.
+            expected = warp   .mapSourcePoint(source);
+            computed = adapter.mapSourcePoint(source);
+            assertEquals("X", expected.getX(), computed.getX(), 1E-5);
+            assertEquals("Y", expected.getY(), computed.getY(), 1E-5);
+
+            // Try warpPoint
+            final float[] exp = warp   .warpPoint((int)source.getX(), (int)source.getY(), null);
+            final float[] com = adapter.warpPoint((int)source.getX(), (int)source.getY(), null);
+            assertEquals("X", exp[0], com[0], 1E-5);
+            assertEquals("Y", exp[1], com[1], 1E-5);
         }
     }
 }
