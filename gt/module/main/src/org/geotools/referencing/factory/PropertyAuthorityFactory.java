@@ -75,7 +75,7 @@ public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
      * code for a coordinate reference system and the associated value is a 
      * WKT string for the CRS.
      */
-    protected final Properties definitions = new Properties();
+    private final Properties definitions = new Properties();
 
     /**
      * An unmodifiable view of the authority keys. This view is always up to date

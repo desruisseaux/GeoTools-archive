@@ -1,5 +1,13 @@
 package org.geotools.util;
 
+/**
+ * Iterator for {@link KeySortedLinkedList}.
+ *
+ * Note: this class may change in the future, or by replaced by
+ *       a {@link java.util.TreeMap}-based solution.
+ *
+ * @author Simone Giannecchini
+ */
 public class KeySortedLinkedListIterator {
     KeySortedListNode current;
 

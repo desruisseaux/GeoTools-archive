@@ -1,5 +1,13 @@
 package org.geotools.util;
 
+/**
+ * List of elements sorted by a key which is not the element itself.
+ *
+ * Note: this class may change in the future, or by replaced by
+ *       a {@link java.util.TreeMap}-based solution.
+ *
+ * @author Simone Giannecchini
+ */
 public class KeySortedLinkedList {
     KeySortedListNode header;
 

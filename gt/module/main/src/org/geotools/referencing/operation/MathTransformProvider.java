@@ -349,8 +349,8 @@ public abstract class MathTransformProvider extends OperationMethod {
      * @return The requested parameter value.
      * @throws ParameterNotFoundException if the parameter is not found.
      */
-    private static ParameterValue getValue(final ParameterDescriptor param,
-                                           final ParameterValueGroup group)
+    private static ParameterValue getParameter(final ParameterDescriptor param,
+                                               final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
         /*
@@ -396,7 +396,27 @@ public abstract class MathTransformProvider extends OperationMethod {
         }
         return null;
     }
-    
+
+    /**
+     * Returns the parameter value for the specified operation parameter.
+     * This convenience method is used by subclasses for initializing
+     * {@linkplain MathTransform math transform} from a set of parameters.
+     *
+     * @param  param The parameter to look for.
+     * @param  group The parameter value group to search into.
+     * @return The requested parameter value, or {@code null} if {@code param} is
+     *         {@linkplain #createOptionalDescriptor optional} and the user didn't
+     *         provided any value.
+     * @throws ParameterNotFoundException if the parameter is not found.
+     */
+    protected static Object value(final ParameterDescriptor param,
+                                  final ParameterValueGroup group)
+            throws ParameterNotFoundException
+    {
+        final ParameterValue value = getParameter(param, group);
+        return (value!=null) ? value.getValue() : null;
+    }
+
     /**
      * Returns the parameter value for the specified operation parameter.
      * This convenience method is used by subclasses for initializing
@@ -413,7 +433,7 @@ public abstract class MathTransformProvider extends OperationMethod {
                                         final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        final ParameterValue value = getValue(param, group);
+        final ParameterValue value = getParameter(param, group);
         return (value!=null) ? value.stringValue() : null;
     }
 
@@ -433,7 +453,7 @@ public abstract class MathTransformProvider extends OperationMethod {
                                   final ParameterValueGroup group)
             throws ParameterNotFoundException
     {
-        final ParameterValue value = getValue(param, group);
+        final ParameterValue value = getParameter(param, group);
         return (value!=null) ? value.intValue() : 0;
     }
 
@@ -456,7 +476,7 @@ public abstract class MathTransformProvider extends OperationMethod {
             throws ParameterNotFoundException
     {
         final Unit unit = param.getUnit();
-        final ParameterValue value = getValue(param, group);
+        final ParameterValue value = getParameter(param, group);
         return (value==null) ? Double.NaN :
                 (unit!=null) ? value.doubleValue(unit) : value.doubleValue();
     }

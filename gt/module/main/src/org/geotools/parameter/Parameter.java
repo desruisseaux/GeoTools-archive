@@ -110,7 +110,7 @@ public class Parameter extends AbstractParameter
     private Unit unit;
 
     /**
-     * Construct a parameter from the specified name and value. This convenience constructor
+     * Constructs a parameter from the specified name and value. This convenience constructor
      * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code>
      * is to invokes {@link ParameterDescriptor#createValue}.
@@ -125,7 +125,7 @@ public class Parameter extends AbstractParameter
     }
 
     /**
-     * Construct a parameter from the specified name and value. This convenience constructor
+     * Constructs a parameter from the specified name and value. This convenience constructor
      * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code> is
      * to invokes {@link ParameterDescriptor#createValue}.
@@ -142,7 +142,7 @@ public class Parameter extends AbstractParameter
     }
 
     /**
-     * Construct a parameter from the specified enumeration. This convenience constructor
+     * Constructs a parameter from the specified enumeration. This convenience constructor
      * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if
      * such an object was available, then the preferred way to get a <code>ParameterValue</code>
      * is to invokes {@link ParameterDescriptor#createValue}.
@@ -156,7 +156,7 @@ public class Parameter extends AbstractParameter
     }
 
     /**
-     * Construct a parameter value from the specified descriptor.
+     * Constructs a parameter value from the specified descriptor.
      * The value will be initialized to the default value, if any.
      *
      * @param descriptor The abstract definition of this parameter.
@@ -168,7 +168,24 @@ public class Parameter extends AbstractParameter
     }
 
     /**
-     * Wrap the specified value in an {@link Integer} object.
+     * Constructs a parameter value from the specified descriptor and value.
+     *
+     * @param  descriptor The abstract definition of this parameter.
+     * @param  value The parameter value.
+     * @throws InvalidParameterValueException if the type of <code>value</code> is inappropriate
+     *         for this parameter, or if the value is illegal for some other reason (for example
+     *         the value is numeric and out of range).
+     */
+    public Parameter(final ParameterDescriptor descriptor, final Object value)
+            throws InvalidParameterValueException
+    {
+        super(descriptor);
+        unit = descriptor.getUnit();
+        setValue(value);
+    }
+
+    /**
+     * Wraps the specified value in an {@link Integer} object.
      * This method try to avoid object creation if the value
      * is one of {@link #CACHED_VALUES frequently used values}.
      */
@@ -178,7 +195,7 @@ public class Parameter extends AbstractParameter
     }
 
     /**
-     * Wrap the specified value in an {@link Double} object.
+     * Wraps the specified value in an {@link Double} object.
      * This method try to avoid object creation if the value
      * is one of {@link #CACHED_VALUES frequently used values}.
      */
