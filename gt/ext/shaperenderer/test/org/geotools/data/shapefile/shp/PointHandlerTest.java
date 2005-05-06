@@ -48,8 +48,8 @@ public class PointHandlerTest extends TestCase {
 		URL url=TestData.getResource(LabelingTest.class, "streams.shp");
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
-//		Envelope env=ds.getFeatureSource().getBounds();
-		Envelope env=new Envelope(-180,180,-90,90);
+		Envelope env=ds.getFeatureSource().getBounds();
+//		Envelope env=new Envelope(-180,180,-90,90);
 		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 //		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
 		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, GeographicCRS.WGS84);

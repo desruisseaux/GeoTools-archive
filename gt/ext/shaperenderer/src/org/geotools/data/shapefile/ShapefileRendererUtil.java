@@ -24,6 +24,7 @@ import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.renderer.shape.MultiLineHandler;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -35,9 +36,20 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 2.1.x
  */
 public class ShapefileRendererUtil {
-	public static ShapefileReader getShpReader(ShapefileDataStore ds, Envelope bbox, MathTransform mt) throws IOException{
+	/**
+	 * gets a shapefile reader with the custom shaperenderer shape handler.
+	 * @param ds the datastore used to obtain the reader
+	 * @param bbox the area, in data coordinates, of the viewed data.
+	 * @param mt The transform used to transform from data->world coordinates->screen coordinates
+	 * @param worldToScreen the transform from screen coordinates to world coordinates.  Used for decimation. 
+	 * @return
+	 * @throws IOException
+	 * @throws TransformException
+	 */
+	public static ShapefileReader getShpReader(ShapefileDataStore ds, Envelope bbox, MathTransform mt) throws IOException, TransformException{
 		ShapefileReader reader=new ShapefileReader(ds.getReadChannel(ds.shpURL));
 		ShapeType type=reader.getHeader().getShapeType();
+		
 		if( type==ShapeType.ARC || type==ShapeType.ARCM || type==ShapeType.ARCZ )
 			reader.setHandler(new MultiLineHandler(type, bbox, mt));
 		return reader;

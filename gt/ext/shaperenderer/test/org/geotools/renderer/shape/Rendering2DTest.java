@@ -181,6 +181,23 @@ public class Rendering2DTest extends TestCase {
         showRender("testSimpleLineRender", renderer, 3000, env);
 
     }
+    
+    public void testSimpleLineRenderLargebbox() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting rendering2DTest");
+        
+        ShapeRenderer renderer=createLineRenderer();
+        MapContext map=renderer.getContext();
+
+        map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - env.getWidth(), env.getMaxX() + env.getWidth(), 
+        		env.getMinY() - env.getHeight(), env.getMaxY() + env.getHeight());
+        map.setAreaOfInterest(env);
+        showRender("testSimpleLineRender", renderer, 3000, env);
+
+    }
 
     public void disabledtestSimplePointRender() throws Exception {
 

@@ -38,12 +38,16 @@ import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileReader.Record;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultFeature;
+import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import org.geotools.geometry.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
@@ -164,6 +168,8 @@ public class ShapeRenderer {
 				return;
 			}
 			labelCache.startLayer();
+			
+			Envelope bbox=envelope;
 			try {
 				ShapefileDataStore ds = (ShapefileDataStore) currLayer
 						.getFeatureSource().getDataStore();
@@ -173,9 +179,12 @@ public class ShapeRenderer {
 				MathTransform mt;
 				try {
 					mt = CRS.transform(dataCRS, destinationCrs);
+					bbox=JTS.transform(bbox,mt.inverse());
 				} catch (Exception e) {
+					fireErrorEvent(e);
 					mt = null;
 				}
+				
 				MathTransform at = FactoryFinder.getMathTransformFactory(null)
 						.createAffineTransform(new GeneralMatrix(transform));
 				if (mt == null) {
@@ -185,18 +194,15 @@ public class ShapeRenderer {
 							.createConcatenatedTransform(mt,at);
 				}
 				
+				
 //				graphics.setTransform(transform);
 
 				// extract the feature type stylers from the style object
 				// and process them
 				if( isCaching() && geometryCache.size()>0 )
-					processStylersCaching(graphics,ds,new Envelope(paintArea.getMinX(),
-						paintArea.getMaxX(), paintArea.getMinY(), paintArea
-								.getMaxY()), mt, currLayer.getStyle());
+					processStylersCaching(graphics,ds,bbox, mt, currLayer.getStyle());
 				else
-					processStylersNoCaching(graphics, ds, new Envelope(paintArea.getMinX(),
-							paintArea.getMaxX(), paintArea.getMinY(), paintArea
-								.getMaxY()), mt, currLayer.getStyle());
+					processStylersNoCaching(graphics, ds, bbox, mt, currLayer.getStyle());
 			} catch (Exception exception) {
 				fireErrorEvent(new Exception("Exception rendering layer "
 						+ currLayer, exception));
@@ -211,7 +217,7 @@ public class ShapeRenderer {
 	}
 
 	private void processStylersNoCaching(Graphics2D graphics,
-			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
+			ShapefileDataStore datastore, Envelope bbox, MathTransform mt, 
 			Style style) throws IOException {
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("processing " + style.getFeatureTypeStyles().length
@@ -219,8 +225,11 @@ public class ShapeRenderer {
 		}
 		FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
 		FeatureType type;
+		ShapefileReader shpreader=null; 
 		try {
 			type = createFeatureType(style, datastore.getSchema());
+			shpreader= ShapefileRendererUtil.getShpReader(
+					datastore, bbox, mt);
 		} catch (Exception e) {
 			fireErrorEvent(e);
 			return;
@@ -232,8 +241,6 @@ public class ShapeRenderer {
 			}
 
 			FeatureTypeStyle fts = featureStylers[i];
-			ShapefileReader shpreader = ShapefileRendererUtil.getShpReader(
-					datastore, bbox, mt);
 			DbaseFileReader dbfreader = ShapefileRendererUtil
 					.getDBFReader(datastore);
 			String typeName = datastore.getSchema().getTypeName();
@@ -802,5 +809,35 @@ public class ShapeRenderer {
 	}
 	MapContext getContext() {
 		return context;
+	}
+	
+	private class NonValidatingFeature extends DefaultFeature{
+
+		/**
+		 * @param schema
+		 * @param attributes
+		 * @throws IllegalAttributeException
+		 */
+		protected NonValidatingFeature(DefaultFeatureType schema, Object[] attributes) throws IllegalAttributeException {
+			super(schema, attributes);
+			// TODO Auto-generated constructor stub
+		}
+
+		/**
+		 * 
+		 * @see org.geotools.feature.DefaultFeature#setAttributes(java.lang.Object[])
+		 */
+		public void setAttributes(Object[] attributes)
+				throws IllegalAttributeException {
+			for (int i = 0; i < attributes.length; i++) {
+				setAttribute(i,attributes[i]);
+			}
+		}
+		
+		public void setAttribute(int position, Object val) {
+			setAttributeValue(position, val);		
+		}
+		
+		
 	}
 }

@@ -35,6 +35,7 @@ public class MultiLineHandler implements ShapeHandler {
 
 	private ShapeType type;
 	private Envelope bbox;
+	double spanx, spany;
 	private MathTransform mt;
 
 	/**
@@ -42,11 +43,21 @@ public class MultiLineHandler implements ShapeHandler {
 	 * @param type the type of shape.
 	 * @param env the area that is visible.  If shape is not in area then skip.
 	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
+	 * @throws TransformException
 	 */
-	public MultiLineHandler(ShapeType type, Envelope env, MathTransform mt) {
+	public MultiLineHandler(ShapeType type, Envelope env, MathTransform mt) throws TransformException {
 		this.type=type;
 		this.bbox=env;
 		this.mt=mt;
+		if( mt != null ){
+			MathTransform screenToWorld=mt.inverse();
+			double[] original=new double[]{0,0,1,1};
+			double[] coords=new double[4];
+			screenToWorld.transform(original,0,coords,0,2);
+			this.spanx=Math.abs(coords[0]-coords[2]);
+			this.spany=Math.abs(coords[1]-coords[3]);
+		}
+		
 	}
 	
 	/**
@@ -72,20 +83,16 @@ public class MultiLineHandler implements ShapeHandler {
         tmpbbox[2]= buffer.getDouble();
         tmpbbox[3]= buffer.getDouble();
         
-        if( !mt.isIdentity())
-			try {
-				mt.transform(tmpbbox,0,tmpbbox, 0, tmpbbox.length/2);
-			} catch (TransformException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
         Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1], tmpbbox[3]);
 
         if (!bbox.intersects(geomBBox)) {
             skipMultiLineGeom(buffer, dimensions);
             return null;
         }
-
+        
+        Geometry decimatedGeom=decimateBasedOnEnvelope(geomBBox);
+        if( decimatedGeom!=null )
+        	return decimatedGeom;
         int numParts = buffer.getInt();
         int numPoints = buffer.getInt(); // total number of points
 
@@ -97,6 +104,7 @@ public class MultiLineHandler implements ShapeHandler {
         }
         double[][] coords = new double[numParts][];
         double[][] transformed=new double[numParts][];
+        int[] total = new int[numParts];
         // if needed in future otherwise all references to a z are commented out.
         // if( dimensions==3 )
         // z=new double[numParts][];
@@ -121,18 +129,31 @@ public class MultiLineHandler implements ShapeHandler {
             // clonePoint = false;
             // }
             coords[part] = new double[length * 2];
-            transformed[part] = new double[length * 2];
-            for( int i = 0; i < length*2;  ) {
-                coords[part][i] = buffer.getDouble();
-                i++;
-                coords[part][i] = buffer.getDouble();
-                i++;
+            int readDoubles=0;
+            int currentDoubles=0;
+            int totalDoubles=length*2;
+            for( ; currentDoubles < totalDoubles;  ) {
+                coords[part][readDoubles] = buffer.getDouble();
+                readDoubles++;
+                currentDoubles++;
+                coords[part][readDoubles] = buffer.getDouble();
+                readDoubles++;
+                currentDoubles++;
+        		if( currentDoubles>3 && readDoubles<totalDoubles-1 ){
+	            	if ( Math.abs(coords[part][readDoubles-4]-coords[part][readDoubles-2])<=spanx 
+	            			&& Math.abs(coords[part][readDoubles-3]-coords[part][readDoubles-1])<=spany ){
+	            		readDoubles-=2;
+	                }
+        		}
             }
+            total[part]=readDoubles/2;
+
             if( !mt.isIdentity() ){
 	            try {
-	                mt.transform(coords[part], 0, transformed[part], 0, length);
+	            	transformed[part] = new double[readDoubles];
+	                mt.transform(coords[part], 0, transformed[part], 0, readDoubles/2);
 	            } catch (Exception e) {
-	                ShapeRenderer.LOGGER.severe("could not transform coordinates"
+	                ShapeRenderer.LOGGER.severe("could not transform coordinates "
 	                        + e.getLocalizedMessage());
 	            }
             }else
@@ -175,7 +196,28 @@ public class MultiLineHandler implements ShapeHandler {
         return new Geometry(type, transformed, geomBBox);
 	}
 
-    private void skipMultiLineGeom( ByteBuffer buffer, int dimensions ) {
+	/**
+	 * @return
+	 */
+	private Geometry decimateBasedOnEnvelope(Envelope geomBBox) {
+		if ( geomBBox.getWidth()<=spanx && geomBBox.getHeight()<=spany ){
+        	double [][] coords=new double[1][];
+        	coords[0]=new double[]{geomBBox.getMinX(),geomBBox.getMinY()};
+        	double[][] transformed=new double[1][];
+        	transformed[0]=new double[2];
+        	try{
+        		mt.transform(coords[0], 0, transformed[0], 0, 1);
+        	}catch (Exception e) {
+                ShapeRenderer.LOGGER.severe("could not transform coordinates "
+                        + e.getLocalizedMessage());
+                transformed=coords;
+			}
+        	return new Geometry( type, transformed, geomBBox );
+        }
+		return null;
+	}
+
+	private void skipMultiLineGeom( ByteBuffer buffer, int dimensions ) {
         int numParts = buffer.getInt();
         int numPoints = buffer.getInt(); // total number of points
 
