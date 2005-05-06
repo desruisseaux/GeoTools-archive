@@ -49,28 +49,32 @@
     <dependency>
       <artifactId>geoapi</artifactId>
       <groupId>geoapi</groupId>
-      <version>SNAPSHOT</version>
+      <version>20050403</version>
     </dependency>
     <dependency>
       <id>units</id>
       <url>http://jsr-108.sourceforge.net</url>
       <version>0.01</version>
     </dependency>
+    <dependency>
+      <artifactId>epsg-wkt</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>${basedir}/src</sourceDirectory>
+    <unitTestSourceDirectory>${basedir}/test</unitTestSourceDirectory>
     <unitTest>
-      <includes>
-        <include>**/*Test.java</include>
-      </includes>
       <excludes>
-        <exclude>**/org/geotools/gce/geotiff/GeoTiffReaderTest.java</exclude>
+        <exclude>**/GeoTiffReaderTest.java</exclude>
+        <exclude>**/GeoTiffReaderWriterTest.java</exclude>
       </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
           <includes>
-            <include>**/*.png</include>
+            <include>**/*.tif</include>
           </includes>
         </resource>
       </resources>

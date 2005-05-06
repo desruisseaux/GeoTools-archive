@@ -127,6 +127,7 @@ public class GeoTiffException extends IOException {
         return this.geoKeys;
     }
 
+
     public String getMessage() {
         StringWriter text = new StringWriter(1024);
         PrintWriter message = new PrintWriter(text);

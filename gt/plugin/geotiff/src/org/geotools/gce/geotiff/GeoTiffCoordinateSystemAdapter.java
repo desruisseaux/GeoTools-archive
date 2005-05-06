@@ -121,7 +121,7 @@ public class GeoTiffCoordinateSystemAdapter {
     public static final short CT_TransvMercator_SouthOriented = 27;
 
     // code from GeoTIFF spec section 6.3.2.4
-    private static final String PM_Greenwich = "8901";
+    private static final String PM_Greenwich = "EPSG:8901";
     private static final Map mapCoordTrans = new HashMap();
 
     static {
@@ -308,10 +308,12 @@ public class GeoTiffCoordinateSystemAdapter {
             // coordinate system
         } else {
             try {
-                gcs = crsFactory.createGeographicCRS(geogCode);
+                gcs = crsFactory.createGeographicCRS("EPSG:" + geogCode);
             } catch (FactoryException fe) {
-                throw new UnsupportedOperationException(
+                GeoTiffException gte = new GeoTiffException(metadata,
                     "Invalid EPSG code in GeographicTypeGeoKey");
+                gte.initCause(fe) ; 
+                throw gte ; 
             }
         }
 
@@ -427,7 +429,7 @@ public class GeoTiffCoordinateSystemAdapter {
                         throw new GeoTiffException(metadata, 
                             "This geotiff file requires a DatumAuthorityFactory");
                     }
-                    pm = datumFactory.createPrimeMeridian(pmCode);
+                    pm = datumFactory.createPrimeMeridian("EPSG:" + pmCode);
                 }
             } else {
                 if (datumFactory == null) { 
@@ -476,7 +478,7 @@ public class GeoTiffCoordinateSystemAdapter {
         }
 
         try {
-            datum = (GeodeticDatum) (datumFactory.createDatum(datumCode));
+            datum = (GeodeticDatum) (datumFactory.createDatum("EPSG:"+datumCode));
         } catch (FactoryException fe) {
             throw new GeoTiffException(metadata, "Problem creating datum.");
         } catch (ClassCastException cce) {
@@ -665,7 +667,7 @@ public class GeoTiffCoordinateSystemAdapter {
                     throw new GeoTiffException(metadata, 
                         "This GeoTIFF file requires a CSAuthorityFactory.");
                 }
-                retval = csFactory.createUnit(unitCode);
+                retval = csFactory.createUnit("EPSG:" + unitCode);
             } catch (FactoryException fe) {
                 IOException io = new GeoTiffException(metadata,
                         "Error with EPSG Unit specification.");

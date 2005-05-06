@@ -24,6 +24,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
+import org.geotools.catalog.CatalogEntry ; 
 
 // GeoAPI dependencies
 import org.opengis.coverage.grid.Format;
@@ -77,6 +78,10 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
      * @return true if "o" is a file.
      */
     public boolean accepts(Object o) {
+        if (o instanceof CatalogEntry) { 
+          o = ((CatalogEntry)o).resource() ; 
+        }
+
         return o instanceof File;
     }
 
@@ -89,6 +94,10 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
      * @return DOCUMENT ME!
      */
     public GridCoverageReader getReader(Object source) {
+        if (source instanceof CatalogEntry) { 
+            source = ((CatalogEntry)source).resource() ; 
+        }
+
         GridCoverageReader reader = null;
 
         if (accepts(source)) {
