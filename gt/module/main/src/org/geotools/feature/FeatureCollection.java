@@ -16,6 +16,12 @@
  */
 package org.geotools.feature;
 
+import java.util.Iterator;
+
+import org.geotools.data.FeatureResults;
+
+import com.vividsolutions.jts.geom.Envelope;
+
 
 /** Represents a collection of features. Implementations and client code should
  * adhere to the rules set forth by java.util.Collection. That is, some methods are
@@ -26,9 +32,15 @@ package org.geotools.feature;
  * @author Ian Schneider, USDA-ARS
  * @version $Id: FeatureCollection.java,v 1.12 2003/07/30 21:31:41 jmacgill Exp $
  */
-public interface FeatureCollection extends java.util.Collection, Feature {
+public interface FeatureCollection extends java.util.Collection, Feature, FeatureResults {
+    /**
+     * All iterators must be closed using the {@linkplain FeatureCollection#close(Iterator)} method.
+     * @see java.lang.Iterable#iterator()
+     */
+    Iterator iterator();
     
-    /** Obtain a FeatureIterator of the Feature Objects contained within this
+    /** 
+     * Obtain a FeatureIterator of the Feature Objects contained within this
      * collection. The implementation of Collection must adhere to the rules of
      * fail-fast concurrent modification.
      * 
@@ -59,4 +71,21 @@ public interface FeatureCollection extends java.util.Collection, Feature {
      * @return A reference to this feature's schema.
      */
     FeatureType getFeatureType();
+    
+    /**
+     * Close the iterator if a connection is open that requires closing.  All iterators must be
+     * closed.  
+     * 
+     * @param iterator
+     */
+    void close( Iterator iterator);   
+    
+    /**
+     * Close the iterator if a connection is open that requires closing.  All iterators must be
+     * closed.  
+     * 
+     * @param iterator
+     */
+    void close( FeatureIterator iterator);
+    
 }

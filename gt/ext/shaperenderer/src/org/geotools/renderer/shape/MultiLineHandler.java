@@ -139,7 +139,7 @@ public class MultiLineHandler implements ShapeHandler {
                 coords[part][readDoubles] = buffer.getDouble();
                 readDoubles++;
                 currentDoubles++;
-        		if( currentDoubles>3 && readDoubles<totalDoubles-1 ){
+        		if( currentDoubles>3 && currentDoubles<totalDoubles-1 ){
 	            	if ( Math.abs(coords[part][readDoubles-4]-coords[part][readDoubles-2])<=spanx 
 	            			&& Math.abs(coords[part][readDoubles-3]-coords[part][readDoubles-1])<=spany ){
 	            		readDoubles-=2;

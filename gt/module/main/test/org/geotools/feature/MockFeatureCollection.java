@@ -6,6 +6,11 @@
 
 package org.geotools.feature;
 
+import java.io.IOException;
+import java.util.Iterator;
+
+import org.geotools.data.FeatureReader;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -187,5 +192,27 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
 		// TODO Auto-generated method stub
 		
 	}
+
+    public FeatureType getSchema() throws IOException {
+        return null;
+    }
+
+    public FeatureReader reader() throws IOException {
+        return null;
+    }
+
+    public int getCount() throws IOException {
+        return 0;
+    }
+
+    public FeatureCollection collection() throws IOException {
+        return null;
+    }
+
+    public void close( Iterator iterator ) {
+    }
+
+    public void close( FeatureIterator iterator ) {
+    }
     
 }

@@ -34,6 +34,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.data.crs.ReprojectFeatureResults;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
@@ -62,7 +63,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * impement FeatureSource.
  * </p>
  * 
- * @author Gabriel Roldán
+ * @author Gabriel Roldï¿½n
  */
 public class DefaultView implements FeatureSource {
 
@@ -346,9 +347,9 @@ public class DefaultView implements FeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureResults getFeatures(Query query) throws IOException {
+    public FeatureCollection getFeatures(Query query) throws IOException {
         DefaultQuery mergedQuery = makeDefinitionQuery(query);
-        FeatureResults results = source.getFeatures(mergedQuery);
+        FeatureCollection results = source.getFeatures(mergedQuery);
 
         // Get all the coordinate systems involved in the two queries
         CoordinateReferenceSystem cCs = constraintQuery.getCoordinateSystem();
@@ -425,7 +426,7 @@ public class DefaultView implements FeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
-    public FeatureResults getFeatures(Filter filter) throws IOException {
+    public FeatureCollection getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(schema.getTypeName(),filter));
     }
 
@@ -441,7 +442,7 @@ public class DefaultView implements FeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
-    public FeatureResults getFeatures() throws IOException {
+    public FeatureCollection getFeatures() throws IOException {
         return getFeatures(Query.ALL);
     }
 

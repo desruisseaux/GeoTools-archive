@@ -17,16 +17,15 @@
 package org.geotools.feature;
 
 // J2SE interfaces
+import java.io.IOException;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
+import org.geotools.data.FeatureReader;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.xml.gml.GMLSchema;
 
@@ -71,6 +70,7 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
     	}
     	this.featureType = featureType;
     }
+    
     private FeatureType featureType;
 
     /**
@@ -589,4 +589,30 @@ public class DefaultFeatureCollection extends AbstractCollection implements Feat
 	public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
 		throw new IllegalAttributeException("Not Supported");
 	}
+
+    public FeatureType getSchema() throws IOException {
+        return getFeatureType();
+    }
+
+    public FeatureReader reader() throws IOException {
+        return null;
+    }
+
+    public int getCount() throws IOException {
+        return size();
+    }
+
+    public FeatureCollection collection() throws IOException {
+        return this;
+    }
+
+    public void close( Iterator iterator ) {
+        if( iterator instanceof FeatureReaderIterator ){
+            ((FeatureReaderIterator)iterator).close();
+        }
+    }
+
+    public void close( FeatureIterator iterator ) {
+        close(iterator.iterator);
+    }
 }

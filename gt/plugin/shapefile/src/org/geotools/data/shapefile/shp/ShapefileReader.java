@@ -488,4 +488,10 @@ public class ShapefileReader {
     }
   }
   
+	/**
+	 * @param handler The handler to set.
+	 */
+	public void setHandler(ShapeHandler handler) {
+		this.handler = handler;
+	}
 }

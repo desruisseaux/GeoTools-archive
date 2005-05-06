@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -69,7 +70,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author $Author: jive $ (last modification)
  * @version $Id$ TODO: handle the case where there is more than one geometry and the other geometries have a different CS than the default geometry
  */
-public class ReprojectFeatureResults implements FeatureResults {
+public class ReprojectFeatureResults extends DefaultFeatureCollection implements FeatureResults {
     FeatureResults results;
     FeatureType schema;
     MathTransform transform;
@@ -93,6 +94,7 @@ public class ReprojectFeatureResults implements FeatureResults {
     public ReprojectFeatureResults(FeatureResults results,
         CoordinateReferenceSystem destinationCS)
         throws IOException, SchemaException, TransformException, OperationNotFoundException, NoSuchElementException, FactoryException{
+        super(results.getSchema().getNamespace()+"/"+results.getSchema().getTypeName(),results.getSchema());
         if (destinationCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
@@ -153,7 +155,7 @@ public class ReprojectFeatureResults implements FeatureResults {
      *
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() throws IOException {
+    public Envelope getBounds() {
         try {
             Envelope newBBox = new Envelope();
             Envelope internal;
@@ -166,10 +168,8 @@ public class ReprojectFeatureResults implements FeatureResults {
             }
 
             return newBBox;
-        } catch (IOException e) {
-            throw e;
         } catch (Exception e) {
-            throw new DataSourceException("Exception occurred while computing reprojected bounds",
+            throw new RuntimeException("Exception occurred while computing reprojected bounds",
                 e);
         }
     }

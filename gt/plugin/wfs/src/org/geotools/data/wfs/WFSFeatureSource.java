@@ -103,7 +103,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
-    public FeatureResults getFeatures(){
+    public FeatureCollection getFeatures(){
         return getFeatures(new DefaultQuery(ft.getTypeName(), Filter.NONE));
     }
 
@@ -111,7 +111,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
-    public FeatureResults getFeatures(Filter filter){
+    public FeatureCollection getFeatures(Filter filter){
         return getFeatures(new DefaultQuery(ft.getTypeName(), filter));
     }
 
@@ -119,7 +119,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureResults getFeatures(Query query) {
+    public FeatureCollection getFeatures(Query query) {
         return new WFSFeatureResults(this, query);
     }
 

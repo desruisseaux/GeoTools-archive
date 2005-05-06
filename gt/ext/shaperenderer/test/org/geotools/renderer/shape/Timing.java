@@ -25,8 +25,6 @@ import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -39,6 +37,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.renderer.lite.LiteRenderer2;
+import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Rule;
@@ -65,9 +64,11 @@ public class Timing {
 
 	private static boolean DISPLAY = true;
 
-	private static boolean RUN_SHAPE = true;
+	private static boolean RUN_SHAPE = false;
 
 	private static boolean RUN_LITE = false;
+
+	private static boolean RUN_TINY = true;
 
 	private static boolean ACCURATE = false;
 
@@ -115,6 +116,11 @@ public class Timing {
 	}
 
 	static Style createTestStyle() throws Exception {
+		return createTestStyle(null);
+	}
+		static Style createTestStyle(String typeName) throws Exception {
+		if( typeName==null )
+			typeName="bc_roads";
 		StyleFactory sFac = StyleFactory.createStyleFactory();
 		// The following is complex, and should be built from
 
@@ -142,7 +148,7 @@ public class Timing {
 		}
 		FeatureTypeStyle fts2 = sFac.createFeatureTypeStyle();
 		fts2.setRules(new Rule[] { rule2 });
-		fts2.setFeatureTypeName("bc_roads");
+		fts2.setFeatureTypeName(typeName);
 
 		Style style = sFac.createStyle();
 		style.setFeatureTypeStyles(new FeatureTypeStyle[] { fts2 });
@@ -156,13 +162,11 @@ public class Timing {
 		if (RUN_SHAPE)
 			t.runShapeRendererTest();
 
-		if (DISPLAY)
-			Thread.sleep(3000);
+		if (RUN_TINY)
+			t.runTinyTest();
 
 		if (RUN_LITE)
 			t.runLiteRendererTest();
-		if (DISPLAY)
-			Thread.sleep(3000);
 
 		out.flush();
 	}
@@ -189,6 +193,63 @@ public class Timing {
 			renderer.setCaching(true);
 
 		Envelope bounds = context.getLayerBounds();
+		if (!ALL_DATA)
+			bounds = new Envelope(bounds.getMinX() + bounds.getWidth() / 4,
+					bounds.getMaxX() - bounds.getWidth() / 4, bounds.getMinY()
+							+ bounds.getHeight() / 4, bounds.getMaxY()
+							- bounds.getHeight() / 4);
+
+		if (ACCURATE)
+			renderer.paint(g, new Rectangle(w, h), bounds);
+		long start = System.currentTimeMillis();
+
+		Controller controller = null;
+		if (CPU_PROFILE) {
+			controller = new Controller();
+			controller.startCPUSampling();
+		}
+
+		renderer.paint(g, new Rectangle(w, h), bounds);
+		if (ACCURATE) {
+			renderer.paint(g, new Rectangle(w, h), bounds);
+			renderer.paint(g, new Rectangle(w, h), bounds);
+		}
+		if (CPU_PROFILE) {
+			controller.captureCPUSnapshot("shape_" + testName, false);
+		}
+		long end = System.currentTimeMillis();
+		if(!CPU_PROFILE)
+			if (ACCURATE)
+				out.append("shape " + testName + "=" + (end - start) / 3 + "\n");
+			else
+				out.append("shape " + testName + "=" + (end - start) + "\n");
+		if (DISPLAY)
+			display("shape", image, w, h);
+
+	}
+
+	private void runTinyTest() throws Exception {
+		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
+		ShapefileDataStore store = (ShapefileDataStore) fac
+				.createDataStore(TestData.getResource(Timing.class, "theme1.shp"));
+		DefaultMapContext context = new DefaultMapContext();
+		context.addLayer(store.getFeatureSource(), createTestStyle("theme1"));
+		if (NO_REPROJECTION)
+			context.setAreaOfInterest(new Envelope(), store.getSchema()
+					.getDefaultGeometry().getCoordinateSystem());
+		ShapeRenderer renderer = new ShapeRenderer(context);
+		int w = 1000, h = 1000;
+		final BufferedImage image = new BufferedImage(w, h,
+				BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = image.createGraphics();
+		g.setColor(Color.white);
+		g.fillRect(0, 0, w, h);
+
+		if (CACHING)
+			renderer.setCaching(true);
+
+		Envelope bounds=new Envelope(-7.105552354197932,8.20555235419793,-3.239388966356115,4.191388966388683);
+
 		if (!ALL_DATA)
 			bounds = new Envelope(bounds.getMinX() + bounds.getWidth() / 4,
 					bounds.getMaxX() - bounds.getWidth() / 4, bounds.getMinY()

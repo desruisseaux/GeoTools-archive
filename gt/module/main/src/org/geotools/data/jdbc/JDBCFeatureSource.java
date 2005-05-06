@@ -29,11 +29,11 @@ import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
@@ -176,7 +176,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureResults getFeatures(Query request) throws IOException {
+    public FeatureCollection getFeatures(Query request) throws IOException {
         String typeName = featureType.getTypeName();
 
         if ((request.getTypeName() != null)
@@ -251,7 +251,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public FeatureResults getFeatures(Filter filter) throws IOException {
+    public FeatureCollection getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(featureType.getTypeName(), filter));
     }
 
@@ -262,7 +262,7 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @throws IOException DOCUMENT ME!
      */
-    public FeatureResults getFeatures() throws IOException {
+    public FeatureCollection getFeatures() throws IOException {
         return getFeatures(Filter.NONE);
     }
 

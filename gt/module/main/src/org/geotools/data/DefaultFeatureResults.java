@@ -17,7 +17,9 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Iterator;
 
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -37,7 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  * @author Jody Garnett, Refractions Research
  */
-public class DefaultFeatureResults implements FeatureResults {
+public class DefaultFeatureResults extends DefaultFeatureCollection implements FeatureResults {
     protected Query query;
     protected FeatureSource featureSource;
 
@@ -53,6 +55,7 @@ public class DefaultFeatureResults implements FeatureResults {
      * @param query
      */
     public DefaultFeatureResults(FeatureSource source, Query query) {
+        super(source.getSchema().getNamespace()+"/"+source.getSchema().getTypeName(),source.getSchema());
         this.featureSource = source;
         String typeName = source.getSchema().getTypeName();
 
@@ -153,11 +156,11 @@ public class DefaultFeatureResults implements FeatureResults {
      * @return
      *
      * @throws IOException If bounds could not be obtained
-     * @throws DataSourceException See IOException
      *
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() throws IOException {
+    public Envelope getBounds()  {
+        try{
         Envelope bounds;
 
         bounds = featureSource.getBounds(query);
@@ -166,7 +169,6 @@ public class DefaultFeatureResults implements FeatureResults {
             return bounds;
         }
 
-        try {
             Feature feature;
             bounds = new Envelope();
 
@@ -180,8 +182,8 @@ public class DefaultFeatureResults implements FeatureResults {
             reader.close();
 
             return bounds;
-        } catch (IllegalAttributeException e) {
-            throw new DataSourceException("Could not read feature ", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting Bounds",e);
         }
     }
 
@@ -244,5 +246,13 @@ public class DefaultFeatureResults implements FeatureResults {
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Could not read feature ", e);
         }
+    }
+
+    public Iterator iterator() {
+        return null;
+    }
+
+    public int size() {
+        return 0;
     }
 }

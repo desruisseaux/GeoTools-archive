@@ -24,7 +24,7 @@ package org.geotools.feature;
  */
 public class FeatureIterator {
     /** The iterator from the FeatureCollection to return features from. */
-    private java.util.Iterator iterator;
+     java.util.Iterator iterator;
 
     /**
      * Create a new FeatureIterator using the Iterator from the given
