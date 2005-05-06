@@ -63,7 +63,7 @@ public class PrjFileReader {
         
         String wkt = charBuffer.toString();
      
-        cs = FactoryFinder.getCRSFactory().createFromWKT(wkt);
+        cs = FactoryFinder.getCRSFactory(null).createFromWKT(wkt);
     }
     
     public org.opengis.referencing.crs.CoordinateReferenceSystem getCoodinateSystem(){

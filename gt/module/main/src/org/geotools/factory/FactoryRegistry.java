@@ -125,29 +125,41 @@ public class FactoryRegistry extends ServiceRegistry {
      * created by the default implementation of this method. The {@link FactoryCreator} class
      * change this behavior however.
      *
-     * @param  category The category to look for. Usually an interface class
-     *                  (not the actual implementation class).
-     * @param  filter   An optional filter, or {@code null} if none. This is used for example in
-     *                  order to select the first factory for some {@linkplain
-     *                  org.opengis.referencing.AuthorityFactory#getAuthority authority}.
+     * @param  category The category to look for. Must be one of the categories declared to the
+     *                  constructor. Usually an interface class (not the actual implementation
+     *                  class).
+     * @param  filter   An optional filter, or {@code null} if none.
+     *                  This is used for example in order to select the first factory for some
+     *                  {@linkplain org.opengis.referencing.AuthorityFactory#getAuthority authority}.
      * @param  hints    A {@linkplain Hints map of hints}, or {@code null} if none.
+     * @param  key      The key to use for looking for a user-provided instance in the hints, or
+     *                  {@code null} if none.
      * @return A factory {@linkplain OptionalFactory#isReady ready} to use for the specified
      *         category and hints. The returns type is {@code Object} instead of {@link Factory}
      *         because the factory implementation doesn't need to be a Geotools one.
      * @throws FactoryNotFoundException if no factory was found for the specified category, filter
      *         and hints.
-     * @throws FactoryRegistryException if a factory can't be returned for some othe reason.
+     * @throws FactoryRegistryException if a factory can't be returned for some other reason.
      *
      * @see #getServiceProviders
      * @see FactoryCreator#getServiceProvider
      */
-    public Object getServiceProvider(final Class category, final Filter filter, final Hints hints)
+    public Object getServiceProvider(final Class     category,
+                                     final Filter    filter,
+                                     final Hints     hints,
+                                     final Hints.Key key)
             throws FactoryRegistryException
     {
         Class implementation = null;
-        if (hints!=null && !hints.isEmpty()) {
-            final Hints.Key key = Hints.Key.getKeyForCategory(category);
-            if (key != null) {
+        if (key != null) {
+            /*
+             * Sanity check: make sure that the key class is appropriate for the category.
+             */
+            if (!category.isAssignableFrom(key.getValueClass())) {
+                // TODO: localize this error message.
+                throw new IllegalArgumentException("Illegal hint key: "+key);
+            }
+            if (hints!=null && !hints.isEmpty()) {
                 final Object hint = hints.get(key);
                 if (category.isInstance(hint)) {
                     /*

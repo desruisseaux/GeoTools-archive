@@ -289,11 +289,12 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             switch (key.hashCode()) {
                 // Fix case for common keywords. They are not used
                 // by this class, but are used by some subclasses.
-                case -1528693765: if (key.equals("anchorpoint"))      key="anchorPoint";      break;
-                case -1805658881: if (key.equals("bursawolf"))        key="bursaWolf";        break;
-                case   109688209: if (key.equals("operationversion")) key="operationVersion"; break;
-                case  1127093059: if (key.equals("realizationepoch")) key="realizationEpoch"; break;
-                case -1109785975: if (key.equals("validarea"))        key="validArea";        break;
+                case -1528693765: if (key.equalsIgnoreCase("anchorPoint"))        key="anchorPoint";        break;
+                case -1805658881: if (key.equalsIgnoreCase("bursaWolf"))          key="bursaWolf";          break;
+                case   109688209: if (key.equalsIgnoreCase("operationVersion"))   key="operationVersion";   break;
+                case  1126917133: if (key.equalsIgnoreCase("positionalAccuracy")) key="positionalAccuracy"; break;
+                case  1127093059: if (key.equalsIgnoreCase("realizationEpoch"))   key="realizationEpoch";   break;
+                case -1109785975: if (key.equalsIgnoreCase("validArea"))          key="validArea";          break;
                 // ----------------------------
                 // "name": String or Identifier
                 // ----------------------------
@@ -350,6 +351,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             }
             /*
              * Search for additional locales for remarks (e.g. "remarks_fr").
+             * 'growable.add(...)' will add the value only if the key starts
+             * with the "remarks" prefix.
              */
             if (value instanceof String) {
                 if (growable == null) {

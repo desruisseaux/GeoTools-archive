@@ -48,7 +48,10 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.quality.PositionalAccuracy;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -92,10 +95,27 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     /**
      * The identifier for a transformation which is a datum shift.
      *
+     * @see PositionalAccuracy#DATUM_SHIFT_APPLIED
+     *
      * @todo localize
      */
     protected static final Identifier DATUM_SHIFT =
             new org.geotools.referencing.Identifier(Citation.GEOTOOLS, "Datum shift");
+
+    /**
+     * The identifier for a transformation which is a datum shift without
+     * {@linkplain org.geotools.referencing.datum.BursaWolfParameters Bursa Wolf parameters}.
+     * Only the changes in ellipsoid axis-length are taken in account. Such ellipsoid shifts
+     * are approximative and may have 1 kilometer error. This transformation is allowed
+     * only if the factory was created with {@link Hints#LENIENT_DATUM_SHIFT} set to
+     * {@link Boolean#TRUE}.
+     *
+     * @see PositionalAccuracy#DATUM_SHIFT_OMITTED
+     *
+     * @todo localize
+     */
+    protected static final Identifier ELLIPSOID_SHIFT =
+            new org.geotools.referencing.Identifier(Citation.GEOTOOLS, "Ellipsoid shift");
 
     /**
      * The identifier for a geocentric conversion.
@@ -140,13 +160,31 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     private final WeakHashSet pool = new WeakHashSet();
 
     /**
-     * Constructs a coordinate operation factory from a math transform.
+     * Constructs a coordinate operation factory using the specified hints.
      *
-     * @param mtFactory The math transform factory to use.
+     * @param hints The hints, or {@code null} if none.
+     *
+     * @todo Need a FactoryGroup hint.
      */
-    public AbstractCoordinateOperationFactory(final MathTransformFactory mtFactory) {
+    public AbstractCoordinateOperationFactory(final Hints hints) {
+        /*
+         * Examines the hints.
+         */
+        MathTransformFactory mtFactory = null;
+        if (hints != null) {
+            mtFactory = (MathTransformFactory) hints.get(Hints.MATH_TRANSFORM_FACTORY);
+        }
+        if (mtFactory == null) {
+            mtFactory = FactoryFinder.getMathTransformFactory(hints);
+        }
+        /*
+         * Stores the hints in inner fields.
+         */
         this.mtFactory = mtFactory;
-        ensureNonNull("mtFactory", mtFactory);
+        /*
+         * Declares the hints that we use.
+         */
+        super.hints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
         factories = new FactoryGroup(null, null, null, mtFactory);
     }
 
@@ -154,11 +192,26 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * Constructs a coordinate operation factory from a group of factories.
      *
      * @param factories The factories to use.
+     *
+     * @deprecated Use {@link #AbstractCoordinateOperationFactory(Hints)} instead.
      */
     public AbstractCoordinateOperationFactory(final FactoryGroup factories) {
         ensureNonNull("factories", factories);
         this.factories = factories;
         mtFactory = factories.getMathTransformFactory();
+    }
+
+    /**
+     * Constructs a coordinate operation factory from a math transform.
+     *
+     * @param mtFactory The math transform factory to use.
+     *
+     * @deprecated Use {@link #AbstractCoordinateOperationFactory(Hints)} instead.
+     */
+    public AbstractCoordinateOperationFactory(final MathTransformFactory mtFactory) {
+        this.mtFactory = mtFactory;
+        ensureNonNull("mtFactory", mtFactory);
+        factories = new FactoryGroup(null, null, null, mtFactory);
     }
 
     /**
@@ -204,14 +257,43 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
         } catch (ConversionException exception) {
             throw new OperationNotFoundException(getErrorMessage(sourceCS, targetCS), exception);
         }
-        // No attempt to catch ClassCastException: it would be a programming error.
+        // No attempt to catch ClassCastException since such
+        // exception would indicates a programming error.
+    }
+
+    /**
+     * Returns the specified identifier in a map to be given to coordinate operation constructors.
+     * In the special case where the <code>name</code> identifier is {@link #DATUM_SHIFT} or
+     * {@link #ELLIPSOID_SHIFT}, the map will contains extra informations like positional
+     * accuracy.
+     *
+     * @todo In the datum shift case, an operation version is mandatory but unknow at this time.
+     */
+    private static Map getProperties(final Identifier name) {
+        final Map properties;
+        if (name==DATUM_SHIFT || name==ELLIPSOID_SHIFT) {
+            properties = new HashMap(4);
+            properties.put(NAME_PROPERTY, name);
+            properties.put(
+                  org.geotools.referencing.operation.CoordinateOperation.OPERATION_VERSION_PROPERTY,
+                  "(unknow)");
+            properties.put(
+                  org.geotools.referencing.operation.CoordinateOperation.POSITIONAL_ACCURACY_PROPERTY,
+                  new org.opengis.metadata.quality.PositionalAccuracy[] {
+                      name==DATUM_SHIFT ? PositionalAccuracy.DATUM_SHIFT_APPLIED
+                                        : PositionalAccuracy.DATUM_SHIFT_OMITTED});
+        } else {
+            properties = Collections.singletonMap(NAME_PROPERTY, name);
+        }
+        return properties;
     }
 
     /**
      * Creates a coordinate operation from a matrix, which usually describes an affine tranform.
      * A default {@link OperationMethod} object is given to this transform. In the special case
-     * where the <code>name</code> identifier is {@link #DATUM_SHIFT}, the operation will be an
-     * instance of {@link Transformation} instead of the usual {@link Conversion}.
+     * where the <code>name</code> identifier is {@link #DATUM_SHIFT} or {@link #ELLIPSOID_SHIFT},
+     * the operation will be an instance of {@link Transformation} instead of the usual
+     * {@link Conversion}.
      *
      * @param  name      The identifier for the operation to be created.
      * @param  sourceCRS The source coordinate reference system.
@@ -219,8 +301,6 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @param  matrix    The matrix which describe an affine transform operation.
      * @return The conversion or transformation.
      * @throws FactoryException if the operation can't be created.
-     *
-     * @todo In the datum shift case, an operation version is mandatory but unknow at this time.
      */
     protected CoordinateOperation createFromAffineTransform(
                                   final Identifier                name,
@@ -230,19 +310,9 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
             throws FactoryException
     {
         final MathTransform transform = mtFactory.createAffineTransform(matrix);
-        final Map properties;
-        final Class type;
-        if (name == DATUM_SHIFT) {
-            properties = new HashMap(4);
-            properties.put(NAME_PROPERTY, name);
-            properties.put(
-                  org.geotools.referencing.operation.CoordinateOperation.OPERATION_VERSION_PROPERTY,
-                  "(unknow)");
-            type = Transformation.class;
-        } else {
-            properties = Collections.singletonMap(NAME_PROPERTY, name);
-            type = Conversion.class;
-        }
+        final Map properties = getProperties(name);
+        final Class type = properties.containsKey(org.geotools.referencing.operation.CoordinateOperation.POSITIONAL_ACCURACY_PROPERTY)
+                           ? Transformation.class : Conversion.class;
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
                 ProjectiveTransform.Provider.getMethod(transform.getSourceDimensions(),
                                                        transform.getTargetDimensions()), type);
@@ -267,19 +337,10 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                                   final ParameterValueGroup       parameters)
             throws FactoryException
     {
-        final Map properties;
         final MathTransform transform;
         final Singleton method = new Singleton();
+        final Map   properties = getProperties(name);
         transform = factories.createParameterizedTransform(parameters, method);
-        if (name == DATUM_SHIFT) {
-            properties = new HashMap(4);
-            properties.put(NAME_PROPERTY, name);
-            properties.put(
-                  org.geotools.referencing.operation.CoordinateOperation.OPERATION_VERSION_PROPERTY,
-                  "(unknow)");
-        } else {
-            properties = Collections.singletonMap(NAME_PROPERTY, name);
-        }
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
                                        (OperationMethod) method.get(), Operation.class);
     }

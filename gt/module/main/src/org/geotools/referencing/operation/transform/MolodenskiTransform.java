@@ -33,6 +33,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Transformation;
 
@@ -314,7 +315,21 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         }
         return false;
     }
-    
+
+    /**
+     * A Molodenski transforms in 2D.
+     */
+    private static final class As2D extends MolodenskiTransform implements MathTransform2D {
+        private static final long serialVersionUID = 8098439371246167474L;
+
+        public As2D(final double  a, final double  b,
+                    final double ta, final double tb,
+                    final double dx, final double dy, final double  dz)
+        {
+            super(a, b, false, ta, tb, false, dx, dy, dz);
+        }
+    }
+
     /**
      * The provider for {@link MolodenskiTransform}. This provider will construct transforms
      * from {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} to
@@ -455,13 +470,17 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                 default: throw new IllegalArgumentException(Resources.format(
                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
             }
-            return new MolodenskiTransform(doubleValue(SRC_SEMI_MAJOR, values),
-                                           doubleValue(SRC_SEMI_MINOR, values), hasHeight,
-                                           doubleValue(TGT_SEMI_MAJOR, values),
-                                           doubleValue(TGT_SEMI_MINOR, values), hasHeight,
-                                           doubleValue(DX,             values),
-                                           doubleValue(DY,             values),
-                                           doubleValue(DZ,             values));
+            final double  a = doubleValue(SRC_SEMI_MAJOR, values);
+            final double  b = doubleValue(SRC_SEMI_MINOR, values);
+            final double ta = doubleValue(TGT_SEMI_MAJOR, values);
+            final double tb = doubleValue(TGT_SEMI_MINOR, values);
+            final double dx = doubleValue(DX,             values);
+            final double dy = doubleValue(DY,             values);
+            final double dz = doubleValue(DZ,             values);
+            if (!hasHeight) {
+                return new As2D(a, b, ta, tb, dx, dy, dz);
+            }
+            return new MolodenskiTransform(a, b, hasHeight, ta, tb, hasHeight, dx, dy, dz);
         }
 
         /**

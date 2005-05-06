@@ -26,10 +26,14 @@ package org.geotools.referencing.operation;
 // J2SE dependencies
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 // OpenGIS dependencies
+import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
@@ -150,7 +154,7 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
                                   final MathTransform transform,
                                   final SingleOperation[] operations) // MUST be last argument
     {
-        super(properties,
+        super(mergeAccuracy(properties, operations),
               operations[0].getSourceCRS(),
               operations[operations.length-1].getTargetCRS(),
               transform);
@@ -244,6 +248,39 @@ public class ConcatenatedOperation extends org.geotools.referencing.operation.Co
             }
         }
         return transform;
+    }
+
+    /**
+     * If no accuracy were specified in the given properties map, add all accuracy founds in
+     * the operation to concatenate.
+     *
+     * @todo We should use a Map and merge only one accuracy for each specification.
+     */
+    private static Map mergeAccuracy(final Map properties, final CoordinateOperation[] operations) {
+        if (!properties.containsKey(POSITIONAL_ACCURACY_PROPERTY)) {
+            Set accuracy = null;
+            for (int i=0; i<operations.length; i++) {
+                final PositionalAccuracy[] array = operations[i].getPositionalAccuracy();
+                if (array != null) {
+                    for (int j=0; j<array.length; j++) {
+                        final PositionalAccuracy candidate = array[j];
+                        if (candidate != null) {
+                            if (accuracy == null) {
+                                accuracy = new LinkedHashSet();
+                            }
+                            accuracy.add(candidate);
+                        }
+                    }
+                }
+            }
+            if (accuracy != null) {
+                final Map merged = new HashMap(properties);
+                merged.put(POSITIONAL_ACCURACY_PROPERTY,
+                           accuracy.toArray(new PositionalAccuracy[accuracy.size()]));
+                return merged;
+            }
+        }
+        return properties;
     }
 
     /**

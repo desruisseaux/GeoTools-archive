@@ -121,10 +121,10 @@ public class FactoryGroup {
      * Default factories are:
      *
      * <blockquote><pre>
-     * FactoryFinder.{@linkplain FactoryFinder#getDatumFactory           getDatumFactory()};
-     * FactoryFinder.{@linkplain FactoryFinder#getCSFactory              getCSFactory()};
-     * FactoryFinder.{@linkplain FactoryFinder#getCRSFactory             getCRSFactory()};
-     * FactoryFinder.{@linkplain FactoryFinder#getMathTransformFactory() MathTransformFactory()};
+     * FactoryFinder.{@linkplain FactoryFinder#getDatumFactory         getDatumFactory}(null);
+     * FactoryFinder.{@linkplain FactoryFinder#getCSFactory            getCSFactory}(null);
+     * FactoryFinder.{@linkplain FactoryFinder#getCRSFactory           getCRSFactory}(null);
+     * FactoryFinder.{@linkplain FactoryFinder#getMathTransformFactory MathTransformFactory}(null);
      * </pre></blockquote>
      */
     public FactoryGroup() {

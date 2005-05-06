@@ -24,6 +24,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
+import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -31,6 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Operation;
@@ -38,6 +40,10 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.PassThroughOperation;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.referencing.operation.Transformation;
+
+// Geotools dependencies
+import org.geotools.factory.Hints;
+import org.geotools.referencing.FactoryFinder;
 
 
 /**
@@ -67,6 +73,16 @@ public class TransformationTest extends TestTransform {
      */
     public static void main(String args[]) {
         junit.textui.TestRunner.run(suite());
+    }
+
+    /**
+     * Ensures that positional accuracy dependencies are properly loaded. This is not needed for
+     * normal execution, but JUnit behavior with class loaders is sometime surprising.
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+        assertNotNull(org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_APPLIED);
+        assertNotNull(org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_OMITTED);
     }
 
     /**
@@ -212,7 +228,13 @@ public class TransformationTest extends TestTransform {
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
         assertTransformEquals2_2(transform, -180, -88.21076182660325, -180, -88.21076182655470);
-        assertTransformEquals2_2(transform, +180,  85.41283436546335, +180,  85.41283436548373);
+        if (false) {
+            // When using geocentric method
+            assertTransformEquals2_2(transform, +180,  85.41283436546335, +180,  85.41283436548373);
+        } else {
+            // When using Molodenski method
+            assertTransformEquals2_2(transform, +180,  85.41283436546335, -180,  85.41283436531322);
+        }
         // Note: Expected values above were computed with Geotools (not an external library).
     }
 
@@ -245,6 +267,10 @@ public class TransformationTest extends TestTransform {
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
         assertSame(sourceCRS, operation.getSourceCRS());
         assertSame(targetCRS, operation.getTargetCRS());
+        assertTrue(contains(operation.getPositionalAccuracy(),
+                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_APPLIED));
+        assertFalse(contains(operation.getPositionalAccuracy(),
+                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_OMITTED));
 
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
@@ -252,6 +278,66 @@ public class TransformationTest extends TestTransform {
         assertTransformEquals2_2(transform, 20, -10, -6.663517606186469, 18.00134508026729);
         // Note: Expected values above were computed with Geotools (not an external library).
         //       However, it was tested with both Molodenski and Geocentric transformations.
+
+        /*
+         * Remove the TOWGS84 element and test again. An exception should be throws,
+         * since no Bursa-Wolf parameters were available.
+         */
+        final CoordinateReferenceSystem amputedCRS;
+        if (true) {
+            String wkt = sourceCRS.toWKT();
+            final int start = wkt.indexOf("TOWGS84");  assertTrue(start >= 0);
+            final int end   = wkt.indexOf(']', start); assertTrue(end   >= 0);
+            final int comma = wkt.indexOf(',', end);   assertTrue(comma >= 0);
+            wkt = wkt.substring(0, start) + wkt.substring(comma+1);
+            amputedCRS = crsFactory.createFromWKT(wkt);
+        } else {
+            amputedCRS = sourceCRS;
+        }
+        try {
+            assertNotNull(opFactory.createOperation(amputedCRS, targetCRS));
+            fail("Operation without Bursa-Wolf parameters should not have been allowed.");
+        } catch (OperationNotFoundException excption) {
+            // This is the expected exception.
+        }
+        /*
+         * Try again with hints, asking for a lenient factory.
+         */
+        CoordinateOperationFactory lenientFactory;
+        Hints hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.FALSE);
+        lenientFactory = FactoryFinder.getCoordinateOperationFactory(hints);
+        assertSame(opFactory, lenientFactory);
+        hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+        lenientFactory = FactoryFinder.getCoordinateOperationFactory(hints);
+        assertNotSame(opFactory, lenientFactory);
+        final CoordinateOperation lenient = lenientFactory.createOperation(amputedCRS, targetCRS);
+        assertSame(amputedCRS, lenient.getSourceCRS());
+        assertSame( targetCRS, lenient.getTargetCRS());
+        assertFalse(contains(lenient.getPositionalAccuracy(),
+                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_APPLIED));
+        assertTrue(contains(lenient.getPositionalAccuracy(),
+                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_OMITTED));
+
+        final MathTransform lenientTr = lenient.getMathTransform();
+        assertInterfaced(lenientTr);
+        assertTransformEquals2_2(lenientTr,  0,   0,  2.33722917, 0.0);
+        assertTransformEquals2_2(lenientTr, 20, -10, -6.66277083, 17.99814879585781);
+        // Note: Expected values above were computed with Geotools (not an external library).
+    }
+
+    /**
+     * Returns {@code true} if the specified array contains the specified element.
+     */
+    private static boolean contains(final PositionalAccuracy[] array,
+                                    final PositionalAccuracy searchFor)
+    {
+        assertNotNull(searchFor);
+        for (int i=0; i<array.length; i++) {
+            if (array[i].equals(searchFor)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -311,9 +397,7 @@ public class TransformationTest extends TestTransform {
             targetCRS = crsFactory.createFromWKT(WGS84);
             op = opFactory.createOperation(sourceCRS, targetCRS);
             mt = op.getMathTransform();
-            if (CoordinateOperationFactory.MOLODENSKI != null) {
-                assertTrue(op instanceof Transformation);
-            }
+            assertTrue(op instanceof Transformation);
             assertSame(sourceCRS, op.getSourceCRS());
             assertSame(targetCRS, op.getTargetCRS());
             assertFalse(mt.isIdentity());
@@ -362,9 +446,7 @@ public class TransformationTest extends TestTransform {
             mt = op.getMathTransform();
             assertNotSame(sourceCRS, op.getSourceCRS());
             assertNotSame(targetCRS, op.getTargetCRS());
-            if (CoordinateOperationFactory.MOLODENSKI != null) {
-                assertTrue(op instanceof Transformation);
-            }
+            assertTrue(op                instanceof Transformation);
             assertTrue(sourceCRS         instanceof CompoundCRS);
             assertTrue(op.getSourceCRS() instanceof GeographicCRS);   // 2D + 1D  --->  3D
             assertTrue(targetCRS         instanceof CompoundCRS);
@@ -391,9 +473,7 @@ public class TransformationTest extends TestTransform {
             mt = op.getMathTransform();
             assertNotSame(sourceCRS, op.getSourceCRS());
             assertNotSame(targetCRS, op.getTargetCRS());
-            if (CoordinateOperationFactory.MOLODENSKI != null) {
-                assertTrue(op instanceof Transformation);
-            }
+            assertTrue(op                instanceof Transformation);
             assertTrue(sourceCRS         instanceof CompoundCRS);
             assertTrue(op.getSourceCRS() instanceof GeographicCRS);   // 2D + 1D  --->  3D
             assertTrue(targetCRS         instanceof CompoundCRS);

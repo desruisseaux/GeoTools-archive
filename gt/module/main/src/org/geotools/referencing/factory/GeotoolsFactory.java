@@ -1042,7 +1042,7 @@ public class GeotoolsFactory extends AbstractFactory
     public ParameterValueGroup getDefaultParameters(final String method)
             throws NoSuchIdentifierException
     {
-        return FactoryFinder.getMathTransformFactory().getDefaultParameters(method);
+        return FactoryFinder.getMathTransformFactory(null).getDefaultParameters(method);
     }
 
     /**

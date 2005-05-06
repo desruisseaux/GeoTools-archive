@@ -393,7 +393,7 @@ public class ArcSDEAdapter {
 					+ " does not provides a Coordinate Reference System");
 		} else {
 			try {
-				CRSFactory crsFactory = FactoryFinder.getCRSFactory();
+				CRSFactory crsFactory = FactoryFinder.getCRSFactory(null);
 				crs = crsFactory.createFromWKT(WKT);
 				LOGGER.fine("ArcSDE CRS correctly parsed from layer "
 						+ sdeLayer.getName());

@@ -72,17 +72,22 @@ public class FactoryCreator extends FactoryRegistry {
      * @param  category The category to look for.
      * @param  filter   An optional filter, or {@code null} if none.
      * @param  hints    A {@linkplain Hints map of hints}, or {@code null} if none.
+     * @param  key      The key to use for looking for a user-provided instance in the hints, or
+     *                  {@code null} if none.
      * @return A factory for the specified category and hints (never {@code null}).
      * @throws FactoryNotFoundException if no factory was found, and the specified hints don't
      *         provide suffisient information for creating a new factory.
      * @throws FactoryRegistryException if the factory can't be created for some other reason.
      */
-    public Object getServiceProvider(final Class category, final Filter filter, final Hints hints)
+    public Object getServiceProvider(final Class     category,
+                                     final Filter    filter,
+                                     final Hints     hints,
+                                     final Hints.Key key)
             throws FactoryRegistryException
     {
         final FactoryNotFoundException notFound;
         try {
-            return super.getServiceProvider(category, filter, hints);
+            return super.getServiceProvider(category, filter, hints, key);
         } catch (FactoryNotFoundException exception) {
             // Will be rethrown later in case of failure to create the factory.
             notFound = exception;
@@ -90,24 +95,21 @@ public class FactoryCreator extends FactoryRegistry {
         /*
          * No existing factory found. Creates one using reflection.
          */
-        if (hints != null) {
-            final Hints.Key key = Hints.Key.getKeyForCategory(category);
-            if (key != null) {
-                final Object hint = hints.get(key);
-                if (hint != null) {
-                    final Class type;
-                    if (hint instanceof Class[]) {
-                        type = ((Class[]) hint)[0];
-                        // Should not fails, since Hints.isCompatibleValue(Object)
-                        // do not allows empty array.
-                    } else {
-                        type = (Class) hint;
-                        // Should not fails, since non-class argument should
-                        // have been accepted by 'getServiceProvider(...)'.
-                    }
-                    if (type!=null && category.isAssignableFrom(type)) {
-                        return createServiceProvider(category, type, hints);
-                    }
+        if (hints!=null && key!=null) {
+            final Object hint = hints.get(key);
+            if (hint != null) {
+                final Class type;
+                if (hint instanceof Class[]) {
+                    type = ((Class[]) hint)[0];
+                    // Should not fails, since Hints.isCompatibleValue(Object)
+                    // do not allows empty array.
+                } else {
+                    type = (Class) hint;
+                    // Should not fails, since non-class argument should
+                    // have been accepted by 'getServiceProvider(...)'.
+                }
+                if (type!=null && category.isAssignableFrom(type)) {
+                    return createServiceProvider(category, type, hints);
                 }
             }
         }

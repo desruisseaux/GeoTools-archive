@@ -83,7 +83,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
      * exported from postgis and cubeworks.
      */
     public EPSGCRSAuthorityFactory() {
-        this(FactoryFinder.getCRSFactory());
+        this(FactoryFinder.getCRSFactory(null));
     }
     
     /**

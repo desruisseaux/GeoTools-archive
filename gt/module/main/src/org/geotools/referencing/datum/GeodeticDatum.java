@@ -357,14 +357,17 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
             if (equals(this.ellipsoid,     that.ellipsoid,     compareMetadata) &&
                 equals(this.primeMeridian, that.primeMeridian, compareMetadata))
             {
-                /*
-                 * HACK: We do not consider Bursa Wolf parameters as a non-metadata field.
-                 *       This is needed in order to get 'equalsIgnoreMetadata(...)' to returns
-                 *       'true' when comparing the WGS84 constant in this class with a WKT
-                 *       DATUM element with a TOWGS84[0,0,0,0,0,0,0] element. Furthermore,
-                 *       the Bursa Wolf parameters are not part of ISO 19111 specification.
-                 */
-                return !compareMetadata || Arrays.equals(this.bursaWolf, that.bursaWolf);
+                if (compareMetadata || (this!=WGS84 && that!=WGS84)) {
+                    /*
+                     * HACK: We do not consider Bursa Wolf parameters as a non-metadata field for
+                     *       comparaisons involving the WGS84 constant. This is needed in order to
+                     *       get 'equalsIgnoreMetadata(...)' to returns 'true' when comparing the
+                     *       WGS84 constant in this class with a WKT DATUM element with a
+                     *       TOWGS84[0,0,0,0,0,0,0] element.
+                     */
+                    return Arrays.equals(this.bursaWolf, that.bursaWolf);
+                }
+                return true;
             }
         }
         return false;

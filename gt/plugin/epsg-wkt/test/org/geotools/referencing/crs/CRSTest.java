@@ -73,7 +73,7 @@ public class CRSTest extends TestCase {
         CoordinateReferenceSystem NAD83_UTM10 = (CoordinateReferenceSystem) CRS.decode("EPSG:26910");
         CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) CRS.decode("EPSG:42102");
                 
-        CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory().createOperation( WGS84, WGS84 );
+        CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory(null).createOperation( WGS84, WGS84 );
         MathTransform math = op.getMathTransform();
                 
         DirectPosition pt1 = new GeneralDirectPosition(0.0,0.0);        

@@ -33,6 +33,7 @@ import javax.vecmath.GMatrix;
 import javax.vecmath.SingularMatrixException;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -70,6 +71,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.OperationNotFoundException;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -91,64 +93,93 @@ import org.geotools.resources.cts.Resources;
  */
 public class CoordinateOperationFactory extends AbstractCoordinateOperationFactory {
     /**
-     * The operation to use by {@link #createTransformationStep(GeographicCRS,GeographicCRS)} for
-     * datum shift. This string can have one of the following values:
-     * <ul>
-     *   <li><code>"Abridged_Molodenski"</code> for the abridged Molodenski transformation.</li>
-     *   <li><code>"Molodenski"</code> for the Molodenski transformation.</li>
-     *   <li><code>null</code> for performing datum shifts is geocentric coordinates.</li>
-     * </ul>
-     * Molodenski transforms are disabled if the <code>-Dgeotools.molodenski=none</code> property
-     * was set on the command line. This is sometime useful for testing purposes.
-     */
-    static final String MOLODENSKI;
-    static {
-        String operation = "Molodenski"; // Default value. An alternative is "Abridged_Molodenski"
-        try {
-            final String candidate = System.getProperty("geotools.molodenski");
-            if (candidate != null) {
-                if (candidate.equalsIgnoreCase("abridged")) {
-                    operation = "Abridged_Molodenski";
-                } else {
-                    operation = null;
-                }
-                Logger.getLogger("org.geotools.referencing").config("Datum shift method set to \"" + 
-                            (operation!=null ? operation : "Geocentric") + '"');
-            }
-        } catch (SecurityException ignore) {
-            // Ignore. We will keep the default value.
-        }
-        MOLODENSKI = operation;
-    }
-
-    /**
      * A unit of one millisecond.
      */
     private static final Unit MILLISECOND = SI.MILLI(SI.SECOND);
 
     /**
+     * The operation to use by {@link #createTransformationStep(GeographicCRS,GeographicCRS)} for
+     * datum shift. This string can have one of the following values:
+     * <p>
+     * <ul>
+     *   <li><code>"Abridged_Molodenski"</code> for the abridged Molodenski transformation.</li>
+     *   <li><code>"Molodenski"</code> for the Molodenski transformation.</li>
+     *   <li><code>null</code> for performing datum shifts is geocentric coordinates.</li>
+     * </ul>
+     */
+    private final String molodenskiMethod;
+
+    /**
+     * {@code true} if datum shift are allowed even if no Bursa Wolf parameters is available.
+     */
+    private final boolean lenientDatumShift;
+
+    /**
      * Constructs a coordinate operation factory using the default factories.
      */
     public CoordinateOperationFactory() {
-        this(FactoryFinder.getMathTransformFactory(null));
+        this((Hints) null);
+    }
+
+    /**
+     * Constructs a coordinate operation factory using the specified hints.
+     */
+    public CoordinateOperationFactory(final Hints hints) {
+        super(hints);
+        //
+        // Default hints values
+        //
+        String  molodenskiMethod  = "Molodenski"; // Alternative: "Abridged_Molodenski"
+        boolean lenientDatumShift = false;
+        //
+        // Fetchs the user-supplied hints
+        //
+        if (hints != null) {
+            Object candidate = hints.get(Hints.DATUM_SHIFT_METHOD);
+            if (candidate != null) {
+                molodenskiMethod = (String) candidate;
+                if (molodenskiMethod.trim().equalsIgnoreCase("Geocentric")) {
+                    molodenskiMethod = null;
+                }
+            }
+            candidate = hints.get(Hints.LENIENT_DATUM_SHIFT);
+            if (candidate != null) {
+                lenientDatumShift = ((Boolean) candidate).booleanValue();
+            }
+        }
+        //
+        // Stores the retained hints
+        //
+        this.molodenskiMethod  = molodenskiMethod;
+        this.lenientDatumShift = lenientDatumShift;
+        this.hints.put(Hints.DATUM_SHIFT_METHOD,  molodenskiMethod);
+        this.hints.put(Hints.LENIENT_DATUM_SHIFT, Boolean.valueOf(lenientDatumShift));
     }
 
     /**
      * Constructs a coordinate operation factory from the specified math transform factory.
      *
      * @param mtFactory The math transform factory to use.
+     *
+     * @deprecated Use {@link #CoordinateOperationFactory(Hints)} instead.
      */
     public CoordinateOperationFactory(final MathTransformFactory mtFactory) {
         super(mtFactory);
+        molodenskiMethod  = "Molodenski";
+        lenientDatumShift = false;
     }
 
     /**
      * Constructs a coordinate operation factory from a group of factories.
      *
      * @param factories The factories to use.
+     *
+     * @deprecated Use {@link #CoordinateOperationFactory(Hints)} instead.
      */
     public CoordinateOperationFactory(final FactoryGroup factories) {
         super(factories);
+        molodenskiMethod  = "Molodenski";
+        lenientDatumShift = false;
     }
 
     /**
@@ -466,6 +497,17 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
             }
             return datum;
         }
+
+        /** Compares this datum with the specified object for equality. */
+        public boolean equals(final org.geotools.referencing.IdentifiedObject object,
+                              final boolean compareMetadata)
+        {
+            if (super.equals(object, compareMetadata)) {
+                final GeodeticDatum other = ((TemporaryDatum) object).datum;
+                return compareMetadata ? datum.equals(other) : equalsIgnoreMetadata(datum, other);
+            }
+            return false;
+        }
     }
 
     /**
@@ -741,6 +783,8 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
             throws FactoryException
     {
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
+        final EllipsoidalCS sourceCS    = (EllipsoidalCS) sourceCRS.getCoordinateSystem();
+        final EllipsoidalCS targetCS    = (EllipsoidalCS) targetCRS.getCoordinateSystem();
         final GeodeticDatum sourceDatum = (GeodeticDatum) sourceCRS.getDatum();
         final GeodeticDatum targetDatum = (GeodeticDatum) targetCRS.getDatum();
         final PrimeMeridian sourcePM    = sourceDatum.getPrimeMeridian();
@@ -754,9 +798,6 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
              *
              * TODO: We should ensure that longitude is in range [-180..+180°].
              */
-            // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-            final EllipsoidalCS sourceCS = (EllipsoidalCS) sourceCRS.getCoordinateSystem();
-            final EllipsoidalCS targetCS = (EllipsoidalCS) targetCRS.getCoordinateSystem();
             final Matrix matrix = swapAndScaleAxis(sourceCS, targetCS, sourcePM, targetPM);
             return createFromAffineTransform(AXIS_CHANGES, sourceCRS, targetCRS, matrix);
         }
@@ -768,23 +809,34 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          * transform below instead: it allows to concatenates many Bursa Wolf parameters
          * in a single affine transform.
          */
-        if (MOLODENSKI != null) {
+        if (molodenskiMethod != null) {
+            Identifier identifier = DATUM_SHIFT;
             BursaWolfParameters bursaWolf = null;
             if (sourceDatum instanceof org.geotools.referencing.datum.GeodeticDatum) {
                 bursaWolf = ((org.geotools.referencing.datum.GeodeticDatum) sourceDatum)
                              .getBursaWolfParameters(targetDatum);
+            }
+            if (bursaWolf==null && lenientDatumShift) {
+                // No BursaWolf parameters available, but the user want us to performs the
+                // datum shift anyway. We will notify the users throws positional accuracy.
+                bursaWolf  = new BursaWolfParameters(targetDatum);
+                identifier = ELLIPSOID_SHIFT;
             }
             /*
              * Apply the Molodenski transformation now. Note: in current parameters, we can't
              * specify a different input and output dimension. However, our Molodenski transform
              * allows that. We should expand the parameters block for this case (TODO).
              */
-            if (bursaWolf!=null && !bursaWolf.isIdentity() && bursaWolf.isTranslation()) {
-                final ParameterValueGroup parameters = mtFactory.getDefaultParameters(MOLODENSKI);
-                final Ellipsoid      sourceEllipsoid = sourceDatum.getEllipsoid();
-                final Ellipsoid      targetEllipsoid = targetDatum.getEllipsoid();
-                final int            sourceDim       = getDimension(sourceCRS);
-                final int            targetDim       = getDimension(targetCRS);
+            if (bursaWolf!=null && bursaWolf.isTranslation()) {
+                final Ellipsoid sourceEllipsoid = sourceDatum.getEllipsoid();
+                final Ellipsoid targetEllipsoid = targetDatum.getEllipsoid();
+                if (bursaWolf.isIdentity() && equalsIgnoreMetadata(sourceEllipsoid, targetEllipsoid)) {
+                    final Matrix matrix = swapAndScaleAxis(sourceCS, targetCS, sourcePM, targetPM);
+                    return createFromAffineTransform(ELLIPSOID_SHIFT, sourceCRS, targetCRS, matrix);
+                }
+                final int sourceDim = getDimension(sourceCRS);
+                final int targetDim = getDimension(targetCRS);
+                final ParameterValueGroup parameters = mtFactory.getDefaultParameters(molodenskiMethod);
                 parameters.parameter("src_semi_major").setValue(sourceEllipsoid.getSemiMajorAxis());
                 parameters.parameter("src_semi_minor").setValue(sourceEllipsoid.getSemiMinorAxis());
                 parameters.parameter("tgt_semi_major").setValue(targetEllipsoid.getSemiMajorAxis());
@@ -798,7 +850,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                     final GeographicCRS normSourceCRS = normalize(sourceCRS, true);
                     final GeographicCRS normTargetCRS = normalize(targetCRS, true);
                     step1 = createOperationStep(sourceCRS, normSourceCRS);
-                    step2 = createFromParameters(DATUM_SHIFT, normSourceCRS, normTargetCRS, parameters);
+                    step2 = createFromParameters(identifier, normSourceCRS, normTargetCRS, parameters);
                     step3 = createOperationStep(normTargetCRS, targetCRS);
                     return concatenate(step1, step2, step3);
                 } else {
@@ -1004,13 +1056,19 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          */
         final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
         final GeneralMatrix matrix;
+        Identifier identifier = DATUM_SHIFT;
         try {
-            final Matrix datumShift = org.geotools.referencing.datum.GeodeticDatum.
+            Matrix datumShift = org.geotools.referencing.datum.GeodeticDatum.
                                       getAffineTransform(TemporaryDatum.unwrap(sourceDatum),
                                                          TemporaryDatum.unwrap(targetDatum));
             if (!(datumShift instanceof GMatrix)) {
-                throw new OperationNotFoundException(Resources.format(
-                            ResourceKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
+                if (lenientDatumShift) {
+                    datumShift = new GeneralMatrix(4); // Identity transform.
+                    identifier = ELLIPSOID_SHIFT;
+                } else {
+                    throw new OperationNotFoundException(Resources.format(
+                                ResourceKeys.BURSA_WOLF_PARAMETERS_REQUIRED));
+                }
             }
             final Matrix normalizeSource = swapAndScaleAxis(sourceCS, STANDARD);
             final Matrix normalizeTarget = swapAndScaleAxis(STANDARD, targetCS);
@@ -1028,7 +1086,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         } catch (SingularMatrixException cause) {
             throw new OperationNotFoundException(getErrorMessage(sourceDatum, targetDatum), cause);
         }
-        return createFromAffineTransform(DATUM_SHIFT, sourceCRS, targetCRS, matrix);
+        return createFromAffineTransform(identifier, sourceCRS, targetCRS, matrix);
     }
 
     /**

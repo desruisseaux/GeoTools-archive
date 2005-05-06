@@ -101,7 +101,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
      * Construct <code>CRSAUTOFactory</code>.
      */
     public AUTOCRSAuthorityFactory(){
-        this(FactoryFinder.getCRSFactory());
+        this(FactoryFinder.getCRSFactory(null));
     }
     
     /**

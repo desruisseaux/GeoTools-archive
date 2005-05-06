@@ -314,11 +314,12 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      *
      * @param name The image or {@linkplain org.geotools.coverage.grid.GridCoverage2D coverage}
      *        name, or {@code null} in unknow. Used only for formatting error message if some
-     *        {@link TransformException} are thrown by the supplied transform.
+     *        {@link org.opengis.referencing.operation.TransformException} are thrown by the
+     *        supplied transform.
      * @param transform The transform to returns as an image warp.
      *
      * @todo We should check for {@link ConcatenatedTransform}. If we detect that a
-     * {@code WarpTransform2D} is concatenated with {@link AffineTransform2D} only, and if the
+     * {@code WarpTransform2D} is concatenated with {@code AffineTransform} only, and if the
      * {@code AffineTransform} has scale factors only, then we can ommit the {@code AffineTransform}
      * and merge the scale factors with {@link WarpPolynomial} preScaleX, preScaleY, postScaleX and
      * postScaleY. Additionnaly, the translation term for the post-AffineTransform may also be

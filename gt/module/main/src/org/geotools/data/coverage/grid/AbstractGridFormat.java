@@ -106,7 +106,7 @@ public abstract class AbstractGridFormat
     }
 
     //i'd say No, thus we are going to create it, store it and the retrieve it!!!
-    CRSAuthorityFactory temp = FactoryFinder.getCRSAuthorityFactory(code);
+    CRSAuthorityFactory temp = FactoryFinder.getCRSAuthorityFactory(code, null);
     CRSAuthorityfactoriesMap.put(code, temp);
     return temp;
 

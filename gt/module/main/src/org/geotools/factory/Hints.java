@@ -23,21 +23,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.awt.RenderingHints;
 
-// JAI dependencies
-import javax.media.jai.JAI; // For Javadoc
-
-// OpenGIS dependencies
-import org.opengis.coverage.SampleDimensionType;                      // For Javadoc
-import org.opengis.coverage.processing.GridCoverageProcessor;         // For Javadoc
-import org.opengis.referencing.cs.CSFactory;                          // For Javadoc
-import org.opengis.referencing.cs.CSAuthorityFactory;                 // For Javadoc
-import org.opengis.referencing.crs.CRSFactory;                        // For Javadoc
-import org.opengis.referencing.crs.CRSAuthorityFactory;               // For Javadoc
-import org.opengis.referencing.datum.DatumFactory;                    // For Javadoc
-import org.opengis.referencing.datum.DatumAuthorityFactory;           // For Javadoc
-import org.opengis.referencing.operation.CoordinateOperationFactory;  // For Javadoc
-import org.opengis.referencing.operation.MathTransformFactory;        // For Javadoc
-
 // Geotools Dependencies
 import org.geotools.resources.Utilities;
 
@@ -74,93 +59,150 @@ import org.geotools.resources.Utilities;
 public final class Hints extends RenderingHints {
     /**
      * Hint for the {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
+     *
+     * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
      */
     public static final Key JTS_GEOMETRY_FACTORY =
             new Key("com.vividsolutions.jts.geom.GeometryFactory");
 
     /**
      * Hint for the {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory} instance to use.
+     *
+     * @see org.geotools.geometry.jts.FactoryFinder#getCoordinateSequenceFactory
      */
     public static final Key JTS_COORDINATE_SEQUENCE_FACTORY =
             new Key("com.vividsolutions.jts.geom.CoordinateSequenceFactory");
 
     /**
      * Hint for the {@link com.vividsolutions.jts.geom.PrecisionModel} instance to use.
+     *
+     * @see org.geotools.geometry.jts.FactoryFinder#getPrecisionModel
      */
     public static final Key JTS_PRECISION_MODEL =
             new Key("com.vividsolutions.jts.geom.PrecisionModel");
 
     /**
      * The spatial reference ID for {@link com.vividsolutions.jts.geom.GeometryFactory}.
+     *
+     * @see org.geotools.geometry.jts.FactoryFinder#getGeometryFactory
      */
     public static final Key JTS_SRID =
-            new Key("java.lang.Integer");
+            new Key(Integer.class);
 
     /**
-     * Hint for the {@link CRSAuthorityFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.crs.CRSAuthorityFactory} instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCRSAuthorityFactory
      */
     public static final Key CRS_AUTHORITY_FACTORY =
             new Key("org.opengis.referencing.crs.CRSAuthorityFactory");
 
     /**
-     * Hint for the {@link CSAuthorityFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.cs.CSAuthorityFactory} instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCSAuthorityFactory
      */
     public static final Key CS_AUTHORITY_FACTORY =
             new Key("org.opengis.referencing.cs.CSAuthorityFactory");
 
     /**
-     * Hint for the {@link DatumAuthorityFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.datum.DatumAuthorityFactory} instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getDatumAuthorityFactory
      */
     public static final Key DATUM_AUTHORITY_FACTORY =
             new Key("org.opengis.referencing.datum.DatumAuthorityFactory");
 
     /**
-     * Hint for the {@link CRSFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.crs.CRSFactory} instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCRSFactory
      */
     public static final Key CRS_FACTORY =
             new Key("org.opengis.referencing.crs.CRSFactory");
 
     /**
-     * Hint for the {@link CSFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.cs.CSFactory} instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCSFactory
      */
     public static final Key CS_FACTORY =
             new Key("org.opengis.referencing.cs.CSFactory");
 
     /**
-     * Hint for the {@link DatumFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.datum.DatumFactory} instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getDatumFactory
      */
     public static final Key DATUM_FACTORY =
             new Key("org.opengis.referencing.datum.DatumFactory");
 
     /**
-     * Hint for the {@link CoordinateOperationFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.operation.CoordinateOperationFactory}
+     * instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
      */
     public static final Key COORDINATE_OPERATION_FACTORY =
             new Key("org.opengis.referencing.operation.CoordinateOperationFactory");
 
     /**
-     * Hint for the {@link MathTransformFactory} instance to use.
+     * Hint for the {@link org.opengis.referencing.operation.MathTransformFactory} instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getMathTransformFactory
      */
     public static final Key MATH_TRANSFORM_FACTORY =
             new Key("org.opengis.referencing.operation.MathTransformFactory");
 
     /**
-     * Hint for the {@link GridCoverageProcessor} instance to use.
+     * Hint for the {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
      */
     public static final Key GRID_COVERAGE_PROCESSOR =
             new Key("org.opengis.coverage.processing.GridCoverageProcessor");
 
     /**
-     * Hint for the {@link JAI} instance to use.
+     * Hint for the {@link javax.media.jai.JAI} instance to use.
      */
     public static final Key JAI_INSTANCE =
             new Key("javax.media.jai.JAI");
 
     /**
-     * Hint for the {@link SampleDimensionType} to use.
+     * Hint for the {@link org.opengis.coverage.SampleDimensionType} to use.
      */
     public static final Key SAMPLE_DIMENSION_TYPE =
             new Key("org.opengis.coverage.SampleDimensionType");
+
+    /**
+     * Hint for the preferred datum shift method to use for coordinate operation.
+     * Valid values are {@code "Molodenski"}, {@code "Abridged_Molodenski"} or {@code "Geocentric"}.
+     * Other values may be supplied if a {@linkplain org.opengis.referencing.operation.MathTransform
+     * math transform} exists for that name, but this is not guaranteed to work.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
+     */
+    public static final Key DATUM_SHIFT_METHOD =
+            new Key(String.class);
+
+    /**
+     * Tells if coordinate operations should be allowed even when a datum shift is required while
+     * no method is found applicable. It may be for example that no
+     * {@linkplain org.geotools.referencing.datum.BursaWolfParameters Bursa Wolf parameters} were
+     * found for a datum shift. The default value is {@link Boolean#FALSE FALSE}, which means that
+     * {@linkplain org.geotools.referencing.operation.CoordinateOperationFactory coordinate
+     * operation factory} throws an exception if such a case occurs. If this hint is set to
+     * {@code TRUE}, then the user is strongly encouraged to check the
+     * {@linkplain org.opengis.referencing.operation.CoordinateOperation#getPositionalAccuracy
+     * positional accuracy} for every transformation created. If the set of positional accuracy
+     * contains {@link org.geotools.metadata.quality.PositionalAccuracy#DATUM_SHIFT_OMITTED
+     * DATUM_SHIFT_OMITTED}, this means that an "ellipsoid shift" were applied without real
+     * datum shift method available, and the transformed coordinates may have one kilometer
+     * error. The application should warn the user (e.g. popup a message dialog box) in such
+     * case.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationFactory
+     */
+    public static final Key LENIENT_DATUM_SHIFT =
+            new Key(Boolean.class);
 
     /**
      * Constructs a new object with keys and values initialized
@@ -193,10 +235,9 @@ public final class Hints extends RenderingHints {
      */
     public static final class Key extends RenderingHints.Key {
         /**
-         * A map of hints created up to date, referenced by their
-         * {@linkplain #getValueClass value class} name.
+         * The number of key created up to date.
          */
-        private static final Map/*<String,Key>*/ byClassName = new HashMap();
+        private static volatile int count;
 
         /**
          * The class name for {@link #valueClass}.
@@ -212,36 +253,30 @@ public final class Hints extends RenderingHints {
         private transient Class valueClass;
 
         /**
-         * Constructs a new key.
+         * Constructs a new key for values of the given class.
          *
-         * NOTE: if this constructor become public, then all usage of {@link #byClassName} will
-         *       need to be synchronized. This synchronization is hard to do in the constructor
-         *       because 'super(...)' references the map.
+         * @param classe The base class for all valid values.
+         */
+        Key(final Class classe) {
+            this(classe.getName());
+            valueClass = classe;
+        }
+
+        /**
+         * Constructs a new key for values of the given class. The class is specified
+         * by name instead of a {@link Class} object. This allows to defer class loading
+         * until needed.
          *
          * @param className Name of base class for all valid values.
          */
         Key(final String className) {
-            super(byClassName.size());
+            super(count++);
             this.className = className;
             try {
                 assert !Class.forName(className).isPrimitive() : className;
             } catch (ClassNotFoundException exception) {
                 throw new AssertionError(exception);
             }
-            final Key previous = (Key) byClassName.put(className, this);
-            if (previous != null) {
-                throw new IllegalArgumentException(className);
-            }
-        }
-
-        /**
-         * Returns the hint key for the specified category.
-         *
-         * @deprecated This method need to be removed. The key should be explicitly specified
-         *             as an argument to {@link FactoryRegistry#getServiceProvider} instead.
-         */
-        static Key getKeyForCategory(final Class type) {
-            return (Key) byClassName.get(type.getName());
         }
 
         /**
@@ -261,7 +296,7 @@ public final class Hints extends RenderingHints {
         /**
          * Returns {@code true} if the specified object is a valid value for this key.
          * This method checks if the specified value is non-null and is one of the following:
-         * <br><br>
+         * <p>
          * <ul>
          *   <li>An instance of the {@linkplain #getValueClass expected value class}.</li>
          *   <li>A {@link Class} assignable to the expected value class.</li>

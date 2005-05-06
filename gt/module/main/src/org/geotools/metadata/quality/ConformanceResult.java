@@ -69,12 +69,17 @@ public class ConformanceResult extends Result
     }
 
     /**
-     * Creates a conformance result.
+     * Creates a conformance result initialized to the given values.
      */
-    public ConformanceResult(final Citation specification) {
+    public ConformanceResult(final Citation            specification,
+                             final InternationalString explanation,
+                             final boolean             pass)
+    {
         setSpecification(specification);
+        setExplanation  (explanation);
+        setPass         (pass);
     }
-    
+
     /**
      * Citation of product specification or user requirement against which data is being evaluated.
      */
@@ -157,8 +162,18 @@ public class ConformanceResult extends Result
 
     /**
      * Returns a string representation of this result.
+     *
+     * @todo localize
      */
     public String toString() {
-        return String.valueOf(specification);
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        final StringBuffer buffer = new StringBuffer();
+        buffer.append("Explanation: ");
+        buffer.append(explanation);
+        buffer.append(lineSeparator);
+        buffer.append("Result: ");
+        buffer.append(pass);
+        buffer.append(lineSeparator);
+        return buffer.toString();
     }
 }

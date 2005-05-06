@@ -134,15 +134,6 @@ public final class FactoryFinder {
 
     /**
      * Programmatic management of authority factories.
-     *
-     * @deprecated Renamed as {@link #addAuthorityFactory}.
-     */
-    public static void addAuthority(final AuthorityFactory authority) {
-        addAuthorityFactory(authority);
-    }
-
-    /**
-     * Programmatic management of authority factories.
      * Needed for user managed, not plug-in managed, authority factory.
      * Also useful for test cases.
      *
@@ -150,31 +141,6 @@ public final class FactoryFinder {
      */
     public static synchronized void removeAuthorityFactory(final AuthorityFactory authority) {
         getServiceRegistry().deregisterServiceProvider(authority);
-    }
-
-    /**
-     * Programmatic management of authority factories.
-     *
-     * @deprecated Renamed as {@link #removeAuthorityFactory}.
-     */
-    public static void removeAuthority(final AuthorityFactory authority) {
-        removeAuthorityFactory(authority);
-    }
-
-    /**
-     * Returns the default implementation of {@link DatumFactory}. If no implementation is
-     * registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
-     * implementation is returned. Otherwise an arbitrary one is selected.
-     *
-     * @return First datum factory found.
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link DatumFactory} interface.
-     *
-     * @deprecated Replaced by {@code getDatumFactory(null)}.
-     */
-    public static synchronized DatumFactory getDatumFactory() throws NoSuchElementException {
-        return (DatumFactory) getServiceRegistry().getServiceProviders(DatumFactory.class).next();
     }
 
     /**
@@ -190,7 +156,8 @@ public final class FactoryFinder {
      *         {@link DatumFactory} interface.
      */
     public static synchronized DatumFactory getDatumFactory(final Hints hints) throws FactoryRegistryException {
-        return (DatumFactory) getServiceRegistry().getServiceProvider(DatumFactory.class, null, hints);
+        return (DatumFactory) getServiceRegistry().getServiceProvider(
+                DatumFactory.class, null, hints, Hints.DATUM_FACTORY);
     }
 
     /**
@@ -200,22 +167,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getDatumFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(DatumFactory.class));
-    }
-
-    /**
-     * Returns the default implementation of {@link CSFactory}. If no implementation is
-     * registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
-     * implementation is returned. Otherwise an arbitrary one is selected.
-     *
-     * @return The first coordinate system factory found.
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link CSFactory} interface.
-     *
-     * @deprecated Replaced by {@code getCSFactory(null)}.
-     */
-    public static synchronized CSFactory getCSFactory() throws NoSuchElementException {
-        return (CSFactory) getServiceRegistry().getServiceProviders(CSFactory.class).next();
     }
 
     /**
@@ -231,7 +182,8 @@ public final class FactoryFinder {
      *         {@link CSFactory} interface.
      */
     public static synchronized CSFactory getCSFactory(final Hints hints) throws FactoryRegistryException {
-        return (CSFactory) getServiceRegistry().getServiceProvider(CSFactory.class, null, hints);
+        return (CSFactory) getServiceRegistry().getServiceProvider(
+                CSFactory.class, null, hints, Hints.CS_FACTORY);
     }
 
     /**
@@ -241,22 +193,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getCSFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(CSFactory.class));
-    }
-
-    /**
-     * Returns the default implementation of {@link CRSFactory}. If no implementation is
-     * registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
-     * implementation is returned. Otherwise an arbitrary one is selected.
-     *
-     * @return The first coordinate reference system factory found.
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link CRSFactory} interface.
-     *
-     * @deprecated Replaced by {@code getCRSFactory(null)}.
-     */
-    public static synchronized CRSFactory getCRSFactory() throws NoSuchElementException {
-        return (CRSFactory) getServiceRegistry().getServiceProviders(CRSFactory.class).next();
     }
 
     /**
@@ -272,7 +208,8 @@ public final class FactoryFinder {
      *         {@link CRSFactory} interface.
      */
     public static synchronized CRSFactory getCRSFactory(final Hints hints) throws FactoryRegistryException {
-        return (CRSFactory) getServiceRegistry().getServiceProvider(CRSFactory.class, null, hints);
+        return (CRSFactory) getServiceRegistry().getServiceProvider(
+                CRSFactory.class, null, hints, Hints.CRS_FACTORY);
     }
 
     /**
@@ -282,45 +219,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getCRSFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(CRSFactory.class));
-    }
-
-    /**
-     * Returns the first authority factory for the specified authority.
-     *
-     * @param  iterator The set of authority factories.
-     * @param  authority The desired authority.
-     * @return The factory for the specified authority.
-     * @throws NoSuchElementException If no factory was found for the specified authority.
-     *
-     * @deprecated Replaced by filters.
-     */
-    private static AuthorityFactory next(final Iterator iterator, final String authority)
-            throws NoSuchElementException
-    {
-        AuthorityFactory factory;
-        do factory = (AuthorityFactory) iterator.next();
-        while (!org.geotools.metadata.citation.Citation.titleMatches(factory.getAuthority(), authority));
-        return factory;
-    }
-
-    /**
-     * Returns the default implementation of {@link DatumAuthorityFactory}. If no implementation is
-     * registered for the given authority, then this method throws an exception. If more than one
-     * implementation is registered and an {@linkplain #setVendorOrdering ordering is set}, then
-     * the preferred implementation is returned.
-     *
-     * @param  authority The desired authority (e.g. "EPSG").
-     * @return First datum authority factory found.
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link DatumAuthorityFactory} interface.
-     *
-     * @deprecated Replaced by {@code getDatumAuthorityFactory(authority, null)}.
-     */
-    public static synchronized DatumAuthorityFactory getDatumAuthorityFactory(final String authority)
-            throws NoSuchElementException
-    {
-        return (DatumAuthorityFactory) next(getServiceRegistry().getServiceProviders(
-                                            DatumAuthorityFactory.class), authority);
     }
 
     /**
@@ -341,7 +239,7 @@ public final class FactoryFinder {
             throws FactoryRegistryException
     {
         return (DatumAuthorityFactory) getServiceRegistry().getServiceProvider(
-                DatumAuthorityFactory.class, new AuthorityFilter(authority), hints);
+                DatumAuthorityFactory.class, new AuthorityFilter(authority), hints, Hints.DATUM_AUTHORITY_FACTORY);
     }
 
     /**
@@ -352,26 +250,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getDatumAuthorityFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(DatumAuthorityFactory.class));
-    }
-
-    /**
-     * Returns the default implementation of {@link CSAuthorityFactory}. If no implementation is
-     * registered for the given authority, then this method throws an exception. If more than one
-     * implementation is registered and an {@linkplain #setVendorOrdering ordering is set}, then
-     * the preferred implementation is returned.
-     *
-     * @param  authority The desired authority (e.g. "EPSG").
-     * @return First coordinate system authority factory found.
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link CSAuthorityFactory} interface.
-     *
-     * @deprecated Replaced by {@code getCSAuthorityFactory(authority, null)}.
-     */
-    public static synchronized CSAuthorityFactory getCSAuthorityFactory(final String authority)
-            throws NoSuchElementException
-    {
-        return (CSAuthorityFactory) next(getServiceRegistry().getServiceProviders(
-                                         CSAuthorityFactory.class), authority);
     }
 
     /**
@@ -392,7 +270,7 @@ public final class FactoryFinder {
             throws FactoryRegistryException
     {
         return (CSAuthorityFactory) getServiceRegistry().getServiceProvider(
-                CSAuthorityFactory.class, new AuthorityFilter(authority), hints);
+                CSAuthorityFactory.class, new AuthorityFilter(authority), hints, Hints.CS_AUTHORITY_FACTORY);
     }
 
     /**
@@ -402,26 +280,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getCSAuthorityFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(CSAuthorityFactory.class));
-    }
-
-    /**
-     * Returns the default implementation of {@link CRSAuthorityFactory}. If no implementation is
-     * registered for the given authority, then this method throws an exception. If more than one
-     * implementation is registered and an {@linkplain #setVendorOrdering ordering is set}, then
-     * the preferred implementation is returned.
-     *
-     * @param  authority The desired authority (e.g. "EPSG").
-     * @return First coordinate reference system authority factory found.
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link CRSAuthorityFactory} interface.
-     *
-     * @deprecated Replaced by {@code getCRSAuthorityFactory(authority, null)}.
-     */
-    public static synchronized CRSAuthorityFactory getCRSAuthorityFactory(final String authority)
-            throws NoSuchElementException
-    {
-        return (CRSAuthorityFactory) next(getServiceRegistry().getServiceProviders(
-                                          CRSAuthorityFactory.class), authority);
     }
 
     /**
@@ -442,7 +300,7 @@ public final class FactoryFinder {
             throws FactoryRegistryException
     {
         return (CRSAuthorityFactory) getServiceRegistry().getServiceProvider(
-                CRSAuthorityFactory.class, new AuthorityFilter(authority), hints);
+                CRSAuthorityFactory.class, new AuthorityFilter(authority), hints, Hints.CRS_AUTHORITY_FACTORY);
     }
     
     /**
@@ -454,21 +312,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getCRSAuthorityFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(CRSAuthorityFactory.class));
-    }
-
-    /**
-     * Returns the default implementation of {@link MathTransformFactory}. If no implementation
-     * is registered, then this method throws an exception. If more than one implementation is
-     * registered and an {@linkplain #setVendorOrdering ordering is set}, then the preferred
-     * implementation is returned. Otherwise an arbitrary one is selected.
-     *
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link MathTransformFactory} interface.
-     *
-     * @deprecated Replaced by {@code getMathTransformFactory(null)}.
-     */
-    public static synchronized MathTransformFactory getMathTransformFactory() throws NoSuchElementException {
-        return (MathTransformFactory) getServiceRegistry().getServiceProviders(MathTransformFactory.class).next();
     }
 
     /**
@@ -487,7 +330,7 @@ public final class FactoryFinder {
             throws FactoryRegistryException
     {
         return (MathTransformFactory) getServiceRegistry().getServiceProvider(
-                MathTransformFactory.class, null, hints);
+                MathTransformFactory.class, null, hints, Hints.MATH_TRANSFORM_FACTORY);
     }
 
     /**
@@ -499,26 +342,16 @@ public final class FactoryFinder {
     }
 
     /**
-     * Returns the default implementation of {@link CoordinateOperationFactory}. If no
-     * implementation is registered, then this method throws an exception. If more than
-     * one implementation is registered and an {@linkplain #setVendorOrdering ordering is set},
-     * then the preferred implementation is returned. Otherwise an arbitrary one is selected.
-     *
-     * @throws NoSuchElementException if no implementation was found for the
-     *         {@link CoordinateOperationFactory} interface.
-     *
-     * @deprecated Replaced by {@code getCoordinateOperationFactory(null)}.
-     */
-    public static synchronized CoordinateOperationFactory getCoordinateOperationFactory() throws NoSuchElementException {
-        return (CoordinateOperationFactory) getServiceRegistry().getServiceProviders(CoordinateOperationFactory.class).next();
-    }
-
-    /**
      * Returns the first implementation of {@link CoordinateOperationFactory} matching the specified
      * hints. If no implementation matches, a new one is created if possible or an exception is
      * thrown otherwise. If more than one implementation is registered and an
      * {@linkplain #setVendorOrdering ordering is set}, then the preferred
      * implementation is returned. Otherwise an arbitrary one is selected.
+     * <p>
+     * Hints that may be understood includes
+     * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM_FACTORY},
+     * {@link Hints#DATUM_SHIFT_METHOD     DATUM_SHIFT_METHOD} and
+     * {@link Hints#LENIENT_DATUM_SHIFT    LENIENT_DATUM_SHIFT}.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return The first coordinate operation factory that matches the supplied hints.
@@ -529,7 +362,7 @@ public final class FactoryFinder {
             throws FactoryRegistryException
     {
         return (CoordinateOperationFactory) getServiceRegistry().getServiceProvider(
-                CoordinateOperationFactory.class, null, hints);
+                CoordinateOperationFactory.class, null, hints, Hints.COORDINATE_OPERATION_FACTORY);
     }
 
     /**
@@ -544,7 +377,7 @@ public final class FactoryFinder {
      * Sets a pairwise ordering between two vendors. If one or both vendors are not
      * currently registered, or if the desired ordering is already set, nothing happens
      * and <code>false</code> is returned.
-     * <br><br>
+     * <p>
      * The example below said that an ESRI implementation (if available) is
      * preferred over the Geotools one:
      *
@@ -598,7 +431,7 @@ public final class FactoryFinder {
      * Sets a pairwise ordering between two authorities. If one or both authorities are not
      * currently registered, or if the desired ordering is already set, nothing happens
      * and <code>false</code> is returned.
-     * <br><br>
+     * <p>
      * The example below said that EPSG {@linkplain AuthorityFactory authority factories}
      * are preferred over ESRI ones:
      *

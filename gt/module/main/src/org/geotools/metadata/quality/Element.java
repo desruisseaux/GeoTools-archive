@@ -299,9 +299,17 @@ public class Element extends MetadataEntity implements org.opengis.metadata.qual
     /**
      * Returns a string representation of this citation.
      *
-     * @todo Provides a more elaborated implementation.
+     * @todo localize
      */
     public String toString() {
-        return String.valueOf(namesOfMeasure);
-    }            
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        final StringBuffer buffer = new StringBuffer();
+        if (measureDescription != null) {
+            buffer.append("Measure: ");
+            buffer.append(measureDescription);
+            buffer.append(lineSeparator);
+        }
+        buffer.append(result);
+        return buffer.toString();
+    }
 }

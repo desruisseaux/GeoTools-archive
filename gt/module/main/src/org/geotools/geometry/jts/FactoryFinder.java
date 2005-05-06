@@ -37,13 +37,14 @@ import org.geotools.resources.LazySet;
 
 
 /**
- * Defines static methods used to access {@linkplain GeometryFactory geometry} or
- * {@linkplain CoordinateSequenceFactory coordinate sequence} factories.
+ * Defines static methods used to access {@linkplain GeometryFactory geometry},
+ * {@linkplain CoordinateSequenceFactory coordinate sequence} or
+ * {@linkplain PrecisionModel precision model} factories.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeometryFactoryFinder {
+public class FactoryFinder {
     /**
      * The service registry for this manager.
      * Will be initialized only when first needed.
@@ -53,7 +54,7 @@ public class GeometryFactoryFinder {
     /**
      * Do not allows any instantiation of this class.
      */
-    private GeometryFactoryFinder() {
+    private FactoryFinder() {
         // singleton
     }
 
@@ -62,7 +63,7 @@ public class GeometryFactoryFinder {
      * time this method is invoked.
      */
     private static FactoryRegistry getServiceRegistry() {
-        assert Thread.holdsLock(GeometryFactoryFinder.class);
+        assert Thread.holdsLock(FactoryFinder.class);
         if (registry == null) {
             registry = new Registry();
         }
@@ -73,6 +74,11 @@ public class GeometryFactoryFinder {
      * Returns the first implementation of {@link GeometryFactory} matching the specified hints.
      * If no implementation matches, a new one is created if possible or an exception is thrown
      * otherwise.
+     * <p>
+     * Hints that may be understood includes
+     * {@link Hints#JTS_COORDINATE_SEQUENCE_FACTORY JTS_COORDINATE_SEQUENCE_FACTORY},
+     * {@link Hints#JTS_PRECISION_MODEL             JTS_PRECISION_MODEL} and
+     * {@link Hints#JTS_SRID                        JTS_SRID}.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return The first geometry factory that matches the supplied hints.
@@ -80,7 +86,8 @@ public class GeometryFactoryFinder {
      *         {@link GeometryFactory} category and the given hints.
      */
     public static synchronized GeometryFactory getGeometryFactory(final Hints hints) throws FactoryRegistryException {
-        return (GeometryFactory) getServiceRegistry().getServiceProvider(GeometryFactory.class, null, hints);
+        return (GeometryFactory) getServiceRegistry().getServiceProvider(
+                GeometryFactory.class, null, hints, Hints.JTS_GEOMETRY_FACTORY);
     }
 
     /**
@@ -103,7 +110,8 @@ public class GeometryFactoryFinder {
      *         {@link PrecisionModel} category and the given hints.
      */
     public static synchronized PrecisionModel getPrecisionModel(final Hints hints) throws FactoryRegistryException {
-        return (PrecisionModel) getServiceRegistry().getServiceProvider(PrecisionModel.class, null, hints);
+        return (PrecisionModel) getServiceRegistry().getServiceProvider(
+                PrecisionModel.class, null, hints, Hints.JTS_PRECISION_MODEL);
     }
 
     /**
@@ -126,7 +134,8 @@ public class GeometryFactoryFinder {
      *         {@link CoordinateSequenceFactory} interface and the given hints.
      */
     public static synchronized CoordinateSequenceFactory getCoordinateSequenceFactory(final Hints hints) throws FactoryRegistryException {
-        return (CoordinateSequenceFactory) getServiceRegistry().getServiceProvider(CoordinateSequenceFactory.class, null, hints);
+        return (CoordinateSequenceFactory) getServiceRegistry().getServiceProvider(
+                CoordinateSequenceFactory.class, null, hints, Hints.JTS_COORDINATE_SEQUENCE_FACTORY);
     }
 
     /**
