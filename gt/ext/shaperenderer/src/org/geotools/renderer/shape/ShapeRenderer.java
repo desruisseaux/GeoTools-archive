@@ -810,8 +810,22 @@ public class ShapeRenderer {
 	MapContext getContext() {
 		return context;
 	}
-	
-	private class NonValidatingFeature extends DefaultFeature{
+
+	public RenderingHints getRenderHints() {
+		return hints;
+	}
+	public void setRenderHints(RenderingHints hints) {
+		this.hints = hints;
+	}	
+    
+    public void setRenderingHint(RenderingHints.Key key, Object value){
+        if( hints==null )
+            hints=new RenderingHints( key, value);
+        else
+            hints.put(key, value);
+    }
+
+    private class NonValidatingFeature extends DefaultFeature{
 
 		/**
 		 * @param schema
@@ -839,5 +853,11 @@ public class ShapeRenderer {
 		}
 		
 		
+	}
+	public boolean isConcatTransforms() {
+		return concatTransforms;
+	}
+	public void setConcatTransforms(boolean concatTransforms) {
+		this.concatTransforms = concatTransforms;
 	}
 }

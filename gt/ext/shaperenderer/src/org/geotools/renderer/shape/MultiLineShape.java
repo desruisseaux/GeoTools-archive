@@ -84,11 +84,11 @@ public class MultiLineShape extends AbstractShape implements Shape {
 				if( currentIndex == geom.coords[currentPart].length ){
 					coords[0] = (float) geom.coords[currentPart][currentIndex-2]+1;
 					currentIndex++;
-					coords[1] = (float) geom.coords[currentPart][currentIndex-2];
+					coords[1] = (float) geom.coords[currentPart][currentIndex-2]+1;
 					if (at != null)
 						at.transform(coords, 0, coords, 0, 1);
 					return SEG_LINETO;
-				}else{
+				} else {
 					coords[0] = (float) geom.coords[currentPart][currentIndex];
 					currentIndex++;
 					coords[1] = (float) geom.coords[currentPart][currentIndex];
@@ -100,19 +100,28 @@ public class MultiLineShape extends AbstractShape implements Shape {
 
 			public int currentSegment(double[] coords) {
 				if (currentIndex == 0) {
-					coords[0] = geom.coords[currentPart][currentIndex]+1;
+					coords[0] = (float) geom.coords[currentPart][currentIndex];
 					currentIndex++;
-					coords[1] = geom.coords[currentPart][currentIndex];
+					coords[1] = (float) geom.coords[currentPart][currentIndex];
 					if (at != null)
 						at.transform(coords, 0, coords, 0, 1);
 					return SEG_MOVETO;
 				}
-				coords[0] = geom.coords[currentPart][currentIndex];
-				currentIndex++;
-				coords[1] = geom.coords[currentPart][currentIndex];
-				if (at != null)
-					at.transform(coords, 0, coords, 0, 1);
-				return SEG_LINETO;
+				if( currentIndex == geom.coords[currentPart].length ){
+					coords[0] = (float) geom.coords[currentPart][currentIndex-2]+1;
+					currentIndex++;
+					coords[1] = (float) geom.coords[currentPart][currentIndex-2]+1;
+					if (at != null)
+						at.transform(coords, 0, coords, 0, 1);
+					return SEG_LINETO;
+				} else {
+					coords[0] = (float) geom.coords[currentPart][currentIndex];
+					currentIndex++;
+					coords[1] = (float) geom.coords[currentPart][currentIndex];
+					if (at != null)
+						at.transform(coords, 0, coords, 0, 1);
+					return SEG_LINETO;
+				}
 			}
 
 		};

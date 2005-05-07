@@ -22,6 +22,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Panel;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -63,12 +64,14 @@ public class Timing {
 	private static boolean ALL_DATA = true;
 
 	private static boolean DISPLAY = true;
+	
+	private static boolean ANTI_ALIASING=true;
 
-	private static boolean RUN_SHAPE = false;
+	private static boolean RUN_SHAPE = true;
 
 	private static boolean RUN_LITE = false;
 
-	private static boolean RUN_TINY = true;
+	private static boolean RUN_TINY = false;
 
 	private static boolean ACCURATE = false;
 
@@ -128,7 +131,7 @@ public class Timing {
 		Stroke myStroke = sFac.getDefaultStroke();
 		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
 		myStroke
-				.setWidth(filterFactory.createLiteralExpression(new Integer(5)));
+				.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
 		linesym.setStroke(myStroke);
 
 		Rule rule2 = sFac.createRule();
@@ -182,6 +185,8 @@ public class Timing {
 			context.setAreaOfInterest(new Envelope(), store.getSchema()
 					.getDefaultGeometry().getCoordinateSystem());
 		ShapeRenderer renderer = new ShapeRenderer(context);
+		if( ANTI_ALIASING )
+			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
@@ -238,6 +243,8 @@ public class Timing {
 			context.setAreaOfInterest(new Envelope(), store.getSchema()
 					.getDefaultGeometry().getCoordinateSystem());
 		ShapeRenderer renderer = new ShapeRenderer(context);
+		if( ANTI_ALIASING )
+			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
@@ -299,6 +306,8 @@ public class Timing {
 
 		LiteRenderer2 renderer = new LiteRenderer2(context);
 		renderer.setOptimizedDataLoadingEnabled(true);
+		if( ANTI_ALIASING )
+			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		if (CACHING)
 			renderer.setMemoryPreloadingEnabled(true);
