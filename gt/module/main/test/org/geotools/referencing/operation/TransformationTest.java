@@ -228,14 +228,11 @@ public class TransformationTest extends TestTransform {
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
         assertTransformEquals2_2(transform, -180, -88.21076182660325, -180, -88.21076182655470);
-        if (false) {
-            // When using geocentric method
-            assertTransformEquals2_2(transform, +180,  85.41283436546335, +180,  85.41283436548373);
-        } else {
-            // When using Molodenski method
-            assertTransformEquals2_2(transform, +180,  85.41283436546335, -180,  85.41283436531322);
-        }
-        // Note: Expected values above were computed with Geotools (not an external library).
+        assertTransformEquals2_2(transform, +180,  85.41283436546335, -180,  85.41283436531322);
+//      assertTransformEquals2_2(transform, +180,  85.41283436546335, +180,  85.41283436548373);
+        // Note 1: Expected values above were computed with Geotools (not an external library).
+        // Note 2: The commented-out test it the one we get when using geocentric instead of
+        //         Molodenski method.
     }
 
     /**
@@ -322,7 +319,10 @@ public class TransformationTest extends TestTransform {
         assertInterfaced(lenientTr);
         assertTransformEquals2_2(lenientTr,  0,   0,  2.33722917, 0.0);
         assertTransformEquals2_2(lenientTr, 20, -10, -6.66277083, 17.99814879585781);
-        // Note: Expected values above were computed with Geotools (not an external library).
+//      assertTransformEquals2_2(lenientTr, 20, -10, -6.66277083, 17.998143675921714);
+        // Note 1: Expected values above were computed with Geotools (not an external library).
+        // Note 2: The commented-out test is the one we get with "Abridged_Molodenski" method
+        //         instead of "Molodenski".
     }
 
     /**

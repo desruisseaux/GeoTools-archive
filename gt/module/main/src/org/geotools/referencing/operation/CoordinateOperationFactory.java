@@ -810,15 +810,17 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          * in a single affine transform.
          */
         if (molodenskiMethod != null) {
-            Identifier identifier = DATUM_SHIFT;
-            BursaWolfParameters bursaWolf = null;
+            Identifier          identifier = DATUM_SHIFT;
+            BursaWolfParameters bursaWolf  = null;
             if (sourceDatum instanceof org.geotools.referencing.datum.GeodeticDatum) {
                 bursaWolf = ((org.geotools.referencing.datum.GeodeticDatum) sourceDatum)
                              .getBursaWolfParameters(targetDatum);
             }
             if (bursaWolf==null && lenientDatumShift) {
-                // No BursaWolf parameters available, but the user want us to performs the
-                // datum shift anyway. We will notify the users throws positional accuracy.
+                /*
+                 * No BursaWolf parameters available, but the user want us to performs the
+                 * datum shift anyway. We will notify the users through positional accuracy.
+                 */
                 bursaWolf  = new BursaWolfParameters(targetDatum);
                 identifier = ELLIPSOID_SHIFT;
             }

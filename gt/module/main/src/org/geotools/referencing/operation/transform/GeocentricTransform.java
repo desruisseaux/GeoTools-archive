@@ -315,12 +315,9 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * Ralph Toms, Feb 1996.
      */
     public void inverseTransform(double[] srcPts, int srcOff,
-                           final double[] dstPts, int dstOff, int numPts)
+                           final double[] dstPts, int dstOff, final int numPts)
     {
         final int dimTarget = getSourceDimensions();
-        final boolean hasHeight = (dimTarget>=3);
-        boolean   computeHeight = hasHeight;
-        assert (computeHeight=true)==true; // Intentional side effect FIXME: are you insane?
         if (srcPts==dstPts && needCopy(srcOff, 3, dstOff, dimTarget, numPts)) {
             // Source and destination arrays overlaps: copy in a temporary buffer.
             final double[] old = srcPts;
@@ -328,52 +325,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             System.arraycopy(old, srcOff, srcPts, 0, srcPts.length);
             srcOff = 0;
         }
-        while (--numPts >= 0) {
-            final double x = srcPts[srcOff++]; // Toward prime meridian
-            final double y = srcPts[srcOff++]; // Toward East
-            final double z = srcPts[srcOff++]; // Toward North
-            
-            // Note: The Java version of 'atan2' work correctly for x==0.
-            //       No need for special handling like in the C version.
-            //       No special handling neither for latitude. Formulas
-            //       below are generic enough, considering that 'atan'
-            //       work correctly with infinities (1/0).
-            
-            // Note: Variable names follow the notation used in Toms, Feb 1996
-            final double      W2 = x*x + y*y;                       // square of distance from Z axis
-            final double      W  = Math.sqrt(W2);                   // distance from Z axis
-            final double      T0 = z * AD_C;                        // initial estimate of vertical component
-            final double      S0 = Math.sqrt(T0*T0 + W2);           // initial estimate of horizontal component
-            final double  sin_B0 = T0 / S0;                         // sin(B0), B0 is estimate of Bowring aux variable
-            final double  cos_B0 = W / S0;                          // cos(B0)
-            final double sin3_B0 = sin_B0 * sin_B0 * sin_B0;        // cube of sin(B0)
-            final double      T1 = z + b * ep2 * sin3_B0;           // corrected estimate of vertical component
-            final double     sum = W - a*e2*(cos_B0*cos_B0*cos_B0); // numerator of cos(phi1)
-            final double      S1 = Math.sqrt(T1*T1 + sum * sum);    // corrected estimate of horizontal component
-            final double  sin_p1 = T1 / S1;                         // sin(phi1), phi1 is estimated latitude
-            final double  cos_p1 = sum / S1;                        // cos(phi1)
-            
-            final double longitude = Math.toDegrees(Math.atan2(y      , x     ));
-            final double  latitude = Math.toDegrees(Math.atan(sin_p1 / cos_p1));
-            final double    height;
-            
-            dstPts[dstOff++] = longitude;
-            dstPts[dstOff++] = latitude;
-            if (computeHeight) {
-                final double rn = a/Math.sqrt(1-e2*(sin_p1*sin_p1)); // Earth radius at location
-                if      (cos_p1 >= +COS_67P5) height = W / +cos_p1 - rn;
-                else if (cos_p1 <= -COS_67P5) height = W / -cos_p1 - rn;
-                else                          height = z / sin_p1 + rn*(e2 - 1.0);
-                if (hasHeight) {
-                    dstPts[dstOff++] = height;
-                }
-                // If assertion are enabled, then transform the
-                // result and compare it with the input array.
-                double distance;
-                assert MAX_ERROR > (distance=checkTransform(new double[]
-                        {x,y,z, longitude, latitude, height})) : distance;
-            }
-        }
+        inverseTransform(null, srcPts, srcOff, null, dstPts, dstOff, numPts, dimTarget);
     }
     
     /**
@@ -384,12 +336,9 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * Ralph Toms, Feb 1996.
      */
     public void inverseTransform(float[] srcPts, int srcOff,
-                           final float[] dstPts, int dstOff, int numPts)
+                           final float[] dstPts, int dstOff, final int numPts)
     {
         final int dimTarget = getSourceDimensions();
-        final boolean hasHeight = (dimTarget>=3);
-        boolean   computeHeight = hasHeight;
-        assert (computeHeight=true) == true; // Intentional side effect FIXME: are you insane?
         if (srcPts==dstPts && needCopy(srcOff, 3, dstOff, dimTarget, numPts)) {
             // Source and destination arrays overlaps: copy in a temporary buffer.
             final float[] old = srcPts;
@@ -397,11 +346,30 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             System.arraycopy(old, srcOff, srcPts, 0, srcPts.length);
             srcOff = 0;
         }
+        inverseTransform(srcPts, null, srcOff, dstPts, null, dstOff, numPts, dimTarget);
+    }
+
+    /**
+     * Implementation of the inverse transformation.
+     */
+    private void inverseTransform(final float[] srcPts1, final double[] srcPts2, int srcOff,
+                                  final float[] dstPts1, final double[] dstPts2, int dstOff,
+                                  int numPts, final int dimTarget)
+    {
+        final boolean hasHeight = (dimTarget>=3);
+        boolean   computeHeight = hasHeight;
+        assert (computeHeight=true)==true; // Force computeHeight to true if assertions are enabled.
         while (--numPts >= 0) {
-            final double x = srcPts[srcOff++]; // Toward prime meridian
-            final double y = srcPts[srcOff++]; // Toward East
-            final double z = srcPts[srcOff++]; // Toward North
-            
+            final double x, y, z;
+            if (srcPts2 != null) {
+                x = srcPts2[srcOff++]; // Toward prime meridian
+                y = srcPts2[srcOff++]; // Toward East
+                z = srcPts2[srcOff++]; // Toward North
+            } else {
+                x = srcPts1[srcOff++]; // Toward prime meridian
+                y = srcPts1[srcOff++]; // Toward East
+                z = srcPts1[srcOff++]; // Toward North
+            }
             // Note: The Java version of 'atan2' work correctly for x==0.
             //       No need for special handling like in the C version.
             //       No special handling neither for latitude. Formulas
@@ -426,15 +394,24 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             final double  latitude = Math.toDegrees(Math.atan(sin_p1 / cos_p1));
             final double    height;
             
-            dstPts[dstOff++] = (float) longitude;
-            dstPts[dstOff++] = (float) latitude;
+            if (dstPts2 != null) {
+                dstPts2[dstOff++] = longitude;
+                dstPts2[dstOff++] = latitude;
+            } else {
+                dstPts1[dstOff++] = (float) longitude;
+                dstPts1[dstOff++] = (float) latitude;
+            }
             if (computeHeight) {
                 final double rn = a/Math.sqrt(1-e2*(sin_p1*sin_p1)); // Earth radius at location
                 if      (cos_p1 >= +COS_67P5) height = W / +cos_p1 - rn;
                 else if (cos_p1 <= -COS_67P5) height = W / -cos_p1 - rn;
                 else                          height = z / sin_p1 + rn*(e2 - 1.0);
                 if (hasHeight) {
-                    dstPts[dstOff++] = (float) height;
+                    if (dstPts2 != null) {
+                        dstPts2[dstOff++] = height;
+                    } else {
+                        dstPts1[dstOff++] = (float) height;
+                    }
                 }
                 // If assertion are enabled, then transform the
                 // result and compare it with the input array.
@@ -479,7 +456,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                           37*(Double.doubleToLongBits( b2) +
                           37*(Double.doubleToLongBits( e2) +
                           37*(Double.doubleToLongBits(ep2))))));
-        return (int) code ^ (int) (code >>> 32);
+        return (int) code ^ (int) (code >>> 32) ^ (int)serialVersionUID;
     }
     
     /**
