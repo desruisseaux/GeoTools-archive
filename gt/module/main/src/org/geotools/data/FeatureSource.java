@@ -18,7 +18,6 @@ package org.geotools.data;
 
 import java.io.IOException;
 
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 
@@ -102,7 +101,7 @@ public interface FeatureSource {
      *
      * @see Query
      */
-    FeatureCollection getFeatures(Query query) throws IOException;
+    FeatureResults getFeatures(Query query) throws IOException;
 
     /**
      * Loads features from the datasource into the returned FeatureResults,
@@ -115,7 +114,7 @@ public interface FeatureSource {
      *
      * @throws DataSourceException For all data source errors.
      */
-    FeatureCollection getFeatures(Filter filter) throws IOException;
+    FeatureResults getFeatures(Filter filter) throws IOException;
 
     /**
      * Loads all features from the datasource into the return FeatureResults.
@@ -129,7 +128,7 @@ public interface FeatureSource {
      *
      * @throws DataSourceException For all data source errors.
      */
-    FeatureCollection getFeatures() throws IOException;
+    FeatureResults getFeatures() throws IOException;
 
     /**
      * Retrieves the featureType that features extracted from this datasource

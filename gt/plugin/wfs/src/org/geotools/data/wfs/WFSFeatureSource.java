@@ -21,13 +21,13 @@ import java.io.IOException;
 import org.geotools.data.AbstractFeatureSource;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
@@ -103,7 +103,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
-    public FeatureCollection getFeatures(){
+    public FeatureResults getFeatures(){
         return getFeatures(new DefaultQuery(ft.getTypeName(), Filter.NONE));
     }
 
@@ -111,7 +111,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
-    public FeatureCollection getFeatures(Filter filter){
+    public FeatureResults getFeatures(Filter filter){
         return getFeatures(new DefaultQuery(ft.getTypeName(), filter));
     }
 
@@ -119,7 +119,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query query) {
+    public FeatureResults getFeatures(Query query) {
         return new WFSFeatureResults(this, query);
     }
 
@@ -135,13 +135,9 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @author dzwiers
      */
-    public static class WFSFeatureResults implements FeatureResults {
+    public static class WFSFeatureResults extends DefaultFeatureResults implements FeatureResults {
         private WFSFeatureSource fs;
         private Query query;
-
-        private WFSFeatureResults() {
-            // should not be used
-        }
 
         /**
          * 
@@ -149,6 +145,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * @param query
          */
         public WFSFeatureResults(WFSFeatureSource fs, Query query) {
+        	super(fs, query);
 //System.out.println("WFS QUERY = "+query.toString()+"\n\n\n");
             this.query = query;
             this.fs = fs;
@@ -174,8 +171,13 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * 
          * @see org.geotools.data.FeatureResults#getBounds()
          */
-        public Envelope getBounds() throws IOException {
-            return fs.getBounds(query);
+        public Envelope getBounds(){
+            try {
+				return fs.getBounds(query);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
         }
 
         /**
@@ -184,28 +186,6 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          */
         public int getCount() throws IOException {
             return fs.getCount(query);
-        }
-
-        /**
-         * 
-         * @see org.geotools.data.FeatureResults#collection()
-         */
-        public FeatureCollection collection() throws IOException {
-            try {
-                FeatureCollection collection = FeatureCollections.newCollection();
-                FeatureReader reader = fs.ds.getFeatureReader(query,
-                        fs.getTransaction());
-
-                while (reader.hasNext()) {
-                    collection.add(reader.next());
-                }
-
-                reader.close();
-
-                return collection;
-            } catch (IllegalAttributeException e) {
-                throw new DataSourceException("Could not read feature ", e);
-            }
         }
     }
 }

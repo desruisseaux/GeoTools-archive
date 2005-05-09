@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -92,7 +91,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query query) {
+    public FeatureResults getFeatures(Query query) {
         return new DefaultFeatureResults(this, query);
     }
     
@@ -105,7 +104,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @throws IOException If results could not be obtained
      */
-    public FeatureCollection getFeatures(Filter filter) throws IOException {
+    public FeatureResults getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
     
@@ -116,7 +115,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @throws IOException If features could not be obtained
      */
-    public FeatureCollection getFeatures() throws IOException {
+    public FeatureResults getFeatures() throws IOException {
         return getFeatures(Filter.NONE);
     }
     

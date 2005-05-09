@@ -305,6 +305,10 @@ public class ShapeRenderer {
 						Feature feature = createFeature(type, record,
 								dbfreader, typeName + index);
 						index++;
+
+						if (renderingStopRequested) {
+							break;
+						}
 						
 						if( caching ){
 							geometryCache.add(geom);
@@ -384,10 +388,12 @@ public class ShapeRenderer {
 						fireFeatureRenderedEvent(null);
 					} catch (Exception e) {
 						fireErrorEvent(e);
+					} finally{
+						dbfreader.close();
+						shpreader.close();
+						
 					}
 				}
-
-				shpreader.close();
 			}
 		}
 	}
@@ -655,6 +661,9 @@ public class ShapeRenderer {
 		for (int m = 0; m < symbolizers.length; m++) {
 			if (LOGGER.isLoggable(Level.FINER)) {
 				LOGGER.finer("applying symbolizer " + symbolizers[m]);
+			}
+			if (renderingStopRequested) {
+				break;
 			}
 
 			//        if( symbolizers[m] instanceof TextSymbolizer ){
