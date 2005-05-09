@@ -40,7 +40,29 @@ import org.geotools.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /*
- * A data store for a VPF library
+ * A data store for a VPF library. A library is identified by
+ * an LHT file.
+ * 
+ * VPF 101: 
+ * Product: a profile of VPF data
+ * Examples include DNC, VMAP, and VITD.<b>
+ * Database: the world is separated into different databases. 
+ * A database typically fits on one CD.<b>
+ * Library: each database is subdivided into libraries. 
+ * Libraries may be organized into coverage groups 
+ * which have different scales.
+ * The BROWSE library typically has information on the other libraries.<b>
+ * Coverage: associated feature types are grouped in coverages.
+ * Coverages share a common topological model.<b>
+ * Feature class: Feature types are grouped into classes.
+ * Feature types in a class share a common set of attributes
+ * and are stored together on disk. <b>
+ * Feature type: Feature types are denoted by a five-character FACC code.
+ * Feature types and feature classes are stored 
+ * at the same directory level, inside their containing coverages.<b>
+ * File: VPF data is stored on disk in a complex hierarchy of flat files.
+ * The VPFFile AbstractDataStore can be used to extract the contents of
+ * an individual file, but this is typically useful only for testing.<b>
  *
  * Created on 19. april 2004, 14:53
  *
