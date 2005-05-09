@@ -88,7 +88,6 @@ public interface FeatureResults {
      * @return A FeatureType for
      *
      * @throws IOException if their is a problem getting the FeatureType.
-     * @deprecated
      */
     FeatureType getSchema() throws IOException;
 
@@ -97,7 +96,6 @@ public interface FeatureResults {
      * blocking api.
      *
      * @return A FeatureReader streaming over the FeatureResults
-     * @deprecated
      */
     FeatureReader reader() throws IOException;
 
@@ -127,7 +125,6 @@ public interface FeatureResults {
      * </pre>
      *
      * @return Bounding box of this FeatureResults
-     * @deprecated
      */
     Envelope getBounds() throws IOException;
 
@@ -154,7 +151,6 @@ public interface FeatureResults {
      * @return The number of Features in this FeatureResults.
      *
      * @throws IOException If there are problems getting the count
-     * @deprecated
      */
     int getCount() throws IOException;
     
@@ -179,7 +175,6 @@ public interface FeatureResults {
      * @return An In-Memory FeatureCollection for existing Renderers
      *
      * @throws IOException If any problems occur aquiring Features
-     * @deprecated
      */
     //@deprecated This method will be removed with as the Renderers convert
     FeatureCollection collection() throws IOException;
