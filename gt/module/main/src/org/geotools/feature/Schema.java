@@ -19,6 +19,7 @@ package org.geotools.feature;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +70,13 @@ public class Schema {
         names( featureType, names );        
         return names;
     }
+    
+    public static List attributes( FeatureType featureType ){
+    	List list = new ArrayList();
+    	attributes( featureType, list );        
+        return list;
+    	
+    }
     /**
      * This order is to be respected, based on Ancestors and so on.
      * <p>
@@ -97,21 +105,22 @@ public class Schema {
 	        }
         }
     }
+    
     /**
-     * This order is matched by  is to be respected, based on Ancestors and so on.
+     * This order is to be respected, based on Ancestors and so on.
      * <p>
      * This method is "faster" then actually constructing the merged
      * AttribtueTypes.
      * </p>
      */
-    private static void map( FeatureType featureType, Map map ){
+    public static void attributes( FeatureType featureType, List list ){
         if( featureType == null || featureType.getAttributeTypes() == null ) return;
 
         FeatureType ancestors[] = featureType.getAncestors();
         if( ancestors != null && ancestors.length != 0 ){
             for( int i=0, length = ancestors.length; i<length; i++ ){
                 FeatureType type = ancestors[i];
-                map( ancestors[i], map );	           
+                attributes( ancestors[i], list );	           
 	        }
         }
         AttributeType attributes[] = featureType.getAttributeTypes();
@@ -119,114 +128,96 @@ public class Schema {
             for( int i=0, length = attributes.length; i<length; i++ ){
                 AttributeType type = attributes[i];
 	            String name = type.getName();
-	            if( map.containsKey( name )){
-	                AttribtueSchema attribute = (AttribtueSchema) map.get( name );
-	                attribute.override( type );
+	            int index = indexOf( list, name );
+	            if( index != -1 ){
+	            	AttributeType origional = (AttributeType) list.get( index );
+	            	list.remove( index );
+	            	list.add( index, override( origional, type ));
 	            }
 	            else {
-	                map.put( name, new AttribtueSchema( type ) );
+	            	list.add( type );
 	            }
 	        }
         }
     }
     
-    private static Filter merge( Filter origional, Filter override ){
-        if( isNOP( origional )) return override;
-        if( isNOP( override )) return origional;
-        return origional.and( override );
+    private static int indexOf( List attributes, String name ){
+    	int index = 0;
+    	for( Iterator i=attributes.iterator(); i.hasNext(); index++){
+    		AttributeType type = (AttributeType) i.next();
+    		if( name.equals( type.getName() )) return index;
+    	}
+    	return -1;
     }
-    private static boolean isNOP( Filter filter ){
-        return filter == null || filter.getFilterType() == Filter.NULL || Filter.NONE.equals( filter );
-    }
-
-    /**
-     * Captures the internal model of an Attribute type based on all
-     * its overrides.
-     * <p>
-     * This matches client's codes idea of what an attribtue type is.
-     * </p>
-     */
-    static class AttribtueSchema {
-        private Filter filter; // merged restrictions
-        private AttributeType type;
-        AttribtueSchema( AttributeType type ){
-            this.type = type;
-            this.filter = type.getRestriction();
-        }
-        /**
-         * Compute the resulting schema from the merge of two attribtue types.
-         * <p>
-         * The facets are both considered as restrictions and are combined using
-         * AND. AttributeType type narrowing is permitted.
-         * </p>
-         * @param origional
-         * @param type
-         * @return an AttributeType capturing the information of both orginal and type
-         */
-        public void override( AttributeType override ){
-            filter = merge( filter, override.getRestriction() );
-            type = override;
-        }
-        /**
-         * We need to create a derrived type that includes merged content.
-         * <p>
-         * This should be done in a manner similar FeatureTypeBuilder.
-         * </p>
-         * @return AttributeType reflecting this entry;
-         */
-        public AttributeType type(){
-            if( type.getRestriction() == filter ){
-                // no overrides!
-                return type;
-            }
-            return type; // can't do better then this right now (two many subclasses)
-        }
+    private static AttributeType override(AttributeType type, AttributeType override ){
+    	int max = override.getMaxOccurs();
+    	if( max < 0 ) max = type.getMinOccurs();
+    	
+    	int min = override.getMinOccurs();
+    	if( min < 0 ) min = type.getMinOccurs();
+    	
+    	String name = override.getName();
+    	if( name == null ) name = type.getName();
+    	
+    	Filter restriction = override( type.getRestriction(), override.getRestriction() );
+    	
+    	Class javaType = override.getType();
+    	if( javaType == null ) javaType = type.getType();
+    	
+    	boolean isNilable = override.isNillable();
+    	
+    	Object defaultValue = override.createDefaultValue();
+    	if( defaultValue == null ) defaultValue = type.createDefaultValue();
+    	
+    	// WARNING cannot copy metadata!    	
+    	return AttributeTypeFactory.newAttributeType( name, javaType, isNilable, restriction, defaultValue, null );    	
     }
     
     /**
-     * This is the internal model of the FeatureType "merged" with
-     * all its ancestors.
-     * <p>
-     * This is lazy construction at its finest, the minimum is done upfront.
-     * It may be used by implmentors as required.
-     * </p>
+     * Query featureType information the complete restrictions for the indicated name.
      * 
-     * @author Jody Garnett
-     * @since 0.6.0
+     * @param featureType
+     * @param name
+     * @return
      */
-    public static class FeatureSchema {
-        private List names = null;
-        private Map attribtues = null; // merged!
-        private FeatureType type;
+    public static Filter restriction( FeatureType featureType, String name ){
+        if( featureType == null || featureType.getAttributeTypes() == null ) return Filter.ALL;
         
-        FeatureSchema( FeatureType featureType ){
-            type = featureType;
+        return restriction( featureType, name, Filter.NONE );
+    }
+    private static Filter restriction( FeatureType featureType, String name, Filter filter ){
+        FeatureType ancestors[] = featureType.getAncestors();
+        if( ancestors != null && ancestors.length != 0 ){
+            for( int i=0, length = ancestors.length; i<length; i++ ){
+                FeatureType type = ancestors[i];
+                filter = restriction( featureType, name, filter );                	          
+	        }
         }
-        
-        synchronized int count(){
-            if( attribtues != null ) return attribtues.size();
-            if( names != null ) return names.size();            
-            return names().size();
+        AttributeType attributes[] = featureType.getAttributeTypes();
+        if( attributes != null && attributes.length != 0 ){
+            for( int i=0, length = attributes.length; i<length; i++ ){
+                AttributeType type = attributes[i];
+	            if( name.equals( type.getName() )){
+	            	filter = override( filter, type.getRestriction() );	            	
+	            }
+	        }
         }
-        synchronized List names(){
-            if( names == null){
-                names = new ArrayList();
-                Schema.names( type, names );        
-            }
-            return names; 
-        }
-        synchronized Map attributes(){
-            if( attribtues == null ){
-                attribtues = new HashMap();
-                Schema.map( type, attribtues );
-            }
-            return attribtues;
-        }
-
-        public synchronized AttributeType attribute( String name ) {
-            AttribtueSchema attribute = (AttribtueSchema) attributes().get( name );
-            return attribute.type();
-        }        
+        return filter;
+    }
+    private static Filter override( Filter filter, Filter override ){
+    	if( isNOP( override )){
+    		// no override is needed
+    		return filter;
+    	}
+    	else if( isNOP( filter )){
+    		return override;
+    	}
+    	else {
+    		return filter.and( override );
+    	}
+    }
+    private static boolean isNOP( Filter filter ){
+        return filter == null || filter.getFilterType() == Filter.NULL || Filter.NONE.equals( filter );
     }
     
     /**
@@ -246,9 +237,15 @@ public class Schema {
      * @return
      */
     public static AttributeType attribute( FeatureType type, int index ) {
-        FeatureSchema schema = new FeatureSchema( type );
-        String name = (String) schema.names().get( index );
-        return schema.attribute( name );
+        String name = (String) names( type ).get( index );
+        return xpath( type, name );
+    }
+    
+    public static AttributeType attribute( FeatureType type, String name ){
+    	List list = attributes( type );
+    	int index = indexOf( list, name );
+    	if( index == -1 ) return null;
+    	return (AttributeType) list.get( index );
     }
     
     /**
@@ -260,7 +257,6 @@ public class Schema {
      * @return
      */
     public static AttributeType xpath( FeatureType type, String xpath) {
-        FeatureSchema schema = new FeatureSchema( type );
-        return schema.attribute( xpath );
+        return attribute( type, xpath ); // for now, use JXPath later
     }
 }

@@ -107,6 +107,27 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue,cf);
     }
     
+    /**
+     * Implementation of AttributeType creation.
+     */
+    protected AttributeType createAttributeType(String name, Class clazz, 
+        boolean isNillable, Filter filter, Object defaultValue, Object metadata) {
+
+    	FilterFactory ff = FilterFactory.createFilterFactory();
+    	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
+    	length.setArgs(new Expression[]{null});
+    	if (Number.class.isAssignableFrom(clazz)) {
+            return new NumericAttributeType(
+                name, clazz, isNillable,1,1,defaultValue, filter);
+        } else if (CharSequence.class.isAssignableFrom(clazz)) {
+            return new TextualAttributeType(name,isNillable,1,1,defaultValue,filter);
+        } else if (java.util.Date.class.isAssignableFrom(clazz)) {
+            return new TemporalAttributeType(name,isNillable,1,1,defaultValue,filter);
+        } else if (Geometry.class.isAssignableFrom( clazz )){
+            return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,filter);
+        }        
+        return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue,filter);
+    }
     
     protected AttributeType createAttributeType( String name, Class clazz, 
         boolean isNillable, int fieldLength, Object defaultValue, 

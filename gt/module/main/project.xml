@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project>
   <pomVersion>3</pomVersion>
   <extend>${basedir}/../../project.xml</extend>
@@ -154,6 +154,14 @@
   </contributors>
 
   <dependencies>
+    <dependency>
+      <id>commons-jxpath</id>
+      <version>1.2</version>
+      <properties>
+        <release.bundle>true</release.bundle>
+       </properties>
+      <url>http://jakarta.apache.org/commons/jxpath/</url>
+    </dependency>
     <dependency>
       <id>JTS</id>
       <version>1.6</version>

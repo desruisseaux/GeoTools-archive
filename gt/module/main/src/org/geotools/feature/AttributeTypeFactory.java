@@ -21,6 +21,7 @@ import java.util.Collections;
 
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryFinder;
+import org.geotools.filter.Filter;
 
 
 /**
@@ -91,7 +92,12 @@ public abstract class AttributeTypeFactory implements Factory {
     public static AttributeType newAttributeType(String name, Class clazz,
         boolean isNillable,int fieldLength,Object defaultValue, Object metaData) {
         return defaultInstance().createAttributeType(name, clazz, isNillable,fieldLength, defaultValue, metaData);
-    }        
+    }
+    public static AttributeType newAttributeType(String name, Class clazz,
+        boolean isNillable, Filter restriction,Object defaultValue, Object metaData) {
+        return defaultInstance().createAttributeType(name, clazz, isNillable, restriction, defaultValue, metaData);
+    }
+
     /**
      * Creates a new AttributeType with the given name, class and nillable
      * values.
@@ -177,6 +183,20 @@ public abstract class AttributeTypeFactory implements Factory {
      */
     protected abstract AttributeType createAttributeType(String name,
         Class clazz, boolean isNillable, int fieldLength, Object defaultValue);
+    
+    /**
+     * Create an AttributeType with the given name, Class, nillability, 
+     * fieldLength, and provided defaultValue.
+     *
+     * @param name The name of the AttributeType to be created.
+     * @param clazz The class that objects will validate against.
+     * @param isNillable if nulls are allowed in the new type.
+     * @param restriction Used to limit the valid values
+     * @return the new AttributeType
+     * @throws IllegalArgumentException If the field is not nillable, yet
+     */
+    protected abstract AttributeType createAttributeType(String name,
+        Class clazz, boolean isNillable, Filter restriction, Object defaultValue, Object metadata);
     
     /**
      * Create an AttributeType with the given name, Class, nillability, and

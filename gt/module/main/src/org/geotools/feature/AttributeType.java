@@ -102,9 +102,10 @@ public interface AttributeType{
     Class getType();
     
     /**
-     * This represents a Facet in XML schema ... for example can be used to represent the max length of 20 for 
+     * This represents a Facet in XML schema ... for example can be used to represent the max length of 20 for
+     * a string.
      * 
-     * @return
+     * @return Filter, or Filter.NONE if no restriction is needed.
      */
     Filter getRestriction();
 
