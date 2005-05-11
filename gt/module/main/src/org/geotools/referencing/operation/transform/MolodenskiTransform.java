@@ -133,7 +133,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     private final double daa, da_a;
     
     /**
-     * The square of excentricity of the ellipsoid: e² = (a²-b²)/a² where
+     * The square of excentricity of the ellipsoid: eï¿½ = (aï¿½-bï¿½)/aï¿½ where
      * <var>a</var> is the semi-major axis length and
      * <var>b</var> is the semi-minor axis length.
      */
@@ -259,8 +259,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         // Assertions: computes the inverse transform in the 3D-case only
         //             (otherwise the transform is too approximative).
         final float error;
-        assert !(target3D && srcPts!=dstPts &&
-                (error=maxError(null, srcPts, srcOff, null, dstPts, dstOff, numPts)) > EPS) : error;
+        error=maxError(null, srcPts, srcOff, null, dstPts, dstOff, numPts);
+        
+        assert !(target3D && srcPts!=dstPts && error > EPS) : error;
     }
 
     /**
@@ -292,8 +293,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         // Assertions: computes the inverse transform in the 3D-case only
         //             (otherwise the transform is too approximative).
         final float error;
-        assert !(target3D && srcPts!=dstPts &&
-                (error=maxError(srcPts, null, srcOff, dstPts, null, dstOff, numPts)) > EPS) : error;
+        error=maxError(srcPts, null, srcOff, dstPts, null, dstOff, numPts);
+        assert !(target3D && srcPts!=dstPts &&error > EPS) : error;
     }
 
     /**
