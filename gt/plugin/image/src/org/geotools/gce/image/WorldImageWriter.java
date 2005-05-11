@@ -16,23 +16,18 @@
  */
 package org.geotools.gce.image;
 
-import net.jmge.gif.Gif89Encoder;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-
 import org.geotools.parameter.Parameter;
-
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
-
 import org.opengis.parameter.GeneralParameterValue;
-
 import org.opengis.spatialschema.geometry.Envelope;
 
-import org.shetline.io.GIFOutputStream;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -40,18 +35,14 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-
 import java.net.URL;
-
 import javax.imageio.ImageIO;
-
 import javax.media.jai.ColorCube;
 import javax.media.jai.IHSColorSpace;
 import javax.media.jai.ImageLayout;
@@ -59,6 +50,11 @@ import javax.media.jai.JAI;
 import javax.media.jai.KernelJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 
 /**
@@ -72,7 +68,7 @@ import javax.media.jai.RenderedOp;
  * @author alessio fabiani
  */
 public class WorldImageWriter implements GridCoverageWriter {
-    /**format for this writer*/
+    /** format for this writer */
     private Format format = new WorldImageFormat();
 
     /** Destination to write to */
@@ -183,7 +179,8 @@ public class WorldImageWriter implements GridCoverageWriter {
         //if provided we have to use them
         //specifically this is one of the way we can provide an output format
         if (parameters != null) {
-            this.format.getWriteParameters().parameter("format").setValue(((Parameter) parameters[0]).stringValue());
+            this.format.getWriteParameters().parameter("format").setValue(((Parameter) parameters[0])
+                .stringValue());
         }
 
         //convert everything into a file when possible
@@ -201,7 +198,8 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         if (destination instanceof File) {
             //WRITING TO A FILE
-            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage).getRenderedImage()).getAsBufferedImage();
+            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage)
+                .getRenderedImage()).getAsBufferedImage();
             Envelope env = coverage.getEnvelope();
             double xMin = env.getMinimum(0);
             double yMin = env.getMinimum(1);
@@ -220,14 +218,15 @@ public class WorldImageWriter implements GridCoverageWriter {
             String path = imageFile.getAbsolutePath();
             int index = path.lastIndexOf(".");
             String baseFile = path.substring(0, index);
-            File worldFile = new File(baseFile +
-                    WorldImageFormat.getWorldExtension(
+            File worldFile = new File(baseFile
+                    + WorldImageFormat.getWorldExtension(
                         format.getWriteParameters().parameter("format")
                               .stringValue()));
 
             //create new files
-            imageFile = new File(baseFile + "." +
-                    format.getWriteParameters().parameter("format").stringValue());
+            imageFile = new File(baseFile + "."
+                    + format.getWriteParameters().parameter("format")
+                            .stringValue());
             imageFile.createNewFile();
             worldFile.createNewFile();
 
@@ -282,18 +281,17 @@ public class WorldImageWriter implements GridCoverageWriter {
         try {
             PlanarImage surrogateImage = null;
 
-            /**
-             * do we need to go to the geophysic view for this data?
-             */
+            /** do we need to go to the geophysic view for this data? */
 
             //let's check if we have a sampledimension which carried geophysics information
-            boolean geophysics = false;
+            //in such a case we have to get the visual representation for this data
+            //by calling geophysiscs(false)
             int i = 0;
 
             for (; i < sourceCoverage.getNumSampleDimensions(); i++)
                 if (!sourceCoverage.getSampleDimension(0).getSampleToGeophysics()
                                        .isIdentity()) {
-                    surrogateImage = ((PlanarImage) ((GridCoverage2D) sourceCoverage).geophysics(false)
+                    surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
                                                      .getRenderedImage());
 
                     break;
@@ -305,7 +303,8 @@ public class WorldImageWriter implements GridCoverageWriter {
                  */
 
                 //I do not need to go to 
-                surrogateImage = (PlanarImage) ((GridCoverage2D) sourceCoverage).getRenderedImage();
+                surrogateImage = (PlanarImage) (sourceCoverage)
+                    .getRenderedImage();
             }
 
             /**
@@ -314,47 +313,23 @@ public class WorldImageWriter implements GridCoverageWriter {
             if ((((String) (this.format.getWriteParameters().parameter("format")
                                            .getValue())).compareToIgnoreCase(
                         "gif") == 0)) {
-                //                
-                //				try{
-                //					GIFOutputStream outStream= new GIFOutputStream(output);
-                //					outStream.write(surrogateImage.createSnapshot().getAsBufferedImage(),GIFOutputStream.DITHERED_216_COLORS);
-                //					
-                //				}
-                //				catch(Exception e1){
-                try {
-					System.err.println(0);
-                    Gif89Encoder gifenc = new Gif89Encoder(surrogateImage.getAsBufferedImage());
-                    gifenc.setTransparentIndex(-1);
-                    gifenc.getFrameAt(0).setInterlaced(false);
-                    gifenc.encode(output);
-					System.err.println(1);
-                } catch (Exception e) {
-					System.err.println(2);
-                    if (surrogateImage.getColorModel() instanceof ComponentColorModel) {
-                        surrogateImage = componentColorModel2GIF(surrogateImage);
-                        ImageIO.write(surrogateImage, "gif", output);
-						System.err.println(3);
-                    }
+  
+                if (surrogateImage.getColorModel() instanceof ComponentColorModel) {
+                    surrogateImage = componentColorModel2GIF(surrogateImage);
                 }
 
-                //				}
-            } else {
-                /**
-                 * write using jai for the others formats
-                 */
-				System.err.println(4);
-                ImageIO.write(surrogateImage,
-                    (String) (this.format.getWriteParameters()
-                                         .parameter("format").getValue()),
-                    output);
-				System.err.println(5);
-            }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
+            } 
 
-            IOException ioe = new IOException();
-            ioe.initCause(e);
-            throw ioe;
+            /**
+             * write using jai for the others formats
+             */
+
+            ImageIO.write(surrogateImage,
+                (String) (this.format.getWriteParameters().parameter("format")
+                                     .getValue()), output);
+
+        } catch (Exception e) {
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -379,12 +354,7 @@ public class WorldImageWriter implements GridCoverageWriter {
             //I might also need to reformat the image in order to get it to 8 bits
             //samples
             if (surrogateImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE) {
-                ParameterBlock pbFormat = new ParameterBlock();
-                pbFormat.addSource(surrogateImage);
-                pbFormat.add(DataBuffer.TYPE_BYTE);
-
-                ImageLayout layout = new ImageLayout();
-                surrogateImage = JAI.create("format", pbFormat, null);
+            	surrogateImage=rescale2Byte(surrogateImage);
             }
 
             //parameter block
@@ -396,9 +366,8 @@ public class WorldImageWriter implements GridCoverageWriter {
                         new int[] { 0, 1, 2 });
             }
 
-            //removing alpha band
-            int w = surrogateImage.getWidth();
-            int h = surrogateImage.getHeight();
+            if(surrogateImage.getSampleModel().getNumBands()==3){
+            //error dither
             KernelJAI ditherMask = KernelJAI.ERROR_FILTER_FLOYD_STEINBERG; //KernelJAI.DITHER_MASK_443;
             ColorCube colorMap = ColorCube.BYTE_496;
 
@@ -411,106 +380,144 @@ public class WorldImageWriter implements GridCoverageWriter {
             pb.add(colorMap);
             pb.add(ditherMask);
 
-            //building final color model
-            //     int bitsNum = 8;
-            //      ColorModel cm = new IndexColorModel(bitsNum,
-            //              colorMap.getByteData()[0].length,
-            ////              colorMap.getByteData()[0], colorMap.getByteData()[1],
-            //              colorMap.getByteData()[2], Transparency.OPAQUE);
-            // PlanarImage op = PlanarImage.wrapRenderedImage(new BufferedImage(
-            //           w, h, BufferedImage.TYPE_BYTE_INDEXED,
-            //    (IndexColorModel) cm));
-            //layout for the final image
-            //      ImageLayout layout = new ImageLayout();
-            ////  layout.setMinX(op.getMinX());
-            //  layout.setMinY(op.getMinY());
-            //  layout.setHeight(op.getHeight());
-            //  layout.setWidth(op.getWidth());
-            //   layout.setTileWidth(surrogateImage.getTileWidth());
-            //   layout.setTileHeight(surrogateImage.getTileHeight());
-            //   layout.setTileGridXOffset(surrogateImage.getTileGridXOffset());
-            //  layout.setTileGridYOffset(surrogateImage.getTileGridYOffset());
-            //  layout.setColorModel(cm);
-            //  layout.setSampleModel(op.getSampleModel());
-            //        RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+    
             RenderedOp op1 = JAI.create("errordiffusion", pb, null);
             surrogateImage = op1.createSnapshot();
+            }
         }
-
         return surrogateImage;
     }
 
-    private RenderedImage highlightImage(RenderedImage stillImg) {
-        RenderedImage dispImg = null;
+    /**
+	 * @param surrogateImage
+	 * @return
+	 */
+	private PlanarImage rescale2Byte(PlanarImage surrogateImage) {
 
-        // Highlight the human pixels (detection results img)
-        // Create a constant image
-        Byte[] bandValues = new Byte[1];
+        //rescale the initial image in order
+        //to expand the dynamic
+        /** EXTREMA */
 
-        bandValues[0] = new Byte("65"); //32 -- orangeish, 65 -- greenish
+        // Set up the parameter block for the source image and
+        // the constants
+        ParameterBlock pb = new ParameterBlock();
+        pb.addSource(surrogateImage); // The source image
+        pb.add(null); // The region of the image to scan
+        pb.add(1); // The horizontal sampling rate
+        pb.add(1); // The vertical sampling rate
 
-        ParameterBlock pbConstant = new ParameterBlock();
+        // Perform the extrema operation on the source image
+        // Retrieve both the maximum and minimum pixel value
+        double[][] extrema = (double[][]) JAI.create("extrema", pb).getProperty("extrema");
 
-        pbConstant.add(new Float(stillImg.getWidth())); // The width
+        /**
+         * RESCSALE
+         */
+        pb.removeSources();
+        pb.removeParameters();
 
-        pbConstant.add(new Float(stillImg.getHeight())); // The height
+        //set the levels for the dynamic
+         pb.addSource(surrogateImage);
 
-        pbConstant.add(bandValues); // The band values
+        //rescaling each band to 8 bits
+        double[] scale = new double[extrema[0].length];
+        double[] offset = new double[extrema[0].length];
 
-        PlanarImage imgConstant = (PlanarImage) JAI.create("constant",
-                pbConstant);
+        for (int i = 0; i < extrema[0].length; i++) {
+            scale[i] = 255 / (extrema[1][i] - extrema[0][i]);
+            offset[i] = -((255 * extrema[0][i]) / (extrema[1][i]
+                - extrema[0][i]));
+        }
+        pb.add(scale);
+        pb.add(offset);
+        RenderedOp image2return = JAI.create("rescale", pb);
 
-        //System.out.println("Making multiply image");
-        // Multiply the mask by 255 so the values are 0 or 255
-        ParameterBlock pbMultiply = new ParameterBlock();
+        
+        
+        //setting up the right layout for this image
+        ImageLayout layout=new ImageLayout(image2return);
+        pb.removeParameters();
+        pb.removeSources();
+        pb.addSource(image2return);
+        pb.add(DataBuffer.TYPE_BYTE);
+        RenderingHints hints=new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout);
+        image2return=JAI.create("format",pb,hints);
 
-        pbMultiply.addSource((PlanarImage) stillImg);
+      
+        return image2return;
+	}
 
-        double[] multiplyArray = new double[] { 255.0 };
-
-        pbMultiply.add(multiplyArray);
-
-        PlanarImage imgMask = (PlanarImage) JAI.create("multiplyconst",
-                pbMultiply);
-
-        //System.out.println("Making IHS image");
-        // Create a Intensity, Hue, Saturation image
-        ParameterBlock pbIHS = new ParameterBlock();
-
-        pbIHS.setSource(stillImg, 0); //still img is the intensity
-
-        pbIHS.setSource(imgConstant, 1); //constant img is the hue
-
-        pbIHS.setSource(imgMask, 2); //mask is the saturation
-
-        //create rendering hint for IHS image to specify the color model
-        ComponentColorModel IHS_model = new ComponentColorModel(IHSColorSpace.getInstance(),
-                new int[] { 8, 8, 8 }, false, false, Transparency.OPAQUE,
-                DataBuffer.TYPE_BYTE);
-
-        ImageLayout layout = new ImageLayout();
-
-        layout.setColorModel(IHS_model);
-
-        RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-
-        PlanarImage IHSImg = JAI.create("bandmerge", pbIHS, rh);
-
-        //System.out.println("Making RGB image");
-        // Convert IHS image to a RGB image
-        ParameterBlock pbRGB = new ParameterBlock();
-
-        //create rendering hint for RGB image to specify the color model
-        ComponentColorModel RGB_model = new ComponentColorModel(ColorSpace.getInstance(
-                    ColorSpace.CS_sRGB), new int[] { 8, 8, 8 }, false, false,
-                Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
-
-        pbRGB.addSource(IHSImg);
-
-        pbRGB.add(RGB_model);
-
-        dispImg = JAI.create("colorconvert", pbRGB);
-
-        return dispImg;
-    }
+//	private RenderedImage highlightImage(RenderedImage stillImg) {
+//        RenderedImage dispImg = null;
+//
+//        // Highlight the human pixels (detection results img)
+//        // Create a constant image
+//        Byte[] bandValues = new Byte[1];
+//
+//        bandValues[0] = new Byte("65"); //32 -- orangeish, 65 -- greenish
+//
+//        ParameterBlock pbConstant = new ParameterBlock();
+//
+//        pbConstant.add(new Float(stillImg.getWidth())); // The width
+//
+//        pbConstant.add(new Float(stillImg.getHeight())); // The height
+//
+//        pbConstant.add(bandValues); // The band values
+//
+//        PlanarImage imgConstant = (PlanarImage) JAI.create("constant",
+//                pbConstant);
+//
+//        //System.out.println("Making multiply image");
+//        // Multiply the mask by 255 so the values are 0 or 255
+//        ParameterBlock pbMultiply = new ParameterBlock();
+//
+//        pbMultiply.addSource((PlanarImage) stillImg);
+//
+//        double[] multiplyArray = new double[] { 255.0 };
+//
+//        pbMultiply.add(multiplyArray);
+//
+//        PlanarImage imgMask = (PlanarImage) JAI.create("multiplyconst",
+//                pbMultiply);
+//
+//        //System.out.println("Making IHS image");
+//        // Create a Intensity, Hue, Saturation image
+//        ParameterBlock pbIHS = new ParameterBlock();
+//
+//        pbIHS.setSource(stillImg, 0); //still img is the intensity
+//
+//        pbIHS.setSource(imgConstant, 1); //constant img is the hue
+//
+//        pbIHS.setSource(imgMask, 2); //mask is the saturation
+//
+//        //create rendering hint for IHS image to specify the color model
+//        ComponentColorModel IHS_model = new ComponentColorModel(IHSColorSpace
+//                .getInstance(), new int[] { 8, 8, 8 }, false, false,
+//                Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+//
+//        ImageLayout layout = new ImageLayout();
+//
+//        layout.setColorModel(IHS_model);
+//
+//        RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+//
+//        PlanarImage IHSImg = JAI.create("bandmerge", pbIHS, rh);
+//
+//        //System.out.println("Making RGB image");
+//        // Convert IHS image to a RGB image
+//        ParameterBlock pbRGB = new ParameterBlock();
+//
+//        //create rendering hint for RGB image to specify the color model
+//        ComponentColorModel RGB_model = new ComponentColorModel(ColorSpace
+//                .getInstance(ColorSpace.CS_sRGB), new int[] { 8, 8, 8 }, false,
+//                false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+//
+//        pbRGB.addSource(IHSImg);
+//
+//        pbRGB.add(RGB_model);
+//
+//        dispImg = JAI.create("colorconvert", pbRGB);
+//
+//        return dispImg;
+//    }
 }
