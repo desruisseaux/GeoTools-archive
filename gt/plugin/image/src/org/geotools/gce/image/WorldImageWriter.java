@@ -16,14 +16,23 @@
  */
 package org.geotools.gce.image;
 
+import net.jmge.gif.Gif89Encoder;
+
 import org.geotools.coverage.grid.GridCoverage2D;
+
 import org.geotools.parameter.Parameter;
+
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
+
 import org.opengis.parameter.GeneralParameterValue;
+
 import org.opengis.spatialschema.geometry.Envelope;
+
+
+
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -31,14 +40,18 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
 import java.net.URL;
+
 import javax.imageio.ImageIO;
+
 import javax.media.jai.ColorCube;
 import javax.media.jai.IHSColorSpace;
 import javax.media.jai.ImageLayout;
@@ -170,8 +183,7 @@ public class WorldImageWriter implements GridCoverageWriter {
         //if provided we have to use them
         //specifically this is one of the way we can provide an output format
         if (parameters != null) {
-            this.format.getWriteParameters().parameter("format").setValue(((Parameter) parameters[0])
-                .stringValue());
+            this.format.getWriteParameters().parameter("format").setValue(((Parameter) parameters[0]).stringValue());
         }
 
         //convert everything into a file when possible
@@ -189,8 +201,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         if (destination instanceof File) {
             //WRITING TO A FILE
-            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage)
-                .getRenderedImage()).getAsBufferedImage();
+            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage).getRenderedImage()).getAsBufferedImage();
             Envelope env = coverage.getEnvelope();
             double xMin = env.getMinimum(0);
             double yMin = env.getMinimum(1);
@@ -209,15 +220,14 @@ public class WorldImageWriter implements GridCoverageWriter {
             String path = imageFile.getAbsolutePath();
             int index = path.lastIndexOf(".");
             String baseFile = path.substring(0, index);
-            File worldFile = new File(baseFile
-                    + WorldImageFormat.getWorldExtension(
+            File worldFile = new File(baseFile +
+                    WorldImageFormat.getWorldExtension(
                         format.getWriteParameters().parameter("format")
                               .stringValue()));
 
             //create new files
-            imageFile = new File(baseFile + "."
-                    + format.getWriteParameters().parameter("format")
-                            .stringValue());
+            imageFile = new File(baseFile + "." +
+                    format.getWriteParameters().parameter("format").stringValue());
             imageFile.createNewFile();
             worldFile.createNewFile();
 
@@ -273,32 +283,55 @@ public class WorldImageWriter implements GridCoverageWriter {
             PlanarImage surrogateImage = null;
 
             /**
-             * ARE WE DEALING WITH A GRAYSCALE IMAGE?
+             * do we need to go to the geophysic view for this data?
              */
-            if (sourceCoverage.getSampleDimension(0).getColorInterpretation()
-                                  .name().equals("GRAY_INDEX")) {
-                //getting rendered image
-                surrogateImage = ((PlanarImage) ((GridCoverage2D) sourceCoverage).geophysics(false)
-                                                 .getRenderedImage());
-            } else {
-                /**
-                 * WORKING ON A COLORED IMAGE
-                 */
-                surrogateImage = (PlanarImage) ((GridCoverage2D) sourceCoverage)
-                    .getRenderedImage();
 
-                //trying to write a GIF
-                if (surrogateImage.getColorModel() instanceof ComponentColorModel
-                        && (((String) (this.format.getWriteParameters()
-                                                      .parameter("format")
-                                                      .getValue()))
-                        .compareToIgnoreCase("gif") == 0)) {
-                    surrogateImage = componentColorModel2GIF(surrogateImage);
+            //let's check if we have a sampledimension which carried geophysics information
+            boolean geophysics = false;
+            int i = 0;
+
+            for (; i < sourceCoverage.getNumSampleDimensions(); i++)
+                if (!sourceCoverage.getSampleDimension(0).getSampleToGeophysics()
+                                       .isIdentity()) {
+                    surrogateImage = ((PlanarImage) ((GridCoverage2D) sourceCoverage).geophysics(false)
+                                                     .getRenderedImage());
+
+                    break;
                 }
+
+            if (i == sourceCoverage.getNumSampleDimensions()) {
+                /**
+                 * we do not need to get the geophysisc view
+                 */
+
+                //I do not need to go to 
+                surrogateImage = (PlanarImage) ((GridCoverage2D) sourceCoverage).getRenderedImage();
             }
 
             /**
-             * WRITE TO OUTPUTBUFER
+             * writing a gif
+             */
+            if (surrogateImage.getColorModel() instanceof ComponentColorModel &&
+                    (((String) (this.format.getWriteParameters()
+                                               .parameter("format").getValue())).compareToIgnoreCase(
+                        "gif") == 0)) {
+                try{
+			    Gif89Encoder gifenc = new Gif89Encoder(surrogateImage.getAsBufferedImage());
+			    gifenc.setTransparentIndex(-1);
+			    gifenc.getFrameAt(0).setInterlaced(false);
+			    gifenc.encode(output);
+                }
+				catch(Exception e)
+				{
+                 surrogateImage = componentColorModel2GIF(surrogateImage);
+				 ImageIO.write(surrogateImage,
+			                "gif", output);
+				}
+				 
+            }
+            else
+            /**
+             * write using jai for the others formats
              */
             ImageIO.write(surrogateImage,
                 (String) (this.format.getWriteParameters().parameter("format")
@@ -330,15 +363,26 @@ public class WorldImageWriter implements GridCoverageWriter {
      */
     private PlanarImage componentColorModel2GIF(PlanarImage surrogateImage) {
         {
+            //I might also need to reformat the image in order to get it to 8 bits
+            //samples
+            if (surrogateImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE) {
+                ParameterBlock pbFormat = new ParameterBlock();
+                pbFormat.addSource(surrogateImage);
+                pbFormat.add(DataBuffer.TYPE_BYTE);
+
+                ImageLayout layout = new ImageLayout();
+                surrogateImage = JAI.create("format", pbFormat, null);
+            }
+
             //parameter block
             ParameterBlock pb = new ParameterBlock();
-            RenderedOp bandSelect = null;
+ 
 
             //check the number of bands looking for alpha band
             if (surrogateImage.getSampleModel().getNumBands() > 3) {
-                bandSelect = JAI.create("bandSelect", surrogateImage,
+				surrogateImage = JAI.create("bandSelect", surrogateImage,
                         new int[] { 0, 1, 2 });
-                surrogateImage = bandSelect.createInstance();
+                
             }
 
             //removing alpha band
@@ -379,7 +423,7 @@ public class WorldImageWriter implements GridCoverageWriter {
             //  layout.setSampleModel(op.getSampleModel());
             //        RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
             RenderedOp op1 = JAI.create("errordiffusion", pb, null);
-            surrogateImage = (PlanarImage) op1.getRendering();
+            surrogateImage =  op1.createSnapshot();
         }
 
         return surrogateImage;
@@ -429,9 +473,9 @@ public class WorldImageWriter implements GridCoverageWriter {
         pbIHS.setSource(imgMask, 2); //mask is the saturation
 
         //create rendering hint for IHS image to specify the color model
-        ComponentColorModel IHS_model = new ComponentColorModel(IHSColorSpace
-                .getInstance(), new int[] { 8, 8, 8 }, false, false,
-                Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+        ComponentColorModel IHS_model = new ComponentColorModel(IHSColorSpace.getInstance(),
+                new int[] { 8, 8, 8 }, false, false, Transparency.OPAQUE,
+                DataBuffer.TYPE_BYTE);
 
         ImageLayout layout = new ImageLayout();
 
@@ -446,9 +490,9 @@ public class WorldImageWriter implements GridCoverageWriter {
         ParameterBlock pbRGB = new ParameterBlock();
 
         //create rendering hint for RGB image to specify the color model
-        ComponentColorModel RGB_model = new ComponentColorModel(ColorSpace
-                .getInstance(ColorSpace.CS_sRGB), new int[] { 8, 8, 8 }, false,
-                false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+        ComponentColorModel RGB_model = new ComponentColorModel(ColorSpace.getInstance(
+                    ColorSpace.CS_sRGB), new int[] { 8, 8, 8 }, false, false,
+                Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
 
         pbRGB.addSource(IHSImg);
 
