@@ -383,7 +383,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 
     
             RenderedOp op1 = JAI.create("errordiffusion", pb, null);
-            
+            surrogateImage=op1.createSnapshot();
             
             
             //adding transparency
