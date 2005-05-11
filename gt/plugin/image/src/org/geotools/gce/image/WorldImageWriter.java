@@ -30,9 +30,8 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 
 import org.opengis.spatialschema.geometry.Envelope;
+
 import org.shetline.io.GIFOutputStream;
-
-
 
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -312,40 +311,44 @@ public class WorldImageWriter implements GridCoverageWriter {
             /**
              * writing a gif
              */
-            if (surrogateImage.getColorModel() instanceof ComponentColorModel &&
-                    (((String) (this.format.getWriteParameters()
-                                               .parameter("format").getValue())).compareToIgnoreCase(
+            if ((((String) (this.format.getWriteParameters().parameter("format")
+                                           .getValue())).compareToIgnoreCase(
                         "gif") == 0)) {
-//                
-//				try{
-//					GIFOutputStream outStream= new GIFOutputStream(output);
-//					outStream.write(surrogateImage.createSnapshot().getAsBufferedImage(),GIFOutputStream.DITHERED_216_COLORS);
-//					
-//				}
-//				catch(Exception e1){
-					try{
-					    Gif89Encoder gifenc = new Gif89Encoder(surrogateImage.getAsBufferedImage());
-					    gifenc.setTransparentIndex(-1);
-					    gifenc.getFrameAt(0).setInterlaced(false);
-					    gifenc.encode(output);
-		                }
-						catch(Exception e)
-						{
-		                 surrogateImage = componentColorModel2GIF(surrogateImage);
-						 ImageIO.write(surrogateImage,
-					                "gif", output);
-						}
-//				}
-					
-				 
+                //                
+                //				try{
+                //					GIFOutputStream outStream= new GIFOutputStream(output);
+                //					outStream.write(surrogateImage.createSnapshot().getAsBufferedImage(),GIFOutputStream.DITHERED_216_COLORS);
+                //					
+                //				}
+                //				catch(Exception e1){
+                try {
+					System.err.println(0);
+                    Gif89Encoder gifenc = new Gif89Encoder(surrogateImage.getAsBufferedImage());
+                    gifenc.setTransparentIndex(-1);
+                    gifenc.getFrameAt(0).setInterlaced(false);
+                    gifenc.encode(output);
+					System.err.println(1);
+                } catch (Exception e) {
+					System.err.println(2);
+                    if (surrogateImage.getColorModel() instanceof ComponentColorModel) {
+                        surrogateImage = componentColorModel2GIF(surrogateImage);
+                        ImageIO.write(surrogateImage, "gif", output);
+						System.err.println(3);
+                    }
+                }
+
+                //				}
+            } else {
+                /**
+                 * write using jai for the others formats
+                 */
+				System.err.println(4);
+                ImageIO.write(surrogateImage,
+                    (String) (this.format.getWriteParameters()
+                                         .parameter("format").getValue()),
+                    output);
+				System.err.println(5);
             }
-            else
-            /**
-             * write using jai for the others formats
-             */
-            ImageIO.write(surrogateImage,
-                (String) (this.format.getWriteParameters().parameter("format")
-                                     .getValue()), output);
         } catch (Exception e) {
             System.err.println(e.getMessage());
 
@@ -386,13 +389,11 @@ public class WorldImageWriter implements GridCoverageWriter {
 
             //parameter block
             ParameterBlock pb = new ParameterBlock();
- 
 
             //check the number of bands looking for alpha band
             if (surrogateImage.getSampleModel().getNumBands() > 3) {
-				surrogateImage = JAI.create("bandSelect", surrogateImage,
+                surrogateImage = JAI.create("bandSelect", surrogateImage,
                         new int[] { 0, 1, 2 });
-                
             }
 
             //removing alpha band
@@ -433,7 +434,7 @@ public class WorldImageWriter implements GridCoverageWriter {
             //  layout.setSampleModel(op.getSampleModel());
             //        RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
             RenderedOp op1 = JAI.create("errordiffusion", pb, null);
-            surrogateImage =  op1.createSnapshot();
+            surrogateImage = op1.createSnapshot();
         }
 
         return surrogateImage;
