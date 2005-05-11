@@ -33,6 +33,7 @@ import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedOutputStream;
@@ -287,7 +288,7 @@ public class WorldImageWriter implements GridCoverageWriter {
             //in such a case we have to get the visual representation for this data
             //by calling geophysiscs(false)
             int i = 0;
-
+            
             for (; i < sourceCoverage.getNumSampleDimensions(); i++)
                 if (!sourceCoverage.getSampleDimension(0).getSampleToGeophysics()
                                        .isIdentity()) {
@@ -382,8 +383,48 @@ public class WorldImageWriter implements GridCoverageWriter {
 
     
             RenderedOp op1 = JAI.create("errordiffusion", pb, null);
-            surrogateImage = op1.createSnapshot();
+            
+            
+            
+            //adding transparency
+            //setting up the right layout for this image
+//            ImageLayout layout=new ImageLayout(op1);
+//            byte [] []rgb=colorMap.getByteData();
+//            layout.setColorModel(new IndexColorModel(
+//            		8,//8 bits
+//            		rgb[0].length,
+//            		rgb[0],
+//            		rgb[1],
+//            		rgb[1],
+//            		0));
+//            
+//            pb.removeParameters();
+//            pb.removeSources();
+//            pb.addSource(op1);
+//            RenderingHints hints=new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout);
+//            surrogateImage=JAI.create("format",pb,hints);
+            
             }
+//            else{
+//            	 //adding transparency
+//                //setting up the right layout for this image
+//                ImageLayout layout=new ImageLayout(op1);
+//                byte [] []rgb=colorMap.getByteData();
+//                layout.setColorModel(new IndexColorModel(
+//                		8,//8 bits
+//                		rgb[0].length,
+//                		rgb[0],
+//                		rgb[1],
+//                		rgb[1],
+//                		0));
+//                
+//                pb.removeParameters();
+//                pb.removeSources();
+//                pb.addSource(op1);
+//                RenderingHints hints=new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout);
+//                surrogateImage=JAI.create("format",pb,hints);            	
+//            }
+
         }
         return surrogateImage;
     }
