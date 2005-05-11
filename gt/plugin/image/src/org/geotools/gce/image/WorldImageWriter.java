@@ -30,6 +30,7 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 
 import org.opengis.spatialschema.geometry.Envelope;
+import org.shetline.io.GIFOutputStream;
 
 
 
@@ -315,18 +316,27 @@ public class WorldImageWriter implements GridCoverageWriter {
                     (((String) (this.format.getWriteParameters()
                                                .parameter("format").getValue())).compareToIgnoreCase(
                         "gif") == 0)) {
-                try{
-			    Gif89Encoder gifenc = new Gif89Encoder(surrogateImage.getAsBufferedImage());
-			    gifenc.setTransparentIndex(-1);
-			    gifenc.getFrameAt(0).setInterlaced(false);
-			    gifenc.encode(output);
-                }
-				catch(Exception e)
-				{
-                 surrogateImage = componentColorModel2GIF(surrogateImage);
-				 ImageIO.write(surrogateImage,
-			                "gif", output);
-				}
+//                
+//				try{
+//					GIFOutputStream outStream= new GIFOutputStream(output);
+//					outStream.write(surrogateImage.createSnapshot().getAsBufferedImage(),GIFOutputStream.DITHERED_216_COLORS);
+//					
+//				}
+//				catch(Exception e1){
+					try{
+					    Gif89Encoder gifenc = new Gif89Encoder(surrogateImage.getAsBufferedImage());
+					    gifenc.setTransparentIndex(-1);
+					    gifenc.getFrameAt(0).setInterlaced(false);
+					    gifenc.encode(output);
+		                }
+						catch(Exception e)
+						{
+		                 surrogateImage = componentColorModel2GIF(surrogateImage);
+						 ImageIO.write(surrogateImage,
+					                "gif", output);
+						}
+//				}
+					
 				 
             }
             else
