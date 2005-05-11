@@ -34,7 +34,6 @@ import org.geotools.units.Unit;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -166,7 +165,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * @param locale The locale, or <code>null</code> for the default locale.
      * @return The localized string.
      */
-    public InternationalString getName() {
+    public org.opengis.metadata.Identifier getName() {
         return name;
     }
 
