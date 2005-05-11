@@ -82,7 +82,7 @@
 		<maven:reactor basedir="${basedir}/module" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building Module" postProcessing="true" ignoreFailures="true"/>
 		<maven:reactor basedir="${basedir}/plugin" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building Plugin" postProcessing="true" ignoreFailures="true"/>
 		<maven:reactor basedir="${basedir}/ext" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building" postProcessing="true" ignoreFailures="true"/>
-		
+		<maven:reactor basedir="${basedir}/demo" includes="*/project.xml" goals="build:log,clean,jar:install,mergeTestReports" banner="Building" postProcessing="true" ignoreFailures="true"/>
 		<loadfile property="build.report" srcFile="${basedir}/buildReport.txt" failonerror="false"/>
 		<echo>
   BUILD REPORT (from buildReport.txt):
