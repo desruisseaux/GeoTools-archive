@@ -168,7 +168,7 @@ public final class ColorUtilities {
             if (alpha != 0xFF000000) {
                 if (alpha==0x00000000 && transparent<0) {
                     transparent = i;
-                    continue;
+                    
                 }
                 hasAlpha = true;
                 break;
