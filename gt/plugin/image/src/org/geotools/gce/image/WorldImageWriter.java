@@ -496,7 +496,6 @@ public class WorldImageWriter implements GridCoverageWriter {
             			surrogateImage=JAI.create("bandmerge",pb);
             		
             	}
-ndmerge");
             }
             
 
