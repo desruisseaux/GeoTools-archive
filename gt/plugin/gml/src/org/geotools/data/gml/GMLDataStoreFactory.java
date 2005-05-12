@@ -1,6 +1,8 @@
 package org.geotools.data.gml;
 
 import java.io.IOException;
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -16,7 +18,10 @@ import org.geotools.data.FileDataStoreFactorySpi;
  * This creates GML DataStores based for the directory provided. By 
  * convention the name of the file x.gml represents the data type x.
  * </p>
+ * 
  * @author dzwiers
+ * @author adanselm
+ * 
  */
 public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
 
@@ -24,10 +29,12 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
      */
     public DataStore createDataStore(Map params) throws IOException {
-        URL url = (URL) URLP.lookUp( params ); // try early error        
-        if( testURL(url)){  
+        URL url = (URL) URLP.lookUp( params ); // try early error
+        boolean retvalue = testURL(url);
+        if( retvalue){  
             try{
-                return new GMLDataStore( new URI(url.toString()) );
+                File tempfile = new File(url.getPath());
+                return new GMLDataStore( new URI(tempfile.getParent()) );
             }catch(URISyntaxException e){
                 throw new IOException(e.toString());
             }
@@ -63,7 +70,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
 //    public static final Param DIRECTORY = new Param("directory", File.class,
 //            "Directory containing gml files", true);
 
-    public static final Param URLP = new Param("url", URL.class,
+    private static final Param URLP = new Param("url", URL.class,
         "url to a gml file");
     /**
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
@@ -76,9 +83,19 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
      * @see org.geotools.data.DataStoreFactorySpi#canProcess(java.util.Map)
      */
     public boolean canProcess(Map params) {
-        return (params != null && params.containsKey("url")
-        && params.get("url") instanceof URL 
-        && canProcess((URL)params.get("url")));
+        if(params != null && params.containsKey("url")){
+            try {
+    			URL tempurl = new URL((String)params.get("url"));
+    			if(canProcess(tempurl))
+    			    return true;
+    			
+			} catch (MalformedURLException mue) {
+			    return false;
+			}
+        }
+        return false;
+        
+        //&& params.get("url") instanceof URL 
     }
 
     /**
@@ -107,7 +124,12 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
         }
     }
     public boolean testURL( URL f ) throws IOException {
-        if("file".equals(f.getProtocol())){        
+        /*if((f.getFile().toUpperCase().endsWith(".XML"))||
+           (f.getFile().toUpperCase().endsWith(".GML"))){
+            return true;
+        }*/
+        
+        if( "file".equals(f.getProtocol()) ){        
             if(f.getFile().toUpperCase().endsWith(".XML")){
                 return true;
             }
@@ -116,7 +138,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
             }
             throw new IOException("*.xml or *.gml file required");
         }
-        if("http".equals(f.getProtocol())){
+        if( "http".equals(f.getProtocol()) ){
             URLConnection conn = f.openConnection();
             if( "text/xml".equals( conn.getContentType() )){
                 return true;
@@ -136,7 +158,7 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
     public DataStore createDataStore(URL url) throws IOException {        
         if(canProcess(url))
             try{
-            return new GMLDataStore(new URI(url.toString()));
+            return new GMLDataStore(new URI(url.getPath()));
 
             }catch(URISyntaxException e){
                 throw new IOException(e.toString());
@@ -160,4 +182,5 @@ public class GMLDataStoreFactory implements FileDataStoreFactorySpi {
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
     }
+
 }
