@@ -63,17 +63,17 @@ public class Timing {
 
 	private static boolean ALL_DATA = true;
 
-	private static boolean DISPLAY = true;
+	private static boolean DISPLAY = false;
 	
 	private static boolean ANTI_ALIASING=true;
 
 	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = false;
+	private static boolean RUN_LITE = true;
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = false;
+	private static boolean ACCURATE = true;
 
 	private static boolean CACHING = false;
 
@@ -82,6 +82,7 @@ public class Timing {
 	private static boolean FILTER = false;
 
 	private static boolean CPU_PROFILE = false;
+	private static int x=300,y=300;
 
 	private String testName;
 	{
@@ -123,7 +124,7 @@ public class Timing {
 	}
 		static Style createTestStyle(String typeName) throws Exception {
 		if( typeName==null )
-			typeName="bc_roads";
+			typeName="tcn-roads";
 		StyleFactory sFac = StyleFactory.createStyleFactory();
 		// The following is complex, and should be built from
 
@@ -140,7 +141,7 @@ public class Timing {
 			ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 			ShapefileDataStore store = (ShapefileDataStore) fac
 					.createDataStore(new URL(
-							"file:///home/jones/aData/bc_roads.shp"));
+							"file:///home/jones/allShapefiles/tcn-roads.shp"));
 			AttributeExpression exp = filterFactory.createAttributeExpression(
 					store.getSchema(), "STREET");
 			CompareFilter filter = filterFactory
@@ -178,7 +179,7 @@ public class Timing {
 		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 		ShapefileDataStore store = (ShapefileDataStore) fac
 				.createDataStore(new URL(
-						"file:///home/jones/aData/bc_roads.shp"));
+						"file:///home/jones/allShapefiles/tcn-roads.shp"));
 		DefaultMapContext context = new DefaultMapContext();
 		context.addLayer(store.getFeatureSource(), createTestStyle());
 		if (NO_REPROJECTION)
@@ -187,7 +188,7 @@ public class Timing {
 		ShapeRenderer renderer = new ShapeRenderer(context);
 		if( ANTI_ALIASING )
 			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		int w = 1000, h = 1000;
+		int w = x, h = y;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
@@ -245,7 +246,7 @@ public class Timing {
 		ShapeRenderer renderer = new ShapeRenderer(context);
 		if( ANTI_ALIASING )
 			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		int w = 1000, h = 1000;
+		int w = x, h = y;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
@@ -279,16 +280,16 @@ public class Timing {
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		}
 		if (CPU_PROFILE) {
-			controller.captureCPUSnapshot("shape_" + testName, false);
+			controller.captureCPUSnapshot("tiny_" + testName, false);
 		}
 		long end = System.currentTimeMillis();
 		if(!CPU_PROFILE)
 			if (ACCURATE)
-				out.append("shape " + testName + "=" + (end - start) / 3 + "\n");
+				out.append("tiny " + testName + "=" + (end - start) / 3 + "\n");
 			else
-				out.append("shape " + testName + "=" + (end - start) + "\n");
+				out.append("tiny " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
-			display("shape", image, w, h);
+			display("tiny", image, w, h);
 
 	}
 
@@ -296,7 +297,7 @@ public class Timing {
 		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 		ShapefileDataStore store = (ShapefileDataStore) fac
 				.createDataStore(new URL(
-						"file:///home/jones/aData/bc_roads.shp"));
+						"file:///home/jones/allShapefiles/tcn-roads.shp"));
 		DefaultMapContext context = new DefaultMapContext();
 		context.addLayer(store.getFeatureSource(), createTestStyle());
 
@@ -312,7 +313,7 @@ public class Timing {
 		if (CACHING)
 			renderer.setMemoryPreloadingEnabled(true);
 
-		int w = 1000, h = 1000;
+		int w = x, h = y;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();

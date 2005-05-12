@@ -105,7 +105,7 @@ public class MultiLineHandlerTest extends TestCase {
 		assertEquals( 4, shape.coords[0].length );
 
 		shape=(Geometry) reader.nextRecord().shape();
-		assertEquals( 2, shape.coords[0].length);
+		assertEquals( 4, shape.coords[0].length);
 //	
 //		assertEquals( shape.coords[0][0], 0, 0.00001 );
 //		assertEquals( shape.coords[0][1], 0, 0.00001 );

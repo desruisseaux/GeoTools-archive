@@ -56,14 +56,6 @@ public class MultiLineShape extends AbstractShape implements Shape {
 			public void next() {
 				if (isDone())
 					return;
-				//If the current line is only a single point then simulate a second point at the same
-				//location
-				
-				if( currentIndex + 1 == geom.coords[currentPart].length && 
-						geom.coords[currentPart].length==2 ){
-					currentIndex++;
-					return;
-				}
 				if (currentIndex + 1 >= geom.coords[currentPart].length) {
 					currentIndex = 0;
 					currentPart++;
@@ -80,15 +72,7 @@ public class MultiLineShape extends AbstractShape implements Shape {
 					if (at != null)
 						at.transform(coords, 0, coords, 0, 1);
 					return SEG_MOVETO;
-				}
-				if( currentIndex == geom.coords[currentPart].length ){
-					coords[0] = (float) geom.coords[currentPart][currentIndex-2]+1;
-					currentIndex++;
-					coords[1] = (float) geom.coords[currentPart][currentIndex-2]+1;
-					if (at != null)
-						at.transform(coords, 0, coords, 0, 1);
-					return SEG_LINETO;
-				} else {
+				}else {
 					coords[0] = (float) geom.coords[currentPart][currentIndex];
 					currentIndex++;
 					coords[1] = (float) geom.coords[currentPart][currentIndex];
@@ -106,15 +90,7 @@ public class MultiLineShape extends AbstractShape implements Shape {
 					if (at != null)
 						at.transform(coords, 0, coords, 0, 1);
 					return SEG_MOVETO;
-				}
-				if( currentIndex == geom.coords[currentPart].length ){
-					coords[0] = (float) geom.coords[currentPart][currentIndex-2]+1;
-					currentIndex++;
-					coords[1] = (float) geom.coords[currentPart][currentIndex-2]+1;
-					if (at != null)
-						at.transform(coords, 0, coords, 0, 1);
-					return SEG_LINETO;
-				} else {
+				}else {
 					coords[0] = (float) geom.coords[currentPart][currentIndex];
 					currentIndex++;
 					coords[1] = (float) geom.coords[currentPart][currentIndex];
