@@ -362,7 +362,7 @@ class GTopo30DataSource {
         Category values = new Category("values", this.getColors(),
                 new NumberRange(1, 255), new NumberRange(min, max));
         Category nan = new Category("nodata",
-                new Color[] { new Color(0, 0, 0, 1) }, new NumberRange(0, 0),
+                new Color[] { new Color(0, 0, 0, 0) }, new NumberRange(0, 0),
                 new NumberRange(-9999, -9999));
         ; //new Category("nodata", new Color(0, 0, 0), 0);
 
