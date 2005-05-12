@@ -17,8 +17,12 @@
 package org.geotools.gce.image;
 
 import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
+import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedOutputStream;
@@ -277,41 +281,93 @@ public class WorldImageWriter implements GridCoverageWriter {
             //in such a case we have to get the visual representation for this data
             //by calling geophysiscs(false)
             int i = 0;
-
             for (; i < sourceCoverage.getNumSampleDimensions(); i++) {
                 if (!sourceCoverage.getSampleDimension(0).getSampleToGeophysics()
                                        .isIdentity()) {
+                	/**
+                	 * Getting the geophysics view of this grid coverage.
+                	 * the geophysiscs view usually comes with an index color model for 3 bands,
+                	 * since sometimes I get some problems with JAI encoders I select onyl 
+                	 * the first band, which by the way is the only band we use.
+                	 * 
+                	 */                	
                     surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
                                                      .getRenderedImage());
+
+                    //removing unused bands from this non geophysics view
+                    //they might cause prblems with jai encoders
+                    surrogateImage = JAI.create("bandSelect", surrogateImage,
+            	            new int[] { 0 });                    
                     break;
                 }
 
                
             }
-
+            /**
+             * GEOPHYSICS(TRUE)?
+             * Are we dealing with a real image and not with the non geophysics representation of an image that 
+             * we built before.
+             */
             if (i == sourceCoverage.getNumSampleDimensions()) {
                 /**
                  * we do not need to get the geophysisc view
                  */
-
-                //I do not need to go to 
                 surrogateImage = (PlanarImage) (sourceCoverage)
                     .getRenderedImage();
             }
-
+            
+            
             /**
-             * writing a gif requires a lot of code to be writtens
+             * 
+             * 
+             * ADJUSTMENTS FOR VARIOUS FILE FORMATS
+             * 
+             * 
+             * 
+             * 
              */
+
+            
+            //------------------------GIF-----------------------------------
             if ((((String) (this.format.getWriteParameters().parameter("format")
                                            .getValue())).compareToIgnoreCase(
                         "gif") == 0)) {
+            	/**
+            	 * component color model is not well digested by the gif encoder
+            	 * we need to go to indecolor model somehow.
+            	 * 
+            	 * This code for the moment remove transparency, but I am confident I will 
+            	 * find a way to add that.
+            	 * 
+            	 */
                 if (surrogateImage.getColorModel() instanceof ComponentColorModel) {
                     surrogateImage = componentColorModel2GIF(surrogateImage);
                 }
-            }
+
+            }else
+            	//-----------------TIFF--------------------------------------
+            	/**
+            	 * TIFF file format.
+            	 * 
+            	 * We need just a couple of correction for this format. It seems that the encoder does not
+            	 * work fine with IndexColorModel therefore in such a case we need the reformat the inpit image to a ComponentColorModel.
+            	 */
+            	if(((String) (this.format.getWriteParameters().parameter("format")
+                        .getValue())).compareToIgnoreCase(
+                        "tiff") == 0
+                        ||
+                        ((String) (this.format.getWriteParameters().parameter("format")
+                                .getValue())).compareToIgnoreCase(
+                                "tif") == 0) {
+            		//Are we dealing with IndexColorModel? If so we need to go back to ComponentColorModel
+            		if(surrogateImage.getColorModel() instanceof IndexColorModel){
+            	      surrogateImage = reformatFromIndexColorModel2ComponentColorModel(surrogateImage);
+            		}
+            	}
+            
 
             /**
-             * write using jai for the others formats
+             * write using JAI encoders
              */
             ImageIO.write(surrogateImage,
                 (String) (this.format.getWriteParameters().parameter("format")
@@ -320,6 +376,50 @@ public class WorldImageWriter implements GridCoverageWriter {
             throw new IOException(e.getMessage());
         }
     }
+
+	/**Reformat the index color model to a component color model preserving transparency.
+	 * 
+	 * @param surrogateImage
+	 * @return
+	 */
+	private PlanarImage reformatFromIndexColorModel2ComponentColorModel(PlanarImage surrogateImage) 
+	throws IllegalArgumentException{
+		// Format the image to be expanded from IndexColorModel to
+		// ComponentColorModel
+		ParameterBlock pbFormat = new ParameterBlock();
+		pbFormat.addSource(surrogateImage);
+		pbFormat.add(surrogateImage.getSampleModel().getTransferType());
+		ImageLayout layout = new ImageLayout();
+		ColorModel cm1 =null;
+		int numBits=0;
+		switch(surrogateImage.getSampleModel().getTransferType()){
+		case DataBuffer.TYPE_BYTE:
+			numBits=8;
+			break;
+		case DataBuffer.TYPE_USHORT:
+			numBits=16;
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported data type for an index color model!");
+		}
+
+		//do we need alpha?
+		if(surrogateImage.getColorModel().hasAlpha())
+			cm1=new ComponentColorModel(ColorSpace.getInstance(
+		            ColorSpace.CS_sRGB), new int[] { numBits, numBits, numBits, numBits }, true, false,
+		        Transparency.TRANSLUCENT, surrogateImage.getSampleModel().getTransferType());
+		
+		else
+			cm1=new ComponentColorModel(ColorSpace.getInstance(
+		            ColorSpace.CS_sRGB), new int[] { numBits, numBits, numBits}, false, false,
+		        Transparency.OPAQUE, surrogateImage.getSampleModel().getTransferType());
+		layout.setColorModel(cm1);
+		layout.setSampleModel(cm1.createCompatibleSampleModel(surrogateImage.getWidth(),surrogateImage.getHeight()));
+		RenderingHints hint = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+		RenderedOp dst = JAI.create("format", pbFormat, hint);
+		surrogateImage=dst.createSnapshot();
+		return surrogateImage;
+	}
 
     /**
      * Convert the image to a GIF-compliant image.  This method has been
@@ -344,7 +444,7 @@ public class WorldImageWriter implements GridCoverageWriter {
             RenderedImage alphaChannel = null;
 
             /**
-             * AMPLITUDE RESCALINGs
+             * AMPLITUDE RESCALING
              */
 
             //I might also need to reformat the image in order to get it to 8 bits
@@ -360,10 +460,10 @@ public class WorldImageWriter implements GridCoverageWriter {
             if (surrogateImage.getColorModel().hasAlpha()) {
                 int numBands = surrogateImage.getSampleModel().getNumBands();
 
-                //alpha channel
+                //getting alpha channel
                 alphaChannel = JAI.create("bandSelect", surrogateImage,
                         new int[] { numBands - 1 });
-
+                //getting needed bands
                 surrogateImage = getBandsFromImage(surrogateImage, numBands);
             }
             
@@ -372,11 +472,12 @@ public class WorldImageWriter implements GridCoverageWriter {
              * 
              * If we do not have 3 bands we have no way to go to
              * index color model in a simple way using jai. Therefore we add 
-             * thebands we need in order to get there. This trick works fine with gray
-             * scale images.
+             * the bands we need in order to get there. This trick works fine with gray
+             * scale images. ATTENTION, if the initial image had no alpha channel we proceed without 
+             * doing anything since it seems that GIF encoder in such a case works fine.
              * 
              */
-            
+
             if(surrogateImage.getSampleModel().getNumBands() == 1
             		&&alphaChannel!=null){
             	int numBands = surrogateImage.getSampleModel().getNumBands();
@@ -393,12 +494,12 @@ public class WorldImageWriter implements GridCoverageWriter {
             			pb.addSource(surrogateImage);
             			pb.addSource(firstBand);
             			surrogateImage=JAI.create("bandmerge",pb);
-            			System.out.println(i);
+            		
             	}
-
+ndmerge");
             }
             
-            
+
             /**
              * ERROR DIFFUSION 
              * 
@@ -447,7 +548,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 	 */
 	private PlanarImage addTransparency2IndexXolorModel(PlanarImage surrogateImage, RenderedImage alphaChannel, ParameterBlock pb) {
 		// TODO Auto-generated method stub
-		return null;
+		return surrogateImage;
 	}
 
 	/**
@@ -471,7 +572,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 		return surrogateImage;
 	}
 
-	/**
+	/**Remove the alpha band and keeps the others.
 	 * @param surrogateImage
 	 * @param numBands
 	 * @return
