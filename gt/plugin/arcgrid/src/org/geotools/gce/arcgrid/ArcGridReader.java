@@ -410,7 +410,7 @@ public class ArcGridReader implements GridCoverageReader {
                     new NumberRange(1, 255),
                     new NumberRange((float) arcGridRaster.getMinValue(),
                         (float) arcGridRaster.getMaxValue()));
-            nan = new Category("nodata", new Color(0, 0, 0, 1), 0);
+            nan = new Category("nodata", new Color(0, 0, 0, 0), 0);
 
             GridSampleDimension band = new GridSampleDimension(new Category[] {
                         nan, values
