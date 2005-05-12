@@ -24,13 +24,13 @@ package org.geotools.gce.geotiff;
 
 import junit.framework.TestCase;
 
-import org.esa.beam.util.geotiff.GeoTIFFMetadata;
+//import org.esa.beam.util.geotiff.GeoTIFFMetadata;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.gce.arcgrid.ArcGridReader;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
-import org.geotools.referencing.wkt.ParseWKT2GeoTiffMetadata;
+//import org.geotools.referencing.wkt.ParseWKT2GeoTiffMetadata;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import java.awt.BorderLayout;
@@ -172,17 +172,15 @@ public class GeoTiffReaderWriterTest { // extends TestCase {
             + "UNIT[\"metre\",1.0], "
             + "AXIS[\"x\",EAST], "
             + "AXIS[\"y\",NORTH]]";
-    	GeoTIFFMetadata metadata=new GeoTIFFMetadata();
-    	ParseWKT2GeoTiffMetadata parser=new ParseWKT2GeoTiffMetadata(
-    			wkt,
-    			metadata);
-    	try {
-			parser.parseCoordinateReferenceSystem();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	System.out.println(metadata.getAsXML());
+    	//GeoTIFFMetadata metadata=new GeoTIFFMetadata();
+    	//ParseWKT2GeoTiffMetadata parser=new ParseWKT2GeoTiffMetadata(wkt,metadata);
+//    	try {
+//			parser.parseCoordinateReferenceSystem();
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    	
+//    	System.out.println(metadata.getAsXML());
     }
 }
