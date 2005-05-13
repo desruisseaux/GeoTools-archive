@@ -194,7 +194,7 @@ public class WorldImageWriter implements GridCoverageWriter {
         if (destination instanceof File) {
             //WRITING TO A FILE
             RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage)
-                .getRenderedImage()).getAsBufferedImage();
+                .getRenderedImage());
             Envelope env = coverage.getEnvelope();
             double xMin = env.getMinimum(0);
             double yMin = env.getMinimum(1);
@@ -207,7 +207,8 @@ public class WorldImageWriter implements GridCoverageWriter {
             double yPixelSize = (yMax - yMin) / image.getHeight();
             double xLoc = xMin;
             double yLoc = yMax;
-
+            image=null;
+            
             //files destinations
             File imageFile = (File) destination;
             String path = imageFile.getAbsolutePath();
@@ -285,7 +286,10 @@ public class WorldImageWriter implements GridCoverageWriter {
             SampleDimensionType sampleDimensionType=sourceCoverage.getSampleDimension(0).getSampleDimensionType();
            if(sampleDimensionType== SampleDimensionType.UNSIGNED_16BITS||
            		sampleDimensionType== SampleDimensionType.UNSIGNED_8BITS||
-           		sampleDimensionType== SampleDimensionType.SIGNED_8BITS){
+           		sampleDimensionType== SampleDimensionType.SIGNED_8BITS||
+           		sampleDimensionType== SampleDimensionType.UNSIGNED_1BIT||
+           		sampleDimensionType== SampleDimensionType.UNSIGNED_2BITS||
+           		sampleDimensionType== SampleDimensionType.UNSIGNED_4BITS){
                 /**
                  * GEOPHYSICS(TRUE)?
                  * Are we dealing with a real image and not with the non geophysics representation of an image that 
@@ -315,9 +319,6 @@ public class WorldImageWriter implements GridCoverageWriter {
         	            new int[] { 0 });                    
                  	
             }
-            
-        
-            
             
             /**
              * 
@@ -516,7 +517,7 @@ public class WorldImageWriter implements GridCoverageWriter {
              * model 
              */
             if(alphaChannel!=null){
-            	surrogateImage = addTransparency2IndexXolorModel(surrogateImage,alphaChannel, pb);
+            	surrogateImage = addTransparency2IndexColorModel(surrogateImage,alphaChannel, pb);
             }
         }
 
@@ -545,8 +546,8 @@ public class WorldImageWriter implements GridCoverageWriter {
 	 * @param pb
 	 * @return
 	 */
-	private PlanarImage addTransparency2IndexXolorModel(PlanarImage surrogateImage, RenderedImage alphaChannel, ParameterBlock pb) {
-		// TODO Auto-generated method stub
+	private PlanarImage addTransparency2IndexColorModel(PlanarImage surrogateImage, RenderedImage alphaChannel, ParameterBlock pb) {
+
 		return surrogateImage;
 	}
 

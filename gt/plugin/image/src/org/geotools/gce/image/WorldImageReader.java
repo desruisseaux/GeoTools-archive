@@ -26,6 +26,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import javax.imageio.ImageIO;
 
@@ -214,14 +215,17 @@ public class WorldImageReader implements GridCoverageReader {
         float yPixelSize = 0;
         float xLoc = 0;
         float yLoc = 0;
-        int world_type = -1;
-        BufferedImage image = null;
+        
+        
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) this.format.getReadParameters()
                                                                                .parameter("crs")
                                                                                .getValue();
         Envelope envelope = null;
         String coverageName = "";
-
+        
+        int world_type = -1;
+        BufferedImage image = null;
+        BufferedReader in = null;
         //are we reading from a file?
         //in such a case we will look for the associated world file
         if (source instanceof File) {
@@ -236,8 +240,7 @@ public class WorldImageReader implements GridCoverageReader {
             String fileExtension = sourceAsString.substring(index + 1);
 
             //We can now construct the baseURL from this string.
-            BufferedReader in = null;
-
+           
             try {
                 URL worldURL = new URL(base + ".wld");
 
@@ -397,18 +400,30 @@ public class WorldImageReader implements GridCoverageReader {
         //no more grid left
         gridLeft = false;
 
-        //building up a coverage
-        GridCoverage coverage = null;
+        
+        return createCoverage(image, crs, envelope, coverageName);
+    }
 
-        try {
+	/**Creating a coverage from an Image.
+	 * @param image
+	 * @param crs
+	 * @param envelope
+	 * @param coverageName
+	 * @return
+	 * @throws MismatchedDimensionException
+	 * @throws IOException
+	 */
+	private GridCoverage createCoverage(BufferedImage image, CoordinateReferenceSystem crs, Envelope envelope, String coverageName) throws MismatchedDimensionException, IOException {
+		//building up a coverage
+        GridCoverage coverage = null;
+		try {
             coverage = new GridCoverage2D(coverageName, image, crs, envelope);
         }
         catch (NoSuchElementException e1) {
             throw new IOException(e1.getMessage());
         }
-
-        return coverage;
-    }
+		return coverage;
+	}
 
     /* (non-Javadoc)
      * @see org.geotools.data.coverage.grid.GridCoverageReader#skip()
