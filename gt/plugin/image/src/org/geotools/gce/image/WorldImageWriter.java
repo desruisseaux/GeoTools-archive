@@ -44,6 +44,7 @@ import javax.media.jai.RenderedOp;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.parameter.Parameter;
 import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
@@ -280,41 +281,42 @@ public class WorldImageWriter implements GridCoverageWriter {
             //let's check if we have a sampledimension which carried geophysics information
             //in such a case we have to get the visual representation for this data
             //by calling geophysiscs(false)
-            int i = 0;
-            for (; i < sourceCoverage.getNumSampleDimensions(); i++) {
-                if (!sourceCoverage.getSampleDimension(0).getSampleToGeophysics()
-                                       .isIdentity()) {
-                	/**
-                	 * Getting the geophysics view of this grid coverage.
-                	 * the geophysiscs view usually comes with an index color model for 3 bands,
-                	 * since sometimes I get some problems with JAI encoders I select onyl 
-                	 * the first band, which by the way is the only band we use.
-                	 * 
-                	 */                	
-                    surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
-                                                     .getRenderedImage());
-
-                    //removing unused bands from this non geophysics view
-                    //they might cause prblems with jai encoders
-                    surrogateImage = JAI.create("bandSelect", surrogateImage,
-            	            new int[] { 0 });                    
-                    break;
-                }
-
-               
-            }
-            /**
-             * GEOPHYSICS(TRUE)?
-             * Are we dealing with a real image and not with the non geophysics representation of an image that 
-             * we built before.
-             */
-            if (i == sourceCoverage.getNumSampleDimensions()) {
+            
+            SampleDimensionType sampleDimensionType=sourceCoverage.getSampleDimension(0).getSampleDimensionType();
+           if(sampleDimensionType== SampleDimensionType.UNSIGNED_16BITS||
+           		sampleDimensionType== SampleDimensionType.UNSIGNED_8BITS||
+           		sampleDimensionType== SampleDimensionType.SIGNED_8BITS){
                 /**
-                 * we do not need to get the geophysisc view
-                 */
-                surrogateImage = (PlanarImage) (sourceCoverage)
-                    .getRenderedImage();
+                 * GEOPHYSICS(TRUE)?
+                 * Are we dealing with a real image and not with the non geophysics representation of an image that 
+                 * we built before.
+                 */         
+            	 surrogateImage = (PlanarImage) (sourceCoverage)
+                 .getRenderedImage();
+           }else
+           	if(sampleDimensionType== SampleDimensionType.SIGNED_16BITS||
+           			sampleDimensionType== SampleDimensionType.SIGNED_32BITS||
+           			sampleDimensionType== SampleDimensionType.SIGNED_16BITS||
+           			sampleDimensionType==SampleDimensionType.REAL_32BITS||
+           			sampleDimensionType== SampleDimensionType.REAL_64BITS){
+            	/**
+            	 * Getting the geophysics view of this grid coverage.
+            	 * the geophysiscs view usually comes with an index color model for 3 bands,
+            	 * since sometimes I get some problems with JAI encoders I select onyl 
+            	 * the first band, which by the way is the only band we use.
+            	 * 
+            	 */                	
+                surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
+                                                 .getRenderedImage());
+
+                //removing unused bands from this non geophysics view
+                //they might cause prblems with jai encoders
+                surrogateImage = JAI.create("bandSelect", surrogateImage,
+        	            new int[] { 0 });                    
+                 	
             }
+            
+        
             
             
             /**
@@ -326,8 +328,6 @@ public class WorldImageWriter implements GridCoverageWriter {
              * 
              * 
              */
-
-            
             //------------------------GIF-----------------------------------
             if ((((String) (this.format.getWriteParameters().parameter("format")
                                            .getValue())).compareToIgnoreCase(
