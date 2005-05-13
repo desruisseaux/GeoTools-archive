@@ -16,31 +16,6 @@
  */
 package org.geotools.gce.image;
 
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.IndexColorModel;
-import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
-import javax.media.jai.ColorCube;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.parameter.Parameter;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -50,6 +25,33 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.spatialschema.geometry.Envelope;
+import java.awt.Color;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
+import java.awt.image.WritableRaster;
+import java.awt.image.renderable.ParameterBlock;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.URL;
+import javax.imageio.ImageIO;
+import javax.media.jai.ColorCube;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.KernelJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.TiledImage;
 
 
 /**
@@ -207,8 +209,8 @@ public class WorldImageWriter implements GridCoverageWriter {
             double yPixelSize = (yMax - yMin) / image.getHeight();
             double xLoc = xMin;
             double yLoc = yMax;
-            image=null;
-            
+            image = null;
+
             //files destinations
             File imageFile = (File) destination;
             String path = imageFile.getAbsolutePath();
@@ -282,90 +284,89 @@ public class WorldImageWriter implements GridCoverageWriter {
             //let's check if we have a sampledimension which carried geophysics information
             //in such a case we have to get the visual representation for this data
             //by calling geophysiscs(false)
-            
-            SampleDimensionType sampleDimensionType=sourceCoverage.getSampleDimension(0).getSampleDimensionType();
-           if(sampleDimensionType== SampleDimensionType.UNSIGNED_16BITS||
-           		sampleDimensionType== SampleDimensionType.UNSIGNED_8BITS||
-           		sampleDimensionType== SampleDimensionType.SIGNED_8BITS||
-           		sampleDimensionType== SampleDimensionType.UNSIGNED_1BIT||
-           		sampleDimensionType== SampleDimensionType.UNSIGNED_2BITS||
-           		sampleDimensionType== SampleDimensionType.UNSIGNED_4BITS){
+            SampleDimensionType sampleDimensionType = sourceCoverage.getSampleDimension(0)
+                                                                    .getSampleDimensionType();
+
+            if ((sampleDimensionType == SampleDimensionType.UNSIGNED_16BITS)
+                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_8BITS)
+                    || (sampleDimensionType == SampleDimensionType.SIGNED_8BITS)
+                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_1BIT)
+                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_2BITS)
+                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_4BITS)) {
                 /**
-                 * GEOPHYSICS(TRUE)?
-                 * Are we dealing with a real image and not with the non geophysics representation of an image that 
-                 * we built before.
-                 */         
-            	 surrogateImage = (PlanarImage) (sourceCoverage)
-                 .getRenderedImage();
-           }else
-           	if(sampleDimensionType== SampleDimensionType.SIGNED_16BITS||
-           			sampleDimensionType== SampleDimensionType.SIGNED_32BITS||
-           			sampleDimensionType== SampleDimensionType.SIGNED_16BITS||
-           			sampleDimensionType==SampleDimensionType.REAL_32BITS||
-           			sampleDimensionType== SampleDimensionType.REAL_64BITS){
-            	/**
-            	 * Getting the geophysics view of this grid coverage.
-            	 * the geophysiscs view usually comes with an index color model for 3 bands,
-            	 * since sometimes I get some problems with JAI encoders I select onyl 
-            	 * the first band, which by the way is the only band we use.
-            	 * 
-            	 */                	
+                 * GEOPHYSICS(TRUE)? Are we dealing with a real image and not
+                 * with the non geophysics representation of an image that  we
+                 * built before.
+                 */
+                surrogateImage = (PlanarImage) (sourceCoverage)
+                    .getRenderedImage();
+            } else if ((sampleDimensionType == SampleDimensionType.SIGNED_16BITS)
+                    || (sampleDimensionType == SampleDimensionType.SIGNED_32BITS)
+                    || (sampleDimensionType == SampleDimensionType.SIGNED_16BITS)
+                    || (sampleDimensionType == SampleDimensionType.REAL_32BITS)
+                    || (sampleDimensionType == SampleDimensionType.REAL_64BITS)) {
+                /**
+                 * Getting the geophysics view of this grid coverage. the
+                 * geophysiscs view usually comes with an index color model
+                 * for 3 bands, since sometimes I get some problems with JAI
+                 * encoders I select onyl  the first band, which by the way is
+                 * the only band we use.
+                 */
                 surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
                                                  .getRenderedImage());
 
                 //removing unused bands from this non geophysics view
                 //they might cause prblems with jai encoders
                 surrogateImage = JAI.create("bandSelect", surrogateImage,
-        	            new int[] { 0 });                    
-                 	
+                        new int[] { 0 });
             }
-            
+
             /**
-             * 
-             * 
              * ADJUSTMENTS FOR VARIOUS FILE FORMATS
-             * 
-             * 
-             * 
-             * 
              */
+
             //------------------------GIF-----------------------------------
             if ((((String) (this.format.getWriteParameters().parameter("format")
                                            .getValue())).compareToIgnoreCase(
                         "gif") == 0)) {
-            	/**
-            	 * component color model is not well digested by the gif encoder
-            	 * we need to go to indecolor model somehow.
-            	 * 
-            	 * This code for the moment remove transparency, but I am confident I will 
-            	 * find a way to add that.
-            	 * 
-            	 */
+                /**
+                 * component color model is not well digested by the gif
+                 * encoder we need to go to indecolor model somehow.  This
+                 * code for the moment remove transparency, but I am confident
+                 * I will  find a way to add that.
+                 */
                 if (surrogateImage.getColorModel() instanceof ComponentColorModel) {
                     surrogateImage = componentColorModel2GIF(surrogateImage);
+                } else
+                /**
+                 * IndexColorModel with full transparency support is not
+                 * suitable for gif images we need to go to bitmask loosing
+                 * some informations. we have only one full transparent color.
+                 */
+                if (surrogateImage.getColorModel() instanceof IndexColorModel
+                        && (surrogateImage.getColorModel().getTransparency() != Transparency.OPAQUE)) {
+                    surrogateImage = convertAlpha4GIF(surrogateImage);
                 }
+            } else
+            //-----------------TIFF--------------------------------------
 
-            }else
-            	//-----------------TIFF--------------------------------------
-            	/**
-            	 * TIFF file format.
-            	 * 
-            	 * We need just a couple of correction for this format. It seems that the encoder does not
-            	 * work fine with IndexColorModel therefore in such a case we need the reformat the inpit image to a ComponentColorModel.
-            	 */
-            	if(((String) (this.format.getWriteParameters().parameter("format")
-                        .getValue())).compareToIgnoreCase(
-                        "tiff") == 0
-                        ||
-                        ((String) (this.format.getWriteParameters().parameter("format")
-                                .getValue())).compareToIgnoreCase(
-                                "tif") == 0) {
-            		//Are we dealing with IndexColorModel? If so we need to go back to ComponentColorModel
-            		if(surrogateImage.getColorModel() instanceof IndexColorModel){
-            	      surrogateImage = reformatFromIndexColorModel2ComponentColorModel(surrogateImage);
-            		}
-            	}
-            
+            /**
+             * TIFF file format.  We need just a couple of correction for this
+             * format. It seems that the encoder does not work fine with
+             * IndexColorModel therefore in such a case we need the reformat
+             * the inpit image to a ComponentColorModel.
+             */
+            if ((((String) (this.format.getWriteParameters().parameter("format")
+                                           .getValue())).compareToIgnoreCase(
+                        "tiff") == 0)
+                    || (((String) (this.format.getWriteParameters()
+                                                  .parameter("format").getValue()))
+                    .compareToIgnoreCase("tif") == 0)) {
+                //Are we dealing with IndexColorModel? If so we need to go back to ComponentColorModel
+                if (surrogateImage.getColorModel() instanceof IndexColorModel) {
+                    surrogateImage = reformatFromIndexColorModel2ComponentColorModel(surrogateImage);
+                }
+            }
 
             /**
              * write using JAI encoders
@@ -378,49 +379,180 @@ public class WorldImageWriter implements GridCoverageWriter {
         }
     }
 
-	/**Reformat the index color model to a component color model preserving transparency.
-	 * 
-	 * @param surrogateImage
-	 * @return
-	 */
-	private PlanarImage reformatFromIndexColorModel2ComponentColorModel(PlanarImage surrogateImage) 
-	throws IllegalArgumentException{
-		// Format the image to be expanded from IndexColorModel to
-		// ComponentColorModel
-		ParameterBlock pbFormat = new ParameterBlock();
-		pbFormat.addSource(surrogateImage);
-		pbFormat.add(surrogateImage.getSampleModel().getTransferType());
-		ImageLayout layout = new ImageLayout();
-		ColorModel cm1 =null;
-		int numBits=0;
-		switch(surrogateImage.getSampleModel().getTransferType()){
-		case DataBuffer.TYPE_BYTE:
-			numBits=8;
-			break;
-		case DataBuffer.TYPE_USHORT:
-			numBits=16;
-			break;
-		default:
-			throw new IllegalArgumentException("Unsupported data type for an index color model!");
-		}
+    /**
+     * GIF does not support full alpha channel we need to reduce it in order to
+     * provide a simple transparency index to a unique fully transparent
+     * color.  We
+     *
+     * @param surrogateImage
+     *
+     * @return
+     */
+    private PlanarImage convertAlpha4GIF(PlanarImage surrogateImage) {
+        final IndexColorModel cm = (IndexColorModel) surrogateImage
+            .getColorModel();
 
-		//do we need alpha?
-		if(surrogateImage.getColorModel().hasAlpha())
-			cm1=new ComponentColorModel(ColorSpace.getInstance(
-		            ColorSpace.CS_sRGB), new int[] { numBits, numBits, numBits, numBits }, true, false,
-		        Transparency.TRANSLUCENT, surrogateImage.getSampleModel().getTransferType());
-		
-		else
-			cm1=new ComponentColorModel(ColorSpace.getInstance(
-		            ColorSpace.CS_sRGB), new int[] { numBits, numBits, numBits}, false, false,
-		        Transparency.OPAQUE, surrogateImage.getSampleModel().getTransferType());
-		layout.setColorModel(cm1);
-		layout.setSampleModel(cm1.createCompatibleSampleModel(surrogateImage.getWidth(),surrogateImage.getHeight()));
-		RenderingHints hint = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-		RenderedOp dst = JAI.create("format", pbFormat, hint);
-		surrogateImage=dst.createSnapshot();
-		return surrogateImage;
-	}
+        //get the r g b a components
+        int[] rgba = new int[256]; //WE MIGHT USE LESS THAN 256 COLORS
+
+        //get the data (actually a copy of them) and prepare to rewrite them
+        WritableRaster raster = surrogateImage.copyData();
+
+        /**
+         * Now we are going to use the first transparent color as it were the
+         * transparent color and we point all the tranpsarent pixel to this
+         * color in the color map.  
+         * 
+         * 
+         * NOTE Assuming we have just one band.
+         */
+        int transparencyIndex = -1;
+        int index = -1;
+        int colorIndex = 0;
+
+        for (int i = 0; i < raster.getHeight(); i++) {
+            for (int j = 0; j < raster.getWidth(); j++) {
+                //index in the color map is given by a value in the raster.
+                index = raster.getSample(j, i, 0);
+
+                //check for transparency
+                if (cm.getAlpha(index) == 0) {
+                    //FULLY TRANSPARENT PIXEL
+                    if (transparencyIndex == -1) {
+                        //setting transparent color to this one
+                        //the other tranpsarent bits will point to this one
+                        transparencyIndex = colorIndex;
+                        rgba[colorIndex] = new Color(cm.getRed(index),
+                                cm.getGreen(index), cm.getBlue(index), 0)
+                            .getRGB();
+//                      setting sample in the raster that corresponds to an index in the
+                        //color map
+                        raster.setSample(j, i, 0, colorIndex++);
+                    } else//we alredy set the transparent color we will reuse that one
+                     {
+                        //basically do nothing here
+                        //we do not need to add a new color because we are reusing the old on
+                        //we already set
+//                      setting sample in the raster that corresponds to an index in the
+                        //color map
+                        raster.setSample(j, i, 0, transparencyIndex);                        
+                    }
+
+                    
+                } else//NON FULLY TRANSPARENT PIXEL
+                 {
+                    rgba[colorIndex] = new Color(cm.getRed(index),
+                            cm.getGreen(index), 
+                            cm.getBlue(index),
+                            255).getRGB();
+                    //setting sample in the raster that corresponds to an index in the
+                    //color map                    
+                    raster.setSample(j, i, 0, colorIndex++);
+                }
+
+
+                
+            }
+        }
+
+        /**
+         * Now all the color are opaque except one and the color map has been
+         * rebuilt loosing all the tranpsarent colors except the first one.
+         * The raster has been rebuilt as well, in order to make it point to the
+         * right color in the color map.  We have to create the new image
+         * to be returned.
+         */
+        IndexColorModel cm1=new IndexColorModel(
+        		cm.getComponentSize(0),
+        		256,
+        		rgba,
+        		0,
+        		false,
+        		transparencyIndex==-1?Transparency.OPAQUE:Transparency.BITMASK,
+        		cm.getTransferType());
+        SampleModel sm=cm1.createCompatibleSampleModel(raster.getWidth(),raster.getHeight());
+        //new image
+        TiledImage image= new TiledImage(
+        		0,
+        		0,
+        		raster.getWidth(),
+        		raster.getHeight(),
+        		0,
+        		0,
+        		sm,
+        		cm1);
+        image.setData(raster);
+        
+        //disposing old image
+        surrogateImage.dispose();
+        
+        return image;
+    }
+
+    /**
+     * Reformat the index color model to a component color model preserving
+     * transparency.
+     *
+     * @param surrogateImage
+     *
+     * @return
+     *
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    private PlanarImage reformatFromIndexColorModel2ComponentColorModel(
+        PlanarImage surrogateImage) throws IllegalArgumentException {
+        // Format the image to be expanded from IndexColorModel to
+        // ComponentColorModel
+        ParameterBlock pbFormat = new ParameterBlock();
+        pbFormat.addSource(surrogateImage);
+        pbFormat.add(surrogateImage.getSampleModel().getTransferType());
+
+        ImageLayout layout = new ImageLayout();
+        ColorModel cm1 = null;
+        int numBits = 0;
+
+        switch (surrogateImage.getSampleModel().getTransferType()) {
+        case DataBuffer.TYPE_BYTE:
+            numBits = 8;
+
+            break;
+
+        case DataBuffer.TYPE_USHORT:
+            numBits = 16;
+
+            break;
+
+        default:
+            throw new IllegalArgumentException(
+                "Unsupported data type for an index color model!");
+        }
+
+        //do we need alpha?
+        if (surrogateImage.getColorModel().hasAlpha()) {
+            cm1 = new ComponentColorModel(ColorSpace.getInstance(
+                        ColorSpace.CS_sRGB),
+                    new int[] { numBits, numBits, numBits, numBits }, true,
+                    false, Transparency.TRANSLUCENT,
+                    surrogateImage.getSampleModel().getTransferType());
+        }
+        else {
+            cm1 = new ComponentColorModel(ColorSpace.getInstance(
+                        ColorSpace.CS_sRGB),
+                    new int[] { numBits, numBits, numBits }, false, false,
+                    Transparency.OPAQUE,
+                    surrogateImage.getSampleModel().getTransferType());
+        }
+
+        layout.setColorModel(cm1);
+        layout.setSampleModel(cm1.createCompatibleSampleModel(
+                surrogateImage.getWidth(), surrogateImage.getHeight()));
+
+        RenderingHints hint = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+        RenderedOp dst = JAI.create("format", pbFormat, hint);
+        surrogateImage = dst.createSnapshot();
+
+        return surrogateImage;
+    }
 
     /**
      * Convert the image to a GIF-compliant image.  This method has been
@@ -464,135 +596,136 @@ public class WorldImageWriter implements GridCoverageWriter {
                 //getting alpha channel
                 alphaChannel = JAI.create("bandSelect", surrogateImage,
                         new int[] { numBands - 1 });
+
                 //getting needed bands
                 surrogateImage = getBandsFromImage(surrogateImage, numBands);
             }
-            
+
             /**
-             * BAND MERGE
-             * 
-             * If we do not have 3 bands we have no way to go to
-             * index color model in a simple way using jai. Therefore we add 
-             * the bands we need in order to get there. This trick works fine with gray
-             * scale images. ATTENTION, if the initial image had no alpha channel we proceed without 
-             * doing anything since it seems that GIF encoder in such a case works fine.
-             * 
+             * BAND MERGE  If we do not have 3 bands we have no way to go to
+             * index color model in a simple way using jai. Therefore we add
+             * the bands we need in order to get there. This trick works fine
+             * with gray scale images. ATTENTION, if the initial image had no
+             * alpha channel we proceed without  doing anything since it seems
+             * that GIF encoder in such a case works fine.
              */
+            if ((surrogateImage.getSampleModel().getNumBands() == 1)
+                    && (alphaChannel != null)) {
+                int numBands = surrogateImage.getSampleModel().getNumBands();
 
-            if(surrogateImage.getSampleModel().getNumBands() == 1
-            		&&alphaChannel!=null){
-            	int numBands = surrogateImage.getSampleModel().getNumBands();
-            	//getting first band
-            	RenderedImage firstBand = JAI.create("bandSelect", surrogateImage,
-                        new int[] {0 });
-            	
-            	
-            	//adding to the image
-            	for(int i=0;i<3-numBands;i++){
-            			pb.removeParameters();
-            			pb.removeSources();
-            			
-            			pb.addSource(surrogateImage);
-            			pb.addSource(firstBand);
-            			surrogateImage=JAI.create("bandmerge",pb);
-            		
-            	}
+                //getting first band
+                RenderedImage firstBand = JAI.create("bandSelect",
+                        surrogateImage, new int[] { 0 });
+
+                //adding to the image
+                for (int i = 0; i < (3 - numBands); i++) {
+                    pb.removeParameters();
+                    pb.removeSources();
+
+                    pb.addSource(surrogateImage);
+                    pb.addSource(firstBand);
+                    surrogateImage = JAI.create("bandmerge", pb);
+                }
             }
-            
 
             /**
-             * ERROR DIFFUSION 
-             * 
-             * we create a single banded image with index color model.
+             * ERROR DIFFUSION   we create a single banded image with index
+             * color model.
              */
             if (surrogateImage.getSampleModel().getNumBands() == 3) {
                 surrogateImage = reduction2IndexColorModel(surrogateImage, pb);
-            
             }
 
             /**
-             * TRANSPARENCY
-             * 
-             * Adding transparency if needed, which means using the alpha channel to build a new color
-             * model 
+             * TRANSPARENCY  Adding transparency if needed, which means using
+             * the alpha channel to build a new color model
              */
-            if(alphaChannel!=null){
-            	surrogateImage = addTransparency2IndexColorModel(surrogateImage,alphaChannel, pb);
+            if (alphaChannel != null) {
+                surrogateImage = addTransparency2IndexColorModel(surrogateImage,
+                        alphaChannel, pb);
             }
         }
 
         return surrogateImage;
     }
 
-	/**
-	 * This method is used to add transparency to a preexisting image whose color model is 
-	 * indexcolormodel.
-	 * 
-	 * There are quite a few step to perform here.
-	 * 1>Creating a new IndexColorModel which supports transparency, using the given image's colormodel
-	 * 
-	 * 2>creating a suitable sample model 
-	 * 
-	 * 3>copying the old sample model to the new sample model.
-	 * 
-	 * 4>looping through the alphaChannel and setting the corresponding pixels
-	 * in the new sample model to the index for transparency
-	 * 
-	 * 5>creating a bufferedimage
-	 * 
-	 * 6>creating a planar image
-	 * @param surrogateImage
-	 * @param alphaChannel
-	 * @param pb
-	 * @return
-	 */
-	private PlanarImage addTransparency2IndexColorModel(PlanarImage surrogateImage, RenderedImage alphaChannel, ParameterBlock pb) {
+    /**
+     * This method is used to add transparency to a preexisting image whose
+     * color model is  indexcolormodel.  There are quite a few step to perform
+     * here. 1>Creating a new IndexColorModel which supports transparency,
+     * using the given image's colormodel  2>creating a suitable sample model
+     * 3>copying the old sample model to the new sample model.  4>looping
+     * through the alphaChannel and setting the corresponding pixels in the
+     * new sample model to the index for transparency  5>creating a
+     * bufferedimage  6>creating a planar image
+     *
+     * @param surrogateImage
+     * @param alphaChannel
+     * @param pb
+     *
+     * @return
+     */
+    private PlanarImage addTransparency2IndexColorModel(
+        PlanarImage surrogateImage, RenderedImage alphaChannel,
+        ParameterBlock pb) {
+        return surrogateImage;
+    }
 
-		return surrogateImage;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param surrogateImage
+     * @param pb
+     *
+     * @return
+     */
+    private PlanarImage reduction2IndexColorModel(PlanarImage surrogateImage,
+        ParameterBlock pb) {
+        //error dither
+        KernelJAI ditherMask = KernelJAI.ERROR_FILTER_STUCKI; //KernelJAI.DITHER_MASK_443;
+        ColorCube colorMap = ColorCube.BYTE_496;
 
-	/**
-	 * @param surrogateImage
-	 * @param pb
-	 * @return
-	 */
-	private PlanarImage reduction2IndexColorModel(PlanarImage surrogateImage, ParameterBlock pb) {
-		//error dither
-		KernelJAI ditherMask = KernelJAI.ERROR_FILTER_STUCKI; //KernelJAI.DITHER_MASK_443;
-		ColorCube colorMap = ColorCube.BYTE_496;
-		//PARAMETER BLOCK
-		pb.removeParameters();
-		pb.removeSources();
-		//color map
-		pb.addSource(surrogateImage);
-		pb.add(colorMap);
-		pb.add(ditherMask);
-		RenderedOp op1 = JAI.create("errordiffusion", pb, null);
-		surrogateImage = op1.createSnapshot();
-		return surrogateImage;
-	}
+        //PARAMETER BLOCK
+        pb.removeParameters();
+        pb.removeSources();
 
-	/**Remove the alpha band and keeps the others.
-	 * @param surrogateImage
-	 * @param numBands
-	 * @return
-	 */
-	private PlanarImage getBandsFromImage(PlanarImage surrogateImage, int numBands) {
-		switch (numBands-1) {
-		case 1:
-		    surrogateImage = JAI.create("bandSelect", surrogateImage,
-		            new int[] { 0 });
+        //color map
+        pb.addSource(surrogateImage);
+        pb.add(colorMap);
+        pb.add(ditherMask);
 
-		    break;
+        RenderedOp op1 = JAI.create("errordiffusion", pb, null);
+        surrogateImage = op1.createSnapshot();
 
-		case 3:
-		    surrogateImage = JAI.create("bandSelect", surrogateImage,
-		            new int[] { 0, 1, 2 });
+        return surrogateImage;
+    }
 
-		    break;
-		}
-		return surrogateImage;
-	}
+    /**
+     * Remove the alpha band and keeps the others.
+     *
+     * @param surrogateImage
+     * @param numBands
+     *
+     * @return
+     */
+    private PlanarImage getBandsFromImage(PlanarImage surrogateImage,
+        int numBands) {
+        switch (numBands - 1) {
+        case 1:
+            surrogateImage = JAI.create("bandSelect", surrogateImage,
+                    new int[] { 0 });
+
+            break;
+
+        case 3:
+            surrogateImage = JAI.create("bandSelect", surrogateImage,
+                    new int[] { 0, 1, 2 });
+
+            break;
+        }
+
+        return surrogateImage;
+    }
 
     /**
      * DOCUMENT ME!
