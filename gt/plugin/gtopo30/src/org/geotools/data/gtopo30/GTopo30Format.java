@@ -83,9 +83,8 @@ public class GTopo30Format extends AbstractGridFormat implements Format {
         try {
             if ((this.input != null) && this.input.equals(source)) {
                 return new GTopo30Reader(this.source);
-            } else {
-                return new GTopo30Reader(source);
             }
+			return new GTopo30Reader(source);
         } catch (Exception e) {
         }
 

@@ -315,14 +315,14 @@ class GTopo30DataSource {
         if (cropEnvelope != null) {
             env = intersectEnvelope(env, cropEnvelope);
 
-            float cxmin = (float) Math.round((env.getUpperCorner().getOrdinate(0)
+            float cxmin = Math.round((env.getUpperCorner().getOrdinate(0)
                     - minx) / xdim);
-            float cymin = (float) Math.round((env.getLowerCorner().getOrdinate(1)
+            float cymin = Math.round((env.getLowerCorner().getOrdinate(1)
                     - miny) / ydim);
-            float cwidth = (float) Math.round(Math.abs(env.getUpperCorner()
+            float cwidth = Math.round(Math.abs(env.getUpperCorner()
                                                           .getOrdinate(0)
                         - env.getLowerCorner().getOrdinate(0)) / xdim);
-            float cheight = (float) Math.round(Math.abs(env.getUpperCorner()
+            float cheight = Math.round(Math.abs(env.getUpperCorner()
                                                            .getOrdinate(1)
                         - env.getUpperCorner().getOrdinate(1)) / ydim);
 
@@ -377,7 +377,7 @@ class GTopo30DataSource {
         //switch from -999 to NaN to keep transparency informations
         //for the gridcoverage
         BufferedImage img = new BufferedImage(band.getColorModel(),
-                (WritableRaster) this.getAdjustedRaster(
+                this.getAdjustedRaster(
                     (WritableRaster) image.createSnapshot().getAsBufferedImage()
                                           .getData()), false, null); // properties????
 
@@ -404,7 +404,8 @@ class GTopo30DataSource {
                 coverageName = coverageName.substring(0, extension);
             }
         }
-
+        header=null;
+        stats=null;
         return new GridCoverage2D(coverageName, img, crs, env,
             new GridSampleDimension[] { band }, null, metadata);
     }

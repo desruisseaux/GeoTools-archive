@@ -169,7 +169,6 @@ public class GTopo30Reader implements GridCoverageReader {
     public org.opengis.coverage.grid.GridCoverage read(
         GeneralParameterValue[] parameters)
         throws java.lang.IllegalArgumentException, java.io.IOException {
-        // @todo Auto-generated method stub
         return this.sourceOfData.getGridCoverage();
     }
 
@@ -184,7 +183,6 @@ public class GTopo30Reader implements GridCoverageReader {
      * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
      */
     public boolean hasMoreGridCoverages() throws IOException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -192,6 +190,5 @@ public class GTopo30Reader implements GridCoverageReader {
      * @see org.opengis.coverage.grid.GridCoverageReader#skip()
      */
     public void skip() throws IOException {
-        // TODO Auto-generated method stub
     }
 }
