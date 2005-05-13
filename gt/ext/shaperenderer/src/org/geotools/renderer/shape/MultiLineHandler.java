@@ -97,7 +97,6 @@ public class MultiLineHandler implements ShapeHandler {
 				tmpbbox[3]);
 
 		if (!bbox.intersects(geomBBox)) {
-			//            skipMultiLineGeom(buffer, dimensions);
 			return null;
 		}
 
@@ -135,6 +134,8 @@ public class MultiLineHandler implements ShapeHandler {
 			buffer.position((buffer.position() + (numPoints-2) * 16));
 			coords[0][2]=buffer.getDouble();
 			coords[0][3]=buffer.getDouble();
+            if( !bbox.contains(coords[0][0],coords[0][1]) && !bbox.contains(coords[0][2], coords[0][3]) )
+                return null;
 			try {
 				mt.transform(coords[0], 0, transformed[0], 0, 2);
 			} catch (Exception e) {
@@ -144,6 +145,7 @@ public class MultiLineHandler implements ShapeHandler {
 				transformed[0]=coords[0];
 			}		
 			}else{
+                boolean intersection=false;
 			for (int part = 0; part < numParts; part++) {
 				start = partOffsets[part];
 
@@ -171,6 +173,9 @@ public class MultiLineHandler implements ShapeHandler {
 					coords[part][readDoubles] = buffer.getDouble();
 					readDoubles++;
 					currentDoubles++;
+                    if( !intersection && bbox.contains(coords[0][0],coords[0][1]) 
+                            && bbox.contains(coords[0][2], coords[0][3]) )
+                        intersection=true;
 					if (currentDoubles > 3 && currentDoubles < totalDoubles - 1) {
 						if (Math.abs(coords[part][readDoubles - 4]
 								- coords[part][readDoubles - 2]) <= spanx
@@ -230,6 +235,8 @@ public class MultiLineHandler implements ShapeHandler {
 				//
 				// }
 			}
+            if( !intersection )
+                return null;
 		}
 		return new Geometry(type, transformed, geomBBox);
 	}

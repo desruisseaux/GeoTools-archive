@@ -278,6 +278,7 @@ public class ShapeRenderer {
 						scaleDenominator);
 
 				int index = 1;
+				try{
 				while (true) {
 					try {
 
@@ -388,11 +389,11 @@ public class ShapeRenderer {
 						fireFeatureRenderedEvent(null);
 					} catch (Exception e) {
 						fireErrorEvent(e);
-					} finally{
-						dbfreader.close();
-						shpreader.close();
-						
-					}
+					} 				
+				}
+				}finally{
+					dbfreader.close();
+					shpreader.close();
 				}
 			}
 		}

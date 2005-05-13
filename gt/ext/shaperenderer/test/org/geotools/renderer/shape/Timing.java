@@ -8,7 +8,7 @@
  *    License as published by the Free Software Foundation;
  *    version 2.1 of the License.
  *
- *    This library is distributed in the hope that it will be useful,
+ *    This library is distributed in the hryope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
@@ -56,24 +56,24 @@ import com.yourkit.api.Controller;
  * @author jeichar
  * @since 2.1.x
  */
-public class Timing {
+public class Timing{
 
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = true;
+	private static boolean ALL_DATA = false;
 
-	private static boolean DISPLAY = false;
-	
-	private static boolean ANTI_ALIASING=true;
+	private static boolean DISPLAY = true;
+
+	private static boolean ANTI_ALIASING = true;
 
 	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = true;
+	private static boolean RUN_LITE = false;
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = true;
+	private static boolean ACCURATE = false;
 
 	private static boolean CACHING = false;
 
@@ -82,25 +82,39 @@ public class Timing {
 	private static boolean FILTER = false;
 
 	private static boolean CPU_PROFILE = false;
-	private static int x=300,y=300;
+
+	private static boolean LINES = true;
 
 	private String testName;
 	{
 		testName = "";
+		if (LINES) {
+			testName += "LINES";
+		} else {
+			testName += "POLYGONS";
+		}
 		if (ALL_DATA) {
-			testName += "ALL";
+			testName += "_ALL";
+		} else {
+			testName += "_ZOOM";
 		}
 		if (ACCURATE) {
 			testName += "_ACCURATE";
+		} else {
+			testName += "_INACCURATE";
 		}
 		if (CACHING) {
 			testName += "_CACHING";
 		}
 		if (NO_REPROJECTION) {
 			testName += "_NO_REPROJECTION";
+		} else {
+			testName += "_REPROJECTED";
 		}
 		if (FILTER) {
 			testName += "_FILTER";
+		} else {
+			testName += "_NO_FILTER";
 		}
 		if (CPU_PROFILE) {
 			testName += "_PROFILE";
@@ -119,12 +133,54 @@ public class Timing {
 		out = tmp;
 	}
 
-	static Style createTestStyle() throws Exception {
-		return createTestStyle(null);
+	static Style createLineStyle() throws Exception {
+		return createLineStyle(null);
 	}
-		static Style createTestStyle(String typeName) throws Exception {
-		if( typeName==null )
-			typeName="tcn-roads";
+
+	static Style createLineStyle(String typeName) throws Exception {
+		if (typeName == null)
+			typeName = LINES_TYPE_NAME;
+		StyleFactory sFac = StyleFactory.createStyleFactory();
+		// The following is complex, and should be built from
+
+		LineSymbolizer linesym = sFac.createLineSymbolizer();
+		Stroke myStroke = sFac.getDefaultStroke();
+		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+		myStroke
+				.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
+		linesym.setStroke(myStroke);
+
+		Rule rule2 = sFac.createRule();
+		rule2.setSymbolizers(new Symbolizer[] { linesym });
+		if (FILTER) {
+			ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
+			ShapefileDataStore store = (ShapefileDataStore) fac
+					.createDataStore(new URL(LINES_FILE));
+			AttributeExpression exp = filterFactory.createAttributeExpression(
+					store.getSchema(), "STREET");
+			CompareFilter filter = filterFactory
+					.createCompareFilter(Filter.COMPARE_NOT_EQUALS);
+			filter.addLeftValue(exp);
+			filter.addRightValue(filterFactory.createLiteralExpression("blah"));
+			rule2.setFilter(filter);
+		}
+		FeatureTypeStyle fts2 = sFac.createFeatureTypeStyle();
+		fts2.setRules(new Rule[] { rule2 });
+		fts2.setFeatureTypeName(typeName);
+
+		Style style = sFac.createStyle();
+		style.setFeatureTypeStyles(new FeatureTypeStyle[] { fts2 });
+
+		return style;
+	}
+
+	static Style createPolyStyle() throws Exception {
+		return createLineStyle(null);
+	}
+
+	static Style createPolyStyle(String typeName) throws Exception {
+		if (typeName == null)
+			typeName = "bc_lakes";
 		StyleFactory sFac = StyleFactory.createStyleFactory();
 		// The following is complex, and should be built from
 
@@ -141,7 +197,7 @@ public class Timing {
 			ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 			ShapefileDataStore store = (ShapefileDataStore) fac
 					.createDataStore(new URL(
-							"file:///home/jones/allShapefiles/tcn-roads.shp"));
+							"file:///home/jones/aData/bc_roads.shp"));
 			AttributeExpression exp = filterFactory.createAttributeExpression(
 					store.getSchema(), "STREET");
 			CompareFilter filter = filterFactory
@@ -172,23 +228,25 @@ public class Timing {
 		if (RUN_LITE)
 			t.runLiteRendererTest();
 
-		out.flush();
+		if (out != null)
+			out.flush();
 	}
 
 	private void runShapeRendererTest() throws Exception {
 		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 		ShapefileDataStore store = (ShapefileDataStore) fac
 				.createDataStore(new URL(
-						"file:///home/jones/allShapefiles/tcn-roads.shp"));
+						"file:///home/jones/aData/bc_roads.shp"));
 		DefaultMapContext context = new DefaultMapContext();
-		context.addLayer(store.getFeatureSource(), createTestStyle());
+		context.addLayer(store.getFeatureSource(), createLineStyle());
 		if (NO_REPROJECTION)
 			context.setAreaOfInterest(new Envelope(), store.getSchema()
 					.getDefaultGeometry().getCoordinateSystem());
 		ShapeRenderer renderer = new ShapeRenderer(context);
-		if( ANTI_ALIASING )
-			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		int w = x, h = y;
+		if (ANTI_ALIASING)
+			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
@@ -224,11 +282,15 @@ public class Timing {
 			controller.captureCPUSnapshot("shape_" + testName, false);
 		}
 		long end = System.currentTimeMillis();
-		if(!CPU_PROFILE)
+		if (!CPU_PROFILE)
 			if (ACCURATE)
-				out.append("shape " + testName + "=" + (end - start) / 3 + "\n");
-			else
-				out.append("shape " + testName + "=" + (end - start) + "\n");
+				if (out != null)
+					out.append("shape " + testName + "=" + (end - start) / 3
+							+ "\n");
+				else if (out != null)
+					out
+							.append("shape " + testName + "=" + (end - start)
+									+ "\n");
 		if (DISPLAY)
 			display("shape", image, w, h);
 
@@ -237,16 +299,18 @@ public class Timing {
 	private void runTinyTest() throws Exception {
 		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 		ShapefileDataStore store = (ShapefileDataStore) fac
-				.createDataStore(TestData.getResource(Timing.class, "theme1.shp"));
+				.createDataStore(TestData.getResource(Timing.class,
+						"theme1.shp"));
 		DefaultMapContext context = new DefaultMapContext();
-		context.addLayer(store.getFeatureSource(), createTestStyle("theme1"));
+		context.addLayer(store.getFeatureSource(), createLineStyle("theme1"));
 		if (NO_REPROJECTION)
 			context.setAreaOfInterest(new Envelope(), store.getSchema()
 					.getDefaultGeometry().getCoordinateSystem());
 		ShapeRenderer renderer = new ShapeRenderer(context);
-		if( ANTI_ALIASING )
-			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		int w = x, h = y;
+		if (ANTI_ALIASING)
+			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
@@ -256,7 +320,8 @@ public class Timing {
 		if (CACHING)
 			renderer.setCaching(true);
 
-		Envelope bounds=new Envelope(-7.105552354197932,8.20555235419793,-3.239388966356115,4.191388966388683);
+		Envelope bounds = new Envelope(-7.105552354197932, 8.20555235419793,
+				-3.239388966356115, 4.191388966388683);
 
 		if (!ALL_DATA)
 			bounds = new Envelope(bounds.getMinX() + bounds.getWidth() / 4,
@@ -280,26 +345,27 @@ public class Timing {
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		}
 		if (CPU_PROFILE) {
-			controller.captureCPUSnapshot("tiny_" + testName, false);
+			controller.captureCPUSnapshot("shape_" + testName, false);
 		}
 		long end = System.currentTimeMillis();
-		if(!CPU_PROFILE)
+		if (!CPU_PROFILE)
 			if (ACCURATE)
-				out.append("tiny " + testName + "=" + (end - start) / 3 + "\n");
+				out
+						.append("shape " + testName + "=" + (end - start) / 3
+								+ "\n");
 			else
-				out.append("tiny " + testName + "=" + (end - start) + "\n");
+				out.append("shape " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
-			display("tiny", image, w, h);
+			display("shape", image, w, h);
 
 	}
 
 	private void runLiteRendererTest() throws Exception {
 		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 		ShapefileDataStore store = (ShapefileDataStore) fac
-				.createDataStore(new URL(
-						"file:///home/jones/allShapefiles/tcn-roads.shp"));
+				.createDataStore(new URL(LINES_FILE));
 		DefaultMapContext context = new DefaultMapContext();
-		context.addLayer(store.getFeatureSource(), createTestStyle());
+		context.addLayer(store.getFeatureSource(), createLineStyle());
 
 		if (NO_REPROJECTION)
 			context.setAreaOfInterest(new Envelope(), store.getSchema()
@@ -307,13 +373,14 @@ public class Timing {
 
 		LiteRenderer2 renderer = new LiteRenderer2(context);
 		renderer.setOptimizedDataLoadingEnabled(true);
-		if( ANTI_ALIASING )
-			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		if (ANTI_ALIASING)
+			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
 
 		if (CACHING)
 			renderer.setMemoryPreloadingEnabled(true);
 
-		int w = x, h = y;
+		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
@@ -347,9 +414,11 @@ public class Timing {
 		long end = System.currentTimeMillis();
 		if (!CPU_PROFILE)
 			if (ACCURATE)
-				out.append("lite " + testName + "=" + (end - start) / 3 + "\n");
-			else
-				out.append("lite " + testName + "=" + (end - start) + "\n");
+				if (out != null)
+					out.append("lite " + testName + "=" + (end - start) / 3
+							+ "\n");
+				else if (out != null)
+					out.append("lite " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
 			display("lite", image, w, h);
 	}
@@ -375,4 +444,8 @@ public class Timing {
 		frame.setSize(w, h);
 		frame.setVisible(true);
 	}
+	
+
+	private static String LINES_FILE="file:///home/jones/aData/bc_roads.shp";
+	private static String LINES_TYPE_NAME="bc_roads";
 }
