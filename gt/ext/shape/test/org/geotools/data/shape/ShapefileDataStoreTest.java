@@ -71,6 +71,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureType schema = s.getSchema(s.getTypeNames()[0]);
         AttributeType[] types = schema.getAttributeTypes();
         assertEquals("Number of Attributes",253,types.length);
+        assertNotNull(schema.getDefaultGeometry().getCoordinateSystem());
     }
     
     public void testSpacesInPath() throws Exception {

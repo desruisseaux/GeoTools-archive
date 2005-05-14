@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -56,6 +57,7 @@ import org.geotools.data.shape.dbf.DbaseFileException;
 import org.geotools.data.shape.dbf.DbaseFileHeader;
 import org.geotools.data.shape.dbf.DbaseFileReader;
 import org.geotools.data.shape.dbf.DbaseFileWriter;
+import org.geotools.data.shape.prj.PrjFileReader;
 import org.geotools.data.shape.shp.IndexFile;
 import org.geotools.data.shape.shp.JTSUtilities;
 import org.geotools.data.shape.shp.ShapeHandler;
@@ -73,6 +75,7 @@ import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
@@ -85,9 +88,18 @@ import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.FilterConsumer;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.fs.FileSystemPageStore;
+import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.xml.gml.GMLSchema;
+import org.opengis.referencing.FactoryException;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -107,11 +119,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     private final URL shpURL;
     private final URL dbfURL;
     private final URL shxURL;
+    private final URL prjURL;
     private final URL treeURL;
     private byte treeType;
     private final boolean useMemoryMappedBuffer;
     private final boolean createIndex;
     private final boolean useIndex;
+    private final URI namespace;
     private FeatureType schema;
 
     /**
@@ -124,6 +138,31 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      */
     public ShapefileDataStore(URL url) throws java.net.MalformedURLException {
         this(url, true, false, true);
+    }
+    /**
+     * Creates a new instance of ShapefileDataStore.
+     *
+     * @param url The URL of the shp file to use for this DataSource.
+     *
+     * @throws java.net.MalformedURLException If computation of related URLs
+     *         (dbf,shx) fails.
+     */
+    public ShapefileDataStore(URL url, URI namespace) throws java.net.MalformedURLException {
+        this(url, namespace, true, false, true);
+        
+    }
+    
+    /**
+     * Creates a new instance of ShapefileDataStore.
+     * 
+     * @param url The URL of the shp file to use for this DataSource.
+     * @param useMemoryMappedBuffer enable/disable memory mapping of files
+     * @throws java.net.MalformedURLException
+     */
+    public ShapefileDataStore(URL url, URI namespace, boolean useMemoryMappedBuffer)
+    throws java.net.MalformedURLException
+    {
+        this(url, namespace, useMemoryMappedBuffer, false, true);
     }
     
     /**
@@ -153,6 +192,21 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     {
         this(url, useMemoryMappedBuffer, createIndex, true);
     }
+
+    /**
+     * Creates a new instance of ShapefileDataStore.
+     * 
+     * @param url The URL of the shp file to use for this DataSource.
+     * @param useMemoryMappedBuffer enable/disable memory mapping of files
+     * @param createIndex enable/disable automatic index creation if needed
+     * @throws java.net.MalformedURLException
+     */
+    public ShapefileDataStore(URL url, URI namespace, boolean useMemoryMappedBuffer,
+                              boolean createIndex)
+    throws java.net.MalformedURLException
+    {
+        this(url, namespace, useMemoryMappedBuffer, createIndex, true);
+    }
     
     /**
      * Creates a new instance of ShapefileDataStore.
@@ -164,9 +218,25 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @throws java.net.MalformedURLException
      */
     public ShapefileDataStore(URL url, boolean useMemoryMappedBuffer,
+                              boolean createIndex, boolean useIndex )  
+    throws java.net.MalformedURLException
+    {
+    	this(url,null, useMemoryMappedBuffer, createIndex, useIndex);
+    }
+    /**
+     * Creates a new instance of ShapefileDataStore.
+     * 
+     * @param url The URL of the shp file to use for this DataSource.
+     * @param useMemoryMappedBuffer enable/disable memory mapping of files
+     * @param createIndex enable/disable automatic index creation if needed
+     * @param useIndex enable/disable index usage (mainly for testing)
+     * @throws java.net.MalformedURLException
+     */
+    public ShapefileDataStore(URL url, URI namespace, boolean useMemoryMappedBuffer,
                               boolean createIndex, boolean useIndex)
     throws java.net.MalformedURLException
     {
+    	this.namespace=namespace;
         String filename = null;
 
         if (url == null) {
@@ -183,6 +253,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         String shpext = ".shp";
         String dbfext = ".dbf";
         String shxext = ".shx";
+        String prjext = ".prj";
         String grxext = ".grx";
         String qixext = ".qix";
 
@@ -196,11 +267,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             dbfext = ".DBF";
             shxext = ".SHX";
             grxext = ".GRX";
+            prjext = ".PRJ";
             qixext = ".QIX";
         }
 
         shpURL = new URL(filename + shpext);
         dbfURL = new URL(filename + dbfext);
+        prjURL = new URL(filename + prjext);
         shxURL = new URL(filename + shxext);
         
         if (this.isLocal()) {
@@ -595,7 +668,29 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         return new DbaseFileReader(rbc, this.useMemoryMappedBuffer);
     }
-
+    
+    /**
+     * Convenience method for opening a DbaseFileReader.
+     *
+     * @return A new DbaseFileReader
+     *
+     * @throws IOException If an error occurs during creation.
+     */
+    protected PrjFileReader openPrjReader() throws IOException, FactoryException {
+        ReadableByteChannel rbc = null;
+        try{
+            rbc = getReadChannel(prjURL);
+        }
+        catch(IOException e){
+            LOGGER.warning("projection (.prj) for shapefile not available");
+        }
+        if (rbc == null) {
+            return null;
+        }
+        
+        return new PrjFileReader(rbc);
+    }
+    
     /**
      * Convenience method for opening an RTree index.
      *
@@ -724,18 +819,42 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         return getSchema();
     }
     public FeatureType getSchema() throws IOException {
-        if (schema == null) {
+    	if (schema == null) {
             try {
-                schema = FeatureTypeFactory.newFeatureType(readAttributes(),
-                        createFeatureTypeName());
+                AttributeType[] types = readAttributes();
+                FeatureType parent = null;
+                Class geomType = types[0].getType();
+                if(geomType == Point.class || geomType == MultiPoint.class){
+                    parent = BasicFeatureTypes.POINT;
+                }
+                else if(geomType == Polygon.class || geomType == MultiPolygon.class){
+                    parent = BasicFeatureTypes.POLYGON;
+                }
+                else if(geomType == LineString.class || geomType == MultiLineString.class){
+                    parent = BasicFeatureTypes.LINE;
+                }
+                if(parent != null){
+                    schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                    createFeatureTypeName(), namespace, false, new FeatureType[] {parent});
+                }
+                else {
+                	if (namespace != null)
+                	{
+                		schema = FeatureTypeFactory.newFeatureType(readAttributes(),
+                				createFeatureTypeName(),namespace,false);
+                	}
+                	else
+                	{
+                		schema = FeatureTypeFactory.newFeatureType(readAttributes(), createFeatureTypeName(), GMLSchema.NAMESPACE, false);
+                	}
+                }
             } catch (SchemaException se) {
                 throw new DataSourceException("Error creating FeatureType", se);
             }
         }
-
+        
         return schema;
     }
-
     /**
      * Create the AttributeTypes contained within this DataStore.
      *
@@ -746,45 +865,57 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected AttributeType[] readAttributes() throws IOException {
         ShapefileReader shp = openShapeReader();
         DbaseFileReader dbf = openDbfReader();
-
+        CoordinateReferenceSystem cs = null;
+        try{
+            PrjFileReader prj = openPrjReader();
+            if(prj!=null){
+                cs = (CoordinateReferenceSystem) prj.getCoodinateSystem();
+            }
+        }
+        catch(FactoryException fe){
+            cs = null;
+        }
         try {
-            AttributeType geometryAttribute = AttributeTypeFactory
-                .newAttributeType("the_geom",
-                    JTSUtilities.findBestGeometryClass(
-                        shp.getHeader().getShapeType()));
-
+            
+            GeometryAttributeType geometryAttribute = (GeometryAttributeType)AttributeTypeFactory
+            .newAttributeType("the_geom",
+            JTSUtilities.findBestGeometryClass(
+            shp.getHeader().getShapeType()),true, 0, null, cs);
+            
             AttributeType[] atts;
-
+            
             // take care of the case where no dbf and query wants all => geometry only
             if (dbf != null) {
                 DbaseFileHeader header = dbf.getHeader();
                 atts = new AttributeType[header.getNumFields() + 1];
                 atts[0] = geometryAttribute;
-
+                
                 for (int i = 0, ii = header.getNumFields(); i < ii; i++) {
                     Class clazz = header.getFieldClass(i);
                     atts[i + 1] = AttributeTypeFactory.newAttributeType(header
-                            .getFieldName(i), clazz, true,
-                            header.getFieldLength(i));
+                    .getFieldName(i), clazz, true,
+                    header.getFieldLength(i));
                 }
             } else {
                 atts = new AttributeType[] { geometryAttribute };
             }
-
+            
             return atts;
         } finally {
             try {
                 shp.close();
             } catch (IOException ioe) {
+                // do nothing
             }
-
+            
             try {
                 dbf.close();
             } catch (IOException ioe) {
+                // do nothing
             }
         }
     }
-
+    
     /**
      * Set the FeatureType of this DataStore. This method will delete any
      * existing local resources or throw an IOException if the DataStore is
