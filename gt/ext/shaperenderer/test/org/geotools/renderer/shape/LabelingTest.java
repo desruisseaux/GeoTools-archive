@@ -56,7 +56,7 @@ public class LabelingTest extends TestCase {
 	private long timout=3000;
 	private static final int CENTERX = 160;
 	private static final int CENTERY = 40;
-    private static final boolean INTERACTIVE=false;
+    private static final boolean INTERACTIVE=true;
 
 
 	/*
@@ -143,7 +143,7 @@ public class LabelingTest extends TestCase {
         Rendering2DTest.INTERACTIVE=INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-//        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
+        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
 	}
 
 	private FeatureCollection createLineFeatureCollection() throws Exception {

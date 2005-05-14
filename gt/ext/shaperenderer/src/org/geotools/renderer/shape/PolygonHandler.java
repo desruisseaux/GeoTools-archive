@@ -152,17 +152,23 @@ public class PolygonHandler implements ShapeHandler {
 				// } else {
 				// clonePoint = false;
 				// }
-				coords[part] = new double[length * 2-2];
+
+				int totalDoubles = length * 2;
+				coords[part] = new double[totalDoubles];
 				int readDoubles = 0;
 				int currentDoubles = 0;
-				int totalDoubles = length * 2;
-				for (; currentDoubles < totalDoubles-2;) {
+				for (; currentDoubles < totalDoubles;) {
+					try {
+						
 					coords[part][readDoubles] = buffer.getDouble();
 					readDoubles++;
 					currentDoubles++;
 					coords[part][readDoubles] = buffer.getDouble();
 					readDoubles++;
 					currentDoubles++;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					if (currentDoubles > 3 && currentDoubles < totalDoubles - 1) {
 						if (Math.abs(coords[part][readDoubles - 4]
 								- coords[part][readDoubles - 2]) <= spanx

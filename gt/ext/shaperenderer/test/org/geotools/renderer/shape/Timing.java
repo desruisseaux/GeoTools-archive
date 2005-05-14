@@ -66,17 +66,17 @@ public class Timing {
 
 	private static boolean ALL_DATA = true;
 
-	private static boolean DISPLAY = true;
+	private static boolean DISPLAY = false;
 
 	private static boolean ANTI_ALIASING = true;
 
 	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = false;
+	private static boolean RUN_LITE = true;
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = false;
+	private static boolean ACCURATE = true;
 
 	private static boolean CACHING = false;
 
@@ -92,9 +92,9 @@ public class Timing {
 	{
 		testName = "";
 		if (LINES) {
-			testName += "LINES";
+			testName += LINES_TYPE_NAME;
 		} else {
-			testName += "POLYGONS";
+			testName += POLY_TYPE_NAME;
 		}
 		if (ALL_DATA) {
 			testName += "_ALL";
@@ -449,19 +449,20 @@ public class Timing {
 	}
 
 
-	private static String NEW_YORK_FILE="file:///home/jones/demo/nyct2000.shp";
-	private static String NORTH_AMERICA_FILE="file:///home/jones/demo/north_america.shp";
+	private static String NEW_YORK_HOME_FILE="file:///home/jones/demo/nyct2000.shp";
+	private static String NEW_YORK_HOME_NAME="nyct2000";
 
-	private static String NEW_YORK_NAME="nyct2000";
-	private static String NORTH_AMERICA_NAME="north_america";
+	private static String NEW_YORK_WORK_FILE="file:///home/jones/aData/nyct2000.shp";
+	private static String NEW_YORK_WORK_NAME="nyct2000";
+
+	private static String BC_FILE="file:///home/jones/aData/lwsg_prov.shp";
+	private static String BC_NAME="lwsg_prov";
 	
 	private static String LINES_FILE = "file:///home/jones/aData/bc_roads.shp";
-
 	private static String LINES_TYPE_NAME = "bc_roads";
 
-	private static String POLY_FILE = NORTH_AMERICA_FILE;
-
-	private static String POLY_TYPE_NAME = NORTH_AMERICA_NAME;
+	private static String POLY_FILE = BC_FILE;
+	private static String POLY_TYPE_NAME = BC_NAME;
 
 	int w = 512, h = 512;
 }

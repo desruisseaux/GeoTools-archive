@@ -64,11 +64,21 @@ import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
+import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * A LiteRenderer Implementations that is optimized for shapefiles.
@@ -97,11 +107,42 @@ public class ShapeRenderer {
 	LabelCache labelCache = new LabelCacheDefault();
 
 	private ListenerList renderListeners = new ListenerList();
-	
-	List geometryCache=new LinkedList();
-	List featureCache=new LinkedList();
-	
-	boolean caching=false;
+
+	List geometryCache = new LinkedList();
+
+	List featureCache = new LinkedList();
+
+	boolean caching = false;
+
+	private static final GeometryFactory geomFactory = new GeometryFactory();
+
+	private static final Coordinate[] COORDS;
+
+	private static final MultiPolygon MULTI_POLYGON_GEOM;
+
+	private static final Polygon POLYGON_GEOM;
+
+	private static final LinearRing LINE_GEOM;
+	private static final MultiLineString MULTI_LINE_GEOM;
+
+	private static final Point POINT_GEOM;
+
+	private static final MultiPoint MULTI_POINT_GEOM;
+	static {
+		COORDS = new Coordinate[5];
+		COORDS[0] = new Coordinate(0.0, 0.0);
+		COORDS[1] = new Coordinate(5.0, 0.0);
+		COORDS[2] = new Coordinate(5.0, 5.0);
+		COORDS[3] = new Coordinate(0.0, 5.0);
+		COORDS[4] = new Coordinate(0.0, 0.0);
+		LINE_GEOM = geomFactory.createLinearRing(COORDS);
+		MULTI_LINE_GEOM = geomFactory.createMultiLineString(new LineString[]{LINE_GEOM});
+		POLYGON_GEOM = geomFactory.createPolygon(LINE_GEOM, new LinearRing[0]);
+		MULTI_POLYGON_GEOM = geomFactory
+				.createMultiPolygon(new Polygon[] { POLYGON_GEOM });
+		POINT_GEOM = geomFactory.createPoint(COORDS[2]);
+		MULTI_POINT_GEOM = geomFactory.createMultiPoint(COORDS);
+	}
 
 	/**
 	 * This listener is added to the list of listeners automatically. It should
@@ -168,8 +209,8 @@ public class ShapeRenderer {
 				return;
 			}
 			labelCache.startLayer();
-			
-			Envelope bbox=envelope;
+
+			Envelope bbox = envelope;
 			try {
 				ShapefileDataStore ds = (ShapefileDataStore) currLayer
 						.getFeatureSource().getDataStore();
@@ -179,30 +220,31 @@ public class ShapeRenderer {
 				MathTransform mt;
 				try {
 					mt = CRS.transform(dataCRS, destinationCrs);
-					bbox=JTS.transform(bbox,mt.inverse());
+					bbox = JTS.transform(bbox, mt.inverse());
 				} catch (Exception e) {
 					fireErrorEvent(e);
 					mt = null;
 				}
-				
+
 				MathTransform at = FactoryFinder.getMathTransformFactory(null)
 						.createAffineTransform(new GeneralMatrix(transform));
 				if (mt == null) {
 					mt = at;
 				} else {
 					mt = FactoryFinder.getMathTransformFactory(null)
-							.createConcatenatedTransform(mt,at);
+							.createConcatenatedTransform(mt, at);
 				}
-				
-				
-//				graphics.setTransform(transform);
+
+				//				graphics.setTransform(transform);
 
 				// extract the feature type stylers from the style object
 				// and process them
-				if( isCaching() && geometryCache.size()>0 )
-					processStylersCaching(graphics,ds,bbox, mt, currLayer.getStyle());
+				if (isCaching() && geometryCache.size() > 0)
+					processStylersCaching(graphics, ds, bbox, mt, currLayer
+							.getStyle());
 				else
-					processStylersNoCaching(graphics, ds, bbox, mt, currLayer.getStyle());
+					processStylersNoCaching(graphics, ds, bbox, mt, currLayer
+							.getStyle());
 			} catch (Exception exception) {
 				fireErrorEvent(new Exception("Exception rendering layer "
 						+ currLayer, exception));
@@ -217,7 +259,7 @@ public class ShapeRenderer {
 	}
 
 	private void processStylersNoCaching(Graphics2D graphics,
-			ShapefileDataStore datastore, Envelope bbox, MathTransform mt, 
+			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
 			Style style) throws IOException {
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("processing " + style.getFeatureTypeStyles().length
@@ -225,11 +267,10 @@ public class ShapeRenderer {
 		}
 		FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
 		FeatureType type;
-		ShapefileReader shpreader=null; 
+		ShapefileReader shpreader = null;
 		try {
 			type = createFeatureType(style, datastore.getSchema());
-			shpreader= ShapefileRendererUtil.getShpReader(
-					datastore, bbox, mt);
+			shpreader = ShapefileRendererUtil.getShpReader(datastore, bbox, mt);
 		} catch (Exception e) {
 			fireErrorEvent(e);
 			return;
@@ -278,126 +319,133 @@ public class ShapeRenderer {
 						scaleDenominator);
 
 				int index = 1;
-				try{
-				while (true) {
-					try {
+				try {
+					while (true) {
+						try {
 
-						if (renderingStopRequested) {
-							break;
-						}
+							if (renderingStopRequested) {
+								break;
+							}
 
-						if (!shpreader.hasNext()) {
-							break;
-						}
+							if (!shpreader.hasNext()) {
+								break;
+							}
 
-						boolean doElse = true;
-
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.fine("trying to read geometry ...");
-						}
-
-						ShapefileReader.Record record = shpreader.nextRecord();
-
-						Geometry geom = (Geometry) record.shape();
-						if (geom == null) {
-							dbfreader.skip();
-							continue;
-						}
-						Feature feature = createFeature(type, record,
-								dbfreader, typeName + index);
-						index++;
-
-						if (renderingStopRequested) {
-							break;
-						}
-						
-						if( caching ){
-							geometryCache.add(geom);
-							featureCache.add(feature);
-						}
-
-						if (LOGGER.isLoggable(Level.FINEST)) {
-							LOGGER.finest("... done: " + geom.toString());
-						}
-
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.fine("... done: " + typeName);
-						}
-
-						//						 applicable rules
-						for (Iterator it = ruleList.iterator(); it.hasNext();) {
-
-							Rule r = (Rule) it.next();
+							boolean doElse = true;
 
 							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("applying rule: " + r.toString());
+								LOGGER.fine("trying to read geometry ...");
+							}
+
+							ShapefileReader.Record record = shpreader
+									.nextRecord();
+
+							Geometry geom = (Geometry) record.shape();
+							if (geom == null) {
+								dbfreader.skip();
+								continue;
+							}
+							Feature feature = createFeature(type, record,
+									dbfreader, typeName + index);
+							index++;
+
+							if (renderingStopRequested) {
+								break;
+							}
+
+							if (caching) {
+								geometryCache.add(geom);
+								featureCache.add(feature);
+							}
+
+							if (LOGGER.isLoggable(Level.FINEST)) {
+								LOGGER.finest("... done: " + geom.toString());
 							}
 
 							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("this rule applies ...");
+								LOGGER.fine("... done: " + typeName);
 							}
 
-							Filter filter = r.getFilter();
-
-							if ((filter == null) || filter.contains(feature))
-							 {
-								doElse = false;
-
-								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("processing Symobolizer ...");
-								}
-
-								Symbolizer[] symbolizers = r.getSymbolizers();
-
-								processSymbolizers(graphics, feature, geom,
-										symbolizers, scaleRange);
-
-
-								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("... done!");
-								}
-							}
-						}
-
-						if (doElse) {
-							// rules with an else filter
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("rules with an else filter");
-							}
-
-							for (Iterator it = elseRuleList.iterator(); it
+							//						 applicable rules
+							for (Iterator it = ruleList.iterator(); it
 									.hasNext();) {
+
 								Rule r = (Rule) it.next();
-								Symbolizer[] symbolizers = r.getSymbolizers();
 
 								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("processing Symobolizer ...");
+									LOGGER.finer("applying rule: "
+											+ r.toString());
 								}
 
-								processSymbolizers(graphics, feature, geom,
-										symbolizers, scaleRange);
-
 								if (LOGGER.isLoggable(Level.FINER)) {
-									LOGGER.finer("... done!");
+									LOGGER.finer("this rule applies ...");
+								}
+
+								Filter filter = r.getFilter();
+
+								if ((filter == null)
+										|| filter.contains(feature)) {
+									doElse = false;
+
+									if (LOGGER.isLoggable(Level.FINER)) {
+										LOGGER
+												.finer("processing Symobolizer ...");
+									}
+
+									Symbolizer[] symbolizers = r
+											.getSymbolizers();
+
+									processSymbolizers(graphics, feature, geom,
+											symbolizers, scaleRange);
+
+									if (LOGGER.isLoggable(Level.FINER)) {
+										LOGGER.finer("... done!");
+									}
 								}
 							}
-						}
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.finer("feature rendered event ...");
-						}
 
-						fireFeatureRenderedEvent(null);
-					} catch (Exception e) {
-						fireErrorEvent(e);
-					} 				
-				}
-				}finally{
+							if (doElse) {
+								// rules with an else filter
+								if (LOGGER.isLoggable(Level.FINER)) {
+									LOGGER.finer("rules with an else filter");
+								}
+
+								for (Iterator it = elseRuleList.iterator(); it
+										.hasNext();) {
+									Rule r = (Rule) it.next();
+									Symbolizer[] symbolizers = r
+											.getSymbolizers();
+
+									if (LOGGER.isLoggable(Level.FINER)) {
+										LOGGER
+												.finer("processing Symobolizer ...");
+									}
+
+									processSymbolizers(graphics, feature, geom,
+											symbolizers, scaleRange);
+
+									if (LOGGER.isLoggable(Level.FINER)) {
+										LOGGER.finer("... done!");
+									}
+								}
+							}
+							if (LOGGER.isLoggable(Level.FINER)) {
+								LOGGER.finer("feature rendered event ...");
+							}
+
+							fireFeatureRenderedEvent(null);
+						} catch (Exception e) {
+							fireErrorEvent(e);
+						}
+					}
+				} finally {
 					dbfreader.close();
 					shpreader.close();
 				}
 			}
 		}
 	}
+
 	private void processStylersCaching(Graphics2D graphics,
 			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
 			Style style) throws IOException {
@@ -455,11 +503,11 @@ public class ShapeRenderer {
 						scaleDenominator);
 
 				int index = 0;
-				Iterator featureIter=featureCache.iterator();
+				Iterator featureIter = featureCache.iterator();
 				for (Iterator iter = geometryCache.iterator(); iter.hasNext();) {
 					Geometry geom = (Geometry) iter.next();
-					Feature feature=(Feature) featureIter.next();
-					
+					Feature feature = (Feature) featureIter.next();
+
 					try {
 
 						if (renderingStopRequested) {
@@ -495,8 +543,7 @@ public class ShapeRenderer {
 
 							Filter filter = r.getFilter();
 
-							if ((filter == null) || filter.contains(feature))
-							 {
+							if ((filter == null) || filter.contains(feature)) {
 								doElse = false;
 
 								if (LOGGER.isLoggable(Level.FINER)) {
@@ -507,7 +554,6 @@ public class ShapeRenderer {
 
 								processSymbolizers(graphics, feature, geom,
 										symbolizers, scaleRange);
-
 
 								if (LOGGER.isLoggable(Level.FINER)) {
 									LOGGER.finer("... done!");
@@ -586,8 +632,22 @@ public class ShapeRenderer {
 	 */
 	private Object getGeom(GeometryAttributeType defaultGeometry) {
 		if (defaultGeom == null) {
-			defaultGeom = defaultGeometry.createDefaultValue();
-			
+			if (MultiPolygon.class.isAssignableFrom(defaultGeometry.getType())) {
+				defaultGeom = MULTI_POLYGON_GEOM;
+			} else if (Polygon.class
+					.isAssignableFrom(defaultGeometry.getType())) {
+				defaultGeom = POLYGON_GEOM;
+			} else if (LineString.class.isAssignableFrom(defaultGeometry
+					.getType())) {
+				defaultGeom = LINE_GEOM;
+			} else if (MultiLineString.class.isAssignableFrom(defaultGeometry.getType())) {
+				defaultGeom = MULTI_LINE_GEOM;
+			} else if (Point.class.isAssignableFrom(defaultGeometry.getType())) {
+				defaultGeom = POINT_GEOM;
+			} else if (MultiPoint.class.isAssignableFrom(defaultGeometry
+					.getType())) {
+				defaultGeom = MULTI_POINT_GEOM;
+			}
 		}
 
 		return defaultGeom;
@@ -667,15 +727,15 @@ public class ShapeRenderer {
 				break;
 			}
 
-			//        if( symbolizers[m] instanceof TextSymbolizer ){
-			//        	labelCache.put((TextSymbolizer) symbolizers[m], feature, shape,
-			// scaleRange);
-			//        }
-			//        else{
+			        if( symbolizers[m] instanceof TextSymbolizer ){
+			        	labelCache.put((TextSymbolizer) symbolizers[m], feature, shape,
+			 scaleRange);
+			        }
+			        else{
 			Style2D style = styleFactory.createStyle(feature, symbolizers[m],
 					scaleRange);
 			painter.paint(graphics, getShape(geom), style, scaleDenominator);
-			//        }
+			        }
 
 		}
 
@@ -686,9 +746,11 @@ public class ShapeRenderer {
 	 * @return
 	 */
 	private Shape getShape(Geometry geom) {
-		if( geom.type==ShapeType.ARC||geom.type==ShapeType.ARCM ||geom.type==ShapeType.ARCZ)
+		if (geom.type == ShapeType.ARC || geom.type == ShapeType.ARCM
+				|| geom.type == ShapeType.ARCZ)
 			return new MultiLineShape(geom);
-		if( geom.type==ShapeType.POLYGON||geom.type==ShapeType.POLYGONM ||geom.type==ShapeType.POLYGONZ)
+		if (geom.type == ShapeType.POLYGON || geom.type == ShapeType.POLYGONM
+				|| geom.type == ShapeType.POLYGONZ)
 			return new PolygonShape(geom);
 		return null;
 	}
@@ -807,18 +869,22 @@ public class ShapeRenderer {
 		}
 
 	}
+
 	/**
 	 * @return Returns the caching.
 	 */
 	public boolean isCaching() {
 		return caching;
 	}
+
 	/**
-	 * @param caching The caching to set.
+	 * @param caching
+	 *            The caching to set.
 	 */
 	public void setCaching(boolean caching) {
 		this.caching = caching;
 	}
+
 	MapContext getContext() {
 		return context;
 	}
@@ -826,25 +892,27 @@ public class ShapeRenderer {
 	public RenderingHints getRenderHints() {
 		return hints;
 	}
+
 	public void setRenderHints(RenderingHints hints) {
 		this.hints = hints;
-	}	
-    
-    public void setRenderingHint(RenderingHints.Key key, Object value){
-        if( hints==null )
-            hints=new RenderingHints( key, value);
-        else
-            hints.put(key, value);
-    }
+	}
 
-    private class NonValidatingFeature extends DefaultFeature{
+	public void setRenderingHint(RenderingHints.Key key, Object value) {
+		if (hints == null)
+			hints = new RenderingHints(key, value);
+		else
+			hints.put(key, value);
+	}
+
+	private class NonValidatingFeature extends DefaultFeature {
 
 		/**
 		 * @param schema
 		 * @param attributes
 		 * @throws IllegalAttributeException
 		 */
-		protected NonValidatingFeature(DefaultFeatureType schema, Object[] attributes) throws IllegalAttributeException {
+		protected NonValidatingFeature(DefaultFeatureType schema,
+				Object[] attributes) throws IllegalAttributeException {
 			super(schema, attributes);
 			// TODO Auto-generated constructor stub
 		}
@@ -856,19 +924,20 @@ public class ShapeRenderer {
 		public void setAttributes(Object[] attributes)
 				throws IllegalAttributeException {
 			for (int i = 0; i < attributes.length; i++) {
-				setAttribute(i,attributes[i]);
+				setAttribute(i, attributes[i]);
 			}
 		}
-		
+
 		public void setAttribute(int position, Object val) {
-			setAttributeValue(position, val);		
+			setAttributeValue(position, val);
 		}
-		
-		
+
 	}
+
 	public boolean isConcatTransforms() {
 		return concatTransforms;
 	}
+
 	public void setConcatTransforms(boolean concatTransforms) {
 		this.concatTransforms = concatTransforms;
 	}

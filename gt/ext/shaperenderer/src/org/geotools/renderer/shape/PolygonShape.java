@@ -43,7 +43,7 @@ public class PolygonShape extends AbstractShape {
 			int currentIndex = 0;
 
 			public int getWindingRule() {
-				return WIND_NON_ZERO;
+				return WIND_EVEN_ODD;
 			}
 
 			public boolean isDone() {
@@ -97,7 +97,7 @@ public class PolygonShape extends AbstractShape {
 					if (at != null)
 						at.transform(coords, 0, coords, 0, 1);
 					return SEG_MOVETO;
-				}else if(currentIndex+1==geom.coords[currentPart].length){
+				}else if(currentIndex+2==geom.coords[currentPart].length){
 					coords[0] = (float) geom.coords[currentPart][currentIndex];
 					currentIndex++;
 					coords[1] = (float) geom.coords[currentPart][currentIndex];
