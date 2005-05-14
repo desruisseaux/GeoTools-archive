@@ -41,6 +41,7 @@ import org.geotools.map.MapContext;
 import org.geotools.renderer.lite.LiteRenderer2;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
@@ -63,7 +64,7 @@ public class Timing {
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = false;
+	private static boolean ALL_DATA = true;
 
 	private static boolean DISPLAY = true;
 
@@ -71,7 +72,7 @@ public class Timing {
 
 	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = true;
+	private static boolean RUN_LITE = false;
 
 	private static boolean RUN_TINY = false;
 
@@ -185,13 +186,12 @@ public class Timing {
 			typeName = POLY_TYPE_NAME;
 		StyleFactory sFac = StyleFactory.createStyleFactory();
 		// The following is complex, and should be built from
-
-		LineSymbolizer lineSym = sFac.createLineSymbolizer();
 		Stroke myStroke = sFac.getDefaultStroke();
 		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
 		myStroke
 				.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
-		lineSym.setStroke(myStroke);
+		Fill myFill= sFac.getDefaultFill();
+		PolygonSymbolizer lineSym = sFac.createPolygonSymbolizer(myStroke,myFill,"the_geom");
 
 		Rule rule2 = sFac.createRule();
 		rule2.setSymbolizers(new Symbolizer[] { lineSym });
@@ -240,9 +240,13 @@ public class Timing {
 		if (ANTI_ALIASING)
 			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
-		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
+
+		Frame display = null;
+		if (DISPLAY)
+			display=display("shape", image, w, h);
+
 		Graphics2D g = image.createGraphics();
 		g.setColor(Color.white);
 		g.fillRect(0, 0, w, h);
@@ -283,9 +287,8 @@ public class Timing {
 								+ "\n");
 		}else if (out != null)
 				out.append("shape " + testName + "=" + (end - start) + "\n");
-		if (DISPLAY)
-			display("shape", image, w, h);
-
+		if( display!=null )
+		display.repaint();
 	}
 
 	private MapContext getMapContext() throws Exception {
@@ -315,9 +318,12 @@ public class Timing {
 		if (ANTI_ALIASING)
 			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
-		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
+
+		Frame display = null;
+		if (DISPLAY)
+			display=display("shape", image, w, h);
 		Graphics2D g = image.createGraphics();
 		g.setColor(Color.white);
 		g.fillRect(0, 0, w, h);
@@ -357,9 +363,8 @@ public class Timing {
 			out.append("shape " + testName + "=" + (end - start) / 3 + "\n");
 		}else
 			out.append("shape " + testName + "=" + (end - start) + "\n");
-		if (DISPLAY)
-			display("shape", image, w, h);
-
+		if( display!=null)
+			display.repaint();
 	}
 
 	private void runLiteRendererTest() throws Exception {
@@ -374,9 +379,13 @@ public class Timing {
 		if (CACHING)
 			renderer.setMemoryPreloadingEnabled(true);
 
-		int w = 1000, h = 1000;
 		final BufferedImage image = new BufferedImage(w, h,
 				BufferedImage.TYPE_INT_ARGB);
+
+		Frame display = null;
+		if (DISPLAY)
+			display=display("shape", image, w, h);
+		
 		Graphics2D g = image.createGraphics();
 		g.setColor(Color.white);
 		g.fillRect(0, 0, w, h);
@@ -412,11 +421,11 @@ public class Timing {
 		}
 			else if (out != null)
 				out.append("lite " + testName + "=" + (end - start) + "\n");
-		if (DISPLAY)
-			display("lite", image, w, h);
+			if( display!=null)
+				display.repaint();
 	}
 
-	public static void display(String testName, final BufferedImage image,
+	public static Frame display(String testName, final BufferedImage image,
 			int w, int h) {
 		Frame frame = new Frame(testName);
 		frame.addWindowListener(new WindowAdapter() {
@@ -436,13 +445,23 @@ public class Timing {
 		frame.add(p);
 		frame.setSize(w, h);
 		frame.setVisible(true);
+		return frame;
 	}
 
+
+	private static String NEW_YORK_FILE="file:///home/jones/demo/nyct2000.shp";
+	private static String NORTH_AMERICA_FILE="file:///home/jones/demo/north_america.shp";
+
+	private static String NEW_YORK_NAME="nyct2000";
+	private static String NORTH_AMERICA_NAME="north_america";
+	
 	private static String LINES_FILE = "file:///home/jones/aData/bc_roads.shp";
 
 	private static String LINES_TYPE_NAME = "bc_roads";
 
-	private static String POLY_FILE = "file:///home/jones/demo/nyct2000.shp";
+	private static String POLY_FILE = NORTH_AMERICA_FILE;
 
-	private static String POLY_TYPE_NAME = "nyct2000";
+	private static String POLY_TYPE_NAME = NORTH_AMERICA_NAME;
+
+	int w = 512, h = 512;
 }
