@@ -24,12 +24,11 @@ import org.geotools.data.Query;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
-import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.renderer.shape.Geometry;
 import org.geotools.renderer.shape.LabelingTest;
-import org.geotools.renderer.shape.MultiLineHandler;
+import org.geotools.renderer.shape.PolygonHandler;
 import org.geotools.resources.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -45,7 +44,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class PolygonHandlerTest extends TestCase {
 
 	public void testRead() throws Exception{
-		URL url=TestData.getResource(LabelingTest.class, "streams.shp");
+		URL url=TestData.getResource(LabelingTest.class, "lakes.shp");
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
 		Envelope env=ds.getFeatureSource().getBounds();
@@ -55,7 +54,7 @@ public class PolygonHandlerTest extends TestCase {
 		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, GeographicCRS.WGS84);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
+		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof Geometry);

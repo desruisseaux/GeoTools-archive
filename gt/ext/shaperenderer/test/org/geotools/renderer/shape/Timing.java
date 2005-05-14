@@ -63,13 +63,13 @@ public class Timing {
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = true;
+	private static boolean ALL_DATA = false;
 
-	private static boolean DISPLAY = false;
+	private static boolean DISPLAY = true;
 
 	private static boolean ANTI_ALIASING = true;
 
-	private static boolean RUN_SHAPE = false;
+	private static boolean RUN_SHAPE = true;
 
 	private static boolean RUN_LITE = true;
 
@@ -85,7 +85,7 @@ public class Timing {
 
 	private static boolean CPU_PROFILE = false;
 
-	private static boolean LINES = true;
+	private static boolean LINES = false;
 
 	private String testName;
 	{
@@ -442,7 +442,7 @@ public class Timing {
 
 	private static String LINES_TYPE_NAME = "bc_roads";
 
-	private static String POLY_FILE = "file:///home/jones/aData/lwsg_prov.shp";
+	private static String POLY_FILE = "file:///home/jones/demo/nyct2000.shp";
 
-	private static String POLY_TYPE_NAME = "lwsg_prov";
+	private static String POLY_TYPE_NAME = "nyct2000";
 }

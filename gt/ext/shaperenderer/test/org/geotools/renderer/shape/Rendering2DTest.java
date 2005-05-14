@@ -66,7 +66,7 @@ public class Rendering2DTest extends TestCase {
      * The logger for the rendering module.
      */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
-    public static boolean INTERACTIVE=false;
+    public static boolean INTERACTIVE=true;
     private static final FilterFactory filterFactory = FilterFactory.createFilterFactory();
     private Object transform;
     static final String LINE = "linefeature";
@@ -170,7 +170,24 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer();
+        ShapeRenderer renderer=createLineRenderer(getLines());
+        MapContext map=renderer.getContext();
+
+        map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
+                .getMaxY() + 20);
+        map.setAreaOfInterest(env);
+        showRender("testSimpleLineRender", renderer, 3000, env);
+
+    }
+    
+    public void testSimplePolygonRender() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting rendering2DTest");
+        
+        ShapeRenderer renderer=createLineRenderer(getPolygons());
         MapContext map=renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
@@ -187,7 +204,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer();
+        ShapeRenderer renderer=createLineRenderer(getLines());
         MapContext map=renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
@@ -262,7 +279,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer();
+        ShapeRenderer renderer=createLineRenderer(getLines());
         Envelope env=renderer.getContext().getAreaOfInterest();
 //        INTERACTIVE=true;
         showRender("testSimpleLineRender", renderer, 3000, env);
@@ -434,7 +451,7 @@ public class Rendering2DTest extends TestCase {
     }
     
     public void testEnvelopePerformance() throws Exception{
-    	ShapeRenderer renderer=createLineRenderer();
+    	ShapeRenderer renderer=createLineRenderer(getLines());
     	MapContext context=renderer.getContext();
     	
     	context.setAreaOfInterest(context.getLayerBounds());
@@ -480,8 +497,8 @@ public class Rendering2DTest extends TestCase {
 	 * @return
 	 * @throws Exception
 	 */
-	private ShapeRenderer createLineRenderer() throws Exception {
-		ShapefileDataStore ds=getLines();
+	private ShapeRenderer createLineRenderer(ShapefileDataStore ds) throws Exception {
+
         FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
         Style style = createTestStyle();
 

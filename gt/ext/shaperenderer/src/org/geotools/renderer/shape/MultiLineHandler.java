@@ -113,7 +113,6 @@ public class MultiLineHandler implements ShapeHandler {
 		}
 		double[][] coords= new double[numParts][];
 		double[][] transformed = new double[numParts][];
-		int[] total = new int[numParts];
 		// if needed in future otherwise all references to a z are commented
 		// out.
 		// if( dimensions==3 )
@@ -185,7 +184,6 @@ public class MultiLineHandler implements ShapeHandler {
 						}
 					}
 				}
-				total[part] = readDoubles / 2;
 
 				if (!mt.isIdentity()) {
 					try {
@@ -210,8 +208,6 @@ public class MultiLineHandler implements ShapeHandler {
 			// if we have another coordinate, read and add to the coordinate
 			// sequences
 			if (dimensions == 3) {
-				// z min, max
-				buffer.position(buffer.position() + 2 * 8 + 8 * numPoints);
 				// for (int part = 0; part < numParts; part++) {
 				// start = partOffsets[part];
 				//

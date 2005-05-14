@@ -688,6 +688,8 @@ public class ShapeRenderer {
 	private Shape getShape(Geometry geom) {
 		if( geom.type==ShapeType.ARC||geom.type==ShapeType.ARCM ||geom.type==ShapeType.ARCZ)
 			return new MultiLineShape(geom);
+		if( geom.type==ShapeType.POLYGON||geom.type==ShapeType.POLYGONM ||geom.type==ShapeType.POLYGONZ)
+			return new PolygonShape(geom);
 		return null;
 	}
 

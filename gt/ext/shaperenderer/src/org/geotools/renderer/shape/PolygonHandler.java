@@ -21,7 +21,9 @@ import java.nio.ByteBuffer;
 import org.geotools.data.shapefile.shp.ShapeHandler;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
+import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -33,19 +35,32 @@ import com.vividsolutions.jts.geom.Envelope;
 public class PolygonHandler implements ShapeHandler {
 
 	private ShapeType type;
-	private Envelope bbox;
-	private MathTransform mt;
 
+	private Envelope bbox;
+
+	double spanx, spany;
+
+	private MathTransform mt;
+  RobustCGAlgorithms cga = new RobustCGAlgorithms();  
 	/**
 	 * Create new instance
 	 * @param type the type of shape.
 	 * @param env the area that is visible.  If shape is not in area then skip.
 	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
 	 */
-	public PolygonHandler(ShapeType type, Envelope env, MathTransform mt) {
-		this.type=type;
-		this.bbox=env;
-		this.mt=mt;
+	public PolygonHandler(ShapeType type, Envelope env, MathTransform mt) 
+	throws TransformException {
+		this.type = type;
+		this.bbox = env;
+		this.mt = mt;
+		if (mt != null) {
+			MathTransform screenToWorld = mt.inverse();
+			double[] original = new double[] { 0, 0, 1, 1 };
+			double[] coords = new double[4];
+			screenToWorld.transform(original, 0, coords, 0, 2);
+			this.spanx = Math.abs(coords[0] - coords[2]);
+			this.spany = Math.abs(coords[1] - coords[3]);
+		}
 	}
 	
 	/**
@@ -60,8 +75,125 @@ public class PolygonHandler implements ShapeHandler {
 	 * @see org.geotools.data.shapefile.shp.ShapeHandler#read(java.nio.ByteBuffer, org.geotools.data.shapefile.shp.ShapeType)
 	 */
 	public Object read(ByteBuffer buffer, ShapeType type) {
-		// TODO Auto-generated method stub
-		return null;
+		if (type == ShapeType.NULL) {
+			return null;
+		}
+
+		int dimensions = (type == ShapeType.ARCZ) ? 3 : 2;
+		// read bounding box
+		double[] tmpbbox = new double[4];
+		tmpbbox[0] = buffer.getDouble();
+		tmpbbox[1] = buffer.getDouble();
+		tmpbbox[2] = buffer.getDouble();
+		tmpbbox[3] = buffer.getDouble();
+
+		Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1],
+				tmpbbox[3]);
+
+		if (!bbox.intersects(geomBBox)) {
+			return null;
+		}
+
+		boolean bboxdecimate = geomBBox.getWidth() <= spanx
+				&& geomBBox.getHeight() <= spany;
+		int numParts = buffer.getInt();
+		int numPoints = buffer.getInt(); // total number of points
+
+		int[] partOffsets = new int[numParts];
+
+		// points = new Coordinate[numPoints];
+		for (int i = 0; i < numParts; i++) {
+			partOffsets[i] = buffer.getInt();
+		}
+		double[][] coords= new double[numParts][];
+		double[][] transformed = new double[numParts][];
+		// if needed in future otherwise all references to a z are commented
+		// out.
+		// if( dimensions==3 )
+		// z=new double[numParts][];
+
+		int finish, start = 0;
+		int length = 0;
+		
+		if (bboxdecimate){
+			coords=new double[1][];
+			coords[0]=new double[4];
+			transformed=new double[1][];
+			transformed[0] = new double[4];
+			coords[0][0]=buffer.getDouble();
+			coords[0][1]=buffer.getDouble();
+			buffer.position((buffer.position() + (numPoints-2) * 16));
+			coords[0][2]=buffer.getDouble();
+			coords[0][3]=buffer.getDouble();
+            if( !bbox.contains(coords[0][0],coords[0][1]) && !bbox.contains(coords[0][2], coords[0][3]) )
+                return null;
+			try {
+				mt.transform(coords[0], 0, transformed[0], 0, 2);
+			} catch (Exception e) {
+				ShapeRenderer.LOGGER
+						.severe("could not transform coordinates "
+								+ e.getLocalizedMessage());
+				transformed[0]=coords[0];
+			}		
+			}else{
+			for (int part = 0; part < numParts; part++) {
+				start = partOffsets[part];
+
+				if (part == (numParts - 1)) {
+					finish = numPoints;
+				} else {
+					finish = partOffsets[part + 1];
+				}
+
+				length = finish - start;
+				// if (length == 1) {
+				// length = 2;
+				// clonePoint = true;
+				// } else {
+				// clonePoint = false;
+				// }
+				coords[part] = new double[length * 2-2];
+				int readDoubles = 0;
+				int currentDoubles = 0;
+				int totalDoubles = length * 2;
+				for (; currentDoubles < totalDoubles-2;) {
+					coords[part][readDoubles] = buffer.getDouble();
+					readDoubles++;
+					currentDoubles++;
+					coords[part][readDoubles] = buffer.getDouble();
+					readDoubles++;
+					currentDoubles++;
+					if (currentDoubles > 3 && currentDoubles < totalDoubles - 1) {
+						if (Math.abs(coords[part][readDoubles - 4]
+								- coords[part][readDoubles - 2]) <= spanx
+								&& Math.abs(coords[part][readDoubles - 3]
+										- coords[part][readDoubles - 1]) <= spany) {
+							readDoubles -= 2;
+						}
+					}
+				}
+
+				if (!mt.isIdentity()) {
+					try {
+						transformed[part] = new double[readDoubles];
+						mt.transform(coords[part], 0, transformed[part], 0,
+								readDoubles / 2);
+					} catch (Exception e) {
+						ShapeRenderer.LOGGER
+								.severe("could not transform coordinates "
+										+ e.getLocalizedMessage());
+						transformed[part]=coords[part];
+					}
+				} else
+					transformed[part] = coords[part];
+				// if(clonePoint) {
+				// builder.setOrdinate(builder.getOrdinate(0, 0), 0, 1);
+				// builder.setOrdinate(builder.getOrdinate(1, 0), 1, 1);
+				// }
+
+			}
+			}
+		return new Geometry(type, transformed, geomBBox);
 	}
 
 	/**

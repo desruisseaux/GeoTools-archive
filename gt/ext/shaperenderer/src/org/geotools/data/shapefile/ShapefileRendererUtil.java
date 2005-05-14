@@ -23,6 +23,7 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.renderer.shape.MultiLineHandler;
+import org.geotools.renderer.shape.PolygonHandler;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -52,6 +53,8 @@ public class ShapefileRendererUtil {
 		
 		if( type==ShapeType.ARC || type==ShapeType.ARCM || type==ShapeType.ARCZ )
 			reader.setHandler(new MultiLineHandler(type, bbox, mt));
+		if( type==ShapeType.POLYGON||type==ShapeType.POLYGONM ||type==ShapeType.POLYGONZ)
+			reader.setHandler(new PolygonHandler(type, bbox, mt));
 		return reader;
 	}
 	public static DbaseFileReader getDBFReader(ShapefileDataStore ds) throws IOException{
