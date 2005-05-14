@@ -37,10 +37,12 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.map.DefaultMapContext;
+import org.geotools.map.MapContext;
 import org.geotools.renderer.lite.LiteRenderer2;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
@@ -56,20 +58,20 @@ import com.yourkit.api.Controller;
  * @author jeichar
  * @since 2.1.x
  */
-public class Timing{
+public class Timing {
 
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = false;
+	private static boolean ALL_DATA = true;
 
-	private static boolean DISPLAY = true;
+	private static boolean DISPLAY = false;
 
 	private static boolean ANTI_ALIASING = true;
 
-	private static boolean RUN_SHAPE = true;
+	private static boolean RUN_SHAPE = false;
 
-	private static boolean RUN_LITE = false;
+	private static boolean RUN_LITE = true;
 
 	private static boolean RUN_TINY = false;
 
@@ -157,7 +159,7 @@ public class Timing{
 			ShapefileDataStore store = (ShapefileDataStore) fac
 					.createDataStore(new URL(LINES_FILE));
 			AttributeExpression exp = filterFactory.createAttributeExpression(
-					store.getSchema(), "STREET");
+					store.getSchema(), "STREETS");
 			CompareFilter filter = filterFactory
 					.createCompareFilter(Filter.COMPARE_NOT_EQUALS);
 			filter.addLeftValue(exp);
@@ -175,31 +177,30 @@ public class Timing{
 	}
 
 	static Style createPolyStyle() throws Exception {
-		return createLineStyle(null);
+		return createPolyStyle(null);
 	}
 
 	static Style createPolyStyle(String typeName) throws Exception {
 		if (typeName == null)
-			typeName = "bc_lakes";
+			typeName = POLY_TYPE_NAME;
 		StyleFactory sFac = StyleFactory.createStyleFactory();
 		// The following is complex, and should be built from
 
-		LineSymbolizer linesym = sFac.createLineSymbolizer();
+		LineSymbolizer lineSym = sFac.createLineSymbolizer();
 		Stroke myStroke = sFac.getDefaultStroke();
 		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
 		myStroke
 				.setWidth(filterFactory.createLiteralExpression(new Integer(2)));
-		linesym.setStroke(myStroke);
+		lineSym.setStroke(myStroke);
 
 		Rule rule2 = sFac.createRule();
-		rule2.setSymbolizers(new Symbolizer[] { linesym });
+		rule2.setSymbolizers(new Symbolizer[] { lineSym });
 		if (FILTER) {
 			ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 			ShapefileDataStore store = (ShapefileDataStore) fac
-					.createDataStore(new URL(
-							"file:///home/jones/aData/bc_roads.shp"));
+					.createDataStore(new URL(LINES_FILE));
 			AttributeExpression exp = filterFactory.createAttributeExpression(
-					store.getSchema(), "STREET");
+					store.getSchema(), "WSG_CODE");
 			CompareFilter filter = filterFactory
 					.createCompareFilter(Filter.COMPARE_NOT_EQUALS);
 			filter.addLeftValue(exp);
@@ -228,21 +229,14 @@ public class Timing{
 		if (RUN_LITE)
 			t.runLiteRendererTest();
 
-		if (out != null)
-			out.flush();
+		if (out != null && !DISPLAY && !CPU_PROFILE)
+			out.close();
 	}
 
 	private void runShapeRendererTest() throws Exception {
-		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
-		ShapefileDataStore store = (ShapefileDataStore) fac
-				.createDataStore(new URL(
-						"file:///home/jones/aData/bc_roads.shp"));
-		DefaultMapContext context = new DefaultMapContext();
-		context.addLayer(store.getFeatureSource(), createLineStyle());
-		if (NO_REPROJECTION)
-			context.setAreaOfInterest(new Envelope(), store.getSchema()
-					.getDefaultGeometry().getCoordinateSystem());
+		MapContext context = getMapContext();
 		ShapeRenderer renderer = new ShapeRenderer(context);
+
 		if (ANTI_ALIASING)
 			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
@@ -282,18 +276,29 @@ public class Timing{
 			controller.captureCPUSnapshot("shape_" + testName, false);
 		}
 		long end = System.currentTimeMillis();
-		if (!CPU_PROFILE)
-			if (ACCURATE)
-				if (out != null)
-					out.append("shape " + testName + "=" + (end - start) / 3
-							+ "\n");
-				else if (out != null)
-					out
-							.append("shape " + testName + "=" + (end - start)
-									+ "\n");
+		if (ACCURATE){
+			if (out != null)
+				out
+						.append("shape " + testName + "=" + (end - start) / 3
+								+ "\n");
+		}else if (out != null)
+				out.append("shape " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
 			display("shape", image, w, h);
 
+	}
+
+	private MapContext getMapContext() throws Exception {
+		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
+		ShapefileDataStore store = (ShapefileDataStore) fac
+				.createDataStore(new URL(LINES ? LINES_FILE : POLY_FILE));
+		DefaultMapContext context = new DefaultMapContext();
+		context.addLayer(store.getFeatureSource(), LINES ? createLineStyle()
+				: createPolyStyle());
+		if (NO_REPROJECTION)
+			context.setAreaOfInterest(new Envelope(), store.getSchema()
+					.getDefaultGeometry().getCoordinateSystem());
+		return context;
 	}
 
 	private void runTinyTest() throws Exception {
@@ -348,29 +353,18 @@ public class Timing{
 			controller.captureCPUSnapshot("shape_" + testName, false);
 		}
 		long end = System.currentTimeMillis();
-		if (!CPU_PROFILE)
-			if (ACCURATE)
-				out
-						.append("shape " + testName + "=" + (end - start) / 3
-								+ "\n");
-			else
-				out.append("shape " + testName + "=" + (end - start) + "\n");
+		if (ACCURATE){
+			out.append("shape " + testName + "=" + (end - start) / 3 + "\n");
+		}else
+			out.append("shape " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
 			display("shape", image, w, h);
 
 	}
 
 	private void runLiteRendererTest() throws Exception {
-		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
-		ShapefileDataStore store = (ShapefileDataStore) fac
-				.createDataStore(new URL(LINES_FILE));
-		DefaultMapContext context = new DefaultMapContext();
-		context.addLayer(store.getFeatureSource(), createLineStyle());
 
-		if (NO_REPROJECTION)
-			context.setAreaOfInterest(new Envelope(), store.getSchema()
-					.getDefaultGeometry().getCoordinateSystem());
-
+		MapContext context = getMapContext();
 		LiteRenderer2 renderer = new LiteRenderer2(context);
 		renderer.setOptimizedDataLoadingEnabled(true);
 		if (ANTI_ALIASING)
@@ -412,13 +406,12 @@ public class Timing{
 		}
 
 		long end = System.currentTimeMillis();
-		if (!CPU_PROFILE)
-			if (ACCURATE)
-				if (out != null)
-					out.append("lite " + testName + "=" + (end - start) / 3
-							+ "\n");
-				else if (out != null)
-					out.append("lite " + testName + "=" + (end - start) + "\n");
+		if (ACCURATE){
+			if (out != null)
+				out.append("lite " + testName + "=" + (end - start) / 3 + "\n");
+		}
+			else if (out != null)
+				out.append("lite " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
 			display("lite", image, w, h);
 	}
@@ -444,8 +437,12 @@ public class Timing{
 		frame.setSize(w, h);
 		frame.setVisible(true);
 	}
-	
 
-	private static String LINES_FILE="file:///home/jones/aData/bc_roads.shp";
-	private static String LINES_TYPE_NAME="bc_roads";
+	private static String LINES_FILE = "file:///home/jones/aData/bc_roads.shp";
+
+	private static String LINES_TYPE_NAME = "bc_roads";
+
+	private static String POLY_FILE = "file:///home/jones/aData/lwsg_prov.shp";
+
+	private static String POLY_TYPE_NAME = "lwsg_prov";
 }
