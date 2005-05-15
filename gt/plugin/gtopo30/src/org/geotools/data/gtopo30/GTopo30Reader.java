@@ -80,7 +80,7 @@ public class GTopo30Reader implements GridCoverageReader {
      * @throws DataSourceException
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public GTopo30Reader(Object source)
+    public GTopo30Reader(final Object source)
         throws MalformedURLException, DataSourceException {
         URL urlToUse = null;
 

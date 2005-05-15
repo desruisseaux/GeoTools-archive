@@ -229,17 +229,17 @@ class GTopo30DataSource {
         try {
             header = new GT30Header(demHeaderURL);
         } catch (Exception e) {
-            throw new DataSourceException("Unexpected exception"
+            throw new DataSourceException("Unexpected exception when trying to retrieve the header "
                 + e.getMessage());
         }
 
         // get information from the header
-        int nrows = header.getNRows();
-        int ncols = header.getNCols();
-        double xdim = header.getXDim();
-        double ydim = header.getYDim();
-        double minx = header.getULXMap() - (xdim / 2);
-        double miny = (header.getULYMap() + (ydim / 2)) - (ydim * nrows);
+        final int nrows = header.getNRows();
+		final int ncols = header.getNCols();
+		final double xdim = header.getXDim();
+		final double ydim = header.getYDim();
+		final double minx = header.getULXMap() - (xdim / 2);
+		final double miny = (header.getULYMap() + (ydim / 2)) - (ydim * nrows);
 
         // Read the statistics file
         GT30Stats stats = null;
@@ -247,21 +247,21 @@ class GTopo30DataSource {
         try {
             stats = new GT30Stats(statsURL);
         } catch (Exception e) {
-            throw new DataSourceException("Unexpected exception "
+            throw new DataSourceException("Unexpected exception when trying to read statistics file "
                 + e.getMessage());
         }
 
-        int max = stats.getMax();
-        int min = stats.getMin();
+		final int max = stats.getMax();
+		final int min = stats.getMin();
 
         // prepare NIO based ImageInputStream
         FileChannelImageInputStream iis = null;
 
         try {
             // trying to create a channel to the file to read
-            String filePath = URLDecoder.decode(demURL.getFile(), "US-ASCII");
-            FileInputStream fis = new FileInputStream(filePath);
-            FileChannel channel = fis.getChannel();
+			final String filePath = URLDecoder.decode(demURL.getFile(), "US-ASCII");
+			final FileInputStream fis = new FileInputStream(filePath);
+			final FileChannel channel = fis.getChannel();
             iis = new FileChannelImageInputStream(channel);
 
             if (header.getByteOrder().compareToIgnoreCase("M") == 0) {
@@ -275,28 +275,28 @@ class GTopo30DataSource {
 
         // Prepare temporaray colorModel and sample model, needed to build the
         // RawImageInputStream
-        ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(
+		final ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(
                     ColorSpace.CS_GRAY), false, false, Transparency.OPAQUE,
                 DataBuffer.TYPE_SHORT);
-        SampleModel sm = cm.createCompatibleSampleModel(ncols, nrows);
-        ImageTypeSpecifier its = new ImageTypeSpecifier(cm, sm); // ImageTypeSpecifier.createGrayscale(16,
+		final SampleModel sm = cm.createCompatibleSampleModel(ncols, nrows);
+		final ImageTypeSpecifier its = new ImageTypeSpecifier(cm, sm); // ImageTypeSpecifier.createGrayscale(16,
 
         // DataBuffer.TYPE_SHORT,
         // true);
         // Finally, build the image input stream
-        RawImageInputStream raw = new RawImageInputStream(iis, its,
+		final RawImageInputStream raw = new RawImageInputStream(iis, its,
                 new long[] { 0 },
                 new Dimension[] { new Dimension(ncols, nrows) });
 
         // if crop needed
-        Envelope env = getBounds();
+		Envelope env = getBounds();
         ImageReadParam irp = null;
 
         // Make some decision about tiling.
-        int tileRows = (int) Math.ceil(TILE_SIZE / (ncols * 2));
+		final int tileRows = (int) Math.ceil(TILE_SIZE / (ncols * 2));
 
         // building the final image layout
-        ImageLayout il = new ImageLayout(0, 0, ncols, nrows, 0, 0, ncols,
+		final ImageLayout il = new ImageLayout(0, 0, ncols, nrows, 0, 0, ncols,
                 tileRows, sm, cm);
 
         // First operator: read the image
@@ -308,9 +308,9 @@ class GTopo30DataSource {
         // using NIO and these tiles are very big and fill up rapidly the cache:
         // better use it to avoid operations down the rendering chaing
         RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
-        //hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
+        hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
-        RenderedOp image = JAI.create("ImageRead", pbj, hints);
+		RenderedOp image = JAI.create("ImageRead", pbj, hints);
 
         if (cropEnvelope != null) {
             env = intersectEnvelope(env, cropEnvelope);
@@ -345,23 +345,24 @@ class GTopo30DataSource {
         }
 
         // Build the coordinate system
-        CoordinateReferenceSystem crs = AbstractGridFormat.getDefaultCRS();
+        final CoordinateReferenceSystem crs = AbstractGridFormat.getDefaultCRS();
 
         // Create the SampleDimension, with colors and byte transformation
         // needed for visualization
         String UoM = null;
-        UnitFormat unitFormat = UnitFormat.getStandardInstance();
+        final UnitFormat unitFormat = UnitFormat.getStandardInstance();
         Unit uom = null;
 
         try {
+			//unit of measure is meter
             uom = unitFormat.parseUnit("m");
         } catch (Exception ex1) {
             uom = null;
         }
 
-        Category values = new Category("values", this.getColors(),
+        final Category values = new Category("values", this.getColors(),
                 new NumberRange(1, 255), new NumberRange(min, max));
-        Category nan = new Category("nodata",
+        final Category nan = new Category("nodata",
                 new Color[] { new Color(0, 0, 0, 0) }, new NumberRange(0, 0),
                 new NumberRange(-9999, -9999));
         ; //new Category("nodata", new Color(0, 0, 0), 0);
@@ -376,10 +377,10 @@ class GTopo30DataSource {
 
         //switch from -999 to NaN to keep transparency informations
         //for the gridcoverage
-        BufferedImage img = new BufferedImage(band.getColorModel(),
+        final BufferedImage img = new BufferedImage(band.getColorModel(),
                 this.getAdjustedRaster(
-                    (WritableRaster) image.createSnapshot().getAsBufferedImage()
-                                          .getData()), false, null); // properties????
+                    (WritableRaster) image.createSnapshot().getAsBufferedImage().copyData(null))
+                                          , false, null); // properties????
 
         //setting metadata
         Map metadata = new HashMap();
@@ -406,6 +407,8 @@ class GTopo30DataSource {
         }
         header=null;
         stats=null;
+		image.dispose();
+		image=null;
         return new GridCoverage2D(coverageName, img, crs, env,
             new GridSampleDimension[] { band }, null, metadata);
     }
