@@ -354,7 +354,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 				 */
 				if (surrogateImage.getColorModel() instanceof IndexColorModel &&
                         (surrogateImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE)) {
-                    surrogateImage = convertIndexColorModel2ComponentColorModel(surrogateImage);
+                    surrogateImage = this.reformatFromIndexColorModel2ComponentColorModel(surrogateImage);
                 }				
                 /**
                  * component color model is not well digested by the gif
@@ -381,7 +381,7 @@ public class WorldImageWriter implements GridCoverageWriter {
              * TIFF file format.  We need just a couple of correction for this
              * format. It seems that the encoder does not work fine with
              * IndexColorModel therefore in such a case we need the reformat
-             * the inpit image to a ComponentColorModel.
+             * the input image to a ComponentColorModel.
              */
             if ((((String) (this.format.getWriteParameters().parameter("format")
                                            .getValue())).compareToIgnoreCase(
@@ -406,47 +406,7 @@ public class WorldImageWriter implements GridCoverageWriter {
         }
     }
 
-	/**
-	 * Convert an IndexColorModel to a compatible ComponentColorModel.
-	 * 
-	 * @param surrogateImage
-	 * @return
-	 */
-    private PlanarImage convertIndexColorModel2ComponentColorModel(PlanarImage surrogateImage) {
-        // Format the image to be expanded from IndexColorModel to
-        // ComponentColorModel taking into account transparency mode
-		final int numBits=surrogateImage.getSampleModel().getTransferType()==DataBuffer.TYPE_BYTE?8:16;
-		final int transferType=surrogateImage.getSampleModel().getTransferType();
-        ParameterBlock pbFormat = new ParameterBlock();
-        pbFormat.addSource(surrogateImage);
-        pbFormat.add(transferType);
-        ImageLayout layout = new ImageLayout();
-        ColorModel cm1 = null;
-		if(surrogateImage.getColorModel().getTransparency()!=Transparency.OPAQUE)
-			cm1=new ComponentColorModel(
-					ColorSpace.getInstance(ColorSpace.CS_sRGB),
-	                              new int[] {numBits, numBits, numBits,numBits},
-	                              true,
-	                              false,
-	                              Transparency.TRANSLUCENT,
-	                              transferType);
-		else
-			cm1=new ComponentColorModel(
-					ColorSpace.getInstance(ColorSpace.CS_sRGB),
-	                              new int[] {numBits, numBits, numBits},
-	                              true,
-	                              false,
-	                              Transparency.OPAQUE,
-	                              transferType);
-			
-        layout.setColorModel(cm1);
-		layout.setSampleModel(cm1.createCompatibleSampleModel(surrogateImage.getWidth(),surrogateImage.getHeight()));
-        RenderingHints hint = new
-        RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-        PlanarImage dst = JAI.create("format", pbFormat, hint);
-		surrogateImage.dispose();
-		return dst;
-	}
+
 
 	/**
      * GIF does not support full alpha channel we need to reduce it in order to
@@ -547,7 +507,7 @@ public class WorldImageWriter implements GridCoverageWriter {
     /**
      * Reformat the index color model to a component color model preserving
      * transparency.
-     *
+     * Code from jai-interests archive.
      * @param surrogateImage
      *
      * @return
@@ -583,17 +543,18 @@ public class WorldImageWriter implements GridCoverageWriter {
         }
 
         //do we need alpha?
-        if (surrogateImage.getColorModel().hasAlpha()) {
+		final int transparency=surrogateImage.getColorModel().getTransparency();
+        if (transparency!=Transparency.OPAQUE) {
             cm1 = new ComponentColorModel(ColorSpace.getInstance(
                         ColorSpace.CS_sRGB),
                     new int[] { numBits, numBits, numBits, numBits }, true,
-                    false, Transparency.TRANSLUCENT,
+                    false,transparency,
                     surrogateImage.getSampleModel().getTransferType());
         } else {
             cm1 = new ComponentColorModel(ColorSpace.getInstance(
                         ColorSpace.CS_sRGB),
                     new int[] { numBits, numBits, numBits }, false, false,
-                    Transparency.OPAQUE,
+					transparency,
                     surrogateImage.getSampleModel().getTransferType());
         }
 
