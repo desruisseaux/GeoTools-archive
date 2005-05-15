@@ -16,16 +16,6 @@
  */
 package org.geotools.data.gtopo30;
 
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.geometry.GeneralEnvelope;
-import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridCoverageWriter;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.spatialschema.geometry.Envelope;
-
-import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedWriter;
@@ -40,15 +30,23 @@ import java.nio.ByteOrder;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStreamImpl;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.media.jai.Histogram;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
+
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.geometry.GeneralEnvelope;
+import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**
@@ -186,8 +184,8 @@ public class GTopo30Writer implements GridCoverageWriter {
 
         //write DEM
         if (this.destination instanceof File) {
-            fileName = ((File) this.destination).getAbsolutePath() + "/"
-                + fileName;
+            fileName = ((File) this.destination).getAbsolutePath() + "/" +
+                fileName;
             dest = new File(fileName + ".DEM");
         }
 
@@ -333,8 +331,8 @@ public class GTopo30Writer implements GridCoverageWriter {
             out.close();
         } else {
             ZipOutputStream outZ = (ZipOutputStream) this.destination;
-            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName())
-                    .toString() + ".HDR");
+            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName()).toString() +
+                    ".HDR");
             outZ.putNextEntry(e);
 
             //          writing world file
@@ -350,7 +348,7 @@ public class GTopo30Writer implements GridCoverageWriter {
 
             outZ.write("NROWS".getBytes());
             outZ.write(" ".getBytes());
-            outZ.write( Integer.toString(height).getBytes());
+            outZ.write(Integer.toString(height).getBytes());
             outZ.write("\n".getBytes());
 
             outZ.write("NCOLS".getBytes());
@@ -362,7 +360,6 @@ public class GTopo30Writer implements GridCoverageWriter {
             outZ.write(" ".getBytes());
             outZ.write("1".getBytes());
             outZ.write("\n".getBytes());
-            
 
             outZ.write("NBITS".getBytes());
             outZ.write(" ".getBytes());
@@ -371,12 +368,12 @@ public class GTopo30Writer implements GridCoverageWriter {
 
             outZ.write("BANDROWBYTES".getBytes());
             outZ.write(" ".getBytes());
-            outZ.write(Integer.toString(width*2).getBytes());
+            outZ.write(Integer.toString(width * 2).getBytes());
             outZ.write("\n".getBytes());
 
             outZ.write("TOTALROWBYTES".getBytes());
             outZ.write(" ".getBytes());
-            outZ.write(Integer.toString(width*2).getBytes());
+            outZ.write(Integer.toString(width * 2).getBytes());
             outZ.write("\n".getBytes());
 
             outZ.write("BANDGAPBYTES".getBytes());
@@ -386,7 +383,7 @@ public class GTopo30Writer implements GridCoverageWriter {
 
             outZ.write("NODATA".getBytes());
             outZ.write(" ".getBytes());
-            outZ.write( Integer.toString((int) noData).getBytes());
+            outZ.write(Integer.toString((int) noData).getBytes());
             outZ.write("\n".getBytes());
 
             outZ.write("ULXMAP".getBytes());
@@ -403,15 +400,14 @@ public class GTopo30Writer implements GridCoverageWriter {
             outZ.write(" ".getBytes());
             outZ.write(Double.toString(dx).getBytes());
             outZ.write("\n".getBytes());
-            
+
             outZ.write("YDIM".getBytes());
             outZ.write(" ".getBytes());
-            outZ.write(Double.toString(dy).toString().getBytes());            
+            outZ.write(Double.toString(dy).toString().getBytes());
             outZ.write("\n".getBytes());
-            
+
             outZ.closeEntry();
-            
-       
+
             ((ZipOutputStream) file).closeEntry();
         }
     }
@@ -438,11 +434,11 @@ public class GTopo30Writer implements GridCoverageWriter {
             out = new FileImageOutputStream((File) dest);
         } else {
             ZipOutputStream outZ = (ZipOutputStream) dest;
-            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName())
-                    .toString() + ".SRC");
+            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName()).toString() +
+                    ".SRC");
             outZ.putNextEntry(e);
 
-            out = new FileCacheImageOutputStream(outZ,null);
+            out = new FileCacheImageOutputStream(outZ, null);
         }
 
         out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
@@ -451,7 +447,6 @@ public class GTopo30Writer implements GridCoverageWriter {
 
         if (!(dest instanceof File)) {
             ((ZipOutputStream) dest).closeEntry();
-       
         }
 
         out.flush();
@@ -469,28 +464,27 @@ public class GTopo30Writer implements GridCoverageWriter {
     private void writeGIF(GridCoverage coverage, Object file)
         throws IOException {
         GridCoverage2D gc = (GridCoverage2D) coverage;
-        ImageOutputStreamImpl out = null;	
+        ImageOutputStreamImpl out = null;
+
         if (file instanceof File) {
             //writing gif image
-        	out = new FileImageOutputStream((File) file);
-        }
-        else
-        {
-        	ZipOutputStream outZ = (ZipOutputStream) file;
-            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName())
-                    .toString() + ".GIF");
+            out = new FileImageOutputStream((File) file);
+        } else {
+            ZipOutputStream outZ = (ZipOutputStream) file;
+            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName()).toString() +
+                    ".GIF");
             outZ.putNextEntry(e);
 
-            out = new FileCacheImageOutputStream(outZ,null);       	
+            out = new FileCacheImageOutputStream(outZ, null);
         }
-        ImageIO.write(gc.geophysics(false).getRenderedImage(),"GIF",out);
+
+        ImageIO.write(gc.geophysics(false).getRenderedImage(), "GIF", out);
+
         if (file instanceof File) {
             out.close();
         } else {
             ((ZipOutputStream) file).closeEntry();
-   
-        }    
-      
+        }
     }
 
     /**
@@ -515,8 +509,8 @@ public class GTopo30Writer implements GridCoverageWriter {
             fileWriter.close();
         } else {
             ZipOutputStream out = (ZipOutputStream) file;
-            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName())
-                    .toString() + ".PRJ");
+            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName()).toString() +
+                    ".PRJ");
             out.putNextEntry(e);
             out.write(gc.getCoordinateReferenceSystem().toWKT().getBytes());
             out.closeEntry();
@@ -535,14 +529,11 @@ public class GTopo30Writer implements GridCoverageWriter {
         throws IOException {
         GridCoverage2D gc = (GridCoverage2D) coverage;
         ParameterBlock pb = new ParameterBlock();
+
         //we need to evaluate stats first using jai
-        double[] Max=new double[]{gc.getSampleDimension(0).getMaximumValue()};
-        double[] Min=new double[]{gc.getSampleDimension(0).getMinimumValue()};
-        	
-        
-        
-        
-       
+        double[] Max = new double[] { gc.getSampleDimension(0).getMaximumValue() };
+        double[] Min = new double[] { gc.getSampleDimension(0).getMinimumValue() };
+
         //histogram
         pb.addSource((PlanarImage) gc.getRenderedImage());
         pb.add(null); //no roi
@@ -577,8 +568,8 @@ public class GTopo30Writer implements GridCoverageWriter {
             out.close();
         } else {
             ZipOutputStream outZ = (ZipOutputStream) file;
-            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName())
-                    .toString() + ".STX");
+            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName()).toString() +
+                    ".STX");
             outZ.putNextEntry(e);
 
             //          writing world file
@@ -609,8 +600,7 @@ public class GTopo30Writer implements GridCoverageWriter {
         GridCoverage2D gc = (GridCoverage2D) coverage;
         gc = (GridCoverage2D) gc.geophysics(true);
 
-        RenderedImage image = ((PlanarImage) gc.getRenderedImage())
-            .getAsBufferedImage();
+        RenderedImage image = ((PlanarImage) gc.getRenderedImage()).getAsBufferedImage();
         Envelope env = gc.getEnvelope();
         double xMin = env.getMinimum(0);
         double yMin = env.getMinimum(1);
@@ -643,8 +633,8 @@ public class GTopo30Writer implements GridCoverageWriter {
             out.close();
         } else {
             ZipOutputStream outZ = (ZipOutputStream) worldFile;
-            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName())
-                    .toString() + ".DMW");
+            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName()).toString() +
+                    ".DMW");
             outZ.putNextEntry(e);
 
             //          writing world file
@@ -664,7 +654,6 @@ public class GTopo30Writer implements GridCoverageWriter {
             outZ.write("\n".getBytes());
 
             ((ZipOutputStream) worldFile).closeEntry();
- 
         }
     }
 
@@ -687,11 +676,11 @@ public class GTopo30Writer implements GridCoverageWriter {
             out = new FileImageOutputStream((File) dest);
         } else {
             ZipOutputStream outZ = (ZipOutputStream) dest;
-            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName())
-                    .toString() + ".DEM");
+            ZipEntry e = new ZipEntry((((GridCoverage2D) coverage).getName()).toString() +
+                    ".DEM");
             outZ.putNextEntry(e);
 
-            out = new FileCacheImageOutputStream(outZ,null);
+            out = new FileCacheImageOutputStream(outZ, null);
         }
 
         out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
@@ -702,7 +691,6 @@ public class GTopo30Writer implements GridCoverageWriter {
             out.close();
         } else {
             ((ZipOutputStream) dest).closeEntry();
-            
         }
     }
 
