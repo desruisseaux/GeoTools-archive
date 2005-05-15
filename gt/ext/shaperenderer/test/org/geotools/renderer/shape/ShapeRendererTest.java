@@ -36,18 +36,13 @@ public class ShapeRendererTest extends TestCase {
 	public void testCreateFeature() throws Exception{
 		ShapeRenderer renderer=new ShapeRenderer(null);
 		Style style=LabelingTest.loadStyle("LineStyle.sld");
-		ShapefileDataStore ds=Rendering2DTest.getLines();
+		ShapefileDataStore ds=Rendering2DTest.getLines("theme1.shp");
 		renderer.dbfheader=ShapefileRendererUtil.getDBFReader(ds).getHeader();
 		FeatureType type=renderer.createFeatureType(style,ds.getSchema());
-		assertEquals( "LINE", type.getAttributeType(0).getName() );
+		assertEquals( "NAME", type.getAttributeType(0).getName() );
 		assertEquals( 2, type.getAttributeCount() );
 		Feature feature=renderer.createFeature(type, ShapefileRendererUtil.getShpReader(ds, ds.getFeatureSource().getBounds(), null).nextRecord(),ShapefileRendererUtil.getDBFReader(ds), "id");
 		assertEquals( "id", feature.getID());
-		assertEquals("LE01_8",feature.getAttribute(0));
+		assertEquals("dave street",feature.getAttribute(0));
 	}
-
-
-	public void testWorldToScreenTransform() {
-	}
-
 }

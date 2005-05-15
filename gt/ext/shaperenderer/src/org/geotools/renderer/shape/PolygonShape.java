@@ -29,7 +29,7 @@ public class PolygonShape extends AbstractShape {
 	/**
 	 * @param geom
 	 */
-	public PolygonShape(Geometry geom) {
+	public PolygonShape(SimpleGeometry geom) {
 		super(geom);
 	}
 

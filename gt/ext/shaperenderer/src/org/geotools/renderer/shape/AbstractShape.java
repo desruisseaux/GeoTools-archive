@@ -31,12 +31,12 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class AbstractShape implements Shape {
 
-	protected Geometry geom;
+	protected SimpleGeometry geom;
 	
 	/**
 	 * @param geom
 	 */
-	public AbstractShape(Geometry geom) {
+	public AbstractShape(SimpleGeometry geom) {
 		this.geom=geom;
 	}
 

@@ -28,7 +28,7 @@ import java.awt.geom.PathIterator;
  */
 public class MultiLineShape extends AbstractShape implements Shape {
 
-	public MultiLineShape(Geometry geom) {
+	public MultiLineShape(SimpleGeometry geom) {
 		super(geom);
 	}
 

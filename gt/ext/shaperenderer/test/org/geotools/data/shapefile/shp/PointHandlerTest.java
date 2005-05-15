@@ -27,7 +27,7 @@ import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.renderer.shape.Geometry;
+import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiLineHandler;
 import org.geotools.resources.TestData;
@@ -58,13 +58,13 @@ public class PointHandlerTest extends TestCase {
 		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
-		assertTrue( shape instanceof Geometry);
+		assertTrue( shape instanceof SimpleGeometry);
 		int i=0;
 		while( reader.hasNext() ){
 			i++;
 			shape=reader.nextRecord().shape();
 			assertNotNull( shape );
-			assertTrue( shape instanceof Geometry);
+			assertTrue( shape instanceof SimpleGeometry);
 		}
 		assertEquals(ds.getFeatureSource().getCount(Query.ALL)-1, i);
 	}

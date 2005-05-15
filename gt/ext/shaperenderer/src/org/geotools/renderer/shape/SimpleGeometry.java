@@ -20,14 +20,14 @@ import org.geotools.data.shapefile.shp.ShapeType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class Geometry {
+public class SimpleGeometry {
     
     
-	public ShapeType type;
-	public double[][] coords;
-    public Envelope bbox;
+	public final ShapeType type;
+	public final double[][] coords;
+    public final Envelope bbox;
     
-    public Geometry( ShapeType shapeType, double[][] coords, Envelope bbox ) {
+    public SimpleGeometry( ShapeType shapeType, double[][] coords, Envelope bbox ) {
         this.type=shapeType;
         this.coords=coords;
         this.bbox=bbox;

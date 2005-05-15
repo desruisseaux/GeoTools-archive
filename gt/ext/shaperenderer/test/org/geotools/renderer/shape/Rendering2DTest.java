@@ -102,6 +102,14 @@ public class Rendering2DTest extends TestCase {
     }
     
     Style createTestStyle() throws IllegalFilterException {
+    	return createTestStyle(null, null);
+    }
+    
+    Style createTestStyle(String polyName, String lineName) throws IllegalFilterException {
+    	if( polyName==null )
+    		polyName="lakes";
+    	if( lineName==null )
+    		lineName="streams";
         StyleFactory sFac = StyleFactory.createStyleFactory();
         // The following is complex, and should be built from
         // an SLD document and not by hand
@@ -126,13 +134,13 @@ public class Rendering2DTest extends TestCase {
         Rule rule = sFac.createRule();
         rule.setSymbolizers(new Symbolizer[]{polysym});
         FeatureTypeStyle fts = sFac.createFeatureTypeStyle(new Rule[]{rule});
-        fts.setFeatureTypeName("lakes");
+        fts.setFeatureTypeName(polyName);
 
         Rule rule2 = sFac.createRule();
         rule2.setSymbolizers(new Symbolizer[]{linesym});
         FeatureTypeStyle fts2 = sFac.createFeatureTypeStyle();
         fts2.setRules(new Rule[]{rule2});
-        fts2.setFeatureTypeName("streams");
+        fts2.setFeatureTypeName(lineName);
 
         Rule rule3 = sFac.createRule();
         rule3.setSymbolizers(new Symbolizer[]{pointsym});
@@ -146,7 +154,7 @@ public class Rendering2DTest extends TestCase {
         return style;
     }
 
-    public void disabledtestSimpleRender() throws Exception {
+    public void testSimpleRender() throws Exception {
 
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
@@ -159,8 +167,8 @@ public class Rendering2DTest extends TestCase {
         map.addLayer(source, style);
         ShapeRenderer renderer = new ShapeRenderer(map);
         Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
-                .getMaxY() + 20);
+        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env
+                .getMaxY());
         showRender("testSimpleRender", renderer, 1000, env);
 
     }
@@ -235,7 +243,7 @@ public class Rendering2DTest extends TestCase {
 
     }
 
-    public void disabledtestReprojection() throws Exception {
+    public void testReprojection() throws Exception {
 
         // same as the datasource test, load in some features into a table
         System.err.println("starting testLiteRender2");
@@ -263,16 +271,12 @@ public class Rendering2DTest extends TestCase {
         Rectangle rect = new Rectangle(400, 400);
 //        renderer.setOptimizedDataLoadingEnabled(true);
 
-        env = new Envelope(bounds.getMinX() - 2000000, bounds.getMaxX() + 2000000,
-                bounds.getMinY() - 2000000, bounds.getMaxY() + 2000000);
+        env = new Envelope(bounds.getMinX(), bounds.getMaxX(),
+                bounds.getMinY(), bounds.getMaxY());
         showRender("testReprojection", renderer, 1000, env);
 
         // System.in.read();
 
-    }
-    
-    public void test(){
-    	//do nothing
     }
     
     public void testLineReprojection() throws Exception {
@@ -280,6 +284,44 @@ public class Rendering2DTest extends TestCase {
         System.err.println("starting rendering2DTest");
         
         ShapeRenderer renderer=createLineRenderer(getLines());
+        Envelope env=renderer.getContext().getAreaOfInterest();
+//        INTERACTIVE=true;
+        showRender("testSimpleLineRender", renderer, 3000, env);
+
+    }
+
+    public void testNullCRSPoly() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting testLiteRender2");
+        
+        ShapefileDataStore ds=getPolygons("smallMultiPoly.shp");
+        FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
+        Style style = createTestStyle(ds.getSchema().getTypeName(), null);
+
+        MapContext map = new DefaultMapContext();
+        map.addLayer(source, style);
+        
+        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
+        ShapeRenderer renderer = new ShapeRenderer(map);
+        Envelope env = map.getLayerBounds();
+
+        Rectangle rect = new Rectangle(400, 400);
+//        renderer.setOptimizedDataLoadingEnabled(true);
+
+        env = new Envelope(env.getMinX()-1, env.getMaxX()+1,
+        		env.getMinY()-1, env.getMaxY()+1);
+        showRender("testReprojection", renderer, 1000, env);
+
+        // System.in.read();
+
+    }
+    
+    public void testNullCRSLine() throws Exception {
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting rendering2DTest");
+        
+        ShapeRenderer renderer=createLineRenderer(getLines("lineNoCRS.shp"));
         Envelope env=renderer.getContext().getAreaOfInterest();
 //        INTERACTIVE=true;
         showRender("testSimpleLineRender", renderer, 3000, env);
@@ -433,9 +475,12 @@ public class Rendering2DTest extends TestCase {
 
         return style;
     }
-
     static ShapefileDataStore getLines() throws IOException{
-    	URL url=TestData.getResource(Rendering2DTest.class, "streams.shp");
+    	return getLines("streams.shp");
+    }
+    
+    static ShapefileDataStore getLines(String filename) throws IOException{
+    	URL url=TestData.getResource(Rendering2DTest.class, filename);
     	ShapefileDataStoreFactory factory=new ShapefileDataStoreFactory();
     	return (ShapefileDataStore) factory.createDataStore(url);
     }
@@ -445,7 +490,10 @@ public class Rendering2DTest extends TestCase {
     	return (ShapefileDataStore) factory.createDataStore(url);
     }
     static ShapefileDataStore getPolygons() throws IOException{
-    	URL url=TestData.getResource(Rendering2DTest.class, "lakes.shp");
+    	return getPolygons("lakes.shp");
+    }
+    static ShapefileDataStore getPolygons(String filename) throws IOException{
+    	URL url=TestData.getResource(Rendering2DTest.class, filename);
     	ShapefileDataStoreFactory factory=new ShapefileDataStoreFactory();
     	return (ShapefileDataStore) factory.createDataStore(url);
     }
@@ -500,7 +548,7 @@ public class Rendering2DTest extends TestCase {
 	private ShapeRenderer createLineRenderer(ShapefileDataStore ds) throws Exception {
 
         FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
-        Style style = createTestStyle();
+        Style style = createTestStyle(null, ds.getTypeNames()[0]);
 
         MapContext map = new DefaultMapContext();
         map.addLayer(source, style);

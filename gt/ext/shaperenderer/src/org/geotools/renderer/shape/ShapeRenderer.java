@@ -56,6 +56,8 @@ import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.lite.LabelCache;
 import org.geotools.renderer.lite.LabelCacheDefault;
 import org.geotools.renderer.lite.ListenerList;
+import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
+import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
@@ -66,11 +68,15 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -114,7 +120,7 @@ public class ShapeRenderer {
 
 	boolean caching = false;
 
-	private static final GeometryFactory geomFactory = new GeometryFactory();
+	private static final GeometryFactory geomFactory = new GeometryFactory(new LiteCoordinateSequenceFactory());
 
 	private static final Coordinate[] COORDS;
 
@@ -123,6 +129,7 @@ public class ShapeRenderer {
 	private static final Polygon POLYGON_GEOM;
 
 	private static final LinearRing LINE_GEOM;
+
 	private static final MultiLineString MULTI_LINE_GEOM;
 
 	private static final Point POINT_GEOM;
@@ -136,7 +143,8 @@ public class ShapeRenderer {
 		COORDS[3] = new Coordinate(0.0, 5.0);
 		COORDS[4] = new Coordinate(0.0, 0.0);
 		LINE_GEOM = geomFactory.createLinearRing(COORDS);
-		MULTI_LINE_GEOM = geomFactory.createMultiLineString(new LineString[]{LINE_GEOM});
+		MULTI_LINE_GEOM = geomFactory
+				.createMultiLineString(new LineString[] { LINE_GEOM });
 		POLYGON_GEOM = geomFactory.createPolygon(LINE_GEOM, new LinearRing[0]);
 		MULTI_POLYGON_GEOM = geomFactory
 				.createMultiPolygon(new Polygon[] { POLYGON_GEOM });
@@ -222,7 +230,6 @@ public class ShapeRenderer {
 					mt = CRS.transform(dataCRS, destinationCrs);
 					bbox = JTS.transform(bbox, mt.inverse());
 				} catch (Exception e) {
-					fireErrorEvent(e);
 					mt = null;
 				}
 
@@ -340,7 +347,7 @@ public class ShapeRenderer {
 							ShapefileReader.Record record = shpreader
 									.nextRecord();
 
-							Geometry geom = (Geometry) record.shape();
+							SimpleGeometry geom = (SimpleGeometry) record.shape();
 							if (geom == null) {
 								dbfreader.skip();
 								continue;
@@ -505,7 +512,7 @@ public class ShapeRenderer {
 				int index = 0;
 				Iterator featureIter = featureCache.iterator();
 				for (Iterator iter = geometryCache.iterator(); iter.hasNext();) {
-					Geometry geom = (Geometry) iter.next();
+					SimpleGeometry geom = (SimpleGeometry) iter.next();
 					Feature feature = (Feature) featureIter.next();
 
 					try {
@@ -634,13 +641,8 @@ public class ShapeRenderer {
 		if (defaultGeom == null) {
 			if (MultiPolygon.class.isAssignableFrom(defaultGeometry.getType())) {
 				defaultGeom = MULTI_POLYGON_GEOM;
-			} else if (Polygon.class
-					.isAssignableFrom(defaultGeometry.getType())) {
-				defaultGeom = POLYGON_GEOM;
-			} else if (LineString.class.isAssignableFrom(defaultGeometry
+			} else if (MultiLineString.class.isAssignableFrom(defaultGeometry
 					.getType())) {
-				defaultGeom = LINE_GEOM;
-			} else if (MultiLineString.class.isAssignableFrom(defaultGeometry.getType())) {
 				defaultGeom = MULTI_LINE_GEOM;
 			} else if (Point.class.isAssignableFrom(defaultGeometry.getType())) {
 				defaultGeom = POINT_GEOM;
@@ -661,6 +663,8 @@ public class ShapeRenderer {
 
 	/** The painter class we use to depict shapes onto the screen */
 	private StyledShapePainter painter = new StyledShapePainter(labelCache);
+
+	private static final int NUM_SAMPLES = 30;
 
 	/**
 	 * @param style
@@ -718,7 +722,7 @@ public class ShapeRenderer {
 	 * @param scaleRange
 	 */
 	private void processSymbolizers(Graphics2D graphics, Feature feature,
-			Geometry geom, Symbolizer[] symbolizers, NumberRange scaleRange) {
+			SimpleGeometry geom, Symbolizer[] symbolizers, NumberRange scaleRange) {
 		for (int m = 0; m < symbolizers.length; m++) {
 			if (LOGGER.isLoggable(Level.FINER)) {
 				LOGGER.finer("applying symbolizer " + symbolizers[m]);
@@ -727,25 +731,90 @@ public class ShapeRenderer {
 				break;
 			}
 
-			        if( symbolizers[m] instanceof TextSymbolizer ){
-			        	labelCache.put((TextSymbolizer) symbolizers[m], feature, shape,
-			 scaleRange);
-			        }
-			        else{
-			Style2D style = styleFactory.createStyle(feature, symbolizers[m],
-					scaleRange);
-			painter.paint(graphics, getShape(geom), style, scaleDenominator);
-			        }
+			if (symbolizers[m] instanceof TextSymbolizer) {
+				try{
+				labelCache.put((TextSymbolizer) symbolizers[m], feature, getLiteShape2(geom, feature),
+						scaleRange);
+				}catch (Exception e) {
+					fireErrorEvent(e);
+				}
+			} else {
+				Style2D style = styleFactory.createStyle(feature,
+						symbolizers[m], scaleRange);
+				painter
+						.paint(graphics, getShape(geom), style,
+								scaleDenominator);
+			}
 
 		}
 
 	}
 
 	/**
+	 * Creates a JTS shape that is an approximation of the SImpleGeometry.  This is ONLY use
+	 * for labelling and is only created if a text symbolizer is part of the current style.
+	 * 
+	 * @param geom the geometry to wrap
+	 * @param feature the current feature.
+	 * @return
+	 * @throws FactoryException
+	 * @throws TransformException
+	 */
+	private LiteShape2 getLiteShape2(SimpleGeometry geom, Feature feature) throws TransformException, FactoryException {
+		Class geomType=feature.getFeatureType().getDefaultGeometry().getType();
+		
+		Geometry jtsGeom;
+		LiteCoordinateSequenceFactory seqFactory=new LiteCoordinateSequenceFactory();
+		
+		if ( MultiPolygon.class.isAssignableFrom(geomType) ){
+			double[] points=getPointSample(geom);
+			CoordinateSequence seq=seqFactory.create(points);
+			Polygon poly=geomFactory.createPolygon(geomFactory.createLinearRing(seq),
+					new LinearRing[]{});
+			jtsGeom=geomFactory.createMultiPolygon(new Polygon[]{poly});
+		}else if( MultiLineString.class.isAssignableFrom(geomType)){
+			double[] points=getPointSample(geom);
+			CoordinateSequence seq=seqFactory.create(points);
+			jtsGeom=geomFactory.createMultiLineString(new LineString[]{geomFactory.createLineString(seq)});
+		}else if( MultiPoint.class.isAssignableFrom(geomType)){
+			double[] points=getPointSample(geom);
+			CoordinateSequence seq=seqFactory.create(points);
+			jtsGeom=geomFactory.createMultiPoint(seq);
+		}else{
+			jtsGeom=geomFactory.createPoint(new Coordinate(geom.coords[0][0],geom.coords[0][1]));
+		}
+		LiteShape2 shape=new LiteShape2(jtsGeom,null,null,false);
+		return shape;
+	}
+
+	/**
+	 * takes a random sampling from the geometry.  Only uses the larges part of the geometry.
 	 * @param geom
 	 * @return
 	 */
-	private Shape getShape(Geometry geom) {
+	private double[] getPointSample(SimpleGeometry geom) {
+		int largestPart=0;
+		for( int i=0; i< geom.coords.length; i++){
+			if( geom.coords[i].length>geom.coords[largestPart].length){
+				largestPart=i;
+			}
+		}
+		int step=geom.coords[largestPart].length<NUM_SAMPLES?1:(int)(geom.coords[largestPart].length/NUM_SAMPLES);
+		int size=Math.min(geom.coords[largestPart].length, NUM_SAMPLES);
+		double[] coords=new double[size];
+		int location = 0;
+		for (int i=0; i < coords.length-1; i++, location+=step) {
+			 coords[i]=geom.coords[largestPart][location];
+		}
+		coords[size-1]=geom.coords[largestPart][geom.coords[largestPart].length-1];
+		return coords;
+	}
+
+	/**
+	 * @param geom
+	 * @return
+	 */
+	private Shape getShape(SimpleGeometry geom) {
 		if (geom.type == ShapeType.ARC || geom.type == ShapeType.ARCM
 				|| geom.type == ShapeType.ARCZ)
 			return new MultiLineShape(geom);

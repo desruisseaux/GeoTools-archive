@@ -199,7 +199,7 @@ public class PolygonHandler implements ShapeHandler {
 
 			}
 			}
-		return new Geometry(type, transformed, geomBBox);
+		return new SimpleGeometry(type, transformed, geomBBox);
 	}
 
 	/**

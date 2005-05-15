@@ -86,7 +86,7 @@ public class PointHandler implements ShapeHandler {
         if( !bbox.intersects(geomBBox) )
             return null;
         
-        return new Geometry(type, coords, geomBBox);
+        return new SimpleGeometry(type, coords, geomBBox);
 	}
 
 	/**

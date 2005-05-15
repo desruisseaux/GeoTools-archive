@@ -56,7 +56,7 @@ public class LabelingTest extends TestCase {
 	private long timout=3000;
 	private static final int CENTERX = 160;
 	private static final int CENTERY = 40;
-    private static final boolean INTERACTIVE=true;
+    private static final boolean INTERACTIVE=false;
 
 
 	/*
@@ -132,7 +132,7 @@ public class LabelingTest extends TestCase {
 
    
 	public void testLineLabeling() throws Exception{		
-        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getLines();
+        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getLines("theme1.shp");
 		Style style=loadStyle("LineStyle.sld");
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
@@ -180,8 +180,8 @@ public class LabelingTest extends TestCase {
 		
 		return pointFeature;
 	}
-	public void disabletestPolyLabeling() throws Exception{		
-        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getPolygons();
+	public void testPolyLabeling() throws Exception{		
+        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getPolygons("smallMultiPoly.shp");
         FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
 
 		Style style=loadStyle("PolyStyle.sld");

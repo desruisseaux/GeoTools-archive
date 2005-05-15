@@ -234,13 +234,13 @@ public class MultiLineHandler implements ShapeHandler {
             if( !intersection )
                 return null;
 		}
-		return new Geometry(type, transformed, geomBBox);
+		return new SimpleGeometry(type, transformed, geomBBox);
 	}
 
 	/**
 	 * @return
 	 */
-	private Geometry decimateBasedOnEnvelope(Envelope geomBBox) {
+	private SimpleGeometry decimateBasedOnEnvelope(Envelope geomBBox) {
 		if (geomBBox.getWidth() <= spanx && geomBBox.getHeight() <= spany) {
 			double[][] coords = new double[1][];
 			coords[0] = new double[] { geomBBox.getMinX(), geomBBox.getMinY() };
@@ -255,7 +255,7 @@ public class MultiLineHandler implements ShapeHandler {
 			}
 			transformed[0][2]=transformed[0][0];
 			transformed[0][3]=transformed[0][1];
-			return new Geometry(type, transformed, geomBBox);
+			return new SimpleGeometry(type, transformed, geomBBox);
 		}
 		return null;
 	}

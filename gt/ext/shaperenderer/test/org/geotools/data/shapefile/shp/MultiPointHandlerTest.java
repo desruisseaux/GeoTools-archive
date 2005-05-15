@@ -27,7 +27,7 @@ import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.renderer.shape.Geometry;
+import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiPointHandler;
 import org.geotools.resources.TestData;

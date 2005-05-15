@@ -6,14 +6,14 @@
 <abstract></abstract>
 <UserStyle>
 <Name>Label_Style</Name>
-<Title>urban_places_label</Title>
+<Title>smallMultiPoly</Title>
 <FeatureTypeStyle> 
 <Name>Label_Style_1</Name> 
 <Rule> 
 <Name>Label</Name> 
 
 <TextSymbolizer> 
-<Label> <ogc:PropertyName>name</ogc:PropertyName> </Label> 
+<Label> <ogc:PropertyName>CNTRY_NAME</ogc:PropertyName> </Label> 
 <Font> 
 <CssParameter name="font-family">Serif</CssParameter>
 <CssParameter name="font-style">italic</CssParameter>
@@ -30,7 +30,11 @@
 </LabelPlacement> 
 </TextSymbolizer> 
 </Rule> 
-
+<LineSymbolizer> 
+<Stroke>
+<CssParameter name="fill">#333333</CssParameter>
+</Stroke> 
+</LineSymbolizer> 
 
 </FeatureTypeStyle> 
 </UserStyle>

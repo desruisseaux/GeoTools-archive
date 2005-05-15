@@ -26,7 +26,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.renderer.shape.Geometry;
+import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.PolygonHandler;
 import org.geotools.resources.TestData;
@@ -57,13 +57,13 @@ public class PolygonHandlerTest extends TestCase {
 		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
-		assertTrue( shape instanceof Geometry);
+		assertTrue( shape instanceof SimpleGeometry);
 		int i=0;
 		while( reader.hasNext() ){
 			i++;
 			shape=reader.nextRecord().shape();
 			assertNotNull( shape );
-			assertTrue( shape instanceof Geometry);
+			assertTrue( shape instanceof SimpleGeometry);
 		}
 		assertEquals(ds.getFeatureSource().getCount(Query.ALL)-1, i);
 	}

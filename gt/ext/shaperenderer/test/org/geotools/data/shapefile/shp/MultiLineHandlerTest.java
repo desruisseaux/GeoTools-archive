@@ -30,7 +30,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.renderer.shape.Geometry;
+import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiLineHandler;
 import org.geotools.renderer.shape.ShapeRenderer;
@@ -63,15 +63,15 @@ public class MultiLineHandlerTest extends TestCase {
 		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
-		assertTrue( shape instanceof Geometry);
+		assertTrue( shape instanceof SimpleGeometry);
 		int i=0;
 		while( reader.hasNext() ){
 			i++;
 			shape=reader.nextRecord().shape();
 			assertNotNull( shape );
-			assertTrue( shape instanceof Geometry);
+			assertTrue( shape instanceof SimpleGeometry);
 			if( i==0 ){
-				Geometry geom=(Geometry) shape;
+				SimpleGeometry geom=(SimpleGeometry) shape;
 				assertEquals(13, geom.coords[0].length);
 			}
 		}
@@ -94,17 +94,17 @@ public class MultiLineHandlerTest extends TestCase {
 		.createConcatenatedTransform(mt,worldToScreen);
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
 		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
-		Geometry shape=(Geometry) reader.nextRecord().shape();
+		SimpleGeometry shape=(SimpleGeometry) reader.nextRecord().shape();
 		assertEquals( 6, shape.coords[0].length );
 //		assertEquals( shape.coords[0][0], -5.828066634497234, 0.00001 );
 //		assertEquals( shape.coords[0][1], -1.480529972741367, 0.00001 );
 //		assertEquals( shape.coords[0][4], 6.729097484720893, 0.00001 );
 //		assertEquals( shape.coords[0][5], -1.6573914392057159, 0.00001 );
 		
-		shape=(Geometry) reader.nextRecord().shape();
+		shape=(SimpleGeometry) reader.nextRecord().shape();
 		assertEquals( 4, shape.coords[0].length );
 
-		shape=(Geometry) reader.nextRecord().shape();
+		shape=(SimpleGeometry) reader.nextRecord().shape();
 		assertEquals( 4, shape.coords[0].length);
 //	
 //		assertEquals( shape.coords[0][0], 0, 0.00001 );

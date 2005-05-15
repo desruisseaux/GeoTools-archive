@@ -102,7 +102,7 @@ public class MultiPointHandler implements ShapeHandler {
             buffer.position(buffer.position() + 2 * 8 + numpoints * 8);
         }
 
-        return new Geometry(type, coords, geomBBox);
+        return new SimpleGeometry(type, coords, geomBBox);
     }
 
     private void skipMultiPointGeom( ByteBuffer buffer, int dimensions ) {

@@ -41,7 +41,7 @@ public class MultiLineShapeTest extends TestCase {
 		double[] coord2=new double[]{0.0,15.0, 10.0, 15.0 ,15.0,15.0};
 		double[][]coords=new double[][]{coord1,coord2};
 		
-		Geometry geom=new Geometry(ShapeType.ARC, coords,new Envelope( 0,15,0,15));
+		SimpleGeometry geom=new SimpleGeometry(ShapeType.ARC, coords,new Envelope( 0,15,0,15));
 		
 		MultiLineShape shape=new MultiLineShape(geom);
 		
