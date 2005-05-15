@@ -17,14 +17,20 @@
 package org.geotools.gce.image;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+
 import org.geotools.parameter.Parameter;
+
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
+
 import org.opengis.parameter.GeneralParameterValue;
+
 import org.opengis.spatialschema.geometry.Envelope;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -33,18 +39,23 @@ import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
 import java.net.URL;
+
 import javax.imageio.ImageIO;
+
 import javax.media.jai.ColorCube;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -52,6 +63,12 @@ import javax.media.jai.KernelJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.TiledImage;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 
 /**
@@ -176,8 +193,7 @@ public class WorldImageWriter implements GridCoverageWriter {
         //if provided we have to use them
         //specifically this is one of the way we can provide an output format
         if (parameters != null) {
-            this.format.getWriteParameters().parameter("format").setValue(((Parameter) parameters[0])
-                .stringValue());
+            this.format.getWriteParameters().parameter("format").setValue(((Parameter) parameters[0]).stringValue());
         }
 
         //convert everything into a file when possible
@@ -195,8 +211,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         if (destination instanceof File) {
             //WRITING TO A FILE
-            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage)
-                .getRenderedImage());
+            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage).getRenderedImage());
             Envelope env = coverage.getEnvelope();
             double xMin = env.getMinimum(0);
             double yMin = env.getMinimum(1);
@@ -216,15 +231,14 @@ public class WorldImageWriter implements GridCoverageWriter {
             String path = imageFile.getAbsolutePath();
             int index = path.lastIndexOf(".");
             String baseFile = path.substring(0, index);
-            File worldFile = new File(baseFile
-                    + WorldImageFormat.getWorldExtension(
+            File worldFile = new File(baseFile +
+                    WorldImageFormat.getWorldExtension(
                         format.getWriteParameters().parameter("format")
                               .stringValue()));
 
             //create new files
-            imageFile = new File(baseFile + "."
-                    + format.getWriteParameters().parameter("format")
-                            .stringValue());
+            imageFile = new File(baseFile + "." +
+                    format.getWriteParameters().parameter("format").stringValue());
             imageFile.createNewFile();
             worldFile.createNewFile();
 
@@ -279,47 +293,50 @@ public class WorldImageWriter implements GridCoverageWriter {
         try {
             PlanarImage surrogateImage = null;
 
-            /** do we need to go to the geophysic view for this data? */
+            //
+            //            //let's check if we have a sampledimension which carried geophysics information
+            //            //in such a case we have to get the visual representation for this data
+            //            //by calling geophysiscs(false)
+            //            SampleDimensionType sampleDimensionType = sourceCoverage.getSampleDimension(0)
+            //                                                                    .getSampleDimensionType();
+            //
+            //            if ((sampleDimensionType == SampleDimensionType.UNSIGNED_16BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_8BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.SIGNED_8BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_1BIT)
+            //                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_2BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_4BITS)) {
+            //                /**
+            //                 * GEOPHYSICS(TRUE)? Are we dealing with a real image and not
+            //                 * with the non geophysics representation of an image that  we
+            //                 * built before.
+            //                 */
+            //                surrogateImage = (PlanarImage) (sourceCoverage)
+            //                    .getRenderedImage();
+            //            } else if ((sampleDimensionType == SampleDimensionType.SIGNED_16BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.SIGNED_32BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.SIGNED_16BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.REAL_32BITS)
+            //                    || (sampleDimensionType == SampleDimensionType.REAL_64BITS)) {
+            /**
+             * Getting the non geophysics view of this grid coverage. the
+             * geophysiscs view usually comes with an index color model
+             * for 3 bands, since sometimes I get some problems with JAI
+             * encoders I select only  the first band, which by the way is
+             * the only band we use.
+             */
+            surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
+                                             .getRenderedImage());
 
-            //let's check if we have a sampledimension which carried geophysics information
-            //in such a case we have to get the visual representation for this data
-            //by calling geophysiscs(false)
-            SampleDimensionType sampleDimensionType = sourceCoverage.getSampleDimension(0)
-                                                                    .getSampleDimensionType();
-
-            if ((sampleDimensionType == SampleDimensionType.UNSIGNED_16BITS)
-                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_8BITS)
-                    || (sampleDimensionType == SampleDimensionType.SIGNED_8BITS)
-                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_1BIT)
-                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_2BITS)
-                    || (sampleDimensionType == SampleDimensionType.UNSIGNED_4BITS)) {
-                /**
-                 * GEOPHYSICS(TRUE)? Are we dealing with a real image and not
-                 * with the non geophysics representation of an image that  we
-                 * built before.
-                 */
-                surrogateImage = (PlanarImage) (sourceCoverage)
-                    .getRenderedImage();
-            } else if ((sampleDimensionType == SampleDimensionType.SIGNED_16BITS)
-                    || (sampleDimensionType == SampleDimensionType.SIGNED_32BITS)
-                    || (sampleDimensionType == SampleDimensionType.SIGNED_16BITS)
-                    || (sampleDimensionType == SampleDimensionType.REAL_32BITS)
-                    || (sampleDimensionType == SampleDimensionType.REAL_64BITS)) {
-                /**
-                 * Getting the geophysics view of this grid coverage. the
-                 * geophysiscs view usually comes with an index color model
-                 * for 3 bands, since sometimes I get some problems with JAI
-                 * encoders I select onyl  the first band, which by the way is
-                 * the only band we use.
-                 */
-                surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
-                                                 .getRenderedImage());
-
-                //removing unused bands from this non geophysics view
-                //they might cause prblems with jai encoders
+            //removing unused bands from this non geophysics view
+            //they might cause prblems with jai encoders
+            if (surrogateImage.getColorModel() instanceof IndexColorModel &&
+                    (surrogateImage.getSampleModel().getNumBands() > 1)) {
                 surrogateImage = JAI.create("bandSelect", surrogateImage,
                         new int[] { 0 });
             }
+
+            //            }
 
             /**
              * ADJUSTMENTS FOR VARIOUS FILE FORMATS
@@ -329,6 +346,16 @@ public class WorldImageWriter implements GridCoverageWriter {
             if ((((String) (this.format.getWriteParameters().parameter("format")
                                            .getValue())).compareToIgnoreCase(
                         "gif") == 0)) {
+				/**
+				 * IndexColorModel with more than 8 bits for sample might be a problem because GIF allows only 8 bits based palette 
+				 * therefore I prefere switching to component color model in order to handle this properly.
+				 * 
+				 * NOTE. The only transfert types avalaible for IndexColorModel are byte and ushort.
+				 */
+				if (surrogateImage.getColorModel() instanceof IndexColorModel &&
+                        (surrogateImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE)) {
+                    surrogateImage = convertIndexColorModel2ComponentColorModel(surrogateImage);
+                }				
                 /**
                  * component color model is not well digested by the gif
                  * encoder we need to go to indecolor model somehow.  This
@@ -336,16 +363,16 @@ public class WorldImageWriter implements GridCoverageWriter {
                  * I will  find a way to add that.
                  */
                 if (surrogateImage.getColorModel() instanceof ComponentColorModel) {
-                    surrogateImage = componentColorModel2GIF(surrogateImage);
+                    surrogateImage = componentColorModel2IndexColorModel4GIF(surrogateImage);
                 } else
                 /**
                  * IndexColorModel with full transparency support is not
                  * suitable for gif images we need to go to bitmask loosing
                  * some informations. we have only one full transparent color.
                  */
-                if (surrogateImage.getColorModel() instanceof IndexColorModel
-                        && (surrogateImage.getColorModel().getTransparency() != Transparency.OPAQUE)) {
-                    surrogateImage = convertAlpha4GIF(surrogateImage);
+                if (surrogateImage.getColorModel() instanceof IndexColorModel &&
+                        (surrogateImage.getColorModel().getTransparency() != Transparency.OPAQUE)) {
+                    surrogateImage = convertIndexColorModelAlpha4GIF(surrogateImage);
                 }
             } else
             //-----------------TIFF--------------------------------------
@@ -358,10 +385,10 @@ public class WorldImageWriter implements GridCoverageWriter {
              */
             if ((((String) (this.format.getWriteParameters().parameter("format")
                                            .getValue())).compareToIgnoreCase(
-                        "tiff") == 0)
-                    || (((String) (this.format.getWriteParameters()
-                                                  .parameter("format").getValue()))
-                    .compareToIgnoreCase("tif") == 0)) {
+                        "tiff") == 0) ||
+                    (((String) (this.format.getWriteParameters()
+                                               .parameter("format").getValue())).compareToIgnoreCase(
+                        "tif") == 0)) {
                 //Are we dealing with IndexColorModel? If so we need to go back to ComponentColorModel
                 if (surrogateImage.getColorModel() instanceof IndexColorModel) {
                     surrogateImage = reformatFromIndexColorModel2ComponentColorModel(surrogateImage);
@@ -379,18 +406,60 @@ public class WorldImageWriter implements GridCoverageWriter {
         }
     }
 
-    /**
+	/**
+	 * Convert an IndexColorModel to a compatible ComponentColorModel.
+	 * 
+	 * @param surrogateImage
+	 * @return
+	 */
+    private PlanarImage convertIndexColorModel2ComponentColorModel(PlanarImage surrogateImage) {
+        // Format the image to be expanded from IndexColorModel to
+        // ComponentColorModel taking into account transparency mode
+		final int numBits=surrogateImage.getSampleModel().getTransferType()==DataBuffer.TYPE_BYTE?8:16;
+		final int transferType=surrogateImage.getSampleModel().getTransferType();
+        ParameterBlock pbFormat = new ParameterBlock();
+        pbFormat.addSource(surrogateImage);
+        pbFormat.add(transferType);
+        ImageLayout layout = new ImageLayout();
+        ColorModel cm1 = null;
+		if(surrogateImage.getColorModel().getTransparency()!=Transparency.OPAQUE)
+			cm1=new ComponentColorModel(
+					ColorSpace.getInstance(ColorSpace.CS_sRGB),
+	                              new int[] {numBits, numBits, numBits,numBits},
+	                              true,
+	                              false,
+	                              Transparency.TRANSLUCENT,
+	                              transferType);
+		else
+			cm1=new ComponentColorModel(
+					ColorSpace.getInstance(ColorSpace.CS_sRGB),
+	                              new int[] {numBits, numBits, numBits},
+	                              true,
+	                              false,
+	                              Transparency.OPAQUE,
+	                              transferType);
+			
+        layout.setColorModel(cm1);
+		layout.setSampleModel(cm1.createCompatibleSampleModel(surrogateImage.getWidth(),surrogateImage.getHeight()));
+        RenderingHints hint = new
+        RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+        PlanarImage dst = JAI.create("format", pbFormat, hint);
+		surrogateImage.dispose();
+		return dst;
+	}
+
+	/**
      * GIF does not support full alpha channel we need to reduce it in order to
      * provide a simple transparency index to a unique fully transparent
-     * color.  We
+     * color.
      *
      * @param surrogateImage
      *
      * @return
      */
-    private PlanarImage convertAlpha4GIF(PlanarImage surrogateImage) {
-        final IndexColorModel cm = (IndexColorModel) surrogateImage
-            .getColorModel();
+    private PlanarImage convertIndexColorModelAlpha4GIF(
+        PlanarImage surrogateImage) {
+        final IndexColorModel cm = (IndexColorModel) surrogateImage.getColorModel();
 
         //get the r g b a components
         int[] rgba = new int[256]; //WE MIGHT USE LESS THAN 256 COLORS
@@ -401,9 +470,9 @@ public class WorldImageWriter implements GridCoverageWriter {
         /**
          * Now we are going to use the first transparent color as it were the
          * transparent color and we point all the tranpsarent pixel to this
-         * color in the color map.  
-         * 
-         * 
+         * color in the color map.
+         *
+         *
          * NOTE Assuming we have just one band.
          */
         int transparencyIndex = -1;
@@ -423,35 +492,29 @@ public class WorldImageWriter implements GridCoverageWriter {
                         //the other tranpsarent bits will point to this one
                         transparencyIndex = colorIndex;
                         rgba[colorIndex] = new Color(cm.getRed(index),
-                                cm.getGreen(index), cm.getBlue(index), 0)
-                            .getRGB();
-//                      setting sample in the raster that corresponds to an index in the
+                                cm.getGreen(index), cm.getBlue(index), 0).getRGB();
+
+                        //                      setting sample in the raster that corresponds to an index in the
                         //color map
                         raster.setSample(j, i, 0, colorIndex++);
-                    } else//we alredy set the transparent color we will reuse that one
+                    } else //we alredy set the transparent color we will reuse that one
                      {
                         //basically do nothing here
                         //we do not need to add a new color because we are reusing the old on
                         //we already set
-//                      setting sample in the raster that corresponds to an index in the
+                        //                      setting sample in the raster that corresponds to an index in the
                         //color map
-                        raster.setSample(j, i, 0, transparencyIndex);                        
+                        raster.setSample(j, i, 0, transparencyIndex);
                     }
-
-                    
-                } else//NON FULLY TRANSPARENT PIXEL
+                } else //NON FULLY TRANSPARENT PIXEL
                  {
                     rgba[colorIndex] = new Color(cm.getRed(index),
-                            cm.getGreen(index), 
-                            cm.getBlue(index),
-                            255).getRGB();
+                            cm.getGreen(index), cm.getBlue(index), 255).getRGB();
+
                     //setting sample in the raster that corresponds to an index in the
                     //color map                    
                     raster.setSample(j, i, 0, colorIndex++);
                 }
-
-
-                
             }
         }
 
@@ -462,30 +525,22 @@ public class WorldImageWriter implements GridCoverageWriter {
          * right color in the color map.  We have to create the new image
          * to be returned.
          */
-        IndexColorModel cm1=new IndexColorModel(
-        		cm.getComponentSize(0),
-        		256,
-        		rgba,
-        		0,
-        		false,
-        		transparencyIndex==-1?Transparency.OPAQUE:Transparency.BITMASK,
-        		cm.getTransferType());
-        SampleModel sm=cm1.createCompatibleSampleModel(raster.getWidth(),raster.getHeight());
+        IndexColorModel cm1 = new IndexColorModel(cm.getComponentSize(0), 256,
+                rgba, 0, false,
+                (transparencyIndex == -1) ? Transparency.OPAQUE
+                                          : Transparency.BITMASK,
+                cm.getTransferType());
+        SampleModel sm = cm1.createCompatibleSampleModel(raster.getWidth(),
+                raster.getHeight());
+
         //new image
-        TiledImage image= new TiledImage(
-        		0,
-        		0,
-        		raster.getWidth(),
-        		raster.getHeight(),
-        		0,
-        		0,
-        		sm,
-        		cm1);
+        TiledImage image = new TiledImage(0, 0, raster.getWidth(),
+                raster.getHeight(), 0, 0, sm, cm1);
         image.setData(raster);
-        
+
         //disposing old image
         surrogateImage.dispose();
-        
+
         return image;
     }
 
@@ -534,8 +589,7 @@ public class WorldImageWriter implements GridCoverageWriter {
                     new int[] { numBits, numBits, numBits, numBits }, true,
                     false, Transparency.TRANSLUCENT,
                     surrogateImage.getSampleModel().getTransferType());
-        }
-        else {
+        } else {
             cm1 = new ComponentColorModel(ColorSpace.getInstance(
                         ColorSpace.CS_sRGB),
                     new int[] { numBits, numBits, numBits }, false, false,
@@ -570,7 +624,8 @@ public class WorldImageWriter implements GridCoverageWriter {
      *
      * @return PlanarImage image converted
      */
-    private PlanarImage componentColorModel2GIF(PlanarImage surrogateImage) {
+    private PlanarImage componentColorModel2IndexColorModel4GIF(
+        PlanarImage surrogateImage) {
         {
             //parameter block
             ParameterBlock pb = new ParameterBlock();
@@ -609,8 +664,8 @@ public class WorldImageWriter implements GridCoverageWriter {
              * alpha channel we proceed without  doing anything since it seems
              * that GIF encoder in such a case works fine.
              */
-            if ((surrogateImage.getSampleModel().getNumBands() == 1)
-                    && (alphaChannel != null)) {
+            if ((surrogateImage.getSampleModel().getNumBands() == 1) &&
+                    (alphaChannel != null)) {
                 int numBands = surrogateImage.getSampleModel().getNumBands();
 
                 //getting first band
@@ -631,14 +686,34 @@ public class WorldImageWriter implements GridCoverageWriter {
             /**
              * ERROR DIFFUSION   we create a single banded image with index
              * color model.
+             *
              */
             if (surrogateImage.getSampleModel().getNumBands() == 3) {
                 surrogateImage = reduction2IndexColorModel(surrogateImage, pb);
             }
 
+		     JFrame frame = new JFrame();
+             JPanel topPanel = new JPanel();
+             topPanel.setLayout(new BorderLayout());
+             frame.getContentPane().add(topPanel);
+
+             frame.setBackground(Color.black);
+
+             JScrollPane pane = new JScrollPane();
+             pane.getViewport().add(new JLabel(
+                     new ImageIcon(
+							 surrogateImage
+                         .getAsBufferedImage())));
+             topPanel.add(pane, BorderLayout.CENTER);
+             frame.getContentPane().add(pane, BorderLayout.CENTER);
+             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
+			frame.pack();
+			frame.show();
+			
             /**
              * TRANSPARENCY  Adding transparency if needed, which means using
              * the alpha channel to build a new color model
+             *
              */
             if (alphaChannel != null) {
                 surrogateImage = addTransparency2IndexColorModel(surrogateImage,
@@ -657,7 +732,7 @@ public class WorldImageWriter implements GridCoverageWriter {
      * 3>copying the old sample model to the new sample model.  4>looping
      * through the alphaChannel and setting the corresponding pixels in the
      * new sample model to the index for transparency  5>creating a
-     * bufferedimage  6>creating a planar image
+     * bufferedimage  6>creating a planar image to be returned
      *
      * @param surrogateImage
      * @param alphaChannel
@@ -666,9 +741,71 @@ public class WorldImageWriter implements GridCoverageWriter {
      * @return
      */
     private PlanarImage addTransparency2IndexColorModel(
-        PlanarImage surrogateImage, RenderedImage alphaChannel,
+        final PlanarImage surrogateImage, final RenderedImage alphaChannel,
         ParameterBlock pb) {
-        return surrogateImage;
+        //getting original color model 
+        //in order to have the rgba vector
+        final IndexColorModel cm = (IndexColorModel) surrogateImage.getColorModel();
+
+        //get the r g b a components
+        final int transparencyIndex = 255;
+        int[] rgba = new int[256]; //WE MIGHT USE LESS THAN 256 COLORS
+		cm.getRGBs(rgba);
+		rgba[transparencyIndex]=new Color(0,0,0,0).getRGB();		
+        //get the data (actually a copy of them) and prepare to rewrite them
+        WritableRaster rasterGIF = surrogateImage.copyData();
+		final Raster rasterAlpha=alphaChannel.getData();
+        /**
+         * Now we are going to use the first transparent color as it were the
+         * transparent color and we point all the tranpsarent pixel to this
+         * color in the color map.
+         *
+         *
+         * NOTE Assuming we have just one band.
+         */
+
+        boolean foundFullyTransparent=false;
+        
+		
+        for (int i = 0; i < rasterGIF.getHeight(); i++) {
+            for (int j = 0; j < rasterGIF.getWidth(); j++) {
+
+                //check for transparency
+                if (rasterAlpha.getSample(j,i,0)== 0) {
+                    //FULLY TRANSPARENT PIXEL
+					System.out.print(j);
+					System.out.print(" ");
+					System.out.println(i);
+					foundFullyTransparent=true;
+                    rasterGIF.setSample(j, i, 0,transparencyIndex );
+                }
+            }
+        }
+
+        /**
+         * Now all the color are opaque except one and the color map has been
+         * rebuilt loosing all the tranpsarent colors except the first one.
+         * The raster has been rebuilt as well, in order to make it point to the
+         * right color in the color map.  We have to create the new image
+         * to be returned.
+         */
+        IndexColorModel cm1 = new IndexColorModel(cm.getComponentSize(0), 256,
+                rgba, 0, false,
+                (!foundFullyTransparent) ? Transparency.OPAQUE
+                                          : Transparency.BITMASK,
+                cm.getTransferType());
+        SampleModel sm = cm1.createCompatibleSampleModel(rasterGIF.getWidth(),
+                rasterGIF.getHeight());
+
+        //new image
+        TiledImage image = new TiledImage(0, 0, rasterGIF.getWidth(),
+                rasterGIF.getHeight(), 0, 0, sm, cm1);
+        image.setData(rasterGIF);
+
+        //disposing old image
+        surrogateImage.dispose();
+
+        return image;
     }
 
     /**
@@ -767,8 +904,8 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         for (int i = 0; i < extrema[0].length; i++) {
             scale[i] = 255 / (extrema[1][i] - extrema[0][i]);
-            offset[i] = -((255 * extrema[0][i]) / (extrema[1][i]
-                - extrema[0][i]));
+            offset[i] = -((255 * extrema[0][i]) / (extrema[1][i] -
+                extrema[0][i]));
         }
 
         pb.add(scale);

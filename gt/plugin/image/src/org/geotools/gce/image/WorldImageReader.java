@@ -17,6 +17,7 @@
 package org.geotools.gce.image;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -417,7 +418,9 @@ public class WorldImageReader implements GridCoverageReader {
 		//building up a coverage
         GridCoverage coverage = null;
 		try {
-            coverage = new GridCoverage2D(coverageName, image, crs, envelope);
+			Hints hint=new Hints(
+					Hints.AVOID_NON_GEOPHYSICS,Boolean.TRUE);
+            coverage = new GridCoverage2D(coverageName, image, crs, envelope,null);
         }
         catch (NoSuchElementException e1) {
             throw new IOException(e1.getMessage());
