@@ -365,12 +365,6 @@ class GTopo30DataSource {
         final Category nan = new Category("nodata",
                 new Color[] { new Color(0, 0, 0, 0) }, new NumberRange(0, 0),
                 new NumberRange(-9999, -9999));
-        ; //new Category("nodata", new Color(0, 0, 0), 0);
-
-        //  GridSampleDimension band = new GridSampleDimension(new Category[] {
-        //     nan, values
-        // }, uom);
-        // band = band.geophysics(true);
         GridSampleDimension band = new GridSampleDimension(new Category[] {
                     values.geophysics(true), nan.geophysics(true)
                 }, uom);
