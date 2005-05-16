@@ -310,7 +310,7 @@ public class SLDParser {
 		}
 	}
 
-	private StyledLayerDescriptor parseDescriptor(Node root) {
+	public StyledLayerDescriptor parseDescriptor(Node root) {
 		StyledLayerDescriptor sld = new StyledLayerDescriptor();
 		// StyledLayer layer = null;
 		// LineSymbolizer symbol = factory.createLineSymbolizer();
@@ -1912,6 +1912,6 @@ public class SLDParser {
 
 		return halo;
 	}
-
+	
 }
 
