@@ -370,12 +370,22 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 if (LOGGER.isLoggable(Level.INFO)) {
                     LOGGER.fine("modifying att# " + i + " to " + currAtt);
                 }
+		String attrValue = null;
+		if (attributes[i].isGeometry()) {
+		    String geomName = attributes[i].getName();
+		    int srid = ftInfo.getSRID(geomName);
+		    attrValue = getGeometryInsertText((Geometry) currAtt, srid);
+		} else {
+		    attrValue = addQuotes(attributes[i]);
+		}
+
 		String colName = encodeName(attributes[i].getName());
                 statementSQL.append(colName).append(" = ")
-                            .append(addQuotes(currAtt)).append(", ");
+                            .append(attrValue).append(", ");
             }
         }
 
+        //erase the last comma
         statementSQL.setLength(statementSQL.length() - 2);
         statementSQL.append(" WHERE ");
 

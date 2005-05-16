@@ -342,10 +342,15 @@ public class JDBCFeatureWriter implements FeatureWriter {
      * @see org.geotools.data.FeatureWriter#close()
      */
     public void close() throws IOException {
+        //changed this from throwing an exception if already closed to just
+        //issuing a warning.  Mysql was having trouble with this, but I see
+        //no great harm in not throwing an exception, since this will only
+        //be in clean-up.
         if (queryData.isClosed()) {
-            throw new IOException("Feature writer already closed");
-        }
-
-        reader.close();
+            LOGGER.warning("Feature writer calling close when queryData is " +
+                        " already closed");
+        } else {
+            reader.close();
+	}
     }
 }
