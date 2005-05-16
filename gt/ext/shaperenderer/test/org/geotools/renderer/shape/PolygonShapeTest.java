@@ -40,7 +40,7 @@ import junit.framework.TestCase;
  * @since 2.1.x
  */
 public class PolygonShapeTest extends TestCase {
-	private static final boolean DISPLAY = true;
+	private static final boolean DISPLAY = false;
 	
 	public static void testPolygonWithHoles() throws Exception{
 		double[] coord1=new double[]{0.0,0.0, 0.0, 200.0 ,200,200.0, 200.0,0.0, 0.0, 0.0};

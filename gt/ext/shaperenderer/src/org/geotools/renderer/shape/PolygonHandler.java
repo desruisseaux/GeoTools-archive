@@ -41,15 +41,22 @@ public class PolygonHandler implements ShapeHandler {
 	double spanx, spany;
 
 	private MathTransform mt;
-  RobustCGAlgorithms cga = new RobustCGAlgorithms();  
+
+	RobustCGAlgorithms cga = new RobustCGAlgorithms();
+
 	/**
 	 * Create new instance
-	 * @param type the type of shape.
-	 * @param env the area that is visible.  If shape is not in area then skip.
-	 * @param mt the transform to go from data to the envelope (and that should be used to transform the shape coords)
+	 * 
+	 * @param type
+	 *            the type of shape.
+	 * @param env
+	 *            the area that is visible. If shape is not in area then skip.
+	 * @param mt
+	 *            the transform to go from data to the envelope (and that should
+	 *            be used to transform the shape coords)
 	 */
-	public PolygonHandler(ShapeType type, Envelope env, MathTransform mt) 
-	throws TransformException {
+	public PolygonHandler(ShapeType type, Envelope env, MathTransform mt)
+			throws TransformException {
 		this.type = type;
 		this.bbox = env;
 		this.mt = mt;
@@ -62,7 +69,7 @@ public class PolygonHandler implements ShapeHandler {
 			this.spany = Math.abs(coords[1] - coords[3]);
 		}
 	}
-	
+
 	/**
 	 * @see org.geotools.data.shapefile.shp.ShapeHandler#getShapeType()
 	 */
@@ -70,9 +77,11 @@ public class PolygonHandler implements ShapeHandler {
 		return type;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.geotools.data.shapefile.shp.ShapeHandler#read(java.nio.ByteBuffer, org.geotools.data.shapefile.shp.ShapeType)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.data.shapefile.shp.ShapeHandler#read(java.nio.ByteBuffer,
+	 *      org.geotools.data.shapefile.shp.ShapeType)
 	 */
 	public Object read(ByteBuffer buffer, ShapeType type) {
 		if (type == ShapeType.NULL) {
@@ -105,7 +114,7 @@ public class PolygonHandler implements ShapeHandler {
 		for (int i = 0; i < numParts; i++) {
 			partOffsets[i] = buffer.getInt();
 		}
-		double[][] coords= new double[numParts][];
+		double[][] coords = new double[numParts][];
 		double[][] transformed = new double[numParts][];
 		// if needed in future otherwise all references to a z are commented
 		// out.
@@ -114,30 +123,33 @@ public class PolygonHandler implements ShapeHandler {
 
 		int finish, start = 0;
 		int length = 0;
-		
-		if (bboxdecimate){
-			coords=new double[1][];
-			coords[0]=new double[4];
-			transformed=new double[1][];
+		if (bboxdecimate) {
+			coords = new double[1][];
+			coords[0] = new double[4];
+			transformed = new double[1][];
 			transformed[0] = new double[4];
-			coords[0][0]=buffer.getDouble();
-			coords[0][1]=buffer.getDouble();
-			buffer.position((buffer.position() + (numPoints-2) * 16));
-			coords[0][2]=buffer.getDouble();
-			coords[0][3]=buffer.getDouble();
-            if( !bbox.contains(coords[0][0],coords[0][1]) && !bbox.contains(coords[0][2], coords[0][3]) )
-                return null;
+			coords[0][0] = buffer.getDouble();
+			coords[0][1] = buffer.getDouble();
+			buffer.position((buffer.position() + (numPoints - 2) * 16));
+			coords[0][2] = buffer.getDouble();
+			coords[0][3] = buffer.getDouble();
+			if (!bbox.contains(coords[0][0], coords[0][1])
+					&& !bbox.contains(coords[0][2], coords[0][3]))
+				return null;
 			try {
 				mt.transform(coords[0], 0, transformed[0], 0, 2);
 			} catch (Exception e) {
-				ShapeRenderer.LOGGER
-						.severe("could not transform coordinates "
-								+ e.getLocalizedMessage());
-				transformed[0]=coords[0];
-			}		
-			}else{
+				ShapeRenderer.LOGGER.severe("could not transform coordinates "
+						+ e.getLocalizedMessage());
+				transformed[0] = coords[0];
+			}
+		} else {
+			Envelope partEnvelope = new Envelope();
+			int partsInBBox = 0;
+
 			for (int part = 0; part < numParts; part++) {
 				start = partOffsets[part];
+				partEnvelope.init();
 
 				if (part == (numParts - 1)) {
 					finish = numPoints;
@@ -146,26 +158,18 @@ public class PolygonHandler implements ShapeHandler {
 				}
 
 				length = finish - start;
-				// if (length == 1) {
-				// length = 2;
-				// clonePoint = true;
-				// } else {
-				// clonePoint = false;
-				// }
-
 				int totalDoubles = length * 2;
 				coords[part] = new double[totalDoubles];
 				int readDoubles = 0;
 				int currentDoubles = 0;
 				for (; currentDoubles < totalDoubles;) {
 					try {
-						
-					coords[part][readDoubles] = buffer.getDouble();
-					readDoubles++;
-					currentDoubles++;
-					coords[part][readDoubles] = buffer.getDouble();
-					readDoubles++;
-					currentDoubles++;
+						coords[part][readDoubles] = buffer.getDouble();
+						readDoubles++;
+						currentDoubles++;
+						coords[part][readDoubles] = buffer.getDouble();
+						readDoubles++;
+						currentDoubles++;
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -175,39 +179,57 @@ public class PolygonHandler implements ShapeHandler {
 								&& Math.abs(coords[part][readDoubles - 3]
 										- coords[part][readDoubles - 1]) <= spany) {
 							readDoubles -= 2;
+						} else {
+							partEnvelope.expandToInclude(
+									coords[part][readDoubles - 2],
+									coords[part][readDoubles - 1]);
 						}
+					} else {
+						partEnvelope.expandToInclude(
+								coords[part][readDoubles - 2],
+								coords[part][readDoubles - 1]);
 					}
 				}
-
+				if (!partEnvelope.intersects(bbox)) {
+					continue;
+				}
 				if (!mt.isIdentity()) {
 					try {
-						transformed[part] = new double[readDoubles];
-						mt.transform(coords[part], 0, transformed[part], 0,
-								readDoubles / 2);
+						transformed[partsInBBox] = new double[readDoubles];
+						mt.transform(coords[part], 0, transformed[partsInBBox],
+								0, readDoubles / 2);
 					} catch (Exception e) {
 						ShapeRenderer.LOGGER
 								.severe("could not transform coordinates "
 										+ e.getLocalizedMessage());
-						transformed[part]=coords[part];
+						transformed[partsInBBox] = coords[part];
 					}
-				} else
-					transformed[part] = coords[part];
-				// if(clonePoint) {
-				// builder.setOrdinate(builder.getOrdinate(0, 0), 0, 1);
-				// builder.setOrdinate(builder.getOrdinate(1, 0), 1, 1);
-				// }
-
+				} else {
+					transformed[partsInBBox] = new double[readDoubles];
+					System.arraycopy(coords[part], 0, transformed[partsInBBox],
+							0, readDoubles / 2);
+				}
+				partsInBBox++;
 			}
+			if (partsInBBox == 0)
+				return null;
+			if (partsInBBox != numParts) {
+				double[][] tmp = new double[partsInBBox][];
+				System.arraycopy(transformed, 0, tmp, 0, partsInBBox);
+				transformed = tmp;
 			}
+		}
 		return new SimpleGeometry(type, transformed, geomBBox);
 	}
 
 	/**
-	 * @see org.geotools.data.shapefile.shp.ShapeHandler#write(java.nio.ByteBuffer, java.lang.Object)
+	 * @see org.geotools.data.shapefile.shp.ShapeHandler#write(java.nio.ByteBuffer,
+	 *      java.lang.Object)
 	 */
 	public void write(ByteBuffer buffer, Object geometry) {
 		// This handler doesnt write
-		throw new UnsupportedOperationException("This handler is only for reading");
+		throw new UnsupportedOperationException(
+				"This handler is only for reading");
 	}
 
 	/**
@@ -217,6 +239,5 @@ public class PolygonHandler implements ShapeHandler {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 
 }

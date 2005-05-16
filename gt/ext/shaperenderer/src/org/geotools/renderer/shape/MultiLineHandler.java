@@ -107,20 +107,15 @@ public class MultiLineHandler implements ShapeHandler {
 
 		int[] partOffsets = new int[numParts];
 
-		// points = new Coordinate[numPoints];
 		for (int i = 0; i < numParts; i++) {
 			partOffsets[i] = buffer.getInt();
 		}
 		double[][] coords= new double[numParts][];
 		double[][] transformed = new double[numParts][];
-		// if needed in future otherwise all references to a z are commented
-		// out.
-		// if( dimensions==3 )
-		// z=new double[numParts][];
 
 		int finish, start = 0;
 		int length = 0;
-		// boolean clonePoint = false;
+		
 		// if bbox is less than a pixel then decimate the geometry.  But orientation must
 		// remain the same so geometry data must be parsed.
 		if (bboxdecimate){
@@ -144,8 +139,11 @@ public class MultiLineHandler implements ShapeHandler {
 				transformed[0]=coords[0];
 			}		
 			}else{
-                boolean intersection=false;
+
+	            boolean intersection=false;
+	            int partsInBBox=0;
 			for (int part = 0; part < numParts; part++) {
+				intersection=false;
 				start = partOffsets[part];
 
 				if (part == (numParts - 1)) {
@@ -155,12 +153,6 @@ public class MultiLineHandler implements ShapeHandler {
 				}
 
 				length = finish - start;
-				// if (length == 1) {
-				// length = 2;
-				// clonePoint = true;
-				// } else {
-				// clonePoint = false;
-				// }
 				coords[part] = new double[length * 2];
 				int readDoubles = 0;
 				int currentDoubles = 0;
@@ -184,55 +176,34 @@ public class MultiLineHandler implements ShapeHandler {
 						}
 					}
 				}
-
+				if( !intersection )
+					continue;
+				
 				if (!mt.isIdentity()) {
 					try {
-						transformed[part] = new double[readDoubles];
-						mt.transform(coords[part], 0, transformed[part], 0,
+						transformed[partsInBBox] = new double[readDoubles];
+						mt.transform(coords[part], 0, transformed[partsInBBox], 0,
 								readDoubles / 2);
 					} catch (Exception e) {
 						ShapeRenderer.LOGGER
 								.severe("could not transform coordinates "
 										+ e.getLocalizedMessage());
-						transformed[part]=coords[part];
+						transformed[partsInBBox]=coords[part];
 					}
-				} else
-					transformed[part] = coords[part];
-				// if(clonePoint) {
-				// builder.setOrdinate(builder.getOrdinate(0, 0), 0, 1);
-				// builder.setOrdinate(builder.getOrdinate(1, 0), 1, 1);
-				// }
-
+				} else{
+					transformed[partsInBBox] = new double[readDoubles];
+					System.arraycopy(coords[part], 0, transformed[partsInBBox], 0,
+							readDoubles / 2);
+				}
+				partsInBBox++;
 			}
-
-			// if we have another coordinate, read and add to the coordinate
-			// sequences
-			if (dimensions == 3) {
-				// for (int part = 0; part < numParts; part++) {
-				// start = partOffsets[part];
-				//
-				// if (part == (numParts - 1)) {
-				// finish = numPoints;
-				// } else {
-				// finish = partOffsets[part + 1];
-				// }
-				//
-				// length = finish - start;
-				// // if (length == 1) {
-				// // length = 2;
-				// // clonePoint = true;
-				// // } else {
-				// // clonePoint = false;
-				// // }
-				//
-				// for (int i = 0; i < length; i++) {
-				// builder.setOrdinate(lines[part], buffer.getDouble(), 2, i);
-				// }
-				//
-				// }
+			if( partsInBBox==0 )
+				return null;
+			if( partsInBBox!=numParts ){
+				double[][] tmp=new double[partsInBBox][];
+				System.arraycopy(transformed, 0, tmp, 0, partsInBBox);
+				transformed=tmp;
 			}
-            if( !intersection )
-                return null;
 		}
 		return new SimpleGeometry(type, transformed, geomBBox);
 	}

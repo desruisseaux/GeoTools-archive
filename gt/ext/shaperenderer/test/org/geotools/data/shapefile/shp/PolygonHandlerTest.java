@@ -16,6 +16,8 @@
  */
 package org.geotools.data.shapefile.shp;
 
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -25,12 +27,16 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.renderer.shape.ShapeRenderer;
 import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.PolygonHandler;
 import org.geotools.resources.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -67,5 +73,31 @@ public class PolygonHandlerTest extends TestCase {
 		}
 		assertEquals(ds.getFeatureSource().getCount(Query.ALL)-1, i);
 	}
+	
 
+	public void testPolgyonPartDecimation() throws Exception{
+		URL url=TestData.getResource(LabelingTest.class, "smallMultiPoly.shp");
+		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
+		
+		Envelope env=new Envelope(-116.61514977458947,-115.06357335975156,31.826799280244018,32.590528603609826);
+//		Envelope env=new Envelope(-180,180,-90,90);
+//		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
+		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
+		MathTransform mt= CRS.transform(crs, GeographicCRS.WGS84);
+		ShapeRenderer renderer=new ShapeRenderer(null);
+		AffineTransform at=renderer.worldToScreenTransform(env,new Rectangle(300,300));
+		mt = FactoryFinder.getMathTransformFactory(null)
+		.createConcatenatedTransform(mt, FactoryFinder.getMathTransformFactory(null)
+				.createAffineTransform(new GeneralMatrix(at)));
+
+		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
+		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt));
+		Object shape=reader.nextRecord().shape();
+		assertNotNull( shape );
+		assertTrue( shape instanceof SimpleGeometry);
+		SimpleGeometry geom=(SimpleGeometry) shape;
+		assertEquals(1, geom.coords.length);
+		assertEquals(10, geom.coords[0].length);
+	}
+		
 }

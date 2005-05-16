@@ -29,12 +29,14 @@
 </PointPlacement> 
 </LabelPlacement> 
 </TextSymbolizer> 
-</Rule> 
 <LineSymbolizer> 
 <Stroke>
 <CssParameter name="fill">#333333</CssParameter>
 </Stroke> 
 </LineSymbolizer> 
+
+</Rule> 
+
 
 </FeatureTypeStyle> 
 </UserStyle>

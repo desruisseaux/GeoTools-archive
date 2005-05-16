@@ -42,6 +42,7 @@ import org.geotools.renderer.lite.LiteRenderer2;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
+import org.geotools.styling.Font;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
@@ -49,9 +50,9 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
+import org.geotools.styling.TextSymbolizer;
 
 import com.vividsolutions.jts.geom.Envelope;
-import com.yourkit.api.Controller;
 
 /**
  * @TODO class description
@@ -64,9 +65,9 @@ public class Timing {
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = true;
+	private static boolean ALL_DATA = false;
 
-	private static boolean DISPLAY = false;
+	private static boolean DISPLAY = true;
 
 	private static boolean ANTI_ALIASING = true;
 
@@ -76,7 +77,7 @@ public class Timing {
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = true;
+	private static boolean ACCURATE = false;
 
 	private static boolean CACHING = false;
 
@@ -87,6 +88,8 @@ public class Timing {
 	private static boolean CPU_PROFILE = false;
 
 	private static boolean LINES = false;
+	
+	private static boolean LABELING=true;
 
 	private String testName;
 	{
@@ -167,6 +170,14 @@ public class Timing {
 			filter.addRightValue(filterFactory.createLiteralExpression("blah"));
 			rule2.setFilter(filter);
 		}
+		if (LABELING) {
+			TextSymbolizer textsym=sFac.createTextSymbolizer();
+			textsym.setFill(sFac.getDefaultFill());
+			textsym.setGeometryPropertyName("the_geom");
+			textsym.setLabel(filterFactory.createLiteralExpression(LINES_LABEL));
+			textsym.setFonts(new Font[]{sFac.getDefaultFont()});
+			rule2.setSymbolizers(new Symbolizer[] { linesym, textsym });
+		}		
 		FeatureTypeStyle fts2 = sFac.createFeatureTypeStyle();
 		fts2.setRules(new Rule[] { rule2 });
 		fts2.setFeatureTypeName(typeName);
@@ -198,15 +209,28 @@ public class Timing {
 		if (FILTER) {
 			ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 			ShapefileDataStore store = (ShapefileDataStore) fac
-					.createDataStore(new URL(LINES_FILE));
+					.createDataStore(new URL(POLY_FILE));
 			AttributeExpression exp = filterFactory.createAttributeExpression(
-					store.getSchema(), "WSG_CODE");
+					store.getSchema(), POLY_LABEL);
 			CompareFilter filter = filterFactory
 					.createCompareFilter(Filter.COMPARE_NOT_EQUALS);
 			filter.addLeftValue(exp);
 			filter.addRightValue(filterFactory.createLiteralExpression("blah"));
 			rule2.setFilter(filter);
 		}
+		if (LABELING) {
+			TextSymbolizer textsym=sFac.createTextSymbolizer();
+			textsym.setFill(sFac.createFill(filterFactory.createLiteralExpression("#0000ff")));
+			textsym.setGeometryPropertyName("the_geom");
+			ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
+			ShapefileDataStore store = (ShapefileDataStore) fac
+					.createDataStore(new URL(POLY_FILE));
+			textsym.setLabel(filterFactory.createAttributeExpression(
+					store.getSchema(), POLY_LABEL));
+			textsym.setFonts(new Font[]{sFac.getDefaultFont()});
+			rule2.setSymbolizers(new Symbolizer[] { lineSym, textsym });
+		}		
+
 		FeatureTypeStyle fts2 = sFac.createFeatureTypeStyle();
 		fts2.setRules(new Rule[] { rule2 });
 		fts2.setFeatureTypeName(typeName);
@@ -244,8 +268,6 @@ public class Timing {
 				BufferedImage.TYPE_INT_ARGB);
 
 		Frame display = null;
-		if (DISPLAY)
-			display=display("shape", image, w, h);
 
 		Graphics2D g = image.createGraphics();
 		g.setColor(Color.white);
@@ -265,20 +287,13 @@ public class Timing {
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		long start = System.currentTimeMillis();
 
-		Controller controller = null;
-		if (CPU_PROFILE) {
-			controller = new Controller();
-			controller.startCPUSampling();
-		}
 
 		renderer.paint(g, new Rectangle(w, h), bounds);
 		if (ACCURATE) {
 			renderer.paint(g, new Rectangle(w, h), bounds);
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		}
-		if (CPU_PROFILE) {
-			controller.captureCPUSnapshot("shape_" + testName, false);
-		}
+
 		long end = System.currentTimeMillis();
 		if (ACCURATE){
 			if (out != null)
@@ -287,8 +302,9 @@ public class Timing {
 								+ "\n");
 		}else if (out != null)
 				out.append("shape " + testName + "=" + (end - start) + "\n");
-		if( display!=null )
-		display.repaint();
+
+		if (DISPLAY)
+			display=display("shape", image, w, h);
 	}
 
 	private MapContext getMapContext() throws Exception {
@@ -322,8 +338,6 @@ public class Timing {
 				BufferedImage.TYPE_INT_ARGB);
 
 		Frame display = null;
-		if (DISPLAY)
-			display=display("shape", image, w, h);
 		Graphics2D g = image.createGraphics();
 		g.setColor(Color.white);
 		g.fillRect(0, 0, w, h);
@@ -344,27 +358,22 @@ public class Timing {
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		long start = System.currentTimeMillis();
 
-		Controller controller = null;
-		if (CPU_PROFILE) {
-			controller = new Controller();
-			controller.startCPUSampling();
-		}
 
 		renderer.paint(g, new Rectangle(w, h), bounds);
 		if (ACCURATE) {
 			renderer.paint(g, new Rectangle(w, h), bounds);
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		}
-		if (CPU_PROFILE) {
-			controller.captureCPUSnapshot("shape_" + testName, false);
-		}
+
 		long end = System.currentTimeMillis();
 		if (ACCURATE){
-			out.append("shape " + testName + "=" + (end - start) / 3 + "\n");
+			out.append("tiny " + testName + "=" + (end - start) / 3 + "\n");
 		}else
-			out.append("shape " + testName + "=" + (end - start) + "\n");
-		if( display!=null)
-			display.repaint();
+			out.append("tiny " + testName + "=" + (end - start) + "\n");
+		if (DISPLAY)
+			display=display("tiny", image, w, h);
+		
+
 	}
 
 	private void runLiteRendererTest() throws Exception {
@@ -383,9 +392,6 @@ public class Timing {
 				BufferedImage.TYPE_INT_ARGB);
 
 		Frame display = null;
-		if (DISPLAY)
-			display=display("shape", image, w, h);
-		
 		Graphics2D g = image.createGraphics();
 		g.setColor(Color.white);
 		g.fillRect(0, 0, w, h);
@@ -400,20 +406,12 @@ public class Timing {
 		if (ACCURATE)
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		long start = System.currentTimeMillis();
-		Controller controller = null;
-		if (CPU_PROFILE) {
-			controller = new Controller();
-			controller.startCPUSampling();
-		}
+
 		renderer.paint(g, new Rectangle(w, h), bounds);
 		if (ACCURATE) {
 			renderer.paint(g, new Rectangle(w, h), bounds);
 			renderer.paint(g, new Rectangle(w, h), bounds);
 		}
-		if (CPU_PROFILE) {
-			controller.captureCPUSnapshot("lite_" + testName, false);
-		}
-
 		long end = System.currentTimeMillis();
 		if (ACCURATE){
 			if (out != null)
@@ -421,8 +419,9 @@ public class Timing {
 		}
 			else if (out != null)
 				out.append("lite " + testName + "=" + (end - start) + "\n");
-			if( display!=null)
-				display.repaint();
+		if (DISPLAY)
+			display=display("lite", image, w, h);
+		
 	}
 
 	public static Frame display(String testName, final BufferedImage image,
@@ -450,19 +449,33 @@ public class Timing {
 
 
 	private static String NEW_YORK_HOME_FILE="file:///home/jones/demo/nyct2000.shp";
-	private static String NEW_YORK_HOME_NAME="nyct2000";
 
 	private static String NEW_YORK_WORK_FILE="file:///home/jones/aData/nyct2000.shp";
 	private static String NEW_YORK_WORK_NAME="nyct2000";
+	private static String NEW_YORK_WORK_LABEL="CT2000";
+
+	private static String WORLD_HOME_FILE="file:///home/jones/allShapefiles/cntry00.shp";
+	private static String WORLD_HOME_NAME="cntry00";
+	private static String WORLD_HOME_LABEL="CNTRY_NAME";
 
 	private static String BC_FILE="file:///home/jones/aData/lwsg_prov.shp";
 	private static String BC_NAME="lwsg_prov";
 	
-	private static String LINES_FILE = "file:///home/jones/aData/bc_roads.shp";
-	private static String LINES_TYPE_NAME = "bc_roads";
+	private static String LINES_WORK_FILE = "file:///home/jones/aData/bc_roads.shp";
+	private static String LINES_WORK_TYPE_NAME = "bc_roads";
+	private static String LINES_WORK_LABEL = "STREET";	
+	
+	private static String LINES_HOME_FILE = "file:///home/jones/allShapefiles/tcn-roads.shp";
+	private static String LINES_HOME_TYPE_NAME = "tcn-roads";
+	private static String LINES_HOME_LABEL = "STREET";
 
-	private static String POLY_FILE = BC_FILE;
-	private static String POLY_TYPE_NAME = BC_NAME;
+	private static String LINES_FILE = LINES_HOME_FILE;
+	private static String LINES_TYPE_NAME = LINES_HOME_TYPE_NAME;
+	private static String LINES_LABEL = LINES_HOME_LABEL;	
+	
+	private static String POLY_FILE = WORLD_HOME_FILE;
+	private static String POLY_TYPE_NAME = WORLD_HOME_NAME;
+	private static String POLY_LABEL = WORLD_HOME_LABEL;
 
 	int w = 512, h = 512;
 }

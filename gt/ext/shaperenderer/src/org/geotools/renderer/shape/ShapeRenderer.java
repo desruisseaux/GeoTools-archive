@@ -56,6 +56,7 @@ import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.lite.LabelCache;
 import org.geotools.renderer.lite.LabelCacheDefault;
 import org.geotools.renderer.lite.ListenerList;
+import org.geotools.renderer.lite.LiteCoordinateSequence;
 import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
 import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
@@ -664,7 +665,7 @@ public class ShapeRenderer {
 	/** The painter class we use to depict shapes onto the screen */
 	private StyledShapePainter painter = new StyledShapePainter(labelCache);
 
-	private static final int NUM_SAMPLES = 30;
+	private static final int NUM_SAMPLES = 60;
 
 	/**
 	 * @param style
@@ -733,7 +734,7 @@ public class ShapeRenderer {
 
 			if (symbolizers[m] instanceof TextSymbolizer) {
 				try{
-				labelCache.put((TextSymbolizer) symbolizers[m], feature, getLiteShape2(geom, feature),
+				labelCache.put((TextSymbolizer) symbolizers[m], feature, getLiteShape2(geom),
 						scaleRange);
 				}catch (Exception e) {
 					fireErrorEvent(e);
@@ -760,25 +761,30 @@ public class ShapeRenderer {
 	 * @throws FactoryException
 	 * @throws TransformException
 	 */
-	private LiteShape2 getLiteShape2(SimpleGeometry geom, Feature feature) throws TransformException, FactoryException {
-		Class geomType=feature.getFeatureType().getDefaultGeometry().getType();
+	LiteShape2 getLiteShape2(SimpleGeometry geom) throws TransformException, FactoryException {
 		
 		Geometry jtsGeom;
 		LiteCoordinateSequenceFactory seqFactory=new LiteCoordinateSequenceFactory();
 		
-		if ( MultiPolygon.class.isAssignableFrom(geomType) ){
-			double[] points=getPointSample(geom);
-			CoordinateSequence seq=seqFactory.create(points);
+		if ( geom.type==ShapeType.POLYGON ||
+				geom.type==ShapeType.POLYGONM ||
+				geom.type==ShapeType.POLYGONZ ){
+			double[] points=getPointSample(geom,true);
+			CoordinateSequence seq=new LiteCoordinateSequence(points);
 			Polygon poly=geomFactory.createPolygon(geomFactory.createLinearRing(seq),
 					new LinearRing[]{});
 			jtsGeom=geomFactory.createMultiPolygon(new Polygon[]{poly});
-		}else if( MultiLineString.class.isAssignableFrom(geomType)){
-			double[] points=getPointSample(geom);
-			CoordinateSequence seq=seqFactory.create(points);
+		}else if( geom.type==ShapeType.ARC ||
+				geom.type==ShapeType.ARCM ||
+				geom.type==ShapeType.ARCZ ){
+			double[] points=getPointSample(geom, false);
+			CoordinateSequence seq=new LiteCoordinateSequence(points);
 			jtsGeom=geomFactory.createMultiLineString(new LineString[]{geomFactory.createLineString(seq)});
-		}else if( MultiPoint.class.isAssignableFrom(geomType)){
-			double[] points=getPointSample(geom);
-			CoordinateSequence seq=seqFactory.create(points);
+		}else if( geom.type==ShapeType.MULTIPOINT ||
+				geom.type==ShapeType.MULTIPOINTM ||
+				geom.type==ShapeType.MULTIPOINTZ ){
+			double[] points=getPointSample(geom, false);
+			CoordinateSequence seq=new LiteCoordinateSequence(points);
 			jtsGeom=geomFactory.createMultiPoint(seq);
 		}else{
 			jtsGeom=geomFactory.createPoint(new Coordinate(geom.coords[0][0],geom.coords[0][1]));
@@ -792,7 +798,7 @@ public class ShapeRenderer {
 	 * @param geom
 	 * @return
 	 */
-	private double[] getPointSample(SimpleGeometry geom) {
+	private double[] getPointSample(SimpleGeometry geom, boolean isPolygon) {
 		int largestPart=0;
 		for( int i=0; i< geom.coords.length; i++){
 			if( geom.coords[i].length>geom.coords[largestPart].length){
@@ -803,10 +809,20 @@ public class ShapeRenderer {
 		int size=Math.min(geom.coords[largestPart].length, NUM_SAMPLES);
 		double[] coords=new double[size];
 		int location = 0;
-		for (int i=0; i < coords.length-1; i++, location+=step) {
+		for (int i=0; i < coords.length-2; location+=step) {
 			 coords[i]=geom.coords[largestPart][location];
+			 i++;
+			 location++;
+			 coords[i]=geom.coords[largestPart][location];
+			 i++;
 		}
-		coords[size-1]=geom.coords[largestPart][geom.coords[largestPart].length-1];
+		if( isPolygon ){
+			coords[size-2]=coords[0];
+			coords[size-1]=coords[1];
+		}else{
+			coords[size-2]=geom.coords[largestPart][geom.coords[largestPart].length-2];
+			coords[size-1]=geom.coords[largestPart][geom.coords[largestPart].length-1];			
+		}
 		return coords;
 	}
 
