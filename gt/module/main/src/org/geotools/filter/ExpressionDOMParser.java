@@ -626,6 +626,38 @@ public final class ExpressionDOMParser {
      		if(!childName.startsWith("gml:"))
                     childName = "gml:" + childName;
             }
+            if (childName.equalsIgnoreCase("gml:coord"))
+            {
+            	//DJB: adding support for:
+            	//<gml:coord><gml:X>-180.0</gml:X><gml:Y>-90.0</gml:Y></gml:coord>
+				//<gml:coord><gml:X>180.0</gml:X><gml:Y>90.0</gml:Y></gml:coord>
+            	Coordinate c = new Coordinate();
+            	NodeList grandChildren = child.getChildNodes();
+
+                for (int t = 0; t < grandChildren.getLength(); t++) 
+                {
+                	Node grandChild = grandChildren.item(t);
+                	String grandChildName = grandChild.getNodeName();
+                    if(grandChildName == null)
+                    	grandChildName = grandChild.getLocalName();
+             		if(!grandChildName.startsWith("gml:"))
+             			grandChildName = "gml:" + grandChildName;
+                    
+             	    if (grandChildName.equalsIgnoreCase("gml:x")) 
+             	    {
+             	    	c.x = Double.parseDouble(grandChild.getChildNodes().item(0).getNodeValue().trim());
+             	    }
+             	    else if (grandChildName.equalsIgnoreCase("gml:y")) 
+             	    {
+             	    	c.y = Double.parseDouble(grandChild.getChildNodes().item(0).getNodeValue().trim());
+             	    }
+             	   else if (grandChildName.equalsIgnoreCase("gml:z")) 
+            	    {
+            	    	c.z = Double.parseDouble(grandChild.getChildNodes().item(0).getNodeValue().trim());
+            	    }
+                }
+                clist.add(c);
+            }
 
             if (childName.equalsIgnoreCase("gml:coordinates")) {
                 LOGGER.finer("coordinates "
