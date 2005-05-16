@@ -35,7 +35,7 @@ class MyFileFilter implements FilenameFilter {
 
     public MyFileFilter() {
         String[] extensions = new String[] {
-                ".gif", ".jpg", ".jpeg", ".tif", ".tiff", ".png"
+                ".gif", ".jpg", ".jpeg", ".tif", ".tiff", ".png", ".bmp"
             };
         this.setExtensions(extensions);
     }
