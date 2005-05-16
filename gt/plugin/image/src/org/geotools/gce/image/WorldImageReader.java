@@ -257,67 +257,6 @@ public class WorldImageReader implements GridCoverageReader {
             //reading the image as given
             image = ImageIO.read(sourceURL);
 
-//            if (image.getColorModel().getColorSpace().getType() != ColorSpace.TYPE_RGB) {
-//                ColorModel rgbcm = new ComponentColorModel(ColorSpace.getInstance(
-//                            ColorSpace.CS_sRGB), new int[] { 8, 8, 8 }, false,
-//                        false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
-//
-//                ParameterBlock pb = new ParameterBlock();
-//                pb.addSource(image).add(rgbcm);
-//
-//                ImageLayout il = new ImageLayout();
-//                il.setColorModel(rgbcm);
-//                il.setSampleModel(rgbcm.createCompatibleSampleModel(
-//                        image.getWidth(), image.getHeight()));
-//
-//                RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
-//                        il);
-//
-//                hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
-//
-//                PlanarImage dst = JAI.create("ColorConvert", pb, hints);
-//
-//                     
-//                					double[][] matrix = {
-//                					       { -0.80D, 0.00D, 0.00D, 1.0D, 0.0D }, //R 
-//											{ 0.00D, -0.80D, 0.00D, 1.0D, 0.0D }, //G 
-//											{ 0.00D, 0.00D, -0.80D, 1.0D, 0.0D } //B 
-//                            };
-//                            ParameterBlock pb = new ParameterBlock();
-//                            pb.addSource(image);
-//                            pb.add(matrix);
-//                            PlanarImage imagep = JAI.create("bandcombine", pb, null);
-//                            ParameterBlockJAI pbjai = new  ParameterBlockJAI("colorconvert");
-//                            ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-//                            int[] bits = { 8, 8, 8 };
-//                            ColorModel cm = new ComponentColorModel(cs,bits,false,false,Transparency.OPAQUE,DataBuffer.TYPE_BYTE);
-//                            pbjai.addSource(imagep);
-//                            pbjai.setParameter("colormodel", cm);
-//                            ImageLayout il = new ImageLayout();
-//                            il.setSampleModel(cm.createCompatibleSampleModel(imagep.getWidth(),imagep.getHeight()));
-//                            RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
-//                            RenderedOp dst = JAI.create("colorconvert", pbjai, hints);
-//                    
-//                
-//                
-//                //displaying
-//                JFrame frame = new JFrame();
-//                JPanel topPanel = new JPanel();
-//                topPanel.setLayout(new BorderLayout());
-//                frame.getContentPane().add(topPanel);
-//
-//                frame.setBackground(Color.black);
-//
-//                JScrollPane pane = new JScrollPane();
-//                pane.getViewport().add(new JLabel(
-//                        new ImageIcon(dst.createSnapshot().getAsBufferedImage())));
-//                topPanel.add(pane, BorderLayout.CENTER);
-//                frame.getContentPane().add(pane);
-//                frame.getContentPane().add(pane, BorderLayout.CENTER);
-//                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//                frame.pack();
-//                frame.show();
-//            }
 
             String sourceAsString = sourceURL.toExternalForm();
             int index = sourceAsString.lastIndexOf(".");
@@ -500,7 +439,7 @@ public class WorldImageReader implements GridCoverageReader {
         try {
             Hints hint = new Hints(Hints.AVOID_NON_GEOPHYSICS, Boolean.TRUE);
             coverage = new GridCoverage2D(coverageName, image, crs, envelope,
-                    null);
+					hint);
         } catch (NoSuchElementException e1) {
             throw new IOException(e1.getMessage());
         }
@@ -528,3 +467,68 @@ public class WorldImageReader implements GridCoverageReader {
     public void dispose() throws IOException {
     }
 }
+/**
+ * COLOR SPACE CONVERSION TO RGB
+ * TODO  implement it!!!
+ */
+//if (image.getColorModel().getColorSpace().getType() != ColorSpace.TYPE_RGB) {
+//ColorModel rgbcm = new ComponentColorModel(ColorSpace.getInstance(
+//          ColorSpace.CS_sRGB), new int[] { 8, 8, 8 }, false,
+//      false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+//
+//ParameterBlock pb = new ParameterBlock();
+//pb.addSource(image).add(rgbcm);
+//
+//ImageLayout il = new ImageLayout();
+//il.setColorModel(rgbcm);
+//il.setSampleModel(rgbcm.createCompatibleSampleModel(
+//      image.getWidth(), image.getHeight()));
+//
+//RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+//      il);
+//
+//hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
+//
+//PlanarImage dst = JAI.create("ColorConvert", pb, hints);
+//
+//   
+//					double[][] matrix = {
+//					       { -0.80D, 0.00D, 0.00D, 1.0D, 0.0D }, //R 
+//							{ 0.00D, -0.80D, 0.00D, 1.0D, 0.0D }, //G 
+//							{ 0.00D, 0.00D, -0.80D, 1.0D, 0.0D } //B 
+//          };
+//          ParameterBlock pb = new ParameterBlock();
+//          pb.addSource(image);
+//          pb.add(matrix);
+//          PlanarImage imagep = JAI.create("bandcombine", pb, null);
+//          ParameterBlockJAI pbjai = new  ParameterBlockJAI("colorconvert");
+//          ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+//          int[] bits = { 8, 8, 8 };
+//          ColorModel cm = new ComponentColorModel(cs,bits,false,false,Transparency.OPAQUE,DataBuffer.TYPE_BYTE);
+//          pbjai.addSource(imagep);
+//          pbjai.setParameter("colormodel", cm);
+//          ImageLayout il = new ImageLayout();
+//          il.setSampleModel(cm.createCompatibleSampleModel(imagep.getWidth(),imagep.getHeight()));
+//          RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
+//          RenderedOp dst = JAI.create("colorconvert", pbjai, hints);
+//  
+//
+//
+////displaying
+//JFrame frame = new JFrame();
+//JPanel topPanel = new JPanel();
+//topPanel.setLayout(new BorderLayout());
+//frame.getContentPane().add(topPanel);
+//
+//frame.setBackground(Color.black);
+//
+//JScrollPane pane = new JScrollPane();
+//pane.getViewport().add(new JLabel(
+//      new ImageIcon(dst.createSnapshot().getAsBufferedImage())));
+//topPanel.add(pane, BorderLayout.CENTER);
+//frame.getContentPane().add(pane);
+//frame.getContentPane().add(pane, BorderLayout.CENTER);
+//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//frame.pack();
+//frame.show();
+//}

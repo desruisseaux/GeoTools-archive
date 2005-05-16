@@ -35,9 +35,11 @@ import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
@@ -60,6 +62,7 @@ import javax.media.jai.ColorCube;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.KernelJAI;
+import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.TiledImage;
@@ -338,6 +341,11 @@ public class WorldImageWriter implements GridCoverageWriter {
 
             //            }
 
+			if (surrogateImage.getColorModel() instanceof DirectColorModel ) {
+		        surrogateImage = direct2ComponentColorModel(surrogateImage);
+
+
+            }				
             /**
              * ADJUSTMENTS FOR VARIOUS FILE FORMATS
              */
@@ -347,6 +355,15 @@ public class WorldImageWriter implements GridCoverageWriter {
                                            .getValue())).compareToIgnoreCase(
                         "gif") == 0)) {
 				/**
+				 * For the moment we do not work with DirectColorModel but instead we switch to 
+				 * component color model which is really easier to handle even if it much more memory expensive.
+				 * Once we are in component color model is really easy to go to Gif and similar.
+				 * 
+				 */
+				if (surrogateImage.getColorModel() instanceof DirectColorModel ) {
+	                surrogateImage = this.reformatColorModel2ComponentColorModel(surrogateImage);
+	            }				
+				/**
 				 * IndexColorModel with more than 8 bits for sample might be a problem because GIF allows only 8 bits based palette 
 				 * therefore I prefere switching to component color model in order to handle this properly.
 				 * 
@@ -354,7 +371,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 				 */
 				if (surrogateImage.getColorModel() instanceof IndexColorModel &&
                         (surrogateImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE)) {
-                    surrogateImage = this.reformatFromIndexColorModel2ComponentColorModel(surrogateImage);
+                    surrogateImage = this.reformatColorModel2ComponentColorModel(surrogateImage);
                 }				
                 /**
                  * component color model is not well digested by the gif
@@ -391,7 +408,7 @@ public class WorldImageWriter implements GridCoverageWriter {
                         "tif") == 0)) {
                 //Are we dealing with IndexColorModel? If so we need to go back to ComponentColorModel
                 if (surrogateImage.getColorModel() instanceof IndexColorModel) {
-                    surrogateImage = reformatFromIndexColorModel2ComponentColorModel(surrogateImage);
+                    surrogateImage = reformatColorModel2ComponentColorModel(surrogateImage);
                 }
             }
 
@@ -405,6 +422,32 @@ public class WorldImageWriter implements GridCoverageWriter {
             throw new IOException(e.getMessage());
         }
     }
+
+	/**
+	 * @param surrogateImage
+	 * @return
+	 */
+	private PlanarImage direct2ComponentColorModel(PlanarImage surrogateImage) {
+		ParameterBlockJAI pb = new ParameterBlockJAI("ColorConvert");
+		pb.addSource(surrogateImage);
+		ComponentColorModel colorModel = new ComponentColorModel(surrogateImage.getColorModel().getColorSpace(),
+		                                                         new int[] { 
+																			8,
+																			8,
+																			8,
+																			8 },
+		                                                         false,
+		                                                         surrogateImage.getColorModel().hasAlpha(),
+																 surrogateImage.getColorModel().getTransparency(),
+																 surrogateImage.getSampleModel().getTransferType());
+		pb.setParameter("colormodel", colorModel);
+		ImageLayout layout = new ImageLayout();
+		layout.setColorModel(colorModel);
+		layout.setSampleModel(colorModel.createCompatibleSampleModel(surrogateImage.getWidth(), surrogateImage.getHeight()));
+		RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+		surrogateImage = JAI.create("ColorConvert", pb, hints).createInstance();
+		return surrogateImage;
+	}
 
 
 
@@ -514,7 +557,7 @@ public class WorldImageWriter implements GridCoverageWriter {
      *
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    private PlanarImage reformatFromIndexColorModel2ComponentColorModel(
+    private PlanarImage reformatColorModel2ComponentColorModel(
         PlanarImage surrogateImage) throws IllegalArgumentException {
         // Format the image to be expanded from IndexColorModel to
         // ComponentColorModel
@@ -529,13 +572,24 @@ public class WorldImageWriter implements GridCoverageWriter {
         switch (surrogateImage.getSampleModel().getTransferType()) {
         case DataBuffer.TYPE_BYTE:
             numBits = 8;
-
             break;
 
         case DataBuffer.TYPE_USHORT:
             numBits = 16;
-
             break;
+		case DataBuffer.TYPE_SHORT:
+            numBits = 16;
+            break;
+
+        case DataBuffer.TYPE_INT:
+            numBits = 32;
+            break;			
+		case DataBuffer.TYPE_FLOAT:
+            numBits = 32;
+            break;
+		case DataBuffer.TYPE_DOUBLE:
+			numBits=64;
+			break;
 
         default:
             throw new IllegalArgumentException(
@@ -652,24 +706,24 @@ public class WorldImageWriter implements GridCoverageWriter {
             if (surrogateImage.getSampleModel().getNumBands() == 3) {
                 surrogateImage = reduction2IndexColorModel(surrogateImage, pb);
             }
+			JFrame frame = new JFrame();
+	         JPanel topPanel = new JPanel();
+	         topPanel.setLayout(new BorderLayout());
+	         frame.getContentPane().add(topPanel);
 
-		     JFrame frame = new JFrame();
-             JPanel topPanel = new JPanel();
-             topPanel.setLayout(new BorderLayout());
-             frame.getContentPane().add(topPanel);
 
-             frame.setBackground(Color.black);
 
-             JScrollPane pane = new JScrollPane();
-             pane.getViewport().add(new JLabel(
-                     new ImageIcon(
+	         JScrollPane pane = new JScrollPane();
+	         pane.getViewport().add(new JLabel(
+	                 new ImageIcon(
 							 surrogateImage
-                         .getAsBufferedImage())));
-             topPanel.add(pane, BorderLayout.CENTER);
-             frame.getContentPane().add(pane, BorderLayout.CENTER);
-             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
+	                     .getAsBufferedImage())));
+	         topPanel.add(pane, BorderLayout.CENTER);
+	         frame.getContentPane().add(pane, BorderLayout.CENTER);
+	         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
 			frame.pack();
 			frame.show();
+		
 			
             /**
              * TRANSPARENCY  Adding transparency if needed, which means using
@@ -681,7 +735,23 @@ public class WorldImageWriter implements GridCoverageWriter {
                         alphaChannel, pb);
             }
         }
+	     JFrame frame = new JFrame();
+         JPanel topPanel = new JPanel();
+         topPanel.setLayout(new BorderLayout());
+         frame.getContentPane().add(topPanel);
 
+     
+
+         JScrollPane pane = new JScrollPane();
+         pane.getViewport().add(new JLabel(
+                 new ImageIcon(
+						 surrogateImage
+                     .getAsBufferedImage())));
+         topPanel.add(pane, BorderLayout.CENTER);
+         frame.getContentPane().add(pane, BorderLayout.CENTER);
+         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
+		frame.pack();
+		frame.show();
         return surrogateImage;
     }
 
@@ -710,9 +780,17 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         //get the r g b a components
         final int transparencyIndex = 255;
-        int[] rgba = new int[256]; //WE MIGHT USE LESS THAN 256 COLORS
-		cm.getRGBs(rgba);
-		rgba[transparencyIndex]=new Color(0,0,0,0).getRGB();		
+		
+        byte[][] rgba = new byte[3][256]; //WE MIGHT USE LESS THAN 256 COLORS
+		//cm.getRGBs(rgba);
+		cm.getReds(rgba[0]);
+		cm.getGreens(rgba[1]);
+		cm.getBlues(rgba[2]);
+		//setting color
+		rgba[0][transparencyIndex]=0;
+		rgba[1][transparencyIndex]=0;
+		rgba[2][transparencyIndex]=0;
+		
         //get the data (actually a copy of them) and prepare to rewrite them
         WritableRaster rasterGIF = surrogateImage.copyData();
 		final Raster rasterAlpha=alphaChannel.getData();
@@ -734,11 +812,11 @@ public class WorldImageWriter implements GridCoverageWriter {
                 //check for transparency
                 if (rasterAlpha.getSample(j,i,0)== 0) {
                     //FULLY TRANSPARENT PIXEL
-					System.out.print(j);
-					System.out.print(" ");
-					System.out.println(i);
+	
 					foundFullyTransparent=true;
+					//System.out.println(rasterGIF.getSample(j, i, 0));
                     rasterGIF.setSample(j, i, 0,transparencyIndex );
+					//System.out.println(rasterGIF.getSample(j, i, 0));
                 }
             }
         }
@@ -750,23 +828,30 @@ public class WorldImageWriter implements GridCoverageWriter {
          * right color in the color map.  We have to create the new image
          * to be returned.
          */
-        IndexColorModel cm1 = new IndexColorModel(cm.getComponentSize(0), 256,
-                rgba, 0, false,
-                (!foundFullyTransparent) ? Transparency.OPAQUE
-                                          : Transparency.BITMASK,
-                cm.getTransferType());
-        SampleModel sm = cm1.createCompatibleSampleModel(rasterGIF.getWidth(),
-                rasterGIF.getHeight());
+        IndexColorModel cm1 = new IndexColorModel(
+				cm.getPixelSize(),
+				256,
+				rgba[0],
+				rgba[1],
+				rgba[2],
+				255);
+				
+ //       SampleModel sm = cm1.createCompatibleSampleModel(rasterGIF.getWidth(),
+   //             rasterGIF.getHeight());
 
         //new image
-        TiledImage image = new TiledImage(0, 0, rasterGIF.getWidth(),
-                rasterGIF.getHeight(), 0, 0, sm, cm1);
+        //TiledImage image = new TiledImage(0, 0, rasterGIF.getWidth(),
+        //        rasterGIF.getHeight(), 0, 0, sm, cm1);
+		BufferedImage image= new BufferedImage(rasterGIF.getWidth(),
+				rasterGIF.getHeight(),
+				BufferedImage.TYPE_BYTE_INDEXED,
+				cm1);
         image.setData(rasterGIF);
 
         //disposing old image
         surrogateImage.dispose();
 
-        return image;
+        return PlanarImage.wrapRenderedImage(image);
     }
 
     /**
@@ -780,8 +865,8 @@ public class WorldImageWriter implements GridCoverageWriter {
     private PlanarImage reduction2IndexColorModel(PlanarImage surrogateImage,
         ParameterBlock pb) {
         //error dither
-        KernelJAI ditherMask = KernelJAI.ERROR_FILTER_STUCKI; //KernelJAI.DITHER_MASK_443;
-        ColorCube colorMap = ColorCube.BYTE_496;
+        final KernelJAI ditherMask = KernelJAI.ERROR_FILTER_STUCKI; //KernelJAI.DITHER_MASK_443;
+        final ColorCube colorMap = ColorCube.BYTE_496;
 
         //PARAMETER BLOCK
         pb.removeParameters();
@@ -793,9 +878,8 @@ public class WorldImageWriter implements GridCoverageWriter {
         pb.add(ditherMask);
 
         RenderedOp op1 = JAI.create("errordiffusion", pb, null);
-        surrogateImage = op1.createSnapshot();
-
-        return surrogateImage;
+ 
+        return op1.createSnapshot();
     }
 
     /**
