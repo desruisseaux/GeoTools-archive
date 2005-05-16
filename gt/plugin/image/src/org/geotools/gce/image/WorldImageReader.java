@@ -17,21 +17,35 @@
 package org.geotools.gce.image;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+
 import org.geotools.factory.Hints;
+
 import org.geotools.geometry.GeneralEnvelope;
+
 import org.geotools.parameter.Parameter;
+
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+
 import org.opengis.parameter.GeneralParameterValue;
+
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-import javax.imageio.ImageIO;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.renderable.ParameterBlock;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,10 +58,24 @@ import java.net.URL;
 
 import java.util.NoSuchElementException;
 
+import javax.imageio.ImageIO;
+
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+
 /**
- * 
- * @author simone giannecchini 
- * @author alessio fabiani 
+ *
+ * @author simone giannecchini
+ * @author alessio fabiani
  * @author rgould
  * Reads a GridCoverage from a given source. WorldImage sources
  * only support one GridCoverage so hasMoreGridCoverages() will
@@ -83,8 +111,7 @@ public class WorldImageReader implements GridCoverageReader {
         if (source instanceof File) { //File
 
             return; //do nothing if it is a file
-        }
-        else if (source instanceof URL) { //URL that point to a file
+        } else if (source instanceof URL) { //URL that point to a file
 
             if (((URL) source).getProtocol().compareToIgnoreCase("file") == 0) {
                 this.source = new File(((URL) source).getPath());
@@ -124,8 +151,7 @@ public class WorldImageReader implements GridCoverageReader {
     /**
      * Metadata is not suported. Returns null.
      */
-    public String[] getMetadataNames()
-        throws IOException {
+    public String[] getMetadataNames() throws IOException {
         return null;
     }
 
@@ -148,8 +174,7 @@ public class WorldImageReader implements GridCoverageReader {
     /**
      * WorldImage GridCoverages are not named. Returns null.
      */
-    public String[] listSubNames()
-        throws IOException {
+    public String[] listSubNames() throws IOException {
         return null;
     }
 
@@ -160,8 +185,7 @@ public class WorldImageReader implements GridCoverageReader {
     /**
      * WorldImage GridCoverages are not named. Returns null.
      */
-    public String getCurrentSubname()
-        throws IOException {
+    public String getCurrentSubname() throws IOException {
         return null;
     }
 
@@ -173,8 +197,7 @@ public class WorldImageReader implements GridCoverageReader {
      * Returns true until read has been called, as World Image files only
      * support one GridCoverage.
      */
-    public boolean hasMoreGridCoverages()
-        throws IOException {
+    public boolean hasMoreGridCoverages() throws IOException {
         return gridLeft;
     }
 
@@ -198,10 +221,8 @@ public class WorldImageReader implements GridCoverageReader {
         //do we have paramters to use for reading from the specified source
         if (parameters != null) {
             //they will be ignored if we will find a world file
-            this.format.getReadParameters().parameter("crs").setValue(((Parameter) parameters[0])
-                .getValue());
-            this.format.getReadParameters().parameter("envelope").setValue(((Parameter) parameters[1])
-                .getValue());
+            this.format.getReadParameters().parameter("crs").setValue(((Parameter) parameters[0]).getValue());
+            this.format.getReadParameters().parameter("envelope").setValue(((Parameter) parameters[1]).getValue());
         }
 
         URL sourceURL = null;
@@ -216,40 +237,84 @@ public class WorldImageReader implements GridCoverageReader {
         float yPixelSize = 0;
         float xLoc = 0;
         float yLoc = 0;
-        
-        
+
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) this.format.getReadParameters()
                                                                                .parameter("crs")
                                                                                .getValue();
         Envelope envelope = null;
         String coverageName = "";
-        
+
         int world_type = -1;
         BufferedImage image = null;
         BufferedReader in = null;
+
         //are we reading from a file?
         //in such a case we will look for the associated world file
         if (source instanceof File) {
             sourceURL = ((File) source).toURL();
 
+			
             //reading the image as given
             image = ImageIO.read(sourceURL);
 
+//			if(image.getColorModel().getColorSpace().getType()!=ColorSpace.TYPE_RGB
+//					)
+//			{
+//            double[][] matrix = {
+//                    { -1.0D,  0.0D,  0.0D, 1.0D, 0.0D },
+//                    {  0.0D, -1.0D,  0.0D, 1.0D, 0.0D },
+//                    {  0.0D,  0.0D, -1.0D, 1.0D, 0.0D },
+//            };
+//            ParameterBlock pb = new ParameterBlock();
+//            pb.addSource(image);
+//            pb.add(matrix);
+//            PlanarImage imagep = JAI.create("bandcombine", pb, null);
+//            ParameterBlockJAI pbjai = new  ParameterBlockJAI("colorconvert");
+//            ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+//            int[] bits = { 8, 8, 8 };
+//            ColorModel cm = new ComponentColorModel(cs,bits,false,false,Transparency.OPAQUE,DataBuffer.TYPE_BYTE);
+//            pbjai.addSource(imagep);
+//            pbjai.setParameter("colormodel", cm);
+//            ImageLayout il = new ImageLayout();
+//            il.setSampleModel(cm.createCompatibleSampleModel(imagep.getWidth(),imagep.getHeight()));
+//            RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, il);
+//            RenderedOp dst = JAI.create("colorconvert", pbjai, hints);
+//    
+//
+//
+//		    //displaying
+//            JFrame frame = new JFrame();
+//            JPanel topPanel = new JPanel();
+//            topPanel.setLayout(new BorderLayout());
+//            frame.getContentPane().add(topPanel);
+//
+//            frame.setBackground(Color.black);
+//
+//            JScrollPane pane = new JScrollPane();
+//            pane.getViewport().add(new JLabel(
+//                    new ImageIcon(
+//							dst.createSnapshot()
+//                        .getAsBufferedImage())));
+//            topPanel.add(pane, BorderLayout.CENTER);
+//            frame.getContentPane().add(pane);
+//            frame.getContentPane().add(pane, BorderLayout.CENTER);
+//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//            frame.pack();
+//            frame.show();                				
+//        }
             String sourceAsString = sourceURL.toExternalForm();
             int index = sourceAsString.lastIndexOf(".");
             String base = sourceAsString.substring(0, index);
             String fileExtension = sourceAsString.substring(index + 1);
 
             //We can now construct the baseURL from this string.
-           
             try {
                 URL worldURL = new URL(base + ".wld");
 
                 in = new BufferedReader(new InputStreamReader(
                             worldURL.openStream()));
                 world_type = WORLD_WLD;
-            }
-            catch (FileNotFoundException e1) {
+            } catch (FileNotFoundException e1) {
                 try {
                     //.wld extension not found, go for .meta.
                     URL worldURL = new URL(base + ".meta");
@@ -257,11 +322,10 @@ public class WorldImageReader implements GridCoverageReader {
                     in = new BufferedReader(new InputStreamReader(
                                 worldURL.openStream()));
                     world_type = WORLD_META;
-                }
-                catch (FileNotFoundException e2) {
+                } catch (FileNotFoundException e2) {
                     //.wld & .meta extension not found, go for file based one.
-                    URL worldURL = new URL(base
-                            + WorldImageFormat.getWorldExtension(fileExtension));
+                    URL worldURL = new URL(base +
+                            WorldImageFormat.getWorldExtension(fileExtension));
 
                     in = new BufferedReader(new InputStreamReader(
                                 worldURL.openStream()));
@@ -311,8 +375,7 @@ public class WorldImageReader implements GridCoverageReader {
                     default:
                         break;
                     }
-                }
-                else if (world_type == WORLD_META) {
+                } else if (world_type == WORLD_META) {
                     String line = str;
 
                     rotation1 = 0.0f;
@@ -369,8 +432,7 @@ public class WorldImageReader implements GridCoverageReader {
 
             envelope = new GeneralEnvelope(new double[] { xMin, yMin },
                     new double[] { xMax, yMax });
-        }
-        else { //assuming it is an  url or an input stream
+        } else { //assuming it is an  url or an input stream
 
             //well it seems we are not reading from a file
             //therefore we need the parameters
@@ -387,8 +449,7 @@ public class WorldImageReader implements GridCoverageReader {
             if (source instanceof URL) {
                 image = ImageIO.read((URL) source);
                 coverageName = ((URL) source).getFile();
-            }
-            else if (source instanceof InputStream) {
+            } else if (source instanceof InputStream) {
                 image = ImageIO.read((InputStream) source);
             }
 
@@ -401,32 +462,34 @@ public class WorldImageReader implements GridCoverageReader {
         //no more grid left
         gridLeft = false;
 
-        
         return createCoverage(image, crs, envelope, coverageName);
     }
 
-	/**Creating a coverage from an Image.
-	 * @param image
-	 * @param crs
-	 * @param envelope
-	 * @param coverageName
-	 * @return
-	 * @throws MismatchedDimensionException
-	 * @throws IOException
-	 */
-	private GridCoverage createCoverage(BufferedImage image, CoordinateReferenceSystem crs, Envelope envelope, String coverageName) throws MismatchedDimensionException, IOException {
-		//building up a coverage
+    /**Creating a coverage from an Image.
+     * @param image
+     * @param crs
+     * @param envelope
+     * @param coverageName
+     * @return
+     * @throws MismatchedDimensionException
+     * @throws IOException
+     */
+    private GridCoverage createCoverage(BufferedImage image,
+        CoordinateReferenceSystem crs, Envelope envelope, String coverageName)
+        throws MismatchedDimensionException, IOException {
+        //building up a coverage
         GridCoverage coverage = null;
-		try {
-			Hints hint=new Hints(
-					Hints.AVOID_NON_GEOPHYSICS,Boolean.TRUE);
-            coverage = new GridCoverage2D(coverageName, image, crs, envelope,null);
-        }
-        catch (NoSuchElementException e1) {
+
+        try {
+            Hints hint = new Hints(Hints.AVOID_NON_GEOPHYSICS, Boolean.TRUE);
+            coverage = new GridCoverage2D(coverageName, image, crs, envelope,
+                    null);
+        } catch (NoSuchElementException e1) {
             throw new IOException(e1.getMessage());
         }
-		return coverage;
-	}
+
+        return coverage;
+    }
 
     /* (non-Javadoc)
      * @see org.geotools.data.coverage.grid.GridCoverageReader#skip()
