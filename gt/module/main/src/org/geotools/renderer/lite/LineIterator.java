@@ -142,6 +142,8 @@ class LineIterator extends AbstractLiteIterator {
 	 * @param maxDistance
 	 */
 	public void init(LineString ls, AffineTransform at, boolean generalize, float maxDistance) {
+		if( at==null )
+			at=new AffineTransform();
 		_init(ls, at, generalize, maxDistance);
 		
         xScale = (float) Math.sqrt(

@@ -124,7 +124,7 @@ public class StyledShapePainter {
         		gs[0] = shape.getGeometry();
         		gc = shape.getGeometry().getFactory().createGeometryCollection(gs); //make a Point,Line, or Poly into a GC
         	}
-        	GeomCollectionIterator citer = new GeomCollectionIterator(gc,shape.getAffineTransform(),false,1.0);
+        	GeomCollectionIterator citer = new GeomCollectionIterator(gc,IDENTITY_TRANSFORM, false,1.0);
         	        	
             // get the point onto the shape has to be painted
             float[] coords = new float[2];

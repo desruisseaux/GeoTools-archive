@@ -77,10 +77,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * A lite implementation of the Renderer and Renderer2D interfaces. Lite means that:
@@ -815,7 +811,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             LOGGER.fine("processing " + featureStylers.length + " stylers");
         }
 
-        LiteShape2 shape = createPath(null, at);
+//        LiteShape2 shape = createPath(null, at);
         transformMap = new HashMap();
 
         for( int i = 0; i < featureStylers.length; i++ ) {
@@ -824,6 +820,16 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 		        }
 
             FeatureTypeStyle fts = featureStylers[i];
+
+            String typeName = features.getSchema().getTypeName();
+
+				        if (LOGGER.isLoggable(Level.FINER)) {
+				            LOGGER.fine("... done: " + typeName);
+				        }
+            if ((typeName != null)
+                    && (features.getSchema().isDescendedFrom(null,
+                            fts.getFeatureTypeName()) || typeName.equalsIgnoreCase(fts
+                            .getFeatureTypeName()))) {
 
             // get applicable rules at the current scale
             Rule[] rules = fts.getRules();
@@ -874,16 +880,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 						            LOGGER.finest("... done: " + feature.toString());
 						        }
 
-                    String typeName = feature.getFeatureType().getTypeName();
-
-						        if (LOGGER.isLoggable(Level.FINER)) {
-						            LOGGER.fine("... done: " + typeName);
-						        }
-
-                    if ((typeName != null)
-                            && (feature.getFeatureType().isDescendedFrom(null,
-                                    fts.getFeatureTypeName()) || typeName.equalsIgnoreCase(fts
-                                    .getFeatureTypeName()))) {
                         // applicable rules
                         for( Iterator it = ruleList.iterator(); it.hasNext(); ) {
 
@@ -943,7 +939,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 												        }
                             }
                         }
-                    }
 
 						        if (LOGGER.isLoggable(Level.FINER)) {
 						            LOGGER.finer("feature rendered event ...");
@@ -956,7 +951,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             }
 
             reader.close();
-            
+
+            }
         }
     }
 
@@ -980,7 +976,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             final Symbolizer[] symbolizers, Range scaleRange, AffineTransform at,
             CoordinateReferenceSystem destinationCrs ) throws TransformException, FactoryException {
 
-    	LiteShape2 shape=createPath(null, at);
+    	
+    	LiteShape2 shape;
         for( int m = 0; m < symbolizers.length; m++ ) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("applying symbolizer " + symbolizers[m]);
@@ -988,7 +985,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
             if (symbolizers[m] instanceof RasterSymbolizer) {
                 AffineTransform tempTransform = graphics.getTransform();
-                graphics.setTransform(shape.getAffineTransform());
+                graphics.setTransform(at);
                 renderRaster(graphics, feature, (RasterSymbolizer) symbolizers[m]);
                 graphics.setTransform(tempTransform);
             } else{
@@ -998,18 +995,24 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
                 if (canTransform) {
                     try {
-                        transform = getMathTransform(crs, destinationCrs, shape
-                                .getAffineTransform());
+                        transform = getMathTransform(crs, destinationCrs);
+                        if (transform != null) {
+                            transform = (MathTransform2D) operationFactory.getMathTransformFactory()
+                                    .createConcatenatedTransform(
+                                            transform,
+                                            operationFactory.getMathTransformFactory().createAffineTransform(
+                                                    new GeneralMatrix(at)));
+                        } else {
+                            transform = (MathTransform2D) operationFactory.getMathTransformFactory()
+                                    .createAffineTransform(new GeneralMatrix(at));
+                        }
                     } catch (Exception e) {
                         // fall through
                     }
                 }
 
-                if (transform != null) {
-                	shape = getTransformedShape(g, transform);
-                } else {
-                    shape.setGeometry(g);
-                }
+            	shape = getTransformedShape(g, transform);
+            	
                 if( symbolizers[m] instanceof TextSymbolizer ){
                 	labelCache.put((TextSymbolizer) symbolizers[m], feature, shape, scaleRange);
                 }
@@ -1033,11 +1036,30 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     private LiteShape2 getTransformedShape( Geometry g, MathTransform2D transform )
             throws TransformException, FactoryException {
-        LiteShape2 shape = new LiteShape2(g, null, transform, false);
+    	
+        LiteShape2 shape = new LiteShape2(g, transform, getDecimator(transform), false);
         return shape;
     }
 
+    HashMap decimators=new HashMap();
     /**
+	 * @return
+     * @throws org.opengis.referencing.operation.NoninvertibleTransformException
+	 */
+	private Decimator getDecimator(MathTransform2D mathTransform) throws org.opengis.referencing.operation.NoninvertibleTransformException {
+		Decimator decimator=(Decimator) decimators.get(mathTransform);
+		if( decimator==null ){
+			if (mathTransform != null && !mathTransform.isIdentity())
+				decimator=new Decimator(mathTransform.inverse());
+			else
+				decimator=new Decimator(null);
+			
+			decimators.put(mathTransform, decimator);
+		}
+		return decimator;
+	}
+
+	/**
      * Computes the math transform from the source CRS to the destination CRS. Since this is
      * expensive, we keep a cache of coordinate transformations during the rendering process
      * 
@@ -1050,7 +1072,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @throws OperationNotFoundException
      */
     private MathTransform2D getMathTransform( CoordinateReferenceSystem sourceCrs,
-            CoordinateReferenceSystem destinationCrs, AffineTransform at )
+            CoordinateReferenceSystem destinationCrs)
             throws OperationNotFoundException, FactoryException {
         MathTransform2D transform = (MathTransform2D) transformMap.get(sourceCrs);
 
@@ -1058,24 +1080,13 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             return transform;
         }
 
-        if ((sourceCrs == null) || (destinationCrs == null)) { // no transformation possible
+        if (((sourceCrs == null) || (destinationCrs == null)) ) { // no transformation possible
 
             return null;
         }
 
         transform = (MathTransform2D) operationFactory.createOperation(sourceCrs, destinationCrs)
                 .getMathTransform();
-
-        if (transform != null) {
-            transform = (MathTransform2D) operationFactory.getMathTransformFactory()
-                    .createConcatenatedTransform(
-                            transform,
-                            operationFactory.getMathTransformFactory().createAffineTransform(
-                                    new GeneralMatrix(at)));
-        } else {
-            transform = (MathTransform2D) operationFactory.getMathTransformFactory()
-                    .createAffineTransform(new GeneralMatrix(at));
-        }
 
         transformMap.put(sourceCrs, transform);
 
@@ -1192,21 +1203,21 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
         return geomName;
     }
-
-    /**
-     * Convenience method. Converts a Geometry object into a Shape
-     * 
-     * @param geom The Geometry object to convert
-     * @param at DOCUMENT ME!
-     * @return A GeneralPath that is equivalent to geom
-     */
-    private LiteShape2 createPath( final Geometry geom, final AffineTransform at ) {
-	    	if (generalizationDistance > 0) {
-	            return new LiteShape2(geom, at, true, generalizationDistance);
-	        } else {
-	            return new LiteShape2(geom, at, false);
-	        }
-    }
+//
+//    /**
+//     * Convenience method. Converts a Geometry object into a Shape
+//     * 
+//     * @param geom The Geometry object to convert
+//     * @param at DOCUMENT ME!
+//     * @return A GeneralPath that is equivalent to geom
+//     */
+//    private LiteShape2 createPath( final Geometry geom ) {
+//	    	if (generalizationDistance > 0) {
+//	            return new LiteShape2(geom, true, generalizationDistance);
+//	        } else {
+//	            return new LiteShape2(geom, false);
+//	        }
+//    }
 
     /**
      * Getter for property interactive.
