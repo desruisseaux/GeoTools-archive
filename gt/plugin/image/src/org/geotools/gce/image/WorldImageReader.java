@@ -16,6 +16,9 @@
  */
 package org.geotools.gce.image;
 
+import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 
 import org.geotools.factory.Hints;
@@ -23,6 +26,8 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.util.NumberRange;
 
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
@@ -435,13 +440,35 @@ public class WorldImageReader implements GridCoverageReader {
         throws MismatchedDimensionException, IOException {
         //building up a coverage
         GridCoverage coverage = null;
-
+		//deciding the number range
+		NumberRange geophysicRange=null;
+		switch(image.getSampleModel().getTransferType()){
+		case DataBuffer.TYPE_BYTE:
+			geophysicRange=new NumberRange(0, 255);
+			break;
+		case DataBuffer.TYPE_USHORT:
+			geophysicRange=new NumberRange(0, 655535);
+			break;
+		case DataBuffer.TYPE_INT:
+			geophysicRange=new NumberRange(-Integer.MAX_VALUE,Integer.MAX_VALUE);
+			break;	
+		default:
+			throw new IOException("Data buffer type not supported! Use byte, ushort or int");
+		}
         try {
-            Hints hint = new Hints(Hints.AVOID_NON_GEOPHYSICS, Boolean.TRUE);
-            coverage = new GridCoverage2D(coverageName, image, crs, envelope,
-					hint);
+			
+			//convenieience category in order to 
+            Category  values = new Category("values",new Color[]{Color.BLACK},geophysicRange,LinearTransform1D.IDENTITY );
+
+			//creating bands
+            GridSampleDimension bands[]=new GridSampleDimension[image.getSampleModel().getNumBands()];
+			for(int i=0;i<image.getSampleModel().getNumBands();i++)
+				bands[i]=new GridSampleDimension(new Category[] {values}, null).geophysics(true);
+		
+			//creating coverage
+            coverage = new GridCoverage2D(coverageName, image, crs, envelope,bands,null,null);
         } catch (NoSuchElementException e1) {
-            throw new IOException(e1.getMessage());
+            throw new IOException("Error when creating the coverage in world image"+e1.getMessage());
         }
 
         return coverage;

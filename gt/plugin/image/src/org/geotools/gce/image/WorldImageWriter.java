@@ -388,7 +388,10 @@ public class WorldImageWriter implements GridCoverageWriter {
                  * some informations. we have only one full transparent color.
                  */
                 if (surrogateImage.getColorModel() instanceof IndexColorModel &&
-                        (surrogateImage.getColorModel().getTransparency() != Transparency.OPAQUE)) {
+                        ((surrogateImage.getColorModel().getTransparency() == Transparency.TRANSLUCENT)||
+								(surrogateImage.getColorModel().getTransparency() == Transparency.BITMASK&&
+										surrogateImage.getColorModel().getTransparency()==-1	))
+						) {
                     surrogateImage = convertIndexColorModelAlpha4GIF(surrogateImage);
                 }
             } else
