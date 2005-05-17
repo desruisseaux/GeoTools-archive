@@ -267,10 +267,13 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *
      * @throws MismatchedDimensionException If the grid range's dimension
      *         is not the same than the coordinate system's dimension.
+     *
+     * @deprecated Replaced by a {@code create} method with the same signature in
+     *             {@link GridCoverageFactory}.
      */
     public GridCoverage2D(final CharSequence             name, final ImageFunction  function,
                           final CoordinateReferenceSystem crs, final GridGeometry2D gridGeometry,
-                          final GridSampleDimension[]     bands, final Map            properties)
+                          final GridSampleDimension[]   bands, final Map            properties)
             throws MismatchedDimensionException
     {
         this(name, getImage(function, gridGeometry),
@@ -330,6 +333,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *                 coordinates.
      *
      * @throws MismatchedDimensionException If the envelope's dimension is not 2.
+     *
+     * @deprecated Replaced by a {@code create} method with the same signature in
+     *             {@link GridCoverageFactory}.
      */
     public GridCoverage2D(final CharSequence   name,
                           final WritableRaster raster,
@@ -378,6 +384,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         is not the same than the coordinate system's dimension.
      * @throws IllegalArgumentException if the number of bands differs
      *         from the number of sample dimensions.
+     *
+     * @deprecated Replaced by a {@code create} method with the same signature in
+     *             {@link GridCoverageFactory}.
      */
     public GridCoverage2D(final CharSequence             name, final WritableRaster raster,
                           final CoordinateReferenceSystem crs, final Envelope       envelope,
@@ -424,6 +433,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *         is not the same than the coordinate system's dimension.
      * @throws IllegalArgumentException if the number of bands differs
      *         from the number of sample dimensions.
+     *
+     * @deprecated Replaced by a {@code create} method with the same signature in
+     *             {@link GridCoverageFactory}.
      */
     public GridCoverage2D(final CharSequence             name, final WritableRaster raster,
                           final CoordinateReferenceSystem crs, final MathTransform  gridToCRS,
@@ -473,6 +485,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *
      * @throws MismatchedDimensionException If the envelope's dimension
      *         is not the same than the coordinate system's dimension.
+     *
+     * @deprecated Replaced by a {@code create} method with the same signature in
+     *             {@link GridCoverageFactory}.
      */
     public GridCoverage2D(final CharSequence             name, final RenderedImage  image,
                           final CoordinateReferenceSystem crs, final Envelope    envelope)

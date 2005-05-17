@@ -49,12 +49,6 @@ import javax.imageio.spi.ServiceRegistry; // For javadoc
  * state (i.e. return value of {@link #isReady} varying in an unpredictable way). The behavior is
  * undetermined if the {@code isReady()} state changes with time.
  *
- * @todo This interface is like a tiny skeleton of external service API. To complete the picture
- *       we would need a callback mechanism. A listener that that client code can give to the
- *       factory, that it will call when ready. If it is ready it will be called immeditely.
- *       The above advice about alternatives could really be managed by such a factory (especially
- *       if it allowed to notify client code more then once.
- *
  * @author Martin Desruisseaux
  * @version $Id$
  */

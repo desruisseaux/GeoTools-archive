@@ -1,3 +1,4 @@
+Class-Path: units.jar geoapi.jar
 Implementation-Version: 2.1
 Implementation-Vendor: Geotools OpenSource project
 

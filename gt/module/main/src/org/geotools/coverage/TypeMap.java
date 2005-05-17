@@ -42,6 +42,7 @@ import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.NumberRange;
 
 
 /**
@@ -55,10 +56,27 @@ import org.geotools.util.SimpleInternationalString;
  */
 public final class TypeMap {
     /**
+     * The 0 pixel value. For range construction.
+     */
+    private static final Number ZERO = new Long(0);
+
+    /**
+     * The 1 pixel value. For range construction.
+     */
+    private static final Number ONE = new Long(1);
+    
+    /**
      * The mapping of {@link SampleDimensionType} to {@link DataBuffer} types.
+     *
+     * @todo Simplify when we will be allowed to compile with J2SE 1.5
+     *       (using auto-boxing and static imports).
      */
     private static final TypeMap[] MAP = new TypeMap[SampleDimensionType.values().length];
     static {
+        final Float  M1 = new Float (-Float  .MAX_VALUE);
+        final Float  P1 = new Float ( Float  .MAX_VALUE);
+        final Double M2 = new Double(-Double .MAX_VALUE);
+        final Double P2 = new Double( Double .MAX_VALUE);
         // The constructor will register automatically those objects in the above array.
         new TypeMap(SampleDimensionType. UNSIGNED_1BIT,  DataBuffer.TYPE_BYTE,   (byte) 1, false, false);
         new TypeMap(SampleDimensionType. UNSIGNED_2BITS, DataBuffer.TYPE_BYTE,   (byte) 2, false, false);
@@ -69,8 +87,8 @@ public final class TypeMap {
         new TypeMap(SampleDimensionType.  SIGNED_16BITS, DataBuffer.TYPE_SHORT,  (byte)16, true,  false);
         new TypeMap(SampleDimensionType.UNSIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, false, false);
         new TypeMap(SampleDimensionType.  SIGNED_32BITS, DataBuffer.TYPE_INT,    (byte)32, true,  false);
-        new TypeMap(SampleDimensionType.    REAL_32BITS, DataBuffer.TYPE_FLOAT,  (byte)32, true,  true );
-        new TypeMap(SampleDimensionType.    REAL_64BITS, DataBuffer.TYPE_DOUBLE, (byte)64, true,  true );
+        new TypeMap(SampleDimensionType.    REAL_32BITS, DataBuffer.TYPE_FLOAT,  (byte)32, true,  true, M1, P1);
+        new TypeMap(SampleDimensionType.    REAL_64BITS, DataBuffer.TYPE_DOUBLE, (byte)64, true,  true, M2, P2);
     };
 
     /**
@@ -103,6 +121,18 @@ public final class TypeMap {
     private final boolean real;
 
     /**
+     * The full range of sample values.
+     */
+    private final NumberRange range;
+
+    /**
+     * The range of positive sample values (excluding 0). This range is non-null only for unsigned
+     * type. A range excluding 0 is sometime usefull when the 0 value is reserved for a "no data"
+     * category.
+     */
+    private final NumberRange positiveRange;
+
+    /**
      * The name as an international string.
      */
     private final InternationalString name = new AbstractInternationalString() {
@@ -119,14 +149,42 @@ public final class TypeMap {
                     final int     type,   final byte    size,
                     final boolean signed, final boolean real)
     {
-        this.code   = code;
-        this.type   = type;
-        this.size   = size;
-        this.signed = signed;
-        this.real   = real;
-        final int ordinal = code.ordinal();
+        this(code, type, size, signed, real, (1L << (signed ? size-1 : size)) - 1);
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors").
+     */
+    private TypeMap(final SampleDimensionType code,
+                    final int     type,   final byte    size,
+                    final boolean signed, final boolean real,
+                    final long    max)
+    {
+        this(code, type, size, signed, real, signed ? new Long(~max) : ZERO, new Long(max));
+    }
+
+    /**
+     * Constructs a new mapping with the specified value.
+     */
+    private TypeMap(final SampleDimensionType code,
+                    final int     type,   final byte    size,
+                    final boolean signed, final boolean real,
+                    final Number  lower,  final Number  upper)
+    {
+        assert ((Comparable) lower).compareTo(upper) < 0 : upper;
+        final Class c      = upper.getClass();
+        this.code          = code;
+        this.type          = type;
+        this.size          = size;
+        this.signed        = signed;
+        this.real          = real;
+        this.range         = new NumberRange(c, lower, upper);
+        this.positiveRange = signed ? null : new NumberRange(c, ONE, upper);
+        final int ordinal  = code.ordinal();
         assert MAP[ordinal] == null : code;
         MAP[ordinal] = this;
+        assert code.equals(getSampleDimensionType(range)) : code;
     }
 
     /**
@@ -235,6 +293,19 @@ public final class TypeMap {
     }
 
     /**
+     * Returns the sample dimension type name as an international string. For example, the localized
+     * name for {@link SampleDimensionType#UNSIGNED_16BITS} is "<cite>16 bits unsigned integer</cite>"
+     * in English and "<cite>Entier non-signé sur 16 bits</cite>" in French.
+     */
+    public static InternationalString getName(final SampleDimensionType type) {
+        final int ordinal = type.ordinal();
+        if (ordinal>=0 && ordinal<MAP.length) {
+            return MAP[ordinal].name;
+        }
+        return new SimpleInternationalString(type.name());
+    }
+
+    /**
      * Returns the {@link DataBuffer} type. This is one of the following constants:
      * {@link DataBuffer#TYPE_BYTE   TYPE_BYTE},
      * {@link DataBuffer#TYPE_USHORT TYPE_USHORT},
@@ -252,19 +323,6 @@ public final class TypeMap {
             }
         }
         return DataBuffer.TYPE_UNDEFINED;
-    }
-
-    /**
-     * Returns the sample dimension type name as an international string. For example, the localized
-     * name for {@link SampleDimensionType#UNSIGNED_16BITS} is "<cite>16 bits unsigned integer</cite>"
-     * in English and "<cite>Entier non-signé sur 16 bits</cite>" in French.
-     */
-    public static InternationalString getName(final SampleDimensionType type) {
-        final int ordinal = type.ordinal();
-        if (ordinal>=0 && ordinal<MAP.length) {
-            return MAP[ordinal].name;
-        }
-        return new SimpleInternationalString(type.name());
     }
 
     /**
@@ -288,6 +346,34 @@ public final class TypeMap {
      */
     public static boolean isFloatingPoint(final SampleDimensionType type) {
         return map(type).real;
+    }
+
+    /**
+     * Returns the full range of sample values for the specified dimension type.
+     */
+    public static NumberRange getRange(final SampleDimensionType type) {
+        if (type != null) {
+            final int ordinal = type.ordinal();
+            if (ordinal>=0 && ordinal<MAP.length) {
+                return MAP[ordinal].range;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the range of positive sample values (excluding 0). This range is non-null only for
+     * unsigned type. A range excluding 0 is sometime usefull when the 0 value is reserved for a
+     * "no data" category.
+     */
+    public static NumberRange getPositiveRange(final SampleDimensionType type) {
+        if (type != null) {
+            final int ordinal = type.ordinal();
+            if (ordinal>=0 && ordinal<MAP.length) {
+                return MAP[ordinal].positiveRange;
+            }
+        }
+        return null;
     }
 
     /**

@@ -16,10 +16,6 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.coverage.grid;
 
@@ -63,42 +59,6 @@ import org.geotools.util.SimpleInternationalString;
  * @author Martin Desruisseaux
  */
 final class Grid2DSampleDimension extends GridSampleDimension {
-    /**
-     * The range of sample values after a transformation from
-     * integer geophysics value to 8 bits indexed image.
-     */
-    private static final NumberRange INTEGER_TO_UBYTE;
-
-    /**
-     * The range of sample values after a transformation from
-     * integer geophysics value to 16 bits indexed image.
-     */
-    private static final NumberRange INTEGER_TO_USHORT;
-
-    /**
-     * The range of sample values after a transformation from floating point geophysics
-     * value to 8 bits indexed image. Index 0 is reserved for {@link Category#NODATA},
-     * which maps to {@link Float#NaN} values.
-     */
-    private static final NumberRange FLOAT_TO_UBYTE;
-
-    /**
-     * The range of sample values after a transformation from floating point geophysics
-     * value to 16 bits indexed image. Index 0 is reserved for {@link Category#NODATA},
-     * which maps to {@link Float#NaN} values.
-     */
-    private static final NumberRange FLOAT_TO_USHORT;
-    static {
-        final Integer ZERO = new Integer(0);
-        final Integer ONE  = new Integer(1);
-        final Integer U08  = new Integer(255);
-        final Integer U16  = new Integer(65535);
-        INTEGER_TO_UBYTE   = new NumberRange(Integer.class, ZERO, U08);
-        INTEGER_TO_USHORT  = new NumberRange(Integer.class, ZERO, U16);
-        FLOAT_TO_UBYTE     = new NumberRange(Integer.class, ONE,  U08);
-        FLOAT_TO_USHORT    = new NumberRange(Integer.class, ONE,  U16);
-    }
-
     /**
      * Band number for this sample dimension.
      */
@@ -160,16 +120,26 @@ final class Grid2DSampleDimension extends GridSampleDimension {
                     ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(dst.length), "SampleDimension"));
         }
+        /*
+         * Now, we know that the number of bands and the array length are consistent.
+         * Search if there is any null SampleDimension. If any, replace the null value
+         * by a default SampleDimension. In all cases, count the number of geophysics
+         * and non-geophysics sample dimensions.
+         */
         int nGeo = 0;
         int nInt = 0;
         GridSampleDimension[] defaultSD = null;
         for (int i=0; i<numBands; i++) {
             GridSampleDimension sd = (src!=null) ? src[i] : null;
             if (sd == null) {
+                /*
+                 * If the user didn't provided explicitly a SampleDimension, create a default one.
+                 * We will creates a SampleDimension for all bands in one step, even if only a few
+                 * of them are required.
+                 */
                 if (defaultSD == null) {
                     defaultSD = new GridSampleDimension[numBands];
-                    create(name, RectIterFactory.create(image, null),
-                           image.getSampleModel().getDataType(),
+                    create(name, RectIterFactory.create(image, null), image.getSampleModel(),
                            null, null, null, null, defaultSD, null);
                 }
                 sd = defaultSD[i];
@@ -223,7 +193,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
     {
         final GridSampleDimension[] dst = new GridSampleDimension[raster.getNumBands()];
         create(name, (min==null || max==null) ? RectIterFactory.create(raster, null) : null,
-               raster.getDataBuffer().getDataType(), min, max, units, colors, dst, hints);
+               raster.getSampleModel(), min, max, units, colors, dst, hints);
         return dst;
     }
 
@@ -232,8 +202,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
      *
      * @param  name The name for data (e.g. "Elevation").
      * @param  iterator The iterator through the raster data, or {@code null}.
-     * @param  rasterType The data type of the image sample values.
-     *         Must be one of {@link DataBuffer} constants.
+     * @param  model The image or raster sample model.
      * @param  min The minimal value, or {@code null} for computing it automatically.
      * @param  max The maximal value, or {@code null} for computing it automatically.
      * @param  units The units of sample values, or {@code null} if unknow.
@@ -254,7 +223,7 @@ final class Grid2DSampleDimension extends GridSampleDimension {
      */
     private static void create(final CharSequence          name,
                                final RectIter              iterator,
-                               final int                   rasterType,
+                               final SampleModel           model,
                                double[]                    min,
                                double[]                    max,
                                final Unit                  units,
@@ -262,23 +231,13 @@ final class Grid2DSampleDimension extends GridSampleDimension {
                                final GridSampleDimension[] dst,
                                final RenderingHints        hints)
     {
-        final int     numBands   = dst.length;
-        final boolean computeMin = (min == null);
-        final boolean computeMax = (max == null);
-        if (computeMin) {
-            min = new double[numBands];
-            Arrays.fill(min, Double.POSITIVE_INFINITY);
-        }
-        if (computeMax) {
-            max = new double[numBands];
-            Arrays.fill(max, Double.NEGATIVE_INFINITY);
-        }
-        if (min.length != numBands) {
+        final int numBands = dst.length;
+        if (min!=null && min.length != numBands) {
             throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(min.length), "min[i]"));
         }
-        if (max.length != numBands) {
+        if (max!=null && max.length != numBands) {
             throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_NUMBER_OF_BANDS_MISMATCH_$3,
                     new Integer(numBands), new Integer(max.length), "max[i]"));
@@ -291,50 +250,63 @@ final class Grid2DSampleDimension extends GridSampleDimension {
         /*
          * Arguments are know to be valids. We now need to compute two ranges:
          *
-         * STEP 1: Range of sample values. This is computed in the following block.
-         * STEP 2: Range of geophysics values. It will be computed one block later.
+         * STEP 1: Range of target (sample) values. This is computed in the following block.
+         * STEP 2: Range of source (geophysics) values. It will be computed one block later.
          *
-         * The range of sample values will range from 0 to 255 or 0 to 65535 according
-         * the rendering hint provided. If the raster data use floating point numbers,
-         * then a "nodata" category will be added in order to handle NaN values. If the
-         * the raster data use integer numbers, then we will rescale the numbers only
-         * if they would not fit in the rendering type.
+         * The target (sample) values will typically range from 0 to 255 or 0 to 65535, but the
+         * general case is handled as well. If the source (geophysics) raster uses floating point
+         * numbers, then a "nodata" category may be added in order to handle NaN values. If the
+         * source raster use integer numbers instead, then we will rescale samples only if they
+         * would not fit in the target data type.
          */
-        SampleDimensionType renderingType = SampleDimensionType.UNSIGNED_8BITS;
-        if (rasterType!=DataBuffer.TYPE_BYTE && hints!=null) {
-            renderingType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
+        final SampleDimensionType sourceType = TypeMap.getSampleDimensionType(model, 0);
+        final boolean          sourceIsFloat = TypeMap.isFloatingPoint(sourceType);
+        SampleDimensionType targetType = null;
+        if (hints != null) {
+            targetType = (SampleDimensionType) hints.get(Hints.SAMPLE_DIMENSION_TYPE);
         }
-        final boolean byteRenderingType = TypeMap.getSize(renderingType)<=8;
-        final NumberRange sampleValueRange;
-        final Category[]  categories;
-        boolean needScaling = true;
-        switch (rasterType) {
-            case DataBuffer.TYPE_FLOAT:
-            case DataBuffer.TYPE_DOUBLE: {
-                categories = new Category[2];
+        if (targetType == null) {
+            // Default to TYPE_BYTE for floating point images only; otherwise keep unchanged.
+            targetType = sourceIsFloat ? SampleDimensionType.UNSIGNED_8BITS : sourceType;
+        }
+        // Default setting: no scaling
+        final boolean targetIsFloat = TypeMap.isFloatingPoint(targetType);
+        NumberRange   targetRange   = TypeMap.getRange(targetType);
+        Category[]    categories    = new Category[1];
+        final boolean needScaling;
+        if (targetIsFloat) {
+            // Never rescale if the target is floating point numbers.
+            needScaling = false;
+        } else if (sourceIsFloat) {
+            // Always rescale for "float to integer" conversions. In addition,
+            // Use 0 value as a "no data" category for unsigned data type only.
+            needScaling = true;
+            if (!TypeMap.isSigned(targetType)) {
+                categories    = new Category[2];
                 categories[1] = Category.NODATA;
-                sampleValueRange = byteRenderingType ? FLOAT_TO_UBYTE : FLOAT_TO_USHORT;
-                break;
+                targetRange   = TypeMap.getPositiveRange(targetType);
             }
-            case DataBuffer.TYPE_BYTE:
-            case DataBuffer.TYPE_USHORT: {
-                if (rasterType == TypeMap.getDataBufferType(renderingType)) {
-                    needScaling = false;
-                }
-                // fall through
-            }
-            default: {
-                categories = new Category[1];
-                sampleValueRange = byteRenderingType ? INTEGER_TO_UBYTE : INTEGER_TO_USHORT;
-                break;
-            }
+        } else {
+            // In "integer to integer" conversions, rescale only if
+            // the target range is smaller than the source range.
+            needScaling = !targetRange.contains(TypeMap.getRange(sourceType));
         }
         /*
          * Computes the minimal and maximal values, if not explicitely provided.
          * This information is required for determining the range of geophysics
          * values.
          */
-        if (computeMin || computeMax) {
+        if (needScaling && (min==null || max==null)) {
+            final boolean computeMin;
+            final boolean computeMax;
+            if (computeMin = (min == null)) {
+                min = new double[numBands];
+                Arrays.fill(min, Double.POSITIVE_INFINITY);
+            }
+            if (computeMax = (max == null)) {
+                max = new double[numBands];
+                Arrays.fill(max, Double.NEGATIVE_INFINITY);
+            }
             int b=0;
             iterator.startBands();
             if (!iterator.finishedBands()) do {
@@ -357,44 +329,20 @@ final class Grid2DSampleDimension extends GridSampleDimension {
             } while (!iterator.nextBandDone());
         }
         /*
-         * Determines the class of geophysics values. This class can generally be infered from
-         * the raster data type. In the exceptional case where the data type is unknow, we will
-         * determine a default class based on the range of values computed just above.
-         */
-        Class classe = null;
-        switch (rasterType) {
-            case DataBuffer.TYPE_BYTE:   // Fall through
-            case DataBuffer.TYPE_SHORT:  classe =   Short.class; break;
-            case DataBuffer.TYPE_USHORT: // Fall through
-            case DataBuffer.TYPE_INT:    classe = Integer.class; break;
-            case DataBuffer.TYPE_FLOAT:  classe =   Float.class; break;
-            case DataBuffer.TYPE_DOUBLE: classe =  Double.class; break;
-            default: {
-                // Unrecognized type. Fallback on the finest
-                // type capable to hold the range of all bands.
-                for (int b=0; b<numBands; b++) {
-                    classe = ClassChanger.getWidestClass(classe,
-                             ClassChanger.getWidestClass(
-                             ClassChanger.getFinestClass(min[b]),
-                             ClassChanger.getFinestClass(max[b])));
-                }
-                break;
-            }
-        }
-        /*
          * Now, constructs the sample dimensions. We will inconditionnaly provides a "nodata"
-         * category for floating point images, since we don't know if the user plan to have
-         * NaN values. Even if the current image doesn't have NaN values, it could have NaN
-         * later if the image uses a writable raster.
+         * category for floating point images targeting unsigned integers, since we don't know
+         * if the user plan to have NaN values. Even if the current image doesn't have NaN values,
+         * it could have NaN later if the image uses a writable raster.
          */
+        final InternationalString n = SimpleInternationalString.wrap(name);
+        NumberRange sourceRange = TypeMap.getRange(sourceType);
         for (int b=0; b<numBands; b++) {
-            NumberRange geophysicsValueRange = new NumberRange(min[b], max[b]).castTo(classe);
             final Color[] c = colors!=null ? colors[b] : null;
-            final InternationalString n = SimpleInternationalString.wrap(name);
             if (needScaling) {
-                categories[0] = new Category(n, c, sampleValueRange, geophysicsValueRange);
+                sourceRange = new NumberRange(min[b], max[b]).castTo(sourceRange.getElementClass());
+                categories[0] = new Category(n, c, targetRange, sourceRange);
             } else {
-                categories[0] = new Category(n, c, sampleValueRange, LinearTransform1D.IDENTITY);
+                categories[0] = new Category(n, c, targetRange, LinearTransform1D.IDENTITY);
             }
             dst[b] = new GridSampleDimension(categories, units).geophysics(true);
         }
