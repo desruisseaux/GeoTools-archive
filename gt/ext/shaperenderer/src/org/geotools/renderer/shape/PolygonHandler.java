@@ -23,7 +23,6 @@ import org.geotools.data.shapefile.shp.ShapeType;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.algorithm.RobustCGAlgorithms;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -42,7 +41,6 @@ public class PolygonHandler implements ShapeHandler {
 
 	private MathTransform mt;
 
-	RobustCGAlgorithms cga = new RobustCGAlgorithms();
 
 	/**
 	 * Create new instance
@@ -127,7 +125,7 @@ public class PolygonHandler implements ShapeHandler {
 			coords = new double[1][];
 			coords[0] = new double[4];
 			transformed = new double[1][];
-			transformed[0] = new double[4];
+			transformed[0] = new double[8];
 			coords[0][0] = buffer.getDouble();
 			coords[0][1] = buffer.getDouble();
 			buffer.position((buffer.position() + (numPoints - 2) * 16));

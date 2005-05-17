@@ -665,7 +665,7 @@ public class ShapeRenderer {
 	/** The painter class we use to depict shapes onto the screen */
 	private StyledShapePainter painter = new StyledShapePainter(labelCache);
 
-	private static final int NUM_SAMPLES = 60;
+	static int NUM_SAMPLES = 200;
 
 	/**
 	 * @param style
@@ -736,15 +736,22 @@ public class ShapeRenderer {
 				try{
 				labelCache.put((TextSymbolizer) symbolizers[m], feature, getLiteShape2(geom),
 						scaleRange);
+
 				}catch (Exception e) {
 					fireErrorEvent(e);
 				}
 			} else {
 				Style2D style = styleFactory.createStyle(feature,
 						symbolizers[m], scaleRange);
-				painter
-						.paint(graphics, getShape(geom), style,
-								scaleDenominator);
+				painter.paint(graphics, getShape(geom), style,
+						scaleDenominator);
+				
+//				try{
+//					painter.paint(graphics, getLiteShape2(geom), style,
+//							scaleDenominator);
+//				}catch (Exception e) {
+//					fireErrorEvent(e);
+//				}
 			}
 
 		}
@@ -805,16 +812,15 @@ public class ShapeRenderer {
 				largestPart=i;
 			}
 		}
-		int step=geom.coords[largestPart].length<NUM_SAMPLES?1:(int)(geom.coords[largestPart].length/NUM_SAMPLES);
+		int step=geom.coords[largestPart].length<NUM_SAMPLES?2:(int)(geom.coords[largestPart].length/NUM_SAMPLES);
+		if(step%2!=0)
+			step++;
 		int size=Math.min(geom.coords[largestPart].length, NUM_SAMPLES);
 		double[] coords=new double[size];
 		int location = 0;
-		for (int i=0; i < coords.length-2; location+=step) {
+		for (int i=0; i < coords.length; i+=2, location+=step) {
 			 coords[i]=geom.coords[largestPart][location];
-			 i++;
-			 location++;
-			 coords[i]=geom.coords[largestPart][location];
-			 i++;
+			 coords[i+1]=geom.coords[largestPart][location+1];
 		}
 		if( isPolygon ){
 			coords[size-2]=coords[0];

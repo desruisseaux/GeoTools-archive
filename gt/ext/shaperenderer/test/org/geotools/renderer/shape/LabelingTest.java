@@ -53,26 +53,11 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class LabelingTest extends TestCase {
 
-	private long timout=4000;
+	private long timout=1000;
 	private static final int CENTERX = 160;
 	private static final int CENTERY = 40;
     private static final boolean INTERACTIVE=true;
 
-	
-	public void disabletestPointLabeling() throws Exception{
-//		FeatureCollection collection=createPointFeatureCollection();
-//		Style style=loadStyle("PointStyle.sld");
-//		assertNotNull(style);
-//		MapContext map = new DefaultMapContext();
-//        map.addLayer(collection, style);
-//        ShapeRenderer renderer = new ShapeRenderer(map);
-//        Envelope env = map.getLayerBounds();
-//        int boundary=10;
-//        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
-//        		env.getMinY() - boundary, env.getMaxY() + boundary);
-////        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-//        Rendering2DTest.showRender("testPointLabeling", renderer, timout, env);
-	}
 
 	static Style loadStyle(String sldFilename) throws IOException {
         StyleFactory factory = StyleFactory.createStyleFactory();

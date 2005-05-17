@@ -33,5 +33,8 @@ public class SimpleGeometry {
         this.bbox=bbox;
     }
     
+    public String toString() {
+    	return coords[0].toString();
+    }
     
 }
