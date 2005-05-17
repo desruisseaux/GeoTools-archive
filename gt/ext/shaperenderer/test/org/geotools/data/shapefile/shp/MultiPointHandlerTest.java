@@ -20,14 +20,11 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.Query;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
-import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiPointHandler;
 import org.geotools.resources.TestData;

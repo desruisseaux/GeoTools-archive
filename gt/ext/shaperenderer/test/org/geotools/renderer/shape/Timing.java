@@ -65,7 +65,7 @@ public class Timing {
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = false;
+	private static boolean ALL_DATA = true;
 
 	private static boolean DISPLAY = true;
 
@@ -89,7 +89,7 @@ public class Timing {
 
 	private static boolean LINES = false;
 	
-	private static boolean LABELING=true;
+	private static boolean LABELING=false;
 
 	private String testName;
 	{
@@ -220,7 +220,7 @@ public class Timing {
 		}
 		if (LABELING) {
 			TextSymbolizer textsym=sFac.createTextSymbolizer();
-			textsym.setFill(sFac.createFill(filterFactory.createLiteralExpression("#0000ff")));
+			textsym.setFill(sFac.createFill(filterFactory.createLiteralExpression("#000000")));
 			textsym.setGeometryPropertyName("the_geom");
 			ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 			ShapefileDataStore store = (ShapefileDataStore) fac
@@ -473,9 +473,9 @@ public class Timing {
 	private static String LINES_TYPE_NAME = LINES_HOME_TYPE_NAME;
 	private static String LINES_LABEL = LINES_HOME_LABEL;	
 	
-	private static String POLY_FILE = WORLD_HOME_FILE;
-	private static String POLY_TYPE_NAME = WORLD_HOME_NAME;
-	private static String POLY_LABEL = WORLD_HOME_LABEL;
+	private static String POLY_FILE = NEW_YORK_HOME_FILE;
+	private static String POLY_TYPE_NAME = NEW_YORK_WORK_NAME;
+	private static String POLY_LABEL = NEW_YORK_WORK_LABEL;
 
 	int w = 512, h = 512;
 }

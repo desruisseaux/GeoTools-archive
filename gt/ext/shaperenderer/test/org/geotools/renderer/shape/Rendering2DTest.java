@@ -189,7 +189,7 @@ public class Rendering2DTest extends TestCase {
         showRender("testSimpleLineRender", renderer, 3000, env);
 
     }
-    
+   
     public void testSimplePolygonRender() throws Exception {
 
         // same as the datasource test, load in some features into a table
@@ -202,6 +202,22 @@ public class Rendering2DTest extends TestCase {
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
+        map.setAreaOfInterest(env);
+        showRender("testSimpleLineRender", renderer, 3000, env);
+
+    }   
+    public void testSimplePolygonRenderZoomedOut() throws Exception {
+
+        // same as the datasource test, load in some features into a table
+        System.err.println("starting rendering2DTest");
+        
+        ShapeRenderer renderer=createLineRenderer(getPolygons());
+        MapContext map=renderer.getContext();
+
+        map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
+        Envelope env = map.getLayerBounds();
+        env = new Envelope(env.getMinX() - 200000, env.getMaxX() + 200000, env.getMinY() - 200000, env
+                .getMaxY() + 200000);
         map.setAreaOfInterest(env);
         showRender("testSimpleLineRender", renderer, 3000, env);
 

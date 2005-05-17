@@ -21,29 +21,15 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.geotools.data.FeatureSource;
-import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.resources.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * Tests the LiteRenderer labelling algorithms
@@ -56,7 +42,7 @@ public class LabelingTest extends TestCase {
 	private long timout=1000;
 	private static final int CENTERX = 160;
 	private static final int CENTERY = 40;
-    private static final boolean INTERACTIVE=true;
+    private static final boolean INTERACTIVE=false;
 
 
 	static Style loadStyle(String sldFilename) throws IOException {
@@ -95,6 +81,23 @@ public class LabelingTest extends TestCase {
         ShapeRenderer renderer = new ShapeRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=1;
+        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+        		env.getMinY() - boundary, env.getMaxY() + boundary);
+        Rendering2DTest.INTERACTIVE=INTERACTIVE;
+        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
+	}
+
+	public void testPolyLabelingZoomedOut() throws Exception{		
+        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getPolygons("smallMultiPoly.shp");
+        FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
+
+		Style style=loadStyle("PolyStyle.sld");
+		assertNotNull(style);
+		MapContext map = new DefaultMapContext();
+        map.addLayer(ds.getFeatureSource(), style);
+        ShapeRenderer renderer = new ShapeRenderer(map);
+        Envelope env = map.getLayerBounds();
+        int boundary=30;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
         Rendering2DTest.INTERACTIVE=INTERACTIVE;

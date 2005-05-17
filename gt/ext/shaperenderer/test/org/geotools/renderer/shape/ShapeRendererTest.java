@@ -18,7 +18,6 @@ package org.geotools.renderer.shape;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.DataUtilities;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.shp.ShapeType;
@@ -30,7 +29,6 @@ import org.geotools.styling.Style;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.precision.SimpleGeometryPrecisionReducer;
 
 /**
  * @TODO class description
@@ -97,7 +95,7 @@ public class ShapeRendererTest extends TestCase {
 		assertEquals(new Coordinate(0, 100), coordinates[1]);
 		assertEquals(new Coordinate(100, 100), coordinates[2]);
 		assertEquals(new Coordinate(100, 0), coordinates[3]);
-		assertEquals(new Coordinate(10, 0), coordinates[4]);
+		assertEquals(new Coordinate(0, 0), coordinates[4]);
 
 		shape = renderer.getLiteShape2(new SimpleGeometry(ShapeType.MULTIPOINT,
 				coords, env));

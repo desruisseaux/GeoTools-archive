@@ -41,7 +41,6 @@ public class PolygonHandler implements ShapeHandler {
 
 	private MathTransform mt;
 
-
 	/**
 	 * Create new instance
 	 * 
@@ -75,12 +74,6 @@ public class PolygonHandler implements ShapeHandler {
 		return type;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.data.shapefile.shp.ShapeHandler#read(java.nio.ByteBuffer,
-	 *      org.geotools.data.shapefile.shp.ShapeType)
-	 */
 	public Object read(ByteBuffer buffer, ShapeType type) {
 		if (type == ShapeType.NULL) {
 			return null;
@@ -128,19 +121,19 @@ public class PolygonHandler implements ShapeHandler {
 			transformed[0] = new double[8];
 			coords[0][0] = buffer.getDouble();
 			coords[0][1] = buffer.getDouble();
-			buffer.position((buffer.position() + (numPoints - 2) * 16));
-			coords[0][2] = buffer.getDouble();
-			coords[0][3] = buffer.getDouble();
-			if (!bbox.contains(coords[0][0], coords[0][1])
-					&& !bbox.contains(coords[0][2], coords[0][3]))
-				return null;
 			try {
-				mt.transform(coords[0], 0, transformed[0], 0, 2);
+				mt.transform(coords[0], 0, transformed[0], 0, 1);
 			} catch (Exception e) {
 				ShapeRenderer.LOGGER.severe("could not transform coordinates "
 						+ e.getLocalizedMessage());
 				transformed[0] = coords[0];
 			}
+			transformed[0][2] = transformed[0][0];
+			transformed[0][3] = transformed[0][1] + 0.1;
+			transformed[0][4] = transformed[0][0] + 0.1;
+			transformed[0][5] = transformed[0][1] + 0.1;
+			transformed[0][6] = transformed[0][0];
+			transformed[0][7] = transformed[0][1];
 		} else {
 			Envelope partEnvelope = new Envelope();
 			int partsInBBox = 0;
@@ -171,17 +164,9 @@ public class PolygonHandler implements ShapeHandler {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (currentDoubles > 3 && currentDoubles < totalDoubles - 1) {
-						if (Math.abs(coords[part][readDoubles - 4]
-								- coords[part][readDoubles - 2]) <= spanx
-								&& Math.abs(coords[part][readDoubles - 3]
-										- coords[part][readDoubles - 1]) <= spany) {
-							readDoubles -= 2;
-						} else {
-							partEnvelope.expandToInclude(
-									coords[part][readDoubles - 2],
-									coords[part][readDoubles - 1]);
-						}
+					if (collapsePoints(coords, part, totalDoubles, readDoubles,
+							currentDoubles)) {
+						readDoubles -= 2;
 					} else {
 						partEnvelope.expandToInclude(
 								coords[part][readDoubles - 2],
@@ -191,9 +176,11 @@ public class PolygonHandler implements ShapeHandler {
 				if (!partEnvelope.intersects(bbox)) {
 					continue;
 				}
+
+				transformed[partsInBBox] = new double[readDoubles];
+
 				if (!mt.isIdentity()) {
 					try {
-						transformed[partsInBBox] = new double[readDoubles];
 						mt.transform(coords[part], 0, transformed[partsInBBox],
 								0, readDoubles / 2);
 					} catch (Exception e) {
@@ -203,10 +190,10 @@ public class PolygonHandler implements ShapeHandler {
 						transformed[partsInBBox] = coords[part];
 					}
 				} else {
-					transformed[partsInBBox] = new double[readDoubles];
 					System.arraycopy(coords[part], 0, transformed[partsInBBox],
 							0, readDoubles / 2);
 				}
+
 				partsInBBox++;
 			}
 			if (partsInBBox == 0)
@@ -218,6 +205,27 @@ public class PolygonHandler implements ShapeHandler {
 			}
 		}
 		return new SimpleGeometry(type, transformed, geomBBox);
+	}
+
+	/**
+	 * Return true if the current point and the last point should be collapsed
+	 * into a single point. The first and last point must be the same so if the
+	 * current doubles is the 1-2 second double or if one of the last two the it
+	 * will return false. Otherwise it will return true if the distance in the y
+	 * axis is less than the distance of one pixel... similar comparison is done
+	 * along the x-axis.
+	 * 
+	 * @return true if the current point and the last point should be collapsed
+	 *         into a single point.
+	 */
+	private boolean collapsePoints(double[][] coords, int part,
+			int totalDoubles, int readDoubles, int currentDoubles) {
+		return currentDoubles > 3
+				&& currentDoubles < totalDoubles - 1
+				&& Math.abs(coords[part][readDoubles - 4]
+						- coords[part][readDoubles - 2]) <= spanx
+				&& Math.abs(coords[part][readDoubles - 3]
+						- coords[part][readDoubles - 1]) <= spany;
 	}
 
 	/**
