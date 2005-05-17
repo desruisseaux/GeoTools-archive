@@ -16,22 +16,7 @@
  */
 package org.geotools.gce.image;
 
-import org.geotools.coverage.grid.GridCoverage2D;
-
-import org.geotools.parameter.Parameter;
-
-import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.coverage.SampleDimensionType;
-import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridCoverageWriter;
-
-import org.opengis.parameter.GeneralParameterValue;
-
-import org.opengis.spatialschema.geometry.Envelope;
-
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -43,21 +28,17 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-
 import java.net.URL;
 
 import javax.imageio.ImageIO;
-
 import javax.media.jai.ColorCube;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -65,13 +46,20 @@ import javax.media.jai.KernelJAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
-import javax.media.jai.TiledImage;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.parameter.Parameter;
+import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**

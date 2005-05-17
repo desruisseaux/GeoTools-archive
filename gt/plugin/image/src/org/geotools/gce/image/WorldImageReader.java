@@ -16,66 +16,35 @@
  */
 package org.geotools.gce.image;
 
-import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
-import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GridCoverage2D;
-
-import org.geotools.factory.Hints;
-
-import org.geotools.geometry.GeneralEnvelope;
-
-import org.geotools.parameter.Parameter;
-import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.util.NumberRange;
-
-import org.opengis.coverage.MetadataNameNotFoundException;
-import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridCoverageReader;
-
-import org.opengis.parameter.GeneralParameterValue;
-
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.renderable.ParameterBlock;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.net.URL;
-
 import java.util.NoSuchElementException;
 
 import javax.imageio.ImageIO;
 
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import org.geotools.coverage.Category;
+import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.Parameter;
+import org.geotools.referencing.operation.transform.LinearTransform1D;
+import org.geotools.util.NumberRange;
+import org.opengis.coverage.MetadataNameNotFoundException;
+import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
