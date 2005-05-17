@@ -812,8 +812,8 @@ public class WorldImageWriter implements GridCoverageWriter {
         boolean foundFullyTransparent=false;
         
 		
-        for (int i = 0; i < rasterGIF.getHeight(); i++) {
-            for (int j = 0; j < rasterGIF.getWidth(); j++) {
+        for (int i = rasterGIF.getMinY(); i < rasterGIF.getHeight(); i++) {
+            for (int j = rasterGIF.getMinX(); j < rasterGIF.getWidth(); j++) {
 
                 //check for transparency
                 if (rasterAlpha.getSample(j,i,0)== 0) {
