@@ -152,12 +152,12 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
         AbstractGridFormat format = (AbstractGridFormat) new GTopo30FormatFactory()
             .createFormat();
 
-     //   if (format.accepts(statURL)) {
+        if (format.accepts(statURL)) {
             //    	get a reader
             GridCoverageReader reader = format.getReader(statURL);
 
             //get a grid coverage
-            GridCoverage2D gc = ((GridCoverage2D) reader.read(null)); //.geophysics(false);
+            GridCoverage2D gc = ((GridCoverage2D) reader.read(null));
             File zipFile = getFile("test.zip");
             ZipOutputStream out = new ZipOutputStream(new FileOutputStream(
                         zipFile));
@@ -167,6 +167,6 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
             out.flush();
             out.close();
 
-       // }
+        }
     }
 }
