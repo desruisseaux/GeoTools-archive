@@ -259,9 +259,9 @@ class GTopo30DataSource {
 
         try {
             // trying to create a channel to the file to read
-			final String filePath = URLDecoder.decode(demURL.getFile(), "US-ASCII");
-			final FileInputStream fis = new FileInputStream(filePath);
-			final FileChannel channel = fis.getChannel();
+			 String filePath = URLDecoder.decode(demURL.getFile(), "US-ASCII");
+			 FileInputStream fis = new FileInputStream(filePath);
+			 FileChannel channel = fis.getChannel();
             iis = new FileChannelImageInputStream(channel);
 
             if (header.getByteOrder().compareToIgnoreCase("M") == 0) {
@@ -275,16 +275,16 @@ class GTopo30DataSource {
 
         // Prepare temporaray colorModel and sample model, needed to build the
         // RawImageInputStream
-		final ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(
+		ColorModel cm = new ComponentColorModel(ColorSpace.getInstance(
                     ColorSpace.CS_GRAY), false, false, Transparency.OPAQUE,
                 DataBuffer.TYPE_SHORT);
-		final SampleModel sm = cm.createCompatibleSampleModel(ncols, nrows);
-		final ImageTypeSpecifier its = new ImageTypeSpecifier(cm, sm); // ImageTypeSpecifier.createGrayscale(16,
+		SampleModel sm = cm.createCompatibleSampleModel(ncols, nrows);
+		ImageTypeSpecifier its = new ImageTypeSpecifier(cm, sm); // ImageTypeSpecifier.createGrayscale(16,
 
         // DataBuffer.TYPE_SHORT,
         // true);
         // Finally, build the image input stream
-		final RawImageInputStream raw = new RawImageInputStream(iis, its,
+		RawImageInputStream raw = new RawImageInputStream(iis, its,
                 new long[] { 0 },
                 new Dimension[] { new Dimension(ncols, nrows) });
 
@@ -296,7 +296,7 @@ class GTopo30DataSource {
 		final int tileRows = (int) Math.ceil(TILE_SIZE / (ncols * 2));
 
         // building the final image layout
-		final ImageLayout il = new ImageLayout(0, 0, ncols, nrows, 0, 0, ncols,
+		ImageLayout il = new ImageLayout(0, 0, ncols, nrows, 0, 0, ncols,
                 tileRows, sm, cm);
 
         // First operator: read the image
@@ -345,12 +345,12 @@ class GTopo30DataSource {
         }
 
         // Build the coordinate system
-        final CoordinateReferenceSystem crs = AbstractGridFormat.getDefaultCRS();
+        CoordinateReferenceSystem crs = AbstractGridFormat.getDefaultCRS();
 
         // Create the SampleDimension, with colors and byte transformation
         // needed for visualization
         String UoM = null;
-        final UnitFormat unitFormat = UnitFormat.getStandardInstance();
+        UnitFormat unitFormat = UnitFormat.getStandardInstance();
         Unit uom = null;
 
         try {
@@ -360,20 +360,20 @@ class GTopo30DataSource {
             uom = null;
         }
 
-        final Category values = new Category("values", this.getColors(),
-                new NumberRange(1, 255), new NumberRange(min, max));
-        final Category nan = new Category("nodata",
+        Category values = new Category("values", this.getColors(),
+                new NumberRange(1, 255), new NumberRange((short)min,(short) max));
+        Category nan = new Category("nodata",
                 new Color[] { new Color(0, 0, 0, 0) }, new NumberRange(0, 0),
-                new NumberRange(-9999, -9999));
+                new NumberRange((short)-9999, (short)-9999));
         GridSampleDimension band = new GridSampleDimension(new Category[] {
-                    values.geophysics(true), nan.geophysics(true)
+                    values, nan
                 }, uom);
-
+		band=band.geophysics(true);
         //switch from -999 to NaN to keep transparency informations
         //for the gridcoverage
-        final BufferedImage img = new BufferedImage(band.getColorModel(),
+        BufferedImage img = new BufferedImage(band.getColorModel(),
                 this.getAdjustedRaster(
-                    (WritableRaster) image.createSnapshot().getAsBufferedImage().copyData(null))
+                    (WritableRaster) image.createSnapshot().getAsBufferedImage().getRaster())
                                           , false, null); // properties????
 
         //setting metadata
@@ -399,10 +399,7 @@ class GTopo30DataSource {
                 coverageName = coverageName.substring(0, extension);
             }
         }
-        header=null;
-        stats=null;
-		image.dispose();
-		image=null;
+
         return new GridCoverage2D(coverageName, img, crs, env,
             new GridSampleDimension[] { band }, null, metadata);
     }
