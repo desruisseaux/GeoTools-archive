@@ -412,12 +412,26 @@ public class WorldImageWriter implements GridCoverageWriter {
 	private PlanarImage direct2ComponentColorModel(PlanarImage surrogateImage) {
 		ParameterBlockJAI pb = new ParameterBlockJAI("ColorConvert");
 		pb.addSource(surrogateImage);
+		int numBits=8;
+		if(DataBuffer.TYPE_INT==surrogateImage.getSampleModel().getTransferType())
+			numBits=32;
+		else
+			if(DataBuffer.TYPE_USHORT==surrogateImage.getSampleModel().getTransferType()||
+					DataBuffer.TYPE_SHORT==surrogateImage.getSampleModel().getTransferType())
+				numBits=16;
+			else
+				if(DataBuffer.TYPE_FLOAT==surrogateImage.getSampleModel().getTransferType())
+					numBits=32;
+				else
+					if(DataBuffer.TYPE_DOUBLE==surrogateImage.getSampleModel().getTransferType())
+						numBits=64;
 		ComponentColorModel colorModel = new ComponentColorModel(surrogateImage.getColorModel().getColorSpace(),
 		                                                         new int[] { 
-																			8,
-																			8,
-																			8,
-																			8 },
+																		numBits,
+																		numBits,
+																		numBits,
+																		numBits 
+																 },
 		                                                         false,
 		                                                         surrogateImage.getColorModel().hasAlpha(),
 																 surrogateImage.getColorModel().getTransparency(),
