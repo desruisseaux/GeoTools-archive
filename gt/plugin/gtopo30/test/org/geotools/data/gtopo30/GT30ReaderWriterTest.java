@@ -16,21 +16,18 @@
  */
 package org.geotools.data.gtopo30;
 
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.coverage.grid.GridCoverageWriter;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.zip.ZipOutputStream;
 
-import javax.media.jai.PlanarImage;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.gce.image.WorldImageWriter;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
 
 
 /**
@@ -158,6 +155,13 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
 
             //get a grid coverage
             GridCoverage2D gc = ((GridCoverage2D) reader.read(null));
+			
+//			BufferedOutputStream out1=new BufferedOutputStream(new FileOutputStream(new File("c:\\temp\\gtopo.png")));
+//			WorldImageWriter writer1 = new WorldImageWriter(out1);
+//			writer1.getFormat().getWriteParameters().parameter("format").setValue("png");
+//			
+//			writer1.write(gc,null);
+			
             File zipFile = getFile("test.zip");
             ZipOutputStream out = new ZipOutputStream(new FileOutputStream(
                         zipFile));
