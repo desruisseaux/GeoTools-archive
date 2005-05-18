@@ -16,7 +16,11 @@
  */
 package org.geotools.data.gtopo30;
 
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -478,13 +482,119 @@ public class GTopo30Writer implements GridCoverageWriter {
             out = new FileCacheImageOutputStream(outZ, null);
         }
 
-        ImageIO.write(gc.geophysics(false).getRenderedImage(), "GIF", out);
+        ImageIO.write(this.convertIndexColorModelAlpha4GIF((PlanarImage)gc.geophysics(false).getRenderedImage()), "GIF", out);
 
         if (file instanceof File) {
             out.close();
         } else {
             ((ZipOutputStream) file).closeEntry();
         }
+    }
+	/**
+     * GIF does not support full alpha channel we need to reduce it in order to
+     * provide a simple transparency index to a unique fully transparent
+     * color.
+     *
+     * @param surrogateImage
+     *
+     * @return
+     */
+    private PlanarImage convertIndexColorModelAlpha4GIF(
+        PlanarImage surrogateImage) {
+		//doing nothing if the input color model is correct
+        final IndexColorModel cm = (IndexColorModel) surrogateImage.getColorModel();
+		if(cm.getTransparency()==Transparency.OPAQUE)
+			return surrogateImage;
+			
+
+		
+        byte[][] rgba = new byte[4][256]; //WE MIGHT USE LESS THAN 256 COLORS
+ 
+		//getting all the colors
+		cm.getReds(rgba[0]);
+		cm.getGreens(rgba[1]);
+		cm.getBlues(rgba[2]);
+		
+
+
+        //get the data (actually a copy of them) and prepare to rewrite them
+        WritableRaster raster = surrogateImage.copyData();
+
+        /**
+         * Now we are going to use the first transparent color as it were the
+         * transparent color and we point all the tranpsarent pixel to this
+         * color in the color map.
+         *
+         *
+         * NOTE Assuming we have just one band.
+         */
+        int transparencyIndex = -1;
+        int index = -1;
+        for (int i = 0; i < raster.getHeight(); i++) {
+            for (int j = 0; j < raster.getWidth(); j++) {
+                //index in the color map is given by a value in the raster.
+                index = raster.getSample(j, i, 0);
+
+                //check for transparency
+                if ((cm.getAlpha(index)&0xff) == 0) {
+                    //FULLY TRANSPARENT PIXEL
+                    if (transparencyIndex == -1) {
+                        //setting transparent color to this one
+                        //the other tranpsarent bits will point to this one
+                        transparencyIndex = cm.getAlpha(index);
+  
+                        //                      setting sample in the raster that corresponds to an index in the
+                        //color map
+                        raster.setSample(j, i, 0, transparencyIndex++);
+                    } else //we alredy set the transparent color we will reuse that one
+                     {
+                        //basically do nothing here
+                        //we do not need to add a new color because we are reusing the old on
+                        //we already set
+                        //                      setting sample in the raster that corresponds to an index in the
+                        //color map
+                        raster.setSample(j, i, 0, transparencyIndex);
+                    }
+                } else //NON FULLY TRANSPARENT PIXEL
+                 {
+
+                    //setting sample in the raster that corresponds to an index in the
+                    //color map                    
+                    //raster.setSample(j, i, 0, colorIndex++);
+                }
+            }
+        }
+
+        /**
+         * Now all the color are opaque except one and the color map has been
+         * rebuilt loosing all the tranpsarent colors except the first one.
+         * The raster has been rebuilt as well, in order to make it point to the
+         * right color in the color map.  We have to create the new image
+         * to be returned.
+         */
+        IndexColorModel cm1 =transparencyIndex==-1? new IndexColorModel(
+				cm.getComponentSize(0),
+				256,
+				rgba[0],
+				rgba[1],
+				rgba[2]): new IndexColorModel(
+						cm.getComponentSize(0),
+						256,
+						rgba[0],
+						rgba[1],
+						rgba[2],
+						transparencyIndex);
+		
+		BufferedImage image= new BufferedImage(raster.getWidth(),
+				raster.getHeight(),
+				BufferedImage.TYPE_BYTE_INDEXED,
+				cm1);
+        image.setData(raster);
+
+        //disposing old image
+        surrogateImage.dispose();
+
+        return PlanarImage.wrapRenderedImage(image);
     }
 
     /**
