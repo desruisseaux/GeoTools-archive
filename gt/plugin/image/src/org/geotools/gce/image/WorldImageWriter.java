@@ -406,6 +406,9 @@ public class WorldImageWriter implements GridCoverageWriter {
 //	}
 
 	/**
+	 * This method allows me to go from DirectColorModel to ComponentColorModel
+	 * which seems to be well acepted from PNGEncoder and TIFFEncoder.
+	 * 
 	 * @param surrogateImage
 	 * @return
 	 */
@@ -714,23 +717,7 @@ public class WorldImageWriter implements GridCoverageWriter {
             if (surrogateImage.getSampleModel().getNumBands() == 3) {
                 surrogateImage = reduction2IndexColorModel(surrogateImage, pb);
             }
-			JFrame frame = new JFrame();
-	         JPanel topPanel = new JPanel();
-	         topPanel.setLayout(new BorderLayout());
-	         frame.getContentPane().add(topPanel);
-
-
-
-	         JScrollPane pane = new JScrollPane();
-	         pane.getViewport().add(new JLabel(
-	                 new ImageIcon(
-							 surrogateImage
-	                     .getAsBufferedImage())));
-	         topPanel.add(pane, BorderLayout.CENTER);
-	         frame.getContentPane().add(pane, BorderLayout.CENTER);
-	         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
-			frame.pack();
-			frame.show();
+		
 		
 			
             /**
@@ -743,23 +730,7 @@ public class WorldImageWriter implements GridCoverageWriter {
                         alphaChannel, pb);
             }
         }
-	     JFrame frame = new JFrame();
-         JPanel topPanel = new JPanel();
-         topPanel.setLayout(new BorderLayout());
-         frame.getContentPane().add(topPanel);
-
-     
-
-         JScrollPane pane = new JScrollPane();
-         pane.getViewport().add(new JLabel(
-                 new ImageIcon(
-						 surrogateImage
-                     .getAsBufferedImage())));
-         topPanel.add(pane, BorderLayout.CENTER);
-         frame.getContentPane().add(pane, BorderLayout.CENTER);
-         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
-		frame.pack();
-		frame.show();
+	  
         return surrogateImage;
     }
 
