@@ -497,7 +497,8 @@ public class SLDStyleFactory {
         // extract geometry
         Geometry geom = findGeometry(feature, geomName);
 
-        if (geom.isEmpty()) {
+        if ( (geom == null) || geom.isEmpty()) 
+        {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("empty geometry");
             }
