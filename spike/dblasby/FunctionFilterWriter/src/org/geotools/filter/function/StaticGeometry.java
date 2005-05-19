@@ -29,16 +29,13 @@ import com.vividsolutions.jts.io.WKTReader;
 
 
 
-//This class is auto-generated.  Think twice before you try to modify it by hand!
 
-// modified by hand - relate() returns an IntersectionMatrix
-//  I've changed this so that it returns a String
-//   (function prototype change so it returns a String, and called 
-//     .toString() on the resulting IntersectionMatrix)
 
  public class StaticGeometry {
 
 
+ 	//--------------------------------------------------------------------------
+ 	//JTS SF SQL functions
 
     static public Geometry geomFromWKT(String wkt)
     {
@@ -53,14 +50,8 @@ import com.vividsolutions.jts.io.WKTReader;
        }
     }
 
-     static public boolean geomEquals(Geometry arg0,Geometry arg1)
-     {
-           Geometry _this = arg0;
 
-           return _this.equals(arg1);
-     }
-
-     static public String toString(Geometry arg0)
+     static public String toWKT(Geometry arg0)
      {
            Geometry _this = arg0;
 
@@ -81,7 +72,7 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.isEmpty();
      }
 
-     static public double getLength(Geometry arg0)
+     static public double geomLength(Geometry arg0)
      {
            Geometry _this = arg0;
 
@@ -102,21 +93,16 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.isValid();
      }
 
-     static public String getGeometryType(Geometry arg0)
+     static public String geometryType(Geometry arg0)
      {
            Geometry _this = arg0;
 
            return _this.getGeometryType();
      }
 
-     static public int getSRID(Geometry arg0)
-     {
-           Geometry _this = arg0;
+     
 
-           return _this.getSRID();
-     }
-
-     static public int getNumPoints(Geometry arg0)
+     static public int numPoints(Geometry arg0)
      {
            Geometry _this = arg0;
 
@@ -144,49 +130,49 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.isWithinDistance(arg1,arg2);
      }
 
-     static public double getArea(Geometry arg0)
+     static public double area(Geometry arg0)
      {
            Geometry _this = arg0;
 
            return _this.getArea();
      }
 
-     static public Geometry getCentroid(Geometry arg0)
+     static public Geometry centroid(Geometry arg0)
      {
            Geometry _this = arg0;
 
            return _this.getCentroid();
      }
 
-     static public Geometry getInteriorPoint(Geometry arg0)
+     static public Geometry interiorPoint(Geometry arg0)
      {
            Geometry _this = arg0;
 
            return _this.getInteriorPoint();
      }
 
-     static public int getDimension(Geometry arg0)
+     static public int dimension(Geometry arg0)
      {
            Geometry _this = arg0;
 
            return _this.getDimension();
      }
 
-     static public Geometry getBoundary(Geometry arg0)
+     static public Geometry boundary(Geometry arg0)
      {
            Geometry _this = arg0;
 
            return _this.getBoundary();
      }
 
-     static public int getBoundaryDimension(Geometry arg0)
+     static public int boundaryDimension(Geometry arg0)
      {
            Geometry _this = arg0;
 
            return _this.getBoundaryDimension();
      }
 
-     static public Geometry getEnvelope(Geometry arg0)
+     static public Geometry envelope(Geometry arg0)
      {
            Geometry _this = arg0;
 
@@ -242,14 +228,9 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.relate(arg1).toString();
      }
 
-     static public String toText(Geometry arg0)
-     {
-           Geometry _this = arg0;
+    
 
-           return _this.toText();
-     }
-
-     static public Geometry buffer_with_segments(Geometry arg0,double arg1,int arg2)
+     static public Geometry bufferWithSegments(Geometry arg0,double arg1,int arg2)
      {
            Geometry _this = arg0;
 
@@ -277,7 +258,7 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.intersection(arg1);
      }
 
-     static public Geometry unionGeom(Geometry arg0,Geometry arg1)
+     static public Geometry union(Geometry arg0,Geometry arg1)
      {
            Geometry _this = arg0;
 
@@ -312,7 +293,7 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.equalsExact(arg1);
      }
 
-     static public int getNumGeometries(Geometry arg0)
+     static public int numGeometries(Geometry arg0)
      {
            GeometryCollection _this = (GeometryCollection) arg0;
 
@@ -347,21 +328,21 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.isClosed();
      }
 
-     static public Geometry getPointN(Geometry arg0,int arg1)
+     static public Geometry pointN(Geometry arg0,int arg1)
      {
            LineString _this = (LineString) arg0;
 
            return _this.getPointN(arg1);
      }
 
-     static public Geometry getStartPoint(Geometry arg0)
+     static public Geometry startPoint(Geometry arg0)
      {
            LineString _this = (LineString) arg0;
 
            return _this.getStartPoint();
      }
 
-     static public Geometry getEndPoint(Geometry arg0)
+     static public Geometry endPoint(Geometry arg0)
      {
            LineString _this = (LineString) arg0;
 
@@ -375,26 +356,30 @@ import com.vividsolutions.jts.io.WKTReader;
            return _this.isRing();
      }
 
-     static public Geometry getExteriorRing(Geometry arg0)
+     static public Geometry exteriorRing(Geometry arg0)
      {
            Polygon _this = (Polygon) arg0;
 
            return _this.getExteriorRing();
      }
 
-     static public int getNumInteriorRing(Geometry arg0)
+     static public int numInteriorRing(Geometry arg0)
      {
            Polygon _this = (Polygon) arg0;
 
            return _this.getNumInteriorRing();
      }
 
-     static public Geometry getInteriorRingN(Geometry arg0,int arg1)
+     static public Geometry interiorRingN(Geometry arg0,int arg1)
      {
            Polygon _this = (Polygon) arg0;
 
            return _this.getInteriorRingN(arg1);
      }
+     
+     
+ 	//--------------------------------------------------------------------------
+  	//JAVA String functions
      
      static public String strConcat(String s1,String s2)
      {
@@ -453,48 +438,11 @@ import com.vividsolutions.jts.io.WKTReader;
      	return s1.trim();
      }
      
-     static public boolean strIn2(String s, String s1, String s2)
-     {
-     	return (s.equals(s1) || s.equals(s2));
-     }
+ 
+ 	//--------------------------------------------------------------------------
+  	//data type xform
      
-     static public boolean strIn3(String s, String s1, String s2,String s3)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3));
-     }
-     
-     static public boolean strIn4(String s, String s1, String s2,String s3, String s4)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3)|| s.equals(s4));
-     }
-     
-     static public boolean strIn5(String s, String s1, String s2,String s3,String s4,String s5)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3)|| s.equals(s4)|| s.equals(s5));
-     }
-     
-     static public boolean strIn6(String s, String s1, String s2,String s3, String s4,String s5,String s6)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3)|| s.equals(s4)|| s.equals(s5)|| s.equals(s6));
-     }
-     static public boolean strIn7(String s, String s1, String s2,String s3,String s4,String s5,String s6,String s7)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3)|| s.equals(s4)|| s.equals(s5)|| s.equals(s6)|| s.equals(s7));
-     }
-     
-     static public boolean strIn8(String s, String s1, String s2,String s3, String s4,String s5,String s6,String s7,String s8)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3)|| s.equals(s4)|| s.equals(s5)|| s.equals(s6)|| s.equals(s7)|| s.equals(s8));
-     }
-     static public boolean strIn9(String s, String s1, String s2,String s3, String s4,String s5,String s6,String s7,String s8,String s9)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3)|| s.equals(s4)|| s.equals(s5)|| s.equals(s6)|| s.equals(s7)|| s.equals(s8)|| s.equals(s9));
-     }
-     static public boolean strIn10(String s, String s1, String s2,String s3, String s4,String s5,String s6,String s7,String s8,String s9,String s10)
-     {
-     	return (s.equals(s1) || s.equals(s2)|| s.equals(s3)|| s.equals(s4)|| s.equals(s5)|| s.equals(s6)|| s.equals(s7)|| s.equals(s8)|| s.equals(s9) || s.equals(s10));
-     }
-     
+  
      
      static public double parseDouble(String s)
      {
@@ -524,22 +472,22 @@ import com.vividsolutions.jts.io.WKTReader;
      	return (int) Math.round(d);
      }
      
-     static public double i2d(int i)
+     static public double int2ddouble(int i)
      {
      	return (double) i;
      }
      
-     static public boolean i2b(int i)
+     static public boolean int2bbool(int i)
      {
      	return i==0;
      }
      
-     static public boolean d2b(double d)
+     static public boolean double2bool(double d)
      {
      	return d==0;
      }
      
-     static public int if_then_else_int(boolean p, int a, int b)
+     static public Object if_then_else(boolean p, Object a, Object b)
      {
      	if (p)
      		return a;
@@ -547,29 +495,9 @@ import com.vividsolutions.jts.io.WKTReader;
      		return b;
      }
      
-     static public double if_then_else_double(boolean p, double a, double b)
-     {
-     	if (p)
-     		return a;
-     	else
-     		return b;
-     }
-     
-     static public String if_then_else_string(boolean p, String a, String b)
-     {
-     	if (p)
-     		return a;
-     	else
-     		return b;
-     }
-     
-     static public Geometry if_then_else_geom(boolean p, Geometry a, Geometry b)
-     {
-     	if (p)
-     		return a;
-     	else
-     		return b;
-     }
+//   --------------------------------------------------------------------------
+   	//OGC Filter comparisionOP functions
+      
      
      
      static public boolean equalTo(Object o1,Object o2)
@@ -668,4 +596,56 @@ import com.vividsolutions.jts.io.WKTReader;
      	return !b;
      }
 
+//   --------------------------------------------------------------------------
+   	// SQL "var in (list)"
+      
+     
+     
+     static public boolean in2(Object s, Object s1, Object s2)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2) );
+     }
+     
+     static public boolean in3(Object s, Object s1, Object s2, Object s3)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3) );
+     }
+     
+     static public boolean in4(Object s, Object s1, Object s2, Object s3, Object s4)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3)|| equalTo(s,s4) );
+     }
+     
+     static public boolean in5(Object s, Object s1, Object s2, Object s3, Object s4, Object s5)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3)|| equalTo(s,s4)|| equalTo(s,s5)  );
+     }
+     
+     static public boolean in6(Object s, Object s1, Object s2, Object s3, Object s4, Object s5, Object s6)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3)|| equalTo(s,s4)|| equalTo(s,s5)|| equalTo(s,s6)  );
+     }
+     
+     static public boolean in7(Object s, Object s1, Object s2, Object s3, Object s4, Object s5, Object s6, Object s7)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3)|| equalTo(s,s4)|| equalTo(s,s5)|| equalTo(s,s6)|| equalTo(s,s7)  );
+     }
+     
+     static public boolean in8(Object s, Object s1, Object s2, Object s3, Object s4, Object s5, Object s6, Object s7, Object s8)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3)|| equalTo(s,s4)|| equalTo(s,s5)|| equalTo(s,s6)|| equalTo(s,s7)|| equalTo(s,s8)  );
+     }
+   
+     static public boolean in9(Object s, Object s1, Object s2, Object s3, Object s4, Object s5, Object s6, Object s7, Object s8, Object s9)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3)|| equalTo(s,s4)|| equalTo(s,s5)|| equalTo(s,s6)|| equalTo(s,s7)|| equalTo(s,s8)|| equalTo(s,s9)  );
+     }
+  
+     static public boolean in10(Object s, Object s1, Object s2, Object s3, Object s4, Object s5, Object s6, Object s7, Object s8, Object s9, Object s10)
+     {
+     	return ( equalTo(s,s1) || equalTo(s,s2)|| equalTo(s,s3)|| equalTo(s,s4)|| equalTo(s,s5)|| equalTo(s,s6)|| equalTo(s,s7)|| equalTo(s,s8)|| equalTo(s,s9)|| equalTo(s,s10)  );
+     }
+ 
+     
+     
 }
