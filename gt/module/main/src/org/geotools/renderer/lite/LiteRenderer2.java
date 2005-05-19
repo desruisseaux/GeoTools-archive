@@ -410,7 +410,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             labelCache.startLayer();
             try {
                 // mapExtent = this.context.getAreaOfInterest();
-                FeatureResults results = queryLayer(currLayer, envelope, destinationCrs);
+                FeatureResults results = queryLayer(currLayer, envelope, destinationCrs);                                
 
                 // extract the feature type stylers from the style object
                 // and process them
@@ -880,45 +880,39 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             NumberRange scaleRange = new NumberRange(scaleDenominator, scaleDenominator);
             FeatureReader reader = features.reader();
             
-            // do the reprojection here
-            if (sourceCrs != null && destinationCrs != null && !sourceCrs.equals(destinationCrs)) 
-            {
-            	try{
-            		MathTransform  transform = operationFactory.createOperation(sourceCrs,destinationCrs).getMathTransform();
-            		FeatureType newFT = FeatureTypes.transform(reader.getFeatureType(), destinationCrs);
-            		reader = new ReprojectFeatureReader(reader,newFT,transform);
-            	}
-            	catch(Exception e)
-				{
-            		e.printStackTrace(); // hid from user -- try w/o projection
-				}
-            }
-            //if a xform isnt apropriate, then make sure the CRS is correct and will not
-            // cause problems later on.
+            //DJB: dont do reprojection here - do it after decimation
+            //     but we ensure that the reader is producing geometries with the correct CRS
+            //NOTE: it, by default, produces ones that are are tagged with the CRS of the datastore, which
+            //      maybe incorrect.
+            //      The correct value is in sourceCrs.
             
+              // this is the reader's CRS
             CoordinateReferenceSystem rCS = reader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
             
-            // want the reader to spit out features in the destinationCrs
-            if (destinationCrs != null) // its doesnt have one -- no xformation is taking place
+            // sourceCrs == source's real SRS
+            
+            //if we need to recode the incoming geometries
+            
+            if (rCS != sourceCrs)  //not both null or both EXACTLY the same CRS object
             {
-            	if ( (rCS !=null) && (destinationCrs.equals(rCS)) )
+            	if (sourceCrs != null) //dont re-tag to null, keep the DataStore's CRS (this shouldnt really happen)
             	{
-            		//no action -- they're the same CS so we dont have to Force
-            	}
-            	else // either rCS is null and destinationCrs isnt --> need to do a Force
-            		 // or rCS != destinationCrs --> should have been taken care of above
-            	{
-            		try{
-                		reader = new ForceCoordinateSystemFeatureReader(reader,destinationCrs );
-                	}
-                	catch(Exception ee)
-    				{
-                		ee.printStackTrace(); // do nothing but warn user
-    				}
+            		     // if the datastore is producing null CRS, we recode.
+            		     // if the datastore's CRS != real CRS, then we recode
+            		if ( ( rCS ==null) || (!rCS .equals ( sourceCrs) ))
+	            	{
+	            		//need to retag the features
+            			try{
+                    		reader = new ForceCoordinateSystemFeatureReader(reader,sourceCrs );
+                    	}
+                    	catch(Exception ee)
+        				{
+                    		ee.printStackTrace(); // do nothing but warn user
+        				}
+	            	}
             	}
             }
-            
-            
+                        
             while( true ) {
                 try {
 
