@@ -33,10 +33,13 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
+import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.BBoxExpression;
@@ -412,7 +415,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 // extract the feature type stylers from the style object
                 // and process them
                 processStylers(graphics, results, currLayer.getStyle().getFeatureTypeStyles(), at,
-                        context.getCoordinateReferenceSystem());
+                        context.getCoordinateReferenceSystem(),
+                        currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem()); //src CRS
             } catch (Exception exception) {
                 fireErrorEvent(new Exception("Exception rendering layer " + currLayer,exception));
             }
@@ -472,6 +476,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         FeatureSource featureSource = currLayer.getFeatureSource();
         FeatureType schema = featureSource.getSchema();
         Query query = Query.ALL;
+        MathTransform transform =null;
 
         if (optimizedDataLoadingEnabled) {
             // see what attributes we really need by exploring the styles
@@ -489,10 +494,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 if (sourceCrs != null && !sourceCrs.equals(destinationCrs)) {
                     // get an unprojected envelope since the feature source is operating on
                     // unprojected geometries
-                    MathTransform transform = operationFactory.createOperation(destinationCrs,
-                            sourceCrs).getMathTransform();
+                    transform = operationFactory.createOperation(destinationCrs,sourceCrs).getMathTransform();
                     if (transform != null && !transform.isIdentity())
                         envelope = JTS.transform(envelope, transform);
+                    else
+                    	transform = null; //reset transform
                 }
 
                 Filter filter = null;
@@ -540,16 +546,27 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 query = DataUtilities.mixQueries(definitionQuery, query, "liteRenderer");
             }
         }
+        
+        if (!(query instanceof DefaultQuery))
+        	query = new DefaultQuery(query);
+       
+        ((DefaultQuery)query).setCoordinateSystem(
+        		currLayer.getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
+        	
 
-        if (memoryPreloadingEnabled) {
+        if (memoryPreloadingEnabled) 
+        {
             // TODO: attache a feature listener, we must erase the memory cache if
             // anything changes in the data store
-            if (indexedFeatureResults == null) {
+            if (indexedFeatureResults == null) 
+            {
                 indexedFeatureResults = new IndexedFeatureResults(featureSource.getFeatures(query));
             }
             indexedFeatureResults.setQueryBounds(envelope);
             results = indexedFeatureResults;
-        } else {
+        } 
+        else 
+        {
             results = featureSource.getFeatures(query);
         }
 
@@ -694,7 +711,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
         try {
             processStylers(outputGraphics, DataUtilities.results(features), featureStylers, at,
-                    null);
+                    null,null);
         } catch (IOException ioe) {
             fireErrorEvent(new Exception("I/O error while rendering the layer" ,ioe));
         } catch (IllegalAttributeException iae) {
@@ -803,10 +820,15 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      * @throws IOException DOCUMENT ME!
      * @throws IllegalAttributeException DOCUMENT ME!
      */
-    private void processStylers( final Graphics2D graphics, final FeatureResults features,
-            final FeatureTypeStyle[] featureStylers, AffineTransform at,
-            CoordinateReferenceSystem destinationCrs ) throws IOException,
-            IllegalAttributeException {
+    private void processStylers(final Graphics2D graphics, 
+    							final FeatureResults features,
+								final FeatureTypeStyle[] featureStylers, 
+								AffineTransform at,
+								CoordinateReferenceSystem destinationCrs,
+								CoordinateReferenceSystem sourceCrs
+								) 
+    								throws IOException,  IllegalAttributeException 
+	{
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("processing " + featureStylers.length + " stylers");
         }
@@ -857,6 +879,46 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             // get style caching also between multiple rendering runs
             NumberRange scaleRange = new NumberRange(scaleDenominator, scaleDenominator);
             FeatureReader reader = features.reader();
+            
+            // do the reprojection here
+            if (sourceCrs != null && destinationCrs != null && !sourceCrs.equals(destinationCrs)) 
+            {
+            	try{
+            		MathTransform  transform = operationFactory.createOperation(sourceCrs,destinationCrs).getMathTransform();
+            		FeatureType newFT = FeatureTypes.transform(reader.getFeatureType(), destinationCrs);
+            		reader = new ReprojectFeatureReader(reader,newFT,transform);
+            	}
+            	catch(Exception e)
+				{
+            		e.printStackTrace(); // hid from user -- try w/o projection
+				}
+            }
+            //if a xform isnt apropriate, then make sure the CRS is correct and will not
+            // cause problems later on.
+            
+            CoordinateReferenceSystem rCS = reader.getFeatureType().getDefaultGeometry().getCoordinateSystem();
+            
+            // want the reader to spit out features in the destinationCrs
+            if (destinationCrs != null) // its doesnt have one -- no xformation is taking place
+            {
+            	if ( (rCS !=null) && (destinationCrs.equals(rCS)) )
+            	{
+            		//no action -- they're the same CS so we dont have to Force
+            	}
+            	else // either rCS is null and destinationCrs isnt --> need to do a Force
+            		 // or rCS != destinationCrs --> should have been taken care of above
+            	{
+            		try{
+                		reader = new ForceCoordinateSystemFeatureReader(reader,destinationCrs );
+                	}
+                	catch(Exception ee)
+    				{
+                		ee.printStackTrace(); // do nothing but warn user
+    				}
+            	}
+            }
+            
+            
             while( true ) {
                 try {
 
@@ -995,6 +1057,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
                 if (canTransform) {
                     try {
+                    	// DJB: this should never be necessary since we've already taken care to make sure the reader is
+                    	// producing the correct coordinate system
                         transform = getMathTransform(crs, destinationCrs);
                         if (transform != null) {
                             transform = (MathTransform2D) operationFactory.getMathTransformFactory()
