@@ -212,7 +212,8 @@ public class WorldImageWriterTest extends TestCase {
          "    AXIS[\"Latitude\", NORTH],\n"                        +
          "    AXIS[\"Longitude\", EAST]],\n"                       +
          "  PROJECTION[\"Mercator_1SP\"],\n"                       +
-         "  PARAMETER[\"central_meridian\", -20.0],\n"             +
+		 "  PARAMETER[\"latitude_of_origin\", 43.0],\n"             +         
+         "  PARAMETER[\"central_meridian\", 0.0],\n"             +
          "  PARAMETER[\"scale_factor\", 1.0],\n"                   +
          "  PARAMETER[\"false_easting\", 500000.0],\n"             +
          "  PARAMETER[\"false_northing\", 0.0],\n"                 +
@@ -228,38 +229,38 @@ public class WorldImageWriterTest extends TestCase {
         CoordinateOperationFactory operationFactory=new CoordinateOperationFactory(new Hints(Hints.LENIENT_DATUM_SHIFT,Boolean.TRUE));
         CoordinateOperation operationMercator2WGS84=(CoordinateOperation) operationFactory.createOperation(mercator,
 				wgs84);
-		CoordinateOperation operationWGS842Mercator=(CoordinateOperation) operationFactory.createOperation(wgs84,
-				mercator);
+//		CoordinateOperation operationWGS842Mercator=(CoordinateOperation) operationFactory.createOperation(wgs84,
+//				mercator);
 
-		MathTransform transformWGS842Mercator=operationWGS842Mercator.getMathTransform();
+//		MathTransform transformWGS842Mercator=operationWGS842Mercator.getMathTransform();
 		
         //reproject the envelope
-        GeneralEnvelope newEnvelope=(GeneralEnvelope) coverage.getEnvelope(),
-		oldEnvelope=null;
-		oldEnvelope=new GeneralEnvelope(
-        		(GeneralDirectPosition )transformWGS842Mercator.transform(newEnvelope.getLowerCorner(),null),
-        		(GeneralDirectPosition )transformWGS842Mercator.transform(newEnvelope.getUpperCorner(),null)
-        		);
-		//construct the right coverage
-		GridCoverage2D gc=new GridCoverage2D(
-				"a",
-				coverage.getRenderedImage(),
-				mercator,
-				oldEnvelope);
+//        GeneralEnvelope newEnvelope=(GeneralEnvelope) coverage.getEnvelope(),
+//		oldEnvelope=null;
+//		oldEnvelope=new GeneralEnvelope(
+//        		(GeneralDirectPosition )transformWGS842Mercator.transform(newEnvelope.getLowerCorner(),null),
+//        		(GeneralDirectPosition )transformWGS842Mercator.transform(newEnvelope.getUpperCorner(),null)
+//        		);
+//		//construct the right coverage
+//		GridCoverage2D gc=new GridCoverage2D(
+//				"a",
+//				coverage.getRenderedImage(),
+//				mercator,
+//				oldEnvelope);
 		
         
         //creating the new grid range keeping the old range
         GeneralGridRange newGridrange = new GeneralGridRange(new int[] { 0, 0 },
-                new int[] { gc.getGridGeometry().getGridRange().getLength(0),  gc.getGridGeometry().getGridRange().getLength(1) });
+                new int[] { coverage.getGridGeometry().getGridRange().getLength(0),  coverage.getGridGeometry().getGridRange().getLength(1) });
         GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
-                newEnvelope, new boolean[] { false, true });
+				coverage.getEnvelope(), new boolean[] { false, true });
 
         //getting the needed operation
         Resampler2D.Operation op = new Resampler2D.Operation();
 
         //getting parameters
         ParameterValueGroup group = op.getParameters();
-        group.parameter("Source").setValue(gc.geophysics(false));
+        group.parameter("Source").setValue(coverage.geophysics(false));
         group.parameter("CoordinateReferenceSystem").setValue(wgs84);
         group.parameter("GridGeometry").setValue(newGridGeometry);
 
@@ -292,7 +293,7 @@ public class WorldImageWriterTest extends TestCase {
 		writer.write(gcOp, null);
 
 //        //printing
-        System.out.println(gc.getCoordinateReferenceSystem().toWKT());
+        System.out.println(coverage.getCoordinateReferenceSystem().toWKT());
         System.out.println(gcOp.getCoordinateReferenceSystem().toWKT());
 		System.out.println(gcOp.getEnvelope().toString());
 
