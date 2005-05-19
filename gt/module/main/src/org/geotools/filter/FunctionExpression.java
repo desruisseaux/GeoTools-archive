@@ -24,10 +24,23 @@ import org.geotools.factory.Factory;
  * @author James Macgill, PSU
  */
 public interface FunctionExpression extends Expression, Factory{
-    /**
-     * Gets the number of arguments that are set.
+	   
+	/**
+     *   Returns the number of arguments this <Function> requires.
      *
-     * @return the number of args.
+     *   For example <Function name="strCat"> [arg1][arg2]</Function>.
+     *   This function must have EXACTLY 2 arguments, so this function
+     *   would return 2.
+     *
+     *   The parser might use this information to ensure validity, 
+     *   and its also for reporting <Function> capabilities.
+     *
+     *  NOTE: this was previously javadoc-ed incorrectly, please note
+     *        the new definition.
+     *  NOTE: you cannot have a function with a variable number of 
+     *        arguments.
+     *
+     * @return the number of args required by this function.
      */
     int getArgCount();
 
