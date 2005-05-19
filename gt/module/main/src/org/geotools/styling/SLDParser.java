@@ -389,7 +389,9 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("LayerFeatureConstraints")) 
 			{
 				 //DJB: better to throw an exeception than to screw up (old version killed layer)
-				throw new UnsupportedOperationException("LayerFeatureConstraints pending of implementation");
+				//throw new UnsupportedOperationException("LayerFeatureConstraints pending of implementation");
+				//LayerFeatureConstraints is required, so we dont do anything
+				
 			}
 
 		}
