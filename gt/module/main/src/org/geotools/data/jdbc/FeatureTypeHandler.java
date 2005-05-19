@@ -129,7 +129,7 @@ public class FeatureTypeHandler {
             conn = dataStore.getConnection(Transaction.AUTO_COMMIT);
 
             DatabaseMetaData meta = conn.getMetaData();
-            String[] tableType = { "TABLE" };
+            String[] tableType = { "TABLE" , "VIEW"};
             ResultSet tables = meta.getTables(null, dataStore.config.getDatabaseSchemaName(), "%",
                     tableType);
 
