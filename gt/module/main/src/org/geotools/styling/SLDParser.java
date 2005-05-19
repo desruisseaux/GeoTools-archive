@@ -358,33 +358,63 @@ public class SLDParser {
 
 		NodeList children = root.getChildNodes();
 
-		for (int i = 0; i < children.getLength(); i++) {
+		for (int i = 0; i < children.getLength(); i++) 
+		{
 			Node child = children.item(i);
-			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) {
+			if ((child == null) || (child.getNodeType() != Node.ELEMENT_NODE)) 
+			{
 				continue;
 			}
 			String childName = child.getLocalName();
 			if (childName == null) {
 				childName = child.getNodeName();
 			}
-			if (childName.equalsIgnoreCase("UserStyle")) {
+			if (childName.equalsIgnoreCase("InlineFeature"))
+			{
+			    parseInlineFeature(child,layer);
+			}
+			if (childName.equalsIgnoreCase("UserStyle")) 
+			{
 				Style user = parseStyle(child);
 				layer.addUserStyle(user);
 			}
 
-			if (childName.equalsIgnoreCase("Name")) {
+			if (childName.equalsIgnoreCase("Name")) 
+			{
 				String layerName = child.getFirstChild().getNodeValue();
 				layer.setName(layerName);
 				LOGGER.info("layer name: " + layer.getName());
 			}
 
-			if (childName.equalsIgnoreCase("LayerFeatureConstraints")) {
-				layer = new UserLayer();
+			if (childName.equalsIgnoreCase("LayerFeatureConstraints")) 
+			{
+				 //DJB: better to throw an exeception than to screw up (old version killed layer)
+				throw new UnsupportedOperationException("LayerFeatureConstraints pending of implementation");
 			}
 
 		}
 
 		return layer;
+	}
+
+	/**
+	 * 
+	 * @param child
+	 * @param layer
+	 */
+	private void parseInlineFeature(Node root, UserLayer layer) 
+	{		
+		try{
+			SLDInlineFeatureParser inparser = new SLDInlineFeatureParser(root);
+			layer.setInlineFeatureDatastore(inparser.dataStore);
+			layer.setInlineFeatureType(inparser.featureType);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw new IllegalArgumentException(e.getLocalizedMessage());
+		}
+		
 	}
 
 	/**
@@ -890,6 +920,10 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("Label")) {
 				LOGGER.finest("parsing label " + child.getNodeValue());
 				symbol.setLabel(parseCssParameter(child));
+				if (symbol.getLabel() == null)
+				{
+					LOGGER.warning("parsing TextSymbolizer node - couldnt find anything in the Label element!");
+				}
 			}
 
 			if (childName.equalsIgnoreCase("Font")) {
