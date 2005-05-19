@@ -74,7 +74,7 @@ public class ReprojectFeatureReader implements FeatureReader {
     FeatureType schema;
     GeometryCoordinateSequenceTransformer transformer = new GeometryCoordinateSequenceTransformer();
 
-    ReprojectFeatureReader(FeatureReader reader, FeatureType schema,
+    public ReprojectFeatureReader(FeatureReader reader, FeatureType schema,
         MathTransform transform) {
         this.reader = reader;
         this.schema = schema;
