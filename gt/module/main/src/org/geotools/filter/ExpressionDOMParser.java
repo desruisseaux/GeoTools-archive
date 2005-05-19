@@ -456,9 +456,12 @@ public final class ExpressionDOMParser {
         //SLDparser.  I really would like that class redone, so we don't have
         //to use this crappy DOM GML parser.
         String childName = child.getNodeName();
-            if(childName == null){
+            if(childName == null)
+            {
                 childName = child.getLocalName();
+            }
      		if(!childName.startsWith("gml:"))
+     		{
                     childName = "gml:" + childName;
             }
 
@@ -492,6 +495,8 @@ public final class ExpressionDOMParser {
             return gfac.createPolygon(ring, null);
         }
 
+     
+        
         if (childName.equalsIgnoreCase("gml:polygon")) {
             LOGGER.finer("polygon");
             type = GML_POLYGON;
@@ -504,13 +509,15 @@ public final class ExpressionDOMParser {
                 Node kid = kids.item(i);
                 LOGGER.finer("doing " + kid);
 
-		String kidName = kid.getNodeName();
-                if(kidName == null){
+                String kidName = kid.getNodeName();
+                if(kidName == null)
+                {
                     kidName = child.getLocalName();
-                    if(!kidName.startsWith("gml:"))
-                	kidName = "gml:" + childName;
                 }
-       	
+                if(!kidName.startsWith("gml:"))
+                {
+                	kidName = "gml:" + kidName;
+                }       	              
        	
 		
                 if (kidName.equalsIgnoreCase("gml:outerBoundaryIs")) {
@@ -536,7 +543,8 @@ public final class ExpressionDOMParser {
 
             NodeList kids = ((Element) child).getElementsByTagName(
                     "gml:LinearRing");
-
+            if (kids.getLength() ==0)
+            	kids = ((Element) child).getElementsByTagName("LinearRing");
             return parseGML(kids.item(0));
         }
 
@@ -557,6 +565,7 @@ public final class ExpressionDOMParser {
 
             return ring;
         }
+        
 
         if (childName.equalsIgnoreCase("gml:linestring")) {
             LOGGER.finer("linestring");
@@ -621,9 +630,12 @@ public final class ExpressionDOMParser {
             //  String internal = child.getNodeValue();
             //}
             String childName = child.getNodeName();
-            if(childName == null){
+            if(childName == null)
+            {
                 childName = child.getLocalName();
+            }
      		if(!childName.startsWith("gml:"))
+     		{
                     childName = "gml:" + childName;
             }
             if (childName.equalsIgnoreCase("gml:coord"))
@@ -658,6 +670,7 @@ public final class ExpressionDOMParser {
                 }
                 clist.add(c);
             }
+           
 
             if (childName.equalsIgnoreCase("gml:coordinates")) {
                 LOGGER.finer("coordinates "
