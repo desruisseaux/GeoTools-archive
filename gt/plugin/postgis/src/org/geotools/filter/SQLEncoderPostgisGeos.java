@@ -163,8 +163,7 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
         }
 
         boolean constrainBBOX = (literalGeometryCount == 1);
-        boolean onlyBbox = filterType == AbstractFilter.GEOMETRY_BBOX
-	    && looseBbox;
+        boolean onlyBbox = filterType == AbstractFilter.GEOMETRY_BBOX  && looseBbox;
 
         try {
 
