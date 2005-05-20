@@ -18,13 +18,39 @@ package org.geotools.renderer.shape;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureResults;
+import org.geotools.data.Query;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.map.DefaultMapContext;
+import org.geotools.map.DefaultMapLayer;
+import org.geotools.map.MapContext;
+import org.geotools.map.MapLayer;
+import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.renderer.lite.LiteShape2;
+import org.geotools.renderer.lite.RenderListener;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Fill;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.Rule;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.Symbolizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -131,5 +157,5 @@ public class ShapeRendererTest extends TestCase {
 			236.11317091199317, 99.23509261303661, 242.5690788218758,
 			98.31961497838347, 245.82484960695865, 90.8307300832239,
 			243.83302237886664 };
-
+	   
 }

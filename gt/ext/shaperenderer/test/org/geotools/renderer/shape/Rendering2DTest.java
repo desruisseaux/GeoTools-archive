@@ -445,52 +445,6 @@ public class Rendering2DTest extends TestCase {
         }
     }
 
-    
-    private Style createDefQueryTestStyle() throws IllegalFilterException {
-        StyleFactory sFac = StyleFactory.createStyleFactory();
-
-        PointSymbolizer pointsym = sFac.createPointSymbolizer();
-        pointsym.setGraphic(sFac.getDefaultGraphic());
-        pointsym.setGeometryPropertyName("point");
-
-        Rule rulep = sFac.createRule();
-        rulep.setSymbolizers(new Symbolizer[]{pointsym});
-        FeatureTypeStyle ftsP = sFac.createFeatureTypeStyle();
-        ftsP.setRules(new Rule[]{rulep});
-        ftsP.setFeatureTypeName("querytest");
-
-        LineSymbolizer linesym = sFac.createLineSymbolizer();
-        linesym.setGeometryPropertyName("line");
-
-        Stroke myStroke = sFac.getDefaultStroke();
-        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
-        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(3)));
-        LOGGER.info("got new Stroke " + myStroke);
-        linesym.setStroke(myStroke);
-
-        Rule rule2 = sFac.createRule();
-        rule2.setSymbolizers(new Symbolizer[]{linesym});
-        FeatureTypeStyle ftsL = sFac.createFeatureTypeStyle();
-        ftsL.setRules(new Rule[]{rule2});
-        ftsL.setFeatureTypeName("querytest");
-
-        PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
-        polysym.setGeometryPropertyName("polygon");
-        Fill myFill = sFac.getDefaultFill();
-        myFill.setColor(filterFactory.createLiteralExpression("#ff0000"));
-        polysym.setFill(myFill);
-        polysym.setStroke(sFac.getDefaultStroke());
-        Rule rule = sFac.createRule();
-        rule.setSymbolizers(new Symbolizer[]{polysym});
-        FeatureTypeStyle ftsPoly = sFac.createFeatureTypeStyle(new Rule[]{rule});
-        // ftsPoly.setRules(new Rule[]{rule});
-        ftsPoly.setFeatureTypeName("querytest");
-
-        Style style = sFac.createStyle();
-        style.setFeatureTypeStyles(new FeatureTypeStyle[]{ftsPoly, ftsL, ftsP});
-
-        return style;
-    }
     static ShapefileDataStore getLines() throws IOException{
     	return getLines("streams.shp");
     }

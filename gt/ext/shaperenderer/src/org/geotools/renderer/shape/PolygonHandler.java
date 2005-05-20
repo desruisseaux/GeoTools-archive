@@ -177,7 +177,10 @@ public class PolygonHandler implements ShapeHandler {
 					continue;
 				}
 
-				transformed[partsInBBox] = new double[readDoubles];
+                if( readDoubles<8 )
+                    transformed[partsInBBox] = new double[8];                    
+                else
+                    transformed[partsInBBox] = new double[readDoubles];
 
 				if (!mt.isIdentity()) {
 					try {
@@ -193,7 +196,11 @@ public class PolygonHandler implements ShapeHandler {
 					System.arraycopy(coords[part], 0, transformed[partsInBBox],
 							0, readDoubles / 2);
 				}
-
+				if( readDoubles<8 ){
+				    for(int i=readDoubles; i<transformed[partsInBBox].length;i++){
+				        transformed[partsInBBox][i]=transformed[partsInBBox][i-2];
+                    }
+                }
 				partsInBBox++;
 			}
 			if (partsInBBox == 0)

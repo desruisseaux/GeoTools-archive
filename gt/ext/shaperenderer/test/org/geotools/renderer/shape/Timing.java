@@ -67,17 +67,17 @@ public class Timing {
 
 	private static boolean ALL_DATA = true;
 
-	private static boolean DISPLAY = true;
+	private static boolean DISPLAY = false;
 
 	private static boolean ANTI_ALIASING = true;
 
-	private static boolean RUN_SHAPE = true;
+	private static boolean RUN_SHAPE = false;
 
 	private static boolean RUN_LITE = true;
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = false;
+	private static boolean ACCURATE = true;
 
 	private static boolean CACHING = false;
 
@@ -87,7 +87,7 @@ public class Timing {
 
 	private static boolean CPU_PROFILE = false;
 
-	private static boolean LINES = false;
+	private static boolean LINES = true;
 	
 	private static boolean LABELING=false;
 
@@ -469,12 +469,12 @@ public class Timing {
 	private static String LINES_HOME_TYPE_NAME = "tcn-roads";
 	private static String LINES_HOME_LABEL = "STREET";
 
-	private static String LINES_FILE = LINES_HOME_FILE;
-	private static String LINES_TYPE_NAME = LINES_HOME_TYPE_NAME;
+	private static String LINES_FILE = LINES_WORK_FILE;
+	private static String LINES_TYPE_NAME = LINES_WORK_TYPE_NAME;
 	private static String LINES_LABEL = LINES_HOME_LABEL;	
 	
-	private static String POLY_FILE = NEW_YORK_HOME_FILE;
-	private static String POLY_TYPE_NAME = NEW_YORK_WORK_NAME;
+	private static String POLY_FILE = BC_FILE;
+	private static String POLY_TYPE_NAME = BC_NAME;
 	private static String POLY_LABEL = NEW_YORK_WORK_LABEL;
 
 	int w = 512, h = 512;
