@@ -26,6 +26,11 @@
       <version>2.1.x</version>
     </dependency>
     <dependency>
+      <artifactId>indexed-shapefile</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
       <version>2.1.x</version>

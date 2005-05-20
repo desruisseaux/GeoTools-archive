@@ -67,17 +67,17 @@ public class Timing {
 
 	private static boolean ALL_DATA = true;
 
-	private static boolean DISPLAY = false;
+	private static boolean DISPLAY = true;
 
 	private static boolean ANTI_ALIASING = true;
 
-	private static boolean RUN_SHAPE = false;
+	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = true;
+	private static boolean RUN_LITE = false;
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = true;
+	private static boolean ACCURATE = false;
 
 	private static boolean CACHING = false;
 
@@ -87,7 +87,7 @@ public class Timing {
 
 	private static boolean CPU_PROFILE = false;
 
-	private static boolean LINES = true;
+	private static boolean LINES = false;
 	
 	private static boolean LABELING=false;
 

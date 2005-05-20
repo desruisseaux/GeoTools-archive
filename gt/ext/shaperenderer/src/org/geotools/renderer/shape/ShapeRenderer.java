@@ -13,7 +13,9 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
@@ -42,6 +45,8 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
+import org.geotools.index.quadtree.StoreException;
+import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.CRS;
@@ -54,6 +59,7 @@ import org.geotools.renderer.lite.LiteCoordinateSequence;
 import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
 import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
+import org.geotools.renderer.shape.IndexInfo.Reader;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.styling.FeatureTypeStyle;
@@ -160,8 +166,29 @@ public class ShapeRenderer {
 
     private Object defaultGeom;
 
+	private IndexInfo[] layerHasIndex;
+
     public ShapeRenderer( MapContext context ) {
-        this.context = context;
+    	if( context==null )
+    		context=new DefaultMapContext();
+		
+    	this.context = context;
+		MapLayer[] layers = context.getLayers();
+		layerHasIndex=new IndexInfo[layers.length];
+		for (int i = 0; i < layers.length; i++) {
+			DataStore ds=layers[i].getFeatureSource().getDataStore();
+			assert ds instanceof ShapefileDataStore;
+			ShapefileDataStore sds=(ShapefileDataStore) ds;
+			try {
+				layerHasIndex[i]=useIndex(sds);
+			} catch (Exception e) {
+				try {
+					IndexInfo info=new IndexInfo(IndexInfo.TREE_NONE,null,null);
+				} catch (Exception e1) {
+					fireErrorEvent(e);
+				}
+			}
+		}
     }
 
     public void paint( Graphics2D graphics, Rectangle paintArea, Envelope envelope ) {
@@ -243,7 +270,8 @@ public class ShapeRenderer {
                 if (isCaching() && geometryCache.size() > 0)
                     processStylersCaching(graphics, ds, bbox, mt, currLayer.getStyle());
                 else
-                    processStylersNoCaching(graphics, ds, bbox, mt, currLayer.getStyle());
+					processStylersNoCaching(graphics, ds, bbox, mt, currLayer
+							.getStyle(), layerHasIndex[i]);
             } catch (Exception exception) {
                 fireErrorEvent(new Exception("Exception rendering layer " + currLayer, exception));
             }
@@ -255,17 +283,18 @@ public class ShapeRenderer {
                 + styleFactory.getHits() + ", requests " + styleFactory.getRequests());
     }
 
-    private void processStylersNoCaching( Graphics2D graphics, ShapefileDataStore datastore,
-            Envelope bbox, MathTransform mt, Style style ) throws IOException {
+	private void processStylersNoCaching(Graphics2D graphics,
+			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
+			Style style, IndexInfo info) throws IOException {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("processing " + style.getFeatureTypeStyles().length + " stylers");
         }
         FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
         FeatureType type;
-        ShapefileReader shpreader = null;
+        IndexInfo.Reader shpreader = null;
         try {
             type = createFeatureType(style, datastore.getSchema());
-            shpreader = ShapefileRendererUtil.getShpReader(datastore, bbox, mt);
+			shpreader = new IndexInfo.Reader(info,ShapefileRendererUtil.getShpReader(datastore, bbox, mt), bbox);
         } catch (Exception e) {
             fireErrorEvent(e);
             return;
@@ -329,7 +358,7 @@ public class ShapeRenderer {
                                 LOGGER.fine("trying to read geometry ...");
                             }
 
-                            ShapefileReader.Record record = shpreader.nextRecord();
+                            ShapefileReader.Record record = shpreader.next();
 
                             SimpleGeometry geom = (SimpleGeometry) record.shape();
                             if (geom == null) {
@@ -995,4 +1024,50 @@ public class ShapeRenderer {
     public void setConcatTransforms( boolean concatTransforms ) {
         this.concatTransforms = concatTransforms;
     }
+    
+
+	public IndexInfo useIndex(ShapefileDataStore ds) throws IOException, StoreException{
+		IndexInfo info;
+		String filename = null;
+		URL url = ShapefileRendererUtil.getshpURL(ds);
+        if (url==null) {
+            throw new NullPointerException("Null URL for ShapefileDataSource");
+        }
+
+        try {
+            filename = java.net.URLDecoder.decode(url.toString(), "US-ASCII");
+        } catch (java.io.UnsupportedEncodingException use) {
+            throw new java.net.MalformedURLException("Unable to decode " + url
+                + " cause " + use.getMessage());
+        }
+
+        filename = filename.substring(0, filename.length() - 4);
+
+        String grxext = ".grx";
+        String qixext = ".qix";
+        
+        if (ds.isLocal()) {
+            File grxTree = new File(new URL(filename + grxext).getPath());
+            File qixTree = new File(new URL(filename + qixext).getPath());
+            URL shx=new URL(filename + ".shx");
+            if (!grxTree.exists() && qixTree.exists()) {
+            	info=new IndexInfo(IndexInfo.TREE_QIX,
+            			new URL(filename + qixext),
+            			shx);
+                LOGGER.fine("Using qix tree");
+            } else if( !grxTree.exists() && !qixTree.exists()){
+                info=new IndexInfo(IndexInfo.TREE_GRX,
+            			new URL(filename + grxext),
+            			shx);
+                LOGGER.fine("Using grx tree");
+            }else{
+            	info=new IndexInfo(IndexInfo.TREE_NONE,null,null);
+            }
+        } else {
+        	info=new IndexInfo(IndexInfo.TREE_NONE,null,null);
+        }
+		return info;
+		
+	}
+
 }

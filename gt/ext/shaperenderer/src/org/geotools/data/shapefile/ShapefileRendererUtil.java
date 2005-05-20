@@ -17,6 +17,7 @@
 package org.geotools.data.shapefile;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.channels.ReadableByteChannel;
 
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
@@ -64,4 +65,9 @@ public class ShapefileRendererUtil {
 	public static ReadableByteChannel getShpReadChannel(ShapefileDataStore ds) throws IOException{
 		return ds.getReadChannel(ds.shpURL);
 	}
+	
+	public static URL getshpURL(ShapefileDataStore ds){
+		return ds.shpURL;
+	}
+	
 }
