@@ -16,7 +16,6 @@
  */
 package org.geotools.data.gtopo30;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,7 +24,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.gce.image.WorldImageWriter;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 
