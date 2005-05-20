@@ -2,13 +2,13 @@
 <project>
 	<pomVersion>3</pomVersion>
 	<extend>${basedir}/../../project.xml</extend>
-	<name>geotools-shapefile</name>
-	<id>shapefile</id>
+	<name>indexed-shapefile</name>
+	<id>indexed-shapefile</id>
 	<currentVersion>2.1.x</currentVersion>
 	<package>org.geotools</package>
-	<shortDescription>shapefile module</shortDescription>
+	<shortDescription>indexed shapefile module</shortDescription>
 	<gumpRepositoryId>geotools</gumpRepositoryId>
-	<description>shapefile module</description>
+	<description>indexed shapefile module</description>
 	<mailingLists/>
 	<developers>
 		<developer>

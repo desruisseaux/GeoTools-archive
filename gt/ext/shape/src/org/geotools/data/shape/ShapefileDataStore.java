@@ -977,7 +977,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      */
     protected Envelope getBounds(Query query) throws IOException {
         Envelope ret = null;
-        if (query == Query.ALL) {
+        if (query.getFilter() == Filter.NONE) {
             ret = getBounds();
         } else if (this.useIndex) {
             RTree rtree = this.openRTree();
@@ -1078,6 +1078,32 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                     }
                 };
         }
+    }
+    
+    
+    /**
+     * @see org.geotools.data.AbstractDataStore#getCount(org.geotools.data.Query)
+     */
+    protected int getCount( Query query ) throws IOException {
+        if( query.getFilter()==Filter.NONE ){
+            ShapefileReader reader=new ShapefileReader(getReadChannel(shpURL));
+            int count=-1;
+            try{
+                count = reader.getCount(count);
+            }catch (IOException e) {
+                throw e;
+            } finally {
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException ioe) {
+                    // do nothing
+                }
+            }
+            return count;
+        }
+        return super.getCount(query);
     }
     
     /**
