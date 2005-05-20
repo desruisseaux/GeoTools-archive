@@ -55,6 +55,7 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 import javax.units.UnitFormat;
@@ -182,11 +183,11 @@ class GTopo30DataSource {
         GeneralEnvelope env = null;
 
         try {
-            GT30Header header = new GT30Header(demHeaderURL);
-            double xmin = header.getULXMap() - (header.getXDim() / 2);
-            double ymax = header.getULYMap() + (header.getYDim() / 2);
-            double ymin = ymax - (header.getNRows() * header.getYDim());
-            double xmax = xmin + (header.getNCols() * header.getXDim());
+			final GT30Header header = new GT30Header(demHeaderURL);
+            final double xmin = header.getULXMap() - (header.getXDim() / 2);
+			final double ymax = header.getULYMap() + (header.getYDim() / 2);
+			final double ymin = ymax - (header.getNRows() * header.getYDim());
+			final double xmax = xmin + (header.getNCols() * header.getXDim());
 
             env = new GeneralEnvelope(new double[] { xmin, ymin },
                     new double[] { xmax, ymax });
@@ -224,7 +225,7 @@ class GTopo30DataSource {
 
     public GridCoverage getGridCoverage() throws DataSourceException {
         // Read the header
-        GT30Header header = null;
+		final GT30Header header ;
 
         try {
             header = new GT30Header(demHeaderURL);
@@ -242,7 +243,7 @@ class GTopo30DataSource {
 		final double miny = (header.getULYMap() + (ydim / 2)) - (ydim * nrows);
 
         // Read the statistics file
-        GT30Stats stats = null;
+		final GT30Stats stats ;
 
         try {
             stats = new GT30Stats(statsURL);
@@ -372,9 +373,9 @@ class GTopo30DataSource {
         //switch from -999 to NaN to keep transparency informations
         //for the gridcoverage
         BufferedImage img = new BufferedImage(band.getColorModel(),
-                this.getAdjustedRaster(
-                    (WritableRaster) image.createSnapshot().getAsBufferedImage().getRaster())
-                                          , false, null); // properties????
+                    (WritableRaster) image.copyData(),
+                    false,
+                    null); // properties????
 
         //setting metadata
         Map metadata = new HashMap();
@@ -400,73 +401,21 @@ class GTopo30DataSource {
             }
         }
 
-        return new GridCoverage2D(coverageName, img, crs, env,
-            new GridSampleDimension[] { band }, null, metadata);
+		//disposing the image read from disk
+		image.dispose();
+		
+		//returning the coverage
+        return new GridCoverage2D(coverageName,
+				img, 
+				crs, 
+				env,
+				new GridSampleDimension[] { band },
+				null,
+				metadata);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param raster
-     *
-     * @return
-     */
-    private WritableRaster getAdjustedRaster(WritableRaster raster) {
-        return raster; /*
-           int W=raster.getWidth();
-           int H=raster.getHeight();
-           WritableRaster returnedRaster= javax.media.jai.RasterFactory.createBandedRaster(
-                           DataBuffer.TYPE_FLOAT,
-                           W,
-                           H,
-                           raster.getNumBands(),//1
-                           null);
-           int sample=0;
-           for(int i=0;i<H;i++)
-                   for(int j=0;j<W;j++)
-                   {
-                           sample=raster.getSample(j,i,0);
-                           if(sample==-9999)
-                                   returnedRaster.setSample(j,i,0,Float.NaN);
-                           else
-                                   returnedRaster.setSample(j,i,0,(float)sample);
-                   }
-           raster=null;//free initial raster
-           return returnedRaster;*/
-    }
 
-    /**
-     * Convenience method to wrap a GridCoverage in a feature for inclusion in
-     * a FeatureCollection
-     *
-     * @param a the GridCoverage to be passed
-     * @param b DOCUMENT ME!
-     *
-     * @return a feature wrapping the grid coverage
-     */
-
-    /*
-     * private Feature wrapGcInFeature(GridCoverage gc) { // create surrounding
-     * polygon GeometryFactory gf = new GeometryFactory(); Rectangle2D rect =
-     * gc.getEnvelope().toRectangle2D(); Coordinate[] coord = new Coordinate[5];
-     * coord[0] = new Coordinate(rect.getMinX(), rect.getMinY()); coord[1] = new
-     * Coordinate(rect.getMaxX(), rect.getMinY()); coord[2] = new
-     * Coordinate(rect.getMaxX(), rect.getMaxY()); coord[3] = new
-     * Coordinate(rect.getMinX(), rect.getMaxY()); coord[4] = new
-     * Coordinate(rect.getMinX(), rect.getMinY()); Feature feature = null; try {
-     * LinearRing ring = gf.createLinearRing(coord); Polygon bounds =
-     * gf.createPolygon(ring, null); // create the feature type AttributeType
-     * geom = AttributeTypeFactory.newAttributeType("geom", Polygon.class);
-     * AttributeType grid = AttributeTypeFactory.newAttributeType("grid",
-     * GridCoverage.class); FeatureType schema = null; AttributeType[] attTypes =
-     * {geom, grid}; schema = FeatureTypeFactory.newFeatureType(attTypes,
-     * filename); // create the feature feature = schema.create(new Object[]
-     * {bounds, gc}); } catch (SchemaException e) { throw new
-     * RuntimeException("A schema exception occurred, that should not happen!",
-     * e); } catch (IllegalAttributeException e) { throw new
-     * RuntimeException("An illegal attribute exception occurred, that " +
-     * "should not happen!", e); } return feature; }
-     */
+  
 
     /**
      * DOCUMENT ME!

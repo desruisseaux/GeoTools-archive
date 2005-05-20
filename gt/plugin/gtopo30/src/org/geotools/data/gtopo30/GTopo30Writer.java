@@ -518,7 +518,7 @@ public class GTopo30Writer implements GridCoverageWriter {
 
 
         //get the data (actually a copy of them) and prepare to rewrite them
-        WritableRaster raster = surrogateImage.copyData();
+        WritableRaster raster = (WritableRaster) surrogateImage.getData();
 
         /**
          * Now we are going to use the first transparent color as it were the
@@ -628,7 +628,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     }
 
     /**
-     * DOCUMENT ME!
+     * Writing statistics file.
      *
      * @param coverage
      * @param file
@@ -698,7 +698,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     }
 
     /**
-     * DOCUMENT ME!
+     * Writing the world file.
      *
      * @param coverage
      * @param worldFile
@@ -768,7 +768,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     }
 
     /**
-     * DOCUMENT ME!
+     * Writing the DEM file for this gtopo30 coverage.
      *
      * @param coverage
      * @param dest DOCUMENT ME!
