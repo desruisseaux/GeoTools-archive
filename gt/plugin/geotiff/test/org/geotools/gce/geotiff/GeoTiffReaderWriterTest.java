@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 //import org.esa.beam.util.geotiff.GeoTIFFMetadata;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.gce.arcgrid.ArcGridReader;
+//import org.geotools.gce.arcgrid.ArcGridReader;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
 //import org.geotools.referencing.wkt.ParseWKT2GeoTiffMetadata;

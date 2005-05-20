@@ -75,6 +75,7 @@
           <directory>${basedir}/test</directory>
           <includes>
             <include>**/*.tif</include>
+            <include>**/*.jpg</include>
           </includes>
         </resource>
       </resources>

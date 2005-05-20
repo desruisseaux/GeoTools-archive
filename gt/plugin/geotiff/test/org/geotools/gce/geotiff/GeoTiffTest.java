@@ -58,6 +58,45 @@ public class GeoTiffTest extends TestCase {
   }
 
   /**
+   * Tests that the reader will refuse to read jpeg (a non-tiff)
+   */
+  public void testRefuseJpeg() throws IOException  { 
+    
+    GeoTiffFormat fmt = new GeoTiffFormat() ; 
+    File testFile = TestData.file(GeoTiffTest.class, "fire.jpg") ; 
+    assertNotNull("Framework error: no test data!", testFile) ; 
+
+    assertFalse("Accepting JPEGS!", fmt.accepts(testFile)) ; 
+  }
+
+  /**
+   * Tests that the reader will refuse to read tiff files without a 
+   * geokey directory (non-GeoTiffs)
+   */
+  public void testRefuseRegularTiff() throws IOException { 
+    
+    GeoTiffFormat fmt = new GeoTiffFormat() ; 
+    File testFile = TestData.file(GeoTiffTest.class, "fire.tif") ; 
+    assertNotNull("Framework error: no test data!", testFile) ; 
+
+    assertFalse("Accepting non-GeoTIFFs!", fmt.accepts(testFile)) ; 
+  }
+
+
+  /**
+   * Tests that the reader will refuse to read tiff files without a 
+   * geokey directory (non-GeoTiffs)
+   */
+  public void testAcceptGeoTiff() throws IOException { 
+    
+    GeoTiffFormat fmt = new GeoTiffFormat() ; 
+    File testFile = TestData.file(GeoTiffTest.class, "cir.tif") ; 
+    assertNotNull("Framework error: no test data!", testFile) ; 
+
+    assertTrue("Not accepting GeoTIFFs!", fmt.accepts(testFile)) ; 
+  }
+
+  /**
    * Tests that the GeoTiffReader can be instantiated directly.
    * NOTE: Users should never have to do this, but if it can't
    * be done, then nothing else will work.

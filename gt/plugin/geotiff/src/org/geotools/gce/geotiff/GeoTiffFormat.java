@@ -46,9 +46,10 @@ import java.util.HashMap;
  */
 public class GeoTiffFormat extends AbstractGridFormat implements Format {
     /** Indicates whether we need to rescale the input */
-    public static final ParameterDescriptor RESCALE = new ParameterDescriptor("Rescale",
-            "Indicates whether we need to rescale the input", Boolean.TRUE, true);
-
+    public static final ParameterDescriptor RESCALE = new ParameterDescriptor(
+        "Rescale", "Indicates whether we need to rescale the input", 
+        Boolean.TRUE, true);
+  
     /**
      * Creates a new instance of GeoTiffFormat
      */
@@ -78,11 +79,17 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
      * @return true if "o" is a file.
      */
     public boolean accepts(Object o) {
+        boolean goodfile = false ;
         if (o instanceof CatalogEntry) { 
           o = ((CatalogEntry)o).resource() ; 
         }
 
-        return o instanceof File;
+        goodfile = o instanceof File;
+        if (goodfile) { 
+          goodfile = GeoTiffReader.isGeoTiffFile((File)o) ;
+        }
+
+        return goodfile ; 
     }
 
     /**
