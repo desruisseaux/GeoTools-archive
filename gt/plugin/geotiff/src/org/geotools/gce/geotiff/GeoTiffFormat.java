@@ -8,7 +8,7 @@
  * changed, copied, or redistributed, with or without permission of the
  * authors, for free or for compensation.  You may not claim exclusive
  * ownership of this code because it is already owned by everyone.  Use this
- * software entirely at your own risk.  No warranty of any kind is given.
+ * software entirely at your own risk.  No warranty of any kind is given. 
  *
  * A copy of 17-USC-105 should have accompanied this distribution in the file
  * 17USC105.html.  If not, you may access the law via the US Government's
@@ -18,13 +18,13 @@
  */
 package org.geotools.gce.geotiff;
 
+import org.geotools.catalog.CatalogEntry;
 
 // Geotools dependencies
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.parameter.ParameterDescriptor;
 import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.catalog.CatalogEntry ; 
 
 // GeoAPI dependencies
 import org.opengis.coverage.grid.Format;
@@ -46,10 +46,9 @@ import java.util.HashMap;
  */
 public class GeoTiffFormat extends AbstractGridFormat implements Format {
     /** Indicates whether we need to rescale the input */
-    public static final ParameterDescriptor RESCALE = new ParameterDescriptor(
-        "Rescale", "Indicates whether we need to rescale the input", 
-        Boolean.TRUE, true);
-  
+    public static final ParameterDescriptor RESCALE = new ParameterDescriptor("Rescale",
+            "Indicates whether we need to rescale the input", Boolean.TRUE, true);
+
     /**
      * Creates a new instance of GeoTiffFormat
      */
@@ -79,17 +78,19 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
      * @return true if "o" is a file.
      */
     public boolean accepts(Object o) {
-        boolean goodfile = false ;
-        if (o instanceof CatalogEntry) { 
-          o = ((CatalogEntry)o).resource() ; 
+        boolean goodfile = false;
+
+        if (o instanceof CatalogEntry) {
+            o = ((CatalogEntry) o).resource();
         }
 
         goodfile = o instanceof File;
-        if (goodfile) { 
-          goodfile = GeoTiffReader.isGeoTiffFile((File)o) ;
+
+        if (goodfile) {
+            goodfile = GeoTiffReader.isGeoTiffFile((File) o);
         }
 
-        return goodfile ; 
+        return goodfile;
     }
 
     /**
@@ -101,8 +102,8 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
      * @return DOCUMENT ME!
      */
     public GridCoverageReader getReader(Object source) {
-        if (source instanceof CatalogEntry) { 
-            source = ((CatalogEntry)source).resource() ; 
+        if (source instanceof CatalogEntry) {
+            source = ((CatalogEntry) source).resource();
         }
 
         GridCoverageReader reader = null;

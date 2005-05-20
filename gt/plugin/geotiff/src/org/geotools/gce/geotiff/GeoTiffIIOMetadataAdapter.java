@@ -1,4 +1,22 @@
 /*
+ * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
+ *
+ * This work was created by employees of the USDA Forest Service's
+ * Fire Science Lab for internal use.  It is therefore ineligible for
+ * copyright under title 17, section 105 of the United States Code.  You
+ * may treat it as you would treat any public domain work: it may be used,
+ * changed, copied, or redistributed, with or without permission of the
+ * authors, for free or for compensation.  You may not claim exclusive
+ * ownership of this code because it is already owned by everyone.  Use this
+ * software entirely at your own risk.  No warranty of any kind is given. 
+ *
+ * A copy of 17-USC-105 should have accompanied this distribution in the file
+ * 17USC105.html.  If not, you may access the law via the US Government's
+ * public websites:
+ *   - http://www.copyright.gov/title17/92chap1.html#105
+ *   - http://www.gpoaccess.gov/uscode/  (enter "17USC105" in the search box.)
+ */
+/*
  * (c) 2004 Mike Nidel
  *
  * Take, Modify, Distribute freely
@@ -127,8 +145,8 @@ public class GeoTiffIIOMetadataAdapter {
     public static final int GeogGeodeticDatumGeoKey = 2050;
 
     /**
-     * GeogPrimeMeridianGeoKey Key ID = 2051 Type = SHORT (code) Units:
-     * Section 6.3.2.4 code
+     * GeogPrimeMeridianGeoKey Key ID = 2051 Type = SHORT (code) Units: Section
+     * 6.3.2.4 code
      * http://www.remotesensing.org/geotiff/spec/geotiff6.html#6.3.2.4 Allows
      * specification of the location of the Prime meridian for user-defined
      * geographic coordinate systems. The default standard is Greenwich,
@@ -276,8 +294,8 @@ public class GeoTiffIIOMetadataAdapter {
     public static final int ProjCoordTransGeoKey = 3075;
 
     /**
-     * ProjLinearUnitsGeoKey Key ID = 3076  Type = SHORT (code) Values:
-     * Section 6.3.1.3 codes  Defines linear units used by this projection.
+     * ProjLinearUnitsGeoKey Key ID = 3076  Type = SHORT (code) Values: Section
+     * 6.3.1.3 codes  Defines linear units used by this projection.
      * http://www.remotesensing.org/geotiff/spec/geotiff6.html#6.3.1.3
      */
     public static final int ProjLinearUnitsGeoKey = 3076;
@@ -469,20 +487,19 @@ public class GeoTiffIIOMetadataAdapter {
      * 65535] = Private User Implementations GeoTIFF defined CS Model Type
      * Codes: ModelTypeProjected   = 1    Projection Coordinate System
      * ModelTypeGeographic  = 2    Geographic latitude-longitude System
-     * ModelTypeGeocentric  = 3    Geocentric (X,Y,Z) Coordinate System
-     * Notes: 1. ModelTypeGeographic and ModelTypeProjected correspond to the
-     * FGDC metadata Geographic and Planar-Projected coordinate system types.
+     * ModelTypeGeocentric  = 3    Geocentric (X,Y,Z) Coordinate System Notes:
+     * 1. ModelTypeGeographic and ModelTypeProjected correspond to the FGDC
+     * metadata Geographic and Planar-Projected coordinate system types.
      */
     public static final int ModelTypeProjected = 1;
     public static final int ModelTypeGeographic = 2;
     public static final int ModelTypeGeocentric = 3;
 
     /**
-     * 6.3.1.2 Raster Type Codes Ranges: 0             = undefined [   1,
-     * 1023] = Raster Type Codes (GeoTIFF Defined) [1024, 32766] = Reserved
-     * 32767         = user-defined [32768, 65535]= Private User
-     * Implementations Note: Use of "user-defined" or "undefined" raster codes
-     * is not recommended.
+     * 6.3.1.2 Raster Type Codes Ranges: 0             = undefined [   1, 1023]
+     * = Raster Type Codes (GeoTIFF Defined) [1024, 32766] = Reserved 32767
+     * = user-defined [32768, 65535]= Private User Implementations Note:
+     * Use of "user-defined" or "undefined" raster codes is not recommended.
      */
     public static final int RasterPixelIsArea = 1;
     public static final int RasterPixelIsPoint = 2;

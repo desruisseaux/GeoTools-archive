@@ -8,7 +8,7 @@
  * changed, copied, or redistributed, with or without permission of the
  * authors, for free or for compensation.  You may not claim exclusive
  * ownership of this code because it is already owned by everyone.  Use this
- * software entirely at your own risk.  No warranty of any kind is given.
+ * software entirely at your own risk.  No warranty of any kind is given. 
  *
  * A copy of 17-USC-105 should have accompanied this distribution in the file
  * 17USC105.html.  If not, you may access the law via the US Government's
@@ -171,12 +171,13 @@ public class GeoTiffCoordinateSystemAdapter {
 
         // these are optional, but will reduce the functionality if they are
         // not found.
-        csFactory = null ; 
-        datumFactory = null ; 
-        try { 
+        csFactory = null;
+        datumFactory = null;
+
+        try {
             csFactory = FactoryFinder.getCSAuthorityFactory("EPSG", hints);
             datumFactory = FactoryFinder.getDatumAuthorityFactory("EPSG", hints);
-        } catch (FactoryRegistryException fre) { 
+        } catch (FactoryRegistryException fre) {
             ; // do nothing.  Leave them set to null!
         }
 
@@ -311,9 +312,9 @@ public class GeoTiffCoordinateSystemAdapter {
                 gcs = crsFactory.createGeographicCRS("EPSG:" + geogCode);
             } catch (FactoryException fe) {
                 GeoTiffException gte = new GeoTiffException(metadata,
-                    "Invalid EPSG code in GeographicTypeGeoKey");
-                gte.initCause(fe) ; 
-                throw gte ; 
+                        "Invalid EPSG code in GeographicTypeGeoKey");
+                gte.initCause(fe);
+                throw gte;
             }
         }
 
@@ -425,17 +426,19 @@ public class GeoTiffCoordinateSystemAdapter {
                         throw io;
                     }
                 } else {
-                    if (datumFactory == null) { 
-                        throw new GeoTiffException(metadata, 
+                    if (datumFactory == null) {
+                        throw new GeoTiffException(metadata,
                             "This geotiff file requires a DatumAuthorityFactory");
                     }
+
                     pm = datumFactory.createPrimeMeridian("EPSG:" + pmCode);
                 }
             } else {
-                if (datumFactory == null) { 
-                    throw new GeoTiffException(metadata, 
+                if (datumFactory == null) {
+                    throw new GeoTiffException(metadata,
                         "This geotiff file requires a DatumAuthorityFactory");
                 }
+
                 pm = datumFactory.createPrimeMeridian(PM_Greenwich);
             }
         } catch (FactoryException fe) {
@@ -472,13 +475,14 @@ public class GeoTiffCoordinateSystemAdapter {
         }
 
         // The DatumAuthorityFactory must exist.
-        if (datumFactory == null) { 
-            throw new GeoTiffException(metadata, 
+        if (datumFactory == null) {
+            throw new GeoTiffException(metadata,
                 "This geotiff file requires a DatumAuthorityFactory");
         }
 
         try {
-            datum = (GeodeticDatum) (datumFactory.createDatum("EPSG:"+datumCode));
+            datum = (GeodeticDatum) (datumFactory.createDatum("EPSG:"
+                    + datumCode));
         } catch (FactoryException fe) {
             throw new GeoTiffException(metadata, "Problem creating datum.");
         } catch (ClassCastException cce) {
@@ -507,6 +511,7 @@ public class GeoTiffCoordinateSystemAdapter {
      * an angular unit definition (if not degrees)
      * </li>
      * </ul>
+     * 
      *
      * @return DOCUMENT ME!
      *
@@ -664,9 +669,10 @@ public class GeoTiffCoordinateSystemAdapter {
             try {
                 // first check that the csFactory exists.
                 if (csFactory == null) {
-                    throw new GeoTiffException(metadata, 
+                    throw new GeoTiffException(metadata,
                         "This GeoTIFF file requires a CSAuthorityFactory.");
                 }
+
                 retval = csFactory.createUnit("EPSG:" + unitCode);
             } catch (FactoryException fe) {
                 IOException io = new GeoTiffException(metadata,

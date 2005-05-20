@@ -1,4 +1,22 @@
 /*
+ * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
+ *
+ * This work was created by employees of the USDA Forest Service's
+ * Fire Science Lab for internal use.  It is therefore ineligible for
+ * copyright under title 17, section 105 of the United States Code.  You
+ * may treat it as you would treat any public domain work: it may be used,
+ * changed, copied, or redistributed, with or without permission of the
+ * authors, for free or for compensation.  You may not claim exclusive
+ * ownership of this code because it is already owned by everyone.  Use this
+ * software entirely at your own risk.  No warranty of any kind is given. 
+ *
+ * A copy of 17-USC-105 should have accompanied this distribution in the file
+ * 17USC105.html.  If not, you may access the law via the US Government's
+ * public websites:
+ *   - http://www.copyright.gov/title17/92chap1.html#105
+ *   - http://www.gpoaccess.gov/uscode/  (enter "17USC105" in the search box.)
+ */
+/*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2002, Geotools Project Managment Committee (PMC)
@@ -27,9 +45,11 @@ import junit.framework.TestCase;
 //import org.esa.beam.util.geotiff.GeoTIFFMetadata;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+
 //import org.geotools.gce.arcgrid.ArcGridReader;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
+
 //import org.geotools.referencing.wkt.ParseWKT2GeoTiffMetadata;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
@@ -39,7 +59,6 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-
 import javax.media.jai.PlanarImage;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -133,34 +152,32 @@ public class GeoTiffReaderWriterTest { // extends TestCase {
 
     public static void testWriter()
         throws IllegalArgumentException, IOException {
-//        File file = new File(
-//                "c:\\Programmi\\Apache Software Foundation\\Tomcat 5.0\\webapps\\geoserver\\data\\coverages\\arc_sample\\a.asc");
-//
-//        //getting a reader
-//        AbstractGridFormat format = new GeoTiffFormat();
-//
-//        if (format.accepts(file)) {
-//            GridCoverageReader reader = new ArcGridReader( file);
-//
-//            if (reader != null) {
-//                //reading the coverage
-//                GridCoverage2D gc = (GridCoverage2D) reader.read(null);
-//
-//                if (gc != null) {
-//                    GridCoverageWriter writer = new GeoTiffWriter(new File(
-//                                "c:\\a.tiff"));
-//                    writer.write(gc, null);
-//                }
-//				}
-//        }
-    	String wkt = "PROJCS[\"UTM_Zone_10N\", "
-            + "GEOGCS[\"WGS84\", "
-                + "DATUM[\"WGS84\", "
-                + "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], "
-                + "PRIMEM[\"Greenwich\", 0.0], "
-                + "UNIT[\"degree\",0.017453292519943295], "
-                + "AXIS[\"Longitude\",EAST], "
-                + "AXIS[\"Latitude\",NORTH]], "
+        //        File file = new File(
+        //                "c:\\Programmi\\Apache Software Foundation\\Tomcat 5.0\\webapps\\geoserver\\data\\coverages\\arc_sample\\a.asc");
+        //
+        //        //getting a reader
+        //        AbstractGridFormat format = new GeoTiffFormat();
+        //
+        //        if (format.accepts(file)) {
+        //            GridCoverageReader reader = new ArcGridReader( file);
+        //
+        //            if (reader != null) {
+        //                //reading the coverage
+        //                GridCoverage2D gc = (GridCoverage2D) reader.read(null);
+        //
+        //                if (gc != null) {
+        //                    GridCoverageWriter writer = new GeoTiffWriter(new File(
+        //                                "c:\\a.tiff"));
+        //                    writer.write(gc, null);
+        //                }
+        //				}
+        //        }
+        String wkt = "PROJCS[\"UTM_Zone_10N\", " + "GEOGCS[\"WGS84\", "
+            + "DATUM[\"WGS84\", "
+            + "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]], "
+            + "PRIMEM[\"Greenwich\", 0.0], "
+            + "UNIT[\"degree\",0.017453292519943295], "
+            + "AXIS[\"Longitude\",EAST], " + "AXIS[\"Latitude\",NORTH]], "
             + "PROJECTION[\"Transverse_Mercator\"], "
             + "PARAMETER[\"semi_major\", 6378137.0], "
             + "PARAMETER[\"semi_minor\", 6356752.314245179], "
@@ -168,19 +185,18 @@ public class GeoTiffReaderWriterTest { // extends TestCase {
             + "PARAMETER[\"latitude_of_origin\", 0.0], "
             + "PARAMETER[\"scale_factor\", 0.9996], "
             + "PARAMETER[\"false_easting\", 500000.0], "
-            + "PARAMETER[\"false_northing\", 0.0], "
-            + "UNIT[\"metre\",1.0], "
-            + "AXIS[\"x\",EAST], "
-            + "AXIS[\"y\",NORTH]]";
-    	//GeoTIFFMetadata metadata=new GeoTIFFMetadata();
-    	//ParseWKT2GeoTiffMetadata parser=new ParseWKT2GeoTiffMetadata(wkt,metadata);
-//    	try {
-//			parser.parseCoordinateReferenceSystem();
-//		} catch (ParseException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//    	
-//    	System.out.println(metadata.getAsXML());
+            + "PARAMETER[\"false_northing\", 0.0], " + "UNIT[\"metre\",1.0], "
+            + "AXIS[\"x\",EAST], " + "AXIS[\"y\",NORTH]]";
+
+        //GeoTIFFMetadata metadata=new GeoTIFFMetadata();
+        //ParseWKT2GeoTiffMetadata parser=new ParseWKT2GeoTiffMetadata(wkt,metadata);
+        //    	try {
+        //			parser.parseCoordinateReferenceSystem();
+        //		} catch (ParseException e) {
+        //			// TODO Auto-generated catch block
+        //			e.printStackTrace();
+        //		}
+        //    	
+        //    	System.out.println(metadata.getAsXML());
     }
 }

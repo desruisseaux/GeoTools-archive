@@ -8,7 +8,7 @@
  * changed, copied, or redistributed, with or without permission of the
  * authors, for free or for compensation.  You may not claim exclusive
  * ownership of this code because it is already owned by everyone.  Use this
- * software entirely at your own risk.  No warranty of any kind is given.
+ * software entirely at your own risk.  No warranty of any kind is given. 
  *
  * A copy of 17-USC-105 should have accompanied this distribution in the file
  * 17USC105.html.  If not, you may access the law via the US Government's
@@ -126,7 +126,6 @@ public class GeoTiffException extends IOException {
     public GeoTiffIIOMetadataAdapter.GeoKeyRecord[] getGeoKeys() {
         return this.geoKeys;
     }
-
 
     public String getMessage() {
         StringWriter text = new StringWriter(1024);

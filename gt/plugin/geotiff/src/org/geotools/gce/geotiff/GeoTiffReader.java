@@ -8,7 +8,7 @@
  * changed, copied, or redistributed, with or without permission of the
  * authors, for free or for compensation.  You may not claim exclusive
  * ownership of this code because it is already owned by everyone.  Use this
- * software entirely at your own risk.  No warranty of any kind is given.
+ * software entirely at your own risk.  No warranty of any kind is given. 
  *
  * A copy of 17-USC-105 should have accompanied this distribution in the file
  * 17USC105.html.  If not, you may access the law via the US Government's
@@ -96,33 +96,41 @@ public class GeoTiffReader implements GridCoverageReader {
 
     /**
      * Static method checks the given file to ensure that:
+     * 
      * <ul>
-     * <li> It's a TIFF file.
-     * <li> It contains GeoTIFF tags.
+     * <li>
+     * It's a TIFF file.
+     * </li>
+     * <li>
+     * It contains GeoTIFF tags.
+     * </li>
      * </ul>
+     * 
      * \return TRUE if the file is a GeoTiff file.
+     *
+     * @param file DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
-    public static boolean isGeoTiffFile(File file) { 
-        RenderedOp img = JAI.create("ImageRead", file) ; 
+    public static boolean isGeoTiffFile(File file) {
+        RenderedOp img = JAI.create("ImageRead", file);
 
         // Get the metadata object.
-        IIOMetadata check = (IIOMetadata)
-          (img.getProperty(ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE)) ;
-        GeoTiffIIOMetadataAdapter metadata = 
-          new GeoTiffIIOMetadataAdapter(check);
+        IIOMetadata check = (IIOMetadata) (img.getProperty(ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE));
+        GeoTiffIIOMetadataAdapter metadata = new GeoTiffIIOMetadataAdapter(check);
 
         // does the GeoKey Directory exist? 
-        boolean geoTiffFile = false ; 
+        boolean geoTiffFile = false;
+
         try {
-          metadata.getGeoKeyDirectoryVersion() ; 
-          geoTiffFile = true ; 
+            metadata.getGeoKeyDirectoryVersion();
+            geoTiffFile = true;
         } catch (UnsupportedOperationException ue) {
-          // this state is captured by the geoTiffFile flag == false
+            // this state is captured by the geoTiffFile flag == false
         }
 
-        return geoTiffFile ; 
+        return geoTiffFile;
     }
-
 
     public void dispose() {
         image.dispose();
@@ -198,7 +206,6 @@ public class GeoTiffReader implements GridCoverageReader {
         gtcs.setMetadata(metadata);
 
         CoordinateReferenceSystem crs = gtcs.createCoordinateSystem();
-        
 
         //rescale image if needed to enhane the dynamic
         image = rescaleIfNeeded(image);
@@ -250,36 +257,45 @@ public class GeoTiffReader implements GridCoverageReader {
         switch (transferType) {
         case DataBuffer.TYPE_BYTE:
             dynamicAcme = 255;
+
             break;
 
         case DataBuffer.TYPE_USHORT:
             dynamicAcme = 65535;
+
             break;
 
         case DataBuffer.TYPE_INT:
             dynamicAcme = 16777215;
+
             break;
+
         case DataBuffer.TYPE_DOUBLE:
-        	dynamicAcme=Double.MAX_VALUE;
-        	break;
+            dynamicAcme = Double.MAX_VALUE;
+
+            break;
+
         case DataBuffer.TYPE_FLOAT:
-        	dynamicAcme=Float.MAX_VALUE;
-        	break;
-        	
+            dynamicAcme = Float.MAX_VALUE;
+
+            break;
         }
 
         pb.addSource(image2);
 
         //rescaling each band
-        double[] scale=new double[ extrema[0].length];
-        double[] offset=new double[ extrema[0].length];
+        double[] scale = new double[extrema[0].length];
+        double[] offset = new double[extrema[0].length];
+
         for (int i = 0; i < extrema[0].length; i++) {
-        	scale[i]=dynamicAcme / (extrema[1][i] - extrema[0][i]);
-            offset[i]=-((dynamicAcme * extrema[0][i]) / (extrema[1][i]
+            scale[i] = dynamicAcme / (extrema[1][i] - extrema[0][i]);
+            offset[i] = -((dynamicAcme * extrema[0][i]) / (extrema[1][i]
                 - extrema[0][i]));
         }
+
         pb.add(scale);
         pb.add(offset);
+
         RenderedOp image2return = JAI.create("rescale", pb);
 
         return image2return;
