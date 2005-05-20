@@ -269,8 +269,9 @@ public class WorldImageReader implements GridCoverageReader {
 
             while ((str = in.readLine()) != null) {
                 if ((world_type == WORLD_WLD) || (world_type == WORLD_BASE)) {
-                    try {
-                    	float value = Float.parseFloat(str.trim());
+                    float value = (float) 0;
+		    try {
+                    	value = Float.parseFloat(str.trim());
                     } catch(Exception e) {
                     	// A trick to bypass invalid lines ...
                     	continue;
