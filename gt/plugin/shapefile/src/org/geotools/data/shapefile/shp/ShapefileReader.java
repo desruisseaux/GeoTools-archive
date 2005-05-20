@@ -394,11 +394,37 @@ public class ShapefileReader {
     return record;
   }
   
+  /**
+   * Needs better data, what is the requirements for offset?
+   * @param offset
+   * @return
+   * @throws IOException
+   * @throws UnsupportedOperationException
+   */
   public Object shapeAt(int offset) throws IOException,UnsupportedOperationException {
     if (randomAccessEnabled) {
       buffer.position(offset);
       hasNext();
       return nextRecord().shape();
+    }
+    throw new UnsupportedOperationException("Random Access not enabled");
+  }
+  
+	/**
+	 * Sets the current location of the byteStream to offset and returns the next record.
+	 * Usually used in conjuctions with the shx file or some other index file.
+	 * 
+	 * @param offset If using an shx file the offset would be: 2 * (index.getOffset(i))
+	 * @return The record after the offset location in the bytestream
+	 * @throws IOException thrown in a read error occurs
+	 * @throws UnsupportedOperationException  thrown if not a random access file
+	 */
+
+  public Record recordAt(int offset) throws IOException,UnsupportedOperationException {
+    if (randomAccessEnabled) {
+      buffer.position(offset-50);
+      hasNext();
+      return nextRecord();
     }
     throw new UnsupportedOperationException("Random Access not enabled");
   }
