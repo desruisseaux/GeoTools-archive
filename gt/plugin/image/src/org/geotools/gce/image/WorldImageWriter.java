@@ -16,7 +16,6 @@
  */
 package org.geotools.gce.image;
 
-import java.awt.BorderLayout;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -46,11 +45,6 @@ import javax.media.jai.KernelJAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.parameter.Parameter;
@@ -577,7 +571,7 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         ImageLayout layout = new ImageLayout();
         ColorModel cm1 = null;
-        int numBits = 0;
+        final int numBits;
 
         switch (surrogateImage.getSampleModel().getTransferType()) {
         case DataBuffer.TYPE_BYTE:
@@ -607,7 +601,7 @@ public class WorldImageWriter implements GridCoverageWriter {
         }
 
         //do we need alpha?
-		int transparency=surrogateImage.getColorModel().getTransparency();
+		final int transparency=surrogateImage.getColorModel().getTransparency();
 		final int transpPixel=((IndexColorModel)surrogateImage.getColorModel()).getTransparentPixel();
         if (transparency!=Transparency.OPAQUE) {
             cm1 = new ComponentColorModel(ColorSpace.getInstance(
@@ -771,8 +765,10 @@ public class WorldImageWriter implements GridCoverageWriter {
 		rgba[2][transparencyIndex]=0;
 		
         //get the data (actually a copy of them) and prepare to rewrite them
-        WritableRaster rasterGIF = surrogateImage.copyData();
-		final Raster rasterAlpha=alphaChannel.getData();
+        final WritableRaster rasterGIF = surrogateImage.copyData();
+		final Raster rasterAlpha=((PlanarImage)alphaChannel).copyData();
+		((PlanarImage)alphaChannel).dispose();
+		
         /**
          * Now we are going to use the first transparent color as it were the
          * transparent color and we point all the tranpsarent pixel to this
@@ -784,18 +780,18 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         boolean foundFullyTransparent=false;
         
-		
-        for (int i = rasterGIF.getMinY(); i < rasterGIF.getHeight(); i++) {
-            for (int j = rasterGIF.getMinX(); j < rasterGIF.getWidth(); j++) {
+		final int minX=rasterGIF.getMinX();
+		final int minY=rasterGIF.getMinY();
+		final int W=rasterGIF.getWidth();
+		final int H=rasterGIF.getHeight();
+        for (int i = minY; i <H ; i++) {
+            for (int j = minX; j < W; j++) {
 
                 //check for transparency
                 if (rasterAlpha.getSample(j,i,0)== 0) {
                     //FULLY TRANSPARENT PIXEL
-	
 					foundFullyTransparent=true;
-					//System.out.println(rasterGIF.getSample(j, i, 0));
                     rasterGIF.setSample(j, i, 0,transparencyIndex );
-					//System.out.println(rasterGIF.getSample(j, i, 0));
                 }
             }
         }
@@ -921,7 +917,8 @@ public class WorldImageWriter implements GridCoverageWriter {
         double[] scale = new double[extrema[0].length];
         double[] offset = new double[extrema[0].length];
 
-        for (int i = 0; i < extrema[0].length; i++) {
+		final int length=extrema[0].length;
+        for (int i = 0; i < length; i++) {
             scale[i] = 255 / (extrema[1][i] - extrema[0][i]);
             offset[i] = -((255 * extrema[0][i]) / (extrema[1][i] -
                 extrema[0][i]));
@@ -945,77 +942,5 @@ public class WorldImageWriter implements GridCoverageWriter {
         return image2return;
     }
 
-    //	private RenderedImage highlightImage(RenderedImage stillImg) {
-    //        RenderedImage dispImg = null;
-    //
-    //        // Highlight the human pixels (detection results img)
-    //        // Create a constant image
-    //        Byte[] bandValues = new Byte[1];
-    //
-    //        bandValues[0] = new Byte("65"); //32 -- orangeish, 65 -- greenish
-    //
-    //        ParameterBlock pbConstant = new ParameterBlock();
-    //
-    //        pbConstant.add(new Float(stillImg.getWidth())); // The width
-    //
-    //        pbConstant.add(new Float(stillImg.getHeight())); // The height
-    //
-    //        pbConstant.add(bandValues); // The band values
-    //
-    //        PlanarImage imgConstant = (PlanarImage) JAI.create("constant",
-    //                pbConstant);
-    //
-    //        //System.out.println("Making multiply image");
-    //        // Multiply the mask by 255 so the values are 0 or 255
-    //        ParameterBlock pbMultiply = new ParameterBlock();
-    //
-    //        pbMultiply.addSource((PlanarImage) stillImg);
-    //
-    //        double[] multiplyArray = new double[] { 255.0 };
-    //
-    //        pbMultiply.add(multiplyArray);
-    //
-    //        PlanarImage imgMask = (PlanarImage) JAI.create("multiplyconst",
-    //                pbMultiply);
-    //
-    //        //System.out.println("Making IHS image");
-    //        // Create a Intensity, Hue, Saturation image
-    //        ParameterBlock pbIHS = new ParameterBlock();
-    //
-    //        pbIHS.setSource(stillImg, 0); //still img is the intensity
-    //
-    //        pbIHS.setSource(imgConstant, 1); //constant img is the hue
-    //
-    //        pbIHS.setSource(imgMask, 2); //mask is the saturation
-    //
-    //        //create rendering hint for IHS image to specify the color model
-    //        ComponentColorModel IHS_model = new ComponentColorModel(IHSColorSpace
-    //                .getInstance(), new int[] { 8, 8, 8 }, false, false,
-    //                Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
-    //
-    //        ImageLayout layout = new ImageLayout();
-    //
-    //        layout.setColorModel(IHS_model);
-    //
-    //        RenderingHints rh = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-    //
-    //        PlanarImage IHSImg = JAI.create("bandmerge", pbIHS, rh);
-    //
-    //        //System.out.println("Making RGB image");
-    //        // Convert IHS image to a RGB image
-    //        ParameterBlock pbRGB = new ParameterBlock();
-    //
-    //        //create rendering hint for RGB image to specify the color model
-    //        ComponentColorModel RGB_model = new ComponentColorModel(ColorSpace
-    //                .getInstance(ColorSpace.CS_sRGB), new int[] { 8, 8, 8 }, false,
-    //                false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
-    //
-    //        pbRGB.addSource(IHSImg);
-    //
-    //        pbRGB.add(RGB_model);
-    //
-    //        dispImg = JAI.create("colorconvert", pbRGB);
-    //
-    //        return dispImg;
-    //    }
+   
 }
