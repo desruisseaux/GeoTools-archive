@@ -35,6 +35,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.crs.ReprojectFeatureReader;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -51,7 +52,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
-import org.geotools.referencing.operation.CoordinateOperationFactory;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.Renderer;
 import org.geotools.renderer.Renderer2D;
@@ -71,8 +72,10 @@ import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -114,7 +117,16 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
     /** Filter factory for creating bounding box filters */
     private FilterFactory filterFactory = FilterFactory.createFilterFactory();
-    CoordinateOperationFactory operationFactory = new CoordinateOperationFactory();
+    private final static CoordinateOperationFactory operationFactory;
+    static {
+        Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+        operationFactory=FactoryFinder.getCoordinateOperationFactory(hints);
+    }
+    private final static MathTransformFactory mathTransformFactory;
+    static {
+        Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+        mathTransformFactory=FactoryFinder.getMathTransformFactory(hints);
+    }
 
     /**
      * Context which contains the layers and the bouning box which needs to be rendered.
@@ -1055,13 +1067,13 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     	// producing the correct coordinate system
                         transform = getMathTransform(crs, destinationCrs);
                         if (transform != null) {
-                            transform = (MathTransform2D) operationFactory.getMathTransformFactory()
+                            transform = (MathTransform2D) mathTransformFactory
                                     .createConcatenatedTransform(
                                             transform,
-                                            operationFactory.getMathTransformFactory().createAffineTransform(
+                                            mathTransformFactory.createAffineTransform(
                                                     new GeneralMatrix(at)));
                         } else {
-                            transform = (MathTransform2D) operationFactory.getMathTransformFactory()
+                            transform = (MathTransform2D) mathTransformFactory
                                     .createAffineTransform(new GeneralMatrix(at));
                         }
                     } catch (Exception e) {

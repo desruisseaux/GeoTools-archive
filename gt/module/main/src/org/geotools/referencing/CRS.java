@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 // OpenGIS dependencies
+import org.geotools.factory.Hints;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
@@ -79,6 +80,28 @@ public class CRS {
         public Object  factory( CoordinateOperationFactory factory ) throws FactoryException;
     }
 
+
+    /**
+     * Grab transform between two CoordianteReference Systems.
+     * <p>
+     * Sample use:<pre><code>
+     * MathTransform transform = CRS.transform( CRS.decode("EPSG:42102"), CRS.decode("EPSG:4326") ); 
+     * </code></pre>
+     * </p>
+     * 
+     * @param from
+     * @param to
+     * @param lenientTransforms if true then the transforms created will not throw bursa wolf required exception during datum
+     * shifts if the bursa wolf paramaters are not specified. Instead it will assume a no datum shift.
+     * @return MathTransform, or null if unavailable
+     * @throws FactoryException only if MathTransform is unavailable due to error
+     */
+    public static MathTransform transform( final CoordinateReferenceSystem from, final CoordinateReferenceSystem to, boolean lenientTransforms ) throws FactoryException {
+        if( lenientTransforms )
+            return FactoryFinder.getCoordinateOperationFactory(new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE)).createOperation(from, to).getMathTransform();
+        else
+            return transform(from, to);
+    }
     /**
      * Grab transform between two CoordianteReference Systems.
      * <p>
@@ -95,8 +118,8 @@ public class CRS {
     public static MathTransform transform( final CoordinateReferenceSystem from, final CoordinateReferenceSystem to ) throws FactoryException {
         List list = visit( new OperationVisitor() {
             public Object factory( CoordinateOperationFactory factory ) throws FactoryException {
-                CoordinateOperation opperation = factory.createOperation( from, to );                
-                return opperation.getMathTransform();                
+                CoordinateOperation operation = factory.createOperation( from, to );                
+                return operation.getMathTransform();                
             }
         });
         return list.isEmpty() ? null : (MathTransform) list.get(0);                         
