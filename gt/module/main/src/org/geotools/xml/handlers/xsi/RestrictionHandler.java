@@ -169,7 +169,7 @@ public class RestrictionHandler extends XSIElementHandler {
                     constraints = new LinkedList();
                 }
 
-                EnumerationHandler eh = new EnumerationHandler();
+                MaxLengthHandler eh = new MaxLengthHandler();
                 constraints.add(eh);
 
                 return eh;
