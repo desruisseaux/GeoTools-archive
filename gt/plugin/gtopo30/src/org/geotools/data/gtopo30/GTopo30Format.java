@@ -87,7 +87,7 @@ public class GTopo30Format extends AbstractGridFormat implements Format {
 			return new GTopo30Reader(source);
         } catch (Exception e) {
         }
-
+		this.source=null;
         return null;
     }
 
@@ -145,8 +145,6 @@ public class GTopo30Format extends AbstractGridFormat implements Format {
 
             //        //well we have an url, let's try to use it!!!
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
 
             return false;
         }
