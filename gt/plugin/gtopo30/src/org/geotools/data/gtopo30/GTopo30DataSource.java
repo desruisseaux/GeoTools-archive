@@ -37,11 +37,13 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -183,17 +185,17 @@ class GTopo30DataSource {
         GeneralEnvelope env = null;
 
         try {
-			final GT30Header header = new GT30Header(demHeaderURL);
+            GT30Header header = new GT30Header(demHeaderURL);
             final double xmin = header.getULXMap() - (header.getXDim() / 2);
-			final double ymax = header.getULYMap() + (header.getYDim() / 2);
-			final double ymin = ymax - (header.getNRows() * header.getYDim());
-			final double xmax = xmin + (header.getNCols() * header.getXDim());
+            final double ymax = header.getULYMap() + (header.getYDim() / 2);
+            final double ymin = ymax - (header.getNRows() * header.getYDim());
+            final double xmax = xmin + (header.getNCols() * header.getXDim());
 
             env = new GeneralEnvelope(new double[] { xmin, ymin },
                     new double[] { xmax, ymax });
         } catch (Exception e) {
             // This should not happen!
-            throw new RuntimeException("Unexpected error!" + e);
+            throw new RuntimeException("Unexpected error during creation of the envelope!" + e.getMessage());
         }
 
         return env;
@@ -223,9 +225,16 @@ class GTopo30DataSource {
         return cropEnvelope;
     }
 
+	/**
+	 * Retrieves a grid coverage based on the DEM assoicated to this gtopo coverage.
+	 * The color palette is fixed and there is no possibility for the final user to change it.
+	 * 
+	 * @return
+	 * @throws DataSourceException
+	 */
     public GridCoverage getGridCoverage() throws DataSourceException {
         // Read the header
-		final GT30Header header ;
+        GT30Header header = null;
 
         try {
             header = new GT30Header(demHeaderURL);
@@ -243,7 +252,7 @@ class GTopo30DataSource {
 		final double miny = (header.getULYMap() + (ydim / 2)) - (ydim * nrows);
 
         // Read the statistics file
-		final GT30Stats stats ;
+        GT30Stats stats = null;
 
         try {
             stats = new GT30Stats(statsURL);
@@ -264,7 +273,10 @@ class GTopo30DataSource {
 			 FileInputStream fis = new FileInputStream(filePath);
 			 FileChannel channel = fis.getChannel();
             iis = new FileChannelImageInputStream(channel);
-
+			
+			//freeing
+			fis=null;
+			
             if (header.getByteOrder().compareToIgnoreCase("M") == 0) {
                 iis.setByteOrder(ByteOrder.BIG_ENDIAN);
             } else {
@@ -280,10 +292,7 @@ class GTopo30DataSource {
                     ColorSpace.CS_GRAY), false, false, Transparency.OPAQUE,
                 DataBuffer.TYPE_SHORT);
 		SampleModel sm = cm.createCompatibleSampleModel(ncols, nrows);
-		ImageTypeSpecifier its = new ImageTypeSpecifier(cm, sm); // ImageTypeSpecifier.createGrayscale(16,
-
-        // DataBuffer.TYPE_SHORT,
-        // true);
+		ImageTypeSpecifier its = new ImageTypeSpecifier(cm, sm); 
         // Finally, build the image input stream
 		RawImageInputStream raw = new RawImageInputStream(iis, its,
                 new long[] { 0 },
@@ -297,7 +306,7 @@ class GTopo30DataSource {
 		final int tileRows = (int) Math.ceil(TILE_SIZE / (ncols * 2));
 
         // building the final image layout
-		ImageLayout il = new ImageLayout(0, 0, ncols, nrows, 0, 0, ncols,
+		final ImageLayout il = new ImageLayout(0, 0, ncols, nrows, 0, 0, ncols,
                 tileRows, sm, cm);
 
         // First operator: read the image
@@ -312,7 +321,10 @@ class GTopo30DataSource {
         hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
 		RenderedOp image = JAI.create("ImageRead", pbj, hints);
-
+		pbj.removeParameters();
+		pbj.removeSources();
+		hints=null;
+		
         if (cropEnvelope != null) {
             env = intersectEnvelope(env, cropEnvelope);
 
@@ -337,12 +349,17 @@ class GTopo30DataSource {
             pb.add(cheight);
             hints = new RenderingHints(JAI.KEY_TILE_CACHE, null);
             image = JAI.create("Crop", pb, hints);
+			pb.removeSources();
+			
 
             pb = new ParameterBlock();
             pb.addSource(image);
             pb.add(-cxmin);
             pb.add(-cymin);
             image = JAI.create("Translate", pb, hints);
+			pb.removeSources();
+			hints=null;
+			
         }
 
         // Build the coordinate system
@@ -350,7 +367,6 @@ class GTopo30DataSource {
 
         // Create the SampleDimension, with colors and byte transformation
         // needed for visualization
-        String UoM = null;
         UnitFormat unitFormat = UnitFormat.getStandardInstance();
         Unit uom = null;
 
@@ -360,6 +376,7 @@ class GTopo30DataSource {
         } catch (Exception ex1) {
             uom = null;
         }
+		unitFormat=null;
 
         Category values = new Category("values", this.getColors(),
                 new NumberRange(1, 255), new NumberRange((short)min,(short) max));
@@ -372,11 +389,13 @@ class GTopo30DataSource {
 		band=band.geophysics(true);
         //switch from -999 to NaN to keep transparency informations
         //for the gridcoverage
+		WritableRaster raster=image.createSnapshot().copyData();
         BufferedImage img = new BufferedImage(band.getColorModel(),
-                    (WritableRaster) image.copyData(),
-                    false,
-                    null); // properties????
+                   raster,
+                   false,
+                   null); // properties????
 
+		
         //setting metadata
         Map metadata = new HashMap();
         metadata.put("maximum", new Double(stats.getMax()));
@@ -388,7 +407,6 @@ class GTopo30DataSource {
         //cleaning name
         String coverageName = (new File(this.name)).getName();
         int extension = coverageName.lastIndexOf(".");
-
         if (extension != -1) {
             String ext = coverageName.substring(extension + 1);
 
@@ -400,22 +418,35 @@ class GTopo30DataSource {
                 coverageName = coverageName.substring(0, extension);
             }
         }
-
-		//disposing the image read from disk
-		image.dispose();
 		
-		//returning the coverage
-        return new GridCoverage2D(coverageName,
-				img, 
-				crs, 
-				env,
-				new GridSampleDimension[] { band },
-				null,
-				metadata);
+		GridCoverage2D gc=new GridCoverage2D(coverageName, img, crs, env,
+	            new GridSampleDimension[] { band }, null, metadata);
+		
+		/**
+		 * Freeing everything to be sure we do not leave any dead reference.
+		 * This might seem an overkill, but we have to remember that we might be working on a server machine
+		 * therefore we have to put particular care on removing any possible cause of memory leaks.
+		 * 
+		 */
+		try {
+			iis.close();
+		} catch (IOException e) {
+			//do nothing here
+		}
+		header=null;
+		stats=null;
+		crs=null;		
+		image=null;		
+		raster=null;		
+		iis=null;
+		img=null;
+		cm=null;
+		raw=null;
+		its=null;
+		sm=null;
+		metadata=null;
+        return gc;
     }
-
-
-  
 
     /**
      * DOCUMENT ME!

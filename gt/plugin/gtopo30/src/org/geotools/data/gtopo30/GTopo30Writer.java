@@ -16,6 +16,7 @@
  */
 package org.geotools.data.gtopo30;
 
+import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
@@ -54,15 +55,16 @@ import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**
- * DOCUMENT ME!
+ * Class useful for writing gtopo30 file format from a GridCoverage2D.
  *
  * @author jeichar
+ * @author Simone Giannecchini
  */
 public class GTopo30Writer implements GridCoverageWriter {
     private Object destination;
 
     /**
-     * DOCUMENT ME!
+     * Contructor.
      *
      * @param dest
      */
@@ -239,7 +241,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     }
 
     /**
-     * DOCUMENT ME!
+     * Writing down the header file for the gtopo30 format:
      *
      * @param coverage
      * @param file
@@ -257,20 +259,21 @@ public class GTopo30Writer implements GridCoverageWriter {
         if (gc.geophysics(true).getSampleDimension(0).getNoDataValues() != null) {
             noData = gc.geophysics(true).getSampleDimension(0).getNoDataValues()[0];
         } else if (metadataNames != null) {
-            for (int i = 0; i < metadataNames.length; i++)
+			final int length=metadataNames.length;
+            for (int i = 0; i < length; i++)
                 if (metadataNames[i].compareToIgnoreCase("nodata") == 0) {
                     noData = Double.parseDouble(gc.getMetadataValue(
                                 metadataNames[i]));
                 }
         }
 
-        double xUpperLeft = envelope.getLowerCorner().getOrdinate(0);
-        double yUpperLeft = envelope.getUpperCorner().getOrdinate(1);
-        int width = gc.getGridGeometry().getGridRange().getLength(0);
-        double dx = envelope.getLength(0) / width;
+		final  double xUpperLeft = envelope.getLowerCorner().getOrdinate(0);
+		final  double yUpperLeft = envelope.getUpperCorner().getOrdinate(1);
+		final  int width = gc.getGridGeometry().getGridRange().getLength(0);
+		final double dx = envelope.getLength(0) / width;
 
-        int height = gc.getGridGeometry().getGridRange().getLength(1);
-        double dy = envelope.getLength(1) / height;
+		final int height = gc.getGridGeometry().getGridRange().getLength(1);
+		final double dy = envelope.getLength(1) / height;
 
         if (file instanceof File) {
             PrintWriter out = new PrintWriter(new FileOutputStream((File) file));
@@ -428,9 +431,10 @@ public class GTopo30Writer implements GridCoverageWriter {
      */
     private void writeSRC(GridCoverage coverage, Object dest, ByteOrder bo)
         throws FileNotFoundException, IOException {
+		
         //we cannot get all the needed information 
         GridCoverage2D gc = (GridCoverage2D) coverage;
-        gc = gc.geophysics(false); //8 bit
+        gc = gc.geophysics(false); //8 bit non geophyisic representation for this coverage
 
         ImageOutputStreamImpl out = null;
 
@@ -445,10 +449,24 @@ public class GTopo30Writer implements GridCoverageWriter {
             out = new FileCacheImageOutputStream(outZ, null);
         }
 
-        out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
-        ImageIO.write(((PlanarImage) gc.getRenderedImage()).getAsBufferedImage(),
-            "raw", out);
+		//getting byte to write out
+		RenderedImage image2Write=gc.getRenderedImage();
 
+		//setting byte order
+        out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
+		//writing
+		/**
+		 * This might be buggy! It seems to  have memory leaks!
+		 */
+        ImageIO.write( image2Write,
+            "raw", out);
+		
+
+		//releasing gc
+		gc=null;
+		//releasing image
+		image2Write=null;
+		
         if (!(dest instanceof File)) {
             ((ZipOutputStream) dest).closeEntry();
         }
@@ -458,7 +476,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     }
 
     /**
-     * DOCUMENT ME!
+     * Writing a gif file as an overview for this gtopo.
      *
      * @param coverage
      * @param file
@@ -468,6 +486,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     private void writeGIF(GridCoverage coverage, Object file)
         throws IOException {
         GridCoverage2D gc = (GridCoverage2D) coverage;
+		gc=gc.geophysics(false);
         ImageOutputStreamImpl out = null;
 
         if (file instanceof File) {
@@ -482,8 +501,12 @@ public class GTopo30Writer implements GridCoverageWriter {
             out = new FileCacheImageOutputStream(outZ, null);
         }
 
-        ImageIO.write(this.convertIndexColorModelAlpha4GIF((PlanarImage)gc.geophysics(false).getRenderedImage()), "GIF", out);
-
+		PlanarImage image=(PlanarImage) gc.getRenderedImage();
+		RenderedImage image2Write=this.convertIndexColorModelAlpha4GIF(image);
+		image.dispose();
+		gc=null;
+        ImageIO.write(image2Write, "GIF", out);
+		image2Write=null;
         if (file instanceof File) {
             out.close();
         } else {
@@ -499,10 +522,10 @@ public class GTopo30Writer implements GridCoverageWriter {
      *
      * @return
      */
-    private PlanarImage convertIndexColorModelAlpha4GIF(
+    private RenderedImage convertIndexColorModelAlpha4GIF(
         PlanarImage surrogateImage) {
 		//doing nothing if the input color model is correct
-        final IndexColorModel cm = (IndexColorModel) surrogateImage.getColorModel();
+        IndexColorModel cm = (IndexColorModel) surrogateImage.getColorModel();
 		if(cm.getTransparency()==Transparency.OPAQUE)
 			return surrogateImage;
 			
@@ -514,12 +537,10 @@ public class GTopo30Writer implements GridCoverageWriter {
 		cm.getReds(rgba[0]);
 		cm.getGreens(rgba[1]);
 		cm.getBlues(rgba[2]);
-		
-
 
         //get the data (actually a copy of them) and prepare to rewrite them
-        WritableRaster raster = (WritableRaster) surrogateImage.getData();
-
+        WritableRaster raster = surrogateImage.copyData();
+		surrogateImage=null;
         /**
          * Now we are going to use the first transparent color as it were the
          * transparent color and we point all the tranpsarent pixel to this
@@ -530,8 +551,10 @@ public class GTopo30Writer implements GridCoverageWriter {
          */
         int transparencyIndex = -1;
         int index = -1;
-        for (int i = 0; i < raster.getHeight(); i++) {
-            for (int j = 0; j < raster.getWidth(); j++) {
+		final int H=raster.getHeight();
+		final int W=raster.getWidth();
+        for (int i = 0; i <H ; i++) {
+            for (int j = 0; j < W; j++) {
                 //index in the color map is given by a value in the raster.
                 index = raster.getSample(j, i, 0);
 
@@ -590,11 +613,13 @@ public class GTopo30Writer implements GridCoverageWriter {
 				BufferedImage.TYPE_BYTE_INDEXED,
 				cm1);
         image.setData(raster);
-
-        //disposing old image
-        surrogateImage.dispose();
-
-        return PlanarImage.wrapRenderedImage(image);
+		
+		
+		raster=null;
+		rgba=null;
+		cm=null;
+		cm1=null;
+        return image;
     }
 
     /**
@@ -628,7 +653,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     }
 
     /**
-     * Writing statistics file.
+     * DOCUMENT ME!
      *
      * @param coverage
      * @param file
@@ -639,13 +664,13 @@ public class GTopo30Writer implements GridCoverageWriter {
         throws IOException {
         GridCoverage2D gc = (GridCoverage2D) coverage;
         ParameterBlock pb = new ParameterBlock();
-
+		PlanarImage src=(PlanarImage) gc.getRenderedImage();
         //we need to evaluate stats first using jai
         double[] Max = new double[] { gc.getSampleDimension(0).getMaximumValue() };
         double[] Min = new double[] { gc.getSampleDimension(0).getMinimumValue() };
 
         //histogram
-        pb.addSource((PlanarImage) gc.getRenderedImage());
+        pb.addSource(src);
         pb.add(null); //no roi
         pb.add(1);
         pb.add(1);
@@ -653,10 +678,13 @@ public class GTopo30Writer implements GridCoverageWriter {
         pb.add(Min);
         pb.add(Max);
         pb.add(1);
-
-        Histogram hist = (Histogram) ((PlanarImage) JAI.create("histogram", pb,
-                null)).getProperty("histogram");
-
+		PlanarImage histogramImage=(PlanarImage) JAI.create("histogram", pb,
+                new RenderingHints(JAI.KEY_TILE_CACHE,null));
+        Histogram hist = (Histogram) histogramImage.getProperty("histogram");
+		histogramImage=null;
+		pb.removeParameters();
+		pb.removeSources();
+		
         if (file instanceof File) {
             //files destinations
             if (!((File) file).exists()) {
@@ -695,10 +723,11 @@ public class GTopo30Writer implements GridCoverageWriter {
                                                                  .getBytes());
             ((ZipOutputStream) file).closeEntry();
         }
+		hist=null;
     }
 
     /**
-     * Writing the world file.
+     * DOCUMENT ME!
      *
      * @param coverage
      * @param worldFile
@@ -708,21 +737,20 @@ public class GTopo30Writer implements GridCoverageWriter {
     private void writeWorldFile(GridCoverage coverage, Object worldFile)
         throws IOException {
         GridCoverage2D gc = (GridCoverage2D) coverage;
-        gc = (GridCoverage2D) gc.geophysics(true);
 
-        RenderedImage image = ((PlanarImage) gc.getRenderedImage()).getAsBufferedImage();
+        RenderedImage image = (PlanarImage) gc.getRenderedImage();
         Envelope env = gc.getEnvelope();
-        double xMin = env.getMinimum(0);
-        double yMin = env.getMinimum(1);
-        double xMax = env.getMaximum(0);
-        double yMax = env.getMaximum(1);
+        final double xMin = env.getMinimum(0);
+		final double yMin = env.getMinimum(1);
+		final double xMax = env.getMaximum(0);
+		final double yMax = env.getMaximum(1);
 
-        double xPixelSize = (xMax - xMin) / image.getWidth();
-        double rotation1 = 0;
-        double rotation2 = 0;
-        double yPixelSize = (yMax - yMin) / image.getHeight();
-        double xLoc = xMin;
-        double yLoc = yMax;
+		final double xPixelSize = (xMax - xMin) / image.getWidth();
+		final double rotation1 = 0;
+		final double rotation2 = 0;
+		final double yPixelSize = (yMax - yMin) / image.getHeight();
+		final double xLoc = xMin;
+		final double yLoc = yMax;
 
         PrintWriter out = null;
 
@@ -768,7 +796,7 @@ public class GTopo30Writer implements GridCoverageWriter {
     }
 
     /**
-     * Writing the DEM file for this gtopo30 coverage.
+     * DOCUMENT ME!
      *
      * @param coverage
      * @param dest DOCUMENT ME!
@@ -794,7 +822,7 @@ public class GTopo30Writer implements GridCoverageWriter {
         }
 
         out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
-        ImageIO.write(((PlanarImage) gc.getRenderedImage()).getAsBufferedImage(),
+        ImageIO.write( gc.getRenderedImage(),
             "raw", out);
 
         if (dest instanceof File) {
@@ -808,6 +836,6 @@ public class GTopo30Writer implements GridCoverageWriter {
      * @see org.opengis.coverage.grid.GridCoverageWriter#dispose()
      */
     public void dispose() throws IOException {
-        // @todo Auto-generated method stub
+        this.destination=null;
     }
 }
