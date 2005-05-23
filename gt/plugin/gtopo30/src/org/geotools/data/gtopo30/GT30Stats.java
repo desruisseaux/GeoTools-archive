@@ -69,6 +69,10 @@ class GT30Stats {
         maximum = Integer.parseInt(stok.nextToken());
         average = Double.parseDouble(stok.nextToken());
         stddev = Double.parseDouble(stok.nextToken());
+		
+		//freeing when possible
+		reader.close();
+		reader=null;
     }
 
     /**
