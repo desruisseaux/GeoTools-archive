@@ -131,9 +131,6 @@ public class WFSDataStore extends AbstractDataStore {
         throws SAXException, IOException {
         super(true);
 
-        // TODO find a better way of adding functionality to the factory ... perhaps putting in your own RootHandler?
-        new WFSSchemaFactory();
-
         if ((username != null) && (password != null)) {
             auth = new WFSAuthenticator(username, password);
         }

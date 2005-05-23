@@ -19,7 +19,6 @@ import org.geotools.data.wms.xml.WMSDescribeLayerTypes.WMS_DescribeLayerResponse
 import org.geotools.data.wms.xml.WMSDescribeLayerTypes._LayerDescription;
 import org.geotools.data.wms.xml.WMSDescribeLayerTypes._Query;
 import org.geotools.xml.PrintHandler;
-import org.geotools.xml.handlers.IgnoreHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.AttributeValue;
@@ -173,7 +172,7 @@ public class WMSSchema implements Schema {
         new WMSElement("ServiceException", _ServiceException.getInstance()),
         
         
-        new WMSElement(IgnoreHandler.NAME, new WMSSchema.WMSIgnoreType(), 0, Integer.MAX_VALUE)
+        new WMSElement(null, new WMSSchema.WMSIgnoreType(), 0, Integer.MAX_VALUE)
     };
     
     static final ComplexType[] complexTypes = new ComplexType[] {

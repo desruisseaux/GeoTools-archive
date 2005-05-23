@@ -35,7 +35,6 @@ import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.filter.FilterSchema;
 import org.geotools.xml.filter.FilterComplexTypes.Filter_CapabilitiesType;
-import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.ComplexType;
 import org.geotools.xml.schema.Element;
@@ -56,6 +55,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotSupportedException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.xdo.ElementHandlerFactory;
 
 
 /**

@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import org.geotools.data.ows.LayerDescription;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.xml.DocumentFactory;
-import org.geotools.xml.handlers.DocumentHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -46,7 +45,7 @@ public class DescribeLayerResponse extends AbstractResponse {
         super(contentType, inputStream);
         
         Map hints = new HashMap();
-        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+//        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
 
         Object object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
         

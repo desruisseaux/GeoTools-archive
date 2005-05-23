@@ -4,6 +4,7 @@ package org.geotools.xml;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import javax.xml.parsers.SAXParser;
@@ -12,6 +13,11 @@ import javax.xml.parsers.SAXParserFactory;
 import junit.framework.TestCase;
 
 import org.geotools.resources.TestData;
+import org.xml.sax.SAXException;
+
+import com.vividsolutions.xdo.Decoder;
+import com.vividsolutions.xdo.PluginFinder;
+import com.vividsolutions.xdo.xsi.Schema;
 
 
 /**
@@ -37,52 +43,32 @@ public class SchemaParserTest extends TestCase {
         parser = spf.newSAXParser();
     }
 
-    public void testMail(){
+    public void testMail() throws IOException, SAXException{
         runit("mails.xsd");
     }
 
-    public void testWFS(){
+    public void testWFS() throws IOException, SAXException{
         runit("wfs/WFS-basic.xsd");
     }
 
-    public void testGMLFeature(){
+    public void testGMLFeature() throws IOException, SAXException{
         runit("gml/feature.xsd");
     }
 
-    public void testGMLGeometry(){
+    public void testGMLGeometry() throws IOException, SAXException{
         runit("gml/geometry.xsd");
     }
 
-    public void testGMLXLinks(){
+    public void testGMLXLinks() throws IOException{
         runit("gml/xlinks.xsd");
     }
 
-    private void runit(String path){
+    private void runit(String path) throws IOException{
         File f;
-        try {
+
             f = TestData.file(this,path);
         URI u = f.toURI();
-        XSISAXHandler contentHandler = new XSISAXHandler(u);
-//        XSISAXHandler.setLogLevel(Level.INFO);
-        XSISAXHandler.setLogLevel(Level.WARNING);
-
-        try {
-            parser.parse(f, contentHandler);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-
-        try{
-            assertNotNull("Schema missing", contentHandler.getSchema());
-            System.out.println(contentHandler.getSchema());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            fail(e1.toString());
-        }
+        Schema doc = PluginFinder.getInstance().getSchemaBuilder().find(u);
+        assertNotNull(doc);
     }
 }

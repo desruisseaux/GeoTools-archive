@@ -20,6 +20,8 @@ import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
 
+import com.vividsolutions.xdo.Decoder;
+
 
 /**
  * <p>
@@ -41,21 +43,12 @@ public class GMLParserTest extends TestCase {
             spf.setNamespaceAware(true);
             spf.setValidating(false);
 
-            SAXParser parser = spf.newSAXParser();
-
             String path = "geoserver/oneFeature.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.FINEST);
-            XSISAXHandler.setLogLevel(Level.FINEST);
-            XMLElementHandler.setLogLevel(Level.FINEST);
-            XSIElementHandler.setLogLevel(Level.FINEST);
+            Object doc = Decoder.decode(u,new HashMap());
 
-            parser.parse(f, xmlContentHandler);
-
-            Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             
@@ -72,21 +65,12 @@ public class GMLParserTest extends TestCase {
             spf.setNamespaceAware(true);
             spf.setValidating(false);
 
-            SAXParser parser = spf.newSAXParser();
-
             String path = "geoserver/roads.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.WARNING);
-            XSISAXHandler.setLogLevel(Level.WARNING);
-            XMLElementHandler.setLogLevel(Level.WARNING);
-            XSIElementHandler.setLogLevel(Level.WARNING);
 
-            parser.parse(f, xmlContentHandler);
-
-            Object doc = xmlContentHandler.getDocument();
+            Object doc = Decoder.decode(u,new HashMap());
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             
@@ -104,21 +88,12 @@ public class GMLParserTest extends TestCase {
             spf.setNamespaceAware(true);
             spf.setValidating(false);
 
-            SAXParser parser = spf.newSAXParser();
-
             String path = "fme/roads/roads.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.WARNING);
-            XSISAXHandler.setLogLevel(Level.WARNING);
-            XMLElementHandler.setLogLevel(Level.WARNING);
-            XSIElementHandler.setLogLevel(Level.WARNING);
 
-            parser.parse(f, xmlContentHandler);
-
-            Object doc = xmlContentHandler.getDocument();
+            Object doc = Decoder.decode(u,new HashMap());
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
 
@@ -136,21 +111,11 @@ public class GMLParserTest extends TestCase {
             spf.setNamespaceAware(true);
             spf.setValidating(false);
 
-            SAXParser parser = spf.newSAXParser();
-
             String path = "fme/lakes/lakes.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-            XMLSAXHandler.setLogLevel(Level.WARNING);
-            XSISAXHandler.setLogLevel(Level.WARNING);
-            XMLElementHandler.setLogLevel(Level.WARNING);
-            XSIElementHandler.setLogLevel(Level.WARNING);
-
-            parser.parse(f, xmlContentHandler);
-
-            Object doc = xmlContentHandler.getDocument();
+            Object doc = Decoder.decode(u,new HashMap());
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             
@@ -254,21 +219,11 @@ public class GMLParserTest extends TestCase {
            spf.setNamespaceAware(true);
            spf.setValidating(false);
 
-           SAXParser parser = spf.newSAXParser();
-
            String path = "iba-gml-bad.xml";
            File f = TestData.file(this,path);
            URI u = f.toURI();
 
-           XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
-           XMLSAXHandler.setLogLevel(Level.WARNING);
-           XSISAXHandler.setLogLevel(Level.WARNING);
-           XMLElementHandler.setLogLevel(Level.WARNING);
-           XSIElementHandler.setLogLevel(Level.WARNING);
-
-           parser.parse(f, xmlContentHandler);
-
-           Object doc = xmlContentHandler.getDocument();
+           Object doc = Decoder.decode(u,new HashMap());
            assertNotNull("Document missing", doc);
 //           System.out.println(doc);
            
