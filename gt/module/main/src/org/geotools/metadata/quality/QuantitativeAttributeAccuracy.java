@@ -29,6 +29,7 @@ package org.geotools.metadata.quality;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code QuantitativeAttributeAccuracyImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class QuantitativeAttributeAccuracy extends ThematicAccuracy
         implements org.opengis.metadata.quality.QuantitativeAttributeAccuracy

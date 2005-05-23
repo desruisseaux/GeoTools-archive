@@ -32,6 +32,7 @@ import org.opengis.metadata.quality.Result;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code AbsoluteExternalPositionalAccuracyImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class AbsoluteExternalPositionalAccuracy extends PositionalAccuracy
        implements org.opengis.metadata.quality.AbsoluteExternalPositionalAccuracy

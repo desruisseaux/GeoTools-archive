@@ -41,6 +41,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code KeywordsImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Keywords extends MetadataEntity
         implements org.opengis.metadata.identification.Keywords

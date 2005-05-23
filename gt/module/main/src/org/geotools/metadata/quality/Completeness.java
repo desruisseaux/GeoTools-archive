@@ -29,6 +29,7 @@ package org.geotools.metadata.quality;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code CompletenessImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Completeness extends Element
         implements org.opengis.metadata.quality.Completeness

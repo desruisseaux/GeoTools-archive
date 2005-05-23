@@ -34,6 +34,7 @@ import org.opengis.metadata.content.ImagingCondition;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ImageDescriptionImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class ImageDescription extends CoverageDescription
        implements org.opengis.metadata.content.ImageDescription

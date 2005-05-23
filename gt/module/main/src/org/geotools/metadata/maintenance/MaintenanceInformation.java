@@ -39,6 +39,7 @@ import org.opengis.util.InternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code MaintenanceInformationImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class MaintenanceInformation extends MetadataEntity
        implements org.opengis.metadata.maintenance.MaintenanceInformation

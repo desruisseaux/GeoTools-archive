@@ -36,6 +36,7 @@ import org.geotools.metadata.MetadataEntity;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code TemporalExtentImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class TemporalExtent extends MetadataEntity
        implements org.opengis.metadata.extent.TemporalExtent

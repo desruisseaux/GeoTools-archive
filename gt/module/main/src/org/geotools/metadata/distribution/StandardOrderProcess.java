@@ -37,6 +37,7 @@ import org.opengis.util.InternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett
+ * @deprecated Renamed as {@code StandardOrderProcessImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class StandardOrderProcess extends MetadataEntity implements org.opengis.metadata.distribution.StandardOrderProcess {
     /**

@@ -31,6 +31,7 @@ import org.geotools.resources.Utilities;
  *
  * @author Jody Garnett
  * @author Martin Desruisseaux
+ * @deprecated Renamed as {@code TelephoneImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Telephone extends MetadataEntity
        implements org.opengis.metadata.citation.Telephone

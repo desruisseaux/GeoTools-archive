@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code BrowseGraphicImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class BrowseGraphic extends MetadataEntity
         implements org.opengis.metadata.identification.BrowseGraphic

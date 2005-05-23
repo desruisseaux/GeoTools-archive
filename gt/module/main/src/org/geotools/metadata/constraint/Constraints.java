@@ -40,6 +40,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ConstraintsImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Constraints extends MetadataEntity
        implements org.opengis.metadata.constraint.Constraints

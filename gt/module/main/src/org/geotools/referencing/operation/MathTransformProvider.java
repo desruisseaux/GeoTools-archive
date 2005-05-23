@@ -48,6 +48,7 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.util.GenericName;
 
 // Geotools dependencies
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.cts.ResourceKeys;
@@ -143,8 +144,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Constructs a parameter descriptor from a set of alias. The parameter is
      * identified by codes provided by one or more authorities. Common authorities are
-     * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
-     * {@link org.geotools.metadata.citation.Citation#EPSG} for example.
+     * {@link CitationImpl#OPEN_GIS OPEN_GIS} and {@link CitationImpl#EPSG EPSG} for example.
      *
      * <P>The first entry in the <code>identifiers</code> array is both the
      * {@linkplain ParameterDescriptor#getName main name} and the
@@ -188,8 +188,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Constructs a parameter group from a set of alias. The parameter group is
      * identified by codes provided by one or more authorities. Common authorities are
-     * {@link org.geotools.metadata.citation.Citation#OPEN_GIS} and
-     * {@link org.geotools.metadata.citation.Citation#EPSG} for example.
+     * {@link CitationImpl#OPEN_GIS OPEN_GIS} and {@link CitationImpl#EPSG EPSG} for example.
      *
      * <P>The first entry in the <code>identifiers</code> array is both the
      * {@linkplain ParameterDescriptorGroup#getName main name} and the
@@ -366,7 +365,7 @@ public abstract class MathTransformProvider extends OperationMethod {
             for (int i=0; i<alias.length; i++) {
                 final GenericName scope = alias[i].getScope();
                 if (scope != null) {
-                    if (org.geotools.metadata.citation.Citation.titleMatches(authority, scope.toString())) {
+                    if (CitationImpl.titleMatches(authority, scope.toString())) {
                         name = alias[i].asLocalName().toString();
                         break;
                     }

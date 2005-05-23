@@ -56,6 +56,7 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett
+ * @deprecated Renamed as {@code CitationImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Citation extends MetadataEntity
        implements org.opengis.metadata.citation.Citation

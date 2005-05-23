@@ -18,7 +18,7 @@
  */
 package org.geotools.referencing.crs;
 
-// JAI dependencies
+// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,10 +29,8 @@ import java.util.TreeSet;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.measure.Latitude;
-import org.geotools.measure.Longitude;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
+// OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -48,6 +46,13 @@ import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
+
+// Geotools dependencies
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.metadata.iso.citation.CitationImpl;
 
 /**
  * Generate Automatic Projections (dynamic projections) based on code and location.
@@ -142,8 +147,8 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
         return (ProjectedCRS) createCoordinateReferenceSystem(code);
     }
      
-    public org.opengis.metadata.citation.Citation getAuthority() {
-        return org.geotools.metadata.citation.Citation.AUTO;
+    public Citation getAuthority() {
+        return CitationImpl.AUTO;
     }
     
     /**
@@ -173,8 +178,8 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
         return factories.getCRSFactory();
     }
     
-    public org.opengis.metadata.citation.Citation getVendor() {
-        return org.geotools.metadata.citation.Citation.GEOTOOLS;
+    public Citation getVendor() {
+        return CitationImpl.GEOTOOLS;
     }
     
     public org.opengis.util.InternationalString getDescriptionText(String str) throws FactoryException {

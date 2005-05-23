@@ -21,21 +21,28 @@ package org.geotools.coverage.grid;
 // J2SE and JAI dependencies
 import java.awt.Color;
 import java.awt.RenderingHints;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Map;
 import javax.media.jai.ImageFunction;
+import javax.media.jai.util.CaselessStringKey;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.referencing.crs.GeographicCRS;
 
 
 /**
@@ -135,7 +142,7 @@ public class GridCoverageFactory {
      * @param hints       An optional set of rendering hints, or {@code null} if none.
      *                    Those hints will not affect the grid coverage to be created.
      *                    However, they may affect the grid coverage to be returned by
-     *                    <code>{@link #geophysics geophysics}(false)</code>, i.e.
+     *                    <code>{@link GridCoverage2D#geophysics geophysics}(false)</code>, i.e.
      *                    the view to be used at rendering time. The optional hint
      *                    {@link Hints#SAMPLE_DIMENSION_TYPE} specifies the
      *                    {@link SampleDimensionType} to be used at rendering time, which can be
@@ -182,7 +189,7 @@ public class GridCoverageFactory {
      * @param hints       An optional set of rendering hints, or {@code null} if none.
      *                    Those hints will not affect the grid coverage to be created.
      *                    However, they may affect the grid coverage to be returned by
-     *                    <code>{@link #geophysics geophysics}(false)</code>, i.e.
+     *                    <code>{@link GridCoverage2D#geophysics geophysics}(false)</code>, i.e.
      *                    the view to be used at rendering time. The optional hint
      *                    {@link Hints#SAMPLE_DIMENSION_TYPE} specifies the
      *                    {@link SampleDimensionType} to be used at rendering time, which can be

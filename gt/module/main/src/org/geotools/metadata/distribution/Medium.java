@@ -42,6 +42,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code MediumImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Medium extends MetadataEntity implements org.opengis.metadata.distribution.Medium {
     /**

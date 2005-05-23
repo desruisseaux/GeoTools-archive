@@ -38,6 +38,7 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code PositionalAccuracyImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class PositionalAccuracy extends Element
        implements org.opengis.metadata.quality.PositionalAccuracy

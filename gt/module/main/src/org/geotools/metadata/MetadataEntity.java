@@ -51,6 +51,7 @@ import org.geotools.util.CheckedHashSet;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  * @since 2.1
+ * @deprecated Moved to {@code org.geotools.metadata.iso} subpackage.
  */
 public class MetadataEntity implements java.lang.Cloneable, Serializable {
     /**

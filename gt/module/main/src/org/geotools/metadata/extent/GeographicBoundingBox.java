@@ -33,6 +33,7 @@ import java.awt.geom.Rectangle2D;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code GeographicBoundingBoxImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class GeographicBoundingBox extends GeographicExtent
        implements org.opengis.metadata.extent.GeographicBoundingBox

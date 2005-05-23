@@ -39,6 +39,7 @@ import org.geotools.util.CheckedArrayList;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code GridSpatialRepresentationImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class GridSpatialRepresentation extends SpatialRepresentation
         implements org.opengis.metadata.spatial.GridSpatialRepresentation

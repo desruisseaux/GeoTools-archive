@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformFactory;
 import org.geotools.referencing.operation.MathTransformProvider;
@@ -101,12 +101,12 @@ public class Mercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Mercator_1SP"),
-                new Identifier(Citation.EPSG,     "Mercator (1SP)"),
-                new Identifier(Citation.EPSG,     "9804"),
-                new Identifier(Citation.GEOTIFF,  "CT_Mercator"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+                new Identifier(CitationImpl.OPEN_GIS, "Mercator_1SP"),
+                new Identifier(CitationImpl.EPSG,     "Mercator (1SP)"),
+                new Identifier(CitationImpl.EPSG,     "9804"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, SCALE_FACTOR,
@@ -163,9 +163,9 @@ public class Mercator extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "standard_parallel_1"),
-                    new Identifier(Citation.EPSG,     "Latitude of 1st standard parallel"),
-                    new Identifier(Citation.GEOTIFF,  "StdParallel1")
+                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_1"),
+                    new Identifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
+                    new Identifier(CitationImpl.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -173,13 +173,13 @@ public class Mercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Mercator_2SP"),
-                new Identifier(Citation.EPSG,     "Mercator (2SP)"),
-                new Identifier(Citation.EPSG,     "9805"),
-                new Identifier(Citation.GEOTIFF,  "CT_Mercator"),
-                new Identifier(Citation.ESRI,     "Mercator"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+                new Identifier(CitationImpl.OPEN_GIS, "Mercator_2SP"),
+                new Identifier(CitationImpl.EPSG,     "Mercator (2SP)"),
+                new Identifier(CitationImpl.EPSG,     "9805"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
+                new Identifier(CitationImpl.ESRI,     "Mercator"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, STANDARD_PARALLEL,

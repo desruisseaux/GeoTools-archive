@@ -31,6 +31,7 @@ import javax.units.ConversionException;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
+import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
@@ -49,8 +50,8 @@ import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.metadata.citation.Citation;
-import org.geotools.metadata.quality.PositionalAccuracy;
+import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractFactory;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -81,7 +82,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier IDENTITY =
-            new org.geotools.referencing.Identifier(Citation.GEOTOOLS, "Identity");
+            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Identity");
 
     /**
      * The identifier for conversion using an affine transform for axis swapping and/or
@@ -90,17 +91,17 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier AXIS_CHANGES =
-            new org.geotools.referencing.Identifier(Citation.GEOTOOLS, "Axis changes");
+            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Axis changes");
 
     /**
      * The identifier for a transformation which is a datum shift.
      *
-     * @see PositionalAccuracy#DATUM_SHIFT_APPLIED
+     * @see PositionalAccuracyImpl#DATUM_SHIFT_APPLIED
      *
      * @todo localize
      */
     protected static final Identifier DATUM_SHIFT =
-            new org.geotools.referencing.Identifier(Citation.GEOTOOLS, "Datum shift");
+            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Datum shift");
 
     /**
      * The identifier for a transformation which is a datum shift without
@@ -110,18 +111,18 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * only if the factory was created with {@link Hints#LENIENT_DATUM_SHIFT} set to
      * {@link Boolean#TRUE}.
      *
-     * @see PositionalAccuracy#DATUM_SHIFT_OMITTED
+     * @see PositionalAccuracyImpl#DATUM_SHIFT_OMITTED
      *
      * @todo localize
      */
     protected static final Identifier ELLIPSOID_SHIFT =
-            new org.geotools.referencing.Identifier(Citation.GEOTOOLS, "Ellipsoid shift");
+            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Ellipsoid shift");
 
     /**
      * The identifier for a geocentric conversion.
      */
     protected static final Identifier GEOCENTRIC_CONVERSION =
-            new org.geotools.referencing.Identifier(Citation.GEOTOOLS,
+            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS,
                 Resources.formatInternational(ResourceKeys.GEOCENTRIC_TRANSFORM));
 
     /**
@@ -130,7 +131,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier INVERSE_OPERATION =
-            new org.geotools.referencing.Identifier(Citation.GEOTOOLS,
+            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS,
                 "Inverse operation");
 
     /**
@@ -280,8 +281,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
             properties.put(
                   org.geotools.referencing.operation.CoordinateOperation.POSITIONAL_ACCURACY_PROPERTY,
                   new org.opengis.metadata.quality.PositionalAccuracy[] {
-                      name==DATUM_SHIFT ? PositionalAccuracy.DATUM_SHIFT_APPLIED
-                                        : PositionalAccuracy.DATUM_SHIFT_OMITTED});
+                      name==DATUM_SHIFT ? PositionalAccuracyImpl.DATUM_SHIFT_APPLIED
+                                        : PositionalAccuracyImpl.DATUM_SHIFT_OMITTED});
         } else {
             properties = Collections.singletonMap(NAME_PROPERTY, name);
         }
@@ -564,7 +565,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
         /** Work around for RFE #4093999 in Sun's bug database */
         private TemporaryIdentifier(final Identifier parent, final int count) {
-            super(Citation.GEOTOOLS, unwrap(parent).getCode() + " (step " + count + ')');
+            super(CitationImpl.GEOTOOLS, unwrap(parent).getCode() + " (step " + count + ')');
             this.parent = parent;
             this.count  = count;
         }

@@ -37,6 +37,7 @@ import org.opengis.util.InternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ContactImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Contact extends MetadataEntity
        implements org.opengis.metadata.citation.Contact

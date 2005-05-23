@@ -36,6 +36,7 @@ import org.geotools.metadata.MetadataEntity;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ScopeDescriptionImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class ScopeDescription extends MetadataEntity
        implements org.opengis.metadata.maintenance.ScopeDescription

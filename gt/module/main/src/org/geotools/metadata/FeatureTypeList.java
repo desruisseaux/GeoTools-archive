@@ -32,6 +32,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code FeatureTypeListImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class FeatureTypeList extends MetadataEntity
         implements org.opengis.metadata.FeatureTypeList

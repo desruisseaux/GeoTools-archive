@@ -44,7 +44,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.ParameterReal;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformProvider;
@@ -563,8 +563,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          */
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "semi_major"),
-                    new Identifier(Citation.EPSG,     "semi-major axis")   //epsg does not specifically define this parameter
+                    new Identifier(CitationImpl.OPEN_GIS, "semi_major"),
+                    new Identifier(CitationImpl.EPSG,     "semi-major axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -574,8 +574,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          */
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "semi_minor"),
-                    new Identifier(Citation.EPSG,     "semi-minor axis")   //epsg does not specifically define this parameter
+                    new Identifier(CitationImpl.OPEN_GIS, "semi_minor"),
+                    new Identifier(CitationImpl.EPSG,     "semi-minor axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -586,7 +586,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         private static final ParameterDescriptor DIM =
                 new org.geotools.parameter.ParameterDescriptor(
                     Collections.singletonMap(NAME_PROPERTY,
-                                             new Identifier(Citation.GEOTOOLS, "dim")),
+                                             new Identifier(CitationImpl.GEOTOOLS, "dim")),
                     3, 2, 3, false);
 
         /**
@@ -607,10 +607,10 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                                                               final int geotools)
         {
             return createDescriptorGroup(new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, ogc),
-                    new Identifier(Citation.EPSG,     epsgName),
-                    new Identifier(Citation.EPSG,     epsgCode),
-                    new Identifier(Citation.GEOTOOLS, Resources.formatInternational(geotools))
+                    new Identifier(CitationImpl.OPEN_GIS, ogc),
+                    new Identifier(CitationImpl.EPSG,     epsgName),
+                    new Identifier(CitationImpl.EPSG,     epsgCode),
+                    new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(geotools))
                 }, new ParameterDescriptor[] {
                     SEMI_MAJOR, SEMI_MINOR, DIM
                 });

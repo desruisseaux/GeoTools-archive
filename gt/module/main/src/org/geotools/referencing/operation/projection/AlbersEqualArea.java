@@ -60,7 +60,7 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -137,9 +137,9 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "standard_parallel_1"),
-                    new Identifier(Citation.EPSG,     "Latitude of 1st standard parallel"),
-                    new Identifier(Citation.GEOTIFF,  "StdParallel1")
+                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_1"),
+                    new Identifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
+                    new Identifier(CitationImpl.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
                 
@@ -149,9 +149,9 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.OPEN_GIS, "standard_parallel_2"),
-                    new Identifier(Citation.EPSG,     "Latitude of 2nd standard parallel"),
-                    new Identifier(Citation.GEOTIFF,  "StdParallel2")
+                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_2"),
+                    new Identifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
+                    new Identifier(CitationImpl.GEOTIFF,  "StdParallel2")
                 },
                 -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -159,14 +159,14 @@ public class AlbersEqualArea extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Albers_Conic_Equal_Area"),
-                new Identifier(Citation.EPSG,     "Albers Equal Area"),
-                new Identifier(Citation.EPSG,     "9822"),
-                new Identifier(Citation.GEOTIFF,  "CT_AlbersEqualArea"),
-                new Identifier(Citation.ESRI,     "Albers"),
-                new Identifier(Citation.ESRI,     "Albers Equal Area Conic"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION))
+                new Identifier(CitationImpl.OPEN_GIS, "Albers_Conic_Equal_Area"),
+                new Identifier(CitationImpl.EPSG,     "Albers Equal Area"),
+                new Identifier(CitationImpl.EPSG,     "9822"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),
+                new Identifier(CitationImpl.ESRI,     "Albers"),
+                new Identifier(CitationImpl.ESRI,     "Albers Equal Area Conic"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,

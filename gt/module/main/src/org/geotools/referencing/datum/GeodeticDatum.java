@@ -38,7 +38,7 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.wkt.Formatter;
@@ -69,13 +69,13 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     public static final GeodeticDatum WGS84;
     static {
         final Identifier[] identifiers = {
-            new Identifier(Citation.OPEN_GIS, "WGS84"),
-            new Identifier(Citation.ORACLE,   "WGS 84"),
-            new Identifier(null,              "WGS_84"),
-            new Identifier(null,              "WGS 1984"),
-            new Identifier(Citation.EPSG,     "WGS_1984"),
-            new Identifier(Citation.ESRI,     "D_WGS_1984"),
-            new Identifier(Citation.EPSG,     "World Geodetic System 1984")
+            new Identifier(CitationImpl.OPEN_GIS, "WGS84"),
+            new Identifier(CitationImpl.ORACLE,   "WGS 84"),
+            new Identifier(null,                  "WGS_84"),
+            new Identifier(null,                  "WGS 1984"),
+            new Identifier(CitationImpl.EPSG,     "WGS_1984"),
+            new Identifier(CitationImpl.ESRI,     "D_WGS_1984"),
+            new Identifier(CitationImpl.EPSG,     "World Geodetic System 1984")
         };
         final Map properties = new HashMap(4);
         properties.put(NAME_PROPERTY,  identifiers[0]);

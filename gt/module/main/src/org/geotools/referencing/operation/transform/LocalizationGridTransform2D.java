@@ -43,7 +43,7 @@ import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.Identifier;
@@ -769,7 +769,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.GEOTOOLS, "WarpPolynomial")
+                new Identifier(CitationImpl.GEOTOOLS, "WarpPolynomial")
             }, new ParameterDescriptor[] {});
 
         /**

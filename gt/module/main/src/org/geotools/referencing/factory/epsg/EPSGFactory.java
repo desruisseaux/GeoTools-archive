@@ -79,7 +79,9 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.nature.Units;
-import org.geotools.metadata.extent.GeographicBoundingBox;
+import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.metadata.iso.extent.ExtentImpl;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.Identifier;
@@ -292,10 +294,10 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the authority, which is {@link org.geotools.metadata.citation.Citation#EPSG EPSG}.
+     * Returns the authority, which is {@link CitationImpl#EPSG EPSG}.
      */
     public Citation getAuthority() {
-        return org.geotools.metadata.citation.Citation.EPSG;
+        return CitationImpl.EPSG;
     }
 
     /**
@@ -853,10 +855,10 @@ public class EPSGFactory extends AbstractAuthorityFactory {
             stmt.setString(1, trimAuthority(code));
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                org.geotools.metadata.extent.Extent extent = null;
+                ExtentImpl extent = null;
                 final String description = result.getString(1);
                 if (description != null) {
-                    extent = new org.geotools.metadata.extent.Extent();
+                    extent = new ExtentImpl();
                     extent.setDescription(new SimpleInternationalString(description));
                 }
                 final double ymin = result.getDouble(2);
@@ -868,10 +870,10 @@ public class EPSGFactory extends AbstractAuthorityFactory {
                             final double xmax = result.getDouble(5);
                             if (!result.wasNull()) {
                                 if (extent == null) {
-                                    extent = new org.geotools.metadata.extent.Extent();
+                                    extent = new ExtentImpl();
                                 }
                                 extent.setGeographicElements(Collections.singleton(
-                                        new GeographicBoundingBox(xmin, xmax, ymin, ymax)));
+                                        new GeographicBoundingBoxImpl(xmin, xmax, ymin, ymax)));
                             }
                         }
                     }

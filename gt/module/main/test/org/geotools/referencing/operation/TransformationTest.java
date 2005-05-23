@@ -44,6 +44,7 @@ import org.opengis.referencing.operation.Transformation;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 
 
 /**
@@ -81,8 +82,8 @@ public class TransformationTest extends TestTransform {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        assertNotNull(org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_APPLIED);
-        assertNotNull(org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_OMITTED);
+        assertNotNull(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED);
+        assertNotNull(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED);
     }
 
     /**
@@ -264,10 +265,8 @@ public class TransformationTest extends TestTransform {
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
         assertSame(sourceCRS, operation.getSourceCRS());
         assertSame(targetCRS, operation.getTargetCRS());
-        assertTrue(contains(operation.getPositionalAccuracy(),
-                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_APPLIED));
-        assertFalse(contains(operation.getPositionalAccuracy(),
-                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_OMITTED));
+        assertTrue (contains(operation.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+        assertFalse(contains(operation.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
 
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
@@ -310,10 +309,8 @@ public class TransformationTest extends TestTransform {
         final CoordinateOperation lenient = lenientFactory.createOperation(amputedCRS, targetCRS);
         assertSame(amputedCRS, lenient.getSourceCRS());
         assertSame( targetCRS, lenient.getTargetCRS());
-        assertFalse(contains(lenient.getPositionalAccuracy(),
-                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_APPLIED));
-        assertTrue(contains(lenient.getPositionalAccuracy(),
-                   org.geotools.metadata.quality.PositionalAccuracy.DATUM_SHIFT_OMITTED));
+        assertFalse(contains(lenient.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+        assertTrue (contains(lenient.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
 
         final MathTransform lenientTr = lenient.getMathTransform();
         assertInterfaced(lenientTr);

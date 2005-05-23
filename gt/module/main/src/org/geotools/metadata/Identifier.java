@@ -33,6 +33,7 @@ import org.opengis.metadata.citation.Citation;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code IdentifierImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Identifier extends MetadataEntity
         implements org.opengis.metadata.Identifier

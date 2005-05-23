@@ -56,6 +56,7 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.crs.TemporalCRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 
@@ -249,8 +250,7 @@ control:    for (int p=0; p<=1; p++) {
                 geographicArea = CRSUtilities.transform((MathTransform2D)transform.getMathTransform(),
                                                          geographicArea, geographicArea);
             }
-            boundingBox = (GeographicBoundingBox)
-              new org.geotools.metadata.extent.GeographicBoundingBox(geographicArea).unmodifiable();
+            boundingBox = (GeographicBoundingBox) new GeographicBoundingBoxImpl(geographicArea).unmodifiable();
         }
         return boundingBox;
     }

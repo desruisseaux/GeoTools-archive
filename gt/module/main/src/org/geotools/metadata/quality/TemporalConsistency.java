@@ -29,6 +29,7 @@ package org.geotools.metadata.quality;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code TemporalConsistencyImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class TemporalConsistency extends TemporalAccuracy
         implements org.opengis.metadata.quality.TemporalConsistency

@@ -73,7 +73,7 @@ public final class FactoryFinder {
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return The first grid coverage factory that matches the supplied hints.
      * @throws FactoryRegistryException if no implementation was found or can be created for the
-     *         {@link DatumFactory} interface.
+     *         {@link GridCoverageFactory} interface.
      */
     public static synchronized GridCoverageFactory getGridCoverageFactory(final Hints hints)
             throws FactoryRegistryException

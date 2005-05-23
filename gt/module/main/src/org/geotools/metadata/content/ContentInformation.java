@@ -32,6 +32,7 @@ import org.geotools.metadata.MetadataEntity;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ContentInformationImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class ContentInformation extends MetadataEntity
        implements org.opengis.metadata.content.ContentInformation

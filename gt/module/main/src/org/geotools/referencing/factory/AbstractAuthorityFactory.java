@@ -71,6 +71,7 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.Utilities;
 import org.geotools.util.NameFactory;
 
@@ -785,7 +786,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
         if (scope == null) {
             return code;
         }
-        if (org.geotools.metadata.citation.Citation.titleMatches(getAuthority(), scope.toString())) {
+        if (CitationImpl.titleMatches(getAuthority(), scope.toString())) {
             return name.asLocalName().toString();
         }
         final InternationalString authority = getAuthority().getTitle();

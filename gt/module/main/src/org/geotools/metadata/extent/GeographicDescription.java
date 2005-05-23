@@ -33,6 +33,7 @@ import org.opengis.metadata.Identifier;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code GeographicDescriptionImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class GeographicDescription extends GeographicExtent
        implements org.opengis.metadata.extent.GeographicDescription

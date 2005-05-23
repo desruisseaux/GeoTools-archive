@@ -33,6 +33,7 @@ import javax.units.SI;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
@@ -66,7 +67,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.IdentifiedObject;
 import org.geotools.referencing.Identifier;
@@ -227,7 +228,7 @@ public class Parser extends MathTransformParser {
         for (int i=0; i<values.length; i++) {
             directions.put(values[i].name().trim().toUpperCase(), values[i]);
         }
-        predefinedAxis = Citation.GEOTOOLS.equals(csFactory.getVendor()) ? GEOTOOLS_AXIS : NO_AXIS;
+        predefinedAxis = CitationImpl.GEOTOOLS.equals(csFactory.getVendor()) ? GEOTOOLS_AXIS : NO_AXIS;
     }
 
     /**
@@ -325,7 +326,7 @@ public class Parser extends MathTransformParser {
         final String code = element.pullString("code");
         element.close();
         final Map     properties = new HashMap(4);
-        final Citation authority = Citation.createCitation(auth);
+        final Citation authority = CitationImpl.createCitation(auth);
         properties.put(IdentifiedObject.       NAME_PROPERTY, new Identifier(authority, name));
         properties.put(IdentifiedObject.IDENTIFIERS_PROPERTY, new Identifier(authority, code));
         return properties;
@@ -1023,7 +1024,7 @@ public class Parser extends MathTransformParser {
         try {
             final Parser parser = new Parser();
             if (authority != null) {
-                parser.setAuthority(Citation.createCitation(authority));
+                parser.setAuthority(CitationImpl.createCitation(authority));
             }
             parser.reformat(in, arguments.out, arguments.err);
         } catch (Exception exception) {

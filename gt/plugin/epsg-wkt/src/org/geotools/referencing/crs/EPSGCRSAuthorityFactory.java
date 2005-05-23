@@ -18,6 +18,7 @@
  */
 package org.geotools.referencing.crs;
 
+// J2SE dependencies
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,8 +29,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.metadata.citation.Citation;
-import org.geotools.referencing.FactoryFinder;
+// OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -40,6 +41,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.referencing.FactoryFinder;
 
 /**
  * Default implementation for a coordinate reference system authority factory backed
@@ -194,8 +199,8 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
          return (GeographicCRS) createCoordinateReferenceSystem(code);
     }    
     
-    public org.opengis.metadata.citation.Citation getAuthority() {
-        return org.geotools.metadata.citation.Citation.EPSG;
+    public Citation getAuthority() {
+        return CitationImpl.EPSG;
     }
     
     /**  
@@ -260,8 +265,8 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
         return crsFactory;        
     }
     
-    public org.opengis.metadata.citation.Citation getVendor() {
-         return org.geotools.metadata.citation.Citation.GEOTOOLS;
+    public Citation getVendor() {
+         return CitationImpl.GEOTOOLS;
     }
     
     public InternationalString getDescriptionText(String code) throws FactoryException { 

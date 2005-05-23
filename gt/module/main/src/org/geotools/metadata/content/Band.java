@@ -34,6 +34,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code BandImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Band extends RangeDimension
        implements org.opengis.metadata.content.Band

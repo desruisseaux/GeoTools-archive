@@ -48,6 +48,7 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ResponsiblePartyImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class ResponsibleParty extends MetadataEntity
        implements org.opengis.metadata.citation.ResponsibleParty

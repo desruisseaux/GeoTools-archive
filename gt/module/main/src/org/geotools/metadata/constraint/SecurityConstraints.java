@@ -34,6 +34,7 @@ import org.opengis.util.InternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code SecurityConstraintsImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class SecurityConstraints extends Constraints
        implements org.opengis.metadata.constraint.SecurityConstraints

@@ -41,7 +41,7 @@ import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.cs.CartesianCS;
@@ -120,7 +120,7 @@ public class BasicTest extends TestCase {
         }
 
         assertNotNull(properties.remove("authority"));
-        assertNull   (properties.put("AutHOrITY", new Citation("An other authority")));
+        assertNull   (properties.put("AutHOrITY", new CitationImpl("An other authority")));
         identifier = new Identifier(properties);
         assertEquals("authority", "An other authority", identifier.getAuthority().getTitle().toString(Locale.ENGLISH));
 

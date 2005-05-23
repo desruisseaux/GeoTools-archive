@@ -47,6 +47,7 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
@@ -78,7 +79,7 @@ public class Formatter {
     /**
      * The preferred authority for object or parameter names.
      */
-    Citation authority = org.geotools.metadata.citation.Citation.OPEN_GIS;
+    Citation authority = CitationImpl.OPEN_GIS;
 
     /**
      * The unit for formatting measures, or <code>null</code> for the "natural" unit of each WKT
@@ -532,9 +533,9 @@ public class Formatter {
     /**
      * Returns the preferred identifier for the specified object. If the specified
      * object contains an identifier from the preferred authority (usually
-     * {@linkplain org.geotools.metadata.citation.Citation#OPEN_GIS OpenGIS}), then
-     * this identifier is returned. Otherwise, the first identifier is returned. If
-     * the specified object contains no identifier, then this method returns <code>null</code>.
+     * {@linkplain CitationImpl#OPEN_GIS OpenGIS}), then this identifier is
+     * returned. Otherwise, the first identifier is returned. If the specified
+     * object contains no identifier, then this method returns {@code null}.
      *
      * @param  info The object to looks for a preferred identifier.
      * @return The preferred identifier, or <code>null</code> if none.
@@ -574,8 +575,8 @@ public class Formatter {
     /**
      * Returns the preferred name for the specified object. If the specified
      * object contains a name from the preferred authority (usually
-     * {@linkplain org.geotools.metadata.citation.Citation#OPEN_GIS OpenGIS}),
-     * then this name is returned. Otherwise, the first name found is returned.
+     * {@linkplain CitationImpl#OPEN_GIS OpenGIS}), then this name is
+     * returned. Otherwise, the first name found is returned.
      *
      * @param  info The object to looks for a preferred name.
      * @return The preferred name.

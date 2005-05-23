@@ -59,7 +59,7 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -188,14 +188,14 @@ public class TransverseMercator extends MapProjection {
          * @task REVISIT: should we set some default UTM parameter values
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Transverse_Mercator"),
-                new Identifier(Citation.EPSG,     "Transverse Mercator"),
-                new Identifier(Citation.EPSG,     "Gauss-Kruger"),
-                new Identifier(Citation.EPSG,     "9807"),
-                new Identifier(Citation.GEOTIFF,  "CT_TransverseMercator"),
-                new Identifier(Citation.ESRI,     "Transverse_Mercator"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION))
+                new Identifier(CitationImpl.OPEN_GIS, "Transverse_Mercator"),
+                new Identifier(CitationImpl.EPSG,     "Transverse Mercator"),
+                new Identifier(CitationImpl.EPSG,     "Gauss-Kruger"),
+                new Identifier(CitationImpl.EPSG,     "9807"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
+                new Identifier(CitationImpl.ESRI,     "Transverse_Mercator"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,

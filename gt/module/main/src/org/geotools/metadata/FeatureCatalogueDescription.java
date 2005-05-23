@@ -41,6 +41,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code FeatureCatalogueDescriptionImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class FeatureCatalogueDescription extends ContentInformation
        implements org.opengis.metadata.content.FeatureCatalogueDescription

@@ -37,7 +37,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.PlanarProjection;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -174,14 +174,14 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Oblique_Stereographic"),
-                new Identifier(Citation.EPSG,     "Oblique Stereographic"),
-                new Identifier(Citation.EPSG,     "Roussilhe"),
-                new Identifier(Citation.EPSG,     "9809"),
-                new Identifier(Citation.GEOTIFF,  "CT_ObliqueStereographic"),
-                new Identifier(Citation.ESRI,     "Double_Stereographic"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new Identifier(CitationImpl.OPEN_GIS, "Oblique_Stereographic"),
+                new Identifier(CitationImpl.EPSG,     "Oblique Stereographic"),
+                new Identifier(CitationImpl.EPSG,     "Roussilhe"),
+                new Identifier(CitationImpl.EPSG,     "9809"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_ObliqueStereographic"),
+                new Identifier(CitationImpl.ESRI,     "Double_Stereographic"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -258,12 +258,12 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Polar_Stereographic"),
-                new Identifier(Citation.EPSG,     "Polar Stereographic (variant A)"),
-                new Identifier(Citation.EPSG,     "9810"),
-                new Identifier(Citation.GEOTIFF,  "CT_PolarStereographic"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new Identifier(CitationImpl.OPEN_GIS, "Polar_Stereographic"),
+                new Identifier(CitationImpl.EPSG,     "Polar Stereographic (variant A)"),
+                new Identifier(CitationImpl.EPSG,     "9810"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_PolarStereographic"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -323,8 +323,8 @@ public abstract class Stereographic extends MapProjection {
          */
         public static final ParameterDescriptor LATITUDE_TRUE_SCALE = createOptionalDescriptor(
                 new Identifier[] {
-                    new Identifier(Citation.ESRI, "Standard_Parallel_1"),
-                    new Identifier(Citation.EPSG, "Latitude of standard parallel")
+                    new Identifier(CitationImpl.ESRI, "Standard_Parallel_1"),
+                    new Identifier(CitationImpl.EPSG, "Latitude of standard parallel")
                 },
                 -90, 90, NonSI.DEGREE_ANGLE);
                 
@@ -332,10 +332,10 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.EPSG,     "Polar Stereographic (variant B)"),
-                new Identifier(Citation.EPSG,     "9829"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new Identifier(CitationImpl.EPSG,     "Polar Stereographic (variant B)"),
+                new Identifier(CitationImpl.EPSG,     "9829"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,
@@ -402,9 +402,9 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.ESRI,     "Stereographic_North_Pole"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new Identifier(CitationImpl.ESRI,     "Stereographic_North_Pole"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,
@@ -469,9 +469,9 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.ESRI,     "Stereographic_South_Pole"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new Identifier(CitationImpl.ESRI,     "Stereographic_South_Pole"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_TRUE_SCALE,
@@ -526,10 +526,10 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.ESRI,     "Stereographic"),
-                new Identifier(Citation.GEOTIFF,  "CT_Stereographic"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.STEREOGRAPHIC_PROJECTION))
+                new Identifier(CitationImpl.ESRI,     "Stereographic"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_Stereographic"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.STEREOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,

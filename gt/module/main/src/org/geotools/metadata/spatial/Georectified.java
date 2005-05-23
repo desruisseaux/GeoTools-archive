@@ -46,6 +46,7 @@ import org.geotools.util.CheckedArrayList;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code GeorectifiedImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Georectified extends GridSpatialRepresentation
         implements org.opengis.metadata.spatial.Georectified

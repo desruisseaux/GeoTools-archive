@@ -36,6 +36,7 @@ import org.opengis.referencing.datum.VerticalDatum;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code VerticalExtentImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class VerticalExtent extends MetadataEntity
        implements org.opengis.metadata.extent.VerticalExtent

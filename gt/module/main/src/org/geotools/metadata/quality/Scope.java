@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ScopeImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Scope extends MetadataEntity implements org.opengis.metadata.quality.Scope {
     /**

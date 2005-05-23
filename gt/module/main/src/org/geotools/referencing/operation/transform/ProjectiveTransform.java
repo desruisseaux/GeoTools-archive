@@ -44,7 +44,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.MatrixParameterDescriptors;
 import org.geotools.parameter.MatrixParameterValues;
 import org.geotools.referencing.Identifier;
@@ -477,14 +477,14 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          */
         static final ParameterDescriptorGroup PARAMETERS;
         static {
-            final Identifier name = new Identifier(Citation.OPEN_GIS, "Affine");
+            final Identifier name = new Identifier(CitationImpl.OPEN_GIS, "Affine");
             final Map  properties = new HashMap(4, 0.8f);
             properties.put(NAME_PROPERTY,        name);
             properties.put(IDENTIFIERS_PROPERTY, name);
             properties.put(ALIAS_PROPERTY, new Identifier[] {name,
-                new Identifier(Citation.EPSG, "Affine general parametric transformation"),
-                new Identifier(Citation.EPSG, "9624"),
-                new Identifier(Citation.GEOTOOLS,
+                new Identifier(CitationImpl.EPSG, "Affine general parametric transformation"),
+                new Identifier(CitationImpl.EPSG, "9624"),
+                new Identifier(CitationImpl.GEOTOOLS,
                     Resources.formatInternational(ResourceKeys.AFFINE_TRANSFORM))
             });
             PARAMETERS = new MatrixParameterDescriptors(properties);

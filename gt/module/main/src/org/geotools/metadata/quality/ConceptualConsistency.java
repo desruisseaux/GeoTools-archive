@@ -29,6 +29,7 @@ package org.geotools.metadata.quality;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ConceptualConsistencyImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class ConceptualConsistency extends LogicalConsistency
         implements org.opengis.metadata.quality.ConceptualConsistency

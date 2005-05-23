@@ -35,6 +35,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Jody Garnett
  * @author Martin Desruisseaux
+ * @deprecated Renamed as {@code SeriesImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Series extends MetadataEntity
        implements org.opengis.metadata.citation.Series

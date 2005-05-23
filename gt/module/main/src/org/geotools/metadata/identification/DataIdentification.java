@@ -46,6 +46,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code DataIdentificationImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class DataIdentification extends Identification
         implements org.opengis.metadata.identification.DataIdentification

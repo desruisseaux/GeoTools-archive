@@ -34,6 +34,7 @@ import org.opengis.metadata.content.RangeDimension;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code CoverageDescriptionImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class CoverageDescription extends ContentInformation
        implements org.opengis.metadata.content.CoverageDescription

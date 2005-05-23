@@ -38,6 +38,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code MetadataExtensionInformationImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class MetadataExtensionInformation extends MetadataEntity
         implements org.opengis.metadata.MetadataExtensionInformation
@@ -78,7 +79,7 @@ public class MetadataExtensionInformation extends MetadataEntity
      */
     public synchronized void setextensionOnLineResource(final OnLineResource newValue) {
         checkWritePermission();
-	this.extensionOnLineResource = newValue; 
+        this.extensionOnLineResource = newValue; 
     }
 
     /**
@@ -117,7 +118,7 @@ public class MetadataExtensionInformation extends MetadataEntity
         if (object!=null && object.getClass().equals(getClass())) {
             final MetadataExtensionInformation that = (MetadataExtensionInformation) object;
             return Utilities.equals(extensionOnLineResource,    that.extensionOnLineResource   ) &&
-		   Utilities.equals(extendedElementInformation, that.extendedElementInformation);
+                   Utilities.equals(extendedElementInformation, that.extendedElementInformation);
         }
         return false;
     }

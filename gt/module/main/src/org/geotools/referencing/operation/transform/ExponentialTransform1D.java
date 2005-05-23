@@ -34,7 +34,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.ParameterReal;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.LinearTransform;
@@ -347,8 +347,8 @@ public class ExponentialTransform1D extends AbstractMathTransform
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.EXPONENTIAL))
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.EXPONENTIAL))
             }, new ParameterDescriptor[] {
                 BASE, SCALE
             });

@@ -36,6 +36,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code GeometricObjectsImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class GeometricObjects extends MetadataEntity
         implements org.opengis.metadata.spatial.GeometricObjects

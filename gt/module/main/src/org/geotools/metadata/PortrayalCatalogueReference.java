@@ -38,6 +38,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code PortrayalCatalogueReferenceImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class PortrayalCatalogueReference extends MetadataEntity
         implements org.opengis.metadata.PortrayalCatalogueReference

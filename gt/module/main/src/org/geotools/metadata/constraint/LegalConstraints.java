@@ -39,6 +39,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code LegalConstraintsImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class LegalConstraints extends Constraints
        implements org.opengis.metadata.constraint.LegalConstraints

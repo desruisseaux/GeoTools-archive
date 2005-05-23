@@ -37,6 +37,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ConformanceResultImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class ConformanceResult extends Result
         implements org.opengis.metadata.quality.ConformanceResult

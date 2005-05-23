@@ -193,7 +193,7 @@ public final class Hints extends RenderingHints {
      * {@code TRUE}, then the user is strongly encouraged to check the
      * {@linkplain org.opengis.referencing.operation.CoordinateOperation#getPositionalAccuracy
      * positional accuracy} for every transformation created. If the set of positional accuracy
-     * contains {@link org.geotools.metadata.quality.PositionalAccuracy#DATUM_SHIFT_OMITTED
+     * contains {@link org.geotools.metadata.iso.quality.PositionalAccuracy#DATUM_SHIFT_OMITTED
      * DATUM_SHIFT_OMITTED}, this means that an "ellipsoid shift" were applied without real
      * datum shift method available, and the transformed coordinates may have one kilometer
      * error. The application should warn the user (e.g. popup a message dialog box) in such

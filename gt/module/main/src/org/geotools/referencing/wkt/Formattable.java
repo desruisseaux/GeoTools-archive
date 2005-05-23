@@ -32,6 +32,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.cs.CoordinateSystem;
 
 // Geotools dependencies
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -81,7 +82,7 @@ public class Formattable {
      * </code><i>etc.</i><code>]"</code>.
      */
     public String toString() {
-        return toWKT(org.geotools.metadata.citation.Citation.OPEN_GIS, getIndentation(), false);
+        return toWKT(CitationImpl.OPEN_GIS, getIndentation(), false);
     }
 
     /**
@@ -122,7 +123,7 @@ public class Formattable {
      *         implementations can be formatted as WKT.
      */
     public String toWKT(final int indentation) throws UnformattableObjectException {
-        return toWKT(org.geotools.metadata.citation.Citation.OPEN_GIS, indentation);
+        return toWKT(CitationImpl.OPEN_GIS, indentation);
     }
 
     /**

@@ -47,6 +47,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.geotools.factory.JNDI;
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
@@ -114,10 +115,10 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     }
 
     /**
-     * Returns the authority, which is {@link org.geotools.metadata.citation.Citation#EPSG EPSG}.
+     * Returns the authority, which is {@link CitationImpl#EPSG EPSG}.
      */
     public Citation getAuthority() {
-        return org.geotools.metadata.citation.Citation.EPSG;
+        return CitationImpl.EPSG;
     }
 
     /**

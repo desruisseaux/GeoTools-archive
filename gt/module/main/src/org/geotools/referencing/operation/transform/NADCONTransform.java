@@ -55,7 +55,7 @@ import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.Identifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Arguments;
@@ -968,11 +968,11 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "NADCON"),
-                new Identifier(Citation.EPSG,     "NADCON"),
-                new Identifier(Citation.EPSG,     "9613"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.NADCON_TRANSFORM))
+                new Identifier(CitationImpl.OPEN_GIS, "NADCON"),
+                new Identifier(CitationImpl.EPSG,     "NADCON"),
+                new Identifier(CitationImpl.EPSG,     "9613"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.NADCON_TRANSFORM))
             }, new ParameterDescriptor[] {
                 LAT_DIFF_FILE,
                 LONG_DIFF_FILE

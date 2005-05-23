@@ -30,6 +30,7 @@ package org.geotools.metadata.identification;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ServiceIdentificationImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class ServiceIdentification extends Identification
         implements org.opengis.metadata.identification.ServiceIdentification

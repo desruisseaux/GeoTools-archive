@@ -43,6 +43,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code GeoreferenceableImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Georeferenceable extends GridSpatialRepresentation
         implements org.opengis.metadata.spatial.Georeferenceable

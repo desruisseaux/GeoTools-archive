@@ -38,6 +38,7 @@ import org.opengis.spatialschema.geometry.Geometry;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code BoundingPolygonImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class BoundingPolygon extends GeographicExtent
        implements org.opengis.metadata.extent.BoundingPolygon

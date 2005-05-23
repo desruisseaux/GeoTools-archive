@@ -32,6 +32,7 @@ import org.geotools.metadata.MetadataEntity;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code ResolutionImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Resolution extends MetadataEntity
         implements org.opengis.metadata.identification.Resolution

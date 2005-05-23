@@ -34,7 +34,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.PlanarProjection;
 
 // Geotools dependencies
-import org.geotools.metadata.citation.Citation;
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.Identifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -81,11 +81,11 @@ public abstract class Orthographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(Citation.OPEN_GIS, "Orthographic"),
-                new Identifier(Citation.GEOTIFF,  "CT_Orthographic"),
-                new Identifier(Citation.ESRI,     "Orthographic"),
-                new Identifier(Citation.GEOTOOLS, Resources.formatInternational(
-                                                  ResourceKeys.ORTHOGRAPHIC_PROJECTION))
+                new Identifier(CitationImpl.OPEN_GIS, "Orthographic"),
+                new Identifier(CitationImpl.GEOTIFF,  "CT_Orthographic"),
+                new Identifier(CitationImpl.ESRI,     "Orthographic"),
+                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                      ResourceKeys.ORTHOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,

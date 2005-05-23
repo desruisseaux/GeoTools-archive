@@ -30,6 +30,7 @@ package org.geotools.metadata.quality;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code TopologicalConsistencyImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class TopologicalConsistency extends LogicalConsistency
         implements org.opengis.metadata.quality.TopologicalConsistency

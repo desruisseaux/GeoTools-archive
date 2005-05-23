@@ -41,6 +41,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ * @deprecated Renamed as {@code DistributionImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class Distribution extends MetadataEntity
        implements org.opengis.metadata.distribution.Distribution

@@ -38,6 +38,7 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @deprecated Renamed as {@code CitationDateImpl} in {@code org.geotools.metadata.iso} subpackage.
  */
 public class CitationDate extends MetadataEntity
         implements org.opengis.metadata.citation.CitationDate

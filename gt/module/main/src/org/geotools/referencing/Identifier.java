@@ -32,17 +32,21 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
-import org.geotools.util.GrowableInternationalString;
-import org.geotools.util.WeakValueHashMap;
+// OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
 import org.opengis.util.ScopedName;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.util.GrowableInternationalString;
+import org.geotools.util.WeakValueHashMap;
 
 
 /**
@@ -191,8 +195,8 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link org.geotools.metadata.citation.Citation#OPEN_GIS}
-     *                  or {@link org.geotools.metadata.citation.Citation#EPSG}).
+     * @param authority The authority (e.g. {@link CitationImpl#OPEN_GIS OPEN_GIS}
+     *                  or {@link CitationImpl#EPSG EPSG}).
      * @param code      The code. The {@linkplain Locale#US English name} is used
      *                  for the code, and the international string is used for the
      *                  {@linkplain GenericName generic name}.
@@ -207,8 +211,8 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link org.geotools.metadata.citation.Citation#OPEN_GIS}
-     *                  or {@link org.geotools.metadata.citation.Citation#EPSG}).
+     * @param authority The authority (e.g. {@link CitationImpl#OPEN_GIS OPEN_GIS}
+     *                  or {@link Citation#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
      */
     public Identifier(final Citation authority, final String code) {
@@ -220,8 +224,8 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link org.geotools.metadata.citation.Citation#OPEN_GIS}
-     *                  or {@link org.geotools.metadata.citation.Citation#EPSG}).
+     * @param authority The authority (e.g. {@link CitationImpl#OPEN_GIS OPEN_GIS}
+     *                  or {@link CitationImpl#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
      * @param version   The version, or <code>null</code> if none.
      */
@@ -308,7 +312,7 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
                 case 1475610435: {
                     if (key.equals(AUTHORITY_PROPERTY)) {
                         if (value instanceof String) {
-                            value = new org.geotools.metadata.citation.Citation(value.toString());
+                            value = new CitationImpl(value.toString());
                         }
                         authority = value;
                         continue;
