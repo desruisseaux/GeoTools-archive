@@ -55,12 +55,14 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux
+ * @author Richard Didier
  */
 public class FactoryForSQL extends EPSGFactory {
     /**
      * The default map using ANSI names.
      */
     private static final String[] ANSI = {
+        "[Alias]",                                  "epsg_alias",
         "[Area]",                                   "epsg_area",
         "[Coordinate Axis]",                        "epsg_coordinateaxis",
         "[Coordinate Axis Name]",                   "epsg_coordinateaxisname",
@@ -73,6 +75,7 @@ public class FactoryForSQL extends EPSGFactory {
         "[Coordinate System]",                      "epsg_coordinatesystem",
         "[Datum]",                                  "epsg_datum",
         "[Ellipsoid]",                              "epsg_ellipsoid",
+        "[Naming System]",                          "epsg_namingsystem",
         "[Prime Meridian]",                         "epsg_primemeridian",
         "[Unit of Measure]",                        "epsg_unitofmeasure",
         "[CA.ORDER]",                               "coord_axis_order" //a field in epsg_coordinateaxis
