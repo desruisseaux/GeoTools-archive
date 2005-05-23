@@ -107,6 +107,10 @@ class GT30Header {
             throw new DataSourceException(
                 "Needed properties missing in GTOPO30 header file");
         }
+		
+		//freeing
+		reader.close();
+		reader=null;
     }
 
     /**
@@ -324,6 +328,9 @@ class GT30Header {
             // read next line
             currLine = reader.readLine();
         }
+		
+		//closing the reader
+		reader.close();
     }
 
     /**
