@@ -69,7 +69,14 @@
       <id>jdom</id>
       <version>1.0b10</version>
       <url>http://www.jdom.org/</url>
-    </dependency>    
+    </dependency>   
+    <dependency>
+      <id>XDO</id>
+      <version>beta</version>
+      <properties>
+        <release.bundle>true</release.bundle>
+       </properties>
+    </dependency> 
   </dependencies>
   <build>
     <unitTest>
