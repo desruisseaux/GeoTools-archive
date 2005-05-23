@@ -319,8 +319,8 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
 
   <goal name="xjavadoc">
     <echo>${basedir}</echo>
-    <maven:reactor basedir="${basedir}"
-      includes="module/*/project.xml"
+    <maven:reactor basedir="."
+      includes="*/*/project.xml"
       excludes="**/target/**,**/test/project.xml,project.xml,site/**"
       banner="Site Prep:"
       ignoreFailures="false"
