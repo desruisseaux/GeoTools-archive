@@ -51,7 +51,7 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
     public static final ParameterDescriptor FORMAT = new ParameterDescriptor("Format",
             "Indicates the output format for this image", "png", true);
     public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
-            CoordinateReferenceSystem.class, //calss of the object we will pass
+            CoordinateReferenceSystem.class, //class of the object we will pass
             null, //list of valid values not provided
             getDefaultCRS() //default value
         );

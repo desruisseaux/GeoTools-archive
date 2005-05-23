@@ -439,6 +439,9 @@ public class WorldImageWriter implements GridCoverageWriter {
 		layout.setSampleModel(colorModel.createCompatibleSampleModel(surrogateImage.getWidth(), surrogateImage.getHeight()));
 		RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
 		surrogateImage = JAI.create("ColorConvert", pb, hints).createInstance();
+        pb.removeParameters();
+        pb.removeSources();
+		
 		return surrogateImage;
 	}
 
@@ -484,8 +487,10 @@ public class WorldImageWriter implements GridCoverageWriter {
          */
         int transparencyIndex = -1;
         int index = -1;
-        for (int i = 0; i < raster.getHeight(); i++) {
-            for (int j = 0; j < raster.getWidth(); j++) {
+		final int H=raster.getHeight();
+		final int W=raster.getWidth();
+        for (int i = 0; i < H; i++) {
+            for (int j = 0; j < W; j++) {
                 //index in the color map is given by a value in the raster.
                 index = raster.getSample(j, i, 0);
 
@@ -624,7 +629,10 @@ public class WorldImageWriter implements GridCoverageWriter {
         RenderingHints hint = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
         RenderedOp dst = JAI.create("format", pbFormat, hint);
         surrogateImage = dst.createSnapshot();
-
+		pbFormat.removeParameters();
+		pbFormat.removeSources();
+		dst.dispose();
+		
         return surrogateImage;
     }
 
@@ -700,6 +708,9 @@ public class WorldImageWriter implements GridCoverageWriter {
                     pb.addSource(surrogateImage);
                     pb.addSource(firstBand);
                     surrogateImage = JAI.create("bandmerge", pb);
+					
+                    pb.removeParameters();
+                    pb.removeSources();					
                 }
             }
 
@@ -765,8 +776,8 @@ public class WorldImageWriter implements GridCoverageWriter {
 		rgba[2][transparencyIndex]=0;
 		
         //get the data (actually a copy of them) and prepare to rewrite them
-        final WritableRaster rasterGIF = surrogateImage.copyData();
-		final Raster rasterAlpha=((PlanarImage)alphaChannel).copyData();
+        WritableRaster rasterGIF = surrogateImage.copyData();
+		Raster rasterAlpha=((PlanarImage)alphaChannel).copyData();
 		((PlanarImage)alphaChannel).dispose();
 		
         /**
@@ -820,8 +831,12 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         //disposing old image
         surrogateImage.dispose();
-
-        return PlanarImage.wrapRenderedImage(image);
+		
+		PlanarImage retImage=PlanarImage.wrapRenderedImage(image);
+		image=null;
+		rasterGIF=null;
+		rasterAlpha=null;
+        return retImage;
     }
 
     /**
@@ -848,7 +863,9 @@ public class WorldImageWriter implements GridCoverageWriter {
         pb.add(ditherMask);
 
         RenderedOp op1 = JAI.create("errordiffusion", pb, null);
- 
+        pb.removeParameters();
+        pb.removeSources();
+		
         return op1.createSnapshot();
     }
 
@@ -938,7 +955,10 @@ public class WorldImageWriter implements GridCoverageWriter {
 
         RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
         image2return = JAI.create("format", pb, hints);
-
+        pb.removeSources();
+        pb.removeParameters();
+		surrogateImage.dispose();
+		
         return image2return;
     }
 

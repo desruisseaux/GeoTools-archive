@@ -422,13 +422,13 @@ public class WorldImageReader implements GridCoverageReader {
 			geophysicRange=new NumberRange(0, 255);
 			break;
 		case DataBuffer.TYPE_USHORT:
-			geophysicRange=new NumberRange(0, 655535);
+			geophysicRange=new NumberRange(0, 65535);
 			break;
 		case DataBuffer.TYPE_INT:
 			geophysicRange=new NumberRange(-Integer.MAX_VALUE,Integer.MAX_VALUE);
 			break;	
 		default:
-			throw new IOException("Data buffer type not supported! Use byte, ushort or int");
+			throw new IOException("Data buffer type not supported by this world image reader! Use byte, ushort or int");
 		}
         try {
 			
