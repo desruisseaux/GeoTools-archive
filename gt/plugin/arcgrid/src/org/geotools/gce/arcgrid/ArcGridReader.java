@@ -373,37 +373,12 @@ public class ArcGridReader implements GridCoverageReader {
 
         envelope.setCoordinateReferenceSystem(coordinateSystem);
 
-        //                                        (float) arcGridRaster.getMinValue(),
-        //                                      (float) arcGridRaster.getMaxValue());
         try {
-            //////////////////////////////////////////////////////////////////////////////////////////////////
-            //
-            //TODO this is not finished it is just a temporary hack
-            //
-            //////////////////////////////////////////////////////////////////////////////////////////////////
 
-            /**
-             *
-             */
-
-            //String UoM =;
-            //UnitFormat unitFormat = UnitFormat.getStandardInstance();
             Unit uom = null;
 
-            //try {
-            //    uom = unitFormat.parseUnit(UoM);
-            //} catch (ParseException ex1) {
-            //    uom = null;
-            //}
-            //IT WILL BECOME GRAYSCALE FOR THE MOMENT
+   
             Category values;
-
-            //try {
-            //    uom = unitFormat.parseUnit(UoM);
-            //} catch (ParseException ex1) {
-            //    uom = null;
-            //}
-            //IT WILL BECOME GRAYSCALE FOR THE MOMENT
             Category nan;
             values = new Category("values",
                     new Color[] { Color.BLUE, Color.GREEN, Color.RED },
@@ -418,18 +393,13 @@ public class ArcGridReader implements GridCoverageReader {
             band = band.geophysics(true);
 
             BufferedImage image = new BufferedImage(band.getColorModel(),
-                    raster, false, null); //properties????
+                    raster, false, null); //TODO properties????
 
             return new GridCoverage2D("ArcGrid", //TODO SET THE NAME!!!
                 image, coordinateSystem, envelope,
                 new GridSampleDimension[] { band }, null, null); //TODO SET THE METADATA AS SOON AS POSSIBLE!!!!
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////
-            //
-            //TODO this is not finishedit is just a temporary hack
-            //
-            //////////////////////////////////////////////////////////////////////////////////////////////////
-        } catch (NoSuchElementException e) {
+  } catch (NoSuchElementException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -437,32 +407,7 @@ public class ArcGridReader implements GridCoverageReader {
         return null;
     }
 
-    /*
-       private WritableRaster preprocessRaster(WritableRaster dest, float min, float max) {
-         if (dest == null) {
-           return dest;
-         }
-         WritableRaster newRaster= RasterFactory.createBandedRaster(DataBuffer.TYPE_BYTE,dest.getWidth(),dest.getHeight(),1,null);
-         float scale = (255.0f - 1.0f) / (max - min);
-         float offset = -min * (255.0f - 1.0f) / (max - min) + 1.0f;
-         float temp = 0.0f;
-         for (int i = 0; i < dest.getHeight(); i++) {
-           for (int j = 0; j < dest.getWidth(); j++) {
-             //getting value
-             temp = dest.getSample(j, i, 0);
-             if (Float.isNaN(temp)) {
-               newRaster.setSample(j, i, 0, 0.0f);
-             }
-             else {
-               newRaster.setSample(j, i, 0, temp * scale +offset);
-             }
-           }
-         }
-         dest=newRaster;
-         return dest;
-       }
-     */
-
+   
     /**
      * Gets the coordinate system that will be associated to the GridCoverage.
      * Gets the coordinate system that will be associated to the GridCoverage.
