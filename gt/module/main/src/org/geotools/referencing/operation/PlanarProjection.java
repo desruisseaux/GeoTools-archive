@@ -28,6 +28,7 @@ import java.util.Map;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 
@@ -50,7 +51,26 @@ public class PlanarProjection extends Projection
     private static final long serialVersionUID = 8171256287775067736L;
 
     /**
-     * Construct a projection from a set of properties. The properties given in argument
+     * Constructs a new projection with the same values than the specified one, together with the
+     * specified source and target CRS. While the source conversion can be an arbitrary one, it is
+     * typically a {@linkplain DefiningConversion defining conversion}.
+     *
+     * @param conversion The defining conversion.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
+     */
+    public PlanarProjection(final Conversion                conversion,
+                            final CoordinateReferenceSystem sourceCRS,
+                            final CoordinateReferenceSystem targetCRS,
+                            final MathTransform             transform)
+    {
+        super(conversion, sourceCRS, targetCRS, transform);
+    }
+
+    /**
+     * Constructs a projection from a set of properties. The properties given in argument
      * follow the same rules than for the {@link CoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.

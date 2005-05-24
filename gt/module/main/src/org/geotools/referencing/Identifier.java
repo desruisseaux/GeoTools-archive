@@ -212,7 +212,7 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
      * @param authority The authority (e.g. {@link CitationImpl#OPEN_GIS OPEN_GIS}
-     *                  or {@link Citation#EPSG EPSG}).
+     *                  or {@link CitationImpl#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
      */
     public Identifier(final Citation authority, final String code) {

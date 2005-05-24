@@ -40,8 +40,6 @@ import org.opengis.referencing.operation.OperationMethod;
  * <P>An unofficial list of projections and their parameters can
  * be found <A HREF="http://www.remotesensing.org/geotiff/proj_list/">there</A>.
  * Most projections expect the following parameters:
- *  <code>"semi_major"</code> (mandatory),
- *  <code>"semi_minor"</code> (mandatory),
  *  <code>"central_meridian"</code> (default to 0),
  *  <code>"latitude_of_origin"</code> (default to 0),
  *  <code>"scale_factor"</code> (default to 1),
@@ -59,6 +57,25 @@ public class Projection extends Conversion implements org.opengis.referencing.op
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -7176751851369816864L;
+
+    /**
+     * Constructs a new projection with the same values than the specified one, together with the
+     * specified source and target CRS. While the source conversion can be an arbitrary one, it is
+     * typically a {@linkplain DefiningConversion defining conversion}.
+     *
+     * @param conversion The defining conversion.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
+     */
+    public Projection(final org.opengis.referencing.operation.Conversion conversion,
+                      final CoordinateReferenceSystem sourceCRS,
+                      final CoordinateReferenceSystem targetCRS,
+                      final MathTransform             transform)
+    {
+        super(conversion, sourceCRS, targetCRS, transform);
+    }
 
     /**
      * Construct a projection from a set of properties. The properties given in argument

@@ -91,6 +91,8 @@ public final class CRSUtilities {
      * @param  object1 The first object to compare (may be null).
      * @param  object2 The second object to compare (may be null).
      * @return <code>true</code> if both objects are equals.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
         if (object1 == object2) {
@@ -255,6 +257,8 @@ public final class CRSUtilities {
     /**
      * Returns the first horizontal coordinate reference system found in the given CRS,
      * or {@code null} if there is none.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof SingleCRS && crs.getCoordinateSystem().getDimension()==2) {
@@ -282,6 +286,8 @@ public final class CRSUtilities {
     /**
      * Returns the first projected coordinate reference system found in a the given CRS,
      * or {@code null} if there is none.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static ProjectedCRS getProjectedCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof ProjectedCRS) {
@@ -302,6 +308,8 @@ public final class CRSUtilities {
     /**
      * Returns the first vertical coordinate reference system found in a the given CRS,
      * or {@code null} if there is none.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static VerticalCRS getVerticalCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof VerticalCRS) {
@@ -322,6 +330,8 @@ public final class CRSUtilities {
     /**
      * Returns the first temporal coordinate reference system found in the given CRS,
      * or {@code null} if there is none.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static TemporalCRS getTemporalCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof TemporalCRS) {
@@ -341,6 +351,8 @@ public final class CRSUtilities {
 
     /**
      * Returns the datum of the specified CRS, or {@code null} if none.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static Datum getDatum(final CoordinateReferenceSystem crs) {
         return (crs instanceof SingleCRS) ? ((SingleCRS) crs).getDatum() : null;
@@ -349,6 +361,8 @@ public final class CRSUtilities {
     /**
      * Returns the first ellipsoid found in a coordinate reference system,
      * or {@code null} if there is none.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static Ellipsoid getEllipsoid(final CoordinateReferenceSystem crs) {
         final Datum datum = getDatum(crs);
@@ -393,6 +407,8 @@ public final class CRSUtilities {
      *
      * @param  crs The coordinate reference system, or {@code null}.
      * @return The envelope, or {@code null} if none.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
         GeneralEnvelope envelope = null;
@@ -439,6 +455,8 @@ public final class CRSUtilities {
      * @return The transformed envelope. It may not have the same number of dimensions
      *         than the original envelope.
      * @throws TransformException if a transform failed.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
             throws TransformException
@@ -499,6 +517,8 @@ public final class CRSUtilities {
      * @return {@code dest}, or a new rectangle if {@code dest} was non-null
      *         and {@code source} was null.
      * @throws TransformException if a transform failed.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static Rectangle2D transform(final MathTransform2D transform,
                                         final Rectangle2D     source,
@@ -555,6 +575,8 @@ public final class CRSUtilities {
      * @throws TransformException if the transformation failed.
      *
      * @see AffineTransform#deltaTransform(Point2D,Point2D)
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static Point2D deltaTransform(final MathTransform2D transform,
                                          final Point2D         origin,
@@ -585,6 +607,11 @@ public final class CRSUtilities {
      * form "45°00.00'N-50°00.00'N 30°00.00'E-40°00.00'E". If a map projection is required in
      * order to obtain this representation, it will be automatically applied.  This string is
      * mostly used for debugging purpose.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     *       Or yet better: move formatting code in {@code GeographicBoundingBox.toString()}
+     *       method, and move the transformation code into {@code GeographicBoundingBox}
+     *       constructor.
      */
     public static String toWGS84String(CoordinateReferenceSystem crs, Rectangle2D bounds) {
         Exception exception;

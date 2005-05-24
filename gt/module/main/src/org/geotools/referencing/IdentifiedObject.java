@@ -176,6 +176,16 @@ public class IdentifiedObject extends Formattable
     private final InternationalString remarks;
 
     /**
+     * Constructs a new identified object with the same values than the specified one.
+     */
+    public IdentifiedObject(final org.opengis.referencing.IdentifiedObject object) {
+        name        = object.getName();
+        alias       = object.getAlias();
+        identifiers = object.getIdentifiers();
+        remarks     = object.getRemarks();
+    }
+
+    /**
      * Constructs an object from a set of properties. Keys are strings from the table below.
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
      * argument shall contains at least a <code>"name"</code> property. Other properties listed

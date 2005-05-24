@@ -22,8 +22,9 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -39,9 +40,12 @@ import org.opengis.referencing.operation.Projection;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.parameter.Parameters;
 import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.operation.SingleOperation;
+import org.geotools.referencing.operation.Operation;
+import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -73,7 +77,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      * when a comparaison is in progress. A null value means <CODE>false</CODE>, and a non-null
      * value means <CODE>true</CODE>. The non-null value is used for assertion.</P>
      *
-     * <P>When an <CODE>equals</CODE> method is invoked, this <CODE>\u00A4COMPARING</CODE>
+     * <P>When an <CODE>equals</CODE> method is invoked, this <CODE>_COMPARING</CODE>
      * field is set to the originator (either the <CODE>GeneralDerivedCRS</CODE> or the
      * {@link org.geotools.referencing.operation.CoordinateOperation} object where the
      * comparaison begin).</P>
@@ -85,7 +89,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *       because {@link org.geotools.referencing.operation.CoordinateOperation} lives in
      *       a different package.
      */
-    public static IdentifiedObject COMPARING;
+    public static IdentifiedObject _COMPARING;
 
     /**
      * The base coordinate reference system.
@@ -96,6 +100,43 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      * The conversion from the {@linkplain #getBaseCRS base CRS} to this CRS.
      */
     protected final Conversion conversionFromBase;
+
+    /**
+     * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}.
+     * The properties are given unchanged to the
+     * {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
+     * constructor}.
+     *
+     * @param  properties Name and other properties to give to the new derived CRS object.
+     * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
+     * @param  base Coordinate reference system to base the derived CRS on.
+     * @param  baseToDerived The transform from the base CRS to returned CRS.
+     * @param  derivedCS The coordinate system for the derived CRS. The number
+     *         of axes must match the target dimension of the transform
+     *         <code>baseToDerived</code>.
+     * @throws MismatchedDimensionException if the source and target dimension of
+     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
+     *         and <code>derivedCS</code> respectively.
+     */
+    protected GeneralDerivedCRS(final Map                 properties,
+                                final Conversion  conversionFromBase,
+                                final CoordinateReferenceSystem base,
+                                final MathTransform    baseToDerived,
+                                final CoordinateSystem     derivedCS)
+            throws MismatchedDimensionException
+    {
+        super(properties, getDatum(base), derivedCS);
+        ensureNonNull("conversionFromBase", conversionFromBase);
+        ensureNonNull("baseToDerived",      baseToDerived);
+        this.baseCRS = base;
+        checkDimensions(base, baseToDerived, derivedCS);
+        org.geotools.referencing.operation.OperationMethod.checkDimensions(conversionFromBase.getMethod(), baseToDerived);
+        this.conversionFromBase = org.geotools.referencing.operation.Conversion.create(
+            /* definition */ conversionFromBase,
+            /* sourceCRS  */ base,
+            /* targetCRS  */ this,
+            /* transform  */ baseToDerived);
+    }
 
     /**
      * Constructs a derived CRS from a set of properties. The properties are given unchanged to
@@ -133,27 +174,17 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
      *         and <code>derivedCS</code> respectively.
      */
-    public GeneralDerivedCRS(final Map                 properties,
-                             final OperationMethod         method,
-                             final CoordinateReferenceSystem base,
-                             final MathTransform    baseToDerived,
-                             final CoordinateSystem     derivedCS)
+    protected GeneralDerivedCRS(final Map                 properties,
+                                final OperationMethod         method,
+                                final CoordinateReferenceSystem base,
+                                final MathTransform    baseToDerived,
+                                final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
         super(properties, getDatum(base), derivedCS);
         ensureNonNull("method",        method);
         ensureNonNull("baseToDerived", baseToDerived);
         this.baseCRS = base;
-        final int dimSource = baseToDerived.getSourceDimensions();
-        final int dimTarget = baseToDerived.getTargetDimensions();
-        int dim1, dim2;
-        if ((dim1=dimSource) != (dim2=base.getCoordinateSystem().getDimension()) ||
-            (dim1=dimTarget) != (dim2=derivedCS.getDimension()))
-        {
-            throw new MismatchedDimensionException(Resources.format(
-                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
-                        new Integer(dim1), new Integer(dim2)));
-        }
         /*
          * A method was explicitly specified. Make sure that the source and target
          * dimensions match. We do not check parameters in current version of this
@@ -161,8 +192,9 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
          * descriptors provided in this user-supplied OperationMethod may be more
          * accurate than the one inferred from the MathTransform.
          */
+        checkDimensions(base, baseToDerived, derivedCS);
         org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
-        this.conversionFromBase = (Conversion) SingleOperation.create(
+        this.conversionFromBase = (Conversion) Operation.create(
             /* properties */ new UnprefixedMap(properties, "conversion."),
             /* sourceCRS  */ base,
             /* targetCRS  */ this,
@@ -180,6 +212,26 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
     private static Datum getDatum(final CoordinateReferenceSystem base) {
         ensureNonNull("base",  base);
         return (base instanceof SingleCRS) ? ((SingleCRS) base).getDatum() : null;
+    }
+
+    /**
+     * Checks consistency between the base CRS and the "base to derived" transform.
+     */
+    private static void checkDimensions(final CoordinateReferenceSystem base,
+                                        final MathTransform    baseToDerived,
+                                        final CoordinateSystem     derivedCS)
+            throws MismatchedDimensionException
+    {
+        final int dimSource = baseToDerived.getSourceDimensions();
+        final int dimTarget = baseToDerived.getTargetDimensions();
+        int dim1, dim2;
+        if ((dim1=dimSource) != (dim2=base.getCoordinateSystem().getDimension()) ||
+            (dim1=dimTarget) != (dim2=derivedCS.getDimension()))
+        {
+            throw new MismatchedDimensionException(Resources.format(
+                        ResourceKeys.ERROR_MISMATCHED_DIMENSION_$2,
+                        new Integer(dim1), new Integer(dim2)));
+        }
     }
 
     /**
@@ -220,18 +272,18 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
                  * from the CoordinateOperation super-class) that is set to this GeneralDerivedCRS.
                  */
                 synchronized (GeneralDerivedCRS.class) {
-                    if (COMPARING != null) {
+                    if (_COMPARING != null) {
                         // NOTE: the following assertion fails for deserialized objects.
                         // assert \u00A4COMPARING == conversionFromBase;
                         return true;
                     }
                     try {
-                        COMPARING = this;
+                        _COMPARING = this;
                         return equals(this.conversionFromBase,
                                       that.conversionFromBase,
                                       compareMetadata);
                     } finally {
-                        COMPARING = null;
+                        _COMPARING = null;
                     }
                 }
             }

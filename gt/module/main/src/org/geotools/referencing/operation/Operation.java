@@ -30,8 +30,15 @@ import java.util.Map;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Transformation;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.PlanarProjection;
+import org.opengis.referencing.operation.CylindricalProjection;
+import org.opengis.referencing.operation.ConicProjection;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -75,15 +82,28 @@ public class Operation extends SingleOperation
     protected final OperationMethod method;
 
     /**
-     * Construct an operation from a set of properties. The properties given in argument
-     * follow the same rules than for the {@link CoordinateOperation} constructor.
+     * Constructs a new operation with the same values than the specified defining
+     * conversion, together with the specified source and target CRS. This constructor
+     * is used by {@link ConversionImpl} only.
+     */
+    Operation(final Conversion                definition,
+              final CoordinateReferenceSystem sourceCRS,
+              final CoordinateReferenceSystem targetCRS,
+              final MathTransform             transform)
+    {
+        super(definition, sourceCRS, targetCRS, transform);
+        method = definition.getMethod();
+    }
+
+    /**
+     * Constructs an operation from a set of properties. The properties given in argument
+     * follow the same rules than for the {@link org.geotools.referencing.operation.CoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
-     *                  reference system} to positions in the {@linkplain #getTargetCRS target
-     *                  coordinate reference system}.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      * @param method    The operation method.
      */
     public Operation(final Map                      properties,
@@ -99,6 +119,71 @@ public class Operation extends SingleOperation
     }
 
     /**
+     * Returns a coordinate operation of the specified class. This method may constructs instance of
+     * {@link Conversion} or {@link Transformation} among others.
+     *
+     * @param properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
+     * @param method    The operation method, or {@code null}.
+     * @param type      The minimal type as <code>{@linkplain Conversion}.class</code>,
+     *                  <code>{@linkplain Projection}.class</code>, etc. This method may
+     *                  create an instance of a subclass of <code>type</code>.
+     *
+     * @see org.geotools.referencing.operation.Conversion#create
+     */
+    public static CoordinateOperation create(final Map                      properties,
+                                             final CoordinateReferenceSystem sourceCRS,
+                                             final CoordinateReferenceSystem targetCRS,
+                                             final MathTransform             transform,
+                                             final OperationMethod           method,
+                                                   Class                     type)
+    {
+        if (method != null) {
+            if (method instanceof MathTransformProvider) {
+                final Class candidate = ((MathTransformProvider) method).getOperationType();
+                if (candidate != null) {
+                    if (type==null || type.isAssignableFrom(candidate)) {
+                        type = candidate;
+                    }
+                }
+            }
+            if (type != null) {
+                if (Transformation.class.isAssignableFrom(type)) {
+                    return new org.geotools.referencing.operation.Transformation(
+                               properties, sourceCRS, targetCRS, transform, method);
+                }
+                if (ConicProjection.class.isAssignableFrom(type)) {
+                    return new org.geotools.referencing.operation.ConicProjection(
+                               properties, sourceCRS, targetCRS, transform, method);
+                }
+                if (CylindricalProjection.class.isAssignableFrom(type)) {
+                    return new org.geotools.referencing.operation.CylindricalProjection(
+                               properties, sourceCRS, targetCRS, transform, method);
+                }
+                if (PlanarProjection.class.isAssignableFrom(type)) {
+                    return new org.geotools.referencing.operation.PlanarProjection(
+                               properties, sourceCRS, targetCRS, transform, method);
+                }
+                if (Projection.class.isAssignableFrom(type)) {
+                    return new org.geotools.referencing.operation.Projection(
+                               properties, sourceCRS, targetCRS, transform, method);
+                }
+                if (Conversion.class.isAssignableFrom(type)) {
+                    return new org.geotools.referencing.operation.Conversion(
+                               properties, sourceCRS, targetCRS, transform, method);
+                }
+            }
+            return new org.geotools.referencing.operation.Operation(
+                       properties, sourceCRS, targetCRS, transform, method);
+        }
+        return new org.geotools.referencing.operation.SingleOperation(
+                   properties, sourceCRS, targetCRS, transform);
+    }
+
+    /**
      * Returns the operation method.
      */
     public OperationMethod getMethod() {
@@ -106,9 +191,8 @@ public class Operation extends SingleOperation
     }
 
     /**
-     * Returns the parameter values, or an empty array if none.
-     * The default implementation infer the parameter values from the
-     * {@link #transform transform}, if possible.
+     * Returns the parameter values. The default implementation infer the parameter
+     * values from the {@link #transform transform}, if possible.
      *
      * @throws UnsupportedOperationException if the parameters values can't be determined
      *         for current math transform implementation.

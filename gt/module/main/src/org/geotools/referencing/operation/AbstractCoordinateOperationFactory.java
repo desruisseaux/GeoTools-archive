@@ -408,7 +408,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                 }
             }
         }
-        operation = org.geotools.referencing.operation.SingleOperation.create(properties,
+        operation = org.geotools.referencing.operation.Operation.create(properties,
                     sourceCRS, targetCRS, transform, method, type);
         operation = (CoordinateOperation) pool.canonicalize(operation);
         return operation;

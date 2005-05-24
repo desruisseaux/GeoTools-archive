@@ -54,15 +54,14 @@ public class Transformation extends Operation
     private static final long serialVersionUID = -7486704846151648971L;
 
     /**
-     * Construct a conversion from a set of properties. The properties given in argument
+     * Constructs a transformation from a set of properties. The properties given in argument
      * follow the same rules than for the {@link CoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
-     *                  reference system} to positions in the {@linkplain #getTargetCRS target
-     *                  coordinate reference system}.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      * @param method    The operation method.
      */
     public Transformation(final Map                       properties,

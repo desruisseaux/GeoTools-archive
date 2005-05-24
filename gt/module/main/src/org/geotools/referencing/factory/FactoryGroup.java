@@ -25,9 +25,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
 import javax.units.ConversionException;
 import javax.units.Unit;
 
@@ -57,6 +54,7 @@ import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
@@ -65,8 +63,11 @@ import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.parameter.Parameters;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
+import org.geotools.resources.CRSUtilities;
 import org.geotools.util.Singleton;
 import org.geotools.resources.XArray;
 
@@ -80,11 +81,6 @@ import org.geotools.resources.XArray;
  * @author Martin Desruisseaux
  */
 public class FactoryGroup {
-    /**
-     * Small number for floating point comparaisons.
-     */
-    private static final double EPS = 1E-8;
-
     /**
      * The {@linkplain Datum datum} factory.
      * If null, then a default factory will be created only when first needed.
@@ -238,35 +234,37 @@ public class FactoryGroup {
     }
 
     /**
-     * Creates a projected coordinate reference system from a set of parameters.
-     * The client shall supply at least the <code>"semi_major"</code> and
-     * <code>"semi_minor"</code> parameters for cartographic projection.
-     * If the two above-cited parameters were not supplied, they will be inferred
-     * from the {@linkplain Ellipsoid ellipsoid} and added to {@code parameters}.
+     * Creates a {@linkplain #createParameterizedTransform parameterized transform} from a base
+     * CRS to a derived CS. If the <code>"semi_major"</code> and <code>"semi_minor"</code>
+     * parameters are not explicitly specified, they will be inferred from the
+     * {@linkplain Ellipsoid ellipsoid} and added to {@code parameters}.
+     * In addition, this method performs axis switch as needed. 
      *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  base Geographic coordinate reference system to base projection on.
-     * @param  method The operation method, or {@code null} for a default one.
-     * @param  parameters The parameter values to give to the projection.
-     * @param  derivedCS The coordinate system for the projected CRS.
-     * @throws FactoryException if the object creation failed.
+     * @param  baseCRS The source coordinate reference system.
+     * @param  parameters The parameter values for the transform.
+     * @param  derivedCS the target coordinate system.
+     * @param  methods A collection where to add the operation method that apply to the transform,
+     *                 or <code>null</code> if none.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
      */
-    public ProjectedCRS createProjectedCRS(Map                 properties,
-                                           GeographicCRS             base,
-                                           OperationMethod         method,
-                                           ParameterValueGroup parameters,
-                                           CartesianCS          derivedCS)
-            throws FactoryException
+    public MathTransform createBaseToDerived(final CoordinateReferenceSystem baseCRS,
+                                             final ParameterValueGroup       parameters,
+                                             final CoordinateSystem          derivedCS,
+                                             final Collection                methods)
+            throws NoSuchIdentifierException, FactoryException
     {
         /*
          * If the user's parameter do not contains semi-major and semi-minor axis length, infers
          * them from the ellipsoid. This is a convenience service since the user often omit those
          * parameters (because they duplicate datum information).
          */
-        final Ellipsoid ellipsoid = ((GeodeticDatum) base.getDatum()).getEllipsoid();
+        final Ellipsoid ellipsoid = CRSUtilities.getHeadGeoEllipsoid(baseCRS);
         final Unit axisUnit = ellipsoid.getAxisUnit();
-        ensureSet(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit);
-        ensureSet(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit);
+        Parameters.ensureSet(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit, false);
+        Parameters.ensureSet(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit, false);
         /*
          * Computes matrix for swapping axis and performing units conversion.
          * There is one matrix to apply before projection on (longitude,latitude)
@@ -274,7 +272,7 @@ public class FactoryGroup {
          * coordinates.
          */
         // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final EllipsoidalCS geoCS = (EllipsoidalCS) base.getCoordinateSystem();
+        final EllipsoidalCS geoCS = (EllipsoidalCS) baseCRS.getCoordinateSystem();
         final Matrix swap1, swap3;
         try {
             swap1 = org.geotools.referencing.cs.EllipsoidalCS.swapAndScaleAxis(geoCS,
@@ -292,72 +290,65 @@ public class FactoryGroup {
          * Creates a concatenation of the matrix computed above and the projection.
          * If 'method' is null, an exception will be thrown in 'createProjectedCRS'.
          */
-        final Singleton methods = (method==null) ? new Singleton() : null;
         final MathTransformFactory  mtFactory = getMathTransformFactory();
         final MathTransform step1 = mtFactory.createAffineTransform(swap1);
         final MathTransform step2 = createParameterizedTransform(parameters, methods);
         final MathTransform step3 = mtFactory.createAffineTransform(swap3);
         final MathTransform mt    = mtFactory.createConcatenatedTransform(
                                     mtFactory.createConcatenatedTransform(step1, step2), step3);
-        if (method == null) {
-            method = (OperationMethod) methods.get();
-        }
-        return getCRSFactory().createProjectedCRS(properties, method, base, mt, derivedCS);
+        return mt;
     }
 
     /**
-     * Ensure that the specified parameters are set. The {@code value} is set if and only if
-     * no value were already set by the user.
+     * Creates a projected coordinate reference system from a conversion.
      *
-     * @param parameters The set of projection parameters.
-     * @param name       The parameter name to set.
-     * @param value      The value to set, or to expect if the parameter is already set.
-     * @param unit       The value unit.
+     * @param  properties Name and other properties to give to the new object.
+     * @param  baseCRS Geographic coordinate reference system to base projection on.
+     * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
+     * @param  derivedCS The coordinate system for the projected CRS.
+     * @throws FactoryException if the object creation failed.
      *
-     * @todo The FactoryGroup class is not the most appropriate place for setting axis length.
-     *       A more appropriate place would be MathTransformProvider.ensureValidValues(...).
-     *       But is may be too geotools-specific...
+     * @todo Current implementation creates directly a Geotools implementation, because there
+     *       is not yet a suitable method in GeoAPI interfaces.
      */
-    private static void ensureSet(final ParameterValueGroup parameters,
-                                  final String name, final double value, final Unit unit)
+    public ProjectedCRS createProjectedCRS(final Map           properties,
+                                           final GeographicCRS baseCRS,
+                                           final Conversion    conversionFromBase,
+                                           final CartesianCS   derivedCS)
+            throws FactoryException
     {
-        final ParameterValue parameter;
-        try {
-            parameter = parameters.parameter(name);
-        } catch (ParameterNotFoundException ignore) {
-            /*
-             * Parameter not found. This exception should not occurs most of the time.
-             * If it occurs, we will not try to set the parameter here, but the same
-             * exception is likely to occurs at MathTransform creation time. The later
-             * is the expected place for this exception, so we will let it happen there.
-             */
-            return;
+        final MathTransform mt;
+        mt = createBaseToDerived(baseCRS, conversionFromBase.getParameterValues(), derivedCS, null);
+        return new org.geotools.referencing.crs.ProjectedCRS(
+                    properties, conversionFromBase, baseCRS, mt, derivedCS);
+    }
+
+    /**
+     * Creates a projected coordinate reference system from a set of parameters.
+     * If the <code>"semi_major"</code> and <code>"semi_minor"</code> parameters
+     * are not explicitly specified, they will be inferred from the {@linkplain Ellipsoid ellipsoid}
+     * and added to {@code parameters}.
+     *
+     * @param  properties Name and other properties to give to the new object.
+     * @param  baseCRS Geographic coordinate reference system to base projection on.
+     * @param  method The operation method, or {@code null} for a default one.
+     * @param  parameters The parameter values to give to the projection.
+     * @param  derivedCS The coordinate system for the projected CRS.
+     * @throws FactoryException if the object creation failed.
+     */
+    public ProjectedCRS createProjectedCRS(Map                 properties,
+                                           GeographicCRS          baseCRS,
+                                           OperationMethod         method,
+                                           ParameterValueGroup parameters,
+                                           CartesianCS          derivedCS)
+            throws FactoryException
+    {
+        final Singleton methods = (method==null) ? new Singleton() : null;
+        final MathTransform mt = createBaseToDerived(baseCRS, parameters, derivedCS, methods);
+        if (method == null) {
+            method = (OperationMethod) methods.get();
         }
-        try {
-            if (Math.abs(parameter.doubleValue(unit)/value - 1) <= EPS) {
-                return;
-            }
-        } catch (InvalidParameterTypeException exception) {
-            /*
-             * The parameter is not a floating point value. Don't try to set it. An exception is
-             * likely to be thrown at MathTransform creation time, which is the expected place.
-             */
-            return;
-        } catch (IllegalStateException exception) {
-            /*
-             * No value were set for this parameter, and there is no default value.
-             */
-            parameter.setValue(value, unit);
-            return;
-        }
-        /*
-         * A value were set, but is different from the expected value.
-         */
-        // TODO: localize
-        final LogRecord record = new LogRecord(Level.FINE, "Axis length mismatch.");
-        record.setSourceClassName("FactoryGroup");
-        record.setSourceMethodName("createProjectedCRS");
-        Logger.getLogger("org.geotools.referencing.factory").log(record);
+        return getCRSFactory().createProjectedCRS(properties, method, baseCRS, mt, derivedCS);
     }
 
     /**

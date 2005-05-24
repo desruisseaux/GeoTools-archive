@@ -1007,8 +1007,6 @@ public class GeotoolsFactory extends AbstractFactory
 
     /**
      * Creates a projected coordinate reference system from a set of parameters.
-     * The client must supply at least the <code>"semi_major"</code> and <code>"semi_minor"</code>
-     * parameters for cartographic projection.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  base Geographic coordinate reference system to base projection on.

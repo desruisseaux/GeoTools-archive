@@ -30,6 +30,11 @@ import java.util.Map;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.PlanarProjection;
+import org.opengis.referencing.operation.CylindricalProjection;
+import org.opengis.referencing.operation.ConicProjection;
 
 
 /**
@@ -50,15 +55,33 @@ public class Conversion extends Operation implements org.opengis.referencing.ope
     private static final long serialVersionUID = -2148164324805562793L;
 
     /**
-     * Construct a conversion from a set of properties. The properties given in argument
+     * Constructs a new conversion with the same values than the specified one, together with the
+     * specified source and target CRS. While the source conversion can be an arbitrary one, it is
+     * typically a {@linkplain DefiningConversion defining conversion}.
+     *
+     * @param definition The defining conversion.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
+     */
+    public Conversion(final org.opengis.referencing.operation.Conversion definition,
+                      final CoordinateReferenceSystem sourceCRS,
+                      final CoordinateReferenceSystem targetCRS,
+                      final MathTransform             transform)
+    {
+        super(definition, sourceCRS, targetCRS, transform);
+    }
+
+    /**
+     * Constructs a conversion from a set of properties. The properties given in argument
      * follow the same rules than for the {@link CoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
-     *                  reference system} to positions in the {@linkplain #getTargetCRS target
-     *                  coordinate reference system}.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      * @param method    The operation method.
      */
     public Conversion(final Map                       properties,
@@ -71,12 +94,51 @@ public class Conversion extends Operation implements org.opengis.referencing.ope
     }
 
     /**
-     * Version of the coordinate transformation.
+     * Returns a conversion from the specified {@linkplain DefiningConversion defining conversion}.
+     * This method may constructs instance of {@link PlanarProjection} or
+     * {@link CylindricalProjection} among others.
      *
-     * @deprecated This attribute is declared in {@link CoordinateOperation}
-     *             but is not used in a conversion.
+     * @param definition The defining conversion.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
+     *
+     * @see org.geotools.referencing.operation.Operation#create
      */
-    public String getOperationVersion() {
-        return super.getOperationVersion();
+    public static org.opengis.referencing.operation.
+                  Conversion create(final org.opengis.referencing.operation.Conversion definition,
+                                    final CoordinateReferenceSystem sourceCRS,
+                                    final CoordinateReferenceSystem targetCRS,
+                                    final MathTransform             transform)
+    {
+        Class type = getType(definition);
+        final OperationMethod method = definition.getMethod();
+        if (method instanceof MathTransformProvider) {
+            final Class candidate = ((MathTransformProvider) method).getOperationType();
+            if (candidate != null) {
+                if (type.isAssignableFrom(candidate)) {
+                    type = candidate;
+                }
+            }
+        }
+        if (ConicProjection.class.isAssignableFrom(type)) {
+            return new org.geotools.referencing.operation.ConicProjection(
+                       definition, sourceCRS, targetCRS, transform);
+        }
+        if (CylindricalProjection.class.isAssignableFrom(type)) {
+            return new org.geotools.referencing.operation.CylindricalProjection(
+                       definition, sourceCRS, targetCRS, transform);
+        }
+        if (PlanarProjection.class.isAssignableFrom(type)) {
+            return new org.geotools.referencing.operation.PlanarProjection(
+                       definition, sourceCRS, targetCRS, transform);
+        }
+        if (Projection.class.isAssignableFrom(type)) {
+            return new org.geotools.referencing.operation.Projection(
+                       definition, sourceCRS, targetCRS, transform);
+        }
+        return new org.geotools.referencing.operation.Conversion(
+                   definition, sourceCRS, targetCRS, transform);
     }
 }

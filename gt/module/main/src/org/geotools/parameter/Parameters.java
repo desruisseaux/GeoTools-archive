@@ -1,7 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,7 +18,7 @@
  */
 package org.geotools.parameter;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +28,10 @@ import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogRecord;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -37,6 +40,8 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.InvalidParameterTypeException;
 
 // Geotools dependencies
 import org.geotools.referencing.IdentifiedObject;
@@ -51,6 +56,11 @@ import org.geotools.referencing.IdentifiedObject;
  * @author Martin Desruisseaux
  */
 public class Parameters {
+    /**
+     * Small number for floating point comparaisons.
+     */
+    private static final double EPS = 1E-8;
+
     /**
      * An empty parameter group. This group contains no parameters.
      */
@@ -351,5 +361,72 @@ public class Parameters {
             }
         }
         return destination;
+    }
+
+    /**
+     * Ensures that the specified parameter is set. The {@code value} is set if and only if
+     * no value were already set by the user for the given {@code name}.
+     * <p>
+     * The {@code force} argument said what to do if the named parameter is already set. If the
+     * value matches, nothing is done in all case. If there is a mismatch and {@code force} is
+     * {@code true}, then the parameter is overriden with the specified {@code value}. Otherwise,
+     * the parameter is left unchanged but a warning is logged with the {@link Level#FINE FINE}
+     * level.
+     *
+     * @param parameters The set of projection parameters.
+     * @param name       The parameter name to set.
+     * @param value      The value to set, or to expect if the parameter is already set.
+     * @param unit       The value unit.
+     * @param force      {@code true} for forcing the parameter to the specified {@code value}
+     *                   is case of mismatch.
+     * @return {@code true} if the were a mismatch, or {@code false} if the parameters can be
+     *         used with no change.
+     */
+    public static boolean ensureSet(final ParameterValueGroup parameters,
+                                    final String name, final double value, final Unit unit,
+                                    final boolean force)
+    {
+        final ParameterValue parameter;
+        try {
+            parameter = parameters.parameter(name);
+        } catch (ParameterNotFoundException ignore) {
+            /*
+             * Parameter not found. This exception should not occurs most of the time.
+             * If it occurs, we will not try to set the parameter here, but the same
+             * exception is likely to occurs at MathTransform creation time. The later
+             * is the expected place for this exception, so we will let it happen there.
+             */
+            return false;
+        }
+        try {
+            if (Math.abs(parameter.doubleValue(unit)/value - 1) <= EPS) {
+                return false;
+            }
+        } catch (InvalidParameterTypeException exception) {
+            /*
+             * The parameter is not a floating point value. Don't try to set it. An exception is
+             * likely to be thrown at MathTransform creation time, which is the expected place.
+             */
+            return false;
+        } catch (IllegalStateException exception) {
+            /*
+             * No value were set for this parameter, and there is no default value.
+             */
+            parameter.setValue(value, unit);
+            return true;
+        }
+        /*
+         * A value were set, but is different from the expected value.
+         */
+        if (force) {
+            parameter.setValue(value, unit);
+        } else {
+            // TODO: localize
+            final LogRecord record = new LogRecord(Level.FINE, "Axis length mismatch.");
+            record.setSourceClassName("Parameters");
+            record.setSourceMethodName("ensureSet");
+            Logger.getLogger("org.geotools.parameter").log(record);
+        }
+        return true;
     }
 }

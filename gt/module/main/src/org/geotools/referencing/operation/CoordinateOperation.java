@@ -33,6 +33,13 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.quality.PositionalAccuracy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.Transformation;
+import org.opengis.referencing.operation.Operation;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.PlanarProjection;
+import org.opengis.referencing.operation.CylindricalProjection;
+import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -48,11 +55,11 @@ import org.geotools.resources.cts.Resources;
  * Establishes an association between a source and a target coordinate reference system,
  * and provides a {@linkplain MathTransform transform} for transforming coordinates in
  * the source CRS to coordinates in the target CRS. Many but not all coordinate operations (from
- * {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate reference system} <VAR>A</VAR> to
- * {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate reference system} <VAR>B</VAR>)
+ * {@linkplain CoordinateReferenceSystem coordinate reference system} <VAR>A</VAR> to
+ * {@linkplain CoordinateReferenceSystem coordinate reference system} <VAR>B</VAR>)
  * also uniquely define the inverse operation (from
- * {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate reference system} <VAR>B</VAR> to
- * {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate reference system} <VAR>A</VAR>).
+ * {@linkplain CoordinateReferenceSystem coordinate reference system} <VAR>B</VAR> to
+ * {@linkplain CoordinateReferenceSystem coordinate reference system} <VAR>A</VAR>).
  * In some cases, the operation method algorithm for the inverse operation is the same
  * as for the forward algorithm, but the signs of some operation parameter values must
  * be reversed. In other cases, different algorithms are required for the forward and
@@ -116,12 +123,12 @@ public class CoordinateOperation extends IdentifiedObject
     public static final String SCOPE_PROPERTY = "scope";
 
     /**
-     * The source CRS, or <code>null</code> if not available.
+     * The source CRS, or {@code null} if not available.
      */
     protected final CoordinateReferenceSystem sourceCRS;
 
     /**
-     * The target CRS, or <code>null</code> if not available.
+     * The target CRS, or {@code null} if not available.
      */
     protected final CoordinateReferenceSystem targetCRS;
 
@@ -132,13 +139,13 @@ public class CoordinateOperation extends IdentifiedObject
     final String operationVersion;
 
     /**
-     * Estimate(s) of the impact of this operation on point accuracy, or <code>null</code>
+     * Estimate(s) of the impact of this operation on point accuracy, or {@code null}
      * if none.
      */
     private final PositionalAccuracy[] positionalAccuracy;
 
     /**
-     * Area in which this operation is valid, or <code>null</code> if not available.
+     * Area in which this operation is valid, or {@code null} if not available.
      */
     protected final Extent validArea;
 
@@ -152,6 +159,26 @@ public class CoordinateOperation extends IdentifiedObject
      * to positions in the {@linkplain #getTargetCRS target coordinate reference system}.
      */
     protected final MathTransform transform;
+
+    /**
+     * Constructs a new coordinate operation with the same values than the specified
+     * defining conversion, together with the specified source and target CRS. This
+     * constructor is used by {@link ConversionImpl} only.
+     */
+    CoordinateOperation(final Conversion                definition,
+                        final CoordinateReferenceSystem sourceCRS,
+                        final CoordinateReferenceSystem targetCRS,
+                        final MathTransform             transform)
+    {
+        super(definition);
+        this.sourceCRS          = sourceCRS;
+        this.targetCRS          = targetCRS;
+        this.operationVersion   = definition.getOperationVersion();
+        this.positionalAccuracy = definition.getPositionalAccuracy();
+        this.validArea          = definition.getValidArea();
+        this.scope              = definition.getScope();
+        this.transform          = transform;
+    }
 
     /**
      * Constructs a coordinate operation from a set of properties. The properties given in argument
@@ -188,11 +215,10 @@ public class CoordinateOperation extends IdentifiedObject
      * </table>
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
-     *                  reference system} to positions in the {@linkplain #getTargetCRS target
-     *                  coordinate reference system}.
+     * @param sourceCRS The source CRS.
+     * @param targetCRS The target CRS.
+     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      */
     public CoordinateOperation(final Map                      properties,
                                final CoordinateReferenceSystem sourceCRS,
@@ -229,7 +255,12 @@ public class CoordinateOperation extends IdentifiedObject
         this.sourceCRS = sourceCRS;
         this.targetCRS = targetCRS;
         this.transform = transform;
-        ensureNonNull ("transform", transform);
+        if (!(this instanceof Conversion && transform==null && sourceCRS==null && targetCRS==null)) {
+            // Null values authorized only for conversions, and all of them must be null together.
+            ensureNonNull("sourceCRS", transform);
+            ensureNonNull("targetCRS", transform);
+            ensureNonNull("transform", transform);
+        }
         checkDimension("sourceCRS", sourceCRS, transform.getSourceDimensions());
         checkDimension("targetCRS", targetCRS, transform.getTargetDimensions());
     }
@@ -274,7 +305,7 @@ public class CoordinateOperation extends IdentifiedObject
      * nature of the parameters). Mandatory when describing a transformation, and should not
      * be supplied for a conversion.
      *
-     * @return The coordinate operation version, or <code>null</code> in none.
+     * @return The coordinate operation version, or {@code null} in none.
      */
     public String getOperationVersion() {
         return operationVersion;
@@ -295,7 +326,7 @@ public class CoordinateOperation extends IdentifiedObject
     /**
      * Area in which this operation is valid.
      *
-     * @return Coordinate operation valid area, or <code>null</code> if not available.
+     * @return Coordinate operation valid area, or {@code null} if not available.
      */
     public Extent getValidArea() {
         return validArea;
@@ -315,6 +346,26 @@ public class CoordinateOperation extends IdentifiedObject
      */
     public MathTransform getMathTransform() {
         return transform;
+    }
+
+    /**
+     * Returns the most specific GeoAPI interface implemented by the specified operation.
+     *
+     * @param  object A coordinate operation.
+     * @return The most specific GeoAPI interface
+     *         (e.g. <code>{@linkplain Transformation}.class</code>).
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     */
+    public static Class getType(final org.opengis.referencing.operation.CoordinateOperation object) {
+        if (object instanceof        Transformation) return        Transformation.class;
+        if (object instanceof       ConicProjection) return       ConicProjection.class;
+        if (object instanceof CylindricalProjection) return CylindricalProjection.class;
+        if (object instanceof      PlanarProjection) return      PlanarProjection.class;
+        if (object instanceof            Projection) return            Projection.class;
+        if (object instanceof            Conversion) return            Conversion.class;
+        if (object instanceof             Operation) return             Operation.class;
+        return org.opengis.referencing.operation.CoordinateOperation.class;
     }
 
     /**
@@ -350,16 +401,16 @@ public class CoordinateOperation extends IdentifiedObject
                  * 'conversionFromBase' field that is set to this CoordinateOperation.
                  */
                 synchronized (GeneralDerivedCRS.class) {
-                    if (GeneralDerivedCRS.COMPARING != null) {
+                    if (GeneralDerivedCRS._COMPARING != null) {
                         // NOTE: the following assertion fails for deserialized objects.
                         // assert GeneralDerivedCRS.\u00A4COMPARING == targetCRS;
                         return true;
                     }
                     try {
-                        GeneralDerivedCRS.COMPARING = this;
+                        GeneralDerivedCRS._COMPARING = this;
                         return equals(this.targetCRS, that.targetCRS, compareMetadata);
                     } finally {
-                        GeneralDerivedCRS.COMPARING = null;
+                        GeneralDerivedCRS._COMPARING = null;
                     }
                 }
             }
