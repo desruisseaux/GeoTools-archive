@@ -568,7 +568,7 @@ public class GTopo30Writer implements GridCoverageWriter {
   
                         //                      setting sample in the raster that corresponds to an index in the
                         //color map
-                        raster.setSample(j, i, 0, transparencyIndex++);
+                        raster.setSample(j, i, 0, transparencyIndex);
                     } else //we alredy set the transparent color we will reuse that one
                      {
                         //basically do nothing here
