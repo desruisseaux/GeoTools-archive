@@ -477,7 +477,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          */
         static final ParameterDescriptorGroup PARAMETERS;
         static {
-            final Identifier name = new Identifier(CitationImpl.OPEN_GIS, "Affine");
+            final Identifier name = new Identifier(CitationImpl.OGC, "Affine");
             final Map  properties = new HashMap(4, 0.8f);
             properties.put(NAME_PROPERTY,        name);
             properties.put(IDENTIFIERS_PROPERTY, name);

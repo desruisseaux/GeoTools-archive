@@ -188,10 +188,10 @@ public class TransverseMercator extends MapProjection {
          * @task REVISIT: should we set some default UTM parameter values
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Transverse_Mercator"),
-                new Identifier(CitationImpl.EPSG,     "Transverse Mercator"),
-                new Identifier(CitationImpl.EPSG,     "Gauss-Kruger"),
-                new Identifier(CitationImpl.EPSG,     "9807"),
+                new Identifier(CitationImpl.OGC,   "Transverse_Mercator"),
+                new Identifier(CitationImpl.EPSG,  "Transverse Mercator"),
+                new Identifier(CitationImpl.EPSG,  "Gauss-Kruger"),
+                new Identifier(CitationImpl.EPSG,  "9807"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
                 new Identifier(CitationImpl.ESRI,     "Transverse_Mercator"),
                 new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(

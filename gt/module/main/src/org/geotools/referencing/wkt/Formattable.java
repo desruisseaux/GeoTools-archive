@@ -82,7 +82,7 @@ public class Formattable {
      * </code><i>etc.</i><code>]"</code>.
      */
     public String toString() {
-        return toWKT(CitationImpl.OPEN_GIS, getIndentation(), false);
+        return toWKT(CitationImpl.OGC, getIndentation(), false);
     }
 
     /**
@@ -123,7 +123,7 @@ public class Formattable {
      *         implementations can be formatted as WKT.
      */
     public String toWKT(final int indentation) throws UnformattableObjectException {
-        return toWKT(CitationImpl.OPEN_GIS, indentation);
+        return toWKT(CitationImpl.OGC, indentation);
     }
 
     /**

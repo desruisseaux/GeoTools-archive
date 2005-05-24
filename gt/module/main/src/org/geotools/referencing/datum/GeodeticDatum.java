@@ -69,13 +69,13 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     public static final GeodeticDatum WGS84;
     static {
         final Identifier[] identifiers = {
-            new Identifier(CitationImpl.OPEN_GIS, "WGS84"),
-            new Identifier(CitationImpl.ORACLE,   "WGS 84"),
-            new Identifier(null,                  "WGS_84"),
-            new Identifier(null,                  "WGS 1984"),
-            new Identifier(CitationImpl.EPSG,     "WGS_1984"),
-            new Identifier(CitationImpl.ESRI,     "D_WGS_1984"),
-            new Identifier(CitationImpl.EPSG,     "World Geodetic System 1984")
+            new Identifier(CitationImpl.OGC,    "WGS84"),
+            new Identifier(CitationImpl.ORACLE, "WGS 84"),
+            new Identifier(null,                "WGS_84"),
+            new Identifier(null,                "WGS 1984"),
+            new Identifier(CitationImpl.EPSG,   "WGS_1984"),
+            new Identifier(CitationImpl.ESRI,   "D_WGS_1984"),
+            new Identifier(CitationImpl.EPSG,   "World Geodetic System 1984")
         };
         final Map properties = new HashMap(4);
         properties.put(NAME_PROPERTY,  identifiers[0]);

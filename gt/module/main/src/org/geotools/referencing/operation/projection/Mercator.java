@@ -101,7 +101,7 @@ public class Mercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Mercator_1SP"),
+                new Identifier(CitationImpl.OGC,      "Mercator_1SP"),
                 new Identifier(CitationImpl.EPSG,     "Mercator (1SP)"),
                 new Identifier(CitationImpl.EPSG,     "9804"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
@@ -163,7 +163,7 @@ public class Mercator extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_1"),
+                    new Identifier(CitationImpl.OGC,      "standard_parallel_1"),
                     new Identifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
                     new Identifier(CitationImpl.GEOTIFF,  "StdParallel1")
                 },
@@ -173,7 +173,7 @@ public class Mercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Mercator_2SP"),
+                new Identifier(CitationImpl.OGC,      "Mercator_2SP"),
                 new Identifier(CitationImpl.EPSG,     "Mercator (2SP)"),
                 new Identifier(CitationImpl.EPSG,     "9805"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_Mercator"),

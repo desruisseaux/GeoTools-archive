@@ -137,7 +137,7 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_1"),
+                    new Identifier(CitationImpl.OGC,      "standard_parallel_1"),
                     new Identifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
                     new Identifier(CitationImpl.GEOTIFF,  "StdParallel1")
                 },
@@ -149,7 +149,7 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_2"),
+                    new Identifier(CitationImpl.OGC,      "standard_parallel_2"),
                     new Identifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
                     new Identifier(CitationImpl.GEOTIFF,  "StdParallel2")
                 },
@@ -159,7 +159,7 @@ public class AlbersEqualArea extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Albers_Conic_Equal_Area"),
+                new Identifier(CitationImpl.OGC,      "Albers_Conic_Equal_Area"),
                 new Identifier(CitationImpl.EPSG,     "Albers Equal Area"),
                 new Identifier(CitationImpl.EPSG,     "9822"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),

@@ -79,7 +79,7 @@ public class Formatter {
     /**
      * The preferred authority for object or parameter names.
      */
-    Citation authority = CitationImpl.OPEN_GIS;
+    Citation authority = CitationImpl.OGC;
 
     /**
      * The unit for formatting measures, or <code>null</code> for the "natural" unit of each WKT
@@ -533,7 +533,7 @@ public class Formatter {
     /**
      * Returns the preferred identifier for the specified object. If the specified
      * object contains an identifier from the preferred authority (usually
-     * {@linkplain CitationImpl#OPEN_GIS OpenGIS}), then this identifier is
+     * {@linkplain CitationImpl#OGC Open Geospatial}), then this identifier is
      * returned. Otherwise, the first identifier is returned. If the specified
      * object contains no identifier, then this method returns {@code null}.
      *
@@ -575,7 +575,7 @@ public class Formatter {
     /**
      * Returns the preferred name for the specified object. If the specified
      * object contains a name from the preferred authority (usually
-     * {@linkplain CitationImpl#OPEN_GIS OpenGIS}), then this name is
+     * {@linkplain CitationImpl#OGC Open Geospatial}), then this name is
      * returned. Otherwise, the first name found is returned.
      *
      * @param  info The object to looks for a preferred name.

@@ -174,10 +174,10 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Oblique_Stereographic"),
-                new Identifier(CitationImpl.EPSG,     "Oblique Stereographic"),
-                new Identifier(CitationImpl.EPSG,     "Roussilhe"),
-                new Identifier(CitationImpl.EPSG,     "9809"),
+                new Identifier(CitationImpl.OGC,   "Oblique_Stereographic"),
+                new Identifier(CitationImpl.EPSG,  "Oblique Stereographic"),
+                new Identifier(CitationImpl.EPSG,  "Roussilhe"),
+                new Identifier(CitationImpl.EPSG,  "9809"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_ObliqueStereographic"),
                 new Identifier(CitationImpl.ESRI,     "Double_Stereographic"),
                 new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
@@ -258,7 +258,7 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Polar_Stereographic"),
+                new Identifier(CitationImpl.OGC,      "Polar_Stereographic"),
                 new Identifier(CitationImpl.EPSG,     "Polar Stereographic (variant A)"),
                 new Identifier(CitationImpl.EPSG,     "9810"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_PolarStereographic"),

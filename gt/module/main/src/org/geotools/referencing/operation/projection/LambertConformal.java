@@ -137,7 +137,7 @@ public class LambertConformal extends MapProjection{
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Lambert_Conformal_Conic_1SP"),
+                new Identifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_1SP"),
                 new Identifier(CitationImpl.EPSG,     "Lambert Conic Conformal (1SP)"),
                 new Identifier(CitationImpl.EPSG,     "9801"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic_1SP"),
@@ -197,7 +197,7 @@ public class LambertConformal extends MapProjection{
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_1"),
+                    new Identifier(CitationImpl.OGC,      "standard_parallel_1"),
                     new Identifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
                     new Identifier(CitationImpl.GEOTIFF,  "StdParallel1")
                 },
@@ -209,7 +209,7 @@ public class LambertConformal extends MapProjection{
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "standard_parallel_2"),
+                    new Identifier(CitationImpl.OGC,      "standard_parallel_2"),
                     new Identifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
                     new Identifier(CitationImpl.GEOTIFF,  "StdParallel2")
                 },
@@ -219,7 +219,7 @@ public class LambertConformal extends MapProjection{
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Lambert_Conformal_Conic_2SP"),
+                new Identifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_2SP"),
                 new Identifier(CitationImpl.EPSG,     "Lambert Conic Conformal (2SP)"),
                 new Identifier(CitationImpl.EPSG,     "9802"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_LambertConfConic_2SP"),
@@ -284,7 +284,7 @@ public class LambertConformal extends MapProjection{
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Lambert_Conformal_Conic_2SP_Belgium"),
+                new Identifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_2SP_Belgium"),
                 new Identifier(CitationImpl.EPSG,     "Lambert Conic Conformal (2SP Belgium)"),
                 new Identifier(CitationImpl.EPSG,     "9803"),
                 new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(

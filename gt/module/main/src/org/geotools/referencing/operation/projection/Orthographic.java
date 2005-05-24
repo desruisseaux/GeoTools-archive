@@ -81,7 +81,7 @@ public abstract class Orthographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Orthographic"),
+                new Identifier(CitationImpl.OGC,      "Orthographic"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_Orthographic"),
                 new Identifier(CitationImpl.ESRI,     "Orthographic"),
                 new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(

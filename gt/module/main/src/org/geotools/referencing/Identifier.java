@@ -195,7 +195,7 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link CitationImpl#OPEN_GIS OPEN_GIS}
+     * @param authority The authority (e.g. {@link CitationImpl#OGC OGC}
      *                  or {@link CitationImpl#EPSG EPSG}).
      * @param code      The code. The {@linkplain Locale#US English name} is used
      *                  for the code, and the international string is used for the
@@ -211,7 +211,7 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link CitationImpl#OPEN_GIS OPEN_GIS}
+     * @param authority The authority (e.g. {@link CitationImpl#OGC OGC}
      *                  or {@link CitationImpl#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
      */
@@ -224,7 +224,7 @@ public class Identifier implements org.opengis.metadata.Identifier, GenericName,
      * constructor for commonly-used parameters. If more control are wanted (for example adding
      * remarks), use the {@linkplain #Identifier(Map) constructor with a properties map}.
      *
-     * @param authority The authority (e.g. {@link CitationImpl#OPEN_GIS OPEN_GIS}
+     * @param authority The authority (e.g. {@link CitationImpl#OGC OGC}
      *                  or {@link CitationImpl#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
      * @param version   The version, or <code>null</code> if none.

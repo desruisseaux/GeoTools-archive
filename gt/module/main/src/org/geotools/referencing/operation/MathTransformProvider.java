@@ -144,7 +144,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Constructs a parameter descriptor from a set of alias. The parameter is
      * identified by codes provided by one or more authorities. Common authorities are
-     * {@link CitationImpl#OPEN_GIS OPEN_GIS} and {@link CitationImpl#EPSG EPSG} for example.
+     * {@link CitationImpl#OGC OGC} and {@link CitationImpl#EPSG EPSG} for example.
      *
      * <P>The first entry in the <code>identifiers</code> array is both the
      * {@linkplain ParameterDescriptor#getName main name} and the
@@ -188,7 +188,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Constructs a parameter group from a set of alias. The parameter group is
      * identified by codes provided by one or more authorities. Common authorities are
-     * {@link CitationImpl#OPEN_GIS OPEN_GIS} and {@link CitationImpl#EPSG EPSG} for example.
+     * {@link CitationImpl#OGC OGC} and {@link CitationImpl#EPSG EPSG} for example.
      *
      * <P>The first entry in the <code>identifiers</code> array is both the
      * {@linkplain ParameterDescriptorGroup#getName main name} and the

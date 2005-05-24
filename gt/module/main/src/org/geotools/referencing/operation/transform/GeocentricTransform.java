@@ -563,8 +563,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          */
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "semi_major"),
-                    new Identifier(CitationImpl.EPSG,     "semi-major axis")   //epsg does not specifically define this parameter
+                    new Identifier(CitationImpl.OGC,  "semi_major"),
+                    new Identifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -574,8 +574,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          */
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "semi_minor"),
-                    new Identifier(CitationImpl.EPSG,     "semi-minor axis")   //epsg does not specifically define this parameter
+                    new Identifier(CitationImpl.OGC,  "semi_minor"),
+                    new Identifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -607,7 +607,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                                                               final int geotools)
         {
             return createDescriptorGroup(new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, ogc),
+                    new Identifier(CitationImpl.OGC,      ogc),
                     new Identifier(CitationImpl.EPSG,     epsgName),
                     new Identifier(CitationImpl.EPSG,     epsgCode),
                     new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(geotools))

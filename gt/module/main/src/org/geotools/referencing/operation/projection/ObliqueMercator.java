@@ -284,7 +284,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LAT_OF_CENTRE = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "latitude_of_center"),
+                    new Identifier(CitationImpl.OGC,      "latitude_of_center"),
                     new Identifier(CitationImpl.EPSG,     "Latitude of projection centre"),
                     new Identifier(CitationImpl.ESRI,     "Latitude_Of_Center"),
                     new Identifier(CitationImpl.GEOTIFF,  "CenterLat")
@@ -297,7 +297,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LONG_OF_CENTRE = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "longitude_of_center"),
+                    new Identifier(CitationImpl.OGC,      "longitude_of_center"),
                     new Identifier(CitationImpl.EPSG,     "Longitude of projection centre"),
                     new Identifier(CitationImpl.ESRI,     "Longitude_Of_Center"),
                     new Identifier(CitationImpl.GEOTIFF,  "CenterLong")
@@ -311,7 +311,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor AZIMUTH = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "azimuth"),
+                    new Identifier(CitationImpl.OGC,      "azimuth"),
                     new Identifier(CitationImpl.ESRI,     "Azimuth"),
                     new Identifier(CitationImpl.EPSG,     "Azimuth of initial line"),
                     new Identifier(CitationImpl.GEOTIFF,  "AzimuthAngle")
@@ -325,7 +325,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor RECTIFIED_GRID_ANGLE = createOptionalDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "rectified_grid_angle"),
+                    new Identifier(CitationImpl.OGC,      "rectified_grid_angle"),
                     new Identifier(CitationImpl.EPSG,     "Angle from Rectified to Skew Grid"),
                     new Identifier(CitationImpl.ESRI,     "XY_Plane_Rotation"),
                     new Identifier(CitationImpl.GEOTIFF,  "RectifiedGridAngle")
@@ -336,7 +336,7 @@ public class ObliqueMercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Oblique_Mercator"),
+                new Identifier(CitationImpl.OGC,      "Oblique_Mercator"),
                 new Identifier(CitationImpl.EPSG,     "Oblique Mercator"),
                 new Identifier(CitationImpl.EPSG,     "9815"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_ObliqueMercator"),
@@ -402,7 +402,7 @@ public class ObliqueMercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OPEN_GIS, "Hotine_Oblique_Mercator"),
+                new Identifier(CitationImpl.OGC,      "Hotine_Oblique_Mercator"),
                 new Identifier(CitationImpl.EPSG,     "Hotine Oblique Mercator"),
                 new Identifier(CitationImpl.EPSG,     "9812"),
                 new Identifier(CitationImpl.GEOTIFF,  "CT_ObliqueMercator_Hotine"),
@@ -464,7 +464,7 @@ public class ObliqueMercator extends MapProjection {
          */
         public static final ParameterDescriptor LAT_OF_CENTRE = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OPEN_GIS, "latitude_of_center"),
+                    new Identifier(CitationImpl.OGC,      "latitude_of_center"),
                     new Identifier(CitationImpl.EPSG,     "Latitude of projection centre"),
                     new Identifier(CitationImpl.ESRI,     "Latitude_Of_Center"),
                     new Identifier(CitationImpl.GEOTIFF,  "CenterLat")
