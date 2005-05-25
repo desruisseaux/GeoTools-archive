@@ -30,7 +30,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public interface AttributeGroup extends com.vividsolutions.xdo.xsi.AttributeGroup{
+public abstract class AttributeGroup extends com.vividsolutions.xdo.xsi.AttributeGroup {
     /**
      * <p>
      * Represents the Namespace attribute of an AnyAttribute child occuring

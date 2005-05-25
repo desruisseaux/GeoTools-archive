@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import com.vividsolutions.xdo.xsi.ElementGrouping;
+
 /**
  * <p>
  * This interface is intended to represent a Choice in an XML Schema. The
@@ -28,7 +30,12 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers www.refractions.net
  */
-public interface Choice extends ElementGrouping {
+public abstract class Choice extends com.vividsolutions.xdo.xsi.Choice {
+    
+    public Choice(String id, int minOccurs, int maxOccurs, ElementGrouping[] children) {
+        super(id, minOccurs, maxOccurs, children);
+    }
+    
     /**
      * <p>
      * The Schema ID for this choice definition.
@@ -36,17 +43,23 @@ public interface Choice extends ElementGrouping {
      *
      * @return
      */
-    public String getId();
+    public String getId() {
+        return super.getId();
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
      */
-    public int getMaxOccurs();
+    public int getMaxOccurs() {
+        return super.getMaxOccurs();
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
      */
-    public int getMinOccurs();
+    public int getMinOccurs() {
+        return super.getMinOccurs();
+    }
 
     /**
      * <p>
@@ -59,5 +72,5 @@ public interface Choice extends ElementGrouping {
      *
      * @return
      */
-    public ElementGrouping[] getChildren();
+    public abstract com.vividsolutions.xdo.xsi.ElementGrouping[] getChildren();
 }

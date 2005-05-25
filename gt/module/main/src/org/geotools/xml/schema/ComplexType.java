@@ -31,7 +31,7 @@ import org.xml.sax.Attributes;
  *
  * @author dzwiers www.refractions.net
  */
-public interface ComplexType extends Type {
+public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType {
     /**
      * <p>
      * This is used to represent the heirarchy represented within an xml schema
@@ -44,7 +44,9 @@ public interface ComplexType extends Type {
      *
      * @see Type#getValue(Element, ElementValue[], Attributes)
      */
-    public Type getParent();
+    public com.vividsolutions.xdo.xsi.Type getParent() {
+        return super.getParent();
+    }
 
     /**
      * Returns true when the complexType should be considered abstract, as
@@ -53,7 +55,9 @@ public interface ComplexType extends Type {
      *
      * @return
      */
-    public boolean isAbstract();
+    public boolean isAbstract() {
+        return super.isAbstract();
+    }
 
     /**
      * This methos represents the potential 'anyAttribute' declaration's
@@ -61,7 +65,9 @@ public interface ComplexType extends Type {
      *
      * @return
      */
-    public String getAnyAttributeNameSpace();
+    public String getAnyAttributeNameSpace() {
+        return super.getAnyAttributeNameSpace();
+    }
 
     /**
      * The set of attributes required by this complex type declaration. As  per
@@ -71,7 +77,9 @@ public interface ComplexType extends Type {
      *
      * @return
      */
-    public Attribute[] getAttributes();
+    public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
+        return super.getAttributes();
+    }
 
     /**
      * Specifies a mask which denotes which substitution mechanisms may be used
@@ -83,7 +91,9 @@ public interface ComplexType extends Type {
      * @see Schema#RESTRICTION
      * @see Schema#ALL
      */
-    public int getBlock();
+    public int getBlock() {
+        return super.getBlock();
+    }
 
     /**
      * Returns the child element representing the structure of nested  child
@@ -93,9 +103,13 @@ public interface ComplexType extends Type {
      *
      * @see ElementGrouping
      */
-    public ElementGrouping getChild();
+    public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
+        return super.getChild();
+    }
 
-    public Element[] getChildElements();
+    public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
+        return super.getChildren();
+    }
 
     /**
      * Specifies a mask which denotes which substitution mechanisms prohibited
@@ -107,7 +121,9 @@ public interface ComplexType extends Type {
      * @see Schema#RESTRICTION
      * @see Schema#ALL
      */
-    public int getFinal();
+    public int getFinal() {
+        return super.getFinal();
+    }
 
     /**
      * Returns the xml schema id of this complexType if one  exists, null
@@ -115,7 +131,9 @@ public interface ComplexType extends Type {
      *
      * @return
      */
-    public String getId();
+    public String getId() {
+        return super.getId();
+    }
 
     /**
      * Returns true if this complexType allows mixed content (Child elements
@@ -123,7 +141,9 @@ public interface ComplexType extends Type {
      *
      * @return
      */
-    public boolean isMixed();
+    public boolean isMixed() {
+        return super.isMixed();
+    }
 
     /**
      * This method is used to publish whether this complexType is at the root
@@ -133,7 +153,9 @@ public interface ComplexType extends Type {
      *
      * @return
      */
-    public boolean isDerived();
+    public boolean isDerived() {
+        return ( super.getChildren().length == 0 );
+    }
 
     /**
      * This method is a directive to the parser whether to keep the data around
@@ -145,5 +167,5 @@ public interface ComplexType extends Type {
      *
      * @return True, except when streaming the element.
      */
-    public boolean cache(Element element, Map hints);
+    public abstract boolean cache(Element element, Map hints);
 }
