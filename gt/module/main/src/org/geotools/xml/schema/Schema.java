@@ -17,6 +17,7 @@
 package org.geotools.xml.schema;
 
 import java.net.URI;
+import java.util.Arrays;
 
 import org.geotools.factory.Factory;
 
@@ -49,7 +50,7 @@ import org.geotools.factory.Factory;
  *
  * @author dzwiers www.refractions.net
  */
-public interface Schema extends Factory {
+public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implements Factory  {
     /**
      * Used to denote byte masks representing either XML block attributes or
      * XML final attributes.
@@ -87,7 +88,9 @@ public interface Schema extends Factory {
      *
      * @see AttributeGroup
      */
-    public AttributeGroup[] getAttributeGroups();
+    public AttributeGroup[] getAttributeGroups() {
+        return super.getAttributeGroups();
+    }
 
     /**
      * <p>
@@ -101,7 +104,9 @@ public interface Schema extends Factory {
      *
      * @see Attribute
      */
-    public Attribute[] getAttributes();
+    public Attribute[] getAttributes() {
+        return super.getAttributes();
+    }
 
     /**
      * <p>
@@ -114,7 +119,9 @@ public interface Schema extends Factory {
      *
      * @return Block Mask
      */
-    public int getBlockDefault();
+    public int getBlockDefault() {
+        return super.getBlockDefault();
+    }
 
     /**
      * <p>
@@ -128,7 +135,9 @@ public interface Schema extends Factory {
      *
      * @see ComplexType
      */
-    public ComplexType[] getComplexTypes();
+    public ComplexType[] getComplexTypes() {
+        return super.getComplexTypes();
+    }
 
     /**
      * <p>
@@ -142,7 +151,9 @@ public interface Schema extends Factory {
      *
      * @see Element
      */
-    public Element[] getElements();
+    public Element[] getElements() {
+        return super.getElements();
+    }
 
     /**
      * <p>
@@ -155,7 +166,9 @@ public interface Schema extends Factory {
      *
      * @return Final Mask
      */
-    public int getFinalDefault();
+    public int getFinalDefault() {
+        return super.getFinalDefault();
+    }
 
     /**
      * <p>
@@ -169,7 +182,9 @@ public interface Schema extends Factory {
      *
      * @see Group
      */
-    public Group[] getGroups();
+    public Group[] getGroups() {
+        return super.getGroups();
+    }
 
     /**
      * <p>
@@ -178,7 +193,9 @@ public interface Schema extends Factory {
      *
      * @return
      */
-    public String getId();
+    public String getId() {
+        return super.getId();
+    }
 
     /**
      * <p>
@@ -192,7 +209,9 @@ public interface Schema extends Factory {
      *
      * @see Schema
      */
-    public Schema[] getImports();
+    public com.vividsolutions.xdo.xsi.Import[] getImports() {
+        return super.getImports();
+    }
 
     /**
      * <p>
@@ -201,7 +220,9 @@ public interface Schema extends Factory {
      *
      * @return
      */
-    public String getPrefix();
+    public String getPrefix() {
+        return super.getPrefix();
+    }
 
     /**
      * <p>
@@ -215,7 +236,9 @@ public interface Schema extends Factory {
      *
      * @see SimpleType
      */
-    public SimpleType[] getSimpleTypes();
+    public SimpleType[] getSimpleTypes() {
+        return super.getSimpleTypes();
+    }
 
     /**
      * <p>
@@ -225,10 +248,14 @@ public interface Schema extends Factory {
      *
      * @return
      */
-    public URI getTargetNamespace();
+    public URI getTargetNamespace() {
+        return super.getTargetNamespace();
+    }
 
     // may be different than targNS
-    public URI getURI();
+    public URI getURI() {
+        return super.getUris()[0];
+    }
 
     /**
      * <p>
@@ -239,7 +266,9 @@ public interface Schema extends Factory {
      */
 
     //TODO Use the Version in the merge + parsing portion for comparisons
-    public String getVersion();
+    public String getVersion() {
+        return super.getVersion();
+    }
 
     /**
      * <p>
@@ -260,7 +289,15 @@ public interface Schema extends Factory {
      *
      * @see getUris()
      */
-    public boolean includesURI(URI uri);
+    public boolean includesURI(URI uri) {
+        for (int i = 0; i < super.getUris().length; i++) {
+            URI uri2 = super.getUris()[i];
+            if (uri2.equals(uri)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * <p>
@@ -270,7 +307,9 @@ public interface Schema extends Factory {
      *
      * @return
      */
-    public boolean isAttributeFormDefault();
+    public boolean isAttributeFormDefault() {
+        return super.isAttributeFormDefault();
+    }
 
     /**
      * <p>
@@ -280,5 +319,7 @@ public interface Schema extends Factory {
      *
      * @return
      */
-    public boolean isElementFormDefault();
+    public boolean isElementFormDefault() {
+        return super.isElementFormDefault();
+    }
 }
