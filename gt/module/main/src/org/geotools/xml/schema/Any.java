@@ -28,8 +28,12 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public interface Any extends ElementGrouping {
+public abstract class Any extends com.vividsolutions.xdo.xsi.Any implements ElementGrouping {
     
+    public Any( URI arg0, String arg1, int arg2, int arg3 ) {
+        super(arg0, arg1, arg2, arg3);
+    }
+
     public static final URI ALL = null;
     /**
      * <p>
@@ -38,17 +42,23 @@ public interface Any extends ElementGrouping {
      *
      * @return
      */
-    public String getId();
+    public String getId(){
+        return super.getId();
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
      */
-    public int getMaxOccurs();
+    public int getMaxOccurs(){
+        return super.getMaxOccurs();
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
      */
-    public int getMinOccurs();
+    public int getMinOccurs(){
+        return super.getMinOccurs();
+    }
 
     /**
      * <p>
@@ -58,5 +68,11 @@ public interface Any extends ElementGrouping {
      *
      * @return
      */
-    public URI getNamespace();
+    public URI getNamespace(){
+        return super.getNamespace();
+    }
+    
+    public Element findChildElement( String name ) {
+        return null; // not convient to implement this convient method right now
+    }
 }
