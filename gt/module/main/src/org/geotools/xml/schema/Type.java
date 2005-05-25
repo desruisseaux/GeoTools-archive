@@ -59,7 +59,7 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * 
      * @return Object
      */
-    public abstract Object getValue(Element element, ElementValue[] value,
+    public abstract Object getValue(com.vividsolutions.xdo.xsi.Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException;
 
     /**
@@ -84,7 +84,7 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * 
      * @see Type#encode(Element, Object, Writer, Map)
      */
-    public abstract boolean canEncode(Element element, Object value, Map hints);
+    public abstract boolean canEncode(com.vividsolutions.xdo.xsi.Element element, Object value, Map hints);
     
     /**
      * Encode value as element on the provided output.
@@ -98,7 +98,7 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * @throws IOException When there is an error with the Writer.
      * @throws OperationNotSupportedException When this type cannot be encoded ... and wasn't checked first.
      */
-    public abstract void encode(Element element, Object value, PrintHandler output, Map hints) 
+    public abstract void encode(com.vividsolutions.xdo.xsi.Element element, Object value, PrintHandler output, Map hints) 
     	throws IOException, OperationNotSupportedException;
 
 
@@ -110,5 +110,5 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      *
      * @return
      */
-    public abstract  Element findChildElement(String name);
+    public abstract com.vividsolutions.xdo.xsi.Element findChildElement(String name);
 }
