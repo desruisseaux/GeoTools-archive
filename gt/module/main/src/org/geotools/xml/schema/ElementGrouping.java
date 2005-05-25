@@ -17,6 +17,7 @@
 package org.geotools.xml.schema;
 
 /**
+ * This must be an interface! So our Element can extend xdo Element and still implement ElementGroup.
  * <p>
  * This represents an abstract collection of xml element definitions within a
  * Schema.
@@ -28,16 +29,7 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers www.refractions.net
  */
-public abstract class ElementGrouping extends com.vividsolutions.xdo.xsi.ElementGrouping {
-    
-    protected ElementGrouping( int arg0 ) {
-        super(arg0);
-    }
-    
-    protected ElementGrouping( int arg0, String arg1, int arg2, int arg3 ) {
-        super(arg0, arg1, arg2, arg3);
-    }
-
+public interface ElementGrouping {
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
@@ -98,6 +90,6 @@ public abstract class ElementGrouping extends com.vividsolutions.xdo.xsi.Element
      *
      * @return Element or null if not found.
      */
-    public abstract com.vividsolutions.xdo.xsi.Element findChildElement(String name);
+    public Element findChildElement(String name);
 
 }
