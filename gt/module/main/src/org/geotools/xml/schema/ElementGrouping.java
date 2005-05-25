@@ -28,7 +28,16 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers www.refractions.net
  */
-public interface ElementGrouping {
+public abstract class ElementGrouping extends com.vividsolutions.xdo.xsi.ElementGrouping {
+    
+    protected ElementGrouping( int arg0 ) {
+        super(arg0);
+    }
+    
+    protected ElementGrouping( int arg0, String arg1, int arg2, int arg3 ) {
+        super(arg0, arg1, arg2, arg3);
+    }
+
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
@@ -89,6 +98,6 @@ public interface ElementGrouping {
      *
      * @return Element or null if not found.
      */
-    public Element findChildElement(String name);
+    public abstract com.vividsolutions.xdo.xsi.Element findChildElement(String name);
 
 }
