@@ -23,54 +23,62 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers
  */
-public interface Facet {
-    /** DOCUMENT ME! */
-    public static int ENUMERATION = 1;
+public abstract class Facet extends com.vividsolutions.xdo.xsi.Facet {
+    public Facet( int arg0, String arg1 ) {
+        super(arg0, arg1);
+    }
 
     /** DOCUMENT ME! */
-    public static int FRACTIONDIGITS = 2;
+    public static int ENUMERATION = com.vividsolutions.xdo.xsi.Facet.ENUMERATION;
 
     /** DOCUMENT ME! */
-    public static int LENGTH = 3;
+    public static int FRACTIONDIGITS = com.vividsolutions.xdo.xsi.Facet.FRACTIONDIGITS;
 
     /** DOCUMENT ME! */
-    public static int MAXEXCLUSIVE = 4;
+    public static int LENGTH = com.vividsolutions.xdo.xsi.Facet.LENGTH;
 
     /** DOCUMENT ME! */
-    public static int MAXINCLUSIVE = 5;
+    public static int MAXEXCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MAXEXCLUSIVE;
 
     /** DOCUMENT ME! */
-    public static int MAXLENGTH = 6;
+    public static int MAXINCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MAXINCLUSIVE;
 
     /** DOCUMENT ME! */
-    public static int MINEXCLUSIVE = 7;
+    public static int MAXLENGTH = com.vividsolutions.xdo.xsi.Facet.MAXLENGTH;
 
     /** DOCUMENT ME! */
-    public static int MININCLUSIVE = 8;
+    public static int MINEXCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MINEXCLUSIVE;
 
     /** DOCUMENT ME! */
-    public static int MINLENGTH = 9;
+    public static int MININCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MININCLUSIVE;
 
     /** DOCUMENT ME! */
-    public static int PATTERN = 10;
+    public static int MINLENGTH = com.vividsolutions.xdo.xsi.Facet.MINLENGTH;
 
     /** DOCUMENT ME! */
-    public static int TOTALDIGITS = 11;
+    public static int PATTERN = com.vividsolutions.xdo.xsi.Facet.PATTERN;
 
     /** DOCUMENT ME! */
-    public static int WHITESPACE = 12;
+    public static int TOTALDIGITS = com.vividsolutions.xdo.xsi.Facet.TOTALDIGITS;
+
+    /** DOCUMENT ME! */
+    public static int WHITESPACE = com.vividsolutions.xdo.xsi.Facet.WHITESPACE;
 
     /**
      * The Facet Type -- selected from one of the above constant values
      *
      * @return
      */
-    public int getFacetType();
+    public int getFacetType() {
+        return super.getType();
+    }
 
     /**
      * The facet's constraint
      *
      * @return
      */
-    public String getValue();
+    public String getValue() {
+        return super.getValue();
+    }
 }
