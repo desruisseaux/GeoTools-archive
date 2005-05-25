@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import com.vividsolutions.xdo.xsi.ElementGrouping;
+
 /**
  * <p>
  * This interface is intended to represent a Sequence in an XML Schema. This
@@ -29,17 +31,20 @@ package org.geotools.xml.schema;
  *
  * @see ElementGrouping
  */
-public interface Sequence extends ElementGrouping {
-    /**
-     * <p>
-     * This method returns an ORDERED list of children. The children in the
-     * list may be singular elements, sequences, choices, ... , or groups.
-     * </p>
-     *
-     * @return
-     */
-    public ElementGrouping[] getChildren();
+public abstract class Sequence extends com.vividsolutions.xdo.xsi.Sequence {
 
+    /**
+     * Construct <code>Sequence</code>.
+     *
+     * @param arg0
+     * @param arg1
+     * @param arg2
+     * @param arg3
+     */
+    public Sequence( String arg0, int arg1, int arg2, ElementGrouping[] arg3 ) {
+        super(arg0, arg1, arg2, arg3);
+    }
+    
     /**
      * <p>
      * The Schema ID for this sequence definition.
@@ -47,15 +52,15 @@ public interface Sequence extends ElementGrouping {
      *
      * @return
      */
-    public String getId();
+    public abstract String getId();
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
      */
-    public int getMaxOccurs();
+    public abstract int getMaxOccurs();
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
      */
-    public int getMinOccurs();
+    public abstract int getMinOccurs();
 }
