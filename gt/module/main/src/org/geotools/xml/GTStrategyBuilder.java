@@ -43,9 +43,22 @@ public class GTStrategyBuilder extends Converter implements StrategyBuilder {
 		
 		// find element
 		if(s.getElements()!=null){
-			for(int i=0;i<s.getElements().length;i++)
-				if(s.getElements()[i] != null && (type == s.getElements()[i] || (type.getName()!=null && type.getName().equals(s.getElements()[i].getName()))))
-					return new WrappedStrategy(s.getElements()[i].getType());
+			for(int i=0;i<s.getElements().length;i++){
+				if(s.getElements()[i] != null && (type == s.getElements()[i] || (type.getName()!=null && type.getName().equals(s.getElements()[i].getName())))){
+                    com.vividsolutions.xdo.xsi.Element element = s.getElements()[i];
+                    com.vividsolutions.xdo.xsi.Type elementType = element.getType();
+                    
+                    if ( elementType instanceof Type){
+                        return new WrappedStrategy( (Type) elementType );
+                    }
+                    else {
+                        // This is a normal xdo Type
+                        // not sure how to locate a stratagy object for it?
+                        // (we probably should not of been called)
+                        return null;
+                    }
+                }
+            }
 		}
 		
 		return null;
@@ -93,12 +106,21 @@ public class GTStrategyBuilder extends Converter implements StrategyBuilder {
 			return type.getValue(convert(element),value,attrs,hints);
 		}
 
-		/* (non-Javadoc)
-		 * @see com.vividsolutions.xdo.Strategy#cache(com.vividsolutions.xdo.xsi.Element, java.util.Map)
+
+		/**
+         * Looks like this allows the cache of stratagy objects for
+         * complex types? But only returns a true/false?
+         * 
+         * Based on type system changes we can no longer check for
+         * type instanceof ComplexType - code commented out so we can
+         * compile....
 		 */
 		public boolean cache(com.vividsolutions.xdo.xsi.Element element, Map hints) {
-			if(canDecode(element,hints) && type instanceof ComplexType)
-				return ((ComplexType)type).cache(convert(element),hints);
+			if( canDecode(element,hints) ){
+                //if( type instanceof ComplexType ){
+                //    return ((ComplexType)type).cache(convert(element),hints);
+                //}
+            }
 			return true;
 		}
 
@@ -113,7 +135,7 @@ public class GTStrategyBuilder extends Converter implements StrategyBuilder {
 		 * @see com.vividsolutions.xdo.Strategy#encode(com.vividsolutions.xdo.Node, com.vividsolutions.xdo.Encoder, java.util.Map)
 		 */
 		public void encode(Node value, Encoder output, Map hints) throws IOException, OperationNotSupportedException {
-			type.encode(convert(value.element),value.value,new WrappedPrintHandler(output,value.element.getNamespace()),hints);
+            type.encode(convert(value.element),value.value,new WrappedPrintHandler(output,value.element.getNamespace()),hints);
 		}
 	}
 	

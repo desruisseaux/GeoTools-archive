@@ -53,7 +53,9 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import com.vividsolutions.xdo.Encoder;
 import com.vividsolutions.xdo.Node;
+import com.vividsolutions.xdo.Strategy;
 import com.vividsolutions.xdo.schemas.XSDSchema;
+import com.vividsolutions.xdo.xsi.Import;
 
 
 /**
@@ -113,6 +115,8 @@ public class DocumentWriter extends Converter{
         logger.setLevel(l);
     }
 
+    static GTStrategyBuilder stratagyBuilder = new GTStrategyBuilder();
+    
     /**
      * Write value to file using provided schema.
      * 
@@ -209,29 +213,51 @@ public class DocumentWriter extends Converter{
             writeDocument(schema, SchemaFactory.getInstance(XSDSchema.getInstance().getTargetNamespace()),  w2, m);
 
         }
-
-        Element e = null;
+        /** e = element being considered */
+        com.vividsolutions.xdo.xsi.Element e = null;
         logger.setLevel(level);
 
         if (hints != null && hints.containsKey(BASE_ELEMENT)) {
+            // hint provided the base element - good for tie breaker
+            // when applicaiton schema is not explicit about mapping
+            // (eg. WFS allows WFS and GML representation of FeatureCollection)
+            //
             e = (Element) hints.get(BASE_ELEMENT);
         }
 
-        if (e == null) {
-            Element[] elems = schema.getElements();
-        	
+        if (e == null) {                    	
+            // Yes dzwiers you can inline this code for speed
+            e = findElementThatCanEncode( schema.getElements(), value, hints );
+            /*
+            com.vividsolutions.xdo.xsi.Element[] elems = schema.getElements();
             if (elems != null) {
-                for (int j = 0; j < elems.length && e == null; j++)
-                    if ((elems[j].getType() != null)
-                            && elems[j].getType().canEncode(elems[j],
-                                value, hints)) {
-                        e = elems[j];
+                for (int j = 0; j < elems.length && e == null; j++){
+                    if( elems[j] instanceof Element){
+                        Element gtElement = (Element) elems[j];
+                        if (gtElement.getType() != null){
+                            Type gtType = (Type) gtElement.getType();
+                            if( gtType.canEncode(gtElement,value, hints)) {
+                                e = gtElement;
+                            }
+                        }
                     }
+                    else {
+                        // we need to do some kind of stratagy lookup?
+                        com.vividsolutions.xdo.xsi.Element xdoElement = elems[j];
+                        Strategy stratagy = stratagyBuilder.build( xdoElement, hints );
+                        if( stratagy != null && stratagy.canEncode( xdoElement, hints )){
+                            e = xdoElement;
+                        }
+                    }
+                }
             }
+            */
         }
         if (e == null) {
-        	for (int i = 0; i < schema.getImports().length && e == null; i++) {
-	            Element[] elems = schema.getImports()[i].getElements();
+            /* schema no longer has imports with elements?
+        	for (int i = 0; i < schema.getImports().length && e == null; i++) {                
+                Import aImport = schema.getImports()[i];
+                Element[] elems = schema.getImports()[i].getElements();
 	
 	            if (elems != null) {
 	                for (int j = 0; j < elems.length; j++)
@@ -241,7 +267,31 @@ public class DocumentWriter extends Converter{
 	                        e = elems[j];
 	                    }
 	            }
-        	}
+        	}*/
+            
+            // Schema does have elements for us to work through though ...
+            // imagine element list is complete, or more likely ...
+            
+            // Q: are supposed to use the Import to locate another schema?
+            // a: yep that appears to be in the API
+
+            // Q: Are we supposed to check its imports as well?
+            // A: Smacks of recursion (dzwiers does not usually do that)
+            // A: Stratagy object handles all this better, we will just maintain
+            //    parity with what was here before
+            //
+            Import imports[] = schema.getImports();
+            if( imports != null || imports.length != 0 ){
+                for( int i=0; i < imports.length && e == null; i++ ){
+                    Import aImport = imports[i];
+                    com.vividsolutions.xdo.xsi.Schema aSchema = aImport.getSchema();
+                    
+                    // Yes dzwiers you can inline this code for speed
+                    e = findElementThatCanEncode( aSchema.getElements(), value, hints );                    
+                    
+                    // note did not seach
+                }
+            }            
         }
         
         Node n = new Node(convert(e),value);
@@ -249,7 +299,7 @@ public class DocumentWriter extends Converter{
         
         w.flush();
     }
-
+    
     /**
      * Write value to file using provided schema.
      * 
@@ -329,7 +379,7 @@ public class DocumentWriter extends Converter{
 
         }
 
-        Element e = null;
+        com.vividsolutions.xdo.xsi.Element e = null;
         logger.setLevel(level);
 
         if (hints != null && hints.containsKey(BASE_ELEMENT)) {
@@ -337,19 +387,23 @@ public class DocumentWriter extends Converter{
         }
 
         if (e == null) {
-            Element[] elems = schema.getElements();
+            com.vividsolutions.xdo.xsi.Element[] elems = schema.getElements();
         	
             if (elems != null) {
                 for (int j = 0; j < elems.length && e == null; j++)
-                    if ((elems[j].getType() != null)
-                            && elems[j].getType().canEncode(elems[j],
-                                value, hints)) {
-                        e = elems[j];
+                    if ((elems[j].getType() != null)){
+                        if( canEncode( elems[j], value, hints )){
+                            e = elems[j];
+                        }
                     }
             }
         }
         if (e == null) {
-        	for (int i = 0; i < schema.getImports().length && e == null; i++) {
+            Import imports[] = schema.getImports();
+            e = findElementThatCanEncode( schema.getImports(), value, hints );
+            /*
+        	for (int i = 0; i < imports.length && e == null; i++) {
+                schema.
 	            Element[] elems = schema.getImports()[i].getElements();
 	
 	            if (elems != null) {
@@ -360,7 +414,7 @@ public class DocumentWriter extends Converter{
 	                        e = elems[j];
 	                    }
 	            }
-        	}
+        	}*/
         }
         
         Node n = new Node(convert(e),value);
@@ -382,5 +436,74 @@ public class DocumentWriter extends Converter{
     public static void writeSchema(Schema schema, Writer w, Map hints)
         throws IOException, OperationNotSupportedException {
     	writeDocument(schema,convert(XSDSchema.getInstance()),w,hints);
+    }
+    
+    //
+    // Inline methods for reuse 
+    //
+    //    
+    private static final com.vividsolutions.xdo.xsi.Element findElementThatCanEncode( Import[] imports, Object value, Map hints ){
+        com.vividsolutions.xdo.xsi.Element found = null;
+        if( imports != null || imports.length != 0 ){
+            for( int i=0; i < imports.length && found == null; i++ ){
+                Import aImport = imports[i];
+                com.vividsolutions.xdo.xsi.Schema aSchema = aImport.getSchema();
+                
+                // Yes dzwiers you can inline this code for speed
+                found = findElementThatCanEncode( aSchema.getElements(), value, hints );                                    
+            }
+        }
+        return found;
+    }
+        
+    /**
+     * This code is dragged out of writeDocument for reuse.
+     * <p>
+     * This whole game is a waste of time given use of stratagy objects?
+     * </p>
+     * Return null if could not find.
+     */
+    private static final com.vividsolutions.xdo.xsi.Element findElementThatCanEncode( com.vividsolutions.xdo.xsi.Element elements[], Object value, Map hints ){
+        if( elements == null || elements.length == 0) return null;
+        for (int j = 0; j < elements.length; j++){
+            if( elements[j] instanceof Element){
+                Element gtElement = (Element) elements[j];
+                if (gtElement.getType() != null){
+                    Type gtType = (Type) gtElement.getType();
+                    if( gtType.canEncode(gtElement,value, hints)) {
+                        return gtElement;
+                    }
+                }
+            }
+            else {
+                // we need to do some kind of stratagy lookup?
+                com.vividsolutions.xdo.xsi.Element xdoElement = elements[j];
+                Strategy stratagy = stratagyBuilder.build( xdoElement, hints );
+                if( stratagy != null && stratagy.canEncode( xdoElement, hints )){
+                    return xdoElement;
+                }
+            }
+        }
+        return null;
+    }
+    private static final boolean canEncode( com.vividsolutions.xdo.xsi.Element element, Object value, Map hints ){
+        if( element instanceof Element){
+            Element gtElement = (Element) element;
+            if (gtElement.getType() != null){
+                Type gtType = (Type) gtElement.getType();
+                if( gtType.canEncode(gtElement,value, hints)) {
+                    return true;
+                }
+            }
+        }
+        else {
+            // we need to do some kind of stratagy lookup?
+            com.vividsolutions.xdo.xsi.Element xdoElement = element;
+            Strategy stratagy = stratagyBuilder.build( xdoElement, hints );
+            if( stratagy != null && stratagy.canEncode( xdoElement, hints )){
+                return true;
+            }
+        }
+        return false;
     }
 }
