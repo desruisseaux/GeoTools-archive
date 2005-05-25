@@ -31,37 +31,7 @@ import javax.naming.OperationNotSupportedException;
  *
  * @author dzwiers www.refractions.net
  */
-public interface SimpleType extends Type {
-    /**
-     * Represents a masks used to represent how this simpleType may or may not
-     * be changed though the  use of inheritance
-     */
-    public static final int NONE = 0;
-
-    /**
-     * Represents a masks used to represent how this simpleType may or may not
-     * be changed though the  use of inheritance
-     */
-    public static final int UNION = 1;
-
-    /**
-     * Represents a masks used to represent how this simpleType may or may not
-     * be changed though the  use of inheritance
-     */
-    public static final int LIST = 2;
-
-    /**
-     * Represents a masks used to represent how this simpleType may or may not
-     * be changed though the  use of inheritance
-     */
-    public static final int RESTRICTION = 4;
-
-    /**
-     * Represents a masks used to represent how this simpleType may or may not
-     * be changed though the  use of inheritance
-     */
-    public static final int ALL = 7;
-
+public abstract class SimpleType extends com.vividsolutions.xdo.xsi.SimpleType {
     /**
      * <p>
      * This specifies a mask which represents how this XML Schema SimpleType
@@ -70,7 +40,7 @@ public interface SimpleType extends Type {
      *
      * @return
      */
-    public int getFinal();
+    public abstract int getFinal();
 
     /**
      * <p>
@@ -79,7 +49,7 @@ public interface SimpleType extends Type {
      *
      * @return
      */
-    public String getId();
+    public abstract String getId();
 
     /**
      * <p>
@@ -92,7 +62,7 @@ public interface SimpleType extends Type {
      *
      * @return
      */
-    public AttributeValue toAttribute(Attribute attribute, Object value,
+    public abstract AttributeValue toAttribute(Attribute attribute, Object value,
         Map hints) throws OperationNotSupportedException;
 
     /**
@@ -104,7 +74,7 @@ public interface SimpleType extends Type {
      *
      * @return
      */
-    public boolean canCreateAttributes(Attribute attribute, Object value,
+    public abstract boolean canCreateAttributes(Attribute attribute, Object value,
         Map hints);
 
     /**
@@ -112,7 +82,7 @@ public interface SimpleType extends Type {
      *
      * @return
      */
-    public int getChildType();
+    public abstract int getChildType();
 
     /**
      * A simple simpleType when either a List or Restriction ... A set when a
@@ -120,7 +90,7 @@ public interface SimpleType extends Type {
      *
      * @return
      */
-    public SimpleType[] getParents();
+    public abstract com.vividsolutions.xdo.xsi.SimpleType[] getParents();
 
     /**
      * The list of facets for this Restriction ... Null if another type (List,
@@ -128,5 +98,5 @@ public interface SimpleType extends Type {
      *
      * @return
      */
-    public Facet[] getFacets();
+    public abstract com.vividsolutions.xdo.xsi.Facet[] getFacets();
 }
