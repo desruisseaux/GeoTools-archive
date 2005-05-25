@@ -48,14 +48,14 @@ public interface ElementGrouping {
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int ANY = com.vividsolutions.xdo.xsi.ElementGrouping.ANY
+    public static final int ANY = com.vividsolutions.xdo.xsi.ElementGrouping.ANY;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int SEQUENCE = com.vividsolutions.xdo.xsi.ElementGrouping.SEQUENCE
+    public static final int SEQUENCE = com.vividsolutions.xdo.xsi.ElementGrouping.SEQUENCE;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping

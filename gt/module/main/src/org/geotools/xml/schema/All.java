@@ -26,7 +26,11 @@ package org.geotools.xml.schema;
  *
  * @see Element
  */
-public interface All extends ElementGrouping {
+public abstract class All extends com.vividsolutions.xdo.xsi.ElementGrouping {
+    protected All( int arg0 ) {
+        super(arg0);
+    }
+
     /**
      * <p>
      * The list of elements represented within this 'all' declaration. We
@@ -37,7 +41,9 @@ public interface All extends ElementGrouping {
      *
      * @return
      */
-    public Element[] getElements();
+    public Element[] getElements() {
+        return super.getGrouping();
+    }
 
     /**
      * <p>
