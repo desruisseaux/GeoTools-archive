@@ -28,7 +28,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public interface Attribute {
+public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
     /**
      * Represent a mask used to determine the life of the attribute in an
      * instance document.
@@ -55,7 +55,9 @@ public interface Attribute {
      *
      * @return Default Value as a String or Null
      */
-    public String getDefault();
+    public String getDefault() {
+        return super.getDefault();
+    }
 
     /**
      * <p>
@@ -65,7 +67,9 @@ public interface Attribute {
      *
      * @return Fixed Value as a String or Null
      */
-    public String getFixed();
+    public String getFixed() {
+        return super.getFixed();
+    }
 
     /**
      * <p>
@@ -75,7 +79,9 @@ public interface Attribute {
      *
      * @return
      */
-    public boolean isForm();
+    public boolean isForm() {
+        return super.isForm();
+    }
 
     /**
      * <p>
@@ -84,7 +90,9 @@ public interface Attribute {
      *
      * @return
      */
-    public String getId();
+    public String getId() {
+        return super.getId();
+    }
 
     /**
      * <p>
@@ -94,14 +102,18 @@ public interface Attribute {
      *
      * @return
      */
-    public String getName();
+    public String getName() { 
+        return super.getName();
+    }
 
     /**
      * DOCUMENT ME!
      *
      * @return
      */
-    public URI getNamespace();
+    public URI getNamespace() {
+        return super.getNamespace();
+    }
 
     /**
      * <p>
@@ -112,7 +124,9 @@ public interface Attribute {
      *
      * @return
      */
-    public int getUse();
+    public int getUse() {
+        return super.getUse();
+    }
 
     /**
      * <p>
@@ -122,5 +136,7 @@ public interface Attribute {
      *
      * @return
      */
-    public SimpleType getSimpleType();
+    public com.vividsolutions.xdo.xsi.SimpleType getSimpleType() {
+        return super.getSimpleType();
+    }
 }
