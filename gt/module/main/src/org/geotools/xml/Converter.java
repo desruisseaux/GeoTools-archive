@@ -31,11 +31,18 @@ public class Converter {
         return new SchemaWrapper(in);
 	}
 	protected static org.geotools.xml.schema.Element convert(com.vividsolutions.xdo.xsi.Element in){
-	    ElementWrapper wrapper = (ElementWrapper) in;
-        return wrapper.getGtElement();
+        if( in instanceof org.geotools.xml.schema.Element ){
+            return (org.geotools.xml.schema.Element ) in;
+        }
+        else {
+            // we need a wraper that looks up the stratagy object?!
+            //
+            throw new UnsupportedOperationException("We need a wraper of element+stratagy"); // FIXME
+        }
 	}
-	protected static com.vividsolutions.xdo.xsi.Element convert(org.geotools.xml.schema.Element in){
-        return new ElementWrapper(in);
+	protected static com.vividsolutions.xdo.xsi.Element convert( org.geotools.xml.schema.Element in){
+        return in; // this is a nop
+        //return new ElementWrapper(in);
 	}
 	protected static org.geotools.xml.schema.Type convert(com.vividsolutions.xdo.xsi.Type in){
         TypeWrapper wrapper = (TypeWrapper) in;
@@ -62,82 +69,82 @@ public class Converter {
             this.gtSchema = gtSchema;
         }
 
-        @Override
+        
         public AttributeGroup[] getAttributeGroups() {
             return super.getAttributeGroups();
         }
 
-        @Override
+        
         public Attribute[] getAttributes() {
             return super.getAttributes();
         }
 
-        @Override
+        
         public int getBlockDefault() {
             return super.getBlockDefault();
         }
 
-        @Override
+        
         public ComplexType[] getComplexTypes() {
             return super.getComplexTypes();
         }
 
-        @Override
+        
         public com.vividsolutions.xdo.xsi.Element[] getElements() {
             return super.getElements();
         }
 
-        @Override
+        
         public int getFinalDefault() {
             return super.getFinalDefault();
         }
 
-        @Override
+        
         public Group[] getGroups() {
             return super.getGroups();
         }
 
-        @Override
+        
         public Import[] getImports() {
             return super.getImports();
         }
 
-        @Override
+        
         public String getPrefix() {
             return super.getPrefix();
         }
 
-        @Override
+        
         public SimpleType[] getSimpleTypes() {
             return super.getSimpleTypes();
         }
 
-        @Override
+        
         public URI getTargetNamespace() {
             return super.getTargetNamespace();
         }
 
-        @Override
+        
         public URI[] getUris() {
             return super.getUris();
         }
 
-        @Override
+        
         public String getVersion() {
             return super.getVersion();
         }
 
-        @Override
+        
         public boolean isAttributeFormDefault() {
             return super.isAttributeFormDefault();
         }
 
-        @Override
+        
         public boolean isElementFormDefault() {
             return super.isElementFormDefault();
         }
 
-        @Override
+        
         public String getId() {
             return super.getId();
         }
@@ -153,22 +160,22 @@ public class Converter {
             gtType = type;
         }
 
-        @Override
+        
         public int getFinal() {
             return -1; //TODO no direct mapping
         }
 
-        @Override
+        
         public String getName() {
             return gtType.getName();
         }
 
-        @Override
+        
         public URI getNamespace() {
             return gtType.getNamespace();
         }
 
-        @Override
+        
         public String getId() {
             return null; //TODO no direct mapping
         }
@@ -182,7 +189,7 @@ public class Converter {
         }
         
     }
-    
+    /* No longer needed 
     static class ElementWrapper extends com.vividsolutions.xdo.xsi.Element {
         org.geotools.xml.schema.Element gtElement;
 
@@ -199,84 +206,84 @@ public class Converter {
             this.gtElement = gtElement;
         }
 
-        @Override
+        
         public int getBlock() {
             return gtElement.getBlock();
         }
 
-        @Override
+        
         public String getDefault() {
             return gtElement.getDefault();
         }
 
-        @Override
+        
         public int getFinal() {
             return gtElement.getFinal();
         }
 
-        @Override
+        
         public String getFixed() {
             return gtElement.getFixed();
         }
 
-        @Override
+        
         public String getName() {
             return gtElement.getName();
         }
 
-        @Override
+        
         public URI getNamespace() {
             return gtElement.getNamespace();
         }
 
-        @Override
+        
         public com.vividsolutions.xdo.xsi.Element getSubstitutionGroup() {
             return convert(gtElement.getSubstitutionGroup());
         }
 
-        @Override
+        
         public Type getType() {
             return convert(gtElement.getType());
         }
 
-        @Override
+        
         public boolean isAbstract() {
             return gtElement.isAbstract();
         }
 
-        @Override
+        
         public boolean isForm() {
             return gtElement.isForm();
         }
 
-        @Override
+        
         public boolean isNillable() {
             return gtElement.isNillable();
         }
 
-        @Override
+        
         public int getGrouping() {
             return gtElement.getGrouping();
         }
 
-        @Override
+        
         public int getMaxOccurs() {
             return gtElement.getMaxOccurs();
         }
 
-        @Override
+        
         public int getMinOccurs() {
             return gtElement.getMinOccurs();
         }
 
-        @Override
+        
         public String getId() {
             return gtElement.getId();
         }
 
-        @Override
+        
         public boolean equals( Object obj ) {
             return gtElement.equals(obj);
         }
-    }
+    }*/
 }
