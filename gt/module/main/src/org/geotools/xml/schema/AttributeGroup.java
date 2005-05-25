@@ -30,7 +30,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public interface AttributeGroup {
+public interface AttributeGroup extends com.vividsolutions.xdo.xsi.AttributeGroup{
     /**
      * <p>
      * Represents the Namespace attribute of an AnyAttribute child occuring
@@ -39,7 +39,9 @@ public interface AttributeGroup {
      *
      * @return
      */
-    public String getAnyAttributeNameSpace();
+    public String getAnyAttributeNameSpace() {
+        return super.getAnyAttributeNameSpace();
+    }
 
     /**
      * <p>
@@ -50,7 +52,9 @@ public interface AttributeGroup {
      *
      * @return
      */
-    public Attribute[] getAttributes();
+    public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
+        return super.getAttributes();
+    }
 
     /**
      * <p>
@@ -59,7 +63,9 @@ public interface AttributeGroup {
      *
      * @return
      */
-    public String getId();
+    public String getId() {
+        return super.getId();
+    }
 
     /**
      * <p>
@@ -68,12 +74,16 @@ public interface AttributeGroup {
      *
      * @return
      */
-    public String getName();
+    public String getName() {
+        return super.getName();
+    }
 
     /**
      * DOCUMENT ME!
      *
      * @return
      */
-    public URI getNamespace();
+    public URI getNamespace() {
+        return super.getNamespace();
+    }
 }
