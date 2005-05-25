@@ -108,12 +108,6 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
     }
 
     /**
-     * Returns the organization or party responsible for definition and maintenance of the
-     * underlying database.
-     */
-    public abstract Citation getAuthority();
-
-    /**
      * Returns {@code true} if this factory is ready. The default implementation returns
      * {@code false} if {@link #createBackingStore} throws an exception.
      */

@@ -55,7 +55,7 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux
- * @author Richard Didier
+ * @author Didier Richard
  */
 public class FactoryForSQL extends EPSGFactory {
     /**
@@ -78,6 +78,7 @@ public class FactoryForSQL extends EPSGFactory {
         "[Naming System]",                          "epsg_namingsystem",
         "[Prime Meridian]",                         "epsg_primemeridian",
         "[Unit of Measure]",                        "epsg_unitofmeasure",
+        "[Version History]",                        "epsg_versionhistory",
         "[CA.ORDER]",                               "coord_axis_order" //a field in epsg_coordinateaxis
     };
 
@@ -88,6 +89,7 @@ public class FactoryForSQL extends EPSGFactory {
      *
      * <pre><table>
      *   <tr><th align="center">MS-Access name</th>            <th align="center">ANSI name</th></tr>
+     *   <tr><td>[Alias]</td>                                  <td>epsg_alias</td></tr>
      *   <tr><td>[Area]</td>                                   <td>epsg_area</td></tr>
      *   <tr><td>[Coordinate Axis]</td>                        <td>epsg_coordinateaxis</td></tr>
      *   <tr><td>[Coordinate Axis Name]</td>                   <td>epsg_coordinateaxisname</td></tr>
@@ -99,6 +101,7 @@ public class FactoryForSQL extends EPSGFactory {
      *   <tr><td>[Coordinate Reference System]</td>            <td>epsg_coordinatereferencesystem</td></tr>
      *   <tr><td>[Coordinate System]</td>                      <td>epsg_coordinatesystem</td></tr>
      *   <tr><td>[Datum]</td>                                  <td>epsg_datum</td></tr>
+     *   <tr><td>[Naming System]</td>                          <td>epsg_namingsystem</td></tr>
      *   <tr><td>[Ellipsoid]</td>                              <td>epsg_ellipsoid</td></tr>
      *   <tr><td>[Prime Meridian]</td>                         <td>epsg_primemeridian</td></tr>
      *   <tr><td>[Unit of Measure]</td>                        <td>epsg_unitofmeasure</td></tr>

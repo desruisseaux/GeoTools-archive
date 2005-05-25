@@ -133,6 +133,17 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     public abstract Citation getAuthority();
 
     /**
+     * Returns a description of the underlying backing store, or {@code null} if unknow.
+     * This is for example the database software used for storing the data.
+     * The default implementation returns always {@code null}.
+     *
+     * @throws FactoryException if a failure occured while fetching the engine description.
+     */
+    public String getBackingStoreDescription() throws FactoryException {
+        return null;
+    }
+
+    /**
      * Returns the low-level {@linkplain ObjectFactory object factory} used for
      * {@linkplain #createObject object creation}.
      *

@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.logging.LogRecord;
+import java.util.logging.Level;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -67,6 +69,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -182,15 +185,19 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Returns {@code true} if this factory is ready. The default implementation returns
      * {@code false} if no backing store were setup and
      * {@link DeferredAuthorityFactory#createBackingStore} throws an exception.
+     *
+     * @todo Localize the logging message.
      */
     synchronized boolean isReady() {
         try {
             return getBackingStore().isReady();
         } catch (FactoryException exception) {
-            /*
-             * TODO: log a message at the FINER lever. This is not a warning, since the purpose
-             *       of this 'isReady()' method is exactly that: check if the connection is up.
-             */
+            final Citation citation = getAuthority();
+            final LogRecord record = new LogRecord(Level.FINE, "Unavailable factory: "+citation.getTitle());
+            record.setSourceClassName(Utilities.getShortClassName(this));
+            record.setSourceMethodName("isReady");
+            record.setThrown(exception);
+            LOGGER.log(record);
             return false;
         }
     }
@@ -207,7 +214,17 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * underlying database.
      */
     public synchronized Citation getAuthority() {
-        return backingStore.getAuthority();
+        return (backingStore!=null) ? backingStore.getAuthority() : null;
+    }
+
+    /**
+     * Returns a description of the underlying backing store, or {@code null} if unknow.
+     * This is for example the database software used for storing the data.
+     *
+     * @throws FactoryException if a failure occured while fetching the engine description.
+     */
+    public synchronized String getBackingStoreDescription() throws FactoryException {
+        return getBackingStore().getBackingStoreDescription();
     }
 
     /**

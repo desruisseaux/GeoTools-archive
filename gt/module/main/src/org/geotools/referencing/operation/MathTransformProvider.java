@@ -407,6 +407,8 @@ public abstract class MathTransformProvider extends OperationMethod {
      *         {@linkplain #createOptionalDescriptor optional} and the user didn't
      *         provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
     protected static Object value(final ParameterDescriptor param,
                                   final ParameterValueGroup group)
@@ -427,6 +429,8 @@ public abstract class MathTransformProvider extends OperationMethod {
      *         {@linkplain #createOptionalDescriptor optional} and the user didn't
      *         provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
     protected static String stringValue(final ParameterDescriptor param,
                                         final ParameterValueGroup group)
@@ -447,6 +451,8 @@ public abstract class MathTransformProvider extends OperationMethod {
      *         {@linkplain #createOptionalDescriptor optional} and the user didn't
      *         provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
     protected static int intValue(final ParameterDescriptor param,
                                   final ParameterValueGroup group)
@@ -469,6 +475,8 @@ public abstract class MathTransformProvider extends OperationMethod {
      *         {@linkplain #createOptionalDescriptor optional} and the user didn't
      *         provided any value.
      * @throws ParameterNotFoundException if the parameter is not found.
+     *
+     * @todo Move to the {@link org.geotools.parameter.Parameters} class.
      */
     protected static double doubleValue(final ParameterDescriptor param,
                                         final ParameterValueGroup group)

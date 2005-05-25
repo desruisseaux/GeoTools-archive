@@ -45,8 +45,6 @@ public class Citation extends CitationImpl {
 
     /**
      * Constructs a citation with the specified title.
-     *
-     * @param title The title, as a {@link String} or an {@link InternationalString} object.
      */
     public Citation(final CharSequence title) {
         super(title);

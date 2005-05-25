@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>geotools-epsg-hsql</name>
+  <id>epsg-hsql</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools.referencing</package>
+  <shortDescription>EPSG Authoriy Service</shortDescription>
+  <gumpRepositoryId>geotools</gumpRepositoryId>
+  <description>
+    Connection to an embedded EPSG database in HSQL format.
+    This is database is built from the SQL scripts delivered by EPSG.
+    This plugin is very short and the code contains nothing else than
+    connection parameters through the use of a jar embedding the HSQL
+    files.
+  </description>
+  <developers>
+    <developer>
+      <name>Didier Richard</name>
+      <email>dgr@libertysurf.fr</email>
+      <organization>Institut Géographique National - France</organization>
+      <roles>
+        <role>Contributor</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Institut de Recherche pour le Développement</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+            <include>testData/</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>

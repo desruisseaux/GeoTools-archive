@@ -25,7 +25,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -223,6 +225,13 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     ////////    expressions.                                               ////////
     ///////////////////////////////////////////////////////////////////////////////
     /**
+     * The authority for this database. Will be created only when first needed.
+     * This authority will contains the database version in the {@linkplain Citation#getEdition
+     * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
+     */
+    private transient Citation authority;
+
+    /**
      * Last object type returned by {@link #createObject}, or -2 if none.
      * This type is an index in the {@link #OBJECT_TABLES} array and is
      * strictly for {@link #createObject} internal use.
@@ -294,10 +303,70 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the authority, which is {@link CitationImpl#EPSG EPSG}.
+     * Returns the authority for this EPSG database.
+     * This authority will contains the database version in the {@linkplain Citation#getEdition
+     * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
      */
-    public Citation getAuthority() {
-        return CitationImpl.EPSG;
+    public synchronized Citation getAuthority() {
+        if (authority == null) try {
+            final String query = adaptSQL("SELECT VERSION_NUMBER, VERSION_DATE FROM [Version History]" +
+                                          " ORDER BY VERSION_DATE DESC");
+            final Statement statement = connection.createStatement();
+            final ResultSet result = statement.executeQuery(query);
+            if (result.next()) {
+                final CitationImpl ci = new CitationImpl(CitationImpl.EPSG);
+                ci.setEdition(new SimpleInternationalString(result.getString(1)));
+                ci.setEditionDate(result.getDate(2));
+                authority = ci;
+            } else {
+                authority = CitationImpl.EPSG;
+            }
+            result.close();
+            statement.close();
+        } catch (SQLException exception) {
+            Utilities.unexpectedException(LOGGER.getName(), "EPSGFactory", "getAuthority", exception);
+            return CitationImpl.EPSG;
+        }
+        return authority;
+    }
+
+    /**
+     * Returns a description of the database engine.
+     *
+     * @throws FactoryException if the database's metadata can't be fetched.
+     *
+     * @todo localize
+     */
+    public synchronized String getBackingStoreDescription() throws FactoryException {
+        final String lineSeparator = System.getProperty("line.separator", "\r");
+        final StringBuffer  buffer = new StringBuffer();
+        final Citation   authority = getAuthority();
+        CharSequence s;
+        if ((s=authority.getEdition()) != null) {
+            buffer.append("EPSG version:    ");
+            buffer.append(s);
+            buffer.append(lineSeparator);
+        }
+        try {
+            final DatabaseMetaData metadata = connection.getMetaData();
+            if ((s=metadata.getDatabaseProductName()) != null) {
+                buffer.append("Database engine: ");
+                buffer.append(s);
+                if ((s=metadata.getDatabaseProductVersion()) != null) {
+                    buffer.append(" version ");
+                    buffer.append(s);
+                }
+                buffer.append(lineSeparator);
+            }
+            if ((s=metadata.getURL()) != null) {
+                buffer.append("Database URL:    ");
+                buffer.append(s);
+                buffer.append(lineSeparator);
+            }
+        } catch (SQLException exception) {
+            throw new FactoryException(exception);
+        }
+        return buffer.toString();
     }
 
     /**
@@ -934,8 +1003,8 @@ public class EPSGFactory extends AbstractAuthorityFactory {
         List list = null;
         PreparedStatement stmt;
         stmt = prepareStatement("BursaWolfParametersSet",
-                                         "SELECT FIRST(CO.COORD_OP_CODE),"
-                                 +             " FIRST(CO.COORD_OP_METHOD_CODE),"
+                                         "SELECT MIN(CO.COORD_OP_CODE),"
+                                 +             " MIN(CO.COORD_OP_METHOD_CODE),"
                                  +             " CRS2.DATUM_CODE"
                                  +      " FROM ([Coordinate_Operation] AS CO"
                                  + " INNER JOIN [Coordinate Reference System] AS CRS1"

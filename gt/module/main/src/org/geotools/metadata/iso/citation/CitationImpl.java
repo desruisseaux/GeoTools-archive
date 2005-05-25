@@ -360,6 +360,31 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
+     * Constructs a new citation initialized to the values specified by the given object.
+     * This constructor performs a shallow copy (i.e. each source attributes are reused
+     * without copying them).
+     *
+     * @todo Create a {@code copy(Citation, Citation)} method if {@code setXXX} methods
+     *       are added to GeoAPI interfaces.
+     */
+    public CitationImpl(final Citation source) {
+        setTitle                  (source.getTitle());
+        setAlternateTitles        (source.getAlternateTitles());
+        setDates                  (source.getDates());
+        setEdition                (source.getEdition());
+        setEditionDate            (source.getEditionDate());
+        setIdentifiers            (source.getIdentifiers());
+        setIdentifierTypes        (source.getIdentifierTypes());
+        setCitedResponsibleParties(source.getCitedResponsibleParties());
+        setPresentationForm       (source.getPresentationForm());
+        setSeries                 (source.getSeries());
+        setOtherCitationDetails   (source.getOtherCitationDetails());
+        setCollectiveTitle        (source.getCollectiveTitle());
+        setISBN                   (source.getISBN());
+        setISSN                   (source.getISSN());
+    }
+
+    /**
      * Constructs a citation with the specified title.
      *
      * @param title The title, as a {@link String} or an {@link InternationalString} object.
@@ -403,9 +428,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
      * @param  title The title or alternate title to compare.
      * @return <code>true</code> in the title or alternate title matche the given string.
      */
-    public static boolean titleMatches(final org.opengis.metadata.citation.Citation citation,
-                                       String title)
-    {
+    public static boolean titleMatches(final Citation citation, String title) {
         title = title.trim();
         InternationalString candidate = citation.getTitle();
         Iterator iterator = null;

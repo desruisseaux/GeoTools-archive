@@ -9,11 +9,12 @@
   <shortDescription>EPSG Authoriy Service</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>
-  Connection to EPSG database in MS-Access format. This is the primary format
-  released by EPSG, so it should be understood as the most "official" one.
-  This plugin is very short and contains nothing else than connection parameters.
-  Users wanting a connection to an other database (e.g. a PostgreSQL one) can
-  look at this plugin and create a modified copy for their need.</description>
+    Connection to EPSG database in MS-Access format. This is the primary format
+    released by EPSG, so it should be understood as the most "official" one.
+    This plugin is very short and contains nothing else than connection parameters.
+    Users wanting a connection to an other database (e.g. a PostgreSQL one) can
+    look at this plugin and create a modified copy for their need.
+  </description>
   <developers>
     <developer>
       <name>Martin Desruisseaux</name>

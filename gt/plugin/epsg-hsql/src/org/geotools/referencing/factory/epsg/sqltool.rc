@@ -1,0 +1,25 @@
+#
+# Connection parameters to the EPSG database with HSQL.
+# The pathname provided in this example is relative to
+# classes root directory.  Users should copy this file
+# in their home directory and change the path to their
+# database installation directory. (Note: the trailing
+# "HSQL" is the database name, not a directory name).
+#
+# This file doesn't need to be distributed in the JAR
+# file. It is included here only for maintenance of
+# the EPSG database for HSQL.
+#
+# Author: Martin Desruisseaux
+# Revision: $Id$
+#
+
+urlid EPSG
+url jdbc:hsqldb:file:org/geotools/referencing/factory/epsg/HSQL
+username Geotools
+password Geotools
+
+urlid EPSG-admin
+url jdbc:hsqldb:file:org/geotools/referencing/factory/epsg/HSQL
+username sa
+password

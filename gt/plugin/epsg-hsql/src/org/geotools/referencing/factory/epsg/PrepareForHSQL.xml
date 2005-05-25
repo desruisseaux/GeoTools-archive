@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ========================================================================
+
+     ANT BUILD FILE (Ref. http://jakarta.apache.org/ant )
+
+     Ant script preparing SQL scripts for HSQL. The scripts provided by EPSG
+     can't be run "as is" because of minor SQL language differences. Some
+     keywords must be replaced, and the date format must be changed from
+     "yyyy/mm/dd" to "yyyy-mm-dd". This scripts performs those changes in a
+     copy of EPSG scripts.
+
+     There is one change that this script doesn't performs. Column creation
+     in the form "columnName type UNIQUE" must move the "unique" keyword at
+     the end of table creation in the form "UNIQUE (columnName)". This change
+     need to be done by hand in the "EPSG_v66.hsql_Tables.sql" file.
+
+     The SQL scripts must be executed in the following order:
+
+         EPSG_v66.hsql_Tables.sql
+         EPSG_v66.hsql_Data.sql
+         EPSG_v66.hsql_FKeys.sql
+
+     It is easier to executes the scripts using the following tools:
+
+         java org.hsqldb.util.DatabaseManagerSwing
+
+     except "EPSG_v66.hsql_Data.sql", which is too big. This one can be executed
+     using the following command (after the "sqltool.rc" file has been copied in
+     yours home directory):
+
+         java org.hsqldb.util.SqlTool -autoCommit EPSG-admin EPSG_v66.hsql_Data.sql
+
+     Once the import is completed, execute the following in the DatabaseManager:
+
+         CREATE USER Geotools PASSWORD Geotools;
+         SHUTDOWN COMPACT;
+
+     Author:  Martin Desruisseaux
+     Version: $Id$
+     ======================================================================== -->
+
+<project name="Create HSQL scripts" default="create">
+  <target name="create">
+    <copy file="EPSG_v66.mdb_Tables.sql" tofile="EPSG_v66.hsql_Tables.sql"/>
+    <copy file="EPSG_v66.mdb_FKeys.sql"  tofile="EPSG_v66.hsql_FKeys.sql" />
+    <copy file="EPSG_v66.mdb_Data.sql"   tofile="EPSG_v66.hsql_Data.sql"  />
+
+    <replace file="EPSG_v66.hsql_Tables.sql">
+      <replacefilter token="CREATE TABLE" value="CREATE CACHED TABLE"/>
+      <replacefilter token="TEXT"         value="VARCHAR"            />
+    </replace>
+
+    <replaceregexp file="EPSG_v66.hsql_Data.sql" byline="true">
+      <regexp pattern="'(\d{4})/(\d{2})/(\d{2})',\s*"/>
+      <substitution expression="'\1-\2-\3',"/>
+    </replaceregexp>
+
+  </target>
+</project>

@@ -36,12 +36,12 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * The JDBC-ODBC bridge is a documented feature of Sun's J2SE distribution. See
  * <A HREF="http://java.sun.com/j2se/1.5/docs/guide/jdbc/bridge.html">New data source
  * implementations in the JDBC-ODBC bridge</A>.
- *
- * <P>Just having this class accessible in the classpath, together with the registration in
+ * <P>
+ * Just having this class accessible in the classpath, together with the registration in
  * the {@code META-INF/services/} directory, is suffisient to get a working EPSG authority
  * factory backed by this database. Vendors can create a copy of this class, modify it and
  * bundle it with their own distribution if they want to connect their users to an other
- * database (for example a PostgreSQL database reachable on internet).</P>
+ * database (for example a PostgreSQL database reachable on internet).
  *
  * @version $Id$
  * @author Martin Desruisseaux

@@ -34,6 +34,7 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
+import java.io.PrintWriter;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -115,10 +116,13 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     }
 
     /**
-     * Returns the authority, which is {@link CitationImpl#EPSG EPSG}.
+     * Returns the authority for this EPSG database.
+     * This authority will contains the database version in the {@linkplain Citation#getEdition
+     * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
      */
     public Citation getAuthority() {
-        return CitationImpl.EPSG;
+        final Citation authority = super.getAuthority();
+        return (authority!=null) ? authority : CitationImpl.EPSG;
     }
 
     /**
@@ -394,6 +398,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         final Arguments arguments = new Arguments(args);
         final boolean     printMT = arguments.getFlag("-transform");
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
+        final PrintWriter out = arguments.out;
         /*
          * Constructs and prints each object. In the process, keep all coordinate reference systems.
          * They will be used later for printing math transforms. This is usefull in order to check
@@ -408,10 +413,13 @@ public class DefaultFactory extends DeferredAuthorityFactory {
                 for (int i=0; i<args.length; i++) {
                     if (factory == null) {
                         factory = FactoryFinder.getCRSAuthorityFactory("EPSG", HINTS);
+                        if (factory instanceof AbstractAuthorityFactory) {
+                            out.println(((AbstractAuthorityFactory) factory).getBackingStoreDescription());
+                        }
                     }
                     final Object object = factory.createObject(args[i]);
-                    arguments.out.println(object);
-                    arguments.out.println();
+                    out.println(object);
+                    out.println();
                     if (object instanceof CoordinateReferenceSystem) {
                         crs[count++] = (CoordinateReferenceSystem) object;
                     }
@@ -433,16 +441,16 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             for (int i=0; i<count; i++) {
                 for (int j=i+1; j<count; j++) {
                     try {
-                        arguments.out.println(factory.createOperation(crs[i], crs[j]).getMathTransform());
+                        out.println(factory.createOperation(crs[i], crs[j]).getMathTransform());
                     } catch (OperationNotFoundException exception) {
-                        arguments.out.println(exception.getLocalizedMessage());
+                        out.println(exception.getLocalizedMessage());
                     } catch (FactoryException exception) {
                         exception.printStackTrace(arguments.err);
                     }
-                    arguments.out.println();
+                    out.println();
                 }
             }
         }
-        arguments.out.flush();
+        out.flush();
     }
 }
