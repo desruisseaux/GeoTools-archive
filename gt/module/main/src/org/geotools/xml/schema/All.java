@@ -16,6 +16,8 @@
  */
 package org.geotools.xml.schema;
 
+import com.vividsolutions.xdo.xsi.Element;
+
 /**
  * <p>
  * Instances of this interface are intended to represent the 'all' construct in
@@ -26,9 +28,11 @@ package org.geotools.xml.schema;
  *
  * @see Element
  */
-public abstract class All extends com.vividsolutions.xdo.xsi.ElementGrouping {
-    protected All( int arg0 ) {
-        super(arg0);
+public class All extends com.vividsolutions.xdo.xsi.All implements ElementGrouping {
+    
+    /** TODO: wtf */
+    public All( String arg0, int arg1, int arg2, Element[] arg3 ) {
+        super(arg0, arg1, arg2, arg3);
     }
 
     /**
@@ -41,8 +45,8 @@ public abstract class All extends com.vividsolutions.xdo.xsi.ElementGrouping {
      *
      * @return
      */
-    public Element[] getElements() {
-        return super.getGrouping();
+    public Element[] getElements(){
+        return super.getElements();
     }
 
     /**
@@ -52,15 +56,27 @@ public abstract class All extends com.vividsolutions.xdo.xsi.ElementGrouping {
      *
      * @return
      */
-    public String getId();
+    public String getId(){
+        return super.getId();
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
      */
-    public int getMaxOccurs();
+    public int getMaxOccurs(){
+        return super.getMaxOccurs();
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
      */
-    public int getMinOccurs();
+    public int getMinOccurs(){
+        return super.getMinOccurs();
+    }
+    /**
+     * Geotools ElementGrouping method.
+     */
+    public org.geotools.xml.schema.Element findChildElement( String name ) {
+        return null; // inconvient to make convience method at this time
+    }   
 }
