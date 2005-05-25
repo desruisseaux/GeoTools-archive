@@ -27,7 +27,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public interface Element extends ElementGrouping {
+public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** implements ElementGrouping */ {
     /**
      * <p>
      * Returns True when the instance of this XML Schema Element is abstract,
@@ -36,12 +36,16 @@ public interface Element extends ElementGrouping {
      *
      * @return
      */
-    public boolean isAbstract();
+    public boolean isAbstract(){
+        return super.isAbstract();
+    }
 
     /**
      * @see Schema#getBlockDefault()
      */
-    public int getBlock();
+    public int getBlock(){
+        return super.getBlock();
+    }
 
     /**
      * <p>
@@ -50,12 +54,16 @@ public interface Element extends ElementGrouping {
      *
      * @return
      */
-    public String getDefault();
+    public String getDefault(){
+        return super.getDefault();
+    }
 
     /**
      * @see Schema#getFinalDefault()
      */
-    public int getFinal();
+    public int getFinal(){
+        return super.getFinal;
+    }
 
     /**
      * <p>
@@ -64,12 +72,16 @@ public interface Element extends ElementGrouping {
      *
      * @return
      */
-    public String getFixed();
+    public String getFixed(){
+        return super.getFixed();
+    }
 
     /**
      * @see Schema#isElementFormDefault()
      */
-    public boolean isForm();
+    public boolean isForm(){
+        return super.isForm();
+    }
 
     /**
      * <p>
@@ -78,17 +90,23 @@ public interface Element extends ElementGrouping {
      *
      * @return
      */
-    public String getId();
+    public String getId(){
+        return super.getId();
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
      */
-    public int getMaxOccurs();
+    public int getMaxOccurs(){
+        return super.getMaxOccurs();        
+    }
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
      */
-    public int getMinOccurs();
+    public int getMinOccurs(){
+        return super.getMinOccurs();
+    }
 
     /**
      * <p>
@@ -98,14 +116,18 @@ public interface Element extends ElementGrouping {
      *
      * @return
      */
-    public String getName();
+    public String getName(){
+        return super.getName();
+    }
 
     /**
      * DOCUMENT ME!
      *
      * @return
      */
-    public URI getNamespace();
+    public URI getNamespace(){
+        return super.getNamespace();
+    }
 
     /**
      * <p>
@@ -114,7 +136,9 @@ public interface Element extends ElementGrouping {
      *
      * @return
      */
-    public boolean isNillable();
+    public boolean isNillable(){
+        return super.isNillable();
+    }
 
     /**
      * <p>
@@ -125,7 +149,9 @@ public interface Element extends ElementGrouping {
      *
      * @return
      */
-    public Element getSubstitutionGroup();
+    public com.vividsolutions.xdo.xsi.Element getSubstitutionGroup(){
+        return super.getSubstitutionGroup();
+    }
 
     /**
      * <p>
@@ -136,5 +162,7 @@ public interface Element extends ElementGrouping {
      *
      * @see Type
      */
-    public Type getType(); // simpleType or complexType
+    public com.vividsolutions.xdo.xsi.Type getType(){ // simpleType or complexType
+        return super.getType();
+    }
 }
