@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.nature;
+package org.geotools.measure;
 
 // J2SE extensions
 import javax.units.SI;
@@ -32,8 +32,6 @@ import javax.units.TransformedUnit;
  *
  * @version $Id$
  * @author Desruisseaux
- *
- * @deprecated Moved to {@link org.geotools.measure} package.
  */
 public final class Units {
     /**
@@ -52,7 +50,11 @@ public final class Units {
      * avoid as much as possible. Unfortunatly, this pseudo-unit is extensively used in the
      * EPSG database (code 9110).
      */
-    public static final Unit SEXAGESIMAL_DMS = org.geotools.measure.Units.SEXAGESIMAL_DMS;
+    public static final Unit SEXAGESIMAL_DMS = TransformedUnit.getInstance(NonSI.DEGREE_ANGLE,
+                                               new SexagesimalConverter(10000).inverse());
+    static {
+        UnitFormat.label(SEXAGESIMAL_DMS, "D.MS");
+    }
 
     /**
      * Pseudo-unit for degree - minute - second. Numbers in this pseudo-unit has the following
@@ -65,10 +67,17 @@ public final class Units {
      * avoid as much as possible. Unfortunatly, this pseudo-unit is extensively used in the
      * EPSG database (code 9107).
      */
-    public static final Unit DEGREE_MINUTE_SECOND = org.geotools.measure.Units.DEGREE_MINUTE_SECOND;
+    public static final Unit DEGREE_MINUTE_SECOND = TransformedUnit.getInstance(NonSI.DEGREE_ANGLE,
+                                                    new SexagesimalConverter(1).inverse());
+    static {
+        UnitFormat.label(DEGREE_MINUTE_SECOND, "DMS");
+    }
 
     /**
      * Parts per million.
      */
-    public static final Unit PPM = org.geotools.measure.Units.PPM;
+    public static final Unit PPM = Unit.ONE.multiply(1E-6);
+    static {
+        UnitFormat.label(PPM, "ppm");
+    }
 }

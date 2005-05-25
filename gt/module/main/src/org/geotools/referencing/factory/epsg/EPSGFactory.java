@@ -80,7 +80,7 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.nature.Units;
+import org.geotools.measure.Units;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
