@@ -17,9 +17,12 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.geotools.xml.PrintHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import com.vividsolutions.xdo.Encoder;
+import com.vividsolutions.xdo.Node;
+import com.vividsolutions.xdo.Strategy;
 
 /**
  * <p>
@@ -98,7 +101,7 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * @throws IOException When there is an error with the Writer.
      * @throws OperationNotSupportedException When this type cannot be encoded ... and wasn't checked first.
      */
-    public abstract void encode(com.vividsolutions.xdo.xsi.Element element, Object value, PrintHandler output, Map hints) 
+    public abstract void encode(com.vividsolutions.xdo.xsi.Element element, Object value, Encoder output, Map hints) 
     	throws IOException, OperationNotSupportedException;
 
 
@@ -110,5 +113,7 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      *
      * @return
      */
-    public abstract com.vividsolutions.xdo.xsi.Element findChildElement(String name);
+    public com.vividsolutions.xdo.xsi.Element findChildElement(String name){
+        return null; // inconveient to implement method
+    }
 }
