@@ -62,7 +62,7 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      * @see Schema#getFinalDefault()
      */
     public int getFinal(){
-        return super.getFinal;
+        return super.getFinal();
     }
 
     /**
