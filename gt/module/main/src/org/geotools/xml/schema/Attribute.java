@@ -56,7 +56,7 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      * @return Default Value as a String or Null
      */
     public String getDefault() {
-        return super.getDefault();
+        return super.getDefaultValue();
     }
 
     /**
