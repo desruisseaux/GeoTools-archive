@@ -34,7 +34,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public interface Group extends ElementGrouping {
+public abstract class Group extends com.vividsolutions.xdo.xsi.Group {
     /**
      * <p>
      * Returns the Child Schema element (Choice or Sequence) declaring valid
@@ -43,7 +43,9 @@ public interface Group extends ElementGrouping {
      *
      * @return
      */
-    public ElementGrouping getChild();
+    public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
+        return super.getChild();
+    }
 
     /**
      * <p>
@@ -52,7 +54,9 @@ public interface Group extends ElementGrouping {
      *
      * @return
      */
-    public String getId();
+    public String getId() {
+        return super.getId();
+    }
 
     /**
      * <p>
@@ -62,7 +66,9 @@ public interface Group extends ElementGrouping {
      *
      * @return
      */
-    public int getMaxOccurs();
+    public int getMaxOccurs() {
+        return super.getMaxOccurs();
+    }
 
     /**
      * <p>
@@ -72,7 +78,9 @@ public interface Group extends ElementGrouping {
      *
      * @return
      */
-    public int getMinOccurs();
+    public int getMinOccurs() {
+        return super.getMinOccurs();
+    }
 
     /**
      * <p>
@@ -81,12 +89,16 @@ public interface Group extends ElementGrouping {
      *
      * @return
      */
-    public String getName();
+    public String getName() {
+        return super.getName();
+    }
 
     /**
      * DOCUMENT ME!
      *
      * @return
      */
-    public URI getNamespace();
+    public URI getNamespace() {
+        return super.getNamespace();
+    }
 }

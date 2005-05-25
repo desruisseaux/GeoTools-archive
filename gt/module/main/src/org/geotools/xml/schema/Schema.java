@@ -151,7 +151,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see Element
      */
-    public Element[] getElements() {
+    public com.vividsolutions.xdo.xsi.Element[] getElements() {
         return super.getElements();
     }
 
