@@ -41,9 +41,14 @@ public abstract class Sequence extends com.vividsolutions.xdo.xsi.Sequence {
      * @param arg2
      * @param arg3
      */
-    public Sequence( String arg0, int arg1, int arg2, ElementGrouping[] arg3 ) {
+    public Sequence( String arg0, int arg1, int arg2, com.vividsolutions.xdo.xsi.ElementGrouping[] arg3 ) {
         super(arg0, arg1, arg2, arg3);
     }
+    
+    /**
+     * 
+     */
+    public abstract com.vividsolutions.xdo.xsi.ElementGrouping[] getChildren();
     
     /**
      * <p>
