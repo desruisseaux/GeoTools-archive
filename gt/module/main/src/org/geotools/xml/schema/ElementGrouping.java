@@ -34,54 +34,47 @@ public interface ElementGrouping {
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int ELEMENT = 1;
+    public static final int ELEMENT = com.vividsolutions.xdo.xsi.ElementGrouping.ELEMENT;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int GROUP = 2;
+    public static final int GROUP = com.vividsolutions.xdo.xsi.ElementGrouping.GROUP;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int ANY = 4;
+    public static final int ANY = com.vividsolutions.xdo.xsi.ElementGrouping.ANY
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int SEQUENCE = 8;
+    public static final int SEQUENCE = com.vividsolutions.xdo.xsi.ElementGrouping.SEQUENCE
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int CHOICE = 16;
+    public static final int CHOICE = com.vividsolutions.xdo.xsi.ElementGrouping.CHOICE;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int ALL = 32;
+    public static final int ALL = com.vividsolutions.xdo.xsi.ElementGrouping.ALL;
     
-    public static final int UNBOUNDED = Integer.MAX_VALUE;
+    public static final int UNBOUNDED = com.vividsolutions.xdo.xsi.ElementGrouping.UNBOUNDED;
 
-    /**
-     * <p>
-     * Returns the mask informing the caller as to the type of object they are
-     * dealing with.
-     * </p>
-     *
-     * @return
-     */
-    public int getGrouping();
+    public static final int UNDEFINED = com.vividsolutions.xdo.xsi.ElementGrouping.UNDEFINED;
+    
 
     /**
      * <p>
@@ -98,23 +91,4 @@ public interface ElementGrouping {
      */
     public Element findChildElement(String name);
 
-    /**
-     * <p>
-     * returns the max number of allowable occurences within the xml schema for
-     * this construct.
-     * </p>
-     *
-     * @return
-     */
-    public int getMaxOccurs();
-
-    /**
-     * <p>
-     * returns the min number of allowable occurences within the xml schema for
-     * this construct.
-     * </p>
-     *
-     * @return
-     */
-    public int getMinOccurs();
 }
