@@ -88,7 +88,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see AttributeGroup
      */
-    public AttributeGroup[] getAttributeGroups() {
+    public com.vividsolutions.xdo.xsi.AttributeGroup[] getAttributeGroups() {
         return super.getAttributeGroups();
     }
 
@@ -104,7 +104,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see Attribute
      */
-    public Attribute[] getAttributes() {
+    public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
         return super.getAttributes();
     }
 
@@ -135,7 +135,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see ComplexType
      */
-    public ComplexType[] getComplexTypes() {
+    public com.vividsolutions.xdo.xsi.ComplexType[] getComplexTypes() {
         return super.getComplexTypes();
     }
 
@@ -182,7 +182,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see Group
      */
-    public Group[] getGroups() {
+    public com.vividsolutions.xdo.xsi.Group[] getGroups() {
         return super.getGroups();
     }
 
@@ -236,7 +236,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see SimpleType
      */
-    public SimpleType[] getSimpleTypes() {
+    public com.vividsolutions.xdo.xsi.SimpleType[] getSimpleTypes() {
         return super.getSimpleTypes();
     }
 
