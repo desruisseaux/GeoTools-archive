@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
  * @see ComplexType
  * @author dzwiers www.refractions.net
  */
-public interface Type {
+public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
 
     /**
      * <p>
@@ -59,28 +59,8 @@ public interface Type {
      * 
      * @return Object
      */
-    public Object getValue(Element element, ElementValue[] value,
+    public abstract Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException;
-
-    /**
-     * <p>
-     * This returns the XML Schema declaration name of this type (both complex
-     * and simple types have names ...)
-     * </p>
-     * 
-     * @return
-     */
-    public String getName();
-
-    /**
-     * <p>
-     * This is used for validation of an XML document, and represents the
-     * targetNamespace of that this type resides in.
-     * </p>
-     * 
-     * @return
-     */
-    public URI getNamespace();
 
     /**
      * <p>
@@ -92,8 +72,7 @@ public interface Type {
      * 
      * @return
      */
-    public Class getInstanceType();
-
+    public abstract Class getInstanceType();
 
     /**
      * Can I write this object out as element specified?
@@ -105,7 +84,7 @@ public interface Type {
      * 
      * @see Type#encode(Element, Object, Writer, Map)
      */
-    public boolean canEncode(Element element, Object value, Map hints);
+    public abstract boolean canEncode(Element element, Object value, Map hints);
     
     /**
      * Encode value as element on the provided output.
@@ -119,7 +98,7 @@ public interface Type {
      * @throws IOException When there is an error with the Writer.
      * @throws OperationNotSupportedException When this type cannot be encoded ... and wasn't checked first.
      */
-    public void encode(Element element, Object value, PrintHandler output, Map hints) 
+    public abstract void encode(Element element, Object value, PrintHandler output, Map hints) 
     	throws IOException, OperationNotSupportedException;
 
 
@@ -131,5 +110,5 @@ public interface Type {
      *
      * @return
      */
-    public Element findChildElement(String name);
+    public abstract  Element findChildElement(String name);
 }
