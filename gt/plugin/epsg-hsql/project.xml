@@ -49,8 +49,6 @@
   </dependencies>
 
   <build>
-
-  <build>
     <resources>
       <resource>
         <directory>${basedir}/src</directory>
