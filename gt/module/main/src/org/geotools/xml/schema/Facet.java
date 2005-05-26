@@ -23,7 +23,7 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers
  */
-public abstract class Facet extends com.vividsolutions.xdo.xsi.Facet {
+public class Facet extends com.vividsolutions.xdo.xsi.Facet {
     public Facet( int arg0, String arg1 ) {
         super(arg0, arg1);
     }
