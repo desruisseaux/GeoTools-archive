@@ -66,7 +66,7 @@ import java.util.Map;
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.factory.epsg.FactoryForSQL}.
+ * @deprecated Replaced by {@link org.geotools.referencing.factory.epsg.FactoryUsingAnsiSQL}.
  */
 public class CoordinateSystemModifiedEPSGFactory extends CoordinateSystemEPSGFactory {
     /**

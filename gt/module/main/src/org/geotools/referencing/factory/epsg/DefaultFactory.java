@@ -59,7 +59,7 @@ import org.geotools.util.MonolineFormatter;
 
 /**
  * The default EPSG factory to be registered in {@link FactoryFinder}. This factory works as a
- * proxy for 1) select an appropriate {@link EPSGFactory} subclass at runtime and 2) cache CRS
+ * proxy for 1) select an appropriate {@link FactoryUsingSQL} subclass at runtime and 2) cache CRS
  * objects for better performances. The database connection is specified through a
  * {@link DataSource} binded to the <code>{@value #DATASOURCE_NAME}</code> name in <cite>Java
  * Naming and Directory Interfaces</cite> (JNDI). If no binding is found under that name, data
@@ -306,8 +306,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         String url     = "<unknow>";
         try {
             factory = createFactory();
-            if (factory instanceof EPSGFactory) {
-                final DatabaseMetaData info = ((EPSGFactory) factory).connection.getMetaData();
+            if (factory instanceof FactoryUsingSQL) {
+                final DatabaseMetaData info = ((FactoryUsingSQL) factory).connection.getMetaData();
                 product = info.getDatabaseProductName();
                 url     = info.getURL();
             }
@@ -317,8 +317,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         }
         // TODO: Provide a localized message including the database version.
         LOGGER.config("Connected to EPSG database \"" + url + "\" on " + product + '.');
-        if (factory instanceof EPSGFactory) {
-            ((EPSGFactory) factory).buffered = this;
+        if (factory instanceof FactoryUsingSQL) {
+            ((FactoryUsingSQL) factory).buffered = this;
         }
         return factory;
     }

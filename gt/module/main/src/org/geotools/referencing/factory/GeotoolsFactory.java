@@ -867,6 +867,13 @@ public class GeotoolsFactory extends AbstractFactory
      * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
      * affected axes are in degrees.  But you should not rotate this coordinate system
      * in any other plane.
+     * <p>
+     * <strong>NOTE:</strong>
+     * It is the user's responsability to ensure that the {@code baseToDerived}
+     * transform performs all required steps, including
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
+     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
+     * class provides conveniences methods for this task.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  base Coordinate reference system to base the derived CRS on.
@@ -893,6 +900,13 @@ public class GeotoolsFactory extends AbstractFactory
      * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
      * affected axes are in degrees.  But you should not rotate this coordinate system
      * in any other plane.
+     * <p>
+     * <strong>NOTE:</strong>
+     * It is the user's responsability to ensure that the {@code baseToDerived}
+     * transform performs all required steps, including
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
+     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
+     * class provides conveniences methods for this task.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
@@ -921,6 +935,13 @@ public class GeotoolsFactory extends AbstractFactory
     
     /**
      * Creates a projected coordinate reference system from a transform.
+     * <p>
+     * <strong>NOTE:</strong>
+     * It is the user's responsability to ensure that the {@code baseToDerived}
+     * transform performs all required steps, including
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
+     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
+     * class provides conveniences methods for this task.
      * 
      * @param  properties Name and other properties to give to the new object.
      * @param  geoCRS Geographic coordinate reference system to base projection on.
@@ -942,6 +963,13 @@ public class GeotoolsFactory extends AbstractFactory
     
     /**
      * Creates a projected coordinate reference system from a transform.
+     * <p>
+     * <strong>NOTE:</strong>
+     * It is the user's responsability to ensure that the {@code baseToDerived}
+     * transform performs all required steps, including
+     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
+     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
+     * class provides conveniences methods for this task.
      * 
      * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the

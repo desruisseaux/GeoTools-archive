@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
  * @version $Id$
  * @author John Grange
  *
- * @deprecated Replaced by {@link org.geotools.referencing.factory.epsg.FactoryForOracle}.
+ * @deprecated Replaced by {@link org.geotools.referencing.factory.epsg.FactoryUsingOracleSQL}.
  */
 public class CoordinateSystemOracleEPSGFactory extends CoordinateSystemModifiedEPSGFactory {
     /**

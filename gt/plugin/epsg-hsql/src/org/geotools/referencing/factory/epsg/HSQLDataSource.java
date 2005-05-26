@@ -72,7 +72,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
     }
 
     /**
-     * Open a connection and creates an {@linkplain EPSGFactory EPSG factory} for it.
+     * Open a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
      *
      * @param  factories The low-level factories to use for CRS creation.
      * @return The EPSG factory using HSQLDB SQL syntax.
@@ -90,7 +90,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
      *
      * @todo Verify if we can get ride of this hack in a future HSQL version.
      */
-    private static final class Factory extends FactoryForSQL {
+    private static final class Factory extends FactoryUsingAnsiSQL {
         /**
          * The regular expression pattern for searching the "FROM (" clause.
          * This is the pattern for the opening parenthesis.

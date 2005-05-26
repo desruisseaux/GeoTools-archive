@@ -48,7 +48,7 @@ import org.geotools.util.SimpleInternationalString;
 /**
  * Default implementation for a coordinate reference system authority factory
  * backed by a property file. This gives some of the benificts of using the
- * {@linkplain org.geotools.referencing.factory.epsg.EPSGFactory EPSG database backed
+ * {@linkplain org.geotools.referencing.factory.epsg.FactoryUsingSQL EPSG database backed
  * authority factory} (for example), in a portable property file.
  * <br><br>
  * This factory doesn't cache any result. Any call to a {@code createFoo} method will send a new

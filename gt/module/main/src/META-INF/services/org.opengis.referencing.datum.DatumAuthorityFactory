@@ -1,2 +1,2 @@
 org.geotools.referencing.factory.epsg.DefaultFactory
-org.geotools.referencing.factory.epsg.FactoryFromWKT
+org.geotools.referencing.factory.epsg.FactoryUsingWKT

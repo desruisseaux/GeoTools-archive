@@ -39,7 +39,7 @@ import org.geotools.referencing.factory.FactoryGroup;
  *       one possible approach is to set the schema if preferences. Maybe a better was is to look
  *       for a place in the Oracle {@link javax.sql.DataSource} for that.
  */
-public class FactoryForOracle extends FactoryForSQL {
+public class FactoryUsingOracleSQL extends FactoryUsingAnsiSQL {
     /**
      * The pattern to use for removing <code>" as "</code> elements from the SQL statements.
      */
@@ -51,8 +51,8 @@ public class FactoryForOracle extends FactoryForSQL {
      * @param factories  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      */
-    public FactoryForOracle(final FactoryGroup factories,
-                            final Connection  connection)
+    public FactoryUsingOracleSQL(final FactoryGroup factories,
+                                 final Connection  connection)
     {
         super(factories, connection);
     }
@@ -69,9 +69,9 @@ public class FactoryForOracle extends FactoryForSQL {
      * @param connection The connection to the underlying EPSG database.
      * @param epsgSchema The database schema in which the epsg tables are stored (optional).
      */
-    public FactoryForOracle(final FactoryGroup factories,
-                            final Connection  connection,
-                            final String      epsgSchema)
+    public FactoryUsingOracleSQL(final FactoryGroup factories,
+                                 final Connection  connection,
+                                 final String      epsgSchema)
     {
         super(factories, connection);
         adaptTableNames(epsgSchema);

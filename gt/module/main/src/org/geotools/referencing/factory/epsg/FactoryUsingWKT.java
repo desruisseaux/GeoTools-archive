@@ -53,10 +53,10 @@ import org.geotools.referencing.factory.PropertyAuthorityFactory;
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  */
-public class FactoryFromWKT extends DeferredAuthorityFactory {
+public class FactoryUsingWKT extends DeferredAuthorityFactory {
     /**
      * The filename to read. This file will be searched in all locations
-     * described in the {@linkplain #FactoryFromWKT class javadoc}.
+     * described in the {@linkplain FactoryUsingWKT class javadoc}.
      */
     public static final String FILENAME = "epsg.properties";
 
@@ -64,7 +64,7 @@ public class FactoryFromWKT extends DeferredAuthorityFactory {
      * Constructs an authority factory using the default set of
      * {@linkplain org.opengis.referencing.ObjectFactory object factories}.
      */
-    public FactoryFromWKT() {
+    public FactoryUsingWKT() {
         super(new FactoryGroup(), MINIMUM_PRIORITY+20);
         setTimeout(15*60*1000L); // Closes the connection after at least 15 minutes of inactivity.
     }
@@ -78,7 +78,7 @@ public class FactoryFromWKT extends DeferredAuthorityFactory {
 
     /**
      * Creates the backing store authority factory. This method search for the {@value #FILENAME}
-     * file in all locations described in the {@linkplain #FactoryFromWKT class javadoc}.
+     * file in all locations described in the {@linkplain FactoryUsingWKT class javadoc}.
      *
      * @return The backing store to uses in {@code createXXX(...)} methods.
      * @throws FactoryException if the constructor failed to find or read the file.
@@ -87,7 +87,7 @@ public class FactoryFromWKT extends DeferredAuthorityFactory {
     protected AbstractAuthorityFactory createBackingStore() throws FactoryException {
         try {
             URL url;
-            url = FactoryFromWKT.class.getResource(FILENAME);
+            url = FactoryUsingWKT.class.getResource(FILENAME);
             if (url == null) {
                 throw new FileNotFoundException(FILENAME);
             }

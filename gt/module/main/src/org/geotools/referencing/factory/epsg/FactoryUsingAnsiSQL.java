@@ -57,7 +57,7 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @author Martin Desruisseaux
  * @author Didier Richard
  */
-public class FactoryForSQL extends EPSGFactory {
+public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
     /**
      * The default map using ANSI names.
      */
@@ -119,8 +119,8 @@ public class FactoryForSQL extends EPSGFactory {
      * @param factories  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      */
-    public FactoryForSQL(final FactoryGroup factories,
-                         final Connection  connection)
+    public FactoryUsingAnsiSQL(final FactoryGroup factories,
+                               final Connection  connection)
     {
         super(factories, connection);
         for (int i=0; i<ANSI.length; i++) {

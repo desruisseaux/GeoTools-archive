@@ -111,7 +111,7 @@ import org.geotools.util.ScopedName;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  */
-public class EPSGFactory extends AbstractAuthorityFactory {
+public class FactoryUsingSQL extends AbstractAuthorityFactory {
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                            ////////
     ////////      H A R D   C O D E D   V A L U E S    (other than SQL statements)      ////////
@@ -281,7 +281,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
     /**
      * The buffered authority factory, or <code>null</code> if none. This field is set
      * to a different value by {@link DefaultFactory} only, which will point toward a
-     * buffered factory wrapping this {@code EPSGFactory} for efficienty.
+     * buffered factory wrapping this {@code FactoryUsingSQL} for efficienty.
      */
     AbstractAuthorityFactory buffered = this;
 
@@ -296,7 +296,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
      * @param factories  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
      */
-    public EPSGFactory(final FactoryGroup factories, final Connection connection) {
+    public FactoryUsingSQL(final FactoryGroup factories, final Connection connection) {
         super(factories, MAXIMUM_PRIORITY-20);
         this.connection = connection;
         ensureNonNull("connection", connection);
@@ -324,7 +324,7 @@ public class EPSGFactory extends AbstractAuthorityFactory {
             result.close();
             statement.close();
         } catch (SQLException exception) {
-            Utilities.unexpectedException(LOGGER.getName(), "EPSGFactory", "getAuthority", exception);
+            Utilities.unexpectedException(LOGGER.getName(), "FactoryUsingSQL", "getAuthority", exception);
             return CitationImpl.EPSG;
         }
         return authority;

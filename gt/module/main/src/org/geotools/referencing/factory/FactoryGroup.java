@@ -106,13 +106,6 @@ public class FactoryGroup {
     private MathTransformFactory mtFactory;
 
     /**
-     * The implementation hints.
-     *
-     * @todo There is not yet any API for setting it.
-     */
-    private final Hints hints = null;
-
-    /**
      * Constructs an instance using the default factories.
      * Default factories are:
      *
@@ -124,7 +117,24 @@ public class FactoryGroup {
      * </pre></blockquote>
      */
     public FactoryGroup() {
-        this(null, null, null, null);
+    }
+
+    /**
+     * Constructs an instance using the factories initialized with the specified hints.
+     */
+    public FactoryGroup(final Hints hints) {
+        /*
+         * If hints are provided, we will fetch factory immediately (instead of storing the hints
+         * in an inner field) because most factories will retain few hints, while the Hints map
+         * may contains big objects. If no hints were provided, we will construct factories only
+         * when first needed.
+         */
+        if (hints!=null && !hints.isEmpty()) {
+            datumFactory = FactoryFinder.getDatumFactory        (hints);
+            csFactory    = FactoryFinder.getCSFactory           (hints);
+            crsFactory   = FactoryFinder.getCRSFactory          (hints);
+            mtFactory    = FactoryFinder.getMathTransformFactory(hints);
+        }
     }
 
     /**
@@ -153,7 +163,7 @@ public class FactoryGroup {
      */
     public DatumFactory getDatumFactory() {
         if (datumFactory == null) {
-            datumFactory = FactoryFinder.getDatumFactory(hints);
+            datumFactory = FactoryFinder.getDatumFactory(null);
         }
         return datumFactory;
     }
@@ -163,7 +173,7 @@ public class FactoryGroup {
      */
     public CSFactory getCSFactory() {
         if (csFactory == null) {
-            csFactory = FactoryFinder.getCSFactory(hints);
+            csFactory = FactoryFinder.getCSFactory(null);
         }
         return csFactory;
     }
@@ -173,7 +183,7 @@ public class FactoryGroup {
      */
     public CRSFactory getCRSFactory() {
         if (crsFactory == null) {
-            crsFactory = FactoryFinder.getCRSFactory(hints);
+            crsFactory = FactoryFinder.getCRSFactory(null);
         }
         return crsFactory;
     }
@@ -183,7 +193,7 @@ public class FactoryGroup {
      */
     public MathTransformFactory getMathTransformFactory() {
         if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory(hints);
+            mtFactory = FactoryFinder.getMathTransformFactory(null);
         }
         return mtFactory;
     }

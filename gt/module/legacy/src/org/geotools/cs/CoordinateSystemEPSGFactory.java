@@ -105,7 +105,7 @@ import org.opengis.referencing.FactoryException;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
- * @deprecated Replaced by {@link org.geotools.referencing.factory.epsg.EPSGFactory}.
+ * @deprecated Replaced by {@link org.geotools.referencing.factory.epsg.FactoryUsingSQL}.
  */
 public class CoordinateSystemEPSGFactory extends CoordinateSystemAuthorityFactory {
     /**
