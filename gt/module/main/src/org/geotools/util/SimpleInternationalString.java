@@ -38,7 +38,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SimpleInternationalString extends InternationalString implements Serializable {
+public class SimpleInternationalString extends AbstractInternationalString implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -56,12 +56,12 @@ public class SimpleInternationalString extends InternationalString implements Se
 
     /**
      * If the specified string is null or an instance of
-     * {@link org.opengis.util.InternationalString}, returns it unchanged.
+     * {@link AbstractInternationalString}, returns it unchanged.
      * Otherwise, wraps the string value in a {@code SimpleInternationalString}.
      */
-    public static org.opengis.util.InternationalString wrap(final CharSequence string) {
-        if (string==null || string instanceof org.opengis.util.InternationalString) {
-            return (org.opengis.util.InternationalString) string;
+    public static AbstractInternationalString wrap(final CharSequence string) {
+        if (string==null || string instanceof AbstractInternationalString) {
+            return (AbstractInternationalString) string;
         }
         return new SimpleInternationalString(string.toString());
     }

@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -48,7 +49,7 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GrowableInternationalString extends InternationalString implements Serializable {
+public class GrowableInternationalString extends AbstractInternationalString implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -135,9 +136,9 @@ public class GrowableInternationalString extends InternationalString implements 
 
     /**
      * Add a string for the given property key. This is a convenience method for constructing an
-     * <code>InternationalString</code> during iteration through the {@linkplain java.util.Map.Entry
-     * entries} in a {@link Map}. It infers the {@link Locale} from the property <code>key</code>,
-     * using the following steps:
+     * {@code AbstractInternationalString} during iteration through the
+     * {@linkplain java.util.Map.Entry entries} in a {@link Map}. It infers the {@link Locale}
+     * from the property <code>key</code>, using the following steps:
      * <ul>
      *   <li>If the <code>key</code> do not starts with the specified <code>prefix</code>, then
      *       this method do nothing and returns <code>false</code>.</li>

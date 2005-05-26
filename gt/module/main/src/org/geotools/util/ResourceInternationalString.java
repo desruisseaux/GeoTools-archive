@@ -42,7 +42,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ResourceInternationalString extends InternationalString implements Serializable {
+public class ResourceInternationalString extends AbstractInternationalString implements Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
