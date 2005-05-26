@@ -28,6 +28,7 @@ public class AbstractGetMapRequestTest extends TestCase {
 		String processedURL = finalURL.toExternalForm();
 		assertTrue(processedURL.indexOf("LAYERS=Provincial+Boundary") != -1);
 		assertTrue(processedURL.indexOf("STYLES=Two+words") != -1);
+        assertTrue(processedURL.indexOf("SERVICE=WMS") != -1);
 	}
 	
 	private class RequestTest extends AbstractGetMapRequest {

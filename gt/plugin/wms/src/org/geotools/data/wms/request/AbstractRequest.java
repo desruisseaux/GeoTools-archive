@@ -101,7 +101,7 @@ public abstract class AbstractRequest implements Request{
             }
         }
 
-        
+        setProperty(Request.SERVICE, "WMS");
     }
 
     /**

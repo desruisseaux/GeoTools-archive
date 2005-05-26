@@ -30,6 +30,7 @@ public interface Request {
     public static final String VERSION = "VERSION"; //$NON-NLS-1$
     /** Represents the WMTVER parameter */
     public static final String WMTVER = "WMTVER"; //$NON-NLS-1$
+    public static final String SERVICE = "SERVICE";
     
     /**
      * Once the properties of the request are configured, this will return
