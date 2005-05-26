@@ -28,7 +28,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
+public interface Attribute {
     /**
      * Represent a mask used to determine the life of the attribute in an
      * instance document.
@@ -55,9 +55,7 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      *
      * @return Default Value as a String or Null
      */
-    public String getDefault() {
-        return super.getDefaultValue();
-    }
+    public String getDefault();
 
     /**
      * <p>
@@ -67,9 +65,7 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      *
      * @return Fixed Value as a String or Null
      */
-    public String getFixed() {
-        return super.getFixed();
-    }
+    public String getFixed();
 
     /**
      * <p>
@@ -79,9 +75,7 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      *
      * @return
      */
-    public boolean isForm() {
-        return super.isForm();
-    }
+    public boolean isForm();
 
     /**
      * <p>
@@ -90,9 +84,7 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      *
      * @return
      */
-    public String getId() {
-        return super.getId();
-    }
+    public String getId();
 
     /**
      * <p>
@@ -102,18 +94,14 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      *
      * @return
      */
-    public String getName() { 
-        return super.getName();
-    }
+    public String getName();
 
     /**
      * DOCUMENT ME!
      *
      * @return
      */
-    public URI getNamespace() {
-        return super.getNamespace();
-    }
+    public URI getNamespace();
 
     /**
      * <p>
@@ -124,9 +112,7 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      *
      * @return
      */
-    public int getUse() {
-        return super.getUse();
-    }
+    public int getUse();
 
     /**
      * <p>
@@ -136,7 +122,5 @@ public abstract class Attribute extends com.vividsolutions.xdo.xsi.Attribute {
      *
      * @return
      */
-    public com.vividsolutions.xdo.xsi.SimpleType getSimpleType() {
-        return super.getSimpleType();
-    }
+    public SimpleType getSimpleType();
 }

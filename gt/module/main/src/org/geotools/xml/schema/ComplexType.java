@@ -31,7 +31,7 @@ import org.xml.sax.Attributes;
  *
  * @author dzwiers www.refractions.net
  */
-public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType {
+public interface ComplexType extends Type {
     /**
      * <p>
      * This is used to represent the heirarchy represented within an xml schema
@@ -44,9 +44,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @see Type#getValue(Element, ElementValue[], Attributes)
      */
-    public com.vividsolutions.xdo.xsi.Type getParent() {
-        return super.getParent();
-    }
+    public Type getParent();
 
     /**
      * Returns true when the complexType should be considered abstract, as
@@ -55,9 +53,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @return
      */
-    public boolean isAbstract() {
-        return super.isAbstract();
-    }
+    public boolean isAbstract();
 
     /**
      * This methos represents the potential 'anyAttribute' declaration's
@@ -65,9 +61,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @return
      */
-    public String getAnyAttributeNameSpace() {
-        return super.getAnyAttributeNameSpace();
-    }
+    public String getAnyAttributeNameSpace();
 
     /**
      * The set of attributes required by this complex type declaration. As  per
@@ -77,9 +71,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @return
      */
-    public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
-        return super.getAttributes();
-    }
+    public Attribute[] getAttributes();
 
     /**
      * Specifies a mask which denotes which substitution mechanisms may be used
@@ -91,9 +83,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      * @see Schema#RESTRICTION
      * @see Schema#ALL
      */
-    public int getBlock() {
-        return super.getBlock();
-    }
+    public int getBlock();
 
     /**
      * Returns the child element representing the structure of nested  child
@@ -103,13 +93,9 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @see ElementGrouping
      */
-    public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
-        return super.getChild();
-    }
+    public ElementGrouping getChild();
 
-    public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
-        return super.getChildren();
-    }
+    public Element[] getChildElements();
 
     /**
      * Specifies a mask which denotes which substitution mechanisms prohibited
@@ -121,9 +107,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      * @see Schema#RESTRICTION
      * @see Schema#ALL
      */
-    public int getFinal() {
-        return super.getFinal();
-    }
+    public int getFinal();
 
     /**
      * Returns the xml schema id of this complexType if one  exists, null
@@ -131,9 +115,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @return
      */
-    public String getId() {
-        return super.getId();
-    }
+    public String getId();
 
     /**
      * Returns true if this complexType allows mixed content (Child elements
@@ -141,9 +123,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @return
      */
-    public boolean isMixed() {
-        return super.isMixed();
-    }
+    public boolean isMixed();
 
     /**
      * This method is used to publish whether this complexType is at the root
@@ -153,9 +133,7 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @return
      */
-    public boolean isDerived() {
-        return ( super.getChildren().length == 0 );
-    }
+    public boolean isDerived();
 
     /**
      * This method is a directive to the parser whether to keep the data around
@@ -167,5 +145,5 @@ public abstract class ComplexType extends com.vividsolutions.xdo.xsi.ComplexType
      *
      * @return True, except when streaming the element.
      */
-    public abstract boolean cache(Element element, Map hints);
+    public boolean cache(Element element, Map hints);
 }

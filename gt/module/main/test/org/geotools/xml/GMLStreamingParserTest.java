@@ -64,7 +64,11 @@ public class GMLStreamingParserTest extends TestCase {
             String path = "geoserver/roads.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
-            
+
+            XMLSAXHandler.setLogLevel(Level.FINEST);
+            XSISAXHandler.setLogLevel(Level.FINEST);
+            XMLElementHandler.setLogLevel(Level.FINEST);
+            XSIElementHandler.setLogLevel(Level.FINEST);
             fr = FCBuffer.getFeatureReader(u,10,10000);
             
             assertNotNull("FeatureReader missing", fr);

@@ -4,7 +4,6 @@ package org.geotools.xml;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import javax.xml.parsers.SAXParser;
@@ -13,11 +12,6 @@ import javax.xml.parsers.SAXParserFactory;
 import junit.framework.TestCase;
 
 import org.geotools.resources.TestData;
-import org.xml.sax.SAXException;
-
-import com.vividsolutions.xdo.Decoder;
-import com.vividsolutions.xdo.PluginFinder;
-import com.vividsolutions.xdo.xsi.Schema;
 
 
 /**
@@ -43,32 +37,52 @@ public class SchemaParserTest extends TestCase {
         parser = spf.newSAXParser();
     }
 
-    public void testMail() throws IOException, SAXException{
+    public void testMail(){
         runit("mails.xsd");
     }
 
-    public void testWFS() throws IOException, SAXException{
+    public void testWFS(){
         runit("wfs/WFS-basic.xsd");
     }
 
-    public void testGMLFeature() throws IOException, SAXException{
+    public void testGMLFeature(){
         runit("gml/feature.xsd");
     }
 
-    public void testGMLGeometry() throws IOException, SAXException{
+    public void testGMLGeometry(){
         runit("gml/geometry.xsd");
     }
 
-    public void testGMLXLinks() throws IOException{
+    public void testGMLXLinks(){
         runit("gml/xlinks.xsd");
     }
 
-    private void runit(String path) throws IOException{
+    private void runit(String path){
         File f;
-
+        try {
             f = TestData.file(this,path);
         URI u = f.toURI();
-        Schema doc = PluginFinder.getInstance().getSchemaBuilder().find(u);
-        assertNotNull(doc);
+        XSISAXHandler contentHandler = new XSISAXHandler(u);
+//        XSISAXHandler.setLogLevel(Level.INFO);
+        XSISAXHandler.setLogLevel(Level.WARNING);
+
+        try {
+            parser.parse(f, contentHandler);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.toString());
+        }
+
+        try{
+            assertNotNull("Schema missing", contentHandler.getSchema());
+            System.out.println(contentHandler.getSchema());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.toString());
+        }
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            fail(e1.toString());
+        }
     }
 }

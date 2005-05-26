@@ -27,7 +27,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** implements ElementGrouping */ {
+public interface Element extends ElementGrouping {
     /**
      * <p>
      * Returns True when the instance of this XML Schema Element is abstract,
@@ -36,16 +36,12 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @return
      */
-    public boolean isAbstract(){
-        return super.isAbstract();
-    }
+    public boolean isAbstract();
 
     /**
      * @see Schema#getBlockDefault()
      */
-    public int getBlock(){
-        return super.getBlock();
-    }
+    public int getBlock();
 
     /**
      * <p>
@@ -54,16 +50,12 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @return
      */
-    public String getDefault(){
-        return super.getDefault();
-    }
+    public String getDefault();
 
     /**
      * @see Schema#getFinalDefault()
      */
-    public int getFinal(){
-        return super.getFinal();
-    }
+    public int getFinal();
 
     /**
      * <p>
@@ -72,16 +64,12 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @return
      */
-    public String getFixed(){
-        return super.getFixed();
-    }
+    public String getFixed();
 
     /**
      * @see Schema#isElementFormDefault()
      */
-    public boolean isForm(){
-        return super.isForm();
-    }
+    public boolean isForm();
 
     /**
      * <p>
@@ -90,23 +78,17 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @return
      */
-    public String getId(){
-        return super.getId();
-    }
+    public String getId();
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMaxOccurs()
      */
-    public int getMaxOccurs(){
-        return super.getMaxOccurs();        
-    }
+    public int getMaxOccurs();
 
     /**
      * @see org.geotools.xml.xsi.ElementGrouping#getMinOccurs()
      */
-    public int getMinOccurs(){
-        return super.getMinOccurs();
-    }
+    public int getMinOccurs();
 
     /**
      * <p>
@@ -116,18 +98,14 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @return
      */
-    public String getName(){
-        return super.getName();
-    }
+    public String getName();
 
     /**
      * DOCUMENT ME!
      *
      * @return
      */
-    public URI getNamespace(){
-        return super.getNamespace();
-    }
+    public URI getNamespace();
 
     /**
      * <p>
@@ -136,9 +114,7 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @return
      */
-    public boolean isNillable(){
-        return super.isNillable();
-    }
+    public boolean isNillable();
 
     /**
      * <p>
@@ -149,9 +125,7 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @return
      */
-    public com.vividsolutions.xdo.xsi.Element getSubstitutionGroup(){
-        return super.getSubstitutionGroup();
-    }
+    public Element getSubstitutionGroup();
 
     /**
      * <p>
@@ -162,7 +136,5 @@ public abstract class Element extends com.vividsolutions.xdo.xsi.Element /** imp
      *
      * @see Type
      */
-    public com.vividsolutions.xdo.xsi.Type getType(){ // simpleType or complexType
-        return super.getType();
-    }
+    public Type getType(); // simpleType or complexType
 }

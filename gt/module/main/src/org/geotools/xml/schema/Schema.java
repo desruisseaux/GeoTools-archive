@@ -17,7 +17,6 @@
 package org.geotools.xml.schema;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.geotools.factory.Factory;
 
@@ -50,7 +49,7 @@ import org.geotools.factory.Factory;
  *
  * @author dzwiers www.refractions.net
  */
-public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implements Factory  {
+public interface Schema extends Factory {
     /**
      * Used to denote byte masks representing either XML block attributes or
      * XML final attributes.
@@ -88,9 +87,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see AttributeGroup
      */
-    public com.vividsolutions.xdo.xsi.AttributeGroup[] getAttributeGroups() {
-        return super.getAttributeGroups();
-    }
+    public AttributeGroup[] getAttributeGroups();
 
     /**
      * <p>
@@ -104,9 +101,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see Attribute
      */
-    public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
-        return super.getAttributes();
-    }
+    public Attribute[] getAttributes();
 
     /**
      * <p>
@@ -119,9 +114,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @return Block Mask
      */
-    public int getBlockDefault() {
-        return super.getBlockDefault();
-    }
+    public int getBlockDefault();
 
     /**
      * <p>
@@ -135,9 +128,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see ComplexType
      */
-    public com.vividsolutions.xdo.xsi.ComplexType[] getComplexTypes() {
-        return super.getComplexTypes();
-    }
+    public ComplexType[] getComplexTypes();
 
     /**
      * <p>
@@ -151,9 +142,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see Element
      */
-    public com.vividsolutions.xdo.xsi.Element[] getElements() {
-        return super.getElements();
-    }
+    public Element[] getElements();
 
     /**
      * <p>
@@ -166,9 +155,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @return Final Mask
      */
-    public int getFinalDefault() {
-        return super.getFinalDefault();
-    }
+    public int getFinalDefault();
 
     /**
      * <p>
@@ -182,9 +169,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see Group
      */
-    public com.vividsolutions.xdo.xsi.Group[] getGroups() {
-        return super.getGroups();
-    }
+    public Group[] getGroups();
 
     /**
      * <p>
@@ -193,9 +178,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @return
      */
-    public String getId() {
-        return super.getId();
-    }
+    public String getId();
 
     /**
      * <p>
@@ -209,9 +192,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see Schema
      */
-    public com.vividsolutions.xdo.xsi.Import[] getImports() {
-        return super.getImports();
-    }
+    public Schema[] getImports();
 
     /**
      * <p>
@@ -220,9 +201,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @return
      */
-    public String getPrefix() {
-        return super.getPrefix();
-    }
+    public String getPrefix();
 
     /**
      * <p>
@@ -236,9 +215,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see SimpleType
      */
-    public com.vividsolutions.xdo.xsi.SimpleType[] getSimpleTypes() {
-        return super.getSimpleTypes();
-    }
+    public SimpleType[] getSimpleTypes();
 
     /**
      * <p>
@@ -248,14 +225,10 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @return
      */
-    public URI getTargetNamespace() {
-        return super.getTargetNamespace();
-    }
+    public URI getTargetNamespace();
 
     // may be different than targNS
-    public URI getURI() {
-        return super.getUris()[0];
-    }
+    public URI getURI();
 
     /**
      * <p>
@@ -266,9 +239,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      */
 
     //TODO Use the Version in the merge + parsing portion for comparisons
-    public String getVersion() {
-        return super.getVersion();
-    }
+    public String getVersion();
 
     /**
      * <p>
@@ -289,15 +260,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @see getUris()
      */
-    public boolean includesURI(URI uri) {
-        for (int i = 0; i < super.getUris().length; i++) {
-            URI uri2 = super.getUris()[i];
-            if (uri2.equals(uri)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    public boolean includesURI(URI uri);
 
     /**
      * <p>
@@ -307,9 +270,7 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @return
      */
-    public boolean isAttributeFormDefault() {
-        return super.isAttributeFormDefault();
-    }
+    public boolean isAttributeFormDefault();
 
     /**
      * <p>
@@ -319,7 +280,5 @@ public abstract class Schema extends com.vividsolutions.xdo.xsi.Schema implement
      *
      * @return
      */
-    public boolean isElementFormDefault() {
-        return super.isElementFormDefault();
-    }
+    public boolean isElementFormDefault();
 }

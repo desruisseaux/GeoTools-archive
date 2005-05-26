@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,8 +27,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
-
-import com.vividsolutions.xdo.Decoder;
 
 import junit.framework.TestCase;
 
@@ -45,7 +42,11 @@ public class SLDParserTest extends TestCase{
 
         SAXParser parser = spf.newSAXParser();
 
-//        Object doc = Decoder.decode(u,new HashMap());
+        XMLSAXHandler xmlContentHandler = new XMLSAXHandler(new URI(example.toString()),null);
+        XMLSAXHandler.setLogLevel(Level.FINEST);
+        XSISAXHandler.setLogLevel(Level.FINEST);
+        XMLElementHandler.setLogLevel(Level.FINEST);
+        XSIElementHandler.setLogLevel(Level.FINEST);
 
         // fails
 //        parser.parse(example.openStream(), xmlContentHandler);

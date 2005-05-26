@@ -52,6 +52,7 @@ import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.resources.TestData;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.SchemaFactory;
+import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.schema.Schema;
 import org.xml.sax.SAXException;
 
@@ -262,7 +263,7 @@ public class WMS1_0_0Test extends TestCase {
             File getCaps = TestData.file(this, capFile);
             URL getCapsURL = getCaps.toURL();
             Map hints = new HashMap();
-//            hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+            hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
             Object object = DocumentFactory.getInstance(getCapsURL.openStream(), hints, Level.FINEST);
             
             Schema schema = WMSSchema.getInstance();

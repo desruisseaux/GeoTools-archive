@@ -4,7 +4,6 @@ package org.geotools.xml;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import javax.xml.parsers.SAXParser;
@@ -12,8 +11,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.geotools.resources.TestData;
 import org.xml.sax.SAXException;
-
-import com.vividsolutions.xdo.Decoder;
 
 import junit.framework.TestCase;
 
@@ -37,12 +34,21 @@ public class GMLParser2Test extends TestCase {
           spf.setNamespaceAware(true);
           spf.setValidating(false);
 
+          SAXParser parser = spf.newSAXParser();
+
           String path = "city/dj.xml";
           File f = TestData.file(this,path);
           URI u = f.toURI();
 
+          XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+          XMLSAXHandler.setLogLevel(Level.WARNING);
+          XSISAXHandler.setLogLevel(Level.WARNING);
+          XMLElementHandler.setLogLevel(Level.WARNING);
+          XSIElementHandler.setLogLevel(Level.WARNING);
 
-          Object doc = Decoder.decode(u,new HashMap());
+          parser.parse(f, xmlContentHandler);
+
+          Object doc = xmlContentHandler.getDocument();
           assertNotNull("Document missing", doc);
           System.out.println(doc);
           

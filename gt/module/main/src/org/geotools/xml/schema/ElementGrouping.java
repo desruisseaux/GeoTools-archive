@@ -17,7 +17,6 @@
 package org.geotools.xml.schema;
 
 /**
- * This must be an interface! So our Element can extend xdo Element and still implement ElementGroup.
  * <p>
  * This represents an abstract collection of xml element definitions within a
  * Schema.
@@ -35,47 +34,54 @@ public interface ElementGrouping {
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int ELEMENT = com.vividsolutions.xdo.xsi.ElementGrouping.ELEMENT;
+    public static final int ELEMENT = 1;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int GROUP = com.vividsolutions.xdo.xsi.ElementGrouping.GROUP;
+    public static final int GROUP = 2;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int ANY = com.vividsolutions.xdo.xsi.ElementGrouping.ANY;
+    public static final int ANY = 4;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int SEQUENCE = com.vividsolutions.xdo.xsi.ElementGrouping.SEQUENCE;
+    public static final int SEQUENCE = 8;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int CHOICE = com.vividsolutions.xdo.xsi.ElementGrouping.CHOICE;
+    public static final int CHOICE = 16;
 
     /**
      * ElementGrouping mask to determine the type of ElementGrouping
      * represented. This is intended to  reduce the use of the instanceof
      * operand,  increasing performance.
      */
-    public static final int ALL = com.vividsolutions.xdo.xsi.ElementGrouping.ALL;
+    public static final int ALL = 32;
     
-    public static final int UNBOUNDED = com.vividsolutions.xdo.xsi.ElementGrouping.UNBOUNDED;
+    public static final int UNBOUNDED = Integer.MAX_VALUE;
 
-    public static final int UNDEFINED = com.vividsolutions.xdo.xsi.ElementGrouping.UNDEFINED;
-    
+    /**
+     * <p>
+     * Returns the mask informing the caller as to the type of object they are
+     * dealing with.
+     * </p>
+     *
+     * @return
+     */
+    public int getGrouping();
 
     /**
      * <p>
@@ -92,4 +98,23 @@ public interface ElementGrouping {
      */
     public Element findChildElement(String name);
 
+    /**
+     * <p>
+     * returns the max number of allowable occurences within the xml schema for
+     * this construct.
+     * </p>
+     *
+     * @return
+     */
+    public int getMaxOccurs();
+
+    /**
+     * <p>
+     * returns the min number of allowable occurences within the xml schema for
+     * this construct.
+     * </p>
+     *
+     * @return
+     */
+    public int getMinOccurs();
 }

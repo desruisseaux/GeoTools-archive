@@ -21,10 +21,6 @@ import org.geotools.xml.PrintHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import com.vividsolutions.xdo.Encoder;
-import com.vividsolutions.xdo.Node;
-import com.vividsolutions.xdo.Strategy;
-
 /**
  * <p>
  * This is a convinience interface to help speed up the code, allowing for any
@@ -36,7 +32,7 @@ import com.vividsolutions.xdo.Strategy;
  * @see ComplexType
  * @author dzwiers www.refractions.net
  */
-public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
+public interface Type {
 
     /**
      * <p>
@@ -63,8 +59,28 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * 
      * @return Object
      */
-    public abstract Object getValue(com.vividsolutions.xdo.xsi.Element element, ElementValue[] value,
+    public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException, OperationNotSupportedException;
+
+    /**
+     * <p>
+     * This returns the XML Schema declaration name of this type (both complex
+     * and simple types have names ...)
+     * </p>
+     * 
+     * @return
+     */
+    public String getName();
+
+    /**
+     * <p>
+     * This is used for validation of an XML document, and represents the
+     * targetNamespace of that this type resides in.
+     * </p>
+     * 
+     * @return
+     */
+    public URI getNamespace();
 
     /**
      * <p>
@@ -76,7 +92,8 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * 
      * @return
      */
-    public abstract Class getInstanceType();
+    public Class getInstanceType();
+
 
     /**
      * Can I write this object out as element specified?
@@ -88,7 +105,7 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * 
      * @see Type#encode(Element, Object, Writer, Map)
      */
-    public abstract boolean canEncode(com.vividsolutions.xdo.xsi.Element element, Object value, Map hints);
+    public boolean canEncode(Element element, Object value, Map hints);
     
     /**
      * Encode value as element on the provided output.
@@ -102,7 +119,7 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      * @throws IOException When there is an error with the Writer.
      * @throws OperationNotSupportedException When this type cannot be encoded ... and wasn't checked first.
      */
-    public abstract void encode(com.vividsolutions.xdo.xsi.Element element, Object value, PrintHandler output, Map hints) 
+    public void encode(Element element, Object value, PrintHandler output, Map hints) 
     	throws IOException, OperationNotSupportedException;
 
 
@@ -114,7 +131,5 @@ public abstract class Type extends com.vividsolutions.xdo.xsi.Type {
      *
      * @return
      */
-    public com.vividsolutions.xdo.xsi.Element findChildElement(String name){
-        return null; // inconveient to implement method
-    }
+    public Element findChildElement(String name);
 }

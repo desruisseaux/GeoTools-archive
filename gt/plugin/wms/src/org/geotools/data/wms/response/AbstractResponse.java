@@ -24,9 +24,8 @@ import java.util.logging.Level;
 import org.geotools.data.wms.xml.WMSSchema;
 import org.geotools.ows.ServiceException;
 import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.handlers.DocumentHandler;
 import org.xml.sax.SAXException;
-
-import com.vividsolutions.xdo.Decoder;
 
 
 /**
@@ -60,8 +59,8 @@ public class AbstractResponse {
     
     protected ServiceException parseException(InputStream inputStream) throws SAXException {
         Map hints = new HashMap();
-//        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
-        hints.put(Decoder.VALIDATION_HINT, Boolean.FALSE);
+        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
 
         Object object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
         if (object instanceof ServiceException) {

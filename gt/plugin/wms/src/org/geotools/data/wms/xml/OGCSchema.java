@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.geotools.xml.gml.GMLSchema;
+import org.geotools.xml.handlers.xsi.SchemaHandler;
 import org.geotools.xml.schema.Attribute;
 import org.geotools.xml.schema.AttributeGroup;
 import org.geotools.xml.schema.ComplexType;

@@ -18,7 +18,6 @@ package org.geotools.xml;
 
 import java.io.File;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import javax.xml.parsers.SAXParser;
@@ -28,8 +27,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.resources.TestData;
-
-import com.vividsolutions.xdo.Decoder;
 
 import junit.framework.TestCase;
 
@@ -42,11 +39,21 @@ public class GMLInheritanceTest extends TestCase {
             spf.setNamespaceAware(true);
             spf.setValidating(false);
 
+            SAXParser parser = spf.newSAXParser();
+
             String path = "sample/nestedFeatures.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
-            Object doc = Decoder.decode(u,new HashMap());
+            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+            XMLSAXHandler.setLogLevel(Level.FINEST);
+            XSISAXHandler.setLogLevel(Level.FINEST);
+            XMLElementHandler.setLogLevel(Level.FINEST);
+            XSIElementHandler.setLogLevel(Level.FINEST);
+
+            parser.parse(f, xmlContentHandler);
+
+            Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             
@@ -63,12 +70,21 @@ public class GMLInheritanceTest extends TestCase {
             spf.setNamespaceAware(true);
             spf.setValidating(false);
 
+            SAXParser parser = spf.newSAXParser();
+
             String path = "sample/multiInheritance.xml";
             File f = TestData.file(this,path);
             URI u = f.toURI();
 
+            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+            XMLSAXHandler.setLogLevel(Level.FINEST);
+            XSISAXHandler.setLogLevel(Level.FINEST);
+            XMLElementHandler.setLogLevel(Level.FINEST);
+            XSIElementHandler.setLogLevel(Level.FINEST);
 
-            Object doc = Decoder.decode(u,new HashMap());
+            parser.parse(f, xmlContentHandler);
+
+            Object doc = xmlContentHandler.getDocument();
             assertNotNull("Document missing", doc);
 //            System.out.println(doc);
             

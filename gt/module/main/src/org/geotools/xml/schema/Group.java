@@ -34,7 +34,7 @@ import java.net.URI;
  *
  * @author dzwiers www.refractions.net
  */
-public abstract class Group extends com.vividsolutions.xdo.xsi.Group {
+public interface Group extends ElementGrouping {
     /**
      * <p>
      * Returns the Child Schema element (Choice or Sequence) declaring valid
@@ -43,9 +43,7 @@ public abstract class Group extends com.vividsolutions.xdo.xsi.Group {
      *
      * @return
      */
-    public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
-        return super.getChild();
-    }
+    public ElementGrouping getChild();
 
     /**
      * <p>
@@ -54,9 +52,7 @@ public abstract class Group extends com.vividsolutions.xdo.xsi.Group {
      *
      * @return
      */
-    public String getId() {
-        return super.getId();
-    }
+    public String getId();
 
     /**
      * <p>
@@ -66,9 +62,7 @@ public abstract class Group extends com.vividsolutions.xdo.xsi.Group {
      *
      * @return
      */
-    public int getMaxOccurs() {
-        return super.getMaxOccurs();
-    }
+    public int getMaxOccurs();
 
     /**
      * <p>
@@ -78,9 +72,7 @@ public abstract class Group extends com.vividsolutions.xdo.xsi.Group {
      *
      * @return
      */
-    public int getMinOccurs() {
-        return super.getMinOccurs();
-    }
+    public int getMinOccurs();
 
     /**
      * <p>
@@ -89,16 +81,12 @@ public abstract class Group extends com.vividsolutions.xdo.xsi.Group {
      *
      * @return
      */
-    public String getName() {
-        return super.getName();
-    }
+    public String getName();
 
     /**
      * DOCUMENT ME!
      *
      * @return
      */
-    public URI getNamespace() {
-        return super.getNamespace();
-    }
+    public URI getNamespace();
 }

@@ -23,62 +23,54 @@ package org.geotools.xml.schema;
  *
  * @author dzwiers
  */
-public class Facet extends com.vividsolutions.xdo.xsi.Facet {
-    public Facet( int arg0, String arg1 ) {
-        super(arg0, arg1);
-    }
+public interface Facet {
+    /** DOCUMENT ME! */
+    public static int ENUMERATION = 1;
 
     /** DOCUMENT ME! */
-    public static int ENUMERATION = com.vividsolutions.xdo.xsi.Facet.ENUMERATION;
+    public static int FRACTIONDIGITS = 2;
 
     /** DOCUMENT ME! */
-    public static int FRACTIONDIGITS = com.vividsolutions.xdo.xsi.Facet.FRACTIONDIGITS;
+    public static int LENGTH = 3;
 
     /** DOCUMENT ME! */
-    public static int LENGTH = com.vividsolutions.xdo.xsi.Facet.LENGTH;
+    public static int MAXEXCLUSIVE = 4;
 
     /** DOCUMENT ME! */
-    public static int MAXEXCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MAXEXCLUSIVE;
+    public static int MAXINCLUSIVE = 5;
 
     /** DOCUMENT ME! */
-    public static int MAXINCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MAXINCLUSIVE;
+    public static int MAXLENGTH = 6;
 
     /** DOCUMENT ME! */
-    public static int MAXLENGTH = com.vividsolutions.xdo.xsi.Facet.MAXLENGTH;
+    public static int MINEXCLUSIVE = 7;
 
     /** DOCUMENT ME! */
-    public static int MINEXCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MINEXCLUSIVE;
+    public static int MININCLUSIVE = 8;
 
     /** DOCUMENT ME! */
-    public static int MININCLUSIVE = com.vividsolutions.xdo.xsi.Facet.MININCLUSIVE;
+    public static int MINLENGTH = 9;
 
     /** DOCUMENT ME! */
-    public static int MINLENGTH = com.vividsolutions.xdo.xsi.Facet.MINLENGTH;
+    public static int PATTERN = 10;
 
     /** DOCUMENT ME! */
-    public static int PATTERN = com.vividsolutions.xdo.xsi.Facet.PATTERN;
+    public static int TOTALDIGITS = 11;
 
     /** DOCUMENT ME! */
-    public static int TOTALDIGITS = com.vividsolutions.xdo.xsi.Facet.TOTALDIGITS;
-
-    /** DOCUMENT ME! */
-    public static int WHITESPACE = com.vividsolutions.xdo.xsi.Facet.WHITESPACE;
+    public static int WHITESPACE = 12;
 
     /**
      * The Facet Type -- selected from one of the above constant values
      *
      * @return
      */
-    public int getFacetType() {
-        return super.getType();
-    }
+    public int getFacetType();
 
     /**
      * The facet's constraint
      *
      * @return
      */
-    public String getValue() {
-        return super.getValue();
-    }
+    public String getValue();
 }

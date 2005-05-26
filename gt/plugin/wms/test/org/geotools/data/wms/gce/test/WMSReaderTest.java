@@ -38,7 +38,7 @@ import org.geotools.data.wms.gce.WMSReader;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.IdentifiedObject;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -180,7 +180,7 @@ public class WMSReaderTest extends TestCase {
         }
 //
 //        Map properties = new HashMap();
-//        properties.put(DefaultIdentifiedObject.NAME_PROPERTY, "WMS");
+//        properties.put(IdentifiedObject.NAME_PROPERTY, "WMS");
 
         GridCoverage coverage = reader.read(generalParameterValues);
     }
