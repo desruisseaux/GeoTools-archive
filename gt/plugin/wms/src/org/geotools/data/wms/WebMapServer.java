@@ -43,8 +43,15 @@ import org.geotools.data.wms.response.GetStylesResponse;
 import org.geotools.data.wms.response.PutStylesResponse;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
 
 /**
@@ -539,9 +546,12 @@ public class WebMapServer implements Discovery {
     
     /**
      * Given a layer and a coordinate reference system, will locate an envelope
-     * for that layer in that CRS.
+     * for that layer in that CRS. If the layer is declared to support that CRS,
+     * but no envelope can be found, it will try to calculate an appropriate 
+     * bounding box.
      * 
-     * If null is returned, no valid bounding box could be found.
+     * If null is returned, no valid bounding box could be found and one couldn't
+     * be transformed from another.
      * 
      * @param layer
      * @param crs
@@ -559,26 +569,12 @@ public class WebMapServer implements Discovery {
             while( tempBBox == null && parentLayer != null ) {
                 tempBBox = (BoundingBox) parentLayer.getBoundingBoxes().get(epsgCode);
                 
-                //TODO HACK 3005 and 42102 are close enough
-                if (epsgCode.equals("EPSG:3005") && tempBBox == null) {
-                    tempBBox = (BoundingBox) parentLayer.getBoundingBoxes().get("EPSG:42102");
-                    try {
-                        new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
-                                new double[] { tempBBox.getMaxX(), tempBBox.getMaxY() });
-                    } catch (IllegalArgumentException e) {
-                        //TODO LOG here
-                        //log("Layer "+layer.getName()+" has invalid bbox declared: "+tempBbox.toString());
-                        tempBBox = null;
-                    }
-                }
                 parentLayer = parentLayer.getParent();
             }
     
             //Otherwise, locate a LatLon BBOX
     
-            //TODO HACK 4326 is close enough to 4269
-            if (tempBBox == null && ("EPSG:4326".equals(epsgCode.toUpperCase()) ||
-                    "EPSG:4269".equals(epsgCode.toUpperCase()) )) { //$NON-NLS-1$
+            if (tempBBox == null && ("EPSG:4326".equals(epsgCode.toUpperCase()))) { //$NON-NLS-1$
                 LatLonBoundingBox latLonBBox = null;
     
                 parentLayer = layer;
@@ -599,11 +595,55 @@ public class WebMapServer implements Discovery {
                 }
                 
                 if (latLonBBox == null) {
-                    return new GeneralEnvelope(new double[] { -180, -90 }, new double[] {180, 90});
+                    //TODO could convert another bbox to latlon?
+                    tempBBox = new BoundingBox("EPSG:4326", -180, -90, 180, 90);
                 }
                 
-                return new GeneralEnvelope(new double[] {latLonBBox.getMinX(), latLonBBox.getMinY()}, 
-                        new double[] { latLonBBox.getMaxX(), latLonBBox.getMaxY() });
+                tempBBox = new BoundingBox("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
+            }
+            
+            if (tempBBox == null) {
+                //Haven't found a bbox in the requested CRS. Attempt to transform another bbox
+                
+                String epsg = null;
+                if (layer.getLatLonBoundingBox() != null) {
+                    LatLonBoundingBox latLonBBox = layer.getLatLonBoundingBox();
+                    tempBBox = new BoundingBox("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
+                    epsg = "EPSG:4326";
+                }
+                
+                if (layer.getBoundingBoxes() != null && layer.getBoundingBoxes().size() > 0) {
+                    tempBBox = (BoundingBox) layer.getBoundingBoxes().values().iterator().next();
+                    epsg = tempBBox.getCrs();
+                }
+                
+                GeneralEnvelope env = new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
+                        new double[] { tempBBox.getMaxX(), tempBBox.getMaxY() });
+                
+                CoordinateReferenceSystem fromCRS = null;
+                try {
+                    fromCRS = CRS.decode(epsg);
+                    MathTransform transform = CRS.transform(fromCRS, crs, true);
+                    
+                    DirectPosition newLower = transform.transform(env.getLowerCorner(),null);
+                    DirectPosition newUpper = transform.transform(env.getUpperCorner(),null);
+                    
+                    env = new GeneralEnvelope(newLower.getCoordinates(), newUpper.getCoordinates());
+                    env.setCoordinateReferenceSystem(fromCRS);
+                    
+                    //success!!
+                    
+                    return env;
+                    
+                } catch (NoSuchAuthorityCodeException e) {
+                    // TODO Catch e
+                } catch (FactoryException e) {
+                    // TODO Catch e
+                } catch (MismatchedDimensionException e) {
+                    // TODO Catch e
+                } catch (TransformException e) {
+                    // TODO Catch e
+                }
             }
             
             //TODO Attempt to figure out the valid area of teh CRS and use that.
