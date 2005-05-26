@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.opengis.metadata.Identifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
@@ -140,13 +141,25 @@ public final class NameFactory {
             final CharSequence[] values = (CharSequence[]) value;
             final GenericName[] names = new GenericName[values.length];
             for (int i=0; i<values.length; i++) {
-                names[i] = create(values[i].toString());
+                names[i] = create( values[i].toString() );
             }
             return names;
         } else if (value instanceof GenericName) {
             return new GenericName[] {(GenericName) value};
-        } else {
+        }
+        else if( value instanceof Identifier[]){
+            final Identifier[] values = (Identifier[]) value;
+            final GenericName[] names = new GenericName[ values.length ];
+            for( int i=0; i<values.length; i++){
+                names[i] = create( values[i].getCode() );
+            }
+            return names;
+        }
+        else if( value instanceof GenericName[]){
             return (GenericName[]) value;
+        }
+        else {
+            throw new ClassCastException("Cannot convert "+value.toString()+ " to GenericName[]" );
         }
     }
 }
