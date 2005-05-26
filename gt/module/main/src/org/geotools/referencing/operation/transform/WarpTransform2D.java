@@ -33,7 +33,6 @@ import javax.media.jai.WarpPolynomial;
 import javax.media.jai.WarpGeneralPolynomial;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -596,7 +595,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.GEOTOOLS, "WarpPolynomial")
             }, new ParameterDescriptor[] {
                 DEGREE, X_COEFFS, Y_COEFFS, PRE_SCALE_X, PRE_SCALE_Y, POST_SCALE_X, POST_SCALE_Y

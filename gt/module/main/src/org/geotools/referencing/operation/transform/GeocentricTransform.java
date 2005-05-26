@@ -33,7 +33,6 @@ import javax.units.SI;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -563,7 +562,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,  "semi_major"),
                     new NamedIdentifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
                 },
@@ -574,7 +573,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,  "semi_minor"),
                     new NamedIdentifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
                 },
@@ -607,7 +606,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                                                               final String epsgCode,
                                                               final int geotools)
         {
-            return createDescriptorGroup(new Identifier[] {
+            return createDescriptorGroup(new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,      ogc),
                     new NamedIdentifier(CitationImpl.EPSG,     epsgName),
                     new NamedIdentifier(CitationImpl.EPSG,     epsgCode),

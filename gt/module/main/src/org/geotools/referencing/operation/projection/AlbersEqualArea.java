@@ -51,7 +51,6 @@ import java.util.Collection;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -137,7 +136,7 @@ public class AlbersEqualArea extends MapProjection {
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
                     new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
                     new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
@@ -149,7 +148,7 @@ public class AlbersEqualArea extends MapProjection {
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_2"),
                     new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
                     new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel2")
@@ -159,7 +158,7 @@ public class AlbersEqualArea extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Albers_Conic_Equal_Area"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Albers Equal Area"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9822"),

@@ -29,7 +29,6 @@ import java.util.Collection;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -174,7 +173,7 @@ public abstract class Stereographic extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Oblique_Stereographic"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Oblique Stereographic"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Roussilhe"),
@@ -258,7 +257,7 @@ public abstract class Stereographic extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Polar_Stereographic"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Polar Stereographic (variant A)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9810"),
@@ -323,7 +322,7 @@ public abstract class Stereographic extends MapProjection {
          * parameter value. Valid values range is from -90 to 90°. 
          */
         public static final ParameterDescriptor LATITUDE_TRUE_SCALE = createOptionalDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.ESRI, "Standard_Parallel_1"),
                     new NamedIdentifier(CitationImpl.EPSG, "Latitude of standard parallel")
                 },
@@ -332,7 +331,7 @@ public abstract class Stereographic extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.EPSG,     "Polar Stereographic (variant B)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9829"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
@@ -402,7 +401,7 @@ public abstract class Stereographic extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Stereographic_North_Pole"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
                                                            ResourceKeys.STEREOGRAPHIC_PROJECTION))
@@ -469,7 +468,7 @@ public abstract class Stereographic extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Stereographic_South_Pole"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
                                                            ResourceKeys.STEREOGRAPHIC_PROJECTION))
@@ -526,7 +525,7 @@ public abstract class Stereographic extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Stereographic"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Stereographic"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(

@@ -26,7 +26,6 @@ package org.geotools.referencing.operation.projection;
 import java.util.Collection;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -81,7 +80,7 @@ public abstract class Orthographic extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Orthographic"),
                 new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Orthographic"),
                 new NamedIdentifier(CitationImpl.ESRI,     "Orthographic"),

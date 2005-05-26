@@ -30,7 +30,6 @@ import java.util.Collection;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -101,7 +100,7 @@ public class Mercator extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Mercator_1SP"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Mercator (1SP)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9804"),
@@ -163,7 +162,7 @@ public class Mercator extends MapProjection {
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
                     new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
                     new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
@@ -173,7 +172,7 @@ public class Mercator extends MapProjection {
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Mercator_2SP"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Mercator (2SP)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9805"),

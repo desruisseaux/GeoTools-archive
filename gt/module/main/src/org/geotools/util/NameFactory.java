@@ -24,9 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -135,31 +139,38 @@ public final class NameFactory {
      * @throws ClassCastException if {@code value} can't be cast.
      */
     public static GenericName[] toArray(final Object value) throws ClassCastException {
+        if (value instanceof GenericName[]) {
+            return (GenericName[]) value;
+        }
+        if (value instanceof GenericName) {
+            return new GenericName[] {
+                (GenericName) value
+            };
+        }
         if (value instanceof CharSequence) {
-            return new GenericName[] {create(value.toString())};
-        } else if (value instanceof CharSequence[]) {
+            return new GenericName[] {
+                create(value.toString())
+            };
+        }
+        if (value instanceof CharSequence[]) {
             final CharSequence[] values = (CharSequence[]) value;
             final GenericName[] names = new GenericName[values.length];
             for (int i=0; i<values.length; i++) {
-                names[i] = create( values[i].toString() );
+                final CharSequence v = values[i];
+                names[i] = (v instanceof GenericName) ? (GenericName)v : create(v.toString());
             }
             return names;
-        } else if (value instanceof GenericName) {
-            return new GenericName[] {(GenericName) value};
         }
-        else if( value instanceof Identifier[]){
+        if (value instanceof Identifier[]) {
             final Identifier[] values = (Identifier[]) value;
-            final GenericName[] names = new GenericName[ values.length ];
-            for( int i=0; i<values.length; i++){
-                names[i] = create( values[i].getCode() );
+            final GenericName[] names = new GenericName[values.length];
+            for( int i=0; i<values.length; i++) {
+                final Identifier v = values[i];
+                names[i] = (v instanceof GenericName) ? (GenericName)v : create(v.getCode());
             }
             return names;
         }
-        else if( value instanceof GenericName[]){
-            return (GenericName[]) value;
-        }
-        else {
-            throw new ClassCastException("Cannot convert "+value.toString()+ " to GenericName[]" );
-        }
+        // TODO: localize
+        throw new ClassCastException("Cannot convert "+Utilities.getShortClassName(value)+ " to GenericName[]");
     }
 }

@@ -24,7 +24,6 @@ import java.io.Serializable;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -313,7 +312,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
                                                            ResourceKeys.LOGARITHMIC))
             }, new ParameterDescriptor[] {

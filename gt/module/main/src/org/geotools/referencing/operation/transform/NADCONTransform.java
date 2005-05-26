@@ -43,7 +43,6 @@ import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -968,7 +967,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "NADCON"),
                 new NamedIdentifier(CitationImpl.EPSG,     "NADCON"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9613"),

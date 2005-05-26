@@ -30,7 +30,6 @@ import java.util.Collection;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -137,7 +136,7 @@ public class LambertConformal extends MapProjection{
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_1SP"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (1SP)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9801"),
@@ -197,7 +196,7 @@ public class LambertConformal extends MapProjection{
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
                     new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
                     new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
@@ -209,7 +208,7 @@ public class LambertConformal extends MapProjection{
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_2"),
                     new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
                     new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel2")
@@ -219,7 +218,7 @@ public class LambertConformal extends MapProjection{
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_2SP"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (2SP)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9802"),
@@ -284,7 +283,7 @@ public class LambertConformal extends MapProjection{
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Lambert_Conformal_Conic_2SP_Belgium"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Lambert Conic Conformal (2SP Belgium)"),
                 new NamedIdentifier(CitationImpl.EPSG,     "9803"),
@@ -340,7 +339,7 @@ public class LambertConformal extends MapProjection{
         /**
          * The parameters group.
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.ESRI,     "Lambert_Conformal_Conic"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
                                                            ResourceKeys.LAMBERT_CONFORMAL_PROJECTION))

@@ -33,7 +33,6 @@ import javax.units.SI;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -1051,7 +1050,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,  "semi_major"),
                     new NamedIdentifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
                 },
@@ -1064,7 +1063,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,  "semi_minor"),
                     new NamedIdentifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
                 },
@@ -1075,7 +1074,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
         public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,     "central_meridian"),
                     new NamedIdentifier(CitationImpl.EPSG,    "Longitude of natural origin"),
                     new NamedIdentifier(CitationImpl.EPSG,    "Longitude of false origin"),
@@ -1090,7 +1089,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,  "latitude_of_origin"),
                     new NamedIdentifier(CitationImpl.EPSG, "Latitude of false origin"),
                     new NamedIdentifier(CitationImpl.EPSG, "Latitude of natural origin"),
@@ -1106,7 +1105,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * @todo Would like to start range from 0 <u>exclusive</u>.
          */
         public static final ParameterDescriptor SCALE_FACTOR = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,     "scale_factor"),
                     new NamedIdentifier(CitationImpl.EPSG,    "Scale factor at natural origin"),
                     new NamedIdentifier(CitationImpl.GEOTIFF, "ScaleAtNatOrigin"),
@@ -1119,7 +1118,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
         public static final ParameterDescriptor FALSE_EASTING = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,     "false_easting"),
                     new NamedIdentifier(CitationImpl.EPSG,    "False easting"),
                     new NamedIdentifier(CitationImpl.EPSG,    "Easting at false origin"),
@@ -1132,7 +1131,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * parameter value. Valid values range is unrestricted. Default value is 0.
          */
         public static final ParameterDescriptor FALSE_NORTHING = createDescriptor(
-                new Identifier[] {
+                new NamedIdentifier[] {
                     new NamedIdentifier(CitationImpl.OGC,     "false_northing"),
                     new NamedIdentifier(CitationImpl.EPSG,    "False northing"),
                     new NamedIdentifier(CitationImpl.EPSG,    "Northing at false origin"),

@@ -51,7 +51,6 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -188,7 +187,7 @@ public class TransverseMercator extends MapProjection {
          * The parameters group.
          * @task REVISIT: should we set some default UTM parameter values
          */
-        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
                 new NamedIdentifier(CitationImpl.OGC,      "Transverse_Mercator"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Transverse Mercator"),
                 new NamedIdentifier(CitationImpl.EPSG,     "Gauss-Kruger"),

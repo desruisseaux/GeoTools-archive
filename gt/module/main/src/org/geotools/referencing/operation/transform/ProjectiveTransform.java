@@ -33,7 +33,6 @@ import java.util.Map;
 import javax.vecmath.SingularMatrixException;
 
 // OpenGIS dependencies
-import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -478,11 +477,11 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          */
         static final ParameterDescriptorGroup PARAMETERS;
         static {
-            final Identifier name = new NamedIdentifier(CitationImpl.OGC, "Affine");
+            final NamedIdentifier name = new NamedIdentifier(CitationImpl.OGC, "Affine");
             final Map  properties = new HashMap(4, 0.8f);
             properties.put(NAME_PROPERTY,        name);
             properties.put(IDENTIFIERS_PROPERTY, name);
-            properties.put(ALIAS_PROPERTY, new Identifier[] {name,
+            properties.put(ALIAS_PROPERTY, new NamedIdentifier[] {name,
                 new NamedIdentifier(CitationImpl.EPSG, "Affine general parametric transformation"),
                 new NamedIdentifier(CitationImpl.EPSG, "9624"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS,
