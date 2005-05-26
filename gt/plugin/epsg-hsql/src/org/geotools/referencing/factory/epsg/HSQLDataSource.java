@@ -56,8 +56,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
      * Creates a new instance of this data source
      */
     public HSQLDataSource() {
-//        setDatabase("jdbc:hsqldb:res:org/geotools/referencing/factory/epsg/HSQL");
-        setDatabase("jdbc:hsqldb:file:HSQL");
+        setDatabase("jdbc:hsqldb:res:org/geotools/referencing/factory/epsg/HSQL");
         setUser    ("Geotools");
         setPassword("Geotools");
     }

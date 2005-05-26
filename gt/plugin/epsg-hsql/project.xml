@@ -49,6 +49,19 @@
   </dependencies>
 
   <build>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>${basedir}/src</directory>
+        <includes>
+          <!-- The following seems to fail, not sure why -->
+          <include>META-INF/services/**</include>
+          <include>org/geotools/referencing/factory/epsg/HSQL.*</include>
+        </includes>
+      </resource>
+    </resources>
+
     <unitTest>
       <includes>
         <include>**/*Test.java</include>
@@ -56,9 +69,6 @@
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
-          <includes>
-            <include>testData/</include>
-          </includes>
         </resource>
       </resources>
     </unitTest>

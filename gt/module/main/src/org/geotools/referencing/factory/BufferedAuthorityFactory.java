@@ -28,6 +28,7 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
@@ -192,8 +193,23 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         try {
             return getBackingStore().isReady();
         } catch (FactoryException exception) {
-            final Citation citation = getAuthority();
-            final LogRecord record = new LogRecord(Level.FINE, "Unavailable factory: "+citation.getTitle());
+            final Citation   citation = getAuthority();
+            final Collection   titles = citation.getAlternateTitles();
+            InternationalString title = citation.getTitle();
+            if (titles != null) {
+                for (final Iterator it=titles.iterator(); it.hasNext();) {
+                    /*
+                     * Uses the longuest title instead of the main one. In Geotools
+                     * implementation, the alternate title may contains usefull informations
+                     * like the EPSG database version number and the database engine.
+                     */
+                    final InternationalString candidate = (InternationalString) it.next();
+                    if (candidate.length() > title.length()) {
+                        title  = candidate;
+                    }
+                }
+            }
+            final LogRecord record = new LogRecord(Level.FINE, "Unavailable factory: "+title);
             record.setSourceClassName(Utilities.getShortClassName(this));
             record.setSourceMethodName("isReady");
             record.setThrown(exception);

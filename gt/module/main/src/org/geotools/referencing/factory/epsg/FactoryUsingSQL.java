@@ -23,6 +23,7 @@ package org.geotools.referencing.factory.epsg;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Date;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -306,18 +307,26 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * Returns the authority for this EPSG database.
      * This authority will contains the database version in the {@linkplain Citation#getEdition
      * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
+     *
+     * @todo Localize the alternate title.
      */
     public synchronized Citation getAuthority() {
         if (authority == null) try {
             final String query = adaptSQL("SELECT VERSION_NUMBER, VERSION_DATE FROM [Version History]" +
                                           " ORDER BY VERSION_DATE DESC");
-            final Statement statement = connection.createStatement();
-            final ResultSet result = statement.executeQuery(query);
+            final DatabaseMetaData metadata  = connection.getMetaData();
+            final Statement        statement = connection.createStatement();
+            final ResultSet        result    = statement.executeQuery(query);
             if (result.next()) {
-                final CitationImpl ci = new CitationImpl(CitationImpl.EPSG);
-                ci.setEdition(new SimpleInternationalString(result.getString(1)));
-                ci.setEditionDate(result.getDate(2));
-                authority = ci;
+                final String version = result.getString(1);
+                final Date   date    = result.getDate  (2);
+                final String engine  = metadata.getDatabaseProductName();
+                final CitationImpl c = new CitationImpl(CitationImpl.EPSG);
+                c.getAlternateTitles().add(new SimpleInternationalString(
+                        "EPSG database version "+version+" on "+engine));
+                c.setEdition(new SimpleInternationalString(version));
+                c.setEditionDate(date);
+                authority = c;
             } else {
                 authority = CitationImpl.EPSG;
             }
