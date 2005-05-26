@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
  *
  * @author dzwiers www.refractions.net
  */
-public class GMLSchema implements Schema {
+public class GMLSchema extends Schema {
     /** GML target namespace */
     public static final URI NAMESPACE = makeURI("http://www.opengis.net/gml");
 
@@ -91,14 +91,14 @@ public class GMLSchema implements Schema {
     /**
      * @see schema.Schema#getAttributeGroups()
      */
-    public AttributeGroup[] getAttributeGroups() {
+    public com.vividsolutions.xdo.xsi.AttributeGroup[] getAttributeGroups() {
         return attributeGroups;
     }
 
     /**
      * @see schema.Schema#getAttributes()
      */
-    public Attribute[] getAttributes() {
+    public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
         return attributes;
     }
 
@@ -158,7 +158,7 @@ public class GMLSchema implements Schema {
     /**
      * @see schema.Schema#getComplexTypes()
      */
-    public ComplexType[] getComplexTypes() {
+    public com.vividsolutions.xdo.xsi.ComplexType[] getComplexTypes() {
         return complexTypes;
     }
 
@@ -324,7 +324,7 @@ public class GMLSchema implements Schema {
     /**
      * @see schema.Schema#getElements()
      */
-    public Element[] getElements() {
+    public com.vividsolutions.xdo.xsi.Element[] getElements() {
         return elements;
     }
 
@@ -338,7 +338,7 @@ public class GMLSchema implements Schema {
     /**
      * @see schema.Schema#getGroups()
      */
-    public Group[] getGroups() {
+    public com.vividsolutions.xdo.xsi.Group[] getGroups() {
         return new Group[0];
     }
 
@@ -362,7 +362,7 @@ public class GMLSchema implements Schema {
     /**
      * @see schema.Schema#getSimpleTypes()
      */
-    public SimpleType[] getSimpleTypes() {
+    public com.vividsolutions.xdo.xsi.SimpleType[] getSimpleTypes() {
         return simpleTypes;
     }
 
@@ -447,14 +447,14 @@ public class GMLSchema implements Schema {
      *
      * @see Element
      */
-    static class GMLElement implements Element {
+    static class GMLElement extends Element {
         // default visibily to remove the set* methods ... this class is 
         // only package visible
         boolean abstracT = false;
         int max;
         int min;
         String name;
-        Type type;
+        com.vividsolutions.xdo.xsi.Type type;
         Element substitutionGroup;
 
         /*
@@ -477,7 +477,7 @@ public class GMLSchema implements Schema {
          * @param abstracT
          * @param substitutionGroup
          */
-        public GMLElement(String name, Type type, int min, int max,
+        public GMLElement(String name, com.vividsolutions.xdo.xsi.Type type, int min, int max,
             boolean abstracT, Element substitutionGroup) {
             this.abstracT = abstracT;
             this.max = max;
@@ -499,8 +499,8 @@ public class GMLSchema implements Schema {
             this.max = max;
             this.min = min;
             this.name = element.getName();
-            this.type = element.getType();
-            this.substitutionGroup = element.getSubstitutionGroup();
+            this.type = (Type)element.getType();
+            this.substitutionGroup = (Element)element.getSubstitutionGroup();
         }
 
         /**
@@ -603,14 +603,14 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.Element#getSubstitutionGroup()
          */
-        public Element getSubstitutionGroup() {
+        public com.vividsolutions.xdo.xsi.Element getSubstitutionGroup() {
             return substitutionGroup;
         }
 
         /**
          * @see schema.Element#getType()
          */
-        public Type getType() {
+        public com.vividsolutions.xdo.xsi.Type getType() {
             return type;
         }
 
@@ -632,7 +632,7 @@ public class GMLSchema implements Schema {
      *
      * @see ComplexType
      */
-    static abstract class GMLComplexType implements ComplexType {
+    static abstract class GMLComplexType extends ComplexType {
         /**
          * @see schema.ComplexType#getBlock()
          */
@@ -686,7 +686,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.ComplexType#getParent()
          */
-        public Type getParent() {
+        public com.vividsolutions.xdo.xsi.Type getParent() {
             return null;
         }
 
@@ -710,7 +710,7 @@ public class GMLSchema implements Schema {
      *
      * @see Attribute
      */
-    static class GMLAttribute implements Attribute {
+    static class GMLAttribute extends Attribute {
         // package visible class variable, used to avoid set* methods
         String name;
         String def = null;
@@ -817,7 +817,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.Attribute#getSimpleType()
          */
-        public SimpleType getSimpleType() {
+        public com.vividsolutions.xdo.xsi.SimpleType getSimpleType() {
             return simpleType;
         }
     }
@@ -832,7 +832,7 @@ public class GMLSchema implements Schema {
      *
      * @see AttributeGroup
      */
-    static class GMLAssociationAttributeGroup implements AttributeGroup {
+    static class GMLAssociationAttributeGroup extends AttributeGroup {
         // package visible attribute set
         static final Attribute[] attributes1 = {
                 new GMLAttribute("remoteSchema",
@@ -859,7 +859,7 @@ public class GMLSchema implements Schema {
         /**
          * @see schema.Schema#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes1;
         }
 
@@ -887,7 +887,7 @@ public class GMLSchema implements Schema {
      *
      * @see SimpleType
      */
-    static class GMLNullType implements SimpleType {
+    static class GMLNullType extends SimpleType {
         /**
          * @see schema.SimpleType#getNamespace()
          */
@@ -1024,19 +1024,19 @@ public class GMLSchema implements Schema {
         /**
          * @see org.geotools.xml.schema.SimpleType#getParents()
          */
-        public SimpleType[] getParents() {
+        public com.vividsolutions.xdo.xsi.SimpleType[] getParents() {
             return new SimpleType[] { XSISimpleTypes.String.getInstance(), };
         }
 
         /**
          * @see org.geotools.xml.schema.SimpleType#getFacets()
          */
-        public Facet[] getFacets() {
+        public com.vividsolutions.xdo.xsi.Facet[] getFacets() {
             return new Facet[] {
-                new FacetGT(Facet.ENUMERATION, "inapplicable"),
-                new FacetGT(Facet.ENUMERATION, "unknown"),
-                new FacetGT(Facet.ENUMERATION, "unavailable"),
-                new FacetGT(Facet.ENUMERATION, "missing"),
+                new Facet(Facet.ENUMERATION, "inapplicable"),
+                new Facet(Facet.ENUMERATION, "unknown"),
+                new Facet(Facet.ENUMERATION, "unavailable"),
+                new Facet(Facet.ENUMERATION, "missing"),
             };
         }
 

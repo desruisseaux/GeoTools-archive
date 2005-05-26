@@ -622,7 +622,7 @@ public class GMLComplexTypes {
      *
      * @see Choice
      */
-    private static class DefaultChoice implements Choice {
+    private static class DefaultChoice extends Choice {
         // the element set to pick one of
         private Element[] elements = null;
 
@@ -666,7 +666,7 @@ public class GMLComplexTypes {
         /**
          * @see schema.Choice#getChildren()
          */
-        public ElementGrouping[] getChildren() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping[] getChildren() {
             return elements;
         }
 
@@ -702,7 +702,7 @@ public class GMLComplexTypes {
      *
      * @author dzwiers
      */
-    private static class DefaultSequence implements Sequence {
+    private static class DefaultSequence extends Sequence {
         // the list of elements in the sequence (order matters here)
         private Element[] elements = null;
 
@@ -725,7 +725,7 @@ public class GMLComplexTypes {
         /**
          * @see schema.Sequence#getChildren()
          */
-        public ElementGrouping[] getChildren() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping[] getChildren() {
             return elements;
         }
 
@@ -791,7 +791,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return null;
         }
 
@@ -832,14 +832,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return new Attribute[0];
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return new DefaultSequence(new Element[0]);
         }
 
@@ -944,7 +944,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return null;
         }
 
@@ -975,14 +975,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return new Attribute[0];
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return new DefaultSequence(new Element[0]);
         }
 
@@ -1088,7 +1088,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elems;
         }
 
@@ -1096,7 +1096,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new GeometryAssociationType();
 
         // the static attribute list
-        protected static final Attribute[] attributes = loadAttributes();
+        protected static final com.vividsolutions.xdo.xsi.Attribute[] attributes = loadAttributes();
 
         // the static element list
         private static final Element[] elems = {
@@ -1134,9 +1134,9 @@ public class GMLComplexTypes {
         /*
          * statically loads the attributes which GeometryAssociations include
          */
-        private static Attribute[] loadAttributes() {
-            Attribute[] gp = XLinkSchema.SimpleLink.getInstance().getAttributes();
-            Attribute[] r = new Attribute[gp.length + 1];
+        private static com.vividsolutions.xdo.xsi.Attribute[] loadAttributes() {
+            com.vividsolutions.xdo.xsi.Attribute[] gp = XLinkSchema.SimpleLink.getInstance().getAttributes();
+            com.vividsolutions.xdo.xsi.Attribute[] r = new Attribute[gp.length + 1];
 
             for (int i = 1; i < gp.length; i++)
                 r[i] = gp[i];
@@ -1149,14 +1149,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return elements;
         }
 
@@ -1262,7 +1262,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -1270,7 +1270,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new PointMemberType();
 
         // static list of attributes
-        private static final Attribute[] attributes = loadAttributes();
+        private static final com.vividsolutions.xdo.xsi.Attribute[] attributes = loadAttributes();
 
         // static list of elements
         private static final Element[] elements = {
@@ -1310,10 +1310,10 @@ public class GMLComplexTypes {
         /*
          * statically loads the attributes required for a PointMember
          */
-        private static Attribute[] loadAttributes() {
-            Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
-            Attribute[] r = new Attribute[parent.length + gp.length];
+        private static com.vividsolutions.xdo.xsi.Attribute[] loadAttributes() {
+            com.vividsolutions.xdo.xsi.Attribute[] parent = GeometryAssociationType.attributes;
+            com.vividsolutions.xdo.xsi.Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
+            com.vividsolutions.xdo.xsi.Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
                 r[i] = parent[i];
@@ -1327,14 +1327,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -1443,7 +1443,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -1451,7 +1451,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new LineStringMemberType();
 
         // static list of attributes
-        private static final Attribute[] attributes = loadAttributes();
+        private static final com.vividsolutions.xdo.xsi.Attribute[] attributes = loadAttributes();
 
         // static list of elements
         private static final Element[] elements = {
@@ -1491,10 +1491,10 @@ public class GMLComplexTypes {
         /*
          * statically loads the attributes required for a LineStringMember
          */
-        private static Attribute[] loadAttributes() {
-            Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
-            Attribute[] r = new Attribute[parent.length + gp.length];
+        private static com.vividsolutions.xdo.xsi.Attribute[] loadAttributes() {
+            com.vividsolutions.xdo.xsi.Attribute[] parent = GeometryAssociationType.attributes;
+            com.vividsolutions.xdo.xsi.Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
+            com.vividsolutions.xdo.xsi.Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
                 r[i] = parent[i];
@@ -1508,14 +1508,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -1623,7 +1623,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -1631,7 +1631,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new PolygonMemberType();
 
         // static attribute list
-        private static final Attribute[] attributes = loadAttributes();
+        private static final com.vividsolutions.xdo.xsi.Attribute[] attributes = loadAttributes();
 
         // static list of elements
         private static final Element[] elements = {
@@ -1671,10 +1671,10 @@ public class GMLComplexTypes {
         /*
          * statically loads the attributes required for a PolygonMember
          */
-        private static Attribute[] loadAttributes() {
-            Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
-            Attribute[] r = new Attribute[parent.length + gp.length];
+        private static com.vividsolutions.xdo.xsi.Attribute[] loadAttributes() {
+            com.vividsolutions.xdo.xsi.Attribute[] parent = GeometryAssociationType.attributes;
+            com.vividsolutions.xdo.xsi.Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
+            com.vividsolutions.xdo.xsi.Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
                 r[i] = parent[i];
@@ -1688,14 +1688,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -1806,7 +1806,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -1814,7 +1814,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new LinearRingMemberType();
 
         // static attribute list
-        private static final Attribute[] attributes = loadAttributes();
+        private static final com.vividsolutions.xdo.xsi.Attribute[] attributes = loadAttributes();
 
         // static element list
         private static final Element[] elements = {
@@ -1854,10 +1854,10 @@ public class GMLComplexTypes {
         /*
          * statically loads the attributes required for a LinearRingMember
          */
-        private static Attribute[] loadAttributes() {
-            Attribute[] parent = GeometryAssociationType.attributes;
-            Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
-            Attribute[] r = new Attribute[parent.length + gp.length];
+        private static com.vividsolutions.xdo.xsi.Attribute[] loadAttributes() {
+            com.vividsolutions.xdo.xsi.Attribute[] parent = GeometryAssociationType.attributes;
+            com.vividsolutions.xdo.xsi.Attribute[] gp = GMLSchema.GMLAssociationAttributeGroup.attributes1;
+            com.vividsolutions.xdo.xsi.Attribute[] r = new Attribute[parent.length + gp.length];
 
             for (int i = 0; i < parent.length; i++)
                 r[i] = parent[i];
@@ -1871,14 +1871,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -1987,7 +1987,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -2032,14 +2032,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -2168,7 +2168,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -2214,14 +2214,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -2365,7 +2365,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -2410,14 +2410,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -2556,7 +2556,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -2601,14 +2601,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -2782,7 +2782,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -2828,14 +2828,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -2960,7 +2960,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -3003,14 +3003,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryCollectionBaseType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -3119,7 +3119,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -3165,14 +3165,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryCollectionBaseType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -3288,7 +3288,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -3334,14 +3334,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryCollectionBaseType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -3457,7 +3457,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -3503,14 +3503,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryCollectionBaseType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -3625,7 +3625,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -3671,14 +3671,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractGeometryCollectionBaseType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -3813,7 +3813,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return null;
         }
 
@@ -3856,7 +3856,7 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
 //            return AbstractGeometryCollectionBaseType.attributes;
         	return attributes;
         }
@@ -3864,7 +3864,7 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return new DefaultSequence(new Element[0]);
         }
 
@@ -4028,7 +4028,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -4095,14 +4095,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -4417,14 +4417,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return AbstractFeatureType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq1;
         }
 
@@ -4469,7 +4469,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -4519,7 +4519,7 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return null;
         }
 
@@ -4589,7 +4589,7 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -4721,7 +4721,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -4729,7 +4729,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new GeometryPropertyType();
 
         // static attribute list
-        private static final Attribute[] attributes = loadAttributes();
+        private static final com.vividsolutions.xdo.xsi.Attribute[] attributes = loadAttributes();
 
         // static element list
         private static final Element[] elements = {
@@ -4767,9 +4767,9 @@ public class GMLComplexTypes {
         /*
          * statically loads the attributes for a Geom Prop Type
          */
-        private static Attribute[] loadAttributes() {
-            Attribute[] gp = XLinkSchema.SimpleLink.getInstance().getAttributes();
-            Attribute[] r = new Attribute[gp.length + 1];
+        private static com.vividsolutions.xdo.xsi.Attribute[] loadAttributes() {
+            com.vividsolutions.xdo.xsi.Attribute[] gp = XLinkSchema.SimpleLink.getInstance().getAttributes();
+            com.vividsolutions.xdo.xsi.Attribute[] r = new Attribute[gp.length + 1];
 
             for (int i = 1; i < gp.length; i++)
                 r[i] = gp[i];
@@ -4782,14 +4782,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -4898,7 +4898,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -4906,7 +4906,7 @@ public class GMLComplexTypes {
         private static final GMLComplexType instance = new FeatureAssociationType();
 
         // static attribute list
-        protected static final Attribute[] attributes = loadAttributes();
+        protected static final com.vividsolutions.xdo.xsi.Attribute[] attributes = loadAttributes();
 
         // static element list
         private static final Element[] elements = {
@@ -4944,9 +4944,9 @@ public class GMLComplexTypes {
         /*
          * statically loads the attributes for a Feature Association Type
          */
-        private static Attribute[] loadAttributes() {
-            Attribute[] gp = XLinkSchema.SimpleLink.getInstance().getAttributes();
-            Attribute[] r = new Attribute[gp.length + 1];
+        private static com.vividsolutions.xdo.xsi.Attribute[] loadAttributes() {
+            com.vividsolutions.xdo.xsi.Attribute[] gp = XLinkSchema.SimpleLink.getInstance().getAttributes();
+            com.vividsolutions.xdo.xsi.Attribute[] r = new Attribute[gp.length + 1];
 
             for (int i = 1; i < gp.length; i++)
                 r[i] = gp[i];
@@ -4959,14 +4959,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -5080,7 +5080,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -5123,14 +5123,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return null;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -5248,7 +5248,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -5293,14 +5293,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return FeatureAssociationType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -5406,7 +5406,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -5451,14 +5451,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return FeatureAssociationType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -5564,7 +5564,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -5609,14 +5609,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return FeatureAssociationType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -5723,7 +5723,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -5768,14 +5768,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return FeatureAssociationType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -5882,7 +5882,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -5928,14 +5928,14 @@ public class GMLComplexTypes {
         /**
          * @see schema.ComplexType#getAttributes()
          */
-        public Attribute[] getAttributes() {
+        public com.vividsolutions.xdo.xsi.Attribute[] getAttributes() {
             return FeatureAssociationType.attributes;
         }
 
         /**
          * @see schema.ComplexType#getChildren()
          */
-        public ElementGrouping getChild() {
+        public com.vividsolutions.xdo.xsi.ElementGrouping getChild() {
             return seq;
         }
 
@@ -6042,7 +6042,7 @@ public class GMLComplexTypes {
         /**
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
          */
-        public Element[] getChildElements() {
+        public com.vividsolutions.xdo.xsi.Element[] getChildElements() {
             return elements;
         }
 
@@ -6360,7 +6360,7 @@ public class GMLComplexTypes {
 
         GeometryAttributeType geometryAttribute = null;
 
-        ElementGrouping child = ((ComplexType)element.getType()).getChild();
+        com.vividsolutions.xdo.xsi.ElementGrouping child = ((ComplexType)element.getType()).getChild();
 //        FeatureType parent = null;
 //        if(((ComplexType)element.getType()).getParent()instanceof ComplexType)
 //            parent = createFeatureType((ComplexType)((ComplexType)element.getType()).getParent());
