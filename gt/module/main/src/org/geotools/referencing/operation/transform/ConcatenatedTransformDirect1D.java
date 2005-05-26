@@ -53,7 +53,7 @@ final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
     private final MathTransform1D transform2;
     
     /**
-     * Construct a concatenated transform.
+     * Constructs a concatenated transform.
      */
     public ConcatenatedTransformDirect1D(final MathTransform1D transform1,
                                          final MathTransform1D transform2)

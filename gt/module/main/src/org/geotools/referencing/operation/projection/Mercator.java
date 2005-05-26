@@ -30,6 +30,7 @@ import java.util.Collection;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -40,7 +41,7 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformFactory;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
@@ -101,12 +102,12 @@ public class Mercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OGC,      "Mercator_1SP"),
-                new Identifier(CitationImpl.EPSG,     "Mercator (1SP)"),
-                new Identifier(CitationImpl.EPSG,     "9804"),
-                new Identifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.OGC,      "Mercator_1SP"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Mercator (1SP)"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9804"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, SCALE_FACTOR,
@@ -114,7 +115,7 @@ public class Mercator extends MapProjection {
             });
 
         /**
-         * Construct a new provider. 
+         * Constructs a new provider. 
          */
         public Provider1SP() {
             super(PARAMETERS);
@@ -163,9 +164,9 @@ public class Mercator extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,      "standard_parallel_1"),
-                    new Identifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
-                    new Identifier(CitationImpl.GEOTIFF,  "StdParallel1")
+                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -173,13 +174,13 @@ public class Mercator extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OGC,      "Mercator_2SP"),
-                new Identifier(CitationImpl.EPSG,     "Mercator (2SP)"),
-                new Identifier(CitationImpl.EPSG,     "9805"),
-                new Identifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
-                new Identifier(CitationImpl.ESRI,     "Mercator"),
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.OGC,      "Mercator_2SP"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Mercator (2SP)"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9805"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Mercator"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Mercator"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.CYLINDRICAL_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, STANDARD_PARALLEL,
@@ -187,7 +188,7 @@ public class Mercator extends MapProjection {
             });
 
         /**
-         * Construct a new provider. 
+         * Constructs a new provider. 
          */
         public Provider2SP() {
             super(PARAMETERS);
@@ -221,7 +222,7 @@ public class Mercator extends MapProjection {
 
 
     /**
-     * Construct a new map projection from the supplied parameters.
+     * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
@@ -246,7 +247,7 @@ public class Mercator extends MapProjection {
     }
 
     /**
-     * Construct a new map projection from the supplied parameters.
+     * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.
@@ -347,7 +348,7 @@ public class Mercator extends MapProjection {
      */
     private static final class Spherical extends Mercator {
         /**
-         * Construct a new map projection from the suplied parameters.
+         * Constructs a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
          * @param  expected The expected parameter descriptors.

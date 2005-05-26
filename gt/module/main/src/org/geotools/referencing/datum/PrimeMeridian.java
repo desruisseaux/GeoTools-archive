@@ -22,183 +22,38 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE extensions
-import java.util.Collections;
+// J2SE dependencies
 import java.util.Map;
-
-import javax.units.NonSI;
 import javax.units.Unit;
-
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.Utilities;
 
 
 /**
  * A prime meridian defines the origin from which longitude values are determined.
- * The {@link #getName name} initial value is "Greenwich", and that value shall be
- * used when the {@linkplain #getGreenwichLongitude greenwich longitude} value is
- * zero.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link DefaultPrimeMeridian}.
  */
-public class PrimeMeridian extends IdentifiedObject
-                        implements org.opengis.referencing.datum.PrimeMeridian
-{
+public class PrimeMeridian extends DefaultPrimeMeridian {
     /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = 541978454643213305L;;
-    
-    /**
-     * The Greenwich meridian, with angular measurements in degrees.
-     */
-    public static final PrimeMeridian GREENWICH = 
-                    new PrimeMeridian("Greenwich", 0, NonSI.DEGREE_ANGLE);
-    
-    /**
-     * Longitude of the prime meridian measured from the Greenwich meridian, positive eastward.
-     */
-    private final double greenwichLongitude;
-
-    /**
-     * The angular unit of the {@linkplain #getGreenwichLongitude Greenwich longitude}.
-     */
-    private final Unit angularUnit;
-
-    /**
-     * Construct a prime meridian from a name. The <code>greenwichLongitude</code> value
-     * is assumed in {@linkplain NonSI#DEGREE_ANGLE degrees}.
-     *
-     * @param name                The datum name.
-     * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.
+     * Constructs a prime meridian from a name.
      */
     public PrimeMeridian(final String name, final double greenwichLongitude) {
-        this(name, greenwichLongitude, NonSI.DEGREE_ANGLE);
+        super(name, greenwichLongitude);
     }
 
     /**
-     * Construct a prime meridian from a name.
-     *
-     * @param name                The datum name.
-     * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.
-     * @param angularUnit         The angular unit of the longitude.
+     * Constructs a prime meridian from a name.
      */
     public PrimeMeridian(final String name, final double greenwichLongitude, final Unit angularUnit) {
-        this(Collections.singletonMap(NAME_PROPERTY, name), greenwichLongitude, angularUnit);
+        super(name, greenwichLongitude, angularUnit);
     }
 
     /**
-     * Construct a prime meridian from a set of properties. The properties map is
-     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
-     * super-class constructor}.
-     *
-     * @param properties          Set of properties. Should contains at least <code>"name"</code>.
-     * @param greenwichLongitude  The longitude value relative to the Greenwich Meridian.
-     * @param angularUnit         The angular unit of the longitude.
+     * Constructs a prime meridian from a set of properties.
      */
     public PrimeMeridian(final Map properties, final double greenwichLongitude, final Unit angularUnit) {
-        super(properties);
-        this.greenwichLongitude = greenwichLongitude;
-        this.angularUnit        = angularUnit;
-        ensureAngularUnit(angularUnit);
-    }
-
-    /**
-     * Longitude of the prime meridian measured from the Greenwich meridian, positive eastward.
-     * The <code>greenwichLongitude</code> initial value is zero, and that value shall be used
-     * when the {@linkplain #getName meridian name} value is "Greenwich".
-     *
-     * @return The prime meridian Greenwich longitude, in {@linkplain #getAngularUnit angular unit}.
-     */
-    public double getGreenwichLongitude() {
-        return greenwichLongitude;
-    }
-    
-    /**
-     * Returns the longitude value relative to the Greenwich Meridian, expressed in the specified
-     * units. This convenience method makes it easier to obtain longitude in degrees
-     * (<code>getGreenwichLongitude(NonSI.DEGREE_ANGLE)</code>), regardless of the underlying
-     * angular units of this prime meridian.
-     *
-     * @param targetUnit The unit in which to express longitude.
-     */
-    public double getGreenwichLongitude(final Unit targetUnit) {
-        return getAngularUnit().getConverterTo(targetUnit).convert(getGreenwichLongitude());
-    }
-
-    /**
-     * Returns the angular unit of the {@linkplain #getGreenwichLongitude Greenwich longitude}.
-     */
-    public Unit getAngularUnit() {
-        return angularUnit;
-    }
-    
-    /**
-     * Compare this prime meridian with the specified object for equality.
-     *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
-     */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
-        if (object == this) {
-            return true; // Slight optimization.
-        }
-        if (super.equals(object, compareMetadata)) {
-            final PrimeMeridian that = (PrimeMeridian) object;
-            if (compareMetadata) {
-                return Double.doubleToLongBits(this.greenwichLongitude) ==
-                       Double.doubleToLongBits(that.greenwichLongitude) &&
-                       Utilities.equals(this.angularUnit, that.angularUnit);
-            } else {
-                return Double.doubleToLongBits(this.getGreenwichLongitude(NonSI.DEGREE_ANGLE)) ==
-                       Double.doubleToLongBits(that.getGreenwichLongitude(NonSI.DEGREE_ANGLE));
-                /*
-                 * Note: if compareMetadata==false, we relax the unit check because EPSG uses
-                 *       sexagesimal degrees for the Greenwich meridian. Requirying the same
-                 *       unit prevent Geodetic.isWGS84(...) method to recognize EPSG's WGS84.
-                 */
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Returns a hash value for this prime meridian. {@linkplain #getName Name},
-     * {@linkplain #getRemarks remarks} and the like are not taken in account.
-     * In other words, two prime meridians will return the same hash value if
-     * they are equal in the sense of
-     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
-     *
-     * @return The hash code value. This value doesn't need to be the same
-     *         in past or future versions of this class.
-     */
-    public int hashCode() {
-        final long code = Double.doubleToLongBits(greenwichLongitude);
-        return ((int)(code >>> 32) ^ (int)code) ^ (int)serialVersionUID;
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "PRIMEM"
-     */
-    protected String formatWKT(final Formatter formatter) {
-        Unit context = formatter.getAngularUnit();
-        if (context == null) {
-            // If the PrimeMeridian is written inside a "GEOGCS",
-            // then OpenGIS say that it must be written into the
-            // unit of the enclosing geographic coordinate system.
-            // Otherwise, default to degrees.
-            context = NonSI.DEGREE_ANGLE;
-        }
-        formatter.append(getGreenwichLongitude(context));
-        return "PRIMEM";
+        super(properties, greenwichLongitude, angularUnit);
     }
 }

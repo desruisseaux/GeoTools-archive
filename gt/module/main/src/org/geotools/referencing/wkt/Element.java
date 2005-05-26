@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.cts.ResourceKeys;
@@ -68,7 +69,7 @@ public final class Element {
     private final List list;
 
     /**
-     * Construct a root element.
+     * Constructs a root element.
      *
      * @param element The only children for this root.
      */
@@ -80,7 +81,7 @@ public final class Element {
     }
 
     /**
-     * Construct a new <code>Element</code>.
+     * Constructs a new <code>Element</code>.
      *
      * @param  text       The text to parse.
      * @param  position   In input, the position where to start parsing from.

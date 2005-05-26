@@ -51,6 +51,7 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -60,7 +61,7 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -188,14 +189,14 @@ public class TransverseMercator extends MapProjection {
          * @task REVISIT: should we set some default UTM parameter values
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OGC,   "Transverse_Mercator"),
-                new Identifier(CitationImpl.EPSG,  "Transverse Mercator"),
-                new Identifier(CitationImpl.EPSG,  "Gauss-Kruger"),
-                new Identifier(CitationImpl.EPSG,  "9807"),
-                new Identifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
-                new Identifier(CitationImpl.ESRI,     "Transverse_Mercator"),
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION))
+                new NamedIdentifier(CitationImpl.OGC,      "Transverse_Mercator"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Transverse Mercator"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Gauss-Kruger"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9807"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_TransverseMercator"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Transverse_Mercator"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.TRANSVERSE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,
@@ -204,7 +205,7 @@ public class TransverseMercator extends MapProjection {
             });
 
         /**
-         * Construct a new provider. 
+         * Constructs a new provider. 
          */
         public Provider() {
             super(PARAMETERS);
@@ -238,7 +239,7 @@ public class TransverseMercator extends MapProjection {
     
     
     /**
-     * Construct a new map projection from the supplied parameters.
+     * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.
@@ -375,7 +376,7 @@ public class TransverseMercator extends MapProjection {
      */
     private static final class Spherical extends TransverseMercator {
         /**
-         * Construct a new map projection from the suplied parameters.
+         * Constructs a new map projection from the suplied parameters.
          *
          * @param  parameters The parameter values in standard units.
          * @param  expected The expected parameter descriptors.

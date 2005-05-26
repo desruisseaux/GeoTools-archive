@@ -114,7 +114,7 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
     protected final Map map = new LinkedHashMap();
 
     /**
-     * Construct an authority factory using the specified connection.
+     * Constructs an authority factory using the specified connection.
      *
      * @param factories  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.

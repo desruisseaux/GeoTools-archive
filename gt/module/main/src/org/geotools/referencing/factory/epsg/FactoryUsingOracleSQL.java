@@ -58,7 +58,7 @@ public class FactoryUsingOracleSQL extends FactoryUsingAnsiSQL {
     }
 
     /**
-     * Construct an authority factory using the specified connection to an EPSG database
+     * Constructs an authority factory using the specified connection to an EPSG database
      * and a database schema. If the database schema is not supplied, or it is null
      * or an empty string, then the tables are assumed to be in the same schema as
      * the user which is being used to connect to the database.  You <strong>MUST</strong>

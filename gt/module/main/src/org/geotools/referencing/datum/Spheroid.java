@@ -22,9 +22,8 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
-
 import javax.units.Unit;
 
 
@@ -35,7 +34,7 @@ import javax.units.Unit;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class Spheroid extends Ellipsoid {
+final class Spheroid extends DefaultEllipsoid {
     /**
      * Serial number for interoperability with different versions.
      */

@@ -169,7 +169,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
             return ProjectiveTransform.create(matrix);
         }
         /*
-         * Construct the general PassThroughTransform object. An optimisation
+         * Constructs the general PassThroughTransform object. An optimisation
          * for the "Pass through case" is done right in the  constructor.
          */
         return new PassThroughTransform(firstAffectedOrdinate, subTransform, numTrailingOrdinates);

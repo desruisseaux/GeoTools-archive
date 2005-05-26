@@ -33,6 +33,7 @@ import javax.media.jai.WarpPolynomial;
 import javax.media.jai.WarpGeneralPolynomial;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -46,7 +47,7 @@ import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.ParameterGroup;
@@ -596,7 +597,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.GEOTOOLS, "WarpPolynomial")
+                new NamedIdentifier(CitationImpl.GEOTOOLS, "WarpPolynomial")
             }, new ParameterDescriptor[] {
                 DEGREE, X_COEFFS, Y_COEFFS, PRE_SCALE_X, PRE_SCALE_Y, POST_SCALE_X, POST_SCALE_Y
             });

@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -50,7 +51,7 @@ import org.opengis.referencing.operation.Projection;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.ParameterWriter;
-import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.PassThroughTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -126,14 +127,14 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
     private final FactoryRegistry registry;
     
     /**
-     * Construct a default {@link MathTransform math transform} factory.
+     * Constructs a default {@link MathTransform math transform} factory.
      */
     public MathTransformFactory() {
         this(new Class[] {MathTransformProvider.class});
     }
 
     /**
-     * Construct a default {@link MathTransform math transform} factory using the
+     * Constructs a default {@link MathTransform math transform} factory using the
      * specified {@linkplain MathTransformProvider transform providers} categories.
      *
      * @param categories The providers categories, as implementations
@@ -554,7 +555,7 @@ public class MathTransformFactory implements org.opengis.referencing.operation.M
                 scopes.add("OGC");
                 scopes.add("EPSG");
                 scopes.add("Geotools"); // Limit the number of columns to output.
-                transforms = new TreeSet(IdentifiedObject.NAME_COMPARATOR);
+                transforms = new TreeSet(DefaultIdentifiedObject.NAME_COMPARATOR);
                 transforms.addAll(factory.getAvailableMethods(type));
                 writer.summary(transforms, scopes);
             }

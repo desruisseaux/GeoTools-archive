@@ -24,6 +24,7 @@ import java.io.Serializable;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -36,7 +37,7 @@ import org.opengis.referencing.operation.MathTransform1D;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.ParameterReal;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
@@ -92,7 +93,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     private MathTransform inverse;
 
     /**
-     * Construct a new logarithmic transform which is the
+     * Constructs a new logarithmic transform which is the
      * inverse of the supplied exponentional transform.
      */
     LogarithmicTransform1D(final ExponentialTransform1D inverse) {
@@ -103,7 +104,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Construct a new logarithmic transform. This constructor is provided for subclasses only.
+     * Constructs a new logarithmic transform. This constructor is provided for subclasses only.
      * Instances should be created using the {@linkplain #create factory method}, which
      * may returns optimized implementations for some particular argument values.
      *
@@ -117,7 +118,7 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Construct a new logarithmic transform.
+     * Constructs a new logarithmic transform.
      *
      * @param base    The base of the logarithm.
      * @param offset  The offset to add to the logarithm.
@@ -313,8 +314,8 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.LOGARITHMIC))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.LOGARITHMIC))
             }, new ParameterDescriptor[] {
                 BASE, OFFSET
             });

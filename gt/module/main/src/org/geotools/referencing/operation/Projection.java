@@ -78,7 +78,7 @@ public class Projection extends Conversion implements org.opengis.referencing.op
     }
 
     /**
-     * Construct a projection from a set of properties. The properties given in argument
+     * Constructs a projection from a set of properties. The properties given in argument
      * follow the same rules than for the {@link CoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.

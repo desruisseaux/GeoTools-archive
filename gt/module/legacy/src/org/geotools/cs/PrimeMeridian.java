@@ -41,7 +41,7 @@ import org.opengis.cs.CS_PrimeMeridian;
  *
  * @see org.opengis.cs.CS_PrimeMeridian
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.PrimeMeridian}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultPrimeMeridian}.
  */
 public class PrimeMeridian extends Info {
     /**
@@ -89,7 +89,7 @@ public class PrimeMeridian extends Info {
      *
      * @see org.opengis.cs.CS_PrimeMeridian#getLongitude()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.PrimeMeridian#getGreenwichLongitude}.
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultPrimeMeridian#getGreenwichLongitude}.
      */
     public double getLongitude() {
         return longitude;
@@ -113,7 +113,7 @@ public class PrimeMeridian extends Info {
      *
      * @see org.opengis.cs.CS_PrimeMeridian#getAngularUnit()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.PrimeMeridian#getAngularUnit}.
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultPrimeMeridian#getAngularUnit}.
      */
     public Unit getAngularUnit() {
         return unit;

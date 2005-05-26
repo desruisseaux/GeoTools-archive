@@ -52,6 +52,8 @@ import org.opengis.referencing.operation.Transformation;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractFactory;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -82,7 +84,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier IDENTITY =
-            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Identity");
+            new NamedIdentifier(CitationImpl.GEOTOOLS, "Identity");
 
     /**
      * The identifier for conversion using an affine transform for axis swapping and/or
@@ -91,7 +93,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier AXIS_CHANGES =
-            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Axis changes");
+            new NamedIdentifier(CitationImpl.GEOTOOLS, "Axis changes");
 
     /**
      * The identifier for a transformation which is a datum shift.
@@ -101,7 +103,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier DATUM_SHIFT =
-            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Datum shift");
+            new NamedIdentifier(CitationImpl.GEOTOOLS, "Datum shift");
 
     /**
      * The identifier for a transformation which is a datum shift without
@@ -116,13 +118,13 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier ELLIPSOID_SHIFT =
-            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS, "Ellipsoid shift");
+            new NamedIdentifier(CitationImpl.GEOTOOLS, "Ellipsoid shift");
 
     /**
      * The identifier for a geocentric conversion.
      */
     protected static final Identifier GEOCENTRIC_CONVERSION =
-            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(CitationImpl.GEOTOOLS,
                 Resources.formatInternational(ResourceKeys.GEOCENTRIC_TRANSFORM));
 
     /**
@@ -131,7 +133,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo localize
      */
     protected static final Identifier INVERSE_OPERATION =
-            new org.geotools.referencing.Identifier(CitationImpl.GEOTOOLS,
+            new NamedIdentifier(CitationImpl.GEOTOOLS,
                 "Inverse operation");
 
     /**
@@ -140,7 +142,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * @todo Replace by a static import when we will be allowed to compile with J2SE 1.5.
      */
     private static final String NAME_PROPERTY =
-            org.geotools.referencing.IdentifiedObject.NAME_PROPERTY;
+            org.geotools.referencing.DefaultIdentifiedObject.NAME_PROPERTY;
 
     /**
      * The set of helper methods on factories.
@@ -543,14 +545,14 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *       simplified as well.
      */
     static Map getProperties(final IdentifiedObject object) {
-        return org.geotools.referencing.IdentifiedObject.getProperties(object);
+        return DefaultIdentifiedObject.getProperties(object);
     }
 
     /**
      * An identifier for temporary objects. This identifier manage a count of temporary
      * identifier. The count is appended to the identifier name (e.g. "WGS84 (step 1)").
      */
-    private static final class TemporaryIdentifier extends org.geotools.referencing.Identifier {
+    private static final class TemporaryIdentifier extends NamedIdentifier {
         /** The parent identifier. */
         private final Identifier parent;
 
@@ -604,7 +606,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     static Map getTemporaryName(final IdentifiedObject source) {
         final Map properties = new HashMap(4);
         properties.put(NAME_PROPERTY, new TemporaryIdentifier(source.getName()));
-        properties.put(org.geotools.referencing.IdentifiedObject.REMARKS_PROPERTY,
+        properties.put(DefaultIdentifiedObject.REMARKS_PROPERTY,
                        "Derived from " + getClassName(source));
         return properties;
     }
@@ -623,7 +625,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
     /**
      * Compare the specified objects for equality. If both objects are Geotools
-     * implementations of {@linkplain org.geotools.referencing.IdentifiedObject},
+     * implementations of {@linkplain DefaultIdentifiedObject},
      * then this method will ignore the metadata during the comparaison.
      *
      * @param  object1 The first object to compare (may be null).

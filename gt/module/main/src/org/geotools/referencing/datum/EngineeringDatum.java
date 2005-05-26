@@ -27,7 +27,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -43,7 +44,7 @@ import org.geotools.util.LocalName;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class EngineeringDatum extends Datum implements org.opengis.referencing.datum.EngineeringDatum {
+public class EngineeringDatum extends DefaultDatum implements org.opengis.referencing.datum.EngineeringDatum {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -66,7 +67,7 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
     }
 
     /**
-     * Construct an engineering datum from a name.
+     * Constructs an engineering datum from a name.
      *
      * @param name The datum name.
      */
@@ -75,8 +76,8 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
     }
 
     /**
-     * Construct an engineering datum from a set of properties. The properties map is
-     * given unchanged to the {@linkplain Datum#Datum(Map) super-class constructor}.
+     * Constructs an engineering datum from a set of properties. The properties map is given
+     * unchanged to the {@linkplain DefaultDatum#DefaultDatum(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      */
@@ -92,7 +93,7 @@ public class EngineeringDatum extends Datum implements org.opengis.referencing.d
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

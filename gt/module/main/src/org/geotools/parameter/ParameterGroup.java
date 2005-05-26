@@ -31,11 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.io.TableWriter;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -45,6 +41,13 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
+
+// Geotools dependencies
+import org.geotools.io.TableWriter;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -291,7 +294,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
             if (value instanceof ParameterValue) {
-                if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                if (DefaultIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                     return (ParameterValue) value;
                 }
             }
@@ -308,7 +311,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         {
             final GeneralParameterDescriptor descriptor = (GeneralParameterDescriptor) it.next();
             if (descriptor instanceof ParameterDescriptor) {
-                if (IdentifiedObject.nameMatches(descriptor, name)) {
+                if (DefaultIdentifiedObject.nameMatches(descriptor, name)) {
                     // TODO: remove the first cast with J2SE 1.5.
                     final ParameterValue value = (ParameterValue)
                             ((ParameterDescriptor) descriptor).createValue();
@@ -342,7 +345,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
             if (value instanceof org.opengis.parameter.ParameterValueGroup) {
-                if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                if (DefaultIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                     groups.add(value);
                 }
             }
@@ -389,7 +392,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         int count = 0;
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
-            if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+            if (DefaultIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                 count++;
             }
         }

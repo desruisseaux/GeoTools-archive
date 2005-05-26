@@ -57,7 +57,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     private static final long serialVersionUID = 2315556279279988442L;
     
     /**
-     * Construct a square identity matrix of size
+     * Constructs a square identity matrix of size
      * <code>size</code>&nbsp;&times;&nbsp;<code>size</code>.
      */
     public GeneralMatrix(final int size) {
@@ -65,7 +65,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     }
     
     /**
-     * Construct a matrix of size
+     * Constructs a matrix of size
      * <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code>.
      * Elements on the diagonal <var>j==i</var> are set to 1.
      */
@@ -129,7 +129,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     }
     
     /**
-     * Construct a 3&times;3 matrix from the specified affine transform.
+     * Constructs a 3&times;3 matrix from the specified affine transform.
      */
     public GeneralMatrix(final AffineTransform transform) {
         super(3,3, new double[] {

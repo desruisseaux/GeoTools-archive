@@ -22,17 +22,20 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-
 import javax.units.Converter;
 import javax.units.SI;
 import javax.units.Unit;
 
+// OpenGIS dependencies
 import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.datum.TemporalDatum;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 
 
 /**
@@ -88,9 +91,8 @@ public class TemporalCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
-     * Constructs a temporal CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * Constructs a temporal CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param cs The coordinate system.

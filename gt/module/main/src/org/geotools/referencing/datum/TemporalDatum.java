@@ -27,8 +27,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
+// OpenGIS dependencies
 import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 
 
 /**
@@ -37,7 +40,7 @@ import org.opengis.util.InternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TemporalDatum extends Datum implements org.opengis.referencing.datum.TemporalDatum {
+public class TemporalDatum extends DefaultDatum implements org.opengis.referencing.datum.TemporalDatum {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -54,7 +57,7 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
     private final long origin;
 
     /**
-     * Construct a temporal datum from a name.
+     * Constructs a temporal datum from a name.
      *
      * @param name   The datum name.
      * @param origin The date and time origin of this temporal datum.
@@ -64,8 +67,8 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
     }
 
     /**
-     * Construct a temporal datum from a set of properties. The properties map is
-     * given unchanged to the {@linkplain Datum#Datum(Map) super-class constructor}.
+     * Constructs a temporal datum from a set of properties. The properties map is given
+     * unchanged to the {@linkplain DefaultDatum#DefaultDatum(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param origin The date and time origin of this temporal datum.
@@ -87,9 +90,6 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
 
     /**
      * Description of the point or points used to anchor the datum to the Earth.
-     *
-     * @deprecated This attribute is defined in the {@link Datum} parent class,
-     *             but is not used by a temporal datum.
      */
     public InternationalString getAnchorPoint() {
         return super.getAnchorPoint();
@@ -97,9 +97,6 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
 
     /**
      * The time after which this datum definition is valid.
-     *
-     * @deprecated This attribute is defined in the {@link Datum} parent class,
-     *             but is not used by a temporal datum.
      */
     public Date getRealizationEpoch() {
         return super.getRealizationEpoch();
@@ -113,7 +110,7 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -129,7 +126,7 @@ public class TemporalDatum extends Datum implements org.opengis.referencing.datu
      * {@linkplain #getRemarks remarks} and the like are not taken in account. In
      * other words, two temporal datums will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

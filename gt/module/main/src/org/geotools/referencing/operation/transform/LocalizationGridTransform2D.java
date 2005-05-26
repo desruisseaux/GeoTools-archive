@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
@@ -46,7 +47,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Utilities;
@@ -769,7 +770,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.GEOTOOLS, "WarpPolynomial")
+                new NamedIdentifier(CitationImpl.GEOTOOLS, "WarpPolynomial")
             }, new ParameterDescriptor[] {});
 
         /**

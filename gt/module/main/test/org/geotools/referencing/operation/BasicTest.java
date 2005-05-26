@@ -39,7 +39,7 @@ import org.geotools.referencing.crs.ProjectedCRS;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.referencing.cs.CoordinateSystem;
 import org.geotools.referencing.cs.CoordinateSystemAxis;
-import org.geotools.referencing.datum.Ellipsoid;
+import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.operation.OperationMethod;
 
 
@@ -161,8 +161,8 @@ public class BasicTest extends TestCase {
         MathTransform transform;
         Matrix conversion;
 
-        parameters.parameter("semi_major").setValue(Ellipsoid.WGS84.getSemiMajorAxis());
-        parameters.parameter("semi_minor").setValue(Ellipsoid.WGS84.getSemiMinorAxis());
+        parameters.parameter("semi_major").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
+        parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMinorAxis());
         transform = factory.createParameterizedTransform(parameters);
         sourceCRS = new ProjectedCRS("source", new OperationMethod(transform),
                     GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);
@@ -192,7 +192,7 @@ public class BasicTest extends TestCase {
             {0,  0,     1}
         }), conversion);
 
-        parameters.parameter("semi_minor").setValue(Ellipsoid.WGS84.getSemiMajorAxis());
+        parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
         transform = factory.createParameterizedTransform(parameters);
         targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
                     GeographicCRS.WGS84, transform, CartesianCS.PROJECTED);

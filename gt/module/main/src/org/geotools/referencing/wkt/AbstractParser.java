@@ -81,7 +81,7 @@ public abstract class AbstractParser extends Format {
     private final NumberFormat numberFormat;
     
     /**
-     * Construct a parser using the specified set of symbols.
+     * Constructs a parser using the specified set of symbols.
      */
     public AbstractParser(final Symbols symbols) {
         this.symbols      = symbols;

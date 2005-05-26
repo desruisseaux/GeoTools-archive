@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.vecmath.GMatrix;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.PrimeMeridian;
@@ -39,8 +40,8 @@ import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.wkt.Formatter;
 
 
@@ -55,9 +56,7 @@ import org.geotools.referencing.wkt.Formatter;
  * @see Ellipsoid
  * @see PrimeMeridian
  */
-public class GeodeticDatum extends org.geotools.referencing.datum.Datum
-                        implements org.opengis.referencing.datum.GeodeticDatum
-{
+public class GeodeticDatum extends DefaultDatum implements org.opengis.referencing.datum.GeodeticDatum {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -69,20 +68,19 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     public static final GeodeticDatum WGS84;
     static {
         final Identifier[] identifiers = {
-            new Identifier(CitationImpl.OGC,    "WGS84"),
-            new Identifier(CitationImpl.ORACLE, "WGS 84"),
-            new Identifier(null,                "WGS_84"),
-            new Identifier(null,                "WGS 1984"),
-            new Identifier(CitationImpl.EPSG,   "WGS_1984"),
-            new Identifier(CitationImpl.ESRI,   "D_WGS_1984"),
-            new Identifier(CitationImpl.EPSG,   "World Geodetic System 1984")
+            new NamedIdentifier(CitationImpl.OGC,    "WGS84"),
+            new NamedIdentifier(CitationImpl.ORACLE, "WGS 84"),
+            new NamedIdentifier(null,                "WGS_84"),
+            new NamedIdentifier(null,                "WGS 1984"),
+            new NamedIdentifier(CitationImpl.EPSG,   "WGS_1984"),
+            new NamedIdentifier(CitationImpl.ESRI,   "D_WGS_1984"),
+            new NamedIdentifier(CitationImpl.EPSG,   "World Geodetic System 1984")
         };
         final Map properties = new HashMap(4);
         properties.put(NAME_PROPERTY,  identifiers[0]);
         properties.put(ALIAS_PROPERTY, identifiers);
-        WGS84 = new GeodeticDatum(properties,
-                    org.geotools.referencing.datum.Ellipsoid.WGS84,
-                    org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+        WGS84 = new GeodeticDatum(properties, DefaultEllipsoid.WGS84,
+                                  DefaultPrimeMeridian.GREENWICH);
     }
 
     /**
@@ -107,7 +105,7 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     private final BursaWolfParameters[] bursaWolf;
 
     /**
-     * Construct a geodetic datum from a name.
+     * Constructs a geodetic datum from a name.
      *
      * @param name          The datum name.
      * @param ellipsoid     The ellipsoid.
@@ -121,10 +119,9 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
     }
 
     /**
-     * Construct a geodetic datum from a set of properties. The properties map is
-     * given unchanged to the {@linkplain org.geotools.referencing.datum.Datum#Datum(Map)
-     * super-class constructor}. Additionally, the following properties are understood by
-     * this construtor:
+     * Constructs a geodetic datum from a set of properties. The properties map is given
+     * unchanged to the {@linkplain DefaultDatum#DefaultDatum(Map) super-class constructor}.
+     * Additionally, the following properties are understood by this construtor:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -333,8 +330,8 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
      * because it come from an other implementation).
      */
     public static boolean isWGS84(final Datum datum) {
-        if (datum instanceof IdentifiedObject) {
-            return WGS84.equals((IdentifiedObject) datum, false);
+        if (datum instanceof DefaultIdentifiedObject) {
+            return WGS84.equals((DefaultIdentifiedObject) datum, false);
         }
         // Maybe the specified object has its own test...
         return datum!=null && datum.equals(WGS84);
@@ -348,7 +345,7 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -378,7 +375,7 @@ public class GeodeticDatum extends org.geotools.referencing.datum.Datum
      * {@linkplain #getRemarks remarks} and the like are not taken in account. In
      * other words, two geodetic datums will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

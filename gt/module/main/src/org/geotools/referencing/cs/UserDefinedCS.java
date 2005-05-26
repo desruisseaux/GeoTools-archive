@@ -25,6 +25,7 @@ package org.geotools.referencing.cs;
 // J2SE dependencies
 import java.util.Map;
 
+// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 
@@ -47,7 +48,7 @@ public class UserDefinedCS extends CoordinateSystem implements org.opengis.refer
     private static final long serialVersionUID = -4904091898305706316L;
 
     /**
-     * Construct a two-dimensional coordinate system from a name.
+     * Constructs a two-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis0 The first axis.
@@ -61,7 +62,7 @@ public class UserDefinedCS extends CoordinateSystem implements org.opengis.refer
     }
 
     /**
-     * Construct a three-dimensional coordinate system from a name.
+     * Constructs a three-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis0 The first axis.
@@ -77,7 +78,7 @@ public class UserDefinedCS extends CoordinateSystem implements org.opengis.refer
     }
 
     /**
-     * Construct a two-dimensional coordinate system from a set of properties. The properties map is
+     * Constructs a two-dimensional coordinate system from a set of properties. The properties map is
      * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
      * super-class constructor}.
      *
@@ -93,7 +94,7 @@ public class UserDefinedCS extends CoordinateSystem implements org.opengis.refer
     }
 
     /**
-     * Construct a three-dimensional coordinate system from a set of properties. The properties map is
+     * Constructs a three-dimensional coordinate system from a set of properties. The properties map is
      * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
      * super-class constructor}.
      *

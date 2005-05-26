@@ -28,6 +28,10 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+// OpenGIS dependencies
+import org.opengis.referencing.datum.Ellipsoid;
+
+// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
 import org.geotools.measure.Latitude;
@@ -35,8 +39,9 @@ import org.geotools.measure.Longitude;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.geometry.ShapeUtilities;
-import org.opengis.referencing.datum.Ellipsoid;
+import org.geotools.referencing.datum.DefaultEllipsoid;
 
+// JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -268,7 +273,7 @@ public class GeodeticCalculator {
      * Constructs a new geodetic calculator associated with the WGS84 ellipsoid.
      */
     public GeodeticCalculator() {
-        this(org.geotools.referencing.datum.Ellipsoid.WGS84);
+        this(DefaultEllipsoid.WGS84);
     }
 
     /**
@@ -503,10 +508,9 @@ public class GeodeticCalculator {
      * error.
      */
     private boolean checkOrthodromicDistance() {
-        if (ellipsoid instanceof org.geotools.referencing.datum.Ellipsoid) {
+        if (ellipsoid instanceof DefaultEllipsoid) {
             double check;
-            final org.geotools.referencing.datum.Ellipsoid ellipsoid =
-                 (org.geotools.referencing.datum.Ellipsoid) this.ellipsoid;
+            final DefaultEllipsoid ellipsoid = (DefaultEllipsoid) this.ellipsoid;
             check = ellipsoid.orthodromicDistance(Math.toDegrees(long1), Math.toDegrees(lat1),
                                                   Math.toDegrees(long2), Math.toDegrees(lat2));
             check = Math.abs(distance - check);

@@ -81,7 +81,7 @@ public class LinearTransform1D extends AbstractMathTransform
     private transient MathTransform inverse;
 
     /**
-     * Construct a new linear transform. This constructor is provided for subclasses only.
+     * Constructs a new linear transform. This constructor is provided for subclasses only.
      * Instances should be created using the {@linkplain #create factory method}, which
      * may returns optimized implementations for some particular argument values.
      *
@@ -94,7 +94,7 @@ public class LinearTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Construct a new linear transform.
+     * Constructs a new linear transform.
      *
      * @param scale  The <code>scale</code>  term in the linear equation.
      * @param offset The <code>offset</code> term in the linear equation.

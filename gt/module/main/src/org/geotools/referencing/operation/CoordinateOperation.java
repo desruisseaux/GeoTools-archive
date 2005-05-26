@@ -43,7 +43,7 @@ import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.crs.GeneralDerivedCRS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -70,7 +70,7 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CoordinateOperation extends IdentifiedObject
+public class CoordinateOperation extends DefaultIdentifiedObject
                               implements org.opengis.referencing.operation.CoordinateOperation
 {
     /**
@@ -84,7 +84,7 @@ public class CoordinateOperation extends IdentifiedObject
     private static final PositionalAccuracy[] EMPTY_ACCURACY = new PositionalAccuracy[0];
 
     /**
-     * List of localizable properties. To be given to {@link IdentifiedObject} constructor.
+     * List of localizable properties. To be given to {@link DefaultIdentifiedObject} constructor.
      *
      * @todo Declare constants
      */
@@ -181,10 +181,10 @@ public class CoordinateOperation extends IdentifiedObject
     }
 
     /**
-     * Constructs a coordinate operation from a set of properties. The properties given in argument
-     * follow the same rules than for the {@linkplain IdentifiedObject#IdentifiedObject(Map)
-     * super-class constructor}. Additionally, the following properties are understood by this
-     * construtor:
+     * Constructs a coordinate operation from a set of properties.
+     * The properties given in argument follow the same rules than for the
+     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
+     * Additionally, the following properties are understood by this construtor:
      * <br><br>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
@@ -378,7 +378,7 @@ public class CoordinateOperation extends IdentifiedObject
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

@@ -22,18 +22,20 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Map;
-
 import javax.units.Unit;
 
-import org.geotools.measure.Measure;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.ReferenceSystem;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.util.UnsupportedImplementationException;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.measure.Measure;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -43,9 +45,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * @author Martin Desruisseaux
  *
  * @see org.geotools.referencing.cs.CoordinateSystem
- * @see org.geotools.referencing.datum.Datum
+ * @see org.geotools.referencing.datum.DefaultDatum
  */
-public abstract class CoordinateReferenceSystem extends ReferenceSystem
+public abstract class CoordinateReferenceSystem extends DefaultReferenceSystem
                       implements org.opengis.referencing.crs.CoordinateReferenceSystem
 {
     /**
@@ -60,7 +62,8 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
 
     /**
      * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain ReferenceSystem#ReferenceSystem(Map) super-class constructor}.
+     * unchanged to the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class
+     * constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param cs The coordinate system.
@@ -130,7 +133,7 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final CoordinateReferenceSystem that = (CoordinateReferenceSystem) object;
             return equals(this.coordinateSystem, that.coordinateSystem, compareMetadata);
@@ -143,7 +146,8 @@ public abstract class CoordinateReferenceSystem extends ReferenceSystem
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two CRS objects will return the same
      * hash value if they are equal in the sense of
-     * <code>{@link #equals(IdentifiedObject,boolean) equals}(IdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals(DefaultIdentifiedObject,boolean) equals}(DefaultIdentifiedObject,
+     * <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

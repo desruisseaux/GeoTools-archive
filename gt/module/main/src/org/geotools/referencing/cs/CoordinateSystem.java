@@ -39,7 +39,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
-import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -59,10 +59,10 @@ import org.geotools.resources.cts.Resources;
  *
  * @see CoordinateSystemAxis
  * @see javax.units.Unit
- * @see org.geotools.referencing.datum.Datum
+ * @see org.geotools.referencing.datum.DefaultDatum
  * @see org.geotools.referencing.crs.CoordinateReferenceSystem
  */
-public class CoordinateSystem extends IdentifiedObject
+public class CoordinateSystem extends DefaultIdentifiedObject
                            implements org.opengis.referencing.cs.CoordinateSystem
 {
     /**
@@ -92,8 +92,8 @@ public class CoordinateSystem extends IdentifiedObject
     }
 
     /**
-     * Constructs a coordinate system from a set of properties. The properties map
-     * is given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * Constructs a coordinate system from a set of properties. The properties map is given
+     * unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
@@ -350,7 +350,7 @@ public class CoordinateSystem extends IdentifiedObject
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

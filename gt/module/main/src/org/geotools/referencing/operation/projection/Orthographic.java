@@ -26,6 +26,7 @@ package org.geotools.referencing.operation.projection;
 import java.util.Collection;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -35,7 +36,7 @@ import org.opengis.referencing.operation.PlanarProjection;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -81,11 +82,11 @@ public abstract class Orthographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OGC,      "Orthographic"),
-                new Identifier(CitationImpl.GEOTIFF,  "CT_Orthographic"),
-                new Identifier(CitationImpl.ESRI,     "Orthographic"),
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.ORTHOGRAPHIC_PROJECTION))
+                new NamedIdentifier(CitationImpl.OGC,      "Orthographic"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_Orthographic"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Orthographic"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.ORTHOGRAPHIC_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,       SEMI_MINOR,
                 CENTRAL_MERIDIAN, LATITUDE_OF_ORIGIN,
@@ -94,7 +95,7 @@ public abstract class Orthographic extends MapProjection {
             });
             
         /**
-         * Construct a new provider. 
+         * Constructs a new provider. 
          */
         public Provider() {
             super(PARAMETERS);

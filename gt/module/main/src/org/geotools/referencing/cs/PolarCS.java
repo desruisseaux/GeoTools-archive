@@ -25,6 +25,7 @@ package org.geotools.referencing.cs;
 // J2SE dependencies
 import java.util.Map;
 
+// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
@@ -52,7 +53,7 @@ public class PolarCS extends CoordinateSystem implements org.opengis.referencing
     private static final long serialVersionUID = 3960197260975470951L;
 
     /**
-     * Construct a coordinate system from a name.
+     * Constructs a coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis  The set of axis.
@@ -62,7 +63,7 @@ public class PolarCS extends CoordinateSystem implements org.opengis.referencing
     }
 
     /**
-     * Construct a two-dimensional coordinate system from a name.
+     * Constructs a two-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis0 The first axis.
@@ -76,7 +77,7 @@ public class PolarCS extends CoordinateSystem implements org.opengis.referencing
     }
 
     /**
-     * Construct a two-dimensional coordinate system from a set of properties. The properties map is
+     * Constructs a two-dimensional coordinate system from a set of properties. The properties map is
      * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
      * super-class constructor}.
      *

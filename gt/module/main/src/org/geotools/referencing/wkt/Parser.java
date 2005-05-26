@@ -69,9 +69,10 @@ import org.opengis.referencing.operation.OperationMethod;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.ResourceKeys;
@@ -292,8 +293,7 @@ public class Parser extends MathTransformParser {
             if (   "SPHEROID".equals(keyword)) return parseSpheroid  (element);
             if ( "VERT_DATUM".equals(keyword)) return parseVertDatum (element);
             if ("LOCAL_DATUM".equals(keyword)) return parseLocalDatum(element);
-            if (      "DATUM".equals(keyword)) return parseDatum     (element,
-                              org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+            if (      "DATUM".equals(keyword)) return parseDatum     (element, DefaultPrimeMeridian.GREENWICH);
         }
         final MathTransform mt = parseMathTransform(element, false);
         if (mt != null) {
@@ -320,15 +320,15 @@ public class Parser extends MathTransformParser {
     {
         final Element element = parent.pullOptionalElement("AUTHORITY");
         if (element == null) {
-            return Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, name);
+            return Collections.singletonMap(DefaultIdentifiedObject.NAME_PROPERTY, name);
         }
         final String auth = element.pullString("name");
         final String code = element.pullString("code");
         element.close();
         final Map     properties = new HashMap(4);
         final Citation authority = CitationImpl.createCitation(auth);
-        properties.put(IdentifiedObject.       NAME_PROPERTY, new Identifier(authority, name));
-        properties.put(IdentifiedObject.IDENTIFIERS_PROPERTY, new Identifier(authority, code));
+        properties.put(DefaultIdentifiedObject.       NAME_PROPERTY, new NamedIdentifier(authority, name));
+        properties.put(DefaultIdentifiedObject.IDENTIFIERS_PROPERTY, new NamedIdentifier(authority, code));
         return properties;
     }
 
@@ -346,7 +346,7 @@ public class Parser extends MathTransformParser {
      * @throws ParseException if the "UNIT" can't be parsed.
      *
      * @todo Authority code is currently ignored. We may consider to create a subclass of
-     *       {@link Unit} which implements {@link IdentifiedObject} in a future version.
+     *       {@link Unit} which implements {@link DefaultIdentifiedObject} in a future version.
      */
     private static Unit parseUnit(final Element parent, final Unit unit)
             throws ParseException
@@ -432,7 +432,7 @@ public class Parser extends MathTransformParser {
             }
         }
         return csFactory.createCoordinateSystemAxis(Collections.singletonMap(
-               IdentifiedObject.NAME_PROPERTY, name), name, direction, unit);
+               DefaultIdentifiedObject.NAME_PROPERTY, name), name, direction, unit);
     }
 
     /**
@@ -947,7 +947,7 @@ public class Parser extends MathTransformParser {
                 buffer.setLength(start);
                 buffer.append(number);
                 axis[i] = csFactory.createCoordinateSystemAxis(
-                    Collections.singletonMap(IdentifiedObject.NAME_PROPERTY, buffer.toString()),
+                    Collections.singletonMap(DefaultIdentifiedObject.NAME_PROPERTY, buffer.toString()),
                     number, AxisDirection.OTHER, Unit.ONE);
             }
             return crsFactory.createDerivedCRS(properties, method, base, toBase.inverse(),

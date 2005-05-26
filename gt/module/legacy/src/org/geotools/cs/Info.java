@@ -33,6 +33,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Locale;
 import java.util.Map;
 
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.RemoteProxy;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -75,8 +76,8 @@ import org.opengis.util.InternationalString;
  *
  * @see org.opengis.cs.CS_Info
  *
- * @deprecated Replaced by {@link org.geotools.referencing.IdentifiedObject} and
- *             {@link org.geotools.referencing.Identifier}.
+ * @deprecated Replaced by {@link org.geotools.referencing.DefaultIdentifiedObject} and
+ *             {@link NamedIdentifier}.
  */
 public class Info implements org.opengis.referencing.IdentifiedObject, Serializable {
     /**
@@ -144,7 +145,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
             properties = null;
         }
         this.remarks = new SimpleInternationalString("");
-        this.name = new org.geotools.referencing.Identifier(null, name.toString());
+        this.name = new NamedIdentifier(null, name.toString());
     }
     
     /**
@@ -196,7 +197,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      *
      * @see org.opengis.cs.CS_Info#getAuthorityCode()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.Identifier#getCode}.
+     * @deprecated Replaced by {@link NamedIdentifier#getCode}.
      */
     public String getAuthorityCode(final Locale locale) {
         return getProperty("authorityCode");
@@ -212,7 +213,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      *
      * @see org.opengis.cs.CS_Info#getAlias()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.IdentifiedObject#getIdentifiers}.
+     * @deprecated Replaced by {@link org.geotools.referencing.DefaultIdentifiedObject#getIdentifiers}.
      */
     public String getAlias(final Locale locale) {
         return getProperty("alias");

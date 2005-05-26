@@ -22,22 +22,24 @@
  */
 package org.geotools.parameter;
 
-// J2SE direct dependencies
+// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.units.Unit;
 
-import org.geotools.referencing.IdentifiedObject;
+// OpenGIS dependencies
+import org.opengis.util.CodeList;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.rsc.ResourceKeys;
 import org.geotools.resources.rsc.Resources;
-import org.opengis.util.CodeList;
-import org.opengis.util.InternationalString;
 
 
 /**
@@ -312,7 +314,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Constructs a parameter from a set of properties. The properties map is
-     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -346,7 +348,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Constructs a parameter from a set of properties. The properties map is
-     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -528,7 +530,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true;
         }

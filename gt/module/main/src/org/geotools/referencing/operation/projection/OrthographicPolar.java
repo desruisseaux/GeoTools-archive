@@ -67,7 +67,7 @@ public class OrthographicPolar extends Orthographic {
     private final boolean northPole;
     
     /**
-     * Construct a polar orthographic projection.
+     * Constructs a polar orthographic projection.
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.

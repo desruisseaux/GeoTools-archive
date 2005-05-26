@@ -51,6 +51,7 @@ import java.util.Collection;
 import javax.units.NonSI;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -61,7 +62,7 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -137,9 +138,9 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_1 = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,      "standard_parallel_1"),
-                    new Identifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
-                    new Identifier(CitationImpl.GEOTIFF,  "StdParallel1")
+                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_1"),
+                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 1st standard parallel"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel1")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
                 
@@ -149,9 +150,9 @@ public class AlbersEqualArea extends MapProjection {
          */
         public static final ParameterDescriptor STANDARD_PARALLEL_2 = createOptionalDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,      "standard_parallel_2"),
-                    new Identifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
-                    new Identifier(CitationImpl.GEOTIFF,  "StdParallel2")
+                    new NamedIdentifier(CitationImpl.OGC,      "standard_parallel_2"),
+                    new NamedIdentifier(CitationImpl.EPSG,     "Latitude of 2nd standard parallel"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF,  "StdParallel2")
                 },
                 -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -159,14 +160,14 @@ public class AlbersEqualArea extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OGC,      "Albers_Conic_Equal_Area"),
-                new Identifier(CitationImpl.EPSG,     "Albers Equal Area"),
-                new Identifier(CitationImpl.EPSG,     "9822"),
-                new Identifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),
-                new Identifier(CitationImpl.ESRI,     "Albers"),
-                new Identifier(CitationImpl.ESRI,     "Albers Equal Area Conic"),
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION))
+                new NamedIdentifier(CitationImpl.OGC,      "Albers_Conic_Equal_Area"),
+                new NamedIdentifier(CitationImpl.EPSG,     "Albers Equal Area"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9822"),
+                new NamedIdentifier(CitationImpl.GEOTIFF,  "CT_AlbersEqualArea"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Albers"),
+                new NamedIdentifier(CitationImpl.ESRI,     "Albers Equal Area Conic"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.ALBERS_EQUAL_AREA_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
                 CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
@@ -175,7 +176,7 @@ public class AlbersEqualArea extends MapProjection {
             });
 
         /**
-         * Construct a new provider. 
+         * Constructs a new provider. 
          */
         public Provider() {
             super(PARAMETERS);
@@ -205,7 +206,7 @@ public class AlbersEqualArea extends MapProjection {
     
     
     /**
-     * Construct a new map projection from the supplied parameters.
+     * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.

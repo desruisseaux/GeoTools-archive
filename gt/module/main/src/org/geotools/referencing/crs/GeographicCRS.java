@@ -22,16 +22,13 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Map;
-
 import javax.units.NonSI;
 import javax.units.Unit;
 
-import org.geotools.measure.Measure;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.util.UnsupportedImplementationException;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -39,6 +36,13 @@ import org.opengis.referencing.cs.EllipsoidalCS;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.measure.Measure;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -99,9 +103,8 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
-     * Constructs a geographic CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * Constructs a geographic CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
@@ -115,9 +118,8 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
-     * Computes the orthodromic distance between two points. This convenience method delegates the
-     * work to the underlyling {@linkplain org.geotools.referencing.datum.Ellipsoid ellipsoid}, if
-     * possible.
+     * Computes the orthodromic distance between two points. This convenience method delegates
+     * the work to the underlyling {@linkplain DefaultEllipsoid ellipsoid}, if possible.
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
@@ -130,16 +132,16 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
             throws UnsupportedOperationException, MismatchedDimensionException
     {
         final org.geotools.referencing.cs.EllipsoidalCS cs;
-        final org.geotools.referencing.datum.Ellipsoid  e;
+        final DefaultEllipsoid  e;
         if (!(coordinateSystem instanceof org.geotools.referencing.cs.EllipsoidalCS)) {
             throw new UnsupportedImplementationException(coordinateSystem.getClass());
         }
         final Ellipsoid ellipsoid = ((GeodeticDatum) datum).getEllipsoid();
-        if (!(ellipsoid instanceof org.geotools.referencing.datum.Ellipsoid)) {
+        if (!(ellipsoid instanceof DefaultEllipsoid)) {
             throw new UnsupportedImplementationException(ellipsoid.getClass());
         }
         cs = (org.geotools.referencing.cs.EllipsoidalCS) coordinateSystem;
-        e  = (org.geotools.referencing.datum.Ellipsoid)  ellipsoid;
+        e  = (DefaultEllipsoid)  ellipsoid;
         if (coord1.length!=2 || coord2.length!=2 || cs.getDimension()!=2) {
             /*
              * Not yet implemented (an exception will be thrown later).

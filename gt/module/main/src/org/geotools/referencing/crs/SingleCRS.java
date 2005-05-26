@@ -25,18 +25,21 @@ package org.geotools.referencing.crs;
 // J2SE dependencies
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.wkt.Formatter;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.Datum;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.wkt.Formatter;
 
 
 /**
  * Abstract coordinate reference system, consisting of a single
  * {@linkplain CoordinateSystem Coordinate System} and a single
- * {@linkplain Datum Datum} (as opposed to
- * {@linkplain CompoundCRS Compound CRS}).
+ * {@linkplain Datum Datum} (as opposed to {@linkplain CompoundCRS Compound CRS}).
  *
  * A coordinate reference system consists of an ordered sequence of coordinate system
  * axes that are related to the earth through a datum. A coordinate reference system
@@ -54,7 +57,7 @@ import org.opengis.referencing.datum.Datum;
  * @author Martin Desruisseaux
  *
  * @see org.geotools.referencing.cs.CoordinateSystem
- * @see org.geotools.referencing.datum.Datum
+ * @see org.geotools.referencing.datum.DefaultDatum
  */
 public class SingleCRS extends CoordinateReferenceSystem
                     implements org.opengis.referencing.crs.SingleCRS
@@ -71,8 +74,8 @@ public class SingleCRS extends CoordinateReferenceSystem
 
     /**
      * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map)
-     * super-class constructor}.
+     * unchanged to the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class
+     * constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
@@ -131,7 +134,7 @@ public class SingleCRS extends CoordinateReferenceSystem
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final SingleCRS that = (SingleCRS) object;
             return equals(this.datum, that.datum, compareMetadata);
@@ -144,7 +147,8 @@ public class SingleCRS extends CoordinateReferenceSystem
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two CRS objects will return the same
      * hash value if they are equal in the sense of
-     * <code>{@link #equals(IdentifiedObject,boolean) equals}(IdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals(DefaultIdentifiedObject,boolean) equals}(DefaultIdentifiedObject,
+     * <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

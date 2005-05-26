@@ -27,6 +27,7 @@ package org.geotools.cs;
 import java.io.Serializable;
 import java.util.Locale;
 
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -119,7 +120,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      *
      * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getName}.
      */
-    public final org.opengis.metadata.Identifier name;
+    public final Identifier name;
     
     /**
      * Enumerated value for orientation.
@@ -142,7 +143,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * @param orientation The axis orientation.
      */
     public AxisInfo(final String name, final AxisOrientation orientation) {
-        this.name        = new org.geotools.referencing.Identifier(null, name);
+        this.name        = new NamedIdentifier(null, name);
         this.orientation = orientation;
         this.unit        = null;
         Info.ensureNonNull("name",        name);
@@ -165,7 +166,7 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
      * @param locale The locale, or <code>null</code> for the default locale.
      * @return The localized string.
      */
-    public org.opengis.metadata.Identifier getName() {
+    public Identifier getName() {
         return name;
     }
 

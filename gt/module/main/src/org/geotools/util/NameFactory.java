@@ -127,7 +127,7 @@ public final class NameFactory {
     /**
      * Returns the specified name in an array. The {@code value} may be either a {@link String},
      * {@code String[]}, {@link GenericName} or {@code GenericName[]}. This method is used in
-     * {@link org.geotools.referencing.IdentifiedObject} constructors.
+     * {@link org.geotools.referencing.DefaultIdentifiedObject} constructors.
      *
      * @param  value The object to cast into an array of generic names.
      * @return The generic names.

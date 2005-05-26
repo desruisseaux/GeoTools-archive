@@ -75,7 +75,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     private ConcatenatedTransform inverse;
     
     /**
-     * Construct a concatenated transform. This constructor is for subclasses only. To
+     * Constructs a concatenated transform. This constructor is for subclasses only. To
      * create a concatenated transform, use the factory method {@link #create} instead.
      *
      * @param transform1 The first math transform.
@@ -130,7 +130,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
 
     /**
-     * Construct a concatenated transform.  This factory method checks for step transforms
+     * Constructs a concatenated transform.  This factory method checks for step transforms
      * dimension. The returned transform will implements {@link MathTransform2D} if source and
      * target dimensions are equal to 2.  Likewise, it will implements {@link MathTransform1D}
      * if source and target dimensions are equal to 1.  {@link MathTransform} implementations

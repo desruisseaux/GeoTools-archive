@@ -62,6 +62,8 @@ import org.opengis.util.ScopedName;
 import org.geotools.referencing.factory.DatumAliases;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.GeotoolsFactory;
+import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Arguments;
 
@@ -131,7 +133,7 @@ public class CreationTest extends TestCase {
         out.println(greenwich.toWKT());
 
         // NOTE: we could use the following pre-defined constant instead:
-        //       org.geotools.referencing.datum.PrimeMeridian.GREENWICH;
+        //       DefaultPrimeMeridian.GREENWICH;
         final GeodeticDatum datum;
         datum = datumFactory.createGeodeticDatum(name("Airy1830"), airy1830, greenwich);
         out.println();
@@ -235,8 +237,8 @@ public class CreationTest extends TestCase {
         final String           name0 = "Nouvelle Triangulation Francaise (Paris)";
         final String           name1 = "Nouvelle_Triangulation_Francaise_Paris";
         final String           name2 = "NTF (Paris meridian)";
-        final Ellipsoid    ellipsoid = org.geotools.referencing.datum.Ellipsoid.WGS84;
-        final PrimeMeridian meridian = org.geotools.referencing.datum.PrimeMeridian.GREENWICH;
+        final Ellipsoid    ellipsoid = DefaultEllipsoid.WGS84;
+        final PrimeMeridian meridian = DefaultPrimeMeridian.GREENWICH;
         DatumFactory         factory = new GeotoolsFactory();
         final Map         properties = Collections.singletonMap("name", name1);
         GeodeticDatum datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);

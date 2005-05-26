@@ -137,7 +137,7 @@ public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.
     private transient Converter[] converters;
 
     /**
-     * Construct a two-dimensional coordinate system from a name.
+     * Constructs a two-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis0 The first axis.
@@ -151,7 +151,7 @@ public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.
     }
 
     /**
-     * Construct a three-dimensional coordinate system from a name.
+     * Constructs a three-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis0 The first axis.
@@ -167,7 +167,7 @@ public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.
     }
 
     /**
-     * Construct a two-dimensional coordinate system from a set of properties. The properties map is
+     * Constructs a two-dimensional coordinate system from a set of properties. The properties map is
      * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
      * super-class constructor}.
      *
@@ -183,7 +183,7 @@ public class CartesianCS extends AffineCS implements org.opengis.referencing.cs.
     }
 
     /**
-     * Construct a three-dimensional coordinate system from a set of properties. The properties map is
+     * Constructs a three-dimensional coordinate system from a set of properties. The properties map is
      * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
      * super-class constructor}.
      *

@@ -79,9 +79,9 @@ public abstract class AbstractParameter extends Formattable
     
     /**
      * Makes sure that an argument is non-null. This method was already defined in
-     * {@link org.geotools.referencing.IdentifiedObject}, but is defined here again in order
-     * to get a more appropriate stack trace, and for access by class which do not inherit
-     * from {@link org.geotools.referencing.IdentifiedObject}.
+     * {@link org.geotools.referencing.DefaultIdentifiedObject}, but is defined here again
+     * in order to get a more appropriate stack trace, and for access by class which do not
+     * inherit from {@link org.geotools.referencing.DefaultIdentifiedObject}.
      *
      * @param  name   Argument name.
      * @param  object User argument.

@@ -83,7 +83,7 @@ public class StereographicPolar extends Stereographic {
     protected final boolean southPole;
     
     /**
-     * Construct a polar stereographic projection.
+     * Constructs a polar stereographic projection.
      *
      * @param  parameters The group of parameter values.
      * @param  expected The expected parameter descriptors.
@@ -253,7 +253,7 @@ public class StereographicPolar extends Stereographic {
         private final double k0;
 
         /**
-         * Construct a spherical stereographic projection.
+         * Constructs a spherical stereographic projection.
          *
          * @param  parameters The group of parameter values.
          * @param  expected The expected parameter descriptors.
@@ -397,7 +397,7 @@ public class StereographicPolar extends Stereographic {
         private final double k0;
 
         /**
-         * Construct a polar stereographic projection (seires inverse equations).
+         * Constructs a polar stereographic projection (seires inverse equations).
          *
          * @param  parameters The group of parameter values.
          * @param  expected The expected parameter descriptors.

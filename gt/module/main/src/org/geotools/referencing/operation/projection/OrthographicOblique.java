@@ -71,7 +71,7 @@ public class OrthographicOblique extends Orthographic {
     private final double cosphi0;
     
     /**
-     * Construct an oblique orthographic projection.
+     * Constructs an oblique orthographic projection.
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.

@@ -17,61 +17,66 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
- *
  *    This class contains formulas from the public FTP area of NOAA.
  *    NOAAS's work is fully acknowledged here.
  */
-package org.geotools.cs;
+package org.geotools.referencing.datum;
+
+// J2SE dependencies and extensions
+import java.awt.geom.Point2D;
+import java.util.Collections;
+import java.util.Map;
+import javax.units.SI;
+import javax.units.Unit;
 
 // OpenGIS dependencies
-import java.awt.geom.Point2D;
-import java.rmi.RemoteException;
+import org.opengis.referencing.datum.Ellipsoid;
 
+// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.geotools.units.Unit;
-import org.opengis.cs.CS_Ellipsoid;
-import org.opengis.cs.CS_LinearUnit;
 
 
 /**
- * The figure formed by the rotation of an ellipse about an axis.
- * In this context, the axis of rotation is always the minor axis.
- * It is named geodetic ellipsoid if the parameters are derived by
- * the measurement of the shape and the size of the Earth to approximate
- * the geoid as close as possible.
+ * Geometric figure that can be used to describe the approximate shape of the earth.
+ * In mathematical terms, it is a surface formed by the rotation of an ellipse about
+ * its minor axis. An ellipsoid requires two defining parameters:
+ * <ul>
+ *   <li>{@linkplain #getSemiMajorAxis semi-major axis} and
+ *       {@linkplain #getInverseFlattening inverse flattening}, or</li>
+ *   <li>{@linkplain #getSemiMajorAxis semi-major axis} and
+ *       {@linkplain #getSemiMinorAxis semi-minor axis}.</li>
+ * </ul>
  *
  * @version $Id$
- * @author OpenGIS (www.opengis.org)
  * @author Martin Desruisseaux
- *
- * @see org.opengis.cs.CS_Ellipsoid
- *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid}.
  */
-public class Ellipsoid extends Info {
+public class DefaultEllipsoid extends DefaultIdentifiedObject implements Ellipsoid {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -1047804526105439230L;
+    private static final long serialVersionUID = -1149451543954764081L;
     
     /**
-     * WGS 1984 ellipsoid. This ellipsoid is used in GPS systems
-     * and is the default for most <code>org.geotools</code> packages.
+     * WGS 1984 ellipsoid with axis in {@linkplain SI#METER metres}. This ellipsoid is used
+     * in GPS systems and is the default for most <code>org.geotools</code> packages.
      */
-    public static final Ellipsoid WGS84;
-    static {
-        Ellipsoid wgs84 = createFlattenedSphere("WGS84", 6378137.0, 298.257223563, Unit.METRE); 
-        WGS84 = (Ellipsoid) pool.canonicalize( wgs84 );
-        System.out.println( WGS84 );
-    }
+    public static final DefaultEllipsoid WGS84 =
+            createFlattenedSphere("WGS84", 6378137.0, 298.257223563, SI.METER);
+
+    /**
+     * A sphere with a radius of 6371000 {@linkplain SI#METER metres}. Spheres use a simplier
+     * algorithm for {@linkplain #orthodromicDistance orthodromic distance computation}, which
+     * may be faster and more robust.
+     */
+    public static final DefaultEllipsoid SPHERE =
+            createEllipsoid("SPHERE", 6371000, 6371000, SI.METER);
     
     /**
      * The equatorial radius.
@@ -106,23 +111,25 @@ public class Ellipsoid extends Info {
     private final Unit unit;
     
     /**
-     * Constructs a new ellipsoid using the specified axis length.
+     * Constructs a new ellipsoid using the specified axis length. The properties map is
+     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * super-class constructor}.
      *
-     * @param name              Name of this ellipsoid.
+     * @param properties        Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis     The equatorial radius.
      * @param semiMinorAxis     The polar radius.
      * @param inverseFlattening The inverse of the flattening value.
      * @param ivfDefinitive     <code>true</code> if the inverse flattening is definitive.
      * @param unit              The units of the semi-major and semi-minor axis values.
      */
-    protected Ellipsoid(final CharSequence name,
-                        final double       semiMajorAxis,
-                        final double       semiMinorAxis,
-                        final double       inverseFlattening,
-                        final boolean      ivfDefinitive,
-                        final Unit         unit)
+    protected DefaultEllipsoid(final Map     properties,
+                               final double  semiMajorAxis,
+                               final double  semiMinorAxis,
+                               final double  inverseFlattening,
+                               final boolean ivfDefinitive,
+                               final Unit    unit)
     {
-        super(name);
+        super(properties);
         this.unit = unit;
         this.semiMajorAxis     = check("semiMajorAxis",     semiMajorAxis);
         this.semiMinorAxis     = check("semiMinorAxis",     semiMinorAxis);
@@ -135,53 +142,105 @@ public class Ellipsoid extends Info {
     /**
      * Constructs a new ellipsoid using the specified axis length.
      *
-     * @param name          Name of this ellipsoid.
+     * @param name          The ellipsoid name.
      * @param semiMajorAxis The equatorial radius.
      * @param semiMinorAxis The polar radius.
      * @param unit          The units of the semi-major and semi-minor axis values.
-     *
-     * @see org.geotools.cs.CoordinateSystemFactory#createEllipsoid
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#createEllipsoid}.
      */
-    public static Ellipsoid createEllipsoid(final CharSequence name,
-                                            final double       semiMajorAxis,
-                                            final double       semiMinorAxis,
-                                            final Unit         unit)
+    public static DefaultEllipsoid createEllipsoid(final String name,
+                                                   final double semiMajorAxis,
+                                                   final double semiMinorAxis,
+                                                   final Unit   unit)
+    {
+        return createEllipsoid(Collections.singletonMap(NAME_PROPERTY, name),
+                               semiMajorAxis, semiMinorAxis, unit);
+    }
+
+    /**
+     * Constructs a new ellipsoid using the specified axis length. The properties map is
+     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * super-class constructor}.
+     *
+     * @param properties    Set of properties. Should contains at least <code>"name"</code>.
+     * @param semiMajorAxis The equatorial radius.
+     * @param semiMinorAxis The polar radius.
+     * @param unit          The units of the semi-major and semi-minor axis values.
+     */
+    public static DefaultEllipsoid createEllipsoid(final Map    properties,
+                                                   final double semiMajorAxis,
+                                                   final double semiMinorAxis,
+                                                   final Unit   unit)
     {
         if (semiMajorAxis == semiMinorAxis) {
-            return new Spheroid(name, semiMajorAxis, false, unit);
+            return new Spheroid(properties, semiMajorAxis, false, unit);
         } else {
-            return new Ellipsoid(name, semiMajorAxis, semiMinorAxis,
-                                 semiMajorAxis/(semiMajorAxis-semiMinorAxis), false, unit);
+            return new DefaultEllipsoid(properties, semiMajorAxis, semiMinorAxis,
+                       semiMajorAxis/(semiMajorAxis-semiMinorAxis), false, unit);
         }
     }
     
     /**
-     * Constructs a new ellipsoid using the specified axis length
-     * and inverse flattening value.
+     * Constructs a new ellipsoid using the specified axis length and inverse flattening value.
      *
-     * @param name              Name of this ellipsoid.
+     * @param name              The ellipsoid name.
      * @param semiMajorAxis     The equatorial radius.
      * @param inverseFlattening The inverse flattening value.
      * @param unit              The units of the semi-major and semi-minor axis
      *                          values.
-     *
-     * @see org.geotools.cs.CoordinateSystemFactory#createFlattenedSphere
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#createFlattenedSphere}.
      */
-    public static Ellipsoid createFlattenedSphere(final CharSequence name,
-                                                  final double       semiMajorAxis,
-                                                  final double       inverseFlattening,
-                                                  final Unit         unit)
+    public static DefaultEllipsoid createFlattenedSphere(final String name,
+                                                         final double semiMajorAxis,
+                                                         final double inverseFlattening,
+                                                         final Unit   unit)
+    {
+        return createFlattenedSphere(Collections.singletonMap(NAME_PROPERTY, name),
+                                     semiMajorAxis, inverseFlattening, unit);
+    }
+    
+    /**
+     * Constructs a new ellipsoid using the specified axis length and
+     * inverse flattening value. The properties map is given unchanged to the
+     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
+     *
+     * @param properties        Set of properties. Should contains at least <code>"name"</code>.
+     * @param semiMajorAxis     The equatorial radius.
+     * @param inverseFlattening The inverse flattening value.
+     * @param unit              The units of the semi-major and semi-minor axis
+     *                          values.
+     */
+    public static DefaultEllipsoid createFlattenedSphere(final Map    properties,
+                                                         final double semiMajorAxis,
+                                                         final double inverseFlattening,
+                                                         final Unit   unit)
     {
         if (Double.isInfinite(inverseFlattening)) {
-            return new Spheroid(name, semiMajorAxis, true, unit);
+            return new Spheroid(properties, semiMajorAxis, true, unit);
         } else {
-            return new Ellipsoid(name, semiMajorAxis,
-                                 semiMajorAxis*(1-1/inverseFlattening),
-                                 inverseFlattening, true, unit);
+            return new DefaultEllipsoid(properties, semiMajorAxis,
+                                        semiMajorAxis*(1-1/inverseFlattening),
+                                        inverseFlattening, true, unit);
+        }
+    }
+
+    /**
+     * Wraps an arbitrary ellipsoid into a Geotools implementation. This method is
+     * usefull if {@link #orthodromicDistance orthodromic distance computation}
+     * (for example) are desired.
+     */
+    public static DefaultEllipsoid wrap(final Ellipsoid ellipsoid) {
+        if (ellipsoid instanceof DefaultEllipsoid) {
+            return (DefaultEllipsoid) ellipsoid;
+        }
+        if (ellipsoid.isIvfDefinitive()) {
+            return createFlattenedSphere(getProperties(ellipsoid),
+                                         ellipsoid.getSemiMajorAxis(),
+                                         ellipsoid.getInverseFlattening(),
+                                         ellipsoid.getAxisUnit());
+        } else {
+            return createEllipsoid(getProperties(ellipsoid),
+                                   ellipsoid.getSemiMajorAxis(),
+                                   ellipsoid.getSemiMinorAxis(),
+                                   ellipsoid.getAxisUnit());
         }
     }
     
@@ -196,32 +255,38 @@ public class Ellipsoid extends Info {
      *         than  0.
      */
     static double check(final String name, final double value) throws IllegalArgumentException {
-        if (value>0) {
+        if (value > 0) {
             return value;
         }
         throw new IllegalArgumentException(Resources.format(
                     ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, name, new Double(value)));
     }
-    
+
     /**
-     * Gets the equatorial radius.
-     * The returned length is expressed in this object's axis units.
+     * Returns the linear unit of the {@linkplain #getSemiMajorAxis semi-major}
+     * and {@linkplain #getSemiMinorAxis semi-minor} axis values.
      *
-     * @see org.opengis.cs.CS_Ellipsoid#getSemiMajorAxis()
+     * @return The axis linear unit.
+     */
+    public Unit getAxisUnit() {
+        return unit;
+    }
+
+    /**
+     * Length of the semi-major axis of the ellipsoid. This is the
+     * equatorial radius in {@linkplain #getAxisUnit axis linear unit}.
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#getSemiMajorAxis}.
+     * @return Length of semi-major axis.
      */
     public double getSemiMajorAxis() {
         return semiMajorAxis;
     }
-    
+
     /**
-     * Gets the polar radius.
-     * The returned length is expressed in this object's axis units.
+     * Length of the semi-minor axis of the ellipsoid. This is the
+     * polar radius in {@linkplain #getAxisUnit axis linear unit}.
      *
-     * @see org.opengis.cs.CS_Ellipsoid#getSemiMinorAxis()
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#getSemiMinorAxis}.
+     * @return Length of semi-minor axis.
      */
     public double getSemiMinorAxis() {
         return semiMinorAxis;
@@ -231,45 +296,51 @@ public class Ellipsoid extends Info {
      * The ratio of the distance between the center and a focus of the ellipse
      * to the length of its semimajor axis. The eccentricity can alternately be
      * computed from the equation: <code>e=sqrt(2f-f²)</code>.
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#getEccentricity}.
      */
     public double getEccentricity() {
-        final double f=1-getSemiMinorAxis()/getSemiMajorAxis();
+        final double f = 1-getSemiMinorAxis()/getSemiMajorAxis();
         return Math.sqrt(2*f - f*f);
     }
-    
+
     /**
-     * Returns the value of the inverse of the flattening constant.
-     * Flattening is a value used to indicate how closely an ellipsoid
-     * approaches a spherical shape. The inverse flattening is related to the
-     * equatorial/polar radius (<var>r<sub>e</sub></var> and
-     * <var>r<sub>p</sub></var> respectively) by the formula
-     * <code>ivf=r<sub>e</sub>/(r<sub>e</sub>-r<sub>p</sub>)</code>.
-     * For perfect spheres, this method returns {@link Double#POSITIVE_INFINITY}
-     * (which is the correct value).
+     * Returns the value of the inverse of the flattening constant. Flattening is a value
+     * used to indicate how closely an ellipsoid approaches a spherical shape. The inverse
+     * flattening is related to the equatorial/polar radius by the formula
      *
-     * @see org.opengis.cs.CS_Ellipsoid#getInverseFlattening()
+     * <var>ivf</var>&nbsp;=&nbsp;<var>r</var><sub>e</sub>/(<var>r</var><sub>e</sub>-<var>r</var><sub>p</sub>).
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#getInverseFlattening}.
+     * For perfect spheres (i.e. if {@link #isSphere} returns <code>true</code>),
+     * the {@link Double#POSITIVE_INFINITY} value is used.
+     *
+     * @return The inverse flattening value.
      */
     public double getInverseFlattening() {
         return inverseFlattening;
     }
-    
+
     /**
-     * Tells if the Inverse Flattening definitive for this ellipsoid.
-     * Some ellipsoids use the IVF as the defining value, and calculate the
-     * polar radius whenever asked. Other ellipsoids use the polar radius to
-     * calculate the IVF whenever asked. This distinction can be important to
-     * avoid floating-point rounding errors.
+     * Indicates if the {@linkplain #getInverseFlattening inverse flattening} is definitive for
+     * this ellipsoid. Some ellipsoids use the IVF as the defining value, and calculate the polar
+     * radius whenever asked. Other ellipsoids use the polar radius to calculate the IVF whenever
+     * asked. This distinction can be important to avoid floating-point rounding errors.
      *
-     * @see org.opengis.cs.CS_Ellipsoid#isIvfDefinitive()
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#isIvfDefinitive}.
+     * @return <code>true</code> if the {@linkplain #getInverseFlattening inverse flattening} is
+     *         definitive, or <code>false</code> if the {@linkplain #getSemiMinorAxis polar radius}
+     *         is definitive.
      */
     public boolean isIvfDefinitive() {
         return ivfDefinitive;
+    }
+
+    /**
+     * <code>true</code> if the ellipsoid is degenerate and is actually a sphere. The sphere is
+     * completely defined by the {@linkplain #getSemiMajorAxis semi-major axis}, which is the
+     * radius of the sphere.
+     *
+     * @return <code>true</code> if the ellipsoid is degenerate and is actually a sphere.
+     */
+    public boolean isSphere() {
+        return semiMajorAxis == semiMinorAxis;
     }
     
     /**
@@ -281,8 +352,6 @@ public class Ellipsoid extends Info {
      * @param  P1 Longitude and latitude of first point (in degrees).
      * @param  P2 Longitude and latitude of second point (in degrees).
      * @return The orthodromic distance (in the units of this ellipsoid).
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#orthodromicDistance(Point2D,Point2D)}.
      */
     public double orthodromicDistance(final Point2D P1, final Point2D P2) {
         return orthodromicDistance(P1.getX(), P1.getY(), P2.getX(), P2.getY());
@@ -300,8 +369,6 @@ public class Ellipsoid extends Info {
      * @param  x2 Longitude of second point (in degrees).
      * @param  y2 Latitude  of second point (in degrees).
      * @return The orthodromic distance (in the units of this ellipsoid's axis).
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#orthodromicDistance(double,double,double,double)}.
      */
     public double orthodromicDistance(double x1, double y1, double x2, double y2) {
         x1 = Math.toRadians(x1);
@@ -393,32 +460,19 @@ public class Ellipsoid extends Info {
     }
     
     /**
-     * Returns the units of the semi-major and semi-minor axis values.
-     *
-     * @see org.opengis.cs.CS_Ellipsoid#getAxisUnit()
-     *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid#getAxisUnit}.
-     */
-    public Unit getAxisUnit() {
-        return unit;
-    }
-    
-    /**
      * Compare this ellipsoid with the specified object for equality.
      *
      * @param  object The object to compare to <code>this</code>.
-     * @param  compareNames <code>true</code> to comparare the {@linkplain #getName name},
-     *         {@linkplain #getAlias alias}, {@linkplain #getAuthorityCode authority
-     *         code}, etc. as well, or <code>false</code> to compare only properties
-     *         relevant to transformations.
+     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
+     *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final Info object, final boolean compareNames) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
-            return true;
+            return true; // Slight optimization.
         }
-        if (super.equals(object, compareNames)) {
-            final Ellipsoid that = (Ellipsoid) object;
+        if (super.equals(object, compareMetadata)) {
+            final DefaultEllipsoid that = (DefaultEllipsoid) object;
             return this.ivfDefinitive == that.ivfDefinitive &&
                    Double.doubleToLongBits(this.semiMajorAxis)     == Double.doubleToLongBits(that.semiMajorAxis)     &&
                    Double.doubleToLongBits(this.semiMinorAxis)     == Double.doubleToLongBits(that.semiMinorAxis)     &&
@@ -430,10 +484,10 @@ public class Ellipsoid extends Info {
     
     /**
      * Returns a hash value for this ellipsoid. {@linkplain #getName Name},
-     * {@linkplain #getAlias alias}, {@linkplain #getAuthorityCode authority code}
-     * and the like are not taken in account. In other words, two ellipsoids
-     * will return the same hash value if they are equal in the sense of
-     * <code>{@link #equals equals}(Info, <strong>false</strong>)</code>.
+     * {@linkplain #getRemarks remarks} and the like are not taken in account.
+     * In other words, two ellipsoids will return the same hash value if they
+     * are equal in the sense of
+     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.
@@ -449,84 +503,17 @@ public class Ellipsoid extends Info {
     }
     
     /**
-     * Fills the part inside "[...]".
-     * Used for formatting Well Known Text (WKT).
-     */
-    String addString(final StringBuffer buffer, final Unit context) {
-        final double ivf = getInverseFlattening();
-        buffer.append(", ");
-        buffer.append(getSemiMajorAxis());
-        buffer.append(", ");
-        buffer.append(Double.isInfinite(ivf) ? 0 : ivf);
-        return "SPHEROID";
-    }
-    
-    /**
-     * Returns an OpenGIS interface for this ellipsoid.
-     * The returned object is suitable for RMI use.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
      *
-     * Note: The returned type is a generic {@link Object} in order
-     *       to avoid premature class loading of OpenGIS interface.
+     * @param  formatter The formatter to use.
+     * @return The WKT element name, which is "SPHEROID"
      */
-    final Object toOpenGIS(final Object adapters) throws RemoteException {
-        return new Export(adapters);
-    }
-    
-    
-    
-    
-    /////////////////////////////////////////////////////////////////////////
-    ////////////////                                         ////////////////
-    ////////////////             OPENGIS ADAPTER             ////////////////
-    ////////////////                                         ////////////////
-    /////////////////////////////////////////////////////////////////////////
-    
-    /**
-     * Wrap a {@link Ellipsoid} object for use with OpenGIS.
-     * This class is suitable for RMI use.
-     */
-    private final class Export extends Info.Export implements CS_Ellipsoid {
-        /**
-         * Constructs a remote object.
-         */
-        protected Export(final Object adapters) throws RemoteException {
-            super(adapters);
-        }
-        
-        /**
-         * Gets the equatorial radius.
-         */
-        public double getSemiMajorAxis() throws RemoteException {
-            return Ellipsoid.this.getSemiMajorAxis();
-        }
-        
-        /**
-         * Gets the polar radius.
-         */
-        public double getSemiMinorAxis() throws RemoteException {
-            return Ellipsoid.this.getSemiMinorAxis();
-        }
-        
-        /**
-         * Returns the value of the inverse of the flattening constant.
-         */
-        public double getInverseFlattening() throws RemoteException {
-            final double ivf=Ellipsoid.this.getInverseFlattening();
-            return Double.isInfinite(ivf) ? 0 : ivf;
-        }
-        
-        /**
-         * Tell if the Inverse Flattening definitive for this ellipsoid.
-         */
-        public boolean isIvfDefinitive() throws RemoteException {
-            return Ellipsoid.this.isIvfDefinitive();
-        }
-        
-        /**
-         * Returns the linear unit.
-         */
-        public CS_LinearUnit getAxisUnit() throws RemoteException {
-            return (CS_LinearUnit) adapters.export(Ellipsoid.this.getAxisUnit());
-        }
+    protected String formatWKT(final Formatter formatter) {
+        final double ivf = getInverseFlattening();
+        formatter.append(getAxisUnit().getConverterTo(SI.METER).convert(getSemiMajorAxis()));
+        formatter.append(Double.isInfinite(ivf) ? 0 : ivf);
+        return "SPHEROID";
     }
 }

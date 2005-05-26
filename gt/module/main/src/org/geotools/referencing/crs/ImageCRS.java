@@ -26,9 +26,13 @@ package org.geotools.referencing.crs;
 import java.util.Collections;
 import java.util.Map;
 
+// OpenGIS dependencies
 import org.opengis.referencing.cs.AffineCS;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.datum.ImageDatum;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 
 
 /**
@@ -70,8 +74,7 @@ public class ImageCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * Constructs an image CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

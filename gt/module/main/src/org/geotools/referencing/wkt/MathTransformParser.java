@@ -38,7 +38,7 @@ import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.Singleton;
@@ -73,14 +73,14 @@ public class MathTransformParser extends AbstractParser {
     private final Singleton method = new Singleton();
     
     /**
-     * Construct a parser using the default set of symbols.
+     * Constructs a parser using the default set of symbols.
      */
     public MathTransformParser() {
         this(Symbols.DEFAULT);
     }
     
     /**
-     * Construct a parser using the specified set of symbols
+     * Constructs a parser using the specified set of symbols
      * and the default factories.
      *
      * @param symbols The symbols for parsing and formatting numbers.
@@ -92,7 +92,7 @@ public class MathTransformParser extends AbstractParser {
     }
     
     /**
-     * Construct a parser for the specified set of symbols and factory.
+     * Constructs a parser for the specified set of symbols and factory.
      *
      * @param symbols   The symbols for parsing and formatting numbers.
      * @param mtFactory The factory to use to create {@link MathTransform} objects.
@@ -305,7 +305,7 @@ public class MathTransformParser extends AbstractParser {
                                    it.hasNext();)
             {
                 final OperationMethod method = (OperationMethod) it.next();
-                if (IdentifiedObject.nameMatches(method, classification)) {
+                if (DefaultIdentifiedObject.nameMatches(method, classification)) {
                     return method;
                 }
             }

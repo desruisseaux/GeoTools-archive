@@ -32,10 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.resources.UnmodifiableArrayList;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -43,6 +40,12 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.resources.UnmodifiableArrayList;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -94,9 +97,8 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
 
     /**
      * Construct a parameter group from a set of properties.
-     * This parameter group will be required exactly once. The properties map is
-     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
-     * super-class constructor}.
+     * This parameter group will be required exactly once. The properties map is given unchanged to
+     * the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
@@ -108,8 +110,8 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
     }
 
     /**
-     * Construct a parameter group from a set of properties. The properties map is
-     * given unchanged to the {@linkplain IdentifiedObject#IdentifiedObject(Map)
+     * Construct a parameter group from a set of properties. The properties map is given
+     * unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -279,7 +281,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final ParameterDescriptorGroup that = (ParameterDescriptorGroup) object;
             return Arrays.equals(this.parameters, that.parameters);

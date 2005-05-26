@@ -26,11 +26,14 @@ package org.geotools.parameter;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterValue;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.rsc.ResourceKeys;
 import org.geotools.resources.rsc.Resources;
-import org.opengis.parameter.ParameterValue;
 
 
 /**
@@ -44,7 +47,7 @@ import org.opengis.parameter.ParameterValue;
  *
  * @see org.geotools.parameter.AbstractParameter
  */
-public abstract class AbstractParameterDescriptor extends IdentifiedObject
+public abstract class AbstractParameterDescriptor extends DefaultIdentifiedObject
         implements org.opengis.parameter.GeneralParameterDescriptor, Serializable
 {
     /**
@@ -59,8 +62,8 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
     private final int minimumOccurs;
 
     /**
-     * Construct a parameter from a set of properties. The properties map is given unchanged
-     * to the {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
+     * Construct a parameter from a set of properties. The properties map is given unchanged to the
+     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param minimumOccurs The {@linkplain #getMinimumOccurs minimum number of times}
@@ -127,7 +130,7 @@ public abstract class AbstractParameterDescriptor extends IdentifiedObject
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final AbstractParameterDescriptor that = (AbstractParameterDescriptor) object;
             return this.minimumOccurs == that.minimumOccurs;

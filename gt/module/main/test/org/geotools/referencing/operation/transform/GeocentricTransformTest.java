@@ -36,7 +36,7 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.referencing.crs.GeocentricCRS;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.datum.Ellipsoid;
+import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.operation.TestTransform;
 import org.geotools.resources.XMath;
 
@@ -47,7 +47,7 @@ import org.geotools.resources.XMath;
  * <ul>
  *   <li>{@link CoordinateOperation}</li>
  *   <li>{@link GeocentricTransform}</li>
- *   <li>{@link Ellipsoid}</li>
+ *   <li>{@link DefaultEllipsoid}</li>
  * </ul>
  *
  * @version $Id$
@@ -76,7 +76,7 @@ public class GeocentricTransformTest extends TestTransform {
     }
 
     /**
-     * Tests the orthodromic distance computed by {@link Ellipsoid}. There is actually two
+     * Tests the orthodromic distance computed by {@link DefaultEllipsoid}. There is actually two
      * algorithms used: one for the ellipsoidal model, and a simpler one for spherical model.
      * We test the ellipsoidal model using know values of nautical mile at different latitude.
      * Then, we test the spherical model with random values. If JDK 1.4 assertion is enabled,
@@ -94,8 +94,8 @@ public class GeocentricTransformTest extends TestTransform {
      *                                           http://www.granddictionnaire.com
      */
     public void testEllipsoid() throws FactoryException {
-        final Ellipsoid  e = Ellipsoid.WGS84;
-        final double    hm = 0.5/60; // Half of a minute of angle, in degrees.
+        final DefaultEllipsoid e = DefaultEllipsoid.WGS84;
+        final double          hm = 0.5/60; // Half of a minute of angle, in degrees.
         /*
          * Test the ellipsoidal model.
          */
@@ -114,8 +114,8 @@ public class GeocentricTransformTest extends TestTransform {
          */
         final double radius = e.getSemiMajorAxis();
         final double circumference = (radius*1.00000001) * (2*Math.PI);
-        final Ellipsoid s = Ellipsoid.createEllipsoid("Sphere", radius, radius, e.getAxisUnit());
-        assertTrue("Spheroid class", !Ellipsoid.class.equals(s.getClass()));
+        final DefaultEllipsoid s = DefaultEllipsoid.createEllipsoid("Sphere", radius, radius, e.getAxisUnit());
+        assertTrue("Spheroid class", !DefaultEllipsoid.class.equals(s.getClass()));
         for (double i=0; i<=180; i+=1) {
             final double base = 360*random.nextDouble()-180;
             assertEquals(i+"° rotation", s.getSemiMajorAxis()*Math.toRadians(i),
@@ -143,7 +143,7 @@ public class GeocentricTransformTest extends TestTransform {
         /*
          * Gets the math transform from WGS84 to a geocentric transform.
          */
-        final Ellipsoid                 ellipsoid =     Ellipsoid.WGS84;
+        final DefaultEllipsoid          ellipsoid = DefaultEllipsoid.WGS84;
         final CoordinateReferenceSystem sourceCRS = GeographicCRS.WGS84_3D;
         final CoordinateReferenceSystem targetCRS = GeocentricCRS.CARTESIAN;
         final CoordinateOperation       operation = opFactory.createOperation(sourceCRS, targetCRS);
@@ -221,10 +221,10 @@ public class GeocentricTransformTest extends TestTransform {
              */
             try {
                 final double altitude = Math.max(array0[base+2], array0[base+5]);
-                final Ellipsoid ellip = Ellipsoid.createFlattenedSphere("Temporary",
-                                        ellipsoid.getSemiMajorAxis()+altitude,
-                                        ellipsoid.getInverseFlattening(),
-                                        ellipsoid.getAxisUnit());
+                final DefaultEllipsoid ellip = DefaultEllipsoid.createFlattenedSphere("Temporary",
+                                               ellipsoid.getSemiMajorAxis()+altitude,
+                                               ellipsoid.getInverseFlattening(),
+                                               ellipsoid.getAxisUnit());
                 double orthodromic = ellip.orthodromicDistance(array0[base+0], array0[base+1],
                                                                array0[base+3], array0[base+4]);
                 orthodromic = XMath.hypot(orthodromic, array0[base+2]-array0[base+5]);

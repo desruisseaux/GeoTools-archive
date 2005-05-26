@@ -42,7 +42,7 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
     private static final long serialVersionUID = -3568975979013908920L;
     
     /**
-     * Construct a concatenated transform.
+     * Constructs a concatenated transform.
      */
     public ConcatenatedTransformDirect(final MathTransform transform1,
                                        final MathTransform transform2)

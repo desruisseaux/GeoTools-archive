@@ -39,7 +39,7 @@ final class IdentityTransform1D extends LinearTransform1D {
     public static final LinearTransform1D ONE = new IdentityTransform1D();
 
     /**
-     * Construct a new identity transform.
+     * Constructs a new identity transform.
      */
     private IdentityTransform1D() {
         super(1, 0);

@@ -83,6 +83,8 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
+import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.util.WeakHashSet;
 
 
@@ -113,7 +115,7 @@ public class GeotoolsFactory extends AbstractFactory
     private final WeakHashSet pool = new WeakHashSet();
 
     /**
-     * Construct a default factory. This method is public in order to allows instantiations
+     * Constructs a default factory. This method is public in order to allows instantiations
      * from a {@linkplain javax.imageio.spi.ServiceRegistry service registry}. Users should
      * not instantiate this factory directly, but use one of the following lines instead:
      *
@@ -150,7 +152,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         Ellipsoid ellipsoid;
         try {
-            ellipsoid = org.geotools.referencing.datum.Ellipsoid.createEllipsoid(
+            ellipsoid = DefaultEllipsoid.createEllipsoid(
                         properties, semiMajorAxis, semiMinorAxis, unit);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
@@ -175,7 +177,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         Ellipsoid ellipsoid;
         try {
-            ellipsoid = org.geotools.referencing.datum.Ellipsoid.createFlattenedSphere(
+            ellipsoid = DefaultEllipsoid.createFlattenedSphere(
                         properties, semiMajorAxis, inverseFlattening, unit);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
@@ -198,7 +200,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         PrimeMeridian meridian;
         try {
-            meridian = new org.geotools.referencing.datum.PrimeMeridian(properties, longitude, angularUnit);
+            meridian = new DefaultPrimeMeridian(properties, longitude, angularUnit);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }

@@ -30,7 +30,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // Geotools dependencies
-import org.geotools.referencing.datum.Ellipsoid;
+import org.geotools.referencing.datum.DefaultEllipsoid;
 
 
 /**
@@ -89,7 +89,7 @@ public class GeodeticCalculatorTest extends TestCase {
             180.00, 10000,  14142
         };
         final double             R          = 20000/Math.PI;
-        final Ellipsoid          ellipsoid  = Ellipsoid.createEllipsoid("Test",R,R,SI.KILO(SI.METER));
+        final DefaultEllipsoid   ellipsoid  = DefaultEllipsoid.createEllipsoid("Test",R,R,SI.KILO(SI.METER));
         final GeodeticCalculator calculator = new GeodeticCalculator(ellipsoid);
         calculator.setAnchorPoint(0, 45);
         for (int i=0; i<DATA.length; i+=3) {

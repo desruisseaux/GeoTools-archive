@@ -66,7 +66,7 @@ import org.opengis.parameter.ParameterValueGroup;
 public class OrthographicEquatorial extends OrthographicOblique {
     
     /**
-     * Construct an equatorial orthographic projection.
+     * Constructs an equatorial orthographic projection.
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.

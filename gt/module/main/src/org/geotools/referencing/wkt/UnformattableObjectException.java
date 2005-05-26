@@ -32,7 +32,7 @@ package org.geotools.referencing.wkt;
  */
 public class UnformattableObjectException extends UnsupportedOperationException {
     /**
-     * Construct an exception with the specified detail message.
+     * Constructs an exception with the specified detail message.
      *
      * @param message The detail message.
      */

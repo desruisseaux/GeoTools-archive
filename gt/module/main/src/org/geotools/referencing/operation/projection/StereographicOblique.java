@@ -78,7 +78,7 @@ public class StereographicOblique extends Stereographic {
     final double sinphi0, cosphi0, chi1, sinChi1, cosChi1;
 
     /**
-     * Construct an oblique stereographic projection (USGS equations).
+     * Constructs an oblique stereographic projection (USGS equations).
      *
      * @param  parameters The group of parameter values.
      * @param  expected The expected parameter descriptors.
@@ -234,7 +234,7 @@ public class StereographicOblique extends Stereographic {
         private static final double k0 = 2;
         
         /**
-         * Construct a spherical oblique stereographic projection.
+         * Constructs a spherical oblique stereographic projection.
          *
          * @param  parameters The group of parameter values.
          * @param  expected The expected parameter descriptors.
@@ -367,7 +367,7 @@ public class StereographicOblique extends Stereographic {
         private static final double TOL = 1E-14;
         
         /**
-         * Construct an oblique stereographic projection (EPSG equations).
+         * Constructs an oblique stereographic projection (EPSG equations).
          *
          * @param  parameters The group of parameter values.
          * @param  expected The expected parameter descriptors.

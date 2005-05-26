@@ -360,8 +360,8 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @see #createGeodeticDatum
      *
      * @deprecated We should try to rely on the alias mechanism available in all
-     *             {@link org.opengis.referencing.IdentifiedObject} instead. If
-     *             this method is really needed, we can reinsert it later.
+     *             {@link IdentifiedObject} instead. If this method is really
+     *             needed, we can reinsert it later.
      */
     public String geoidFromWktName(String wkt) {
         throw new UnsupportedOperationException();
@@ -378,8 +378,8 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * @see #createGeodeticDatum
      *
      * @deprecated We should try to rely on the alias mechanism available in all
-     *             {@link org.opengis.referencing.IdentifiedObject} instead. If
-     *             this method is really needed, we can reinsert it later.
+     *             {@link IdentifiedObject} instead. If this method is really
+     *             needed, we can reinsert it later.
      */
     public String wktFromGeoidName(String geoid) {
         throw new UnsupportedOperationException();

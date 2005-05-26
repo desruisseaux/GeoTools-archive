@@ -26,10 +26,13 @@ package org.geotools.referencing.datum;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
+// OpenGIS dependencies
+import org.opengis.referencing.datum.PixelInCell;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
-import org.opengis.referencing.datum.PixelInCell;
 
 
 /**
@@ -40,7 +43,7 @@ import org.opengis.referencing.datum.PixelInCell;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ImageDatum extends Datum implements org.opengis.referencing.datum.ImageDatum {
+public class ImageDatum extends DefaultDatum implements org.opengis.referencing.datum.ImageDatum {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -52,7 +55,7 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
     private final PixelInCell pixelInCell;
 
     /**
-     * Construct an image datum from a name.
+     * Constructs an image datum from a name.
      *
      * @param name The datum name.
      * @param pixelInCell the way the image grid is associated with the image data attributes.
@@ -62,8 +65,8 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
     }
 
     /**
-     * Construct an image datum from a set of properties. The properties map is
-     * given unchanged to the {@linkplain Datum#Datum(Map) super-class constructor}.
+     * Constructs an image datum from a set of properties. The properties map is given
+     * unchanged to the {@linkplain DefaultDatum#DefaultDatum(Map) super-class constructor}.
      *
      * @param properties  Set of properties. Should contains at least <code>"name"</code>.
      * @param pixelInCell the way the image grid is associated with the image data attributes.
@@ -91,7 +94,7 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -107,7 +110,7 @@ public class ImageDatum extends Datum implements org.opengis.referencing.datum.I
      * {@linkplain #getRemarks remarks} and the like are not taken in account. In
      * other words, two image datums will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(IdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

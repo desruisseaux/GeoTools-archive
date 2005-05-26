@@ -65,7 +65,7 @@ final class AffineTransform2D extends XAffineTransform
     private transient AffineTransform2D inverse;
     
     /**
-     * Construct an affine transform.
+     * Constructs an affine transform.
      */
     protected AffineTransform2D(final AffineTransform transform) {
         super(transform);

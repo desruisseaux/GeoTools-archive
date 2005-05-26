@@ -52,7 +52,10 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.metadata.iso.citation.CitationImpl;
+
 
 /**
  * Generate Automatic Projections (dynamic projections) based on code and location.
@@ -370,10 +373,10 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return SI.METER;
         }
         public Ellipsoid ellipsoid() {
-            return org.geotools.referencing.datum.Ellipsoid.WGS84;
+            return DefaultEllipsoid.WGS84;
         }
         public PrimeMeridian primeMeridian() {
-            return org.geotools.referencing.datum.PrimeMeridian.GREENWICH;
+            return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
             return org.geotools.referencing.datum.GeodeticDatum.WGS84;
@@ -436,10 +439,10 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return SI.METER;
         }
         public Ellipsoid ellipsoid() {
-            return org.geotools.referencing.datum.Ellipsoid.WGS84;
+            return DefaultEllipsoid.WGS84;
         }
         public PrimeMeridian primeMeridian() {
-            return org.geotools.referencing.datum.PrimeMeridian.GREENWICH;
+            return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
             return org.geotools.referencing.datum.GeodeticDatum.WGS84;
@@ -500,10 +503,10 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return SI.METER;
         }
         public Ellipsoid ellipsoid() {
-            return org.geotools.referencing.datum.Ellipsoid.WGS84;
+            return DefaultEllipsoid.WGS84;
         }
         public PrimeMeridian primeMeridian() {
-            return org.geotools.referencing.datum.PrimeMeridian.GREENWICH;
+            return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
             return org.geotools.referencing.datum.GeodeticDatum.WGS84;
@@ -565,10 +568,10 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return SI.METER;
         }
         public Ellipsoid ellipsoid() {
-            return org.geotools.referencing.datum.Ellipsoid.WGS84;
+            return DefaultEllipsoid.WGS84;
         }
         public PrimeMeridian primeMeridian() {
-            return org.geotools.referencing.datum.PrimeMeridian.GREENWICH;
+            return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
             return org.geotools.referencing.datum.GeodeticDatum.WGS84;

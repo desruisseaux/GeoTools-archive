@@ -23,13 +23,16 @@ package org.geotools.referencing.operation.transform;
 import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.operation.LinearTransform;
+// OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.spatialschema.geometry.DirectPosition;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.referencing.operation.LinearTransform;
 
 
 /**
@@ -61,14 +64,14 @@ public class IdentityTransform extends AbstractMathTransform
     private static final LinearTransform[] POOL = new LinearTransform[8];
     
     /**
-     * Construct an identity transform of the specified dimension.
+     * Constructs an identity transform of the specified dimension.
      */
     protected IdentityTransform(final int dimension) {
         this.dimension = dimension;
     }
 
     /**
-     * Construct an identity transform of the specified dimension.
+     * Constructs an identity transform of the specified dimension.
      */
     public static LinearTransform create(final int dimension) {
         // No need to synchronize; not a big deal in a few objects are duplicated.

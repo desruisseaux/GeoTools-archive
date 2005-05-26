@@ -28,15 +28,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.cs.CompoundCS;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.Datum;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.cs.CompoundCS;
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -104,9 +108,9 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
     }
 
     /**
-     * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map)
-     * super-class constructor}.
+     * Constructs a coordinate reference system from a set of properties.
+     * The properties are given unchanged to the
+     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param crs The array of coordinate reference system making this compound CRS.
@@ -214,7 +218,7 @@ public class CompoundCRS extends org.geotools.referencing.crs.CoordinateReferenc
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

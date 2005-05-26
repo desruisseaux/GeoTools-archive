@@ -24,15 +24,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.units.Unit;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.resources.UnmodifiableArrayList;
-import org.geotools.resources.Utilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterNameException;
@@ -41,6 +35,14 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.Matrix;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.operation.GeneralMatrix;
+import org.geotools.resources.UnmodifiableArrayList;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -135,7 +137,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
 
     /**
      * Construct a parameter group. The properties map is given unchanged to the
-     * {@linkplain IdentifiedObject#IdentifiedObject(Map) super-class constructor}.
+     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
      * The <code>parameters</code> array should contains parameters <strong>other</strong>
      * than matrix elements. The first parameter is assumed to be the number of rows, and
      * the second parameter the number of columns. All extra parameters are ignored.
@@ -417,7 +419,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final MatrixParameterDescriptors that = (MatrixParameterDescriptors) object;
             return this.separator == that.separator &&

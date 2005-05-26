@@ -35,6 +35,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.referencing.DefaultReferenceSystem;        // For javadoc
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 
 
@@ -111,8 +112,7 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
     /**
      * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}.
      * The properties are given unchanged to the
-     * {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object.
      * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.

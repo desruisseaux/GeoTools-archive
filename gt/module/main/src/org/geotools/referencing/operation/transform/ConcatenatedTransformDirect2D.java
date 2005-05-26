@@ -23,10 +23,13 @@ package org.geotools.referencing.operation.transform;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 
-import org.geotools.referencing.operation.GeneralMatrix;
+// OpenGIS dependencies
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.TransformException;
+
+// Geotools dependencies
+import org.geotools.referencing.operation.GeneralMatrix;
 
 
 /**
@@ -58,7 +61,7 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
     private final MathTransform2D transform2;
     
     /**
-     * Construct a concatenated transform.
+     * Constructs a concatenated transform.
      */
     public ConcatenatedTransformDirect2D(final MathTransform2D transform1,
                                          final MathTransform2D transform2)

@@ -61,7 +61,7 @@ public class SingleOperation extends CoordinateOperation
     }
 
     /**
-     * Construct a single operation from a set of properties. The properties given in argument
+     * Constructs a single operation from a set of properties. The properties given in argument
      * follow the same rules than for the {@link CoordinateOperation} constructor.
      *
      * @param sourceCRS The source CRS.

@@ -22,10 +22,12 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
-import org.geotools.referencing.IdentifiedObject;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
 
 
 /**
@@ -52,7 +54,7 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
     private final CoordinateSystem[] cs;
 
     /**
-     * Construct a compound coordinate system. A name for this CS will
+     * Constructs a compound coordinate system. A name for this CS will
      * be automatically constructed from the name of all specified CS.
      *
      * @param cs The set of coordinate syztem.
@@ -121,7 +123,7 @@ public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

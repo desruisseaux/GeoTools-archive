@@ -26,9 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
 
-import org.geotools.referencing.IdentifiedObject;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterCardinalityException;
@@ -36,6 +34,11 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
 
 
 /**
@@ -131,7 +134,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
              * the parameter name was not found, or the parameter descriptor doesn't matches.
              */
             for (final Iterator it=descriptors.iterator(); it.hasNext();) {
-                if (IdentifiedObject.nameMatches((GeneralParameterDescriptor) it.next(), name)) {
+                if (DefaultIdentifiedObject.nameMatches((GeneralParameterDescriptor) it.next(), name)) {
                     /*
                      * Found a matching name. Concequently, the operation failed because
                      * the descriptor was illegal.
@@ -162,7 +165,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
                 final GeneralParameterValue oldValue = (GeneralParameterValue) values.get(i);
                 final GeneralParameterDescriptor oldDescriptor = oldValue.getDescriptor();
                 if (type.equals(oldDescriptor)) {
-                    assert IdentifiedObject.nameMatches(oldDescriptor, name) : parameter;
+                    assert DefaultIdentifiedObject.nameMatches(oldDescriptor, name) : parameter;
                     final boolean same = parameter.equals(oldValue);
                     values.set(i, parameter);
                     return !same;
@@ -176,7 +179,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
             int count = 0;
             for (final Iterator it=values.iterator(); it.hasNext();) {
                 final GeneralParameterValue value = (GeneralParameterValue) it.next();
-                if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                if (DefaultIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                     count++;
                 }
             }
@@ -212,7 +215,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
         final String name = type.getName().getCode();
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
-            if (IdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+            if (DefaultIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                 count++;
             }
         }

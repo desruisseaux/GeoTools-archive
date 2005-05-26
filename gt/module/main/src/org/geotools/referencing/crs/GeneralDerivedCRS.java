@@ -41,7 +41,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.parameter.Parameters;
-import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.DefaultReferenceSystem;
 import org.geotools.referencing.operation.Operation;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
@@ -53,7 +54,7 @@ import org.geotools.resources.cts.Resources;
 /**
  * A coordinate reference system that is defined by its coordinate
  * {@linkplain Conversion conversion} from another coordinate reference system
- * (not by a {@linkplain org.opengis.referencing.datum.Datum datum}).
+ * (not by a {@linkplain Datum datum}).
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -89,7 +90,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *       because {@link org.geotools.referencing.operation.CoordinateOperation} lives in
      *       a different package.
      */
-    public static IdentifiedObject _COMPARING;
+    public static DefaultIdentifiedObject _COMPARING;
 
     /**
      * The base coordinate reference system.
@@ -104,8 +105,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
     /**
      * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}.
      * The properties are given unchanged to the
-     * {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object.
      * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
@@ -140,9 +140,9 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * Constructs a derived CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}. The following optional properties are also understood:
-     * <br><br>
+     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * The following optional properties are also understood:
+     * <p>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>
@@ -156,10 +156,12 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *   </tr>
      * </table>
      *
-     * <P>Additional properties for the {@link org.geotools.referencing.operation.Conversion} object
+     * <P>
+     * Additional properties for the {@link org.geotools.referencing.operation.Conversion} object
      * to be created can be specified with the <code>"conversion."</code> prefix added in front of
      * property names (example: <code>"conversion.remarks"</code>). The same applies for operation
-     * method, using the <code>"method."</code> prefix.</P>
+     * method, using the <code>"method."</code> prefix.
+     * </P>
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
      *         the underlying {@link org.geotools.referencing.operation.Conversion conversion}.
@@ -260,7 +262,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

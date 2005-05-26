@@ -33,6 +33,7 @@ import javax.units.SI;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -48,7 +49,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.resources.XMath;
@@ -196,7 +197,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     private transient MathTransform inverse;
     
     /**
-     * Construct a new map projection from the suplied parameters.
+     * Constructs a new map projection from the suplied parameters.
      *
      * @param  values The parameter values in standard units.
      *         The following parameter are recognized:
@@ -1051,8 +1052,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,  "semi_major"),
-                    new Identifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(CitationImpl.OGC,  "semi_major"),
+                    new NamedIdentifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1064,8 +1065,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,  "semi_minor"),
-                    new Identifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(CitationImpl.OGC,  "semi_minor"),
+                    new NamedIdentifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1075,12 +1076,12 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public static final ParameterDescriptor CENTRAL_MERIDIAN = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,  "central_meridian"),
-                    new Identifier(CitationImpl.EPSG, "Longitude of natural origin"),
-                    new Identifier(CitationImpl.EPSG, "Longitude of false origin"),
-                    new Identifier(CitationImpl.ESRI, "Longitude_Of_Origin"),
-                    new Identifier(CitationImpl.ESRI,     "Longitude_Of_Center"),  //ESRI uses this in orthographic (not to be confused with Longitude_Of_Center in oblique mercator)
-                    new Identifier(CitationImpl.GEOTIFF,  "NatOriginLong")
+                    new NamedIdentifier(CitationImpl.OGC,     "central_meridian"),
+                    new NamedIdentifier(CitationImpl.EPSG,    "Longitude of natural origin"),
+                    new NamedIdentifier(CitationImpl.EPSG,    "Longitude of false origin"),
+                    new NamedIdentifier(CitationImpl.ESRI,    "Longitude_Of_Origin"),
+                    new NamedIdentifier(CitationImpl.ESRI,    "Longitude_Of_Center"),  //ESRI uses this in orthographic (not to be confused with Longitude_Of_Center in oblique mercator)
+                    new NamedIdentifier(CitationImpl.GEOTIFF, "NatOriginLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
 
@@ -1090,11 +1091,11 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,  "latitude_of_origin"),
-                    new Identifier(CitationImpl.EPSG, "Latitude of false origin"),
-                    new Identifier(CitationImpl.EPSG, "Latitude of natural origin"),
-                    new Identifier(CitationImpl.ESRI, "Latitude_Of_Center"),  //ESRI uses this in orthographic 
-                    new Identifier(CitationImpl.GEOTIFF,  "NatOriginLat")
+                    new NamedIdentifier(CitationImpl.OGC,  "latitude_of_origin"),
+                    new NamedIdentifier(CitationImpl.EPSG, "Latitude of false origin"),
+                    new NamedIdentifier(CitationImpl.EPSG, "Latitude of natural origin"),
+                    new NamedIdentifier(CitationImpl.ESRI, "Latitude_Of_Center"),  //ESRI uses this in orthographic 
+                    new NamedIdentifier(CitationImpl.GEOTIFF,  "NatOriginLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -1106,10 +1107,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public static final ParameterDescriptor SCALE_FACTOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,     "scale_factor"),
-                    new Identifier(CitationImpl.EPSG,    "Scale factor at natural origin"),
-                    new Identifier(CitationImpl.GEOTIFF, "ScaleAtNatOrigin"),
-                    new Identifier(CitationImpl.GEOTIFF, "ScaleAtCenter")
+                    new NamedIdentifier(CitationImpl.OGC,     "scale_factor"),
+                    new NamedIdentifier(CitationImpl.EPSG,    "Scale factor at natural origin"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF, "ScaleAtNatOrigin"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF, "ScaleAtCenter")
                 },
                 1, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
@@ -1119,10 +1120,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public static final ParameterDescriptor FALSE_EASTING = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,     "false_easting"),
-                    new Identifier(CitationImpl.EPSG,    "False easting"),
-                    new Identifier(CitationImpl.EPSG,    "Easting at false origin"),
-                    new Identifier(CitationImpl.GEOTIFF, "FalseEasting")
+                    new NamedIdentifier(CitationImpl.OGC,     "false_easting"),
+                    new NamedIdentifier(CitationImpl.EPSG,    "False easting"),
+                    new NamedIdentifier(CitationImpl.EPSG,    "Easting at false origin"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF, "FalseEasting")
                 },
                 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1132,10 +1133,10 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          */
         public static final ParameterDescriptor FALSE_NORTHING = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,     "false_northing"),
-                    new Identifier(CitationImpl.EPSG,    "False northing"),
-                    new Identifier(CitationImpl.EPSG,    "Northing at false origin"),
-                    new Identifier(CitationImpl.GEOTIFF, "FalseNorthing")
+                    new NamedIdentifier(CitationImpl.OGC,     "false_northing"),
+                    new NamedIdentifier(CitationImpl.EPSG,    "False northing"),
+                    new NamedIdentifier(CitationImpl.EPSG,    "Northing at false origin"),
+                    new NamedIdentifier(CitationImpl.GEOTIFF, "FalseNorthing")
                 },
                 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
 

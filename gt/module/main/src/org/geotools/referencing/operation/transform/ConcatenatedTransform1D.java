@@ -40,7 +40,7 @@ final class ConcatenatedTransform1D extends ConcatenatedTransform implements Mat
     private static final long serialVersionUID = 8150427971141078395L;
     
     /**
-     * Construct a concatenated transform.
+     * Constructs a concatenated transform.
      */
     public ConcatenatedTransform1D(final MathTransform transform1,
                                    final MathTransform transform2)

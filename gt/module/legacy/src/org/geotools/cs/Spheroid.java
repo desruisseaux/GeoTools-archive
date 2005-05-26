@@ -46,7 +46,7 @@ import org.geotools.units.Unit;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.Ellipsoid}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEllipsoid}.
  */
 final class Spheroid extends Ellipsoid {
     

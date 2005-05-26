@@ -43,6 +43,7 @@ import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -56,7 +57,7 @@ import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.ResourceKeys;
@@ -968,11 +969,11 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.OGC,      "NADCON"),
-                new Identifier(CitationImpl.EPSG,     "NADCON"),
-                new Identifier(CitationImpl.EPSG,     "9613"),
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.NADCON_TRANSFORM))
+                new NamedIdentifier(CitationImpl.OGC,      "NADCON"),
+                new NamedIdentifier(CitationImpl.EPSG,     "NADCON"),
+                new NamedIdentifier(CitationImpl.EPSG,     "9613"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.NADCON_TRANSFORM))
             }, new ParameterDescriptor[] {
                 LAT_DIFF_FILE,
                 LONG_DIFF_FILE

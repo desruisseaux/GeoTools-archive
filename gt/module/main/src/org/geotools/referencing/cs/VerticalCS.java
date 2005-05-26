@@ -25,10 +25,13 @@ package org.geotools.referencing.cs;
 // J2SE dependencies
 import java.util.Map;
 
-import org.geotools.measure.Measure;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
+// Geotools dependencies
+import org.geotools.measure.Measure;
 
 
 /**
@@ -85,7 +88,7 @@ public class VerticalCS extends CoordinateSystem implements org.opengis.referenc
                     org.geotools.referencing.cs.CoordinateSystemAxis.DEPTH);
 
     /**
-     * Construct a coordinate system from a name.
+     * Constructs a coordinate system from a name.
      *
      * @param name  The coordinate system name.
      * @param axis  The axis.
@@ -95,7 +98,7 @@ public class VerticalCS extends CoordinateSystem implements org.opengis.referenc
     }
 
     /**
-     * Construct a coordinate system from a set of properties. The properties map is given
+     * Constructs a coordinate system from a set of properties. The properties map is given
      * unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
      * super-class constructor}.
      *

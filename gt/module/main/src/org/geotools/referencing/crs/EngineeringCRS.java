@@ -22,23 +22,26 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Map;
-
 import javax.units.SI;
 
-import org.geotools.referencing.IdentifiedObject;
+// OpenGIS dependencies
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.datum.EngineeringDatum;
+import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
+
+// Geotools dependencies
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.DefaultReferenceSystem;
 import org.geotools.referencing.cs.CartesianCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.NameFactory;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.datum.EngineeringDatum;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
  
 
 /**
@@ -84,7 +87,7 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
         private static GenericName ALIAS = NameFactory.create(new InternationalString[] {
                        Resources.formatInternational(ResourceKeys.CARTESIAN)});
 
-        /** Construct a coordinate system with the given name. */
+        /** Constructs a coordinate system with the given name. */
         public Cartesian(final String name, final CoordinateSystem cs) {
             super(name, org.geotools.referencing.datum.EngineeringDatum.UNKNOW, cs);
         }
@@ -99,7 +102,7 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
          * because, otherwise, <code>CARTESIAN_xD</code> and <code>GENERIC_xD</code> would
          * be considered equals when metadata are ignored.
          */
-        public boolean equals(final IdentifiedObject object, final boolean compareMetadata) {
+        public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
             if (super.equals(object, compareMetadata)) {
                 if (compareMetadata) {
                     // No need to performs the check below if metadata were already compared.
@@ -181,9 +184,8 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
-     * Constructs an engineering CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * Constructs an engineering CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

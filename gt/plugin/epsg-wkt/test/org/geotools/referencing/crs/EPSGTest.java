@@ -29,7 +29,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.CitationImpl;
 
 // JUnit dependencies
@@ -98,7 +98,7 @@ public class EPSGTest extends TestCase {
         assertNotNull( crs );
         assertNotNull(crs.getIdentifiers());
         assertTrue(crs.getIdentifiers().length>0);
-        Identifier expected = new Identifier(CitationImpl.EPSG, "42102");
+        NamedIdentifier expected = new NamedIdentifier(CitationImpl.EPSG, "42102");
         assertTrue( Arrays.asList( crs.getIdentifiers() ).contains( expected ));
     }
     public void testSuccess() throws Exception {
@@ -163,7 +163,7 @@ public class EPSGTest extends TestCase {
         assertNotNull( crs );
         assertNotNull(crs.getIdentifiers());
         assertTrue(crs.getIdentifiers().length>0);
-        Identifier expected = new Identifier(CitationImpl.EPSG, "42102");
+        NamedIdentifier expected = new NamedIdentifier(CitationImpl.EPSG, "42102");
         assertTrue( Arrays.asList( crs.getIdentifiers() ).contains( expected ));
     }
 }

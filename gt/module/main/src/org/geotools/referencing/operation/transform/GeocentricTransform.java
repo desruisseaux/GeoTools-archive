@@ -33,6 +33,7 @@ import javax.units.SI;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -46,7 +47,7 @@ import org.opengis.referencing.operation.OperationMethod;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.ParameterReal;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -128,7 +129,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     private transient MathTransform inverse;
     
     /**
-     * Construct a transform from the specified ellipsoid.
+     * Constructs a transform from the specified ellipsoid.
      *
      * @param ellipsoid The ellipsoid.
      * @param hasHeight <code>true</code> if geographic coordinates
@@ -142,7 +143,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     }
     
     /**
-     * Construct a transform from the specified parameters.
+     * Constructs a transform from the specified parameters.
      *
      * @param semiMajor The semi-major axis length.
      * @param semiMinor The semi-minor axis length.
@@ -563,8 +564,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          */
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,  "semi_major"),
-                    new Identifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(CitationImpl.OGC,  "semi_major"),
+                    new NamedIdentifier(CitationImpl.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -574,8 +575,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          */
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new Identifier[] {
-                    new Identifier(CitationImpl.OGC,  "semi_minor"),
-                    new Identifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(CitationImpl.OGC,  "semi_minor"),
+                    new NamedIdentifier(CitationImpl.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -586,7 +587,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
         private static final ParameterDescriptor DIM =
                 new org.geotools.parameter.ParameterDescriptor(
                     Collections.singletonMap(NAME_PROPERTY,
-                                             new Identifier(CitationImpl.GEOTOOLS, "dim")),
+                                             new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
                     3, 2, 3, false);
 
         /**
@@ -599,7 +600,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                         ResourceKeys.GEOCENTRIC_TRANSFORM);
 
         /**
-         * Construct the parameters group.
+         * Constructs the parameters group.
          */
         static ParameterDescriptorGroup createDescriptorGroup(final String ogc,
                                                               final String epsgName,
@@ -607,10 +608,10 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                                                               final int geotools)
         {
             return createDescriptorGroup(new Identifier[] {
-                    new Identifier(CitationImpl.OGC,      ogc),
-                    new Identifier(CitationImpl.EPSG,     epsgName),
-                    new Identifier(CitationImpl.EPSG,     epsgCode),
-                    new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(geotools))
+                    new NamedIdentifier(CitationImpl.OGC,      ogc),
+                    new NamedIdentifier(CitationImpl.EPSG,     epsgName),
+                    new NamedIdentifier(CitationImpl.EPSG,     epsgCode),
+                    new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(geotools))
                 }, new ParameterDescriptor[] {
                     SEMI_MAJOR, SEMI_MINOR, DIM
                 });

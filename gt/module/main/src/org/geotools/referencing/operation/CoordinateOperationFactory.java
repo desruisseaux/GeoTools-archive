@@ -73,7 +73,9 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -485,8 +487,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
 
         /** Wrap the specified datum. */
         public TemporaryDatum(final GeodeticDatum datum) {
-            super(getTemporaryName(datum), datum.getEllipsoid(),
-                  org.geotools.referencing.datum.PrimeMeridian.GREENWICH);
+            super(getTemporaryName(datum), datum.getEllipsoid(), DefaultPrimeMeridian.GREENWICH);
             this.datum = datum;
         }
 
@@ -499,7 +500,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         }
 
         /** Compares this datum with the specified object for equality. */
-        public boolean equals(final org.geotools.referencing.IdentifiedObject object,
+        public boolean equals(final DefaultIdentifiedObject object,
                               final boolean compareMetadata)
         {
             if (super.equals(object, compareMetadata)) {
@@ -1534,6 +1535,6 @@ search: for (int j=0; j<targets.length; j++) {
      *       will be allowed to compile against J2SE 1.5.
      */
     private static boolean nameMatches(final IdentifiedObject object, final String name) {
-        return org.geotools.referencing.IdentifiedObject.nameMatches(object, name);
+        return DefaultIdentifiedObject.nameMatches(object, name);
     }
 }

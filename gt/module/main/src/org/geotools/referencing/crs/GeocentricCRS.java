@@ -22,16 +22,19 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.Collections;
 import java.util.Map;
-
 import javax.units.Unit;
 
-import org.geotools.referencing.wkt.Formatter;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.SphericalCS;
 import org.opengis.referencing.datum.GeodeticDatum;
+
+// Geotools dependencies
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.DefaultReferenceSystem;
 
 
 /**
@@ -107,9 +110,8 @@ public class GeocentricCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
-     * Constructs a geographic CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * Constructs a geographic CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
@@ -125,8 +127,7 @@ public class GeocentricCRS extends org.geotools.referencing.crs.SingleCRS
     /**
      * Constructs a geographic CRS from a set of properties.
      * The properties are given unchanged to the
-     * {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

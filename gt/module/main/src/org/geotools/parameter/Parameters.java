@@ -44,7 +44,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterTypeException;
 
 // Geotools dependencies
-import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.DefaultIdentifiedObject;
 
 
 /**
@@ -318,7 +318,7 @@ public class Parameters {
                                final int maxDepth, final Collection list)
     {
         if (maxDepth >= 0) {
-            if (IdentifiedObject.nameMatches(param.getDescriptor(), name)) {
+            if (DefaultIdentifiedObject.nameMatches(param.getDescriptor(), name)) {
                 list.add(param);
             }
             if (maxDepth!=0 && param instanceof ParameterValueGroup) {

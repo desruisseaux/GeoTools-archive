@@ -26,9 +26,13 @@ package org.geotools.referencing.crs;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.referencing.wkt.Formatter;
+// OpenGIS dependencies
 import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.datum.VerticalDatum;
+
+// Geotools dependencies
+import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.DefaultIdentifiedObject;
 
 
 /**
@@ -82,9 +86,8 @@ public class VerticalCRS extends org.geotools.referencing.crs.SingleCRS
     }
 
     /**
-     * Constructs a vertical CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain org.geotools.referencing.ReferenceSystem#ReferenceSystem(Map) super-class
-     * constructor}.
+     * Constructs a vertical CRS from a set of properties. The properties are given unchanged to
+     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

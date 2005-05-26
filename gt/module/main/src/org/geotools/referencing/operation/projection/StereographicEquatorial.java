@@ -72,7 +72,7 @@ public class StereographicEquatorial extends StereographicOblique {
     static final double k0 = 2;
     
     /**
-     * Construct an equatorial stereographic projection (USGS equations).
+     * Constructs an equatorial stereographic projection (USGS equations).
      *
      * @param  parameters The group of parameter values.
      * @param  expected The expected parameter descriptors.
@@ -127,7 +127,7 @@ public class StereographicEquatorial extends StereographicOblique {
      */
     static final class Spherical extends StereographicEquatorial {
         /**
-         * Construct a spherical equatorial stereographic projection (USGS equations).
+         * Constructs a spherical equatorial stereographic projection (USGS equations).
          *
          * @param  parameters The group of parameter values.
          * @param  expected The expected parameter descriptors.

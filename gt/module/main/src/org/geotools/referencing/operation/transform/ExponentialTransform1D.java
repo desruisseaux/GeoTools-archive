@@ -24,6 +24,7 @@ import java.io.Serializable;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -36,7 +37,7 @@ import org.opengis.referencing.operation.MathTransform1D;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.ParameterReal;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
@@ -93,7 +94,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
     private MathTransform inverse;
 
     /**
-     * Construct a new exponentional transform which is the
+     * Constructs a new exponentional transform which is the
      * inverse of the supplied logarithmic transform.
      */
     ExponentialTransform1D(final LogarithmicTransform1D inverse) {
@@ -104,7 +105,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Construct a new exponentional transform. This constructor is provided for subclasses only.
+     * Constructs a new exponentional transform. This constructor is provided for subclasses only.
      * Instances should be created using the {@linkplain #create factory method}, which
      * may returns optimized implementations for some particular argument values.
      *
@@ -118,7 +119,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Construct a new exponentional transform.
+     * Constructs a new exponentional transform.
      *
      * @param base   The base to be raised to a power.
      * @param scale  The scale value to be multiplied.
@@ -347,8 +348,8 @@ public class ExponentialTransform1D extends AbstractMathTransform
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new Identifier[] {
-                new Identifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
-                                                      ResourceKeys.EXPONENTIAL))
+                new NamedIdentifier(CitationImpl.GEOTOOLS, Resources.formatInternational(
+                                                           ResourceKeys.EXPONENTIAL))
             }, new ParameterDescriptor[] {
                 BASE, SCALE
             });

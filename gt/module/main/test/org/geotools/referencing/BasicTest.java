@@ -50,10 +50,10 @@ import org.geotools.referencing.cs.CoordinateSystemAxis;
 import org.geotools.referencing.cs.EllipsoidalCS;
 import org.geotools.referencing.cs.TimeCS;
 import org.geotools.referencing.cs.VerticalCS;
-import org.geotools.referencing.datum.Datum;
-import org.geotools.referencing.datum.Ellipsoid;
+import org.geotools.referencing.datum.DefaultDatum;
+import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.GeodeticDatum;
-import org.geotools.referencing.datum.PrimeMeridian;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.VerticalDatum;
 import org.geotools.util.SimpleInternationalString;
 
@@ -231,19 +231,19 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Test {@link Datum} and well-know text formatting.
+     * Test {@link DefaultDatum} and well-know text formatting.
      */
     public void testDatum() {
         // WGS84 components and equalities
-        assertEquals("Ellipsoid",     Ellipsoid    .WGS84,     GeodeticDatum.WGS84.getEllipsoid());
-        assertEquals("PrimeMeridian", PrimeMeridian.GREENWICH, GeodeticDatum.WGS84.getPrimeMeridian());
+        assertEquals("Ellipsoid",     DefaultEllipsoid.WGS84,         GeodeticDatum.WGS84.getEllipsoid());
+        assertEquals("PrimeMeridian", DefaultPrimeMeridian.GREENWICH, GeodeticDatum.WGS84.getPrimeMeridian());
         assertFalse ("VerticalDatum", VerticalDatum.GEOIDAL .equals( VerticalDatum.ELLIPSOIDAL));
         assertEquals("Geoidal",       VerticalDatumType.GEOIDAL,     VerticalDatum.GEOIDAL    .getVerticalDatumType());
         assertEquals("Ellipsoidal",   VerticalDatumType.ELLIPSOIDAL, VerticalDatum.ELLIPSOIDAL.getVerticalDatumType());
 
         // Test WKT
-        assertEquals("Ellipsoid",     "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]",  Ellipsoid.WGS84          .toWKT(0));
-        assertEquals("PrimeMeridian", "PRIMEM[\"Greenwich\", 0.0]",                     PrimeMeridian.GREENWICH  .toWKT(0));
+        assertEquals("Ellipsoid",     "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]",  DefaultEllipsoid.WGS84        .toWKT(0));
+        assertEquals("PrimeMeridian", "PRIMEM[\"Greenwich\", 0.0]",                     DefaultPrimeMeridian.GREENWICH.toWKT(0));
         assertEquals("VerticalDatum", "VERT_DATUM[\"Geoidal\", 2005]",                  VerticalDatum.GEOIDAL    .toWKT(0));
         assertEquals("VerticalDatum", "VERT_DATUM[\"Ellipsoidal\", 2002]",              VerticalDatum.ELLIPSOIDAL.toWKT(0));
         assertEquals("GeodeticDatum", "DATUM[\"WGS84\", "+
@@ -258,8 +258,8 @@ public class BasicTest extends TestCase {
         properties.put("remarks_fr",    "Voici des remarques");
 
         GeodeticDatum datum = new GeodeticDatum(properties,
-                                                Ellipsoid.createEllipsoid("Test", 1000, 1000, SI.METER),
-                                                new PrimeMeridian("Test", 12));
+                                  DefaultEllipsoid.createEllipsoid("Test", 1000, 1000, SI.METER),
+                                  new DefaultPrimeMeridian("Test", 12));
 
         assertEquals("name",          "This is a name",         datum.getName   ().getCode());
         assertEquals("scope",         "This is a scope",        datum.getScope  ().toString(null));
@@ -299,7 +299,7 @@ public class BasicTest extends TestCase {
         serialize(EllipsoidalCS.GEODETIC_2D);
         serialize(EllipsoidalCS.GEODETIC_3D);
         serialize(GeodeticDatum.WGS84);
-        serialize(PrimeMeridian.GREENWICH);
+        serialize(DefaultPrimeMeridian.GREENWICH);
     }
 
     /**

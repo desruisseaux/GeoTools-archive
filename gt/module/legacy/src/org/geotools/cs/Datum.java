@@ -50,7 +50,7 @@ import org.opengis.cs.CS_DatumType;
  *
  * @see org.opengis.cs.CS_Datum
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.Datum}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultDatum}.
  */
 public class Datum extends Info {
     /**

@@ -87,7 +87,9 @@ import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.datum.DefaultDatum;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Utilities;
@@ -573,15 +575,15 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             properties.clear();
         }
         if (name != null) {
-            properties.put(prepend(org.geotools.referencing.IdentifiedObject.NAME_PROPERTY),
-                           new Identifier(authority, name.trim()));
+            properties.put(prepend(DefaultIdentifiedObject.NAME_PROPERTY),
+                           new NamedIdentifier(authority, name.trim()));
         }
         if (code != null) {
-            properties.put(prepend(org.geotools.referencing.IdentifiedObject.IDENTIFIERS_PROPERTY),
-                           new Identifier(authority, code.trim()));
+            properties.put(prepend(DefaultIdentifiedObject.IDENTIFIERS_PROPERTY),
+                           new NamedIdentifier(authority, code.trim()));
         }
         if (remarks!=null && (remarks=remarks.trim()).length()!=0) {
-            properties.put(prepend(org.geotools.referencing.IdentifiedObject.REMARKS_PROPERTY), remarks);
+            properties.put(prepend(DefaultIdentifiedObject.REMARKS_PROPERTY), remarks);
         }
         /*
          * Search for alias.
@@ -616,7 +618,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         }
         result.close();
         if (alias != null) {
-            properties.put(prepend(org.geotools.referencing.IdentifiedObject.ALIAS_PROPERTY),
+            properties.put(prepend(DefaultIdentifiedObject.ALIAS_PROPERTY),
                            (GenericName[]) alias.toArray(new GenericName[alias.size()]));
         }
         return properties;
@@ -640,10 +642,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         final Map properties = createProperties(name, code, remarks);
         if (area != null  &&  (area=area.trim()).length() != 0) {
             final Extent extent = buffered.createExtent(area);
-            properties.put(prepend(org.geotools.referencing.datum.Datum.VALID_AREA_PROPERTY), extent);
+            properties.put(prepend(DefaultDatum.VALID_AREA_PROPERTY), extent);
         }
         if (scope != null &&  (scope=scope.trim()).length() != 0) {
-            properties.put(prepend(org.geotools.referencing.datum.Datum.SCOPE_PROPERTY), scope);
+            properties.put(prepend(DefaultDatum.SCOPE_PROPERTY), scope);
         }
         return properties;
     }
@@ -1127,14 +1129,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String remarks = result.getString( 8);
                 Map properties = createProperties(name, epsg, area, scope, remarks);
                 if (anchor != null) {
-                    properties.put(org.geotools.referencing.datum.Datum.
-                                   ANCHOR_POINT_PROPERTY, anchor);
+                    properties.put(DefaultDatum.ANCHOR_POINT_PROPERTY, anchor);
                 }
                 if (epoch != 0) {
                     calendar.clear();
                     calendar.set(epoch, 0, 1);
-                    properties.put(org.geotools.referencing.datum.Datum.
-                                   REALIZATION_EPOCH_PROPERTY, calendar.getTime());
+                    properties.put(DefaultDatum.REALIZATION_EPOCH_PROPERTY, calendar.getTime());
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;

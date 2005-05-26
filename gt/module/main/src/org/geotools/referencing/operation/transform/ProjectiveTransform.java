@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.vecmath.SingularMatrixException;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -47,7 +48,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.MatrixParameterDescriptors;
 import org.geotools.parameter.MatrixParameterValues;
-import org.geotools.referencing.Identifier;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
@@ -111,7 +112,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     private final double[] elt;
     
     /**
-     * Construct a transform from the specified matrix.
+     * Constructs a transform from the specified matrix.
      * The matrix should be affine, but it will not be verified.
      *
      * @param matrix The matrix.
@@ -477,14 +478,14 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          */
         static final ParameterDescriptorGroup PARAMETERS;
         static {
-            final Identifier name = new Identifier(CitationImpl.OGC, "Affine");
+            final Identifier name = new NamedIdentifier(CitationImpl.OGC, "Affine");
             final Map  properties = new HashMap(4, 0.8f);
             properties.put(NAME_PROPERTY,        name);
             properties.put(IDENTIFIERS_PROPERTY, name);
             properties.put(ALIAS_PROPERTY, new Identifier[] {name,
-                new Identifier(CitationImpl.EPSG, "Affine general parametric transformation"),
-                new Identifier(CitationImpl.EPSG, "9624"),
-                new Identifier(CitationImpl.GEOTOOLS,
+                new NamedIdentifier(CitationImpl.EPSG, "Affine general parametric transformation"),
+                new NamedIdentifier(CitationImpl.EPSG, "9624"),
+                new NamedIdentifier(CitationImpl.GEOTOOLS,
                     Resources.formatInternational(ResourceKeys.AFFINE_TRANSFORM))
             });
             PARAMETERS = new MatrixParameterDescriptors(properties);

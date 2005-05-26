@@ -76,7 +76,7 @@ import org.geotools.resources.cts.ResourceKeys;
  */
 public abstract class AbstractMathTransform extends Formattable implements MathTransform {
     /**
-     * Construct a math transform.
+     * Constructs a math transform.
      */
     protected AbstractMathTransform() {
     }
@@ -151,7 +151,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
-     * Construct an error message for the {@link MismatchedDimensionException}.
+     * Constructs an error message for the {@link MismatchedDimensionException}.
      *
      * @param argument  The argument name with the wrong number of dimensions.
      * @param dimension The wrong dimension.
@@ -745,7 +745,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         private static final long serialVersionUID = 3528274816628012283L;
 
         /**
-         * Construct an inverse math transform.
+         * Constructs an inverse math transform.
          */
         protected Inverse() {
         }
