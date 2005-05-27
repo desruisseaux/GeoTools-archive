@@ -62,6 +62,8 @@ import org.opengis.util.ScopedName;
 import org.geotools.referencing.factory.DatumAliases;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.GeotoolsFactory;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.operation.projection.MapProjection;
@@ -141,7 +143,7 @@ public class CreationTest extends TestCase {
         out.println(datum.toWKT());
 
         // NOTE: we could use the following pre-defined constant instead:
-        //       org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D;
+        //       DefaultEllipsoidalCS.GEODETIC_2D;
         final EllipsoidalCS ellCS;
         ellCS = csFactory.createEllipsoidalCS(name("Ellipsoidal"),
                 csFactory.createCoordinateSystemAxis(name("Longitude"), "long", AxisDirection.EAST,  degrees),
@@ -169,7 +171,7 @@ public class CreationTest extends TestCase {
         out.println(param);
 
         // NOTE: we could use the following pre-defined constant instead:
-        //       org.geotools.referencing.cs.CartesianCS.PROJECTED;
+        //       DefaultCartesianCS.PROJECTED;
         final CartesianCS cartCS;
         cartCS = csFactory.createCartesianCS(name("Cartesian"),
                  csFactory.createCoordinateSystemAxis(name("Easting"),  "x", AxisDirection.EAST,  meters),
@@ -220,7 +222,7 @@ public class CreationTest extends TestCase {
                 final ProjectedCRS projCRS =
                         new org.geotools.referencing.crs.ProjectedCRS("Test", method,
                             org.geotools.referencing.crs.GeographicCRS.WGS84, mt,
-                            org.geotools.referencing.cs.CartesianCS.PROJECTED);
+                            DefaultCartesianCS.PROJECTED);
                 final Conversion conversion = projCRS.getConversionFromBase();
                 assertSame(mt, conversion.getMathTransform());
                 final OperationMethod projMethod = conversion.getMethod();

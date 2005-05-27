@@ -83,8 +83,26 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
+import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.cs.AbstractCS;
+import org.geotools.referencing.cs.DefaultAffineCS;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.referencing.cs.DefaultCylindricalCS;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
+import org.geotools.referencing.cs.DefaultLinearCS;
+import org.geotools.referencing.cs.DefaultPolarCS;
+import org.geotools.referencing.cs.DefaultSphericalCS;
+import org.geotools.referencing.cs.DefaultTimeCS;
+import org.geotools.referencing.cs.DefaultUserDefinedCS;
+import org.geotools.referencing.cs.DefaultVerticalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.referencing.datum.DefaultEngineeringDatum;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.referencing.datum.DefaultImageDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
+import org.geotools.referencing.datum.DefaultTemporalDatum;
+import org.geotools.referencing.datum.DefaultVerticalDatum;
 import org.geotools.util.WeakHashSet;
 
 
@@ -222,8 +240,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         GeodeticDatum datum;
         try {
-            datum = new org.geotools.referencing.datum.GeodeticDatum(
-                        properties, ellipsoid, primeMeridian);
+            datum = new DefaultGeodeticDatum(properties, ellipsoid, primeMeridian);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -243,7 +260,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         VerticalDatum datum;
         try {
-            datum = new org.geotools.referencing.datum.VerticalDatum(properties, type);
+            datum = new DefaultVerticalDatum(properties, type);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -263,7 +280,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         TemporalDatum datum;
         try {
-            datum = new org.geotools.referencing.datum.TemporalDatum(properties, origin);
+            datum = new DefaultTemporalDatum(properties, origin);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -281,7 +298,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         EngineeringDatum datum;
         try {
-            datum = new org.geotools.referencing.datum.EngineeringDatum(properties);
+            datum = new DefaultEngineeringDatum(properties);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -302,7 +319,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         ImageDatum datum;
         try {
-            datum = new org.geotools.referencing.datum.ImageDatum(properties, pixelInCell);
+            datum = new DefaultImageDatum(properties, pixelInCell);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -334,7 +351,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         CoordinateSystemAxis axis;
         try {
-            axis = new org.geotools.referencing.cs.CoordinateSystemAxis(properties, abbreviation, direction, unit);
+            axis = new DefaultCoordinateSystemAxis(properties, abbreviation, direction, unit);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -356,7 +373,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         CartesianCS cs;
         try {
-            cs = new org.geotools.referencing.cs.CartesianCS(properties, axis0, axis1);
+            cs = new DefaultCartesianCS(properties, axis0, axis1);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -380,7 +397,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         CartesianCS cs;
         try {
-            cs = new org.geotools.referencing.cs.CartesianCS(properties, axis0, axis1, axis2);
+            cs = new DefaultCartesianCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -402,7 +419,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         AffineCS cs;
         try {
-            cs = new org.geotools.referencing.cs.AffineCS(properties, axis0, axis1);
+            cs = new DefaultAffineCS(properties, axis0, axis1);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -426,7 +443,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         AffineCS cs;
         try {
-            cs = new org.geotools.referencing.cs.AffineCS(properties, axis0, axis1, axis2);
+            cs = new DefaultAffineCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -448,7 +465,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         PolarCS cs;
         try {
-            cs = new org.geotools.referencing.cs.PolarCS(properties, axis0, axis1);
+            cs = new DefaultPolarCS(properties, axis0, axis1);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -490,7 +507,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         CylindricalCS cs;
         try {
-            cs = new org.geotools.referencing.cs.CylindricalCS(properties, axis0, axis1, axis2);
+            cs = new DefaultCylindricalCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -514,7 +531,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         SphericalCS cs;
         try {
-            cs = new org.geotools.referencing.cs.SphericalCS(properties, axis0, axis1, axis2);
+            cs = new DefaultSphericalCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -536,7 +553,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         EllipsoidalCS cs;
         try {
-            cs = new org.geotools.referencing.cs.EllipsoidalCS(properties, axis0, axis1);
+            cs = new DefaultEllipsoidalCS(properties, axis0, axis1);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -560,7 +577,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         EllipsoidalCS cs;
         try {
-            cs = new org.geotools.referencing.cs.EllipsoidalCS(properties, axis0, axis1, axis2);
+            cs = new DefaultEllipsoidalCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -580,7 +597,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         VerticalCS cs;
         try {
-            cs = new org.geotools.referencing.cs.VerticalCS(properties, axis);
+            cs = new DefaultVerticalCS(properties, axis);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -600,7 +617,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         TimeCS cs;
         try {
-            cs = new org.geotools.referencing.cs.TimeCS(properties, axis);
+            cs = new DefaultTimeCS(properties, axis);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -620,7 +637,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         LinearCS cs;
         try {
-            cs = new org.geotools.referencing.cs.LinearCS(properties, axis);
+            cs = new DefaultLinearCS(properties, axis);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -642,7 +659,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         UserDefinedCS cs;
         try {
-            cs = new org.geotools.referencing.cs.UserDefinedCS(properties, axis0, axis1);
+            cs = new DefaultUserDefinedCS(properties, axis0, axis1);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -666,7 +683,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         UserDefinedCS cs;
         try {
-            cs = new org.geotools.referencing.cs.UserDefinedCS(properties, axis0, axis1, axis2);
+            cs = new DefaultUserDefinedCS(properties, axis0, axis1, axis2);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -696,7 +713,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         CompoundCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.CompoundCRS(properties, elements);
+            crs = new DefaultCompoundCRS(properties, elements);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -871,11 +888,10 @@ public class GeotoolsFactory extends AbstractFactory
      * in any other plane.
      * <p>
      * <strong>NOTE:</strong>
-     * It is the user's responsability to ensure that the {@code baseToDerived}
-     * transform performs all required steps, including
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
-     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
-     * class provides conveniences methods for this task.
+     * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
+     * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
+     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
+     * methods for this task.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  base Coordinate reference system to base the derived CRS on.
@@ -904,11 +920,10 @@ public class GeotoolsFactory extends AbstractFactory
      * in any other plane.
      * <p>
      * <strong>NOTE:</strong>
-     * It is the user's responsability to ensure that the {@code baseToDerived}
-     * transform performs all required steps, including
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
-     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
-     * class provides conveniences methods for this task.
+     * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
+     * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
+     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
+     * methods for this task.
      *
      * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
@@ -939,11 +954,10 @@ public class GeotoolsFactory extends AbstractFactory
      * Creates a projected coordinate reference system from a transform.
      * <p>
      * <strong>NOTE:</strong>
-     * It is the user's responsability to ensure that the {@code baseToDerived}
-     * transform performs all required steps, including
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
-     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
-     * class provides conveniences methods for this task.
+     * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
+     * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
+     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
+     * methods for this task.
      * 
      * @param  properties Name and other properties to give to the new object.
      * @param  geoCRS Geographic coordinate reference system to base projection on.
@@ -967,11 +981,10 @@ public class GeotoolsFactory extends AbstractFactory
      * Creates a projected coordinate reference system from a transform.
      * <p>
      * <strong>NOTE:</strong>
-     * It is the user's responsability to ensure that the {@code baseToDerived}
-     * transform performs all required steps, including
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
-     * unit conversions and change of axis order}, if needed. The {@link FactoryGroup}
-     * class provides conveniences methods for this task.
+     * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
+     * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
+     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
+     * methods for this task.
      * 
      * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the

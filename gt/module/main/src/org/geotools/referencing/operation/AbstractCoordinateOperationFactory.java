@@ -57,6 +57,7 @@ import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractFactory;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
@@ -247,14 +248,14 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *         an affine transform. Only axis orientation and units are taken in account.
      * @throws OperationNotFoundException If the affine transform can't be constructed.
      *
-     * @see org.geotools.referencing.cs.CoordinateSystem#swapAndScaleAxis
+     * @see AbstractCS#swapAndScaleAxis
      */
     protected Matrix swapAndScaleAxis(final CoordinateSystem sourceCS,
                                       final CoordinateSystem targetCS)
             throws OperationNotFoundException
     {
         try {
-            return org.geotools.referencing.cs.CoordinateSystem.swapAndScaleAxis(sourceCS,targetCS);
+            return AbstractCS.swapAndScaleAxis(sourceCS,targetCS);
         } catch (IllegalArgumentException exception) {
             throw new OperationNotFoundException(getErrorMessage(sourceCS, targetCS), exception);
         } catch (ConversionException exception) {

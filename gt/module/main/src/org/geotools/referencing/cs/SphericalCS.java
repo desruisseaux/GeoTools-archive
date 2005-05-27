@@ -22,92 +22,39 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
 import java.util.Map;
-
-// OpenGIS dependencies
-import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 
 /**
  * A three-dimensional coordinate system with one distance measured from the origin and two angular
- * coordinates. Not to be confused with an {@linkplain org.geotools.referencing.cs.EllipsoidalCS
- * ellipsoidal coordinate system} based on an ellipsoid "degenerated" into a sphere.
- * A <code>SphericalCS</code> shall have three {@linkplain #getAxis axis}.
- *
- * <TABLE CELLPADDING='6' BORDER='1'>
- * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
- * <TR><TD>
- *   {@link org.geotools.referencing.crs.GeocentricCRS  Geocentric},
- *   {@link org.geotools.referencing.crs.EngineeringCRS Engineering}
- * </TD></TR></TABLE>
+ * coordinates.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link DefaultSphericalCS}.
  */
-public class SphericalCS extends CoordinateSystem implements org.opengis.referencing.cs.SphericalCS {
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = 196295996465774477L;
-
-    /**
-     * A three-dimensional spherical CS with
-     * <var>{@linkplain CoordinateSystemAxis#SPHERICAL_LONGITUDE longitude}</var>,
-     * <var>{@linkplain CoordinateSystemAxis#SPHERICAL_LATITUDE latitude}</var>,
-     * <var>{@linkplain CoordinateSystemAxis#GEOCENTRIC_RADIUS radius}</var>
-     * axis.
-     *
-     * @see org.geotools.referencing.cs.CartesianCS#GEOCENTRIC
-     *
-     * @todo Localize name.
-     */
-    public static SphericalCS GEOCENTRIC = new SphericalCS("Geocentric",
-                    org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LONGITUDE,
-                    org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LATITUDE,
-                    org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_RADIUS);
-
+public class SphericalCS extends DefaultSphericalCS {
     /**
      * Constructs a three-dimensional coordinate system from a name.
-     *
-     * @param name  The coordinate system name.
-     * @param axis0 The first axis.
-     * @param axis1 The second axis.
-     * @param axis2 The third axis.
      */
     public SphericalCS(final String               name,
                        final CoordinateSystemAxis axis0,
                        final CoordinateSystemAxis axis1,
                        final CoordinateSystemAxis axis2)
     {
-        super(name, new CoordinateSystemAxis[] {axis0, axis1, axis2});
+        super(name, axis0, axis1, axis2);
     }
 
     /**
-     * Constructs a three-dimensional coordinate system from a set of properties. The properties map is
-     * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
-     * super-class constructor}.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param axis0 The first axis.
-     * @param axis1 The second axis.
-     * @param axis2 The third axis.
+     * Constructs a three-dimensional coordinate system from a set of properties.
      */
     public SphericalCS(final Map             properties,
                        final CoordinateSystemAxis axis0,
                        final CoordinateSystemAxis axis1,
                        final CoordinateSystemAxis axis2)
     {
-        super(properties, new CoordinateSystemAxis[] {axis0, axis1, axis2});
-    }
-
-    /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
-     * system. The default implementation accepts all directions except temporal ones (i.e.
-     * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
-     */
-    protected boolean isCompatibleDirection(final AxisDirection direction) {
-        return !AxisDirection.FUTURE.equals(direction.absolute());
+        super(properties, axis0, axis1, axis2);
     }
 }

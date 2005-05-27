@@ -33,7 +33,7 @@ import org.geotools.units.Unit;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.TemporalDatum}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultTemporalDatum}.
  */
 public class TemporalDatum extends Datum {
     /**

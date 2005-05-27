@@ -89,8 +89,10 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.datum.DefaultDatum;
+import org.geotools.referencing.datum.AbstractDatum;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -642,10 +644,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         final Map properties = createProperties(name, code, remarks);
         if (area != null  &&  (area=area.trim()).length() != 0) {
             final Extent extent = buffered.createExtent(area);
-            properties.put(prepend(DefaultDatum.VALID_AREA_PROPERTY), extent);
+            properties.put(prepend(AbstractDatum.VALID_AREA_PROPERTY), extent);
         }
         if (scope != null &&  (scope=scope.trim()).length() != 0) {
-            properties.put(prepend(DefaultDatum.SCOPE_PROPERTY), scope);
+            properties.put(prepend(AbstractDatum.SCOPE_PROPERTY), scope);
         }
         return properties;
     }
@@ -1129,12 +1131,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String remarks = result.getString( 8);
                 Map properties = createProperties(name, epsg, area, scope, remarks);
                 if (anchor != null) {
-                    properties.put(DefaultDatum.ANCHOR_POINT_PROPERTY, anchor);
+                    properties.put(AbstractDatum.ANCHOR_POINT_PROPERTY, anchor);
                 }
                 if (epoch != 0) {
                     calendar.clear();
                     calendar.set(epoch, 0, 1);
-                    properties.put(DefaultDatum.REALIZATION_EPOCH_PROPERTY, calendar.getTime());
+                    properties.put(AbstractDatum.REALIZATION_EPOCH_PROPERTY, calendar.getTime());
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;
@@ -1157,8 +1159,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     final BursaWolfParameters[] param = createBursaWolfParameters(code, result);
                     if (param != null) {
                         result = null; // Already closed by createBursaWolfParameters
-                        properties.put(org.geotools.referencing.datum.GeodeticDatum.
-                                       BURSA_WOLF_PROPERTY, param);
+                        properties.put(DefaultGeodeticDatum.BURSA_WOLF_PROPERTY, param);
                     }
                     datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
                 } else if (type.equalsIgnoreCase("vertical")) {
@@ -1253,7 +1254,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             final String remarks      = result.getString( 7);
             AxisDirection direction;
             try {
-                direction = org.geotools.referencing.cs.CoordinateSystemAxis.getDirection(orientation);
+                direction = DefaultCoordinateSystemAxis.getDirection(orientation);
             } catch (NoSuchElementException exception) {
                 if (orientation.equalsIgnoreCase("Geocentre > equator/PM")) {
                     direction = AxisDirection.OTHER; // TODO: can we choose a more accurate direction?

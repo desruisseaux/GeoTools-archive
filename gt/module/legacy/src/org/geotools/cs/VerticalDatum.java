@@ -39,7 +39,7 @@ import org.opengis.cs.CS_VerticalDatum;
  *
  * @see org.opengis.cs.CS_VerticalDatum
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.VerticalDatum}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultVerticalDatum}.
  */
 public class VerticalDatum extends Datum {
     /**

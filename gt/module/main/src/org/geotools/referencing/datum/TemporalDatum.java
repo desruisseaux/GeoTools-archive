@@ -22,16 +22,8 @@
  */
 package org.geotools.referencing.datum;
 
-// J2SE direct dependencies
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
 
 
 /**
@@ -39,99 +31,21 @@ import org.geotools.referencing.DefaultIdentifiedObject;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link DefaultTemporalDatum}.
  */
-public class TemporalDatum extends DefaultDatum implements org.opengis.referencing.datum.TemporalDatum {
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = 3357241732140076884L;
-    
-    /**
-     * Default datum for time measured since January 1st, 1970 at 00:00 UTC.
-     */
-    public static final TemporalDatum UNIX = new TemporalDatum("UNIX", new Date(0));
-
-    /**
-     * The date and time origin of this temporal datum.
-     */
-    private final long origin;
-
+public class TemporalDatum extends DefaultTemporalDatum {
     /**
      * Constructs a temporal datum from a name.
-     *
-     * @param name   The datum name.
-     * @param origin The date and time origin of this temporal datum.
      */
     public TemporalDatum(final String name, final Date origin) {
-        this(Collections.singletonMap(NAME_PROPERTY, name), origin);
+        super(name, origin);
     }
 
     /**
-     * Constructs a temporal datum from a set of properties. The properties map is given
-     * unchanged to the {@linkplain DefaultDatum#DefaultDatum(Map) super-class constructor}.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param origin The date and time origin of this temporal datum.
+     * Constructs a temporal datum from a set of properties.
      */
     public TemporalDatum(final Map properties, final Date origin) {
-        super(properties);
-        ensureNonNull("origin", origin);
-        this.origin = origin.getTime();
-    }
-
-    /**
-     * The date and time origin of this temporal datum.
-     *
-     * @return The date and time origin of this temporal datum.
-     */
-    public Date getOrigin() {
-        return new Date(origin);
-    }
-
-    /**
-     * Description of the point or points used to anchor the datum to the Earth.
-     */
-    public InternationalString getAnchorPoint() {
-        return super.getAnchorPoint();
-    }
-
-    /**
-     * The time after which this datum definition is valid.
-     */
-    public Date getRealizationEpoch() {
-        return super.getRealizationEpoch();
-    }
-    
-    /**
-     * Compare this temporal datum with the specified object for equality.
-     *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
-     */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
-        if (object == this) {
-            return true; // Slight optimization.
-        }
-        if (super.equals(object, compareMetadata)) {
-            final TemporalDatum that = (TemporalDatum) object;
-            return this.origin == that.origin;
-        }
-        return false;
-    }
-
-    /**
-     * Returns a hash value for this temporal datum. {@linkplain #getName Name},
-     * {@linkplain #getRemarks remarks} and the like are not taken in account. In
-     * other words, two temporal datums will return the same hash value if they
-     * are equal in the sense of
-     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
-     *
-     * @return The hash code value. This value doesn't need to be the same
-     *         in past or future versions of this class.
-     */
-    public int hashCode() {
-        return super.hashCode() ^ (int)origin ^ (int)(origin >>> 32);
+        super(properties, origin);
     }
 }

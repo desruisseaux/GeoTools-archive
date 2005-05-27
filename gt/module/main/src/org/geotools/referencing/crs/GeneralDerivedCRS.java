@@ -59,7 +59,7 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
+public class GeneralDerivedCRS extends DefaultSingleCRS
                             implements org.opengis.referencing.crs.GeneralDerivedCRS
 {
     /**
@@ -213,7 +213,7 @@ public class GeneralDerivedCRS extends org.geotools.referencing.crs.SingleCRS
      */
     private static Datum getDatum(final CoordinateReferenceSystem base) {
         ensureNonNull("base",  base);
-        return (base instanceof SingleCRS) ? ((SingleCRS) base).getDatum() : null;
+        return (base instanceof DefaultSingleCRS) ? ((DefaultSingleCRS) base).getDatum() : null;
     }
 
     /**

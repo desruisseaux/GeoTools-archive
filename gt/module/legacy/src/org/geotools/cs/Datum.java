@@ -50,7 +50,7 @@ import org.opengis.cs.CS_DatumType;
  *
  * @see org.opengis.cs.CS_Datum
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultDatum}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.AbstractDatum}.
  */
 public class Datum extends Info {
     /**
@@ -81,7 +81,7 @@ public class Datum extends Info {
      *
      * @see org.opengis.cs.CS_Datum#getDatumType()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.VerticalDatum#getVerticalDatumType}
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultVerticalDatum#getVerticalDatumType}
      *             for the vertical case. No replacement for other cases.
      */
     public DatumType getDatumType() {

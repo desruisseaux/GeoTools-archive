@@ -199,7 +199,7 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
         formatter.append(ey);
         formatter.append(ez);
         formatter.append(ppm);
-        if (!org.geotools.referencing.datum.GeodeticDatum.isWGS84(targetDatum)) {
+        if (!DefaultGeodeticDatum.isWGS84(targetDatum)) {
             if (targetDatum != null) {
                 formatter.append(targetDatum.getName().getCode());
             }

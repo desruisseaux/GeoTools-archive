@@ -71,7 +71,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @see org.opengis.cs.CS_CoordinateSystem
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.CoordinateReferenceSystem}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.AbstractCRS}.
  */
 public abstract class CoordinateSystem extends Info
                                     implements Dimensioned, CoordinateReferenceSystem
@@ -126,7 +126,7 @@ public abstract class CoordinateSystem extends Info
      *
      * @see org.opengis.cs.CS_CoordinateSystem#getDimension()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystem#getDimension}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.AbstractCS#getDimension}.
      */
     public abstract int getDimension();
     
@@ -138,7 +138,7 @@ public abstract class CoordinateSystem extends Info
      *
      * @see org.opengis.cs.CS_CoordinateSystem#getAxis(int)
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystem#getAxis}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.AbstractCS#getAxis}.
      */
     public abstract AxisInfo getAxis(int dimension);
     
@@ -150,7 +150,7 @@ public abstract class CoordinateSystem extends Info
      *
      * @see org.opengis.cs.CS_CoordinateSystem#getUnits(int)
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getUnit}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.DefaultCoordinateSystemAxis#getUnit}.
      */
     public abstract Unit getUnits(int dimension);
     
@@ -290,14 +290,14 @@ public abstract class CoordinateSystem extends Info
             for (int i=0; i<axis.length; i++) {
                 axis[i] = new AxisInfo(getAxis(i), getUnits(i));
             }
-            cs = new org.geotools.referencing.cs.CoordinateSystem(getName().getCode(), axis);
+            cs = new org.geotools.referencing.cs.AbstractCS(getName().getCode(), axis);
         }
         return cs;
     }    
     
     /** For compatibility with GeoAPI interfaces. */
     public org.opengis.referencing.datum.Datum getDatum() {
-        return org.geotools.referencing.datum.EngineeringDatum.UNKNOW;
+        return org.geotools.referencing.datum.DefaultEngineeringDatum.UNKNOW;
     }    
     
     /** For compatibility with GeoAPI interfaces. */

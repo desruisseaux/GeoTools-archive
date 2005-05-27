@@ -24,7 +24,7 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.operation.CoordinateOperation;
 import org.geotools.referencing.operation.CoordinateOperationFactory;
 import org.geotools.referencing.wkt.Parser;
@@ -198,7 +198,7 @@ public class WorldImageWriterTest extends TestCase {
 		//crs authority
 		final CRSAuthorityFactory factory=FactoryFinder.getCRSAuthorityFactory("EPSG",null);
 		final Parser parser= new Parser();
-		final CoordinateReferenceSystem wgs84=(CoordinateReferenceSystem) factory.createCoordinateReferenceSystem("EPSG:4326");
+		final AbstractCRS wgs84=(AbstractCRS) factory.createCoordinateReferenceSystem("EPSG:4326");
 		//mercator cs
 //		final CSAuthorityFactory factoryCS=FactoryFinder.getCSAuthorityFactory("EPSG",null);
 	
@@ -222,7 +222,7 @@ public class WorldImageWriterTest extends TestCase {
          "  AXIS[\"y\", NORTH]]\n";
 		
 		
-		CoordinateReferenceSystem mercator=(CoordinateReferenceSystem) parser.parseCoordinateReferenceSystem(wkt);
+		AbstractCRS mercator=(AbstractCRS) parser.parseCoordinateReferenceSystem(wkt);
 		
           //getting an operation between source and destination crs
 

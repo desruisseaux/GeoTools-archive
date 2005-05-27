@@ -43,7 +43,7 @@ import org.opengis.cs.CS_HorizontalDatum;
  * @see org.opengis.cs.CS_HorizontalCoordinateSystem
  *
  * @deprecated No direct replacement. The nearest parent is
- *             {@link org.geotools.referencing.crs.CoordinateReferenceSystem}.
+ *             {@link org.geotools.referencing.crs.AbstractCRS}.
  */
 public abstract class HorizontalCoordinateSystem extends CoordinateSystem {
     /**
@@ -113,7 +113,7 @@ public abstract class HorizontalCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_HorizontalCoordinateSystem#getHorizontalDatum()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.SingleCRS#getDatum}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultSingleCRS#getDatum}.
      */
     public HorizontalDatum getHorizontalDatum() {
         return datum;

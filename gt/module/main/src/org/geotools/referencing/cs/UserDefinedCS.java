@@ -31,83 +31,53 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 /**
  * A two- or three-dimensional coordinate system that consists of any combination of coordinate
- * axes not covered by any other Coordinate System type. An example is a multilinear coordinate
- * system which contains one coordinate axis that may have any 1-D shape which has no intersections
- * with itself. This non-straight axis is supplemented by one or two straight axes to complete a 2
- * or 3 dimensional coordinate system. The non-straight axis is typically incrementally straight or
- * curved. A <code>UserDefinedCS</code> shall have two or three
- * {@linkplain #getAxis axis}.
+ * axes not covered by any other Coordinate System type.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link DefaultUserDefinedCS}.
  */
-public class UserDefinedCS extends CoordinateSystem implements org.opengis.referencing.cs.UserDefinedCS {
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = -4904091898305706316L;
-
+public class UserDefinedCS extends DefaultUserDefinedCS {
     /**
      * Constructs a two-dimensional coordinate system from a name.
-     *
-     * @param name  The coordinate system name.
-     * @param axis0 The first axis.
-     * @param axis1 The second axis.
      */
     public UserDefinedCS(final String               name,
                          final CoordinateSystemAxis axis0,
                          final CoordinateSystemAxis axis1)
     {
-        super(name, new CoordinateSystemAxis[] {axis0, axis1});
+        super(name, axis0, axis1);
     }
 
     /**
      * Constructs a three-dimensional coordinate system from a name.
-     *
-     * @param name  The coordinate system name.
-     * @param axis0 The first axis.
-     * @param axis1 The second axis.
-     * @param axis2 The third axis.
      */
     public UserDefinedCS(final String               name,
                          final CoordinateSystemAxis axis0,
                          final CoordinateSystemAxis axis1,
                          final CoordinateSystemAxis axis2)
     {
-        super(name, new CoordinateSystemAxis[] {axis0, axis1, axis2});
+        super(name, axis0, axis1, axis2);
     }
 
     /**
-     * Constructs a two-dimensional coordinate system from a set of properties. The properties map is
-     * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
-     * super-class constructor}.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param axis0 The first axis.
-     * @param axis1 The second axis.
+     * Constructs a two-dimensional coordinate system from a set of properties.
      */
     public UserDefinedCS(final Map             properties,
                          final CoordinateSystemAxis axis0,
                          final CoordinateSystemAxis axis1)
     {
-        super(properties, new CoordinateSystemAxis[] {axis0, axis1});
+        super(properties, axis0, axis1);
     }
 
     /**
-     * Constructs a three-dimensional coordinate system from a set of properties. The properties map is
-     * given unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
-     * super-class constructor}.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param axis0 The first axis.
-     * @param axis1 The second axis.
-     * @param axis2 The third axis.
+     * Constructs a three-dimensional coordinate system from a set of properties.
      */
     public UserDefinedCS(final Map             properties,
                          final CoordinateSystemAxis axis0,
                          final CoordinateSystemAxis axis1,
                          final CoordinateSystemAxis axis2)
     {
-        super(properties, new CoordinateSystemAxis[] {axis0, axis1, axis2});
+        super(properties, axis0, axis1, axis2);
     }
 }

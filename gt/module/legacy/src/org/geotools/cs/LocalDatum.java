@@ -46,7 +46,7 @@ import org.opengis.cs.CS_LocalDatum;
  *
  * @see org.opengis.cs.CS_LocalDatum
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.EngineeringDatum}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultEngineeringDatum}.
  */
 public class LocalDatum extends Datum {
     /**

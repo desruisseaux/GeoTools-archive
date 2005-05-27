@@ -26,19 +26,21 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+// Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.crs.CompoundCRS;
-import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.crs.TemporalCRS;
 import org.geotools.referencing.crs.VerticalCRS;
-import org.geotools.referencing.cs.TimeCS;
-import org.geotools.referencing.datum.TemporalDatum;
+import org.geotools.referencing.cs.DefaultTimeCS;
+import org.geotools.referencing.datum.DefaultTemporalDatum;
 
 
 /**
@@ -113,11 +115,11 @@ public class FormatTest extends TestCase {
      */
     public void testCoordinateFormat() {
         final Date epoch = new Date(1041375600000L); // January 1st, 2003
-        final TemporalDatum datum = new TemporalDatum("Time", epoch);
-        final CoordinateReferenceSystem crs = new CompoundCRS("WGS84 3D + time",
+        final DefaultTemporalDatum datum = new DefaultTemporalDatum("Time", epoch);
+        final AbstractCRS crs = new DefaultCompoundCRS("WGS84 3D + time",
                     GeographicCRS.WGS84,
                     VerticalCRS.ELLIPSOIDAL_HEIGHT,
-                    new TemporalCRS("Time", datum, TimeCS.DAYS));
+                    new TemporalCRS("Time", datum, DefaultTimeCS.DAYS));
         final CoordinateFormat format = new CoordinateFormat(Locale.FRANCE);
         format.setCoordinateReferenceSystem(crs);
         format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));

@@ -47,7 +47,7 @@ import org.opengis.cs.CS_CoordinateSystem;
  *
  * @see org.opengis.cs.CS_CompoundCoordinateSystem
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.CompoundCRS}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultCompoundCRS}.
  */
 public class CompoundCoordinateSystem extends CoordinateSystem {
     /**
@@ -101,7 +101,7 @@ public class CompoundCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_CompoundCoordinateSystem#getHeadCS()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.CompoundCRS#getCoordinateReferenceSystems}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultCompoundCRS#getCoordinateReferenceSystems}.
      */
     public CoordinateSystem getHeadCS() {
         return head;
@@ -112,7 +112,7 @@ public class CompoundCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_CompoundCoordinateSystem#getTailCS()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.CompoundCRS#getCoordinateReferenceSystems}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultCompoundCRS#getCoordinateReferenceSystems}.
      */
     public CoordinateSystem getTailCS() {
         return tail;

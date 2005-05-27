@@ -40,7 +40,7 @@ import org.opengis.cs.CS_WGS84ConversionInfo;
  *
  * @see org.opengis.cs.CS_HorizontalDatum
  *
- * @deprecated Replaced by {@link org.geotools.referencing.datum.GeodeticDatum}.
+ * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultGeodeticDatum}.
  */
 public class HorizontalDatum extends Datum {
     /**
@@ -114,7 +114,7 @@ public class HorizontalDatum extends Datum {
      *
      * @see org.opengis.cs.CS_HorizontalDatum#getEllipsoid()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.GeodeticDatum#getEllipsoid}.
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultGeodeticDatum#getEllipsoid}.
      */
     public Ellipsoid getEllipsoid() {
         return ellipsoid;

@@ -84,7 +84,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
-import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.FactoryException;
 
@@ -620,11 +620,11 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected AttributeType[] readAttributes() throws IOException {
         ShapefileReader shp = openShapeReader();
         DbaseFileReader dbf = openDbfReader();
-        CoordinateReferenceSystem cs = null;
+        AbstractCRS cs = null;
         try{
             PrjFileReader prj = openPrjReader();
             if(prj!=null){
-                cs = (CoordinateReferenceSystem) prj.getCoodinateSystem();
+                cs = (AbstractCRS) prj.getCoodinateSystem();
             }
         }
         catch(FactoryException fe){

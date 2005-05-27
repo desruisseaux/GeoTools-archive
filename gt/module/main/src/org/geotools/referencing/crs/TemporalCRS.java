@@ -36,6 +36,7 @@ import org.opengis.referencing.datum.TemporalDatum;
 
 // Geotools dependencies
 import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.DefaultReferenceSystem;
 
 
 /**
@@ -50,7 +51,7 @@ import org.geotools.referencing.DefaultIdentifiedObject;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TemporalCRS extends org.geotools.referencing.crs.SingleCRS
+public class TemporalCRS extends DefaultSingleCRS
                       implements org.opengis.referencing.crs.TemporalCRS
 {
     /**

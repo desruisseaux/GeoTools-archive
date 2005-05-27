@@ -24,18 +24,10 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies and extensions
 import java.util.Map;
-import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
-import org.geotools.measure.Measure;
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
-import org.geotools.referencing.wkt.Formatter;
-import org.geotools.util.UnsupportedImplementationException;
 
 
 /**
@@ -44,141 +36,13 @@ import org.geotools.util.UnsupportedImplementationException;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.referencing.cs.CoordinateSystem
- * @see org.geotools.referencing.datum.DefaultDatum
+ * @deprecated Renamed as {@link AbstractCRS}.
  */
-public abstract class CoordinateReferenceSystem extends DefaultReferenceSystem
-                      implements org.opengis.referencing.crs.CoordinateReferenceSystem
-{
+public abstract class CoordinateReferenceSystem extends AbstractCRS {
     /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = -7433284548909530047L;
-
-    /**
-     * The coordinate system.
-     */
-    protected final CoordinateSystem coordinateSystem;
-
-    /**
-     * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class
-     * constructor}.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param cs The coordinate system.
+     * Constructs a coordinate reference system from a set of properties.
      */
     public CoordinateReferenceSystem(final Map properties, final CoordinateSystem cs) {
-        super(properties);
-        ensureNonNull("cs", cs);
-        this.coordinateSystem = cs;
-    }
-
-    /**
-     * Returns the coordinate system.
-     */
-    public CoordinateSystem getCoordinateSystem() {
-        return coordinateSystem;
-    }
-
-    /**
-     * Returns the unit used for all axis. If not all axis uses the same unit,
-     * then this method returns <code>null</code>. This method is often used
-     * for Well Know Text (WKT) formatting.
-     */
-    final Unit getUnit() {
-        Unit unit = null;
-        for (int i=coordinateSystem.getDimension(); --i>=0;) {
-            final Unit candidate = coordinateSystem.getAxis(i).getUnit();
-            if (candidate != null) {
-                if (unit == null) {
-                    unit = candidate;
-                } else if (!unit.equals(candidate)) {
-                    return null;
-                }
-            }
-        }
-        return unit;
-    }
-
-    /**
-     * Computes the distance between two points. This convenience method delegates the work to the
-     * underlyling {@linkplain org.geotools.referencing.cs.CoordinateSystem coordinate system}, if
-     * possible.
-     *
-     * @param  coord1 Coordinates of the first point.
-     * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
-     * @throws UnsupportedOperationException if this coordinate reference system can't compute
-     *         distances.
-     * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
-     */
-    public Measure distance(final double[] coord1, final double[] coord2)
-            throws UnsupportedOperationException, MismatchedDimensionException
-    {
-        if (coordinateSystem instanceof org.geotools.referencing.cs.CoordinateSystem) {
-            return ((org.geotools.referencing.cs.CoordinateSystem) coordinateSystem)
-                    .distance(coord1, coord2);
-        }
-        throw new UnsupportedImplementationException(coordinateSystem.getClass());
-    }
-
-    /**
-     * Compare this coordinate reference system with the specified object for equality.
-     * If <code>compareMetadata</code> is <code>true</code>, then all available properties are
-     * compared including {@linkplain #getValidArea valid area} and {@linkplain #getScope scope}.
-     *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
-     */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
-        if (super.equals(object, compareMetadata)) {
-            final CoordinateReferenceSystem that = (CoordinateReferenceSystem) object;
-            return equals(this.coordinateSystem, that.coordinateSystem, compareMetadata);
-        }
-        return false;
-    }
-    
-    /**
-     * Returns a hash value for this CRS. {@linkplain #getName Name},
-     * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
-     * are not taken in account. In other words, two CRS objects will return the same
-     * hash value if they are equal in the sense of
-     * <code>{@link #equals(DefaultIdentifiedObject,boolean) equals}(DefaultIdentifiedObject,
-     * <strong>false</strong>)</code>.
-     *
-     * @return The hash code value. This value doesn't need to be the same
-     *         in past or future versions of this class.
-     */
-    public int hashCode() {
-        return (int)serialVersionUID ^ coordinateSystem.hashCode();
-    }
-    
-    /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element. The default implementation write the following elements:
-     * <ul>
-     *   <li>The unit if all axis use the same unit. Otherwise the unit is omitted and
-     *       the WKT format is {@linkplain Formatter#isInvalidWKT flagged as invalid}.</li>
-     *   <li>All {@linkplain #coordinateSystem coordinate system}'s axis.</li>
-     * </ul>
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name.
-     */
-    protected String formatWKT(final Formatter formatter) {
-        final Unit unit = getUnit();
-        formatter.append(unit);
-        final int dimension = coordinateSystem.getDimension();
-        for (int i=0; i<dimension; i++) {
-            formatter.append(coordinateSystem.getAxis(i));
-        }
-        if (unit == null) {
-            formatter.setInvalidWKT();
-        }
-        return super.formatWKT(formatter);
+        super(properties, cs);
     }
 }

@@ -42,19 +42,19 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.cs.CartesianCS;
-import org.geotools.referencing.cs.CoordinateSystem;
-import org.geotools.referencing.cs.CoordinateSystemAxis;
-import org.geotools.referencing.cs.EllipsoidalCS;
-import org.geotools.referencing.cs.TimeCS;
-import org.geotools.referencing.cs.VerticalCS;
-import org.geotools.referencing.datum.DefaultDatum;
+import org.geotools.referencing.cs.AbstractCS;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
+import org.geotools.referencing.cs.DefaultTimeCS;
+import org.geotools.referencing.cs.DefaultVerticalCS;
+import org.geotools.referencing.datum.AbstractDatum;
 import org.geotools.referencing.datum.DefaultEllipsoid;
-import org.geotools.referencing.datum.GeodeticDatum;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
-import org.geotools.referencing.datum.VerticalDatum;
+import org.geotools.referencing.datum.DefaultVerticalDatum;
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -190,64 +190,64 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Tests {@link CoordinateSystemAxis} constants.
+     * Tests {@link DefaultCoordinateSystemAxis} constants.
      */
     public void testAxis() {
         // Test Well Know Text
-        assertEquals("x",         "AXIS[\"x\", EAST]",         CoordinateSystemAxis.X        .toWKT(0));
-        assertEquals("y",         "AXIS[\"y\", NORTH]",        CoordinateSystemAxis.Y        .toWKT(0));
-        assertEquals("z",         "AXIS[\"z\", UP]",           CoordinateSystemAxis.Z        .toWKT(0));
-        assertEquals("Longitude", "AXIS[\"Longitude\", EAST]", CoordinateSystemAxis.LONGITUDE.toWKT(0));
-        assertEquals("Latitude",  "AXIS[\"Latitude\", NORTH]", CoordinateSystemAxis.LATITUDE .toWKT(0));
-        assertEquals("Altitude",  "AXIS[\"Altitude\", UP]",    CoordinateSystemAxis.ALTITUDE .toWKT(0));
-        assertEquals("Time",      "AXIS[\"Time\", FUTURE]",    CoordinateSystemAxis.TIME     .toWKT(0));
+        assertEquals("x",         "AXIS[\"x\", EAST]",         DefaultCoordinateSystemAxis.X        .toWKT(0));
+        assertEquals("y",         "AXIS[\"y\", NORTH]",        DefaultCoordinateSystemAxis.Y        .toWKT(0));
+        assertEquals("z",         "AXIS[\"z\", UP]",           DefaultCoordinateSystemAxis.Z        .toWKT(0));
+        assertEquals("Longitude", "AXIS[\"Longitude\", EAST]", DefaultCoordinateSystemAxis.LONGITUDE.toWKT(0));
+        assertEquals("Latitude",  "AXIS[\"Latitude\", NORTH]", DefaultCoordinateSystemAxis.LATITUDE .toWKT(0));
+        assertEquals("Altitude",  "AXIS[\"Altitude\", UP]",    DefaultCoordinateSystemAxis.ALTITUDE .toWKT(0));
+        assertEquals("Time",      "AXIS[\"Time\", FUTURE]",    DefaultCoordinateSystemAxis.TIME     .toWKT(0));
 
-        assertEquals("Longitude", "AXIS[\"Geodetic longitude\", EAST]",  CoordinateSystemAxis.GEODETIC_LONGITUDE .toWKT(0));
-        assertEquals("Longitude", "AXIS[\"Spherical longitude\", EAST]", CoordinateSystemAxis.SPHERICAL_LONGITUDE.toWKT(0));
-        assertEquals("Latitude",  "AXIS[\"Geodetic latitude\", NORTH]",  CoordinateSystemAxis.GEODETIC_LATITUDE  .toWKT(0));
-        assertEquals("Latitude",  "AXIS[\"Spherical latitude\", NORTH]", CoordinateSystemAxis.SPHERICAL_LATITUDE .toWKT(0));
+        assertEquals("Longitude", "AXIS[\"Geodetic longitude\", EAST]",  DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE .toWKT(0));
+        assertEquals("Longitude", "AXIS[\"Spherical longitude\", EAST]", DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE.toWKT(0));
+        assertEquals("Latitude",  "AXIS[\"Geodetic latitude\", NORTH]",  DefaultCoordinateSystemAxis.GEODETIC_LATITUDE  .toWKT(0));
+        assertEquals("Latitude",  "AXIS[\"Spherical latitude\", NORTH]", DefaultCoordinateSystemAxis.SPHERICAL_LATITUDE .toWKT(0));
 
         // Test localization
-        assertEquals("English", "Time",  CoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.ENGLISH));
-        assertEquals("French",  "Temps", CoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.FRENCH ));
+        assertEquals("English", "Time",  DefaultCoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.ENGLISH));
+        assertEquals("French",  "Temps", DefaultCoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.FRENCH ));
 
         // Test geocentric
-        assertFalse("X",         CoordinateSystemAxis.X        .equals(CoordinateSystemAxis.GEOCENTRIC_X,        false));
-        assertFalse("Longitude", CoordinateSystemAxis.LONGITUDE.equals(CoordinateSystemAxis.GEODETIC_LONGITUDE,  false));
-        assertFalse("Longitude", CoordinateSystemAxis.LONGITUDE.equals(CoordinateSystemAxis.SPHERICAL_LONGITUDE, false));
+        assertFalse("X",         DefaultCoordinateSystemAxis.X        .equals(DefaultCoordinateSystemAxis.GEOCENTRIC_X,        false));
+        assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,  false));
+        assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE, false));
     }
 
     /**
-     * Tests {@link CoordinateSystem}.
+     * Tests {@link AbstractCS}.
      */
     public void testCoordinateSystems() {
         // Test dimensions
-        assertEquals("Cartesian 2D",   2, CartesianCS  .PROJECTED  .getDimension());
-        assertEquals("Cartesian 3D",   3, CartesianCS  .GEOCENTRIC .getDimension());
-        assertEquals("Ellipsoidal 2D", 2, EllipsoidalCS.GEODETIC_2D.getDimension());
-        assertEquals("Ellipsoidal 3D", 3, EllipsoidalCS.GEODETIC_3D.getDimension());
-        assertEquals("Vertical",       1, VerticalCS   .DEPTH      .getDimension());
-        assertEquals("Temporal",       1, TimeCS       .DAYS       .getDimension());
+        assertEquals("Cartesian 2D",   2, DefaultCartesianCS  .PROJECTED  .getDimension());
+        assertEquals("Cartesian 3D",   3, DefaultCartesianCS  .GEOCENTRIC .getDimension());
+        assertEquals("Ellipsoidal 2D", 2, DefaultEllipsoidalCS.GEODETIC_2D.getDimension());
+        assertEquals("Ellipsoidal 3D", 3, DefaultEllipsoidalCS.GEODETIC_3D.getDimension());
+        assertEquals("Vertical",       1, DefaultVerticalCS   .DEPTH      .getDimension());
+        assertEquals("Temporal",       1, DefaultTimeCS       .DAYS       .getDimension());
     }
 
     /**
-     * Test {@link DefaultDatum} and well-know text formatting.
+     * Test {@link AbstractDatum} and well-know text formatting.
      */
     public void testDatum() {
         // WGS84 components and equalities
-        assertEquals("Ellipsoid",     DefaultEllipsoid.WGS84,         GeodeticDatum.WGS84.getEllipsoid());
-        assertEquals("PrimeMeridian", DefaultPrimeMeridian.GREENWICH, GeodeticDatum.WGS84.getPrimeMeridian());
-        assertFalse ("VerticalDatum", VerticalDatum.GEOIDAL .equals( VerticalDatum.ELLIPSOIDAL));
-        assertEquals("Geoidal",       VerticalDatumType.GEOIDAL,     VerticalDatum.GEOIDAL    .getVerticalDatumType());
-        assertEquals("Ellipsoidal",   VerticalDatumType.ELLIPSOIDAL, VerticalDatum.ELLIPSOIDAL.getVerticalDatumType());
+        assertEquals("Ellipsoid",     DefaultEllipsoid.WGS84,         DefaultGeodeticDatum.WGS84.getEllipsoid());
+        assertEquals("PrimeMeridian", DefaultPrimeMeridian.GREENWICH, DefaultGeodeticDatum.WGS84.getPrimeMeridian());
+        assertFalse ("VerticalDatum", DefaultVerticalDatum.GEOIDAL.equals(DefaultVerticalDatum.ELLIPSOIDAL));
+        assertEquals("Geoidal",       VerticalDatumType.GEOIDAL,     DefaultVerticalDatum.GEOIDAL    .getVerticalDatumType());
+        assertEquals("Ellipsoidal",   VerticalDatumType.ELLIPSOIDAL, DefaultVerticalDatum.ELLIPSOIDAL.getVerticalDatumType());
 
         // Test WKT
-        assertEquals("Ellipsoid",     "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]",  DefaultEllipsoid.WGS84        .toWKT(0));
-        assertEquals("PrimeMeridian", "PRIMEM[\"Greenwich\", 0.0]",                     DefaultPrimeMeridian.GREENWICH.toWKT(0));
-        assertEquals("VerticalDatum", "VERT_DATUM[\"Geoidal\", 2005]",                  VerticalDatum.GEOIDAL    .toWKT(0));
-        assertEquals("VerticalDatum", "VERT_DATUM[\"Ellipsoidal\", 2002]",              VerticalDatum.ELLIPSOIDAL.toWKT(0));
+        assertEquals("Ellipsoid",     "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]",  DefaultEllipsoid.WGS84          .toWKT(0));
+        assertEquals("PrimeMeridian", "PRIMEM[\"Greenwich\", 0.0]",                     DefaultPrimeMeridian.GREENWICH  .toWKT(0));
+        assertEquals("VerticalDatum", "VERT_DATUM[\"Geoidal\", 2005]",                  DefaultVerticalDatum.GEOIDAL    .toWKT(0));
+        assertEquals("VerticalDatum", "VERT_DATUM[\"Ellipsoidal\", 2002]",              DefaultVerticalDatum.ELLIPSOIDAL.toWKT(0));
         assertEquals("GeodeticDatum", "DATUM[\"WGS84\", "+
-                                      "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]]", GeodeticDatum.WGS84      .toWKT(0));
+                                      "SPHEROID[\"WGS84\", 6378137.0, 298.257223563]]", DefaultGeodeticDatum.WGS84      .toWKT(0));
 
         // Test properties
         final Map properties = new HashMap();
@@ -257,9 +257,9 @@ public class BasicTest extends TestCase {
         properties.put("remarks",       "There is remarks");
         properties.put("remarks_fr",    "Voici des remarques");
 
-        GeodeticDatum datum = new GeodeticDatum(properties,
-                                  DefaultEllipsoid.createEllipsoid("Test", 1000, 1000, SI.METER),
-                                  new DefaultPrimeMeridian("Test", 12));
+        DefaultGeodeticDatum datum = new DefaultGeodeticDatum(properties,
+                DefaultEllipsoid.createEllipsoid("Test", 1000, 1000, SI.METER),
+                new DefaultPrimeMeridian("Test", 12));
 
         assertEquals("name",          "This is a name",         datum.getName   ().getCode());
         assertEquals("scope",         "This is a scope",        datum.getScope  ().toString(null));
@@ -269,7 +269,7 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Tests {@link CoordinateReferenceSystem}.
+     * Tests {@link AbstractCRS}.
      */
     public void testCoordinateReferenceSystems() {
         // Test dimensions
@@ -291,14 +291,14 @@ public class BasicTest extends TestCase {
      * Test serialization of various objects.
      */
     public void testSerialization() throws IOException, ClassNotFoundException {
-        serialize(CoordinateSystemAxis.X);
-        serialize(CoordinateSystemAxis.GEOCENTRIC_X);
-        serialize(CoordinateSystemAxis.GEODETIC_LONGITUDE);
-        serialize(CartesianCS.PROJECTED);
-        serialize(CartesianCS.GEOCENTRIC);
-        serialize(EllipsoidalCS.GEODETIC_2D);
-        serialize(EllipsoidalCS.GEODETIC_3D);
-        serialize(GeodeticDatum.WGS84);
+        serialize(DefaultCoordinateSystemAxis.X);
+        serialize(DefaultCoordinateSystemAxis.GEOCENTRIC_X);
+        serialize(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE);
+        serialize(DefaultCartesianCS.PROJECTED);
+        serialize(DefaultCartesianCS.GEOCENTRIC);
+        serialize(DefaultEllipsoidalCS.GEODETIC_2D);
+        serialize(DefaultEllipsoidalCS.GEODETIC_3D);
+        serialize(DefaultGeodeticDatum.WGS84);
         serialize(DefaultPrimeMeridian.GREENWICH);
     }
 

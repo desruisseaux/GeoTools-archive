@@ -42,8 +42,8 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.geotools.referencing.crs.DerivedCRS;             // For javadoc
 import org.geotools.referencing.crs.EngineeringCRS;         // For javadoc
 import org.geotools.referencing.crs.GeographicCRS;          // For javadoc
-import org.geotools.referencing.cs.CartesianCS;             // For javadoc
-import org.geotools.referencing.datum.GeodeticDatum;        // For javadoc
+import org.geotools.referencing.cs.DefaultCartesianCS;      // For javadoc
+import org.geotools.referencing.datum.DefaultGeodeticDatum; // For javadoc
 import org.geotools.referencing.operation.OperationMethod;  // For javadoc
 import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
 
@@ -72,7 +72,7 @@ import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
  * <p>
  * The example below goes through the steps of constructing a coordinate reference system for a grid
  * coverage from its grid of localization. This example assumes that the "real world" coordinates
- * are longitudes and latitudes on the {@linkplain GeodeticDatum#WGS84 WGS84} ellipsoid.
+ * are longitudes and latitudes on the {@linkplain DefaultGeodeticDatum#WGS84 WGS84} ellipsoid.
  *
  * <blockquote><table border='2' cellpadding='6'><tr><td><pre>
  * <FONT color='#008000'>//
@@ -99,7 +99,7 @@ import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
  *         new {@linkplain OperationMethod#OperationMethod(MathTransform) OperationMethod}(realToGrid),
  *         realCRS,     <FONT color='#008000'>// The target ("real world") CRS</FONT>
  *         realToGrid,  <FONT color='#008000'>// How the grid CRS relates to the "real world" CRS</FONT>
- *         {@linkplain CartesianCS#GRID});
+ *         {@linkplain DefaultCartesianCS#GRID});
  *
  * <FONT color='#008000'>//
  * // Constructs the grid coverage using the grid coordinate system (not the "real world"

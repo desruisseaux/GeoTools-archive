@@ -2,7 +2,7 @@ package org.geotools.data;
 
 import java.util.Collection;
 
-import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.AbstractCRS;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -43,7 +43,7 @@ public class GeometryBuilder {
      * userData object associated with each Geometry. Note this take up
      * no additional space.
      */
-    private CoordinateReferenceSystem coordinateReferenceSystem;
+    private AbstractCRS coordinateReferenceSystem;
     
     /** GeometryFactory slaved to existing this GeometryBuilder */
     private GeometryFactory geometryFactory = new ProcessedGeometryFactory() {
@@ -60,14 +60,14 @@ public class GeometryBuilder {
     /**
      * @return Returns the coordinateReferenceSystem.
      */
-    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+    public AbstractCRS getCoordinateReferenceSystem() {
         return coordinateReferenceSystem;
     }
     /**
      * @param coordinateReferenceSystem The coordinateReferenceSystem to set.
      */
     public void setCoordinateReferenceSystem(
-            CoordinateReferenceSystem coordinateReferenceSystem) {
+            AbstractCRS coordinateReferenceSystem) {
         this.coordinateReferenceSystem = coordinateReferenceSystem;
     }
     

@@ -41,7 +41,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.measure.Measure;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.util.UnsupportedImplementationException;
 
 
@@ -59,7 +61,7 @@ import org.geotools.util.UnsupportedImplementationException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
+public class GeographicCRS extends DefaultSingleCRS
                         implements org.opengis.referencing.crs.GeographicCRS
 {
     /**
@@ -74,8 +76,7 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
      * prime meridian is Greenwich.
      */
     public static final GeographicCRS WGS84 = new GeographicCRS("WGS84",
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
-                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D);
+                        DefaultGeodeticDatum.WGS84, DefaultEllipsoidalCS.GEODETIC_2D);
 
     /**
      * A three-dimensional geographic coordinate reference system using WGS84 datum.
@@ -85,8 +86,7 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
      * prime meridian is Greenwich.
      */
     public static final GeographicCRS WGS84_3D = new GeographicCRS("WGS84",
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
-                        org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_3D);
+                        DefaultGeodeticDatum.WGS84, DefaultEllipsoidalCS.GEODETIC_3D);
 
     /**
      * Constructs a geographic CRS from a name.
@@ -131,17 +131,17 @@ public class GeographicCRS extends org.geotools.referencing.crs.SingleCRS
     public Measure distance(final double[] coord1, final double[] coord2)
             throws UnsupportedOperationException, MismatchedDimensionException
     {
-        final org.geotools.referencing.cs.EllipsoidalCS cs;
-        final DefaultEllipsoid  e;
-        if (!(coordinateSystem instanceof org.geotools.referencing.cs.EllipsoidalCS)) {
+        final DefaultEllipsoidalCS cs;
+        final DefaultEllipsoid e;
+        if (!(coordinateSystem instanceof DefaultEllipsoidalCS)) {
             throw new UnsupportedImplementationException(coordinateSystem.getClass());
         }
         final Ellipsoid ellipsoid = ((GeodeticDatum) datum).getEllipsoid();
         if (!(ellipsoid instanceof DefaultEllipsoid)) {
             throw new UnsupportedImplementationException(ellipsoid.getClass());
         }
-        cs = (org.geotools.referencing.cs.EllipsoidalCS) coordinateSystem;
-        e  = (DefaultEllipsoid)  ellipsoid;
+        cs = (DefaultEllipsoidalCS) coordinateSystem;
+        e  = (DefaultEllipsoid)     ellipsoid;
         if (coord1.length!=2 || coord2.length!=2 || cs.getDimension()!=2) {
             /*
              * Not yet implemented (an exception will be thrown later).

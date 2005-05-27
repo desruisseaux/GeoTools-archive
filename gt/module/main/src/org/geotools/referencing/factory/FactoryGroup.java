@@ -68,6 +68,9 @@ import org.geotools.parameter.Parameters;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
+import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
+import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.Singleton;
 import org.geotools.resources.XArray;
@@ -286,10 +289,8 @@ public class FactoryGroup {
         final EllipsoidalCS geoCS = (EllipsoidalCS) baseCRS.getCoordinateSystem();
         final Matrix swap1, swap3;
         try {
-            swap1 = org.geotools.referencing.cs.EllipsoidalCS.swapAndScaleAxis(geoCS,
-                    org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D);
-            swap3 = org.geotools.referencing.cs.CartesianCS.swapAndScaleAxis(
-                    org.geotools.referencing.cs.CartesianCS.PROJECTED, derivedCS);
+            swap1 = DefaultEllipsoidalCS.swapAndScaleAxis(geoCS, DefaultEllipsoidalCS.GEODETIC_2D);
+            swap3 = DefaultCartesianCS.swapAndScaleAxis(DefaultCartesianCS.PROJECTED, derivedCS);
         } catch (IllegalArgumentException cause) {
             // User-specified axis don't match.
             throw new FactoryException(cause);
@@ -377,7 +378,7 @@ public class FactoryGroup {
      * @todo Consider extensions of this method to projected CRS if it is usefull for GEOT-401.
      */
     public CoordinateReferenceSystem toGeodetic3D(final CompoundCRS crs) throws FactoryException {
-        final SingleCRS[] components = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(crs);
+        final SingleCRS[] components = DefaultCompoundCRS.getSingleCRS(crs);
         GeographicCRS horizontal = null;
         VerticalCRS   vertical   = null;
         int hi=0, vi=0;

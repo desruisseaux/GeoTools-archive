@@ -209,7 +209,7 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_GeocentricCoordinateSystem#getUnits(int)
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getUnit}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.DefaultCoordinateSystemAxis#getUnit}.
      */
     public Unit getUnits(final int dimension) {
         if (dimension>=0 && dimension<getDimension()) {
@@ -236,7 +236,7 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_GeocentricCoordinateSystem#getPrimeMeridian()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.datum.GeodeticDatum#getPrimeMeridian}.
+     * @deprecated Replaced by {@link org.geotools.referencing.datum.DefaultGeodeticDatum#getPrimeMeridian}.
      */
     public PrimeMeridian getPrimeMeridian() {
         return meridian;

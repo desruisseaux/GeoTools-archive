@@ -36,20 +36,20 @@ import org.geotools.referencing.DefaultIdentifiedObject;
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.crs.CompoundCRS Compound}
+ *   {@link org.geotools.referencing.crs.DefaultCompoundCRS Compound}
  * </TD></TR></TABLE>
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CompoundCS extends org.geotools.referencing.cs.CoordinateSystem {
+public class CompoundCS extends AbstractCS {
     /**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -5726410275278843372L;
 
     /**
-     * The coordinate syetems.
+     * The coordinate systems.
      */
     private final CoordinateSystem[] cs;
 

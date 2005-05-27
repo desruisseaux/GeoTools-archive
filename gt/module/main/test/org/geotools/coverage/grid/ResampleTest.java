@@ -46,7 +46,7 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.referencing.cs.CartesianCS;
+import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DerivedCRS;
 import org.geotools.referencing.crs.ProjectedCRS;
 import org.geotools.referencing.operation.OperationMethod;
@@ -149,7 +149,8 @@ public final class ResampleTest extends GridCoverageTest {
                 fail(exception.getLocalizedMessage());
                 return null;
             }
-            return new ProjectedCRS("Stereographic", new OperationMethod(mt), base, mt, CartesianCS.PROJECTED);
+            return new ProjectedCRS("Stereographic", new OperationMethod(mt),
+                                    base, mt, DefaultCartesianCS.PROJECTED);
         } catch (NoSuchIdentifierException exception) {
             fail(exception.getLocalizedMessage());
             return null;

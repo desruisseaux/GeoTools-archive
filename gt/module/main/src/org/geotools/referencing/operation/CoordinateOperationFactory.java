@@ -74,7 +74,11 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
@@ -426,7 +430,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                     final GeodeticDatum datum)
             throws FactoryException
     {
-        final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
+        final CartesianCS   STANDARD  = DefaultCartesianCS.GEOCENTRIC;
         final GeodeticDatum candidate = (GeodeticDatum) crs.getDatum();
         // TODO: Remove cast once we are allowed to compile against J2SE 1.5.
         if (equalsIgnorePrimeMeridian(candidate, datum)) {
@@ -463,8 +467,8 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
               GeodeticDatum datum = (GeodeticDatum) crs.getDatum();
         final EllipsoidalCS cs    = (EllipsoidalCS) crs.getCoordinateSystem();
         final EllipsoidalCS STANDARD = (cs.getDimension() <= 2) ?
-                org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_2D :
-                org.geotools.referencing.cs.EllipsoidalCS.GEODETIC_3D;
+                                        DefaultEllipsoidalCS.GEODETIC_2D :
+                                        DefaultEllipsoidalCS.GEODETIC_3D;
         if (forceGreenwich && getGreenwichLongitude(datum.getPrimeMeridian()) != 0) {
             datum = new TemporaryDatum(datum);
         } else if (hasStandardAxis(cs, STANDARD)) {
@@ -481,7 +485,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      * A datum identical to the specified datum except for the prime meridian, which is replaced
      * by Greenwich. This datum is processed in a special way by {@link #equalsIgnorePrimeMeridian}.
      */
-    private static final class TemporaryDatum extends org.geotools.referencing.datum.GeodeticDatum {
+    private static final class TemporaryDatum extends DefaultGeodeticDatum {
         /** The wrapped datum. */
         private final GeodeticDatum datum;
 
@@ -517,8 +521,8 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
      *
      * @param crs  The coordinate system to test.
      * @param standard The coordinate system that defines the standard. Usually
-     *        {@link org.geotools.referencing.cs.EllipsoidalCS#GEODETIC_2D} or
-     *        {@link org.geotools.referencing.cs.CartesianCS#PROJECTED}.
+     *        {@link DefaultEllipsoidalCS#GEODETIC_2D} or
+     *        {@link DefaultCartesianCS#PROJECTED}.
      */
     private static boolean hasStandardAxis(final CoordinateSystem cs,
                                            final CoordinateSystem standard)
@@ -813,9 +817,8 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         if (molodenskiMethod != null) {
             Identifier          identifier = DATUM_SHIFT;
             BursaWolfParameters bursaWolf  = null;
-            if (sourceDatum instanceof org.geotools.referencing.datum.GeodeticDatum) {
-                bursaWolf = ((org.geotools.referencing.datum.GeodeticDatum) sourceDatum)
-                             .getBursaWolfParameters(targetDatum);
+            if (sourceDatum instanceof DefaultGeodeticDatum) {
+                bursaWolf = ((DefaultGeodeticDatum) sourceDatum).getBursaWolfParameters(targetDatum);
             }
             if (bursaWolf==null && lenientDatumShift) {
                 /*
@@ -871,7 +874,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          *     geocentric CRS with a preference for datum using Greenwich meridian -->
          *     target geographic CRS
          */
-        final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
+        final CartesianCS STANDARD = DefaultCartesianCS.GEOCENTRIC;
         final GeocentricCRS stepCRS;
         final CRSFactory crsFactory = factories.getCRSFactory();
         if (getGreenwichLongitude(targetPM) == 0) {
@@ -1057,13 +1060,13 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
          *     standard CRS with target datum  -->
          *     target CRS
          */
-        final CartesianCS STANDARD = org.geotools.referencing.cs.CartesianCS.GEOCENTRIC;
+        final CartesianCS STANDARD = DefaultCartesianCS.GEOCENTRIC;
         final GeneralMatrix matrix;
         Identifier identifier = DATUM_SHIFT;
         try {
-            Matrix datumShift = org.geotools.referencing.datum.GeodeticDatum.
-                                      getAffineTransform(TemporaryDatum.unwrap(sourceDatum),
-                                                         TemporaryDatum.unwrap(targetDatum));
+            Matrix datumShift = DefaultGeodeticDatum.getAffineTransform(
+                                    TemporaryDatum.unwrap(sourceDatum),
+                                    TemporaryDatum.unwrap(targetDatum));
             if (!(datumShift instanceof GMatrix)) {
                 if (lenientDatumShift) {
                     datumShift = new GeneralMatrix(4); // Identity transform.
@@ -1196,7 +1199,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                                       final SingleCRS   targetCRS)
             throws FactoryException
     {
-        final SingleCRS[] sources = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(sourceCRS);
+        final SingleCRS[] sources = DefaultCompoundCRS.getSingleCRS(sourceCRS);
         if (sources.length == 1) {
             return createOperation(sources[0], targetCRS);
         }
@@ -1234,7 +1237,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                                       final CompoundCRS targetCRS)
             throws FactoryException
     {
-        final SingleCRS[] targets = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(targetCRS);
+        final SingleCRS[] targets = DefaultCompoundCRS.getSingleCRS(targetCRS);
         if (targets.length == 1) {
             return createOperation(sourceCRS, targets[0]);
         }
@@ -1263,8 +1266,8 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
                                                       final CompoundCRS targetCRS)
             throws FactoryException
     {
-        final SingleCRS[] sources = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(sourceCRS);
-        final SingleCRS[] targets = org.geotools.referencing.crs.CompoundCRS.getSingleCRS(targetCRS);
+        final SingleCRS[] sources = DefaultCompoundCRS.getSingleCRS(sourceCRS);
+        final SingleCRS[] targets = DefaultCompoundCRS.getSingleCRS(targetCRS);
         if (targets.length == 1) {
             return createOperation(sourceCRS, targets[0]);
         }

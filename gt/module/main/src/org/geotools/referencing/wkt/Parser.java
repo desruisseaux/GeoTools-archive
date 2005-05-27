@@ -72,7 +72,11 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
+import org.geotools.referencing.datum.DefaultVerticalDatum;
+import org.geotools.referencing.cs.AbstractCS;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.cts.ResourceKeys;
@@ -99,27 +103,27 @@ public class Parser extends MathTransformParser {
      * Axis appears in preferred order for WKT.
      */
     private static final CoordinateSystemAxis[] GEOTOOLS_AXIS = {
-        org.geotools.referencing.cs.CoordinateSystemAxis.LONGITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.LATITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LONGITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEODETIC_LATITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.EASTING,
-        org.geotools.referencing.cs.CoordinateSystemAxis.WESTING,
-        org.geotools.referencing.cs.CoordinateSystemAxis.NORTHING,
-        org.geotools.referencing.cs.CoordinateSystemAxis.SOUTHING,
-        org.geotools.referencing.cs.CoordinateSystemAxis.X,
-        org.geotools.referencing.cs.CoordinateSystemAxis.Y,
-        org.geotools.referencing.cs.CoordinateSystemAxis.Z,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_X,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Y,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_Z,
-        org.geotools.referencing.cs.CoordinateSystemAxis.ALTITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.DEPTH,
-        org.geotools.referencing.cs.CoordinateSystemAxis.ELLIPSOIDAL_HEIGHT,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GRAVITY_RELATED_HEIGHT,
-        org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LONGITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.SPHERICAL_LATITUDE,
-        org.geotools.referencing.cs.CoordinateSystemAxis.GEOCENTRIC_RADIUS
+        DefaultCoordinateSystemAxis.LONGITUDE,
+        DefaultCoordinateSystemAxis.LATITUDE,
+        DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,
+        DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,
+        DefaultCoordinateSystemAxis.EASTING,
+        DefaultCoordinateSystemAxis.WESTING,
+        DefaultCoordinateSystemAxis.NORTHING,
+        DefaultCoordinateSystemAxis.SOUTHING,
+        DefaultCoordinateSystemAxis.X,
+        DefaultCoordinateSystemAxis.Y,
+        DefaultCoordinateSystemAxis.Z,
+        DefaultCoordinateSystemAxis.GEOCENTRIC_X,
+        DefaultCoordinateSystemAxis.GEOCENTRIC_Y,
+        DefaultCoordinateSystemAxis.GEOCENTRIC_Z,
+        DefaultCoordinateSystemAxis.ALTITUDE,
+        DefaultCoordinateSystemAxis.DEPTH,
+        DefaultCoordinateSystemAxis.ELLIPSOIDAL_HEIGHT,
+        DefaultCoordinateSystemAxis.GRAVITY_RELATED_HEIGHT,
+        DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE,
+        DefaultCoordinateSystemAxis.SPHERICAL_LATITUDE,
+        DefaultCoordinateSystemAxis.GEOCENTRIC_RADIUS
     };
 
     /**
@@ -482,8 +486,7 @@ public class Parser extends MathTransformParser {
         if (element == null) {
             return null;
         }
-        final BursaWolfParameters info = new BursaWolfParameters(
-                org.geotools.referencing.datum.GeodeticDatum.WGS84);
+        final BursaWolfParameters info = new BursaWolfParameters(DefaultGeodeticDatum.WGS84);
         info.dx  = element.pullDouble("dx");
         info.dy  = element.pullDouble("dy");
         info.dz  = element.pullDouble("dz");
@@ -624,8 +627,7 @@ public class Parser extends MathTransformParser {
             if (properties.size() == 1) {
                 properties = new HashMap(properties);
             }
-            properties.put(org.geotools.referencing.datum.GeodeticDatum.BURSA_WOLF_PROPERTY,
-                           toWGS84);
+            properties.put(DefaultGeodeticDatum.BURSA_WOLF_PROPERTY, toWGS84);
         }
         try {
             return datumFactory.createGeodeticDatum(properties, ellipsoid, meridian);
@@ -651,8 +653,7 @@ public class Parser extends MathTransformParser {
         final int datum = element.pullInteger("datum");
         Map  properties = parseAuthority(element, name);
         element.close();
-        final VerticalDatumType type = org.geotools.referencing.datum.VerticalDatum
-                                       .getVerticalDatumTypeFromLegacyCode(datum);
+        final VerticalDatumType type = DefaultVerticalDatum.getVerticalDatumTypeFromLegacyCode(datum);
         if (type == null) {
             throw element.parseFailed(null,
                   Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, new Integer(datum)));
@@ -721,8 +722,7 @@ public class Parser extends MathTransformParser {
         element.close();
 
         final CoordinateSystem cs;
-        cs = new org.geotools.referencing.cs.CoordinateSystem(
-                 Collections.singletonMap("name", name),
+        cs = new AbstractCS(Collections.singletonMap("name", name),
                  (CoordinateSystemAxis[]) list.toArray(new CoordinateSystemAxis[list.size()]));
         try {
             return crsFactory.createEngineeringCRS(properties, datum, cs);
@@ -951,7 +951,7 @@ public class Parser extends MathTransformParser {
                     number, AxisDirection.OTHER, Unit.ONE);
             }
             return crsFactory.createDerivedCRS(properties, method, base, toBase.inverse(),
-                   new org.geotools.referencing.cs.CoordinateSystem(properties, axis));
+                                               new AbstractCS(properties, axis));
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         } catch (NoninvertibleTransformException exception) {

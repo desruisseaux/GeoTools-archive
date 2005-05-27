@@ -32,9 +32,9 @@ import java.util.Map;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Renamed as {@link DefaultDatum}.
+ * @deprecated Renamed as {@link AbstractDatum}.
  */
-public class Datum extends DefaultDatum {
+public class Datum extends AbstractDatum {
     /**
      * Constructs a datum from a set of properties.
      */

@@ -52,8 +52,10 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.metadata.iso.citation.CitationImpl;
 
 
@@ -379,11 +381,11 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
-            return org.geotools.referencing.datum.GeodeticDatum.WGS84;
+            return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
+            CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
             
             final double   falseNorthing   = code.latitude >= 0.0 ? 0.0 : 10000000.0;
             final double   zone            = Math.min(Math.floor((code.longitude + 180.0)/6.0)+1, 60);
@@ -445,11 +447,11 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
-            return org.geotools.referencing.datum.GeodeticDatum.WGS84;
+            return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
+            CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
           
             final double   centralMeridian = code.longitude;
             final double   falseNorthing   = code.latitude >= 0.0 ? 0.0 : 10000000.0;
@@ -509,11 +511,11 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
-            return org.geotools.referencing.datum.GeodeticDatum.WGS84;
+            return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
+            CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
           
             final double   centralMeridian  = code.longitude;
             final double   latitudeOfOrigin = code.latitude;
@@ -574,11 +576,11 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultPrimeMeridian.GREENWICH;
         }
         public Datum datum() {
-            return org.geotools.referencing.datum.GeodeticDatum.WGS84;
+            return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
             GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
-            CartesianCS cartCS = org.geotools.referencing.cs.CartesianCS.PROJECTED;
+            CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
         
             final double   centralMeridian   = code.longitude;
             final double   standardParallel1 = code.latitude;

@@ -35,6 +35,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CartesianCS;
@@ -48,6 +49,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.resources.Utilities;
 
@@ -320,8 +322,7 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
         final double scale = 0.5 * (scaleX + scaleY);
         final CoordinateSystem sourceCS = sourceCRS.getCoordinateSystem();
         final CoordinateSystem targetCS = targetCRS.getCoordinateSystem();
-        final Matrix matrix = org.geotools.referencing.cs.CoordinateSystem.
-                              swapAndScaleAxis(sourceCS, targetCS);
+        final Matrix matrix = AbstractCS.swapAndScaleAxis(sourceCS, targetCS);
         final int sourceDim = sourceCS.getDimension();
         final int targetDim = targetCS.getDimension();
         for (int j=0; j<targetDim; j++) {

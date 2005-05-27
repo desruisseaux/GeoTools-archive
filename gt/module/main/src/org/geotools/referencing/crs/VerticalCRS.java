@@ -32,7 +32,10 @@ import org.opengis.referencing.datum.VerticalDatum;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.referencing.cs.DefaultVerticalCS;
+import org.geotools.referencing.DefaultReferenceSystem;
 import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.datum.DefaultVerticalDatum;
 
 
 /**
@@ -52,7 +55,7 @@ import org.geotools.referencing.DefaultIdentifiedObject;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class VerticalCRS extends org.geotools.referencing.crs.SingleCRS
+public class VerticalCRS extends DefaultSingleCRS
                       implements org.opengis.referencing.crs.VerticalCRS
 {
     /**
@@ -68,8 +71,7 @@ public class VerticalCRS extends org.geotools.referencing.crs.SingleCRS
      * @todo Localize name.
      */
     public static final VerticalCRS ELLIPSOIDAL_HEIGHT = new VerticalCRS("Ellipsoidal height",
-                        org.geotools.referencing.datum.VerticalDatum.ELLIPSOIDAL,
-                        org.geotools.referencing.cs.VerticalCS.ELLIPSOIDAL_HEIGHT);
+                        DefaultVerticalDatum.ELLIPSOIDAL, DefaultVerticalCS.ELLIPSOIDAL_HEIGHT);
 
     /**
      * Constructs a vertical CRS from a name.

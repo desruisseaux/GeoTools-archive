@@ -21,13 +21,14 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gce.image.WorldImageWriter;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.TestData;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -259,7 +260,7 @@ public class ArcGridVisualizationTest extends TestCaseSupport {
     }
 	 private GridCoverage createCoverage(
 	    		RenderedImage image,
-				org.opengis.referencing.crs.CoordinateReferenceSystem crs, 
+				CoordinateReferenceSystem crs, 
 				GeneralEnvelope envelope, 
 				String coverageName
 		) throws MismatchedDimensionException, IOException {

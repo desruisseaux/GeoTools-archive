@@ -77,7 +77,7 @@ public class Formattable {
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT
      * specification</A> do not defines any keyword for {@linkplain CoordinateSystem coordinate
      * system} objects. If this object is an instance of
-     * {@link org.geotools.referencing.cs.CartesianCS}, then the WKT will
+     * {@link org.geotools.referencing.cs.DefaultCartesianCS}, then the WKT will
      * be formatted as <code>"CartesianCS[AXIS["</code>...<code>"], AXIS["</code>...<code>"],
      * </code><i>etc.</i><code>]"</code>.
      */

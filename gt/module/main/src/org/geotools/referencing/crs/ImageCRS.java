@@ -33,6 +33,7 @@ import org.opengis.referencing.datum.ImageDatum;
 
 // Geotools dependencies
 import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.DefaultReferenceSystem;
 
 
 /**
@@ -50,7 +51,7 @@ import org.geotools.referencing.DefaultIdentifiedObject;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ImageCRS extends org.geotools.referencing.crs.SingleCRS
+public class ImageCRS extends DefaultSingleCRS
                    implements org.opengis.referencing.crs.ImageCRS
 {
     /**

@@ -36,7 +36,9 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.referencing.DefaultIdentifiedObject;
 import org.geotools.referencing.DefaultReferenceSystem;
-import org.geotools.referencing.cs.CartesianCS;
+import org.geotools.referencing.datum.DefaultEngineeringDatum;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -68,7 +70,7 @@ import org.geotools.util.NameFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
+public class EngineeringCRS extends DefaultSingleCRS
                          implements org.opengis.referencing.crs.EngineeringCRS
 {
     /**
@@ -89,7 +91,7 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
         /** Constructs a coordinate system with the given name. */
         public Cartesian(final String name, final CoordinateSystem cs) {
-            super(name, org.geotools.referencing.datum.EngineeringDatum.UNKNOW, cs);
+            super(name, DefaultEngineeringDatum.UNKNOW, cs);
         }
 
         /** Returns the localized name for "Cartesian". */
@@ -117,31 +119,31 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
 
     /**
      * A two-dimensional cartesian coordinate reference system with
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y}
+     * {@linkplain DefaultCoordinateSystemAxis#X x},
+     * {@linkplain DefaultCoordinateSystemAxis#Y y}
      * axis in {@linkplain SI#METER metres}. By default, this CRS has no transformation
      * path to any other CRS (i.e. a map using this CS can't be reprojected to a
      * {@linkplain GeographicCRS geographic coordinate reference system} for example).
      */
-    public static final EngineeringCRS CARTESIAN_2D = new Cartesian("Cartesian",
-                                                                    CartesianCS.GENERIC_2D);
+    public static final EngineeringCRS CARTESIAN_2D =
+            new Cartesian("Cartesian", DefaultCartesianCS.GENERIC_2D);
 
     /**
      * A three-dimensional cartesian coordinate reference system with
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y},
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Z z}
+     * {@linkplain DefaultCoordinateSystemAxis#X x},
+     * {@linkplain DefaultCoordinateSystemAxis#Y y},
+     * {@linkplain DefaultCoordinateSystemAxis#Z z}
      * axis in {@linkplain SI#METER metres}. By default, this CRS has no transformation
      * path to any other CRS (i.e. a map using this CS can't be reprojected to a
      * {@linkplain GeographicCRS geographic coordinate reference system} for example).
      */
-    public static final EngineeringCRS CARTESIAN_3D = new Cartesian("Cartesian",
-                                                                    CartesianCS.GENERIC_3D);
+    public static final EngineeringCRS CARTESIAN_3D =
+            new Cartesian("Cartesian", DefaultCartesianCS.GENERIC_3D);
 
     /**
      * A two-dimensional wildcard coordinate system with
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y}
+     * {@linkplain DefaultCoordinateSystemAxis#X x},
+     * {@linkplain DefaultCoordinateSystemAxis#Y y}
      * axis in {@linkplain SI#METER metres}. At the difference of {@link #CARTESIAN_2D},
      * this coordinate system is treated specially by the default {@linkplain
      * org.geotools.referencing.operation.CoordinateOperationFactory coordinate operation factory}
@@ -150,14 +152,14 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
      * CRS to any CRS with a compatible number of dimensions is assumed to be the identity
      * transform. This CRS is usefull as a kind of wildcard when no CRS were explicitly specified.
      */
-    public static final EngineeringCRS GENERIC_2D = new Cartesian("Generic",
-                                                                  CartesianCS.GENERIC_2D);
+    public static final EngineeringCRS GENERIC_2D =
+            new Cartesian("Generic", DefaultCartesianCS.GENERIC_2D);
 
     /**
      * A three-dimensional wildcard coordinate system with
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#X x},
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Y y},
-     * {@linkplain org.geotools.referencing.cs.CoordinateSystemAxis#Z z}
+     * {@linkplain DefaultCoordinateSystemAxis#X x},
+     * {@linkplain DefaultCoordinateSystemAxis#Y y},
+     * {@linkplain DefaultCoordinateSystemAxis#Z z}
      * axis in {@linkplain SI#METER metres}. At the difference of {@link #CARTESIAN_3D},
      * this coordinate system is treated specially by the default {@linkplain
      * org.geotools.referencing.operation.CoordinateOperationFactory coordinate operation factory}
@@ -166,8 +168,8 @@ public class EngineeringCRS extends org.geotools.referencing.crs.SingleCRS
      * CRS to any CRS with a compatible number of dimensions is assumed to be the identity
      * transform. This CRS is usefull as a kind of wildcard when no CRS were explicitly specified.
      */
-    public static final EngineeringCRS GENERIC_3D = new Cartesian("Generic",
-                                                                  CartesianCS.GENERIC_3D);
+    public static final EngineeringCRS GENERIC_3D =
+            new Cartesian("Generic", DefaultCartesianCS.GENERIC_3D);
 
     /**
      * Constructs an engineering CRS from a name.

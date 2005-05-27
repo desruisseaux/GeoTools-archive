@@ -35,6 +35,9 @@ import org.opengis.referencing.datum.GeodeticDatum;
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.cs.DefaultSphericalCS;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 
 
 /**
@@ -52,7 +55,7 @@ import org.geotools.referencing.DefaultReferenceSystem;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeocentricCRS extends org.geotools.referencing.crs.SingleCRS
+public class GeocentricCRS extends DefaultSingleCRS
                         implements org.opengis.referencing.crs.GeocentricCRS
 {
     /**
@@ -62,24 +65,22 @@ public class GeocentricCRS extends org.geotools.referencing.crs.SingleCRS
     
     /**
      * The default geocentric CRS with a
-     * {@linkplain org.geotools.referencing.cs.CartesianCS#GEOCENTRIC cartesian coordinate system}.
+     * {@linkplain DefaultCartesianCS#GEOCENTRIC cartesian coordinate system}.
      * Prime meridian is Greenwich, geodetic datum is WGS84 and linear units are metres.
      * The <var>X</var> axis points towards the prime meridian.
      * The <var>Y</var> axis points East.
      * The <var>Z</var> axis points North.
      */
     public static final GeocentricCRS CARTESIAN = new GeocentricCRS("Cartesian",
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
-                        org.geotools.referencing.cs.CartesianCS.GEOCENTRIC);
+                        DefaultGeodeticDatum.WGS84, DefaultCartesianCS.GEOCENTRIC);
     
     /**
      * The default geocentric CRS with a
-     * {@linkplain org.geotools.referencing.cs.SphericalCS#GEOCENTRIC spherical coordinate system}.
+     * {@linkplain DefaultSphericalCS#GEOCENTRIC spherical coordinate system}.
      * Prime meridian is Greenwich, geodetic datum is WGS84 and linear units are metres.
      */
     public static final GeocentricCRS SPHERICAL = new GeocentricCRS("Spherical",
-                        org.geotools.referencing.datum.GeodeticDatum.WGS84,
-                        org.geotools.referencing.cs.SphericalCS.GEOCENTRIC);
+                        DefaultGeodeticDatum.WGS84, DefaultSphericalCS.GEOCENTRIC);
 
     /**
      * Constructs a geocentric CRS from a name.

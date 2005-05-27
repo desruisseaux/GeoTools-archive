@@ -44,6 +44,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.io.TableWriter;
 import org.geotools.measure.Measure;
+import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.wkt.AbstractConsole;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Preprocessor;
@@ -554,10 +555,10 @@ public class Console extends AbstractConsole {
             table.nextColumn();
         }
         if (position2 != null) {
-            if (crs instanceof org.geotools.referencing.crs.CoordinateReferenceSystem) try {
+            if (crs instanceof AbstractCRS) try {
                 final Measure distance;
-                distance = ((org.geotools.referencing.crs.CoordinateReferenceSystem)crs)
-                           .distance(position1.getCoordinates(), position2.getCoordinates());
+                distance = ((AbstractCRS)crs).distance(position1.getCoordinates(),
+                                                       position2.getCoordinates());
                 table.setAlignment(TableWriter.ALIGN_RIGHT);
                 table.write(numberFormat.format(distance.doubleValue()));
                 table.write("  ");

@@ -61,7 +61,7 @@ import org.opengis.util.ScopedName;
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.datum.DefaultDatum;         // For javadoc
+import org.geotools.referencing.datum.AbstractDatum;        // For javadoc
 import org.geotools.referencing.datum.BursaWolfParameters;  // For javadoc
 import org.geotools.util.LocalName;
 import org.geotools.util.NameFactory;
@@ -70,8 +70,8 @@ import org.geotools.resources.XArray;
 
 /**
  * A datum factory that add {@linkplain DefaultIdentifiedObject#getAlias aliases} to a datum name
- * before to delegates the {@linkplain DefaultDatum#DefaultDatum(Map) datum creation} to an other
- * factory. Aliases are especially important for {@linkplain DefaultDatum datum} since their
+ * before to delegates the {@linkplain AbstractDatum#AbstractDatum(Map) datum creation} to an other
+ * factory. Aliases are especially important for {@linkplain AbstractDatum datum} since their
  * {@linkplain DefaultIdentifiedObject#getName name} are often the only way to differentiate them.
  * Two datum with different names are considered incompatible, unless some datum shift method are
  * specified (e.g. {@linkplain BursaWolfParameters Bursa-Wolf parameters}). Unfortunatly, different
@@ -397,7 +397,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
 
     /**
      * Completes the given map of properties. This method expects a map of properties to
-     * be given to {@link DefaultDatum#DefaultDatum(Map)} constructor. The name is fetch
+     * be given to {@link AbstractDatum#AbstractDatum(Map)} constructor. The name is fetch
      * from the {@link DefaultIdentifiedObject#NAME_PROPERTY NAME_PROPERTY}.
      * The {@link DefaultIdentifiedObject#ALIAS_PROPERTY ALIAS_PROPERTY} is
      * completed with the aliases know to this factory.

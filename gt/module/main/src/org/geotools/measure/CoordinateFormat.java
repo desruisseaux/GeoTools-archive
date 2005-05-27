@@ -32,15 +32,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+// Units dependencies
 import javax.units.Converter;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.referencing.crs.TemporalCRS;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.cts.ResourceKeys;
-import org.geotools.resources.cts.Resources;
+// OpenGIS dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -50,12 +48,19 @@ import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
+// Geotools dependencies
+import org.geotools.referencing.crs.AbstractCRS;
+import org.geotools.referencing.crs.TemporalCRS;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.cts.ResourceKeys;
+import org.geotools.resources.cts.Resources;
+
 
 /**
- * Format a {@linkplain org.geotools.geometry.GeneralDirectPosition direct position} in an
- * arbitrary {@linkplain org.geotools.referencing.crs.CoordinateReferenceSystem coordinate
- * reference system}. The format for each ordinate is infered from the coordinate system
- * units using the following rules:
+ * Formats a {@linkplain org.geotools.geometry.GeneralDirectPosition direct position} in an
+ * arbitrary {@linkplain org.geotools.referencing.crs.AbstractCRS coordinate reference system}.
+ * The format for each ordinate is infered from the coordinate system units using the following
+ * rules:
  * <ul>
  *   <li>Ordinate values in {@linkplain NonSI#DEGREE_ANGLE degrees} are formated as angles
  *       using {@link AngleFormat}.</li>
@@ -255,8 +260,8 @@ public class CoordinateFormat extends Format {
 
     /**
      * Set the pattern for numbers fields.  If some ordinates are formatted as plain number
-     * (for example in {@linkplain org.geotools.referencing.cs.CartesianCS cartesian coordinate
-     * system}), then those numbers will be formatted using this pattern.
+     * (for example in {@linkplain org.geotools.referencing.cs.DefaultCartesianCS cartesian
+     * coordinate system}), then those numbers will be formatted using this pattern.
      *
      * @param pattern The number pattern as specified in {@link DecimalFormat}.
      */
@@ -273,8 +278,9 @@ public class CoordinateFormat extends Format {
 
     /**
      * Set the pattern for angles fields. If some ordinates are formatted as angle
-     * (for example in {@linkplain org.geotools.referencing.cs.EllipsoidalCS ellipsoidal
-     * coordinate system}), then those angles will be formatted using this pattern.
+     * (for example in {@linkplain org.geotools.referencing.cs.DefaultEllipsoidalCS
+     * ellipsoidal coordinate system}), then those angles will be formatted using
+     * this pattern.
      *
      * @param pattern The angle pattern as specified in {@link AngleFormat}.
      */
@@ -291,7 +297,7 @@ public class CoordinateFormat extends Format {
 
     /**
      * Set the pattern for dates fields. If some ordinates are formatted as date (for example in
-     * {@linkplain org.geotools.referencing.cs.TimeCS time coordinate system}), then
+     * {@linkplain org.geotools.referencing.cs.DefaultTimeCS time coordinate system}), then
      * those dates will be formatted using this pattern.
      *
      * @param pattern The date pattern as specified in {@link SimpleDateFormat}.
@@ -309,7 +315,7 @@ public class CoordinateFormat extends Format {
 
     /**
      * Set the time zone for dates fields. If some ordinates are formatted as date (for example in
-     * {@linkplain org.geotools.referencing.cs.TimeCS time coordinate system}), then
+     * {@linkplain org.geotools.referencing.cs.DefaultTimeCS time coordinate system}), then
      * those dates will be formatted using the specified time zone.
      *
      * @param timezone The time zone for dates.

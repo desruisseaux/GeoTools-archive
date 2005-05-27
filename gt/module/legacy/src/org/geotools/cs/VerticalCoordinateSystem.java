@@ -169,7 +169,7 @@ public class VerticalCoordinateSystem extends CoordinateSystem {
      * @see org.opengis.cs.CS_VerticalCoordinateSystem#getUnits(int)
      * @see org.opengis.cs.CS_VerticalCoordinateSystem#getVerticalUnit()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.cs.CoordinateSystemAxis#getUnit}.
+     * @deprecated Replaced by {@link org.geotools.referencing.cs.DefaultCoordinateSystemAxis#getUnit}.
      */
     public Unit getUnits(final int dimension) {
         final int maxDim = getDimension();

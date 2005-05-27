@@ -27,69 +27,29 @@ import java.util.Map;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
-import org.geotools.measure.Measure;
 
 
 /**
  * A one-dimensional coordinate system that consists of the points that lie on the single axis
- * described. The associated ordinate is the distance from the specified origin to the point
- * along the axis. Example: usage of the line feature representing a road to describe points
- * on or along that road. A <code>LinearCS</code> shall have one
- * {@linkplain #getAxis axis}.
- *
- * <TABLE CELLPADDING='6' BORDER='1'>
- * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
- * <TR><TD>
- *   {@link org.geotools.referencing.crs.EngineeringCRS Engineering}
- * </TD></TR></TABLE>
+ * described.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link DefaultLinearCS}.
  */
-public class LinearCS extends CoordinateSystem implements org.opengis.referencing.cs.LinearCS {
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = -6890723478287625763L;
-
+public class LinearCS extends DefaultLinearCS {
     /**
      * Constructs a coordinate system from a name.
-     *
-     * @param name  The coordinate system name.
-     * @param axis  The axis.
      */
     public LinearCS(final String name, final CoordinateSystemAxis axis) {
-        super(name, new CoordinateSystemAxis[] {axis});
+        super(name, axis);
     }
 
     /**
-     * Constructs a coordinate system from a set of properties. The properties map is given
-     * unchanged to the {@linkplain CoordinateSystem#CoordinateSystem(Map,CoordinateSystemAxis[])
-     * super-class constructor}.
-     *
-     * @param properties   Set of properties. Should contains at least <code>"name"</code>.
-     * @param axis         The axis.
+     * Constructs a coordinate system from a set of properties.
      */
     public LinearCS(final Map properties, final CoordinateSystemAxis axis) {
-        super(properties, new CoordinateSystemAxis[] {axis});
-    }
-
-    /**
-     * Computes the distance between two points.
-     *
-     * @param  coord1 Coordinates of the first point.
-     * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
-     * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
-     */
-    public Measure distance(final double[] coord1, final double[] coord2)
-            throws MismatchedDimensionException
-    {
-        ensureDimensionMatch("coord1", coord1);
-        ensureDimensionMatch("coord2", coord2);
-        return new Measure(Math.abs(coord1[0] - coord2[0]), getDistanceUnit());
+        super(properties, axis);
     }
 }

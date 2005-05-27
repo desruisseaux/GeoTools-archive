@@ -629,14 +629,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * <code>sourceCS.equals(targetCS, false)</code> returns <code>true</code> only if
      * the transformation from <code>sourceCS</code> to <code>targetCS</code> is
      * the identity transform, no matter what {@link #getName} saids.
-     *
-     * <P>Some subclasses (especially {@link org.geotools.referencing.datum.DefaultDatum}
+     * <P>
+     * Some subclasses (especially {@link org.geotools.referencing.datum.AbstractDatum}
      * and {@link org.geotools.parameter.AbstractParameterDescriptor}) will test for
      * the {@linkplain #getName name}, since objects with different name have
      * completly different meaning. For example nothing differentiate the
      * <code>"semi_major"</code> and <code>"semi_minor"</code> parameters
      * except the name. The name comparaison may be loose however, i.e. we may
-     * accept a name matching an alias.</P>
+     * accept a name matching an alias.
      *
      * @param  object The object to compare to <code>this</code>.
      * @param  compareMetadata <code>true</code> for performing a strict comparaison, or

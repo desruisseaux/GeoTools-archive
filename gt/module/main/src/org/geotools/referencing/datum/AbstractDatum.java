@@ -43,19 +43,23 @@ import org.geotools.resources.Utilities;
  * org.opengis.referencing.crs.CoordinateReferenceSystem coordinate reference system}. A datum
  * uses a parameter or set of parameters that determine the location of the origin of the coordinate
  * reference system. Each datum subtype can be associated with only specific types of
- * {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate systems}.
- *
+ * {@linkplain org.opengis.referencing.cs.AbstractCS coordinate systems}.
+ * <p>
  * A datum can be defined as a set of real points on the earth that have coordinates.
  * The definition of the datum may also include the temporal behavior (such as the
  * rate of change of the orientation of the coordinate axes).
+ * <p>
+ * This class is called <cite>Abstract</cite> (even if it is technically possible to instantiate it)
+ * in the sense that typical applications should not create instances of this class. They should
+ * instantiate one of the specific subclasses instead.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.referencing.cs.CoordinateSystem
- * @see org.geotools.referencing.crs.CoordinateReferenceSystem
+ * @see org.geotools.referencing.cs.AbstractCS
+ * @see org.geotools.referencing.crs.AbstractCRS
  */
-public class DefaultDatum extends DefaultIdentifiedObject implements Datum {
+public class AbstractDatum extends DefaultIdentifiedObject implements Datum {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -63,28 +67,28 @@ public class DefaultDatum extends DefaultIdentifiedObject implements Datum {
 
     /**
      * Key for the <code>"anchorPoint"</code> property to be given to the
-     * {@linkplain #DefaultDatum(Map) constructor}. This is used
+     * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getAnchorPoint()}.
      */
     public static final String ANCHOR_POINT_PROPERTY = "anchorPoint";
 
     /**
      * Key for the <code>"realizationEpoch"</code> property to be given to the
-     * {@linkplain #DefaultDatum(Map) constructor}. This is used
+     * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getRealizationEpoch()}.
      */
     public static final String REALIZATION_EPOCH_PROPERTY = "realizationEpoch";
 
     /**
      * Key for the <code>"validArea"</code> property to be given to the
-     * {@linkplain #DefaultDatum(Map) constructor}. This is used
+     * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getValidArea()}.
      */
     public static final String VALID_AREA_PROPERTY = "validArea";
 
     /**
      * Key for the <code>"scope"</code> property to be given to the
-     * {@linkplain #DefaultDatum(Map) constructor}. This is used
+     * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getScope()}.
      */
     public static final String SCOPE_PROPERTY = "scope";
@@ -153,7 +157,7 @@ public class DefaultDatum extends DefaultIdentifiedObject implements Datum {
      *   </tr>
      * </table>
      */
-    public DefaultDatum(final Map properties) {
+    public AbstractDatum(final Map properties) {
         this(properties, new HashMap());
     }
 
@@ -161,7 +165,7 @@ public class DefaultDatum extends DefaultIdentifiedObject implements Datum {
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private DefaultDatum(final Map properties, final Map subProperties) {
+    private AbstractDatum(final Map properties, final Map subProperties) {
         super(properties, subProperties, LOCALIZABLES);
         final Date realizationEpoch;
         anchorPoint      = (InternationalString) subProperties.get(ANCHOR_POINT_PROPERTY     );
@@ -257,7 +261,7 @@ public class DefaultDatum extends DefaultIdentifiedObject implements Datum {
                 return nameMatches(object. getName().getCode()) ||
                        nameMatches(object, getName().getCode());
             }
-            final DefaultDatum that = (DefaultDatum) object;
+            final AbstractDatum that = (AbstractDatum) object;
             return this.realizationEpoch == that.realizationEpoch &&
                    Utilities.equals(this.validArea,   that.validArea      ) &&
                    Utilities.equals(this.anchorPoint, that.anchorPoint    ) &&
@@ -271,9 +275,9 @@ public class DefaultDatum extends DefaultIdentifiedObject implements Datum {
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> element.
      *
-     * Note: All subclasses will override this method, but only
-     *       {@link org.geotools.referencing.datum.GeodeticDatum} will <strong>not</strong>
-     *       invokes this parent method, because horizontal datum do not write the datum type.
+     * Note: All subclasses will override this method, but only {@link DefaultGeodeticDatum} will
+     *       <strong>not</strong> invokes this parent method, because horizontal datum do not write
+     *       the datum type.
      *
      * @param  formatter The formatter to use.
      * @return The WKT element name.
