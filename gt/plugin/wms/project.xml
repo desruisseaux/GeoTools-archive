@@ -76,6 +76,9 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
+      <excludes>
+        <exclude>**/Geot553Test.java</exclude>
+      </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
