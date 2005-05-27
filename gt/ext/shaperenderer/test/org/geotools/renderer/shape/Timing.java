@@ -26,6 +26,7 @@ import java.awt.RenderingHints;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -127,11 +128,15 @@ public class Timing {
 		}
 	}
 
-	final static FileWriter out;
+	public final static FileWriter out;
+    
 	static {
 		FileWriter tmp;
 		try {
-			tmp = new FileWriter("/home/jones/Desktop/TimingResults.txt", true);
+            String homePath = System.getProperty("user.home");
+            File home = new File( homePath );
+            File results = new File( homePath, "TimingResults.txt"  );
+			tmp = new FileWriter( results , true);
 		} catch (IOException e) {
 			tmp = null;
 			e.printStackTrace();
@@ -296,12 +301,13 @@ public class Timing {
 
 		long end = System.currentTimeMillis();
 		if (ACCURATE){
-			if (out != null)
-				out
-						.append("shape " + testName + "=" + (end - start) / 3
-								+ "\n");
-		}else if (out != null)
-				out.append("shape " + testName + "=" + (end - start) + "\n");
+			if (out != null) {
+                out.write("shape " + testName + "=" + (end - start) / 3 + "\n");
+            }
+		}
+        else if (out != null) {
+            out.write("shape " + testName + "=" + (end - start) + "\n");
+        }
 
 		if (DISPLAY)
 			display=display("shape", image, w, h);
@@ -367,9 +373,9 @@ public class Timing {
 
 		long end = System.currentTimeMillis();
 		if (ACCURATE){
-			out.append("tiny " + testName + "=" + (end - start) / 3 + "\n");
+			out.write("tiny " + testName + "=" + (end - start) / 3 + "\n");
 		}else
-			out.append("tiny " + testName + "=" + (end - start) + "\n");
+			out.write("tiny " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
 			display=display("tiny", image, w, h);
 		
@@ -415,10 +421,10 @@ public class Timing {
 		long end = System.currentTimeMillis();
 		if (ACCURATE){
 			if (out != null)
-				out.append("lite " + testName + "=" + (end - start) / 3 + "\n");
+				out.write("lite " + testName + "=" + (end - start) / 3 + "\n");
 		}
 			else if (out != null)
-				out.append("lite " + testName + "=" + (end - start) + "\n");
+				out.write("lite " + testName + "=" + (end - start) + "\n");
 		if (DISPLAY)
 			display=display("lite", image, w, h);
 		

@@ -80,6 +80,7 @@ public class PickleTest extends TestCase {
     names = new String[] { "Color","Seeds","Size" };
     clazz = new Class[] { Color.class,Boolean.class,Integer.class};
     FeatureType orange = createType(names,clazz);
+    
     FeatureCollection applesNoranges = FeatureCollections.newCollection();
     Object[] apple1 = new Object[] {Color.red,new Integer(4),Boolean.FALSE};
     Object[] apple2 = new Object[] {Color.green,new Integer(5),Boolean.TRUE};
@@ -90,7 +91,7 @@ public class PickleTest extends TestCase {
     applesNoranges.add( orange.create(orange1) );
     applesNoranges.add( orange.create(orange2) );
     pds.setFeatures(applesNoranges);
-    
+        
     checkFeature(apple1,pds.getFeature(0));
     checkFeature(apple2,pds.getFeature(1));
     checkFeature(orange1,pds.getFeature(2));
