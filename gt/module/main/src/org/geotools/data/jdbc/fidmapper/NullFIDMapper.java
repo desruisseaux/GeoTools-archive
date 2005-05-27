@@ -16,12 +16,11 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
+import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.rmi.server.UID;
 import java.sql.Connection;
 import java.sql.Statement;
-
-import org.geotools.feature.Feature;
 
 
 /**
@@ -34,7 +33,6 @@ import org.geotools.feature.Feature;
  */
 public class NullFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
-    
     private static final String ARRAY_OUT_OF_BOUND_MESSAGE = "There are no columns in this FIDMapper";
 
     public NullFIDMapper() {
@@ -118,10 +116,11 @@ public class NullFIDMapper extends AbstractFIDMapper {
     public void initSupportStructures() {
         // nothing to do        
     }
-    
-    
+
     /**
-     * This FID mappers generates unique IDs out of the blue using {@link UID UID}
+     * This FID mappers generates unique IDs out of the blue using {@link UID
+     * UID}
+     *
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isVolatile()
      */
     public boolean isVolatile() {

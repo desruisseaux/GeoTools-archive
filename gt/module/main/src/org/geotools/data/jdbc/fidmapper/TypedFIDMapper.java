@@ -16,11 +16,10 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
+import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Statement;
-
-import org.geotools.feature.Feature;
 
 
 /**
@@ -32,7 +31,6 @@ import org.geotools.feature.Feature;
  */
 public class TypedFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
-    
     private String featureTypeName;
     private FIDMapper wrappedMapper;
 
@@ -144,7 +142,8 @@ public class TypedFIDMapper extends AbstractFIDMapper {
      */
     public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException {
-        return featureTypeName + "." + wrappedMapper.createID(conn, feature, statement);
+        return featureTypeName + "."
+        + wrappedMapper.createID(conn, feature, statement);
     }
 
     /**

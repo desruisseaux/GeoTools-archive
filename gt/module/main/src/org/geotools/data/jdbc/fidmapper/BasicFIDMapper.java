@@ -14,16 +14,18 @@
  *    Lesser General Public License for more details.
  *
  */
+/*
+ * 26-may-2005 D. Adler Removed returnFIDColumnsAsAttributes
+ *                      variable and related accessor method.
+ */
 package org.geotools.data.jdbc.fidmapper;
 
+import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.rmi.server.UID;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.Types;
-
-import org.geotools.feature.Feature;
-
 
 
 /**
@@ -35,8 +37,6 @@ import org.geotools.feature.Feature;
  */
 public class BasicFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
-
-    private boolean returnFIDColumnsAsAttributes;
 
     /** The name of the field of the primary key */
     private final String fieldName;
@@ -85,13 +85,6 @@ public class BasicFIDMapper extends AbstractFIDMapper {
      */
     public Object[] getPKAttributes(String FID) {
         return new Object[] { FID };
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#returnFIDColumnsAsAttributes()
-     */
-    public boolean returnFIDColumnsAsAttributes() {
-        return returnFIDColumnsAsAttributes;
     }
 
     /**
@@ -166,7 +159,8 @@ public class BasicFIDMapper extends AbstractFIDMapper {
      * This kind of FIDMapper does not generate keys, they must be already
      * present in the primary key.
      *
-     * @see org.geotools.data.fidmapper.FIDMapper#createID(Connection, Feature, Statement)
+     * @see org.geotools.data.fidmapper.FIDMapper#createID(Connection, Feature,
+     *      Statement)
      */
     public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException {

@@ -14,8 +14,17 @@
  *    Lesser General Public License for more details.
  *
  */
+/*
+ * 26-may-2005 D. Adler Added constructor with returnFIDColumnsAsAttributes.
+ *                      Added accessors for ColumnInfo
+ */
 package org.geotools.data.jdbc.fidmapper;
 
+import org.geotools.data.DataSourceException;
+import org.geotools.data.SchemaNotFoundException;
+import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.JDBCUtils;
+import org.geotools.feature.FeatureType;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,12 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.geotools.data.DataSourceException;
-import org.geotools.data.SchemaNotFoundException;
-import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.JDBCUtils;
-import org.geotools.feature.FeatureType;
 
 
 /**
@@ -52,9 +55,39 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
             "org.geotools.data.jdbc");
     private boolean returningTypedFIDMapper = true;
 
+    /** Set if table FID columns are to be returned as business attributes. */
+    protected boolean returnFIDColumnsAsAttributes = false;
+
     /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapperFactory#getMapper(java.lang.String,
-     *      java.sql.DatabaseMetaData)
+     * Constructs a DefaultFIDMapperFactory which will not return FID columns
+     * as business attributes.
+     */
+    public DefaultFIDMapperFactory() {
+    }
+
+    /**
+     * Constructs a DefaultFIDMapperFactory with user specification of whether
+     * to return FID columns as business attributes.
+     *
+     * @param returnFIDColumnsAsAttributes true if FID columns should be
+     *        returned as business  attributes.
+     */
+    public DefaultFIDMapperFactory(boolean returnFIDColumnsAsAttributes) {
+        this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes;
+    }
+
+    /**
+     * Gets the appropriate FIDMapper for the specified table.
+     *
+     * @param catalog
+     * @param schema
+     * @param tableName
+     * @param connection the active database connection to get table key
+     *        information
+     *
+     * @return the appropriate FIDMapper for the specified table.
+     *
+     * @throws IOException if any error occurs.
      */
     public FIDMapper getMapper(String catalog, String schema, String tableName,
         Connection connection) throws IOException {
@@ -136,19 +169,21 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      *
      * @param schema
      * @param tableName
-     * @param connection DOCUMENT ME!
-     * @param ci
+     * @param connection an open database connection.
+     * @param ci the column information for the FID column.
      *
-     * @return
+     * @return the appropriate FIDMapper.
      */
-    private FIDMapper buildSingleColumnFidMapper(String schema,
+    protected FIDMapper buildSingleColumnFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo ci) {
         if (ci.autoIncrement) {
             return new AutoIncrementFIDMapper(ci.colName, ci.dataType);
         } else if (isIntegralType(ci.dataType)) {
-            return new MaxIncFIDMapper(tableName, ci.colName, ci.dataType);
+            return new MaxIncFIDMapper(tableName, ci.colName, ci.dataType,
+                this.returnFIDColumnsAsAttributes);
         } else {
-            return new BasicFIDMapper(ci.colName, ci.size);
+            return new BasicFIDMapper(ci.colName, ci.size,
+                this.returnFIDColumnsAsAttributes);
         }
     }
 
@@ -273,10 +308,9 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      * Returns true if the specified column is auto-increment. This method is
      * left protected so that specific datastore implementations can put their
      * own logic, should the default one be ineffective or have bad
-     * performance.
-     * 
-     *  NOTE: the postgis subclass will call this with the columnname and table name pre-double-quoted!
-     *        Other DB may have to do the same - please check your DB's documentation.
+     * performance.  NOTE: the postgis subclass will call this with the
+     * columnname and table name pre-double-quoted! Other DB may have to do
+     * the same - please check your DB's documentation.
      *
      * @param catalog
      * @param schema
@@ -308,10 +342,10 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
             statement = conn.createStatement();
             statement.setFetchSize(1);
             rs = statement.executeQuery("Select " + columnName + " from "
-                    + tableName+" WHERE 0=1");  //DJB: the "where 0=1" will optimize if you have a lot of dead tuples
+                    + tableName + " WHERE 0=1"); //DJB: the "where 0=1" will optimize if you have a lot of dead tuples
+
             // if the WHERE 0=1 give any data store problems, just remove it 
             // and put a comment here as to why it caused problems.
-
             java.sql.ResultSetMetaData rsInfo = rs.getMetaData();
             autoIncrement = rsInfo.isAutoIncrement(1);
         } finally {
@@ -323,12 +357,15 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     }
 
     /**
-     * Returns true if the dataType for the column can serve as a primary
-     * key.  Note that this now returns true for a DECIMAL type, because
-     * oracle Numbers are returned in jdbc as DECIMAL.  This may cause
-     * errors in very rare cases somewhere down the line, but only if
-     * users do something incredibly silly like defining a primary key
-     * with a double.
+     * Returns true if the dataType for the column can serve as a primary key.
+     * Note that this now returns true for a DECIMAL type, because oracle
+     * Numbers are returned in jdbc as DECIMAL.  This may cause errors in very
+     * rare cases somewhere down the line, but only if users do something
+     * incredibly silly like defining a primary key with a double.
+     *
+     * @param dataType DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
      */
     protected boolean isIntegralType(int dataType) {
         return (dataType == Types.BIGINT) || (dataType == Types.INTEGER)
@@ -373,6 +410,51 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
             return "ColumnInfo, name(" + colName + "), type(" + dataType
             + ") size(" + size + ") decimalDigits(" + decimalDigits
             + ") autoIncrement(" + autoIncrement + ")";
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return Returns the autoIncrement.
+         */
+        public boolean isAutoIncrement() {
+            return autoIncrement;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return Returns the colName.
+         */
+        public String getColName() {
+            return colName;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return Returns the dataType.
+         */
+        public int getDataType() {
+            return dataType;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return Returns the decimalDigits.
+         */
+        public int getDecimalDigits() {
+            return decimalDigits;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return Returns the size.
+         */
+        public int getSize() {
+            return size;
         }
     }
 }

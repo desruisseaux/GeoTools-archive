@@ -14,6 +14,10 @@
  *    Lesser General Public License for more details.
  *
  */
+/*
+ * 26-may-2005 D. Adler Move returnFIDColumnsAsAttributes here
+ *                      from subclasses.
+ */
 package org.geotools.data.jdbc.fidmapper;
 
 /**
@@ -23,6 +27,9 @@ package org.geotools.data.jdbc.fidmapper;
  * @author wolf
  */
 public abstract class AbstractFIDMapper implements FIDMapper {
+    /** Set if table FID columns are to be returned as business attributes. */
+    protected boolean returnFIDColumnsAsAttributes = false;
+
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#hasAutoIncrementColumns()
      */
@@ -44,5 +51,12 @@ public abstract class AbstractFIDMapper implements FIDMapper {
      */
     public boolean isVolatile() {
         return true;
+    }
+
+    /**
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#returnFIDColumnsAsAttributes()
+     */
+    public boolean returnFIDColumnsAsAttributes() {
+        return returnFIDColumnsAsAttributes;
     }
 }

@@ -19,15 +19,14 @@
  */
 package org.geotools.data.jdbc.fidmapper;
 
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.Statement;
-
-import org.geotools.data.DataSourceException;
-import org.geotools.feature.Feature;
 
 
 /**
@@ -37,7 +36,6 @@ import org.geotools.feature.Feature;
  */
 public class MultiColumnFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
-    
     private static final String UTF8 = "UTF-8";
     private boolean[] autoIncrement;
     private int[] colTypes;

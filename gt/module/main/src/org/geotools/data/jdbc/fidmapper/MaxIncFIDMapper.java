@@ -15,20 +15,19 @@
  *
  */
 /*
- * Created on 12-apr-2004
+ * Created on 18-apr-2004
+ * 26-may-2005 D. Adler Removed returnIDAsAttribute variable and method.
  */
 package org.geotools.data.jdbc.fidmapper;
 
+import org.geotools.data.DataSourceException;
+import org.geotools.feature.Feature;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-
-import org.geotools.data.DataSourceException;
-import org.geotools.feature.Feature;
-
 
 
 /**
@@ -41,8 +40,6 @@ import org.geotools.feature.Feature;
  */
 public class MaxIncFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
-    
-    private boolean returnIDAsAttribute;
     private String FIDColumn;
     private int FIDColumnType;
     private String tableName;
@@ -50,28 +47,30 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
     /**
      * Creates a new TypedFIDMapper object.
      *
-     * @param tableName DOCUMENT ME!
-     * @param FIDColumn DOCUMENT ME!
-     * @param FIDColumnType DOCUMENT ME!
+     * @param tableName the table name
+     * @param FIDColumn the name of the FID column
+     * @param FIDColumnType The SQL type of the column - must be a numeric type
      */
     public MaxIncFIDMapper(String tableName, String FIDColumn, int FIDColumnType) {
         this(tableName, FIDColumn, FIDColumnType, false);
     }
 
     /**
-     * Creates a new TypedFIDMapper object.
+     * Creates a new TypedFIDMapper object that will return the FID columns as
+     * business attributes.
      *
-     * @param tableName DOCUMENT ME!
-     * @param FIDColumn DOCUMENT ME!
-     * @param FIDColumnType DOCUMENT ME!
-     * @param returnIDAsAttribute DOCUMENT ME!
+     * @param tableName the table name
+     * @param FIDColumn the name of the FID column
+     * @param FIDColumnType The SQL type of the column - must be a numeric type
+     * @param returnFIDColumnsAsAttributes true to return FID columns as
+     *        attributes.
      */
     public MaxIncFIDMapper(String tableName, String FIDColumn,
-        int FIDColumnType, boolean returnIDAsAttribute) {
+        int FIDColumnType, boolean returnFIDColumnsAsAttributes) {
         this.tableName = tableName;
         this.FIDColumn = FIDColumn;
         this.FIDColumnType = FIDColumnType;
-        this.returnIDAsAttribute = returnIDAsAttribute;
+        this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes;
     }
 
     /**
@@ -86,13 +85,6 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
      */
     public Object[] getPKAttributes(String FID) {
         return new Object[] { new Long(Long.parseLong(FID)) };
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#returnFIDColumnsAsAttributes()
-     */
-    public boolean returnFIDColumnsAsAttributes() {
-        return returnIDAsAttribute;
     }
 
     /**
@@ -147,13 +139,14 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
 
         MaxIncFIDMapper other = (MaxIncFIDMapper) object;
 
-        return (other.FIDColumn == FIDColumn)
-        && (other.FIDColumnType == FIDColumnType)
-        && (other.returnIDAsAttribute == returnIDAsAttribute);
+        return (other.FIDColumn == this.FIDColumn)
+        && (other.FIDColumnType == this.FIDColumnType)
+        && (other.returnFIDColumnsAsAttributes == this.returnFIDColumnsAsAttributes);
     }
 
     /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection)
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#createID(java.sql.Connection,
+     *      Feature, Statement)
      */
     public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException {
