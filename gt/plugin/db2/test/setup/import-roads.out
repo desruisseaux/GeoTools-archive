@@ -1,0 +1,51 @@
+!erase roadsexp*
+
+!erase roadsimp*
+
+connect to geotools
+
+   Database Connection Information
+
+ Database server        = DB2/NT 8.2.2
+ SQL authorization ID   = DAVEA4
+ Local database alias   = GEOTOOLS
+
+
+drop table "Test"."Roads"
+DB20000I  The SQL command completed successfully.
+
+!db2se create_srs geotools -srsName      NY3101 -srsId        3101 -xOffset      0 -yOffset      0 -xScale       100 -coordsysName NAD_1983_STATEPLANE_NEW_YORK_EAST_FIPS_3101_FEET
+GSE1040N  A spatial reference system with the numeric identifier 
+"3101" already exists.
+
+
+!db2se import_shape geotools -fileName data\roads.shp -srsName NY3101 -tableSchema \"Test\" -tableName   \"Roads\" -spatialColumn \"Geom\" -client 1 -messagesFile roadsimp.msg -exceptionFile roadsimperr -commitScope 100
+GSE0000I  The operation was completed successfully.
+
+
+!db2se register_spatial_column geotools -srsName NY3101 -tableSchema \"Test\" -tableName   \"Roads\" -columnName    \"Geom\"
+GSE0000I  The operation was completed successfully.
+
+
+select count(*) from "Test"."Roads"
+
+1          
+-----------
+         87
+
+  1 record(s) selected.
+
+
+describe table  "Test"."Roads"
+
+Column                         Type      Type
+name                           schema    name               Length   Scale Nulls
+------------------------------ --------- ------------------ -------- ----- ------
+ID                             SYSIBM    BIGINT                    8     0 Yes   
+Name                           SYSIBM    VARCHAR                  30     0 Yes   
+Length                         SYSIBM    DOUBLE                    8     0 Yes   
+Geom                           DB2GSE    ST_MULTILINESTRI          0     0 Yes   
+
+  4 record(s) selected.
+
+
