@@ -212,7 +212,7 @@ public class WorldImageWriterTest extends TestCase {
          "    AXIS[\"Latitude\", NORTH],\n"                        +
          "    AXIS[\"Longitude\", EAST]],\n"                       +
          "  PROJECTION[\"Mercator_1SP\"],\n"                       +
-		 "  PARAMETER[\"latitude_of_origin\", 43.0],\n"             +         
+//		 "  PARAMETER[\"latitude_of_origin\", 43.0],\n"             +         
          "  PARAMETER[\"central_meridian\", 0.0],\n"             +
          "  PARAMETER[\"scale_factor\", 1.0],\n"                   +
          "  PARAMETER[\"false_easting\", 500000.0],\n"             +
