@@ -114,9 +114,16 @@ public class GeoTiffReader implements GridCoverageReader {
      */
     public static boolean isGeoTiffFile(File file) {
         RenderedOp img = JAI.create("ImageRead", file);
-
+        if( img == null ){
+            return false;
+        }
         // Get the metadata object.
-        IIOMetadata check = (IIOMetadata) (img.getProperty(ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE));
+        Object metadataImage = img.getProperty(ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE);
+        if( !(metadataImage instanceof IIOMetadata)){
+            return false;
+        }
+        IIOMetadata check = (IIOMetadata) metadataImage;
+        
         GeoTiffIIOMetadataAdapter metadata = new GeoTiffIIOMetadataAdapter(check);
 
         // does the GeoKey Directory exist? 
