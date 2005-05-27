@@ -157,10 +157,11 @@
     <developer>
       <name>Gabriel Roldan</name>
       <id>groldan</id>
-      <email>groldan@users.sourceforge.net</email>
-      <organization>dominion t.i.</organization>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
       <roles>
         <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
       <developer>
