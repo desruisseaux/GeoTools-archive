@@ -56,6 +56,13 @@ import java.util.NoSuchElementException;
  */
 public class JTS {
     
+    
+    public static Envelope empty(){
+        Envelope envelope = new Envelope();
+        envelope.setToNull();        
+        return envelope;
+    }
+    
     public static class ReferencedEnvelope extends Envelope{
         private CoordinateReferenceSystem crs = null;
         public ReferencedEnvelope(Envelope env, CoordinateReferenceSystem crs){

@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
+import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
@@ -62,7 +63,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author aaime
  * @version $Id$
  */
-public class ForceCoordinateSystemFeatureResults implements FeatureResults {
+public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
     FeatureResults results;
     FeatureType schema;
 
@@ -110,7 +111,7 @@ public class ForceCoordinateSystemFeatureResults implements FeatureResults {
     /**
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() throws IOException {
+    public Envelope getBounds() {
         return results.getBounds();
     }
 

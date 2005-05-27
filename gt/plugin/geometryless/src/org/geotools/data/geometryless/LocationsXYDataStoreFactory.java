@@ -138,7 +138,7 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
      * Creates a new instance of PostgisDataStoreFactory
      */
     public LocationsXYDataStoreFactory( Map hints) {
-    	super( hints );
+        this.hints.putAll( hints );
     }
 
     /**

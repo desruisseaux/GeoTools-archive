@@ -107,7 +107,7 @@ public class IndexedFeatureResults implements FeatureResults {
 	/**
 	 * @see org.geotools.data.FeatureResults#getBounds()
 	 */
-	public Envelope getBounds() throws IOException {
+	public Envelope getBounds() {
 		return bounds;
 	}
 

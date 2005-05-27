@@ -17,38 +17,58 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
+import org.geotools.data.store.DataFeatureCollection;
+import org.geotools.feature.CollectionListener;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.JTS;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- * Description
- *
+ * Generic "results" of a query, class.
  * <p>
- * Details
+ * Please optimize this class when use with your own content.
+ * For example a "ResultSet" make a great cache for a JDBCDataStore,
+ * a temporary copy of an original file may work for shapefile etc. 
  * </p>
  *
  * @author Jody Garnett, Refractions Research
  */
-public class DefaultFeatureResults implements FeatureResults {
+public class DefaultFeatureResults extends DataFeatureCollection {
+    
+    /** Query used to define this subset of features from the feature source */
     protected Query query;
+    
+    /**
+     * Feature source used to aquire features, note we are only a
+     * "view" of this FeatureSource, its contents, transaction and events
+     * need to be forwarded through this collection api to simplier code
+     * such as renderers.
+     */
     protected FeatureSource featureSource;
 
     /**
      * FeatureResults query against featureSource.
-     *
      * <p>
-     * Please note that is object will not be valid after the transaction has
-     * closed.
+     * Please note that is object will not be valid
+     * after the transaction has closed.
      * </p>
-     *
+     * <p>
+     * Really? I think it would be, it would just reflect the
+     * same query against the featuresource using AUTO_COMMIT.
+     * </p>
+     * 
      * @param source
      * @param query
      */
@@ -90,7 +110,7 @@ public class DefaultFeatureResults implements FeatureResults {
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
      */
-    public FeatureType getSchema() throws IOException {
+    public FeatureType getSchema() {
         if (query.retrieveAllProperties()) {
             return featureSource.getSchema();
         } else {
@@ -98,7 +118,8 @@ public class DefaultFeatureResults implements FeatureResults {
                 return DataUtilities.createSubType(featureSource.getSchema(),
                     query.getPropertyNames());
             } catch (SchemaException e) {
-                throw new DataSourceException("Could not create schema", e);
+                return featureSource.getSchema();
+                //throw new DataSourceException("Could not create schema", e);
             }
         }
     }
@@ -152,15 +173,18 @@ public class DefaultFeatureResults implements FeatureResults {
      *
      * @return
      *
-     * @throws IOException If bounds could not be obtained
      * @throws DataSourceException See IOException
      *
      * @see org.geotools.data.FeatureResults#getBounds()
      */
-    public Envelope getBounds() throws IOException {
+    public Envelope getBounds() {
         Envelope bounds;
 
-        bounds = featureSource.getBounds(query);
+        try {
+            bounds = featureSource.getBounds(query);
+        } catch (IOException e1) {
+            return JTS.empty();
+        }
 
         if (bounds != null) {
             return bounds;
@@ -181,7 +205,10 @@ public class DefaultFeatureResults implements FeatureResults {
 
             return bounds;
         } catch (IllegalAttributeException e) {
-            throw new DataSourceException("Could not read feature ", e);
+            //throw new DataSourceException("Could not read feature ", e);
+            return JTS.empty();
+        } catch (IOException e) {
+            return JTS.empty();
         }
     }
 
@@ -237,7 +264,6 @@ public class DefaultFeatureResults implements FeatureResults {
             while (reader.hasNext()) {
                 collection.add(reader.next());
             }
-
             reader.close();
 
             return collection;
@@ -245,4 +271,5 @@ public class DefaultFeatureResults implements FeatureResults {
             throw new DataSourceException("Could not read feature ", e);
         }
     }
+
 }

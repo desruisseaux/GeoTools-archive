@@ -16,13 +16,15 @@
  */
 package org.geotools.feature;
 
+import org.opengis.feature.FeatureStoreListener;
+
 /**
  * Interface to be implemented by all listeners of CollectionEvents.
  *
  * @author Ray Gallagher
  * @version $Id: CollectionListener.java,v 1.5 2003/05/07 16:53:04 jmacgill Exp $
  */
-public interface CollectionListener extends java.util.EventListener {
+public interface CollectionListener {
     /**
      * Gets called when a CollectionEvent is fired. Typically fired to signify
      * that a change has occurred in the collection.

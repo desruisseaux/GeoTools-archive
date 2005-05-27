@@ -66,15 +66,22 @@
     </dependency>
     <dependency>
         <artifactId>jtds</artifactId>
-        <groupId>mssql</groupId>
-        <version>0.9</version>
+        <groupId>jtds</groupId>
+        <version>1.0.3</version>
     </dependency>
-       <dependency>
+    <!-- uncomment when you have downloaded from oracle into your repository
+    <dependency>
         <artifactId>ojdbc</artifactId>
         <groupId>oracle</groupId>
         <version>14</version>
     </dependency>
-        <dependency>
+    -->
+    <dependency>
+      <artifactId>dummy_spatial</artifactId>
+      <groupId>oracle</groupId>
+      <version>8.1.8</version>
+    </dependency>    
+    <dependency>
         <artifactId>postgresql</artifactId>
         <groupId>postgresql</groupId>
         <version>74.213</version>

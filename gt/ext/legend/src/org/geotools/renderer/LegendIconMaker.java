@@ -44,6 +44,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureFactory;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -95,8 +96,7 @@ public class LegendIconMaker {
      * create symbolizer to contain it
      */
     public static StyleFactory sFac = StyleFactory.createStyleFactory();
-    public static FeatureFactory fFac;
-
+    
     /**
      * offset for icon, otherwise icons will be connected to others in the
      * legend
@@ -118,6 +118,8 @@ public class LegendIconMaker {
                 return size() > ICON_CACHE_SIZE;
             }
         };
+
+    private static FeatureType fFac;
 
     // Static initialization block
     static {

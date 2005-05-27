@@ -117,7 +117,7 @@ public class JDBCDataStoreFactory extends AbstractFactory
      * Creates a new instance of PostgisDataStoreFactory
      */
     public JDBCDataStoreFactory( Map hints ) {
-    	super( hints );
+        this.hints.putAll( hints );
     }
 
     /**

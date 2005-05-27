@@ -151,7 +151,7 @@ public class BBOXDataStoreFactory extends AbstractFactory
      * </p>
      */
     public BBOXDataStoreFactory( Map hints) {
-    	super( hints );
+        this.hints.putAll( hints );
     }
 
     /**

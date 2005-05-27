@@ -949,7 +949,6 @@ public class DataUtilities {
         for (int i = 0; i < properties.length; i++) {
             types[i] = featureType.getAttributeType(properties[i]);
         }
-
         return FeatureTypeFactory.newFeatureType(types,
             featureType.getTypeName(), featureType.getNamespace());
     }

@@ -193,7 +193,7 @@ public class MockFeatureCollection implements org.geotools.feature.FeatureCollec
 		
 	}
 
-    public FeatureType getSchema() throws IOException {
+    public FeatureType getSchema() {
         return null;
     }
 

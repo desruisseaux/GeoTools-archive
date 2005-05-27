@@ -52,6 +52,18 @@
       <url>http://www.geotools.org</url>
     </dependency>
     <dependency>
+      <artifactId>legacy</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+      <url>http://www.geotools.org</url>
+    </dependency>
+    <dependency>
+      <artifactId>migrate</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+      <url>http://www.geotools.org</url>
+    </dependency>
+    <dependency>
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
       <version>2.1.x</version>

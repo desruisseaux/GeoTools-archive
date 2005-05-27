@@ -18,6 +18,7 @@ package org.geotools.data;
 
 import java.io.IOException;
 
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 
@@ -101,7 +102,7 @@ public interface FeatureSource {
      *
      * @see Query
      */
-    FeatureResults getFeatures(Query query) throws IOException;
+    FeatureCollection getFeatures(Query query) throws IOException;
 
     /**
      * Loads features from the datasource into the returned FeatureResults,
@@ -114,7 +115,7 @@ public interface FeatureSource {
      *
      * @throws DataSourceException For all data source errors.
      */
-    FeatureResults getFeatures(Filter filter) throws IOException;
+    FeatureCollection getFeatures(Filter filter) throws IOException;
 
     /**
      * Loads all features from the datasource into the return FeatureResults.
@@ -128,12 +129,17 @@ public interface FeatureSource {
      *
      * @throws DataSourceException For all data source errors.
      */
-    FeatureResults getFeatures() throws IOException;
+    FeatureCollection getFeatures() throws IOException;
 
     /**
      * Retrieves the featureType that features extracted from this datasource
      * will be created with.
-     *
+     * <p>
+     * The schema returned is the LCD supported by all available Features.
+     * In the common case of shapfiles and database table this schema
+     * will match that of every feature available. In the degenerate GML
+     * case this will simply reflect the gml:AbstractFeatureType.
+     * </p>
      * @return the schema of features created by this datasource.
      *
      * @task REVISIT: Our current FeatureType model is not yet advanced enough

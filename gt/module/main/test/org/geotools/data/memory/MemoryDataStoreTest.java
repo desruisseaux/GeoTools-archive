@@ -777,12 +777,8 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertNull( type.getDefaultGeometry() );
         assertEquals( type.getDefaultGeometry(), actual.getDefaultGeometry() );
         assertEquals( type, actual );
-        try {
-            Envelope b = half.getBounds();
-            assertEquals(new Envelope(1, 5, 0, 4), b);                                    
-        }
-        catch( IOException io ){            
-        }
+        Envelope b = half.getBounds();
+        assertEquals(new Envelope(1, 5, 0, 4), b);                                            
     }
 
     public void testGetFeatureSourceRiver()

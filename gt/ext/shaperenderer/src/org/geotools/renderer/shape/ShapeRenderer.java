@@ -59,7 +59,6 @@ import org.geotools.renderer.lite.LiteCoordinateSequence;
 import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
 import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
-import org.geotools.renderer.shape.IndexInfo.Reader;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.styling.FeatureTypeStyle;
