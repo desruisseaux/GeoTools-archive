@@ -42,7 +42,7 @@ http://www.software.ibm.com/data/spatial.
       </properties>
     </dependency>
 <!-- Use this for building when real DB2 JDBC drivers are not available -->
-<!--
+
     <dependency>
       <id>db2</id>
       <version>8.2</version>
@@ -52,14 +52,14 @@ http://www.software.ibm.com/data/spatial.
         <relese.bundle>true</relese.bundle>
       </properties>
     </dependency>
--->
+
 <!-- End -->
 <!-- The following should be uncommented and comment out the above when DB2 JDBC drivers are available -->
 <!--
  db2jcc.jar should be copied to %HOMEPATH%\.maven\db2\jars and
  db2jcc_license_cu.jar should be copied to HOMEPATH%\.maven\db2license\jars
     (on Windows) -->
-<!-- -->
+<!-- 
     <dependency>
       <id>db2</id>
       <version>8.2</version>
@@ -79,7 +79,7 @@ http://www.software.ibm.com/data/spatial.
       </properties>
     </dependency>
 
- <!-- -->
+ -->
     <dependency>
       <id>JTS</id>
       <version>1.6</version>
