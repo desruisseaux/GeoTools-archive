@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <extend>${basedir}/../../project.xml</extend>
+  <name>db2</name>
+  <id>db2</id>
+  <currentVersion>2.1.x</currentVersion>
+  <package>org.geotools.data.db2</package>
+  <shortDescription>db2 module</shortDescription>
+  <description>Provides a standard interface to the DB2
+Spatial Extender.  More information can be found at:
+http://www.software.ibm.com/data/spatial.
+</description>
+  <developers>
+    <developer>
+      <name>David Adler</name>
+      <id>dadler</id>
+      <email>dadler@us.ibm.com</email>
+      <organization>tbd</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.1.x</version>
+    </dependency>
+    <dependency>
+      <artifactId>units</artifactId>
+      <groupId>units</groupId>
+      <version>0.01</version>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.3</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+<!-- Use this for building when real DB2 JDBC drivers are not available -->
+<!--
+    <dependency>
+      <id>db2</id>
+      <version>8.2</version>
+      <jar>db2jcc_dummy-8.2.jar</jar>
+      <url>http://www.software.ibm.com/data/db2</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+-->
+<!-- End -->
+<!-- The following should be uncommented and comment out the above when DB2 JDBC drivers are available -->
+<!--
+ db2jcc.jar should be copied to %HOMEPATH%\.maven\db2\jars and
+ db2jcc_license_cu.jar should be copied to HOMEPATH%\.maven\db2license\jars
+    (on Windows) -->
+<!-- -->
+    <dependency>
+      <id>db2</id>
+      <version>8.2</version>
+      <jar>db2jcc.jar</jar>
+      <url>http://www.software.ibm.com/data/db2</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>db2license</id>
+      <version>8.2</version>
+      <jar>db2jcc_license_cu.jar</jar>
+      <url>http://www.software.ibm.com/data/db2</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+
+ <!-- -->
+    <dependency>
+      <id>JTS</id>
+      <version>1.6</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+       <properties>
+        <relese.bundle>true</relese.bundle>
+      </properties>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <!-- This section excludes the tests -->
+<!-- Uncomment the following to run tests against live database -->
+      <excludes>
+<!-- -->
+        <exclude>**/DB2*.java</exclude>
+<!-- -->
+      </excludes>
+      <!-- End exclude tests -->
+       <resources>
+          <resource>
+              <directory>${basedir}/test</directory>
+              <includes>
+                  <include>**/*.properties</include>
+              </includes>
+          </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>
