@@ -508,7 +508,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                     // unprojected geometries
                     transform = operationFactory.createOperation(destinationCrs,sourceCrs).getMathTransform();
                     if (transform != null && !transform.isIdentity())
-                        envelope = JTS.transform(envelope, transform);
+                    {
+                       // Envelope eee=  JTS.transform(envelope, transform);// this is the old way
+                    	    //10 = make 10 points on each side of the bbox & transform the polygon
+                        envelope = JTS.transform(envelope, transform,10); // this will usually be a "bigger" bbox
+                    }
                     else
                     	transform = null; //reset transform
                 }
