@@ -42,7 +42,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.factory.Hints;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 
@@ -68,8 +68,8 @@ public abstract class Operation2D implements Operation, Serializable {
     public static final ParameterDescriptor SOURCE_0;
     static {
         final Map properties = new HashMap();
-        properties.put(DefaultIdentifiedObject.NAME_PROPERTY, "Source");
-        properties.put(DefaultIdentifiedObject.ALIAS_PROPERTY, "source0");
+        properties.put(AbstractIdentifiedObject.NAME_PROPERTY, "Source");
+        properties.put(AbstractIdentifiedObject.ALIAS_PROPERTY, "source0");
         SOURCE_0 = new org.geotools.parameter.ParameterDescriptor(properties, GridCoverage2D.class,
                         null, null, null, null, null, true);
     }

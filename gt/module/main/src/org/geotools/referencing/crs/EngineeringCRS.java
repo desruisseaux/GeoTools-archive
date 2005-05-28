@@ -34,8 +34,8 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.datum.DefaultEngineeringDatum;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -70,7 +70,7 @@ import org.geotools.util.NameFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class EngineeringCRS extends DefaultSingleCRS
+public class EngineeringCRS extends AbstractSingleCRS
                          implements org.opengis.referencing.crs.EngineeringCRS
 {
     /**
@@ -104,7 +104,7 @@ public class EngineeringCRS extends DefaultSingleCRS
          * because, otherwise, <code>CARTESIAN_xD</code> and <code>GENERIC_xD</code> would
          * be considered equals when metadata are ignored.
          */
-        public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+        public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
             if (super.equals(object, compareMetadata)) {
                 if (compareMetadata) {
                     // No need to performs the check below if metadata were already compared.
@@ -187,7 +187,7 @@ public class EngineeringCRS extends DefaultSingleCRS
 
     /**
      * Constructs an engineering CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

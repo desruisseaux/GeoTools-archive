@@ -32,8 +32,7 @@ import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.datum.ImageDatum;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractReferenceSystem;
 
 
 /**
@@ -51,7 +50,7 @@ import org.geotools.referencing.DefaultReferenceSystem;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ImageCRS extends DefaultSingleCRS
+public class ImageCRS extends AbstractSingleCRS
                    implements org.opengis.referencing.crs.ImageCRS
 {
     /**
@@ -75,7 +74,7 @@ public class ImageCRS extends DefaultSingleCRS
 
     /**
      * Constructs an image CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

@@ -37,11 +37,16 @@ import org.geotools.resources.Utilities;
 
 /**
  * Description of a spatial and temporal reference system used by a dataset.
+ * <p>
+ * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
+ * instantiate it. Typical applications should create instances of the most specific subclass with
+ * {@link Default} prefix instead. An exception to this rule may occurs when it is not possible to
+ * identify the exact type.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultReferenceSystem extends DefaultIdentifiedObject implements ReferenceSystem {
+public class AbstractReferenceSystem extends AbstractIdentifiedObject implements ReferenceSystem {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -49,20 +54,20 @@ public class DefaultReferenceSystem extends DefaultIdentifiedObject implements R
 
     /**
      * Key for the <code>{@value #VALID_AREA_PROPERTY}</code> property to be given to the
-     * {@linkplain #DefaultReferenceSystem(Map) constructor}. This is used
+     * {@linkplain #AbstractReferenceSystem(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getValidArea()}.
      */
     public static final String VALID_AREA_PROPERTY = "validArea";
 
     /**
      * Key for the <code>{@value #SCOPE_PROPERTY}</code> property to be given to the
-     * {@linkplain #DefaultReferenceSystem(Map) constructor}. This is used
+     * {@linkplain #AbstractReferenceSystem(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getScope()}.
      */
     public static final String SCOPE_PROPERTY = "scope";
 
     /**
-     * List of localizable properties. To be given to {@link DefaultIdentifiedObject} constructor.
+     * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {SCOPE_PROPERTY};
 
@@ -80,7 +85,7 @@ public class DefaultReferenceSystem extends DefaultIdentifiedObject implements R
     /**
      * Constructs a reference system from a set of properties.
      * The properties given in argument follow the same rules than for the
-     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
+     * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      * Additionally, the following properties are understood by this construtor:
      * <br><br>
      * <table border='1'>
@@ -101,7 +106,7 @@ public class DefaultReferenceSystem extends DefaultIdentifiedObject implements R
      *   </tr>
      * </table>
      */
-    public DefaultReferenceSystem(final Map properties) {
+    public AbstractReferenceSystem(final Map properties) {
         this(properties, new HashMap());
     }
 
@@ -109,7 +114,7 @@ public class DefaultReferenceSystem extends DefaultIdentifiedObject implements R
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private DefaultReferenceSystem(final Map properties, final Map subProperties) {
+    private AbstractReferenceSystem(final Map properties, final Map subProperties) {
         super(properties, subProperties, LOCALIZABLES);
         validArea = (Extent)              subProperties.get(VALID_AREA_PROPERTY);
         scope     = (InternationalString) subProperties.get(SCOPE_PROPERTY);
@@ -142,12 +147,12 @@ public class DefaultReferenceSystem extends DefaultIdentifiedObject implements R
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             if (!compareMetadata) {
                 return true;
             }
-            final DefaultReferenceSystem that = (DefaultReferenceSystem) object;
+            final AbstractReferenceSystem that = (AbstractReferenceSystem) object;
             return Utilities.equals(validArea, that.validArea) &&
                    Utilities.equals(scope,     that.scope    );
         }

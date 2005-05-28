@@ -38,7 +38,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -56,7 +56,7 @@ import org.geotools.util.NameFactory;
  * @see AbstractCS
  * @see Unit
  */
-public class DefaultCoordinateSystemAxis extends DefaultIdentifiedObject implements CoordinateSystemAxis {
+public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implements CoordinateSystemAxis {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -402,7 +402,7 @@ public class DefaultCoordinateSystemAxis extends DefaultIdentifiedObject impleme
 
     /**
      * Constructs an axis from a set of properties. The properties map is given unchanged to the
-     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
+     * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
@@ -566,7 +566,7 @@ public class DefaultCoordinateSystemAxis extends DefaultIdentifiedObject impleme
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.util.DerivedMap;
 
 
@@ -59,8 +59,8 @@ final class UnprefixedMap extends DerivedMap {
     public UnprefixedMap(final Map base, final String prefix) {
         super(base);
         this.prefix = prefix.trim();
-        final String  nameKey = this.prefix + DefaultIdentifiedObject. NAME_PROPERTY;
-        final String aliasKey = this.prefix + DefaultIdentifiedObject.ALIAS_PROPERTY;
+        final String  nameKey = this.prefix + AbstractIdentifiedObject. NAME_PROPERTY;
+        final String aliasKey = this.prefix + AbstractIdentifiedObject.ALIAS_PROPERTY;
         boolean hasName  = false;
         boolean hasAlias = false;
         for (final Iterator it=base.keySet().iterator(); it.hasNext();) {
@@ -118,8 +118,8 @@ final class UnprefixedMap extends DerivedMap {
      * or <code>"alias_"</code> are accepted as well.
      */
     private boolean isPlainKey(final String key) {
-        return (!hasName  && keyMatches(DefaultIdentifiedObject.NAME_PROPERTY,  key)) ||
-               (!hasAlias && keyMatches(DefaultIdentifiedObject.ALIAS_PROPERTY, key));
+        return (!hasName  && keyMatches(AbstractIdentifiedObject.NAME_PROPERTY,  key)) ||
+               (!hasAlias && keyMatches(AbstractIdentifiedObject.ALIAS_PROPERTY, key));
     }
 
     /**

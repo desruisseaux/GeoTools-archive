@@ -42,7 +42,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -98,7 +98,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
     /**
      * Construct a parameter group from a set of properties.
      * This parameter group will be required exactly once. The properties map is given unchanged to
-     * the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
+     * the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param parameters The {@linkplain #descriptors() parameter descriptors} for this group.
@@ -111,7 +111,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
 
     /**
      * Construct a parameter group from a set of properties. The properties map is given
-     * unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -281,7 +281,7 @@ public class ParameterDescriptorGroup extends org.geotools.parameter.AbstractPar
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final ParameterDescriptorGroup that = (ParameterDescriptorGroup) object;
             return Arrays.equals(this.parameters, that.parameters);

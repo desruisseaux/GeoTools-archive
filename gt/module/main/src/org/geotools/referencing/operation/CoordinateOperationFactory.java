@@ -73,7 +73,7 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
@@ -504,7 +504,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         }
 
         /** Compares this datum with the specified object for equality. */
-        public boolean equals(final DefaultIdentifiedObject object,
+        public boolean equals(final AbstractIdentifiedObject object,
                               final boolean compareMetadata)
         {
             if (super.equals(object, compareMetadata)) {
@@ -1538,6 +1538,6 @@ search: for (int j=0; j<targets.length; j++) {
      *       will be allowed to compile against J2SE 1.5.
      */
     private static boolean nameMatches(final IdentifiedObject object, final String name) {
-        return DefaultIdentifiedObject.nameMatches(object, name);
+        return AbstractIdentifiedObject.nameMatches(object, name);
     }
 }

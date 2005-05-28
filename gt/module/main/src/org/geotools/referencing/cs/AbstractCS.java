@@ -40,7 +40,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
@@ -55,9 +55,13 @@ import org.geotools.resources.cts.Resources;
  * the order in which the coordinate system axes are recorded, whenever those
  * coordinates use a coordinate reference system that uses this coordinate system.
  * <p>
- * This class is called <cite>Abstract</cite> (even if it is technically possible to instantiate it)
- * in the sense that typical applications should not create instances of this class. They should
- * instantiate one of the specific subclasses instead.
+ * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
+ * instantiate it. Typical applications should create instances of the most specific subclass with
+ * {@link Default} prefix instead. An exception to this rule may occurs when it is not possible to
+ * identify the exact type. For example it is not possible to infer the exact coordinate system from
+ * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+ * Known Text</cite></A> is some cases (e.g. in a {@code LOCAL_CS} element). In such exceptional
+ * situation, a plain {@code AbstractCS} object may be instantiated.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -67,7 +71,7 @@ import org.geotools.resources.cts.Resources;
  * @see org.geotools.referencing.datum.AbstractDatum
  * @see org.geotools.referencing.crs.AbstractCRS
  */
-public class AbstractCS extends DefaultIdentifiedObject implements CoordinateSystem {
+public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSystem {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -96,7 +100,7 @@ public class AbstractCS extends DefaultIdentifiedObject implements CoordinateSys
 
     /**
      * Constructs a coordinate system from a set of properties. The properties map is given
-     * unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
@@ -349,7 +353,7 @@ public class AbstractCS extends DefaultIdentifiedObject implements CoordinateSys
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

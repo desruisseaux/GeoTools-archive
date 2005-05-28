@@ -32,9 +32,9 @@ import java.util.Map;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Renamed as {@link DefaultReferenceSystem}.
+ * @deprecated Renamed as {@link AbstractReferenceSystem}.
  */
-public class ReferenceSystem extends DefaultReferenceSystem {
+public class ReferenceSystem extends AbstractReferenceSystem {
     /**
      * Constructs a reference system from a set of properties.
      */

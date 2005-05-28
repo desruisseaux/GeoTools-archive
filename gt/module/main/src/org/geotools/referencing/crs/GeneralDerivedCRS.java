@@ -41,8 +41,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.parameter.Parameters;
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.operation.Operation;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.wkt.Formatter;
@@ -59,7 +59,7 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeneralDerivedCRS extends DefaultSingleCRS
+public class GeneralDerivedCRS extends AbstractSingleCRS
                             implements org.opengis.referencing.crs.GeneralDerivedCRS
 {
     /**
@@ -90,7 +90,7 @@ public class GeneralDerivedCRS extends DefaultSingleCRS
      *       because {@link org.geotools.referencing.operation.CoordinateOperation} lives in
      *       a different package.
      */
-    public static DefaultIdentifiedObject _COMPARING;
+    public static AbstractIdentifiedObject _COMPARING;
 
     /**
      * The base coordinate reference system.
@@ -105,7 +105,7 @@ public class GeneralDerivedCRS extends DefaultSingleCRS
     /**
      * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}.
      * The properties are given unchanged to the
-     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object.
      * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
@@ -140,7 +140,7 @@ public class GeneralDerivedCRS extends DefaultSingleCRS
 
     /**
      * Constructs a derived CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      * The following optional properties are also understood:
      * <p>
      * <table border='1'>
@@ -213,7 +213,7 @@ public class GeneralDerivedCRS extends DefaultSingleCRS
      */
     private static Datum getDatum(final CoordinateReferenceSystem base) {
         ensureNonNull("base",  base);
-        return (base instanceof DefaultSingleCRS) ? ((DefaultSingleCRS) base).getDatum() : null;
+        return (base instanceof AbstractSingleCRS) ? ((AbstractSingleCRS) base).getDatum() : null;
     }
 
     /**
@@ -262,7 +262,7 @@ public class GeneralDerivedCRS extends DefaultSingleCRS
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

@@ -34,7 +34,7 @@ import org.opengis.referencing.datum.GeodeticDatum;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultSphericalCS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -55,7 +55,7 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeocentricCRS extends DefaultSingleCRS
+public class GeocentricCRS extends AbstractSingleCRS
                         implements org.opengis.referencing.crs.GeocentricCRS
 {
     /**
@@ -112,7 +112,7 @@ public class GeocentricCRS extends DefaultSingleCRS
 
     /**
      * Constructs a geographic CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
@@ -128,7 +128,7 @@ public class GeocentricCRS extends DefaultSingleCRS
     /**
      * Constructs a geographic CRS from a set of properties.
      * The properties are given unchanged to the
-     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

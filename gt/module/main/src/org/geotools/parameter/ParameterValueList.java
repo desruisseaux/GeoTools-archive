@@ -36,7 +36,7 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
@@ -134,7 +134,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
              * the parameter name was not found, or the parameter descriptor doesn't matches.
              */
             for (final Iterator it=descriptors.iterator(); it.hasNext();) {
-                if (DefaultIdentifiedObject.nameMatches((GeneralParameterDescriptor) it.next(), name)) {
+                if (AbstractIdentifiedObject.nameMatches((GeneralParameterDescriptor) it.next(), name)) {
                     /*
                      * Found a matching name. Concequently, the operation failed because
                      * the descriptor was illegal.
@@ -165,7 +165,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
                 final GeneralParameterValue oldValue = (GeneralParameterValue) values.get(i);
                 final GeneralParameterDescriptor oldDescriptor = oldValue.getDescriptor();
                 if (type.equals(oldDescriptor)) {
-                    assert DefaultIdentifiedObject.nameMatches(oldDescriptor, name) : parameter;
+                    assert AbstractIdentifiedObject.nameMatches(oldDescriptor, name) : parameter;
                     final boolean same = parameter.equals(oldValue);
                     values.set(i, parameter);
                     return !same;
@@ -179,7 +179,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
             int count = 0;
             for (final Iterator it=values.iterator(); it.hasNext();) {
                 final GeneralParameterValue value = (GeneralParameterValue) it.next();
-                if (DefaultIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+                if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                     count++;
                 }
             }
@@ -215,7 +215,7 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
         final String name = type.getName().getCode();
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
-            if (DefaultIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
+            if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                 count++;
             }
         }

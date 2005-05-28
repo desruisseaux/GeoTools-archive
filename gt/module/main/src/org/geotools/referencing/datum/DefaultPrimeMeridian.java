@@ -32,7 +32,7 @@ import javax.units.Unit;
 import org.opengis.referencing.datum.PrimeMeridian;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 
@@ -46,7 +46,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultPrimeMeridian extends DefaultIdentifiedObject implements PrimeMeridian {
+public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements PrimeMeridian {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -92,7 +92,7 @@ public class DefaultPrimeMeridian extends DefaultIdentifiedObject implements Pri
 
     /**
      * Constructs a prime meridian from a set of properties. The properties map is given
-     * unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties          Set of properties. Should contains at least <code>"name"</code>.
@@ -144,7 +144,7 @@ public class DefaultPrimeMeridian extends DefaultIdentifiedObject implements Pri
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -172,7 +172,7 @@ public class DefaultPrimeMeridian extends DefaultIdentifiedObject implements Pri
      * {@linkplain #getRemarks remarks} and the like are not taken in account.
      * In other words, two prime meridians will return the same hash value if
      * they are equal in the sense of
-     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(AbstractIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

@@ -48,7 +48,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.resources.Utilities;
@@ -134,7 +134,7 @@ public class ProjectedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
     /**
      * Constructs a projected CRS from a {@linkplain DefiningConversion defining conversion}.
      * The properties are given unchanged to the
-     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new projected CRS object.
      * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.

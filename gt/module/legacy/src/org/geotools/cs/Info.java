@@ -76,7 +76,7 @@ import org.opengis.util.InternationalString;
  *
  * @see org.opengis.cs.CS_Info
  *
- * @deprecated Replaced by {@link org.geotools.referencing.DefaultIdentifiedObject} and
+ * @deprecated Replaced by {@link org.geotools.referencing.AbstractIdentifiedObject} and
  *             {@link NamedIdentifier}.
  */
 public class Info implements org.opengis.referencing.IdentifiedObject, Serializable {
@@ -213,7 +213,7 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
      *
      * @see org.opengis.cs.CS_Info#getAlias()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.DefaultIdentifiedObject#getIdentifiers}.
+     * @deprecated Replaced by {@link org.geotools.referencing.AbstractIdentifiedObject#getIdentifiers}.
      */
     public String getAlias(final Locale locale) {
         return getProperty("alias");

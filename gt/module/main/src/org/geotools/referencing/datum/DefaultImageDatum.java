@@ -31,7 +31,7 @@ import org.opengis.referencing.datum.ImageDatum;
 import org.opengis.referencing.datum.PixelInCell;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 
@@ -95,7 +95,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -111,7 +111,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
      * {@linkplain #getRemarks remarks} and the like are not taken in account. In
      * other words, two image datums will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(AbstractIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

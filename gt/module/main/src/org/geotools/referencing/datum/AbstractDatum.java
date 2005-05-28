@@ -33,7 +33,7 @@ import org.opengis.referencing.datum.Datum;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 
@@ -49,9 +49,10 @@ import org.geotools.resources.Utilities;
  * The definition of the datum may also include the temporal behavior (such as the
  * rate of change of the orientation of the coordinate axes).
  * <p>
- * This class is called <cite>Abstract</cite> (even if it is technically possible to instantiate it)
- * in the sense that typical applications should not create instances of this class. They should
- * instantiate one of the specific subclasses instead.
+ * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
+ * instantiate it. Typical applications should create instances of the most specific subclass with
+ * {@link Default} prefix instead. An exception to this rule may occurs when it is not possible to
+ * identify the exact type.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -59,7 +60,7 @@ import org.geotools.resources.Utilities;
  * @see org.geotools.referencing.cs.AbstractCS
  * @see org.geotools.referencing.crs.AbstractCRS
  */
-public class AbstractDatum extends DefaultIdentifiedObject implements Datum {
+public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -95,7 +96,7 @@ public class AbstractDatum extends DefaultIdentifiedObject implements Datum {
     
     /**
      * List of localizable properties. To be given to
-     * {@link DefaultIdentifiedObject} constructor.
+     * {@link AbstractIdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {ANCHOR_POINT_PROPERTY, SCOPE_PROPERTY};
 
@@ -125,7 +126,7 @@ public class AbstractDatum extends DefaultIdentifiedObject implements Datum {
 
     /**
      * Constructs a datum from a set of properties. The properties given in argument follow
-     * the same rules than for the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * the same rules than for the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}. Additionally, the following properties are understood by this
      * construtor:
      * <br><br>
@@ -249,7 +250,7 @@ public class AbstractDatum extends DefaultIdentifiedObject implements Datum {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             if (!compareMetadata) {
                 /*

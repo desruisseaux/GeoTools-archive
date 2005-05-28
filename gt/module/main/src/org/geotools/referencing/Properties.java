@@ -59,7 +59,7 @@ final class Properties extends AbstractMap {
      */
     public Properties(final IdentifiedObject info) {
         this.info = info;
-        DefaultIdentifiedObject.ensureNonNull("info", info);
+        AbstractIdentifiedObject.ensureNonNull("info", info);
     }
 
     /**
@@ -110,10 +110,10 @@ final class Properties extends AbstractMap {
      * @todo Add properties for {@link IdentifiedObject} sub-interfaces.
      */
     private static final String[] KEYS = {
-        /*[0]*/DefaultIdentifiedObject.   NAME_PROPERTY,
-        /*[1]*/DefaultIdentifiedObject.   IDENTIFIERS_PROPERTY,
-        /*[2]*/DefaultIdentifiedObject.   ALIAS_PROPERTY,
-        /*[3]*/DefaultIdentifiedObject.   REMARKS_PROPERTY,
+        /*[0]*/AbstractIdentifiedObject.   NAME_PROPERTY,
+        /*[1]*/AbstractIdentifiedObject.   IDENTIFIERS_PROPERTY,
+        /*[2]*/AbstractIdentifiedObject.   ALIAS_PROPERTY,
+        /*[3]*/AbstractIdentifiedObject.   REMARKS_PROPERTY,
         /*[4]*/org.geotools.referencing.operation.Operation.SCOPE_PROPERTY,
         /*[5]*/org.geotools.referencing.operation.Operation.VALID_AREA_PROPERTY,
         /*[6]*/org.geotools.referencing.operation.Operation.OPERATION_VERSION_PROPERTY,

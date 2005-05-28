@@ -27,7 +27,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 
 
 /**
@@ -42,7 +42,7 @@ import org.geotools.referencing.DefaultIdentifiedObject;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CompoundCS extends AbstractCS {
+public class DefaultCompoundCS extends AbstractCS {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -59,7 +59,7 @@ public class CompoundCS extends AbstractCS {
      *
      * @param cs The set of coordinate syztem.
      */
-    public CompoundCS(CoordinateSystem[] cs) {
+    public DefaultCompoundCS(CoordinateSystem[] cs) {
         super(getName(cs=clone(cs)), getAxis(cs));
         this.cs = cs;
     }
@@ -123,12 +123,12 @@ public class CompoundCS extends AbstractCS {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
         if (super.equals(object, compareMetadata)) {
-            final CompoundCS that = (CompoundCS) object;
+            final DefaultCompoundCS that = (DefaultCompoundCS) object;
             return equals(this.cs, that.cs, compareMetadata);
         }
         return false;

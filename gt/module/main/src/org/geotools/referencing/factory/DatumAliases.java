@@ -60,7 +60,7 @@ import org.opengis.util.ScopedName;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.datum.AbstractDatum;        // For javadoc
 import org.geotools.referencing.datum.BursaWolfParameters;  // For javadoc
 import org.geotools.util.LocalName;
@@ -69,10 +69,10 @@ import org.geotools.resources.XArray;
 
 
 /**
- * A datum factory that add {@linkplain DefaultIdentifiedObject#getAlias aliases} to a datum name
+ * A datum factory that add {@linkplain AbstractIdentifiedObject#getAlias aliases} to a datum name
  * before to delegates the {@linkplain AbstractDatum#AbstractDatum(Map) datum creation} to an other
  * factory. Aliases are especially important for {@linkplain AbstractDatum datum} since their
- * {@linkplain DefaultIdentifiedObject#getName name} are often the only way to differentiate them.
+ * {@linkplain AbstractIdentifiedObject#getName name} are often the only way to differentiate them.
  * Two datum with different names are considered incompatible, unless some datum shift method are
  * specified (e.g. {@linkplain BursaWolfParameters Bursa-Wolf parameters}). Unfortunatly, different
  * softwares often use different names for the same datum,
@@ -83,7 +83,7 @@ import org.geotools.resources.XArray;
  * class provides a way to handle that.
  * <br><br>
  * {@code DatumAliases} is a class that determines if a datum name is in our list of aliases and
- * constructs a value for the {@linkplain DefaultIdentifiedObject#ALIAS_PROPERTY aliases property} (as
+ * constructs a value for the {@linkplain AbstractIdentifiedObject#ALIAS_PROPERTY aliases property} (as
  * {@linkplain GenericName generic names}) for a name. The default implementation is backed by
  * the text file "{@code DatumAliasesTable.txt}". The first line in this text file must be the
  * authority names. All other lines are the aliases.
@@ -398,8 +398,8 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     /**
      * Completes the given map of properties. This method expects a map of properties to
      * be given to {@link AbstractDatum#AbstractDatum(Map)} constructor. The name is fetch
-     * from the {@link DefaultIdentifiedObject#NAME_PROPERTY NAME_PROPERTY}.
-     * The {@link DefaultIdentifiedObject#ALIAS_PROPERTY ALIAS_PROPERTY} is
+     * from the {@link AbstractIdentifiedObject#NAME_PROPERTY NAME_PROPERTY}.
+     * The {@link AbstractIdentifiedObject#ALIAS_PROPERTY ALIAS_PROPERTY} is
      * completed with the aliases know to this factory.
      *
      * @param  properties The set of properties to complete.
@@ -409,7 +409,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
      */
     private Map addAliases(Map properties) {
         ensureNonNull("properties", properties);
-        Object value = properties.get(DefaultIdentifiedObject.NAME_PROPERTY);
+        Object value = properties.get(AbstractIdentifiedObject.NAME_PROPERTY);
         ensureNonNull("name", value);
         final String name;
         if (value instanceof Identifier) {
@@ -427,7 +427,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
              * acts as a FIFO queue).
              */
             int count = aliases.length;
-            value = properties.get(DefaultIdentifiedObject.ALIAS_PROPERTY);
+            value = properties.get(AbstractIdentifiedObject.ALIAS_PROPERTY);
             if (value != null) {
                 final Map merged/*<String,GenericName>*/ = new LinkedHashMap();
                 putAll(NameFactory.toArray(value), merged);
@@ -441,7 +441,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
              */
             if (count > 0) {
                 properties = new HashMap(properties);
-                properties.put(DefaultIdentifiedObject.ALIAS_PROPERTY, aliases);
+                properties.put(AbstractIdentifiedObject.ALIAS_PROPERTY, aliases);
             }
         }
         return properties;

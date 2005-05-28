@@ -33,8 +33,8 @@ import org.opengis.referencing.datum.VerticalDatum;
 // Geotools dependencies
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.cs.DefaultVerticalCS;
-import org.geotools.referencing.DefaultReferenceSystem;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractReferenceSystem;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.datum.DefaultVerticalDatum;
 
 
@@ -55,7 +55,7 @@ import org.geotools.referencing.datum.DefaultVerticalDatum;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class VerticalCRS extends DefaultSingleCRS
+public class VerticalCRS extends AbstractSingleCRS
                       implements org.opengis.referencing.crs.VerticalCRS
 {
     /**
@@ -89,7 +89,7 @@ public class VerticalCRS extends DefaultSingleCRS
 
     /**
      * Constructs a vertical CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.

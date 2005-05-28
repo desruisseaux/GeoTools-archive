@@ -66,7 +66,7 @@ import org.opengis.referencing.operation.OperationMethod;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.Parameters;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
@@ -238,7 +238,7 @@ public class FactoryGroup {
             final String classification = parameters.getDescriptor().getName().getCode();
             for (final Iterator it=operations.iterator(); it.hasNext();) {
                 final OperationMethod method = (OperationMethod) it.next();
-                if (DefaultIdentifiedObject.nameMatches(method.getParameters(), classification)) {
+                if (AbstractIdentifiedObject.nameMatches(method.getParameters(), classification)) {
                     methods.add(method);
                     break;
                 }
@@ -421,8 +421,8 @@ public class FactoryGroup {
             axis[classic ? 2 : 0] = vertical.getCoordinateSystem().getAxis(0);
             final Map csName, crsName;
             if (components.length == 2) {
-                csName  = DefaultIdentifiedObject.getProperties(crs.getCoordinateSystem());
-                crsName = DefaultIdentifiedObject.getProperties(crs);
+                csName  = AbstractIdentifiedObject.getProperties(crs.getCoordinateSystem());
+                crsName = AbstractIdentifiedObject.getProperties(crs);
             } else {
                 csName  = getTemporaryName(cs);
                 crsName = getTemporaryName(horizontal);
@@ -445,7 +445,7 @@ public class FactoryGroup {
             System.arraycopy(components, 0, c, 0, i);
             c[i] = single;
             System.arraycopy(components, i+2, c, i+1, components.length-(i+2));
-            return crsFactory.createCompoundCRS(DefaultIdentifiedObject.getProperties(crs), c);
+            return crsFactory.createCompoundCRS(AbstractIdentifiedObject.getProperties(crs), c);
         }
         return crs;
     }
@@ -533,7 +533,7 @@ search:     for (int i=0; i<sources.length; i++) {
      * Returns a temporary name for object derived from the specified one.
      */
     private static Map getTemporaryName(final IdentifiedObject source) {
-        return Collections.singletonMap(DefaultIdentifiedObject.NAME_PROPERTY,
+        return Collections.singletonMap(AbstractIdentifiedObject.NAME_PROPERTY,
                                         source.getName().getCode() + " (3D)");
     }
 }

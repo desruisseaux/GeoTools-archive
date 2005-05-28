@@ -52,7 +52,7 @@ import org.opengis.referencing.operation.Transformation;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.AbstractFactory;
@@ -142,8 +142,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *
      * @todo Replace by a static import when we will be allowed to compile with J2SE 1.5.
      */
-    private static final String NAME_PROPERTY =
-            org.geotools.referencing.DefaultIdentifiedObject.NAME_PROPERTY;
+    private static final String NAME_PROPERTY = AbstractIdentifiedObject.NAME_PROPERTY;
 
     /**
      * The set of helper methods on factories.
@@ -546,7 +545,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *       simplified as well.
      */
     static Map getProperties(final IdentifiedObject object) {
-        return DefaultIdentifiedObject.getProperties(object);
+        return AbstractIdentifiedObject.getProperties(object);
     }
 
     /**
@@ -607,7 +606,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     static Map getTemporaryName(final IdentifiedObject source) {
         final Map properties = new HashMap(4);
         properties.put(NAME_PROPERTY, new TemporaryIdentifier(source.getName()));
-        properties.put(DefaultIdentifiedObject.REMARKS_PROPERTY,
+        properties.put(AbstractIdentifiedObject.REMARKS_PROPERTY,
                        "Derived from " + getClassName(source));
         return properties;
     }
@@ -626,7 +625,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
     /**
      * Compare the specified objects for equality. If both objects are Geotools
-     * implementations of {@linkplain DefaultIdentifiedObject},
+     * implementations of {@linkplain AbstractIdentifiedObject},
      * then this method will ignore the metadata during the comparaison.
      *
      * @param  object1 The first object to compare (may be null).

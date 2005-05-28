@@ -35,7 +35,7 @@ import org.opengis.referencing.datum.Ellipsoid;
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.measure.CoordinateFormat;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XMath;
@@ -57,7 +57,7 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultEllipsoid extends DefaultIdentifiedObject implements Ellipsoid {
+public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellipsoid {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -112,7 +112,7 @@ public class DefaultEllipsoid extends DefaultIdentifiedObject implements Ellipso
     
     /**
      * Constructs a new ellipsoid using the specified axis length. The properties map is
-     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * given unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties        Set of properties. Should contains at least <code>"name"</code>.
@@ -158,7 +158,7 @@ public class DefaultEllipsoid extends DefaultIdentifiedObject implements Ellipso
 
     /**
      * Constructs a new ellipsoid using the specified axis length. The properties map is
-     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * given unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
@@ -200,7 +200,7 @@ public class DefaultEllipsoid extends DefaultIdentifiedObject implements Ellipso
     /**
      * Constructs a new ellipsoid using the specified axis length and
      * inverse flattening value. The properties map is given unchanged to the
-     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
+     * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
      * @param properties        Set of properties. Should contains at least <code>"name"</code>.
      * @param semiMajorAxis     The equatorial radius.
@@ -467,7 +467,7 @@ public class DefaultEllipsoid extends DefaultIdentifiedObject implements Ellipso
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -487,7 +487,7 @@ public class DefaultEllipsoid extends DefaultIdentifiedObject implements Ellipso
      * {@linkplain #getRemarks remarks} and the like are not taken in account.
      * In other words, two ellipsoids will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(AbstractIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

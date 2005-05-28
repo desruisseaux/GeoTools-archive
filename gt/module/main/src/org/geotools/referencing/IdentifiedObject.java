@@ -32,9 +32,9 @@ import java.util.Map;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Renamed as {@link DefaultIdentifiedObject}.
+ * @deprecated Renamed as {@link AbstractIdentifiedObject}.
  */
-public class IdentifiedObject extends DefaultIdentifiedObject {
+public class IdentifiedObject extends AbstractIdentifiedObject {
     /**
      * Constructs a new identified object with the same values than the specified one.
      */

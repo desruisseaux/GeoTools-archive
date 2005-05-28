@@ -38,7 +38,7 @@ import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.Singleton;
@@ -305,7 +305,7 @@ public class MathTransformParser extends AbstractParser {
                                    it.hasNext();)
             {
                 final OperationMethod method = (OperationMethod) it.next();
-                if (DefaultIdentifiedObject.nameMatches(method, classification)) {
+                if (AbstractIdentifiedObject.nameMatches(method, classification)) {
                     return method;
                 }
             }

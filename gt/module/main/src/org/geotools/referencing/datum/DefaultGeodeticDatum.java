@@ -41,7 +41,7 @@ import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.wkt.Formatter;
 
@@ -327,8 +327,8 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * because it come from an other implementation).
      */
     public static boolean isWGS84(final Datum datum) {
-        if (datum instanceof DefaultIdentifiedObject) {
-            return WGS84.equals((DefaultIdentifiedObject) datum, false);
+        if (datum instanceof AbstractIdentifiedObject) {
+            return WGS84.equals((AbstractIdentifiedObject) datum, false);
         }
         // Maybe the specified object has its own test...
         return datum!=null && datum.equals(WGS84);
@@ -342,7 +342,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }
@@ -372,7 +372,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * {@linkplain #getRemarks remarks} and the like are not taken in account. In
      * other words, two geodetic datums will return the same hash value if they
      * are equal in the sense of
-     * <code>{@link #equals equals}(DefaultIdentifiedObject, <strong>false</strong>)</code>.
+     * <code>{@link #equals equals}(AbstractIdentifiedObject, <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
      *         in past or future versions of this class.

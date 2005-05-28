@@ -35,7 +35,7 @@ import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.rsc.ResourceKeys;
@@ -314,7 +314,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Constructs a parameter from a set of properties. The properties map is
-     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * given unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -348,7 +348,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Constructs a parameter from a set of properties. The properties map is
-     * given unchanged to the {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map)
+     * given unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -530,7 +530,7 @@ public class ParameterDescriptor extends AbstractParameterDescriptor
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true;
         }

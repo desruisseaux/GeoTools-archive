@@ -88,7 +88,7 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.datum.AbstractDatum;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.BursaWolfParameters;
@@ -577,15 +577,15 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             properties.clear();
         }
         if (name != null) {
-            properties.put(prepend(DefaultIdentifiedObject.NAME_PROPERTY),
+            properties.put(prepend(AbstractIdentifiedObject.NAME_PROPERTY),
                            new NamedIdentifier(authority, name.trim()));
         }
         if (code != null) {
-            properties.put(prepend(DefaultIdentifiedObject.IDENTIFIERS_PROPERTY),
+            properties.put(prepend(AbstractIdentifiedObject.IDENTIFIERS_PROPERTY),
                            new NamedIdentifier(authority, code.trim()));
         }
         if (remarks!=null && (remarks=remarks.trim()).length()!=0) {
-            properties.put(prepend(DefaultIdentifiedObject.REMARKS_PROPERTY), remarks);
+            properties.put(prepend(AbstractIdentifiedObject.REMARKS_PROPERTY), remarks);
         }
         /*
          * Search for alias.
@@ -620,7 +620,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         }
         result.close();
         if (alias != null) {
-            properties.put(prepend(DefaultIdentifiedObject.ALIAS_PROPERTY),
+            properties.put(prepend(AbstractIdentifiedObject.ALIAS_PROPERTY),
                            (GenericName[]) alias.toArray(new GenericName[alias.size()]));
         }
         return properties;

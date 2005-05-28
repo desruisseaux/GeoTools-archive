@@ -32,8 +32,8 @@ import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.datum.Datum;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.wkt.Formatter;
 
 
@@ -60,7 +60,7 @@ import org.geotools.referencing.wkt.Formatter;
  * @see org.geotools.referencing.cs.AbstractCS
  * @see org.geotools.referencing.datum.AbstractDatum
  */
-public class DefaultSingleCRS extends AbstractCRS implements SingleCRS {
+public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -73,16 +73,16 @@ public class DefaultSingleCRS extends AbstractCRS implements SingleCRS {
 
     /**
      * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class
+     * unchanged to the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class
      * constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
      * @param cs The coordinate system.
      */
-    public DefaultSingleCRS(final Map      properties,
-                            final Datum         datum,
-                            final CoordinateSystem cs)
+    public AbstractSingleCRS(final Map      properties,
+                             final Datum         datum,
+                             final CoordinateSystem cs)
     {
         super(properties, cs);
         this.datum = datum;
@@ -132,9 +132,9 @@ public class DefaultSingleCRS extends AbstractCRS implements SingleCRS {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
-            final DefaultSingleCRS that = (DefaultSingleCRS) object;
+            final AbstractSingleCRS that = (AbstractSingleCRS) object;
             return equals(this.datum, that.datum, compareMetadata);
         }
         return false;
@@ -145,7 +145,7 @@ public class DefaultSingleCRS extends AbstractCRS implements SingleCRS {
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two CRS objects will return the same
      * hash value if they are equal in the sense of
-     * <code>{@link #equals(DefaultIdentifiedObject,boolean) equals}(DefaultIdentifiedObject,
+     * <code>{@link #equals(AbstractIdentifiedObject,boolean) equals}(AbstractIdentifiedObject,
      * <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same

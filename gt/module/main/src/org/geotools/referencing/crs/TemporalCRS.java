@@ -35,8 +35,7 @@ import org.opengis.referencing.cs.TimeCS;
 import org.opengis.referencing.datum.TemporalDatum;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractReferenceSystem;
 
 
 /**
@@ -51,7 +50,7 @@ import org.geotools.referencing.DefaultReferenceSystem;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TemporalCRS extends DefaultSingleCRS
+public class TemporalCRS extends AbstractSingleCRS
                       implements org.opengis.referencing.crs.TemporalCRS
 {
     /**
@@ -93,7 +92,7 @@ public class TemporalCRS extends DefaultSingleCRS
 
     /**
      * Constructs a temporal CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param cs The coordinate system.

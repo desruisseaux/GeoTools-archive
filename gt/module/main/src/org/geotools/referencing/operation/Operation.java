@@ -41,7 +41,7 @@ import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.ConicProjection;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.wkt.Formatter;
@@ -249,7 +249,7 @@ public class Operation extends SingleOperation
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final Operation that = (Operation) object;
             return equals(this.method, that.method, compareMetadata);

@@ -37,9 +37,9 @@ import org.opengis.referencing.datum.Datum;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Renamed as {@link DefaultSingleCRS}.
+ * @deprecated Renamed as {@link AbstractSingleCRS}.
  */
-public class SingleCRS extends DefaultSingleCRS {
+public class SingleCRS extends AbstractSingleCRS {
     /**
      * Constructs a coordinate reference system from a set of properties.
      */

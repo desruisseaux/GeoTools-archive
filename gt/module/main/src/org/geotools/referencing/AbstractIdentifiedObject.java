@@ -61,11 +61,19 @@ import org.geotools.util.NameFactory;
  * authority code supplied by the client, respectively. When {@link ObjectFactory} creates an
  * object, the {@linkplain #getName name} is set to the value supplied by the client and
  * all of the other metadata items are left empty.
+ * <p>
+ * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
+ * instantiate it. Typical applications should create instances of the most specific subclass with
+ * {@link Default} prefix instead. An exception to this rule may occurs when it is not possible to
+ * identify the exact type. For example it is not possible to infer the exact coordinate system from
+ * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+ * Known Text</cite></A> is some cases (e.g. in a {@code LOCAL_CS} element). In such exceptional
+ * situation, a plain {@link org.geotools.referencing.cs.AbstractCS} object may be instantiated.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DefaultIdentifiedObject extends Formattable implements IdentifiedObject, Serializable {
+public class AbstractIdentifiedObject extends Formattable implements IdentifiedObject, Serializable {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -73,28 +81,28 @@ public class DefaultIdentifiedObject extends Formattable implements IdentifiedOb
 
     /**
      * Key for the <code>{@value #NAME_PROPERTY}</code> property to be given to the
-     * {@linkplain #DefaultIdentifiedObject(Map) constructor}. This is used
+     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getName}.
      */
     public static final String NAME_PROPERTY = "name";
 
     /**
      * Key for the <code>{@value #ALIAS_PROPERTY}</code> property to be given to the
-     * {@linkplain #DefaultIdentifiedObject(Map) constructor}. This is used
+     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getAlias()}.
      */
     public static final String ALIAS_PROPERTY = "alias";
 
     /**
      * Key for the <code>{@value #IDENTIFIERS_PROPERTY}</code> property to be given to the
-     * {@linkplain #DefaultIdentifiedObject(Map) constructor}. This is used
+     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getIdentifiers()}.
      */
     public static final String IDENTIFIERS_PROPERTY = "identifiers";
     
     /**
      * Key for the <code>{@value #REMARKS_PROPERTY}</code> property to be given to the
-     * {@linkplain #DefaultIdentifiedObject(Map) constructor}. This is used
+     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getRemarks()}.
      */
     public static final String REMARKS_PROPERTY = "remarks";
@@ -177,7 +185,7 @@ public class DefaultIdentifiedObject extends Formattable implements IdentifiedOb
     /**
      * Constructs a new identified object with the same values than the specified one.
      */
-    public DefaultIdentifiedObject(final IdentifiedObject object) {
+    public AbstractIdentifiedObject(final IdentifiedObject object) {
         name        = object.getName();
         alias       = object.getAlias();
         identifiers = object.getIdentifiers();
@@ -242,15 +250,15 @@ public class DefaultIdentifiedObject extends Formattable implements IdentifiedOb
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    public DefaultIdentifiedObject(final Map properties) throws IllegalArgumentException {
+    public AbstractIdentifiedObject(final Map properties) throws IllegalArgumentException {
         this(properties, null, null);
     }
 
     /**
      * Constructs an object from a set of properties and copy unrecognized properties in the
      * specified map. The <code>properties</code> argument is treated as in the {@linkplain
-     * DefaultIdentifiedObject#DefaultIdentifiedObject(Map) one argument constructor}. All
-     * properties unknow to this <code>DefaultIdentifiedObject</code> constructor are copied
+     * AbstractIdentifiedObject#AbstractIdentifiedObject(Map) one argument constructor}. All
+     * properties unknow to this <code>AbstractIdentifiedObject</code> constructor are copied
      * in the <code>subProperties</code> map, after their key has been normalized (usually
      * lower case, leading and trailing space removed).
      *
@@ -266,9 +274,9 @@ public class DefaultIdentifiedObject extends Formattable implements IdentifiedOb
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
      */
-    protected DefaultIdentifiedObject(final Map properties,
-                                      final Map subProperties,
-                                      final String[] localizables)
+    protected AbstractIdentifiedObject(final Map properties,
+                                       final Map subProperties,
+                                       final String[] localizables)
             throws IllegalArgumentException
     {
         ensureNonNull("properties", properties);
@@ -524,7 +532,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two identified objects will return
      * the same hash value if they are equal in the sense of
-     * <code>{@link #equals(DefaultIdentifiedObject,boolean) equals}(DefaultIdentifiedObject,
+     * <code>{@link #equals(AbstractIdentifiedObject,boolean) equals}(AbstractIdentifiedObject,
      * <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same
@@ -567,8 +575,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     public static boolean nameMatches(final IdentifiedObject object,
                                       final String name)
     {
-        if (object instanceof DefaultIdentifiedObject) {
-            return ((DefaultIdentifiedObject) object).nameMatches(name);
+        if (object instanceof AbstractIdentifiedObject) {
+            return ((AbstractIdentifiedObject) object).nameMatches(name);
         } else {
             return nameMatches(object, object.getAlias(), name);
         }
@@ -613,8 +621,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @return <code>true</code> if both objects are equal.
      */
     public final boolean equals(final Object object) {
-        return (object instanceof DefaultIdentifiedObject) &&
-                equals((DefaultIdentifiedObject)object, true);
+        return (object instanceof AbstractIdentifiedObject) &&
+                equals((AbstractIdentifiedObject)object, true);
     }
 
     /**
@@ -643,7 +651,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object!=null && object.getClass().equals(getClass())) {
             if (!compareMetadata) {
                 return true;
@@ -657,7 +665,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare two Geotools's <code>DefaultIdentifiedObject</code> objects for equality. This
+     * Compare two Geotools's <code>AbstractIdentifiedObject</code> objects for equality. This
      * method is equivalent to {@code object1.<b>equals</b>(object2, <var>compareMetadata</var>)}
      * except that one or both arguments may be null. This convenience method is provided for
      * implementation of <code>equals</code> in subclasses.
@@ -668,9 +676,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    static boolean equals(final DefaultIdentifiedObject object1,
-                          final DefaultIdentifiedObject object2,
-                          final boolean         compareMetadata)
+    static boolean equals(final AbstractIdentifiedObject object1,
+                          final AbstractIdentifiedObject object2,
+                          final boolean          compareMetadata)
     {
         return (object1==object2) || (object1!=null && object1.equals(object2, compareMetadata));
     }
@@ -689,9 +697,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                                     final IdentifiedObject object2,
                                     final boolean  compareMetadata)
     {
-        if (!(object1 instanceof DefaultIdentifiedObject)) return Utilities.equals(object1, object2);
-        if (!(object2 instanceof DefaultIdentifiedObject)) return Utilities.equals(object2, object1);
-        return equals((DefaultIdentifiedObject)object1, (DefaultIdentifiedObject)object2, compareMetadata);
+        if (!(object1 instanceof AbstractIdentifiedObject)) return Utilities.equals(object1, object2);
+        if (!(object2 instanceof AbstractIdentifiedObject)) return Utilities.equals(object2, object1);
+        return equals((AbstractIdentifiedObject)object1, (AbstractIdentifiedObject)object2, compareMetadata);
     }
 
     /**

@@ -54,7 +54,7 @@ import org.geotools.util.WeakValueHashMap;
  * An identification of a CRS object. The main interface implemented by this class
  * is {@link Identifier}. However, this class also implements {@link GenericName} in
  * order to make it possible to give identifiers in the list of
- * {@linkplain DefaultIdentifiedObject#getAlias aliases}. Casting an alias's
+ * {@linkplain AbstractIdentifiedObject#getAlias aliases}. Casting an alias's
  * {@linkplain GenericName generic name} to an {@linkplain Identifier identifier}
  * gives access to more informations, like the URL of the authority.
  * <P>
@@ -252,7 +252,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * Implementation of the constructor. The remarks in the <code>properties</code> will be
      * parsed only if the <code>standalone</code> argument is set to <code>true</code>, i.e.
      * this identifier is being constructed as a standalone object. If <code>false</code>, then
-     * this identifier is assumed to be constructed from inside the {@link DefaultIdentifiedObject}
+     * this identifier is assumed to be constructed from inside the {@link AbstractIdentifiedObject}
      * constructor.
      *
      * @param properties The properties to parse, as described in the public constructor.
@@ -377,9 +377,9 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     
     /**
      * Makes sure an argument is non-null. This is method duplicate
-     * {@link DefaultIdentifiedObject#ensureNonNull(String, Object)}
+     * {@link AbstractIdentifiedObject#ensureNonNull(String, Object)}
      * except for the more accurate stack trace. It is duplicated
-     * there in order to avoid a dependency to {@link DefaultIdentifiedObject}.
+     * there in order to avoid a dependency to {@link AbstractIdentifiedObject}.
      *
      * @param  name   Argument name.
      * @param  object User argument.

@@ -36,9 +36,9 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.datum.Datum;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
-import org.geotools.referencing.cs.CompoundCS;
+import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.AbstractReferenceSystem;
+import org.geotools.referencing.cs.DefaultCompoundCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -108,7 +108,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     /**
      * Constructs a coordinate reference system from a set of properties.
      * The properties are given unchanged to the
-     * {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param crs The array of coordinate reference system making this compound CRS.
@@ -139,7 +139,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
         for (int i=0; i<crs.length; i++) {
             cs[i] = crs[i].getCoordinateSystem();
         }
-        return new CompoundCS(cs);
+        return new DefaultCompoundCS(cs);
     }
 
     /**
@@ -215,7 +215,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
             return true; // Slight optimization.
         }

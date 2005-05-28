@@ -59,7 +59,7 @@ import org.geotools.measure.AngleFormat;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -86,7 +86,7 @@ public final class CRSUtilities {
 
     /**
      * Compare the specified objects for equality. If both objects are Geotools
-     * implementations of {@linkplain DefaultIdentifiedObject}, then this method
+     * implementations of {@linkplain AbstractIdentifiedObject}, then this method
      * will ignore the metadata during the comparaison.
      *
      * @param  object1 The first object to compare (may be null).
@@ -99,11 +99,11 @@ public final class CRSUtilities {
         if (object1 == object2) {
             return true;
         }
-        if (object1 instanceof DefaultIdentifiedObject &&
-            object2 instanceof DefaultIdentifiedObject)
+        if (object1 instanceof AbstractIdentifiedObject &&
+            object2 instanceof AbstractIdentifiedObject)
         {
-            return ((DefaultIdentifiedObject) object1).equals(
-                   ((DefaultIdentifiedObject) object2), false);
+            return ((AbstractIdentifiedObject) object1).equals(
+                   ((AbstractIdentifiedObject) object2), false);
         }
         return object1!=null && object1.equals(object2);
     }

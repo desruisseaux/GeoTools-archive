@@ -5,7 +5,7 @@
     <TITLE>package org.geotools.referencing</TITLE>
   </HEAD>
   <BODY>
-  {@linkplain org.geotools.referencing.DefaultReferenceSystem Reference systems} implementation. An
+  {@linkplain org.geotools.referencing.AbstractReferenceSystem Reference systems} implementation. An
   explanation for this package is provided in the {@linkplain org.opengis.referencing OpenGIS&reg; javadoc}.
   The remaining discussion on this page is specific to the Geotools implementation.
 
@@ -18,9 +18,9 @@
   {@linkplain org.geotools.referencing.NamedIdentifier identifier}, which is also a
   {@linkplain org.opengis.util.GenericName generic name}. By implementing those two
   interfaces, it is possible to use the same kind of object for specifying both the
-  {@linkplain org.geotools.referencing.DefaultIdentifiedObject#getName main identifier} and the
-  {@linkplain org.geotools.referencing.DefaultIdentifiedObject#getAlias aliases} of an
-  {@linkplain org.geotools.referencing.DefaultIdentifiedObject identified object}.</P>
+  {@linkplain org.geotools.referencing.AbstractIdentifiedObject#getName main identifier} and the
+  {@linkplain org.geotools.referencing.AbstractIdentifiedObject#getAlias aliases} of an
+  {@linkplain org.geotools.referencing.AbstractIdentifiedObject identified object}.</P>
   
   <P ALIGN="justify">All factory methods are capable to find an object using an
   unscoped (or local) name. However, in order to avoid potential conflict, it is

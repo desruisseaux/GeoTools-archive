@@ -33,8 +33,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
-import org.geotools.referencing.DefaultIdentifiedObject;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.util.UnsupportedImplementationException;
@@ -49,7 +49,7 @@ import org.geotools.util.UnsupportedImplementationException;
  * @see AbstractCS
  * @see org.geotools.referencing.datum.AbstractDatum
  */
-public abstract class AbstractCRS extends DefaultReferenceSystem implements CoordinateReferenceSystem {
+public abstract class AbstractCRS extends AbstractReferenceSystem implements CoordinateReferenceSystem {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -62,7 +62,7 @@ public abstract class AbstractCRS extends DefaultReferenceSystem implements Coor
 
     /**
      * Constructs a coordinate reference system from a set of properties. The properties are given
-     * unchanged to the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class
+     * unchanged to the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class
      * constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -131,7 +131,7 @@ public abstract class AbstractCRS extends DefaultReferenceSystem implements Coor
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final AbstractCRS that = (AbstractCRS) object;
             return equals(this.coordinateSystem, that.coordinateSystem, compareMetadata);
@@ -144,7 +144,7 @@ public abstract class AbstractCRS extends DefaultReferenceSystem implements Coor
      * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
      * are not taken in account. In other words, two CRS objects will return the same
      * hash value if they are equal in the sense of
-     * <code>{@link #equals(DefaultIdentifiedObject,boolean) equals}(DefaultIdentifiedObject,
+     * <code>{@link #equals(AbstractIdentifiedObject,boolean) equals}(AbstractIdentifiedObject,
      * <strong>false</strong>)</code>.
      *
      * @return The hash code value. This value doesn't need to be the same

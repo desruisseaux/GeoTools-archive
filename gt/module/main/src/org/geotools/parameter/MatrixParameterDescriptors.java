@@ -37,7 +37,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
-import org.geotools.referencing.DefaultIdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.resources.UnmodifiableArrayList;
 import org.geotools.resources.Utilities;
@@ -137,7 +137,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
 
     /**
      * Construct a parameter group. The properties map is given unchanged to the
-     * {@linkplain DefaultIdentifiedObject#DefaultIdentifiedObject(Map) super-class constructor}.
+     * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      * The <code>parameters</code> array should contains parameters <strong>other</strong>
      * than matrix elements. The first parameter is assumed to be the number of rows, and
      * the second parameter the number of columns. All extra parameters are ignored.
@@ -419,7 +419,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
      *         <code>false</code> for comparing only properties relevant to transformations.
      * @return <code>true</code> if both objects are equal.
      */
-    public boolean equals(final DefaultIdentifiedObject object, final boolean compareMetadata) {
+    public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final MatrixParameterDescriptors that = (MatrixParameterDescriptors) object;
             return this.separator == that.separator &&

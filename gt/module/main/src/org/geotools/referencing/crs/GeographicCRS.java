@@ -40,7 +40,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 // Geotools dependencies
 import org.geotools.measure.Measure;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.referencing.DefaultReferenceSystem;
+import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -61,7 +61,7 @@ import org.geotools.util.UnsupportedImplementationException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeographicCRS extends DefaultSingleCRS
+public class GeographicCRS extends AbstractSingleCRS
                         implements org.opengis.referencing.crs.GeographicCRS
 {
     /**
@@ -104,7 +104,7 @@ public class GeographicCRS extends DefaultSingleCRS
 
     /**
      * Constructs a geographic CRS from a set of properties. The properties are given unchanged to
-     * the {@linkplain DefaultReferenceSystem#DefaultReferenceSystem(Map) super-class constructor}.
+     * the {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param datum The datum.
