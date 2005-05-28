@@ -780,7 +780,7 @@ public class Rendering2DTest extends TestCase {
         return gf.createLineString(coords);
     }
 
-    private int xCenter = -133, yCenter = 60;
+    private int xCenter = -123, yCenter = 30;
 
     public Point point( final GeometryFactory gf, int x, int y ) {
         Coordinate coord = new Coordinate(x, y);
