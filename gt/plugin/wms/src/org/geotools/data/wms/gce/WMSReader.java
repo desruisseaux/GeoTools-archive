@@ -31,7 +31,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -255,7 +255,7 @@ public class WMSReader implements GridCoverageReader {
                 new double[] { maxx, maxy});
         
         if (crs == null) {
-        	crs = GeographicCRS.WGS84; 
+        	crs = DefaultGeographicCRS.WGS84; 
         }
         
 

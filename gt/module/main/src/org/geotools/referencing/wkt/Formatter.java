@@ -681,9 +681,9 @@ public class Formatter {
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT
      * specification</A>. This method is invoked by {@link Formattable#formatWKT} methods when the
      * object to format is more complex than what the WKT specification allows. For example this
-     * method is invoked when an {@linkplain org.geotools.referencing.crs.EngineeringCRS engineering CRS}
-     * uses different unit for each axis, An application can tests {@link #isInvalidWKT} later for
-     * checking WKT validity.
+     * method is invoked when an {@linkplain org.geotools.referencing.crs.DefaultEngineeringCRS
+     * engineering CRS} uses different unit for each axis, An application can tests
+     * {@link #isInvalidWKT} later for checking WKT validity.
      */
     public void setInvalidWKT() {
         invalidWKT = true;

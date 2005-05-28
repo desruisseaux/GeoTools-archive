@@ -19,7 +19,7 @@ package org.geotools.feature.type;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import org.geotools.referencing.crs.GeocentricCRS;
+import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -79,9 +79,9 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
         }
 
         if (coordinateSystem == null) {
-            coordinateSystem = GeocentricCRS.CARTESIAN;
+            coordinateSystem = DefaultGeocentricCRS.CARTESIAN;
         }
-        geometryFactory = (coordinateSystem == GeocentricCRS.CARTESIAN)
+        geometryFactory = (coordinateSystem == DefaultGeocentricCRS.CARTESIAN)
             ? CSGeometryFactory.DEFAULT : new CSGeometryFactory(coordinateSystem);            
     }
 
@@ -166,7 +166,7 @@ class CSGeometryFactory extends GeometryFactory {
     // And so on
     // Utility Functions
     private static int toSRID(CoordinateReferenceSystem cs) {
-        if ((cs == null) || (cs == GeocentricCRS.CARTESIAN)) {
+        if ((cs == null) || (cs == DefaultGeocentricCRS.CARTESIAN)) {
             return 0;
         }
 
@@ -175,7 +175,7 @@ class CSGeometryFactory extends GeometryFactory {
     }
 
     private static PrecisionModel toPrecisionModel(CoordinateReferenceSystem cs) {
-        if ((cs == null) || (cs == GeocentricCRS.CARTESIAN)) {
+        if ((cs == null) || (cs == DefaultGeocentricCRS.CARTESIAN)) {
             return DEFAULT_PRECISON_MODEL;
         }
 

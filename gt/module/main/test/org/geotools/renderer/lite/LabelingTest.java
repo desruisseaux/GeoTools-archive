@@ -29,7 +29,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
@@ -101,7 +101,7 @@ public class LabelingTest extends TestCase {
 
         
         GeometryFactory geomFac=new GeometryFactory();
-		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
+		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 
         MemoryDataStore data = new MemoryDataStore();
         data.addFeature(createPointFeature(0,0,"LongLabel1",crs, geomFac, types));
@@ -149,7 +149,7 @@ public class LabelingTest extends TestCase {
 
         
         GeometryFactory geomFac=new GeometryFactory();
-		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
+		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 
         MemoryDataStore data = new MemoryDataStore();
         data.addFeature(createLineFeature(10,0,0,10,"LongLabel1",crs, geomFac, types));
@@ -198,7 +198,7 @@ public class LabelingTest extends TestCase {
 
         
         GeometryFactory geomFac=new GeometryFactory();
-		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
+		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 
         MemoryDataStore data = new MemoryDataStore();
         data.addFeature(createPolyFeature(CENTERX+5,CENTERY+0,CENTERX+10,CENTERY+10,"LongLabel1",crs, geomFac, types));

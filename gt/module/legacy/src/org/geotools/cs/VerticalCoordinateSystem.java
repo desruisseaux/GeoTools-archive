@@ -43,7 +43,7 @@ import org.opengis.cs.CS_VerticalDatum;
  *
  * @see org.opengis.cs.CS_VerticalCoordinateSystem
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.VerticalCRS}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultVerticalCRS}.
  */
 public class VerticalCoordinateSystem extends CoordinateSystem {
     /**
@@ -136,7 +136,7 @@ public class VerticalCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_VerticalCoordinateSystem#getVerticalDatum()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.VerticalCRS#getDatum}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultVerticalCRS#getDatum}.
      */
     public VerticalDatum getVerticalDatum() {
         return datum;

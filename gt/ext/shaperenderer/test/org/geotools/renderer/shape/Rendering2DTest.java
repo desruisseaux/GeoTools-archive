@@ -33,7 +33,7 @@ import org.geotools.geometry.JTS;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.lite.RenderListener;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
@@ -277,7 +277,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                GeographicCRS.WGS84, crs).getMathTransform();
+                DefaultGeographicCRS.WGS84, crs).getMathTransform();
 
         Envelope env = map.getLayerBounds();
 
@@ -362,7 +362,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                GeographicCRS.WGS84, crs).getMathTransform();
+                DefaultGeographicCRS.WGS84, crs).getMathTransform();
 
         Envelope env = map.getLayerBounds();
 

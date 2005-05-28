@@ -44,7 +44,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.crs.GeneralDerivedCRS;
+import org.geotools.referencing.crs.AbstractDerivedCRS;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -397,20 +397,20 @@ public class CoordinateOperation extends AbstractIdentifiedObject
                     }
                 }
                 /*
-                 * Avoid never-ending recursivity: GeneralDerivedCRS has a
+                 * Avoid never-ending recursivity: AbstractDerivedCRS has a
                  * 'conversionFromBase' field that is set to this CoordinateOperation.
                  */
-                synchronized (GeneralDerivedCRS.class) {
-                    if (GeneralDerivedCRS._COMPARING != null) {
+                synchronized (AbstractDerivedCRS.class) {
+                    if (AbstractDerivedCRS._COMPARING != null) {
                         // NOTE: the following assertion fails for deserialized objects.
-                        // assert GeneralDerivedCRS.\u00A4COMPARING == targetCRS;
+                        // assert AbstractDerivedCRS.\u00A4COMPARING == targetCRS;
                         return true;
                     }
                     try {
-                        GeneralDerivedCRS._COMPARING = this;
+                        AbstractDerivedCRS._COMPARING = this;
                         return equals(this.targetCRS, that.targetCRS, compareMetadata);
                     } finally {
-                        GeneralDerivedCRS._COMPARING = null;
+                        AbstractDerivedCRS._COMPARING = null;
                     }
                 }
             }

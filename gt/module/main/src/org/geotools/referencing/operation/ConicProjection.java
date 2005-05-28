@@ -39,7 +39,7 @@ import org.opengis.referencing.operation.OperationMethod;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.referencing.crs.ProjectedCRS
+ * @see org.geotools.referencing.crs.DefaultProjectedCRS
  * @see <A HREF="http://mathworld.wolfram.com/ConicProjection.html">Conic projection on MathWorld</A>
  */
 public class ConicProjection extends Projection

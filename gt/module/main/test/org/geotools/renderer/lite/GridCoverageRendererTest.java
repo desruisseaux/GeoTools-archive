@@ -28,7 +28,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.TestData;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Style;
@@ -47,8 +47,8 @@ public class GridCoverageRendererTest extends TestCase {
 
         BufferedImage imageTest = ImageIO.read(inTest);
 
-        GridCoverage2D coverage=new GridCoverage2D("GridCoverage",imageTest, GeographicCRS.WGS84,
-                new Envelope2D(GeographicCRS.WGS84, 0,0, imageTest.getWidth(), imageTest.getHeight()));  
+        GridCoverage2D coverage=new GridCoverage2D("GridCoverage",imageTest, DefaultGeographicCRS.WGS84,
+                new Envelope2D(DefaultGeographicCRS.WGS84, 0,0, imageTest.getWidth(), imageTest.getHeight()));  
         
         MapContext context=new DefaultMapContext();
         context.addLayer(coverage, getStyle());

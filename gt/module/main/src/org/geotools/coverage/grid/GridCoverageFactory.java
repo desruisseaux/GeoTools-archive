@@ -42,7 +42,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 
 /**
@@ -94,7 +94,7 @@ public class GridCoverageFactory {
     /**
      * Constructs a grid coverage from a raster and an envelope in
      * <var>longitude</var>,<var>latitude</var> coordinates. The coordinate system is assumed to
-     * be based on {@linkplain GeographicCRS#WGS84 WGS84}. A default color palette
+     * be based on {@linkplain DefaultGeographicCRS#WGS84 WGS84}. A default color palette
      * is built from the minimal and maximal values found in the raster.
      *
      * @param name     The grid coverage name.

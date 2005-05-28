@@ -26,7 +26,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -67,7 +67,7 @@ public class ShapeReprojector {
             // Let's also create an auto crs based on the UTM with the standard parallel and meridian
             // as the equator and Greenwich 
 
-            CoordinateReferenceSystem originCrs = GeographicCRS.WGS84; // crsService.createCRS("EPSG:4326");
+            CoordinateReferenceSystem originCrs = DefaultGeographicCRS.WGS84; // crsService.createCRS("EPSG:4326");
             CoordinateReferenceSystem destCrs = CRS.decode("AUTO:42001,0.0,0.0");
             
             System.out.println("Origin CRS: " + originCrs);

@@ -64,7 +64,7 @@ import org.geotools.util.NameFactory;
  * <p>
  * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
  * instantiate it. Typical applications should create instances of the most specific subclass with
- * {@link Default} prefix instead. An exception to this rule may occurs when it is not possible to
+ * {@code Default} prefix instead. An exception to this rule may occurs when it is not possible to
  * identify the exact type. For example it is not possible to infer the exact coordinate system from
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
  * Known Text</cite></A> is some cases (e.g. in a {@code LOCAL_CS} element). In such exceptional

@@ -34,8 +34,8 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.referencing.crs.GeocentricCRS;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeocentricCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.operation.TestTransform;
 import org.geotools.resources.XMath;
@@ -144,8 +144,8 @@ public class GeocentricTransformTest extends TestTransform {
          * Gets the math transform from WGS84 to a geocentric transform.
          */
         final DefaultEllipsoid          ellipsoid = DefaultEllipsoid.WGS84;
-        final CoordinateReferenceSystem sourceCRS = GeographicCRS.WGS84_3D;
-        final CoordinateReferenceSystem targetCRS = GeocentricCRS.CARTESIAN;
+        final CoordinateReferenceSystem sourceCRS = DefaultGeographicCRS.WGS84_3D;
+        final CoordinateReferenceSystem targetCRS = DefaultGeocentricCRS.CARTESIAN;
         final CoordinateOperation       operation = opFactory.createOperation(sourceCRS, targetCRS);
         final MathTransform             transform = operation.getMathTransform();
         final int                       dimension = transform.getSourceDimensions();

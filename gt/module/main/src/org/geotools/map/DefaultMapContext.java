@@ -48,7 +48,7 @@ import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -76,7 +76,7 @@ public class DefaultMapContext implements MapContext {
     /** The logger for the map module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.map");
     List layerList = new ArrayList();
-    CoordinateReferenceSystem crs = GeographicCRS.WGS84;
+    CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
     Envelope areaOfInterest = null;
 
     /** Utility field used by event firing mechanism. */

@@ -36,7 +36,7 @@ import junit.framework.TestSuite;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.referencing.crs.ProjectedCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.referencing.wkt.Parser;
@@ -79,8 +79,8 @@ public class WKTParserTest extends TestCase {
      */
     public void testHardCoded() throws ParseException {
         final Parser parser = new Parser();
-        String       wkt1, wkt2;
-        ProjectedCRS crs1, crs2;
+        String              wkt1, wkt2;
+        DefaultProjectedCRS crs1, crs2;
         ParameterValueGroup param;
         /*
          * First, rather simple Mercator projection.
@@ -102,9 +102,9 @@ public class WKTParserTest extends TestCase {
                "  UNIT[\"m\", 1.0],\n"                                   +
                "  AXIS[\"x\", EAST],\n"                                  +
                "  AXIS[\"y\", NORTH]]\n";
-        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
-        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
         param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
         assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
@@ -135,9 +135,9 @@ public class WKTParserTest extends TestCase {
                "  UNIT[\"m\", 1.0],\n"                                   +
                "  AXIS[\"x\", EAST],\n"                                  +
                "  AXIS[\"y\", NORTH]]\n";
-        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
-        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
         param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
         assertEquals("Mercator_1SP", crs1.getConversionFromBase().getMethod().getName().getCode());
@@ -170,9 +170,9 @@ public class WKTParserTest extends TestCase {
                "  AXIS[\"E\",EAST],\n"                                                                    +
                "  AXIS[\"N\",NORTH],\n"                                                                   +
                "  AUTHORITY[\"EPSG\",\"27700\"]]\n";
-        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
-        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
         param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
         assertEquals("Transverse_Mercator", crs1.getConversionFromBase().getMethod().getName().getCode());
@@ -205,9 +205,9 @@ public class WKTParserTest extends TestCase {
                "  UNIT[\"feet\", 0.304800609601219],\n"               +
                "  AXIS[\"x\", EAST],\n"                               +
                "  AXIS[\"y\", NORTH]]\n";
-        crs1  = (ProjectedCRS) parser.parseObject(wkt1);
+        crs1  = (DefaultProjectedCRS) parser.parseObject(wkt1);
         wkt2  = parser.format(crs1);
-        crs2  = (ProjectedCRS)parser.parseObject(wkt2);
+        crs2  = (DefaultProjectedCRS) parser.parseObject(wkt2);
         param = crs1.getConversionFromBase().getParameterValues();
         assertEquals(crs1, crs2);
         assertEquals("Transverse_Mercator", crs1.getConversionFromBase().getMethod().getName().getCode());

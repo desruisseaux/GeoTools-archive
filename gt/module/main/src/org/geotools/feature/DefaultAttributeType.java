@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.filter.Filter;
-import org.geotools.referencing.crs.GeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;

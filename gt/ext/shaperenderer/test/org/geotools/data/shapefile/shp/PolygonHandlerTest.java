@@ -28,7 +28,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.PolygonHandler;
@@ -56,8 +56,8 @@ public class PolygonHandlerTest extends TestCase {
 		Envelope env=ds.getFeatureSource().getBounds();
 //		Envelope env=new Envelope(-180,180,-90,90);
 		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
-//		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
-		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, GeographicCRS.WGS84);
+//		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
+		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
 		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt));
@@ -82,8 +82,8 @@ public class PolygonHandlerTest extends TestCase {
 		Envelope env=new Envelope(-116.61514977458947,-115.06357335975156,31.826799280244018,32.590528603609826);
 //		Envelope env=new Envelope(-180,180,-90,90);
 //		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
-		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
-		MathTransform mt= CRS.transform(crs, GeographicCRS.WGS84);
+		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
+		MathTransform mt= CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		ShapeRenderer renderer=new ShapeRenderer(null);
 		AffineTransform at=renderer.worldToScreenTransform(env,new Rectangle(300,300));
 		mt = FactoryFinder.getMathTransformFactory(null)

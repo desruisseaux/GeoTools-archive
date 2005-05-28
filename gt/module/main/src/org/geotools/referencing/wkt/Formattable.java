@@ -99,8 +99,8 @@ public class Formattable {
      *
      * @return The Well Know Text for this object.
      * @throws UnformattableObjectException If this object can't be formatted as WKT.
-     *         A formatting may fails because an object is too complex for the WKT format
-     *         capability (for example an {@linkplain org.geotools.referencing.crs.EngineeringCRS
+     *         A formatting may fails because an object is too complex for the WKT format capability
+     *         (for example an {@linkplain org.geotools.referencing.crs.DefaultEngineeringCRS
      *         engineering CRS} with different unit for each axis), or because only some specific
      *         implementations can be formatted as WKT.
      */
@@ -117,8 +117,8 @@ public class Formattable {
      *         or 0 for formatting the whole WKT on a single line.
      * @return The Well Know Text for this object.
      * @throws UnformattableObjectException If this object can't be formatted as WKT.
-     *         A formatting may fails because an object is too complex for the WKT format
-     *         capability (for example an {@linkplain org.geotools.referencing.crs.EngineeringCRS
+     *         A formatting may fails because an object is too complex for the WKT format capability
+     *         (for example an {@linkplain org.geotools.referencing.crs.DefaultEngineeringCRS
      *         engineering CRS} with different unit for each axis), or because only some specific
      *         implementations can be formatted as WKT.
      */
@@ -136,8 +136,8 @@ public class Formattable {
      *         or 0 for formatting the whole WKT on a single line.
      * @return The Well Know Text for this object.
      * @throws UnformattableObjectException If this object can't be formatted as WKT.
-     *         A formatting may fails because an object is too complex for the WKT format
-     *         capability (for example an {@linkplain org.geotools.referencing.crs.EngineeringCRS
+     *         A formatting may fails because an object is too complex for the WKT format capability
+     *         (for example an {@linkplain org.geotools.referencing.crs.DefaultEngineeringCRS
      *         engineering CRS} with different unit for each axis), or because only some specific
      *         implementations can be formatted as WKT.
      */
@@ -197,7 +197,7 @@ public class Formattable {
      * Known Text</cite> (WKT)</A> element. This method is automatically invoked by
      * {@link Formatter#append(Formattable)}. Element name and authority code must not be
      * formatted here. For example for a <code>GEOGCS</code> element
-     * ({@link org.geotools.referencing.crs.GeographicCRS}), the formatter will invokes
+     * ({@link org.geotools.referencing.crs.DefaultGeographicCRS}), the formatter will invokes
      * this method for completing the WKT at the insertion point show below:
      *
      * <pre>

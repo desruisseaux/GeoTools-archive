@@ -84,6 +84,14 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.crs.DefaultDerivedCRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultGeocentricCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultImageCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
+import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultAffineCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -735,7 +743,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         EngineeringCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.EngineeringCRS(properties, datum, cs);
+            crs = new DefaultEngineeringCRS(properties, datum, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -757,7 +765,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         ImageCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.ImageCRS(properties, datum, cs);
+            crs = new DefaultImageCRS(properties, datum, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -779,7 +787,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         TemporalCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.TemporalCRS(properties, datum, cs);
+            crs = new DefaultTemporalCRS(properties, datum, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -801,7 +809,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         VerticalCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.VerticalCRS(properties, datum, cs);
+            crs = new DefaultVerticalCRS(properties, datum, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -824,7 +832,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         GeocentricCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.GeocentricCRS(properties, datum, cs);
+            crs = new DefaultGeocentricCRS(properties, datum, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -847,7 +855,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         GeocentricCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.GeocentricCRS(properties, datum, cs);
+            crs = new DefaultGeocentricCRS(properties, datum, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -871,7 +879,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         GeographicCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.GeographicCRS(properties, datum, cs);
+            crs = new DefaultGeographicCRS(properties, datum, cs);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -941,8 +949,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         DerivedCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.DerivedCRS(properties, method,
-                                                              base, baseToDerived, derivedCS);
+            crs = new DefaultDerivedCRS(properties, method, base, baseToDerived, derivedCS);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }
@@ -1002,8 +1009,7 @@ public class GeotoolsFactory extends AbstractFactory
     {
         ProjectedCRS crs;
         try {
-            crs = new org.geotools.referencing.crs.ProjectedCRS(properties, method,
-                                                                base, baseToDerived, derivedCS);
+            crs = new DefaultProjectedCRS(properties, method, base, baseToDerived, derivedCS);
         } catch (IllegalArgumentException exception) {
             throw new FactoryException(exception);
         }

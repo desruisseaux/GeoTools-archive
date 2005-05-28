@@ -64,7 +64,7 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.JTS;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
@@ -819,7 +819,7 @@ public class WFSDataStore extends AbstractDataStore {
 
             if (queryName.equals(fsdName)) {
                 Envelope env = fsd.getLatLongBoundingBox();
-                return new ReferencedEnvelope(env,GeographicCRS.WGS84);
+                return new ReferencedEnvelope(env,DefaultGeographicCRS.WGS84);
             }
         }
 

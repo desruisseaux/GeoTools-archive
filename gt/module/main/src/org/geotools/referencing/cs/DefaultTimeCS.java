@@ -43,7 +43,7 @@ import org.geotools.measure.Measure;
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.crs.TemporalCRS Temporal}
+ *   {@link org.geotools.referencing.crs.DefaultTemporalCRS Temporal}
  * </TD></TR></TABLE>
  *
  * @version $Id$

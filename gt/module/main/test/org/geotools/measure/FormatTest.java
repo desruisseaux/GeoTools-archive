@@ -36,9 +36,9 @@ import junit.textui.TestRunner;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.crs.AbstractCRS;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.crs.TemporalCRS;
-import org.geotools.referencing.crs.VerticalCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
+import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.referencing.cs.DefaultTimeCS;
 import org.geotools.referencing.datum.DefaultTemporalDatum;
 
@@ -97,7 +97,7 @@ public class FormatTest extends TestCase {
     }
 
     /**
-     * Format an object and parse the result. The format
+     * Formats an object and parse the result. The format
      * output is compared with the expected output.
      */
     private static void assertFormat(final String expected,
@@ -111,19 +111,20 @@ public class FormatTest extends TestCase {
     }
 
     /**
-     * Test formatting of a 4-dimensional coordinates.
+     * Tests formatting of a 4-dimensional coordinates.
      */
     public void testCoordinateFormat() {
         final Date epoch = new Date(1041375600000L); // January 1st, 2003
         final DefaultTemporalDatum datum = new DefaultTemporalDatum("Time", epoch);
         final AbstractCRS crs = new DefaultCompoundCRS("WGS84 3D + time",
-                    GeographicCRS.WGS84,
-                    VerticalCRS.ELLIPSOIDAL_HEIGHT,
-                    new TemporalCRS("Time", datum, DefaultTimeCS.DAYS));
+                    DefaultGeographicCRS.WGS84, DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT,
+                    new DefaultTemporalCRS("Time", datum, DefaultTimeCS.DAYS));
         final CoordinateFormat format = new CoordinateFormat(Locale.FRANCE);
         format.setCoordinateReferenceSystem(crs);
         format.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
-	GeneralDirectPosition position = new GeneralDirectPosition(new double[]{23.78, -12.74, 127.9, 3.2});
+        final GeneralDirectPosition position = new GeneralDirectPosition(new double[] {
+            23.78, -12.74, 127.9, 3.2
+        });
         assertEquals("23°46,8'E 12°44,4'S 127,9 4 janv. 2003", format.format(position));
      }
 }

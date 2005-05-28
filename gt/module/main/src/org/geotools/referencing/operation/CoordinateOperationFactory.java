@@ -75,6 +75,8 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.BursaWolfParameters;
@@ -362,10 +364,10 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
         ////     Various CS --> Generic      ////
         ////                                 ////
         /////////////////////////////////////////
-        if (sourceCRS == org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D ||
-            targetCRS == org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D ||
-            sourceCRS == org.geotools.referencing.crs.EngineeringCRS.GENERIC_3D ||
-            targetCRS == org.geotools.referencing.crs.EngineeringCRS.GENERIC_3D)
+        if (sourceCRS == DefaultEngineeringCRS.GENERIC_2D ||
+            targetCRS == DefaultEngineeringCRS.GENERIC_2D ||
+            sourceCRS == DefaultEngineeringCRS.GENERIC_3D ||
+            targetCRS == DefaultEngineeringCRS.GENERIC_3D)
         {
             final int dimSource = getDimension(sourceCRS);
             final int dimTarget = getDimension(targetCRS);
@@ -647,8 +649,7 @@ public class CoordinateOperationFactory extends AbstractCoordinateOperationFacto
     private static Matrix createLinearConversion(final ProjectedCRS sourceCRS,
                                                  final ProjectedCRS targetCRS)
     {
-        return org.geotools.referencing.crs.ProjectedCRS.
-               createLinearConversion(sourceCRS, targetCRS, 1E-12);
+        return DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, 1E-12);
     }
 
 

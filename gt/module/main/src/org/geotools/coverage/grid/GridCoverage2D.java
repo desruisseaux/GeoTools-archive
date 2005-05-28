@@ -104,7 +104,7 @@ import org.geotools.coverage.processing.AbstractGridCoverageProcessor;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.XArray;
@@ -323,7 +323,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * Constructs a grid coverage from a raster and an envelope in
      * <var>longitude</var>,<var>latitude</var> coordinates. The coordinate system is assumed to
-     * be based on {@linkplain GeographicCRS#WGS84 WGS84}. A default color palette
+     * be based on {@linkplain DefaultGeographicCRS#WGS84 WGS84}. A default color palette
      * is built from the minimal and maximal values found in the raster.
      *
      * @param name     The grid coverage name.
@@ -342,7 +342,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
                           final Envelope       envelope)
             throws MismatchedDimensionException
     {
-        this(name, raster, GeographicCRS.WGS84, envelope, null, null, null, null, null);
+        this(name, raster, DefaultGeographicCRS.WGS84, envelope, null, null, null, null, null);
     }
 
     /**

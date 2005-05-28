@@ -44,6 +44,8 @@ import org.opengis.referencing.operation.Transformation;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 
 
@@ -106,32 +108,32 @@ public class TransformationTest extends TestTransform {
      * @todo uses static imports when we will be allowed to compile with J2SE 1.5.
      */
     public void testGenericTransform() throws FactoryException {
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.GeographicCRS.WGS84,
-                   org.geotools.referencing.crs.GeographicCRS.WGS84).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D,
-                   org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_3D,
-                   org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_3D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D,
-                   org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D,
-                   org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D,
-                   org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.GeographicCRS.WGS84,
-                   org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
-        assertTrue(opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.GENERIC_2D,
-                   org.geotools.referencing.crs.GeographicCRS.WGS84).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultGeographicCRS.WGS84,
+                   DefaultGeographicCRS.WGS84).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_2D,
+                   DefaultEngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_3D,
+                   DefaultEngineeringCRS.CARTESIAN_3D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.GENERIC_2D,
+                   DefaultEngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.GENERIC_2D,
+                   DefaultEngineeringCRS.CARTESIAN_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_2D,
+                   DefaultEngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultGeographicCRS.WGS84,
+                   DefaultEngineeringCRS.GENERIC_2D).getMathTransform().isIdentity());
+        assertTrue(opFactory.createOperation(DefaultEngineeringCRS.GENERIC_2D,
+                   DefaultGeographicCRS.WGS84).getMathTransform().isIdentity());
         try {
-            opFactory.createOperation(org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D,
-                                      org.geotools.referencing.crs.GeographicCRS.WGS84);
+            opFactory.createOperation(DefaultEngineeringCRS.CARTESIAN_2D,
+                                      DefaultGeographicCRS.WGS84);
             fail();
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.
         }
         try {
-            opFactory.createOperation(org.geotools.referencing.crs.GeographicCRS.WGS84,
-                                      org.geotools.referencing.crs.EngineeringCRS.CARTESIAN_2D);
+            opFactory.createOperation(DefaultGeographicCRS.WGS84,
+                                      DefaultEngineeringCRS.CARTESIAN_2D);
             fail();
         } catch (OperationNotFoundException exception) {
             // This is the expected exception.

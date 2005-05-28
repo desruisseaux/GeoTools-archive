@@ -53,9 +53,9 @@ import org.geotools.resources.cts.Resources;
 
 
 /**
- * Transforms three dimensional {@linkplain org.geotools.referencing.crs.GeographicCRS geographic}
- * points to {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric} coordinate points.
- * Input points must be longitudes, latitudes and heights above the ellipsoid.
+ * Transforms three dimensional {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS
+ * geographic} points to {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric}
+ * coordinate points. Input points must be longitudes, latitudes and heights above the ellipsoid.
  *
  * @version $Id$
  * @author Frank Warmerdam
@@ -544,9 +544,9 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     
     /**
      * The provider for {@link GeocentricTransform}. This provider will construct transforms
-     * from {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} to
-     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric} coordinate reference
-     * systems.
+     * from {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic} to
+     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric} coordinate
+     * reference systems.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -687,9 +687,9 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     
     /**
      * The provider for inverse of {@link GeocentricTransform}. This provider will construct
-     * transforms from {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric} to
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} coordinate reference
-     * systems.
+     * transforms from {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric}
+     * to {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic} coordinate
+     * reference systems.
      *
      * @version $Id$
      * @author Martin Desruisseaux

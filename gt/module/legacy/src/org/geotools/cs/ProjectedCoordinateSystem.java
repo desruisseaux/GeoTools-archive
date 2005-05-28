@@ -55,7 +55,7 @@ import org.opengis.cs.CS_Projection;
  *
  * @see org.opengis.cs.CS_ProjectedCoordinateSystem
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.ProjectedCRS}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultProjectedCRS}.
  */
 public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
     /**
@@ -171,7 +171,7 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
      *
      * @see org.opengis.cs.CS_ProjectedCoordinateSystem#getGeographicCoordinateSystem()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.ProjectedCRS#getBaseCRS}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultProjectedCRS#getBaseCRS}.
      */
     public GeographicCoordinateSystem getGeographicCoordinateSystem() {
         return gcs;
@@ -182,7 +182,7 @@ public class ProjectedCoordinateSystem extends HorizontalCoordinateSystem {
      *
      * @see org.opengis.cs.CS_ProjectedCoordinateSystem#getProjection()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.ProjectedCRS#getConversionFromBase}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultProjectedCRS#getConversionFromBase}.
      */
     public Projection getProjection() {
         return projection;

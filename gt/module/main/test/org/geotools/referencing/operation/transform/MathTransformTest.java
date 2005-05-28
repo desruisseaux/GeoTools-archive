@@ -44,7 +44,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformFactory;
@@ -125,7 +125,7 @@ public class MathTransformTest extends TestCase {
                 "  UNIT[\"Meter\",1]]");
         
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                                        GeographicCRS.WGS84, crs).getMathTransform();
+                                        DefaultGeographicCRS.WGS84, crs).getMathTransform();
         DirectPosition position = new GeneralDirectPosition(-123, 55);
         position = t.          transform(position, position);
         position = t.inverse().transform(position, position);

@@ -25,7 +25,7 @@ import java.util.HashMap;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 /**
  * AbstractGridFormat is a convenience class so subclasses only need to
@@ -197,7 +197,7 @@ public abstract class AbstractGridFormat
 
     }
     catch (Exception e) {
-      return GeographicCRS.WGS84;
+      return DefaultGeographicCRS.WGS84;
     }
   }
 }

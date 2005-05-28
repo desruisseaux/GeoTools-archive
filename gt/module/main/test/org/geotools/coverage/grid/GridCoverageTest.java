@@ -47,7 +47,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.operation.Resampler2D;
@@ -155,12 +155,12 @@ public class GridCoverageTest extends TestCase {
 
     /**
      * Returns a grid coverage filled with random values. The coordinate
-     * reference system default to {@link GeographicCRS#WGS84}.
+     * reference system default to {@link DefaultGeographicCRS#WGS84}.
      *
      * @return A random coverage.
      */
     protected GridCoverage2D getRandomCoverage() {
-        return getRandomCoverage(GeographicCRS.WGS84);
+        return getRandomCoverage(DefaultGeographicCRS.WGS84);
     }
 
     /**
@@ -299,7 +299,7 @@ public class GridCoverageTest extends TestCase {
             case 0: {
                 //unit = "°C";
                 path = "QL95209.png";
-                crs  = GeographicCRS.WGS84;
+                crs  = DefaultGeographicCRS.WGS84;
                 categories = new Category[] {
                     new Category("Coast line", Color.decode("#000000"), new NumberRange(  0,   0)),
                     new Category("Cloud",      Color.decode("#C3C3C3"), new NumberRange(  1,   9)),
@@ -316,7 +316,7 @@ public class GridCoverageTest extends TestCase {
             case 1: {
                 //unit = "mg/m³";
                 path = "CHL01195.png";
-                crs  = GeographicCRS.WGS84;
+                crs  = DefaultGeographicCRS.WGS84;
                 categories = new Category[] {
                     new Category("Land",       Color.decode("#000000"), new NumberRange(255, 255)),
                     new Category("No data",    Color.decode("#FFFFFF"), new NumberRange(  0,   0)),

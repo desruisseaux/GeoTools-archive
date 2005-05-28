@@ -50,7 +50,7 @@ import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -334,7 +334,7 @@ public class Rendering2DTest extends TestCase {
         System.err.println("starting testLiteRender2");
         GeometryFactory geomFac = new GeometryFactory(
                 PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
-        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, geomFac, POLYGON);
+        FeatureCollection ft = createTestFeatureCollection(DefaultGeographicCRS.WGS84, geomFac, POLYGON);
         Style style = createTestStyle();
 
         StringBuffer stringBuffer = new StringBuffer();
@@ -355,7 +355,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                GeographicCRS.WGS84, crs).getMathTransform();
+                DefaultGeographicCRS.WGS84, crs).getMathTransform();
 
         Envelope env = map.getLayerBounds();
 
@@ -378,7 +378,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting testLiteRender2");
         
-        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, POLYGON);
+        FeatureCollection ft = createTestFeatureCollection(DefaultGeographicCRS.WGS84, POLYGON);
         Style style = createTestStyle();
 
         StringBuffer stringBuffer = new StringBuffer();
@@ -399,7 +399,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                GeographicCRS.WGS84, crs).getMathTransform();
+                DefaultGeographicCRS.WGS84, crs).getMathTransform();
 
         Envelope env = map.getLayerBounds();
 
@@ -423,7 +423,7 @@ public class Rendering2DTest extends TestCase {
         System.err.println("starting testLiteRender2");
         GeometryFactory geomFac = new GeometryFactory(
                 PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
-        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, geomFac, LINE);
+        FeatureCollection ft = createTestFeatureCollection(DefaultGeographicCRS.WGS84, geomFac, LINE);
         Style style = createTestStyle();
 
         StringBuffer stringBuffer = new StringBuffer();
@@ -450,7 +450,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                GeographicCRS.WGS84, crs).getMathTransform();
+                DefaultGeographicCRS.WGS84, crs).getMathTransform();
 
         env = map.getLayerBounds();
 
@@ -473,7 +473,7 @@ public class Rendering2DTest extends TestCase {
         System.err.println("starting testLiteRender2");
         GeometryFactory geomFac = new GeometryFactory(
                 PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
-        FeatureCollection ft = createTestFeatureCollection(GeographicCRS.WGS84, geomFac, POINT);
+        FeatureCollection ft = createTestFeatureCollection(DefaultGeographicCRS.WGS84, geomFac, POINT);
         Style style = createTestStyle();
 
         StringBuffer stringBuffer = new StringBuffer();
@@ -494,7 +494,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                GeographicCRS.WGS84, crs).getMathTransform();
+                DefaultGeographicCRS.WGS84, crs).getMathTransform();
 
         Envelope env = map.getLayerBounds();
 

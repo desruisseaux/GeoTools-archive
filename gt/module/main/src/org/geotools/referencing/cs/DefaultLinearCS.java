@@ -44,7 +44,7 @@ import org.geotools.measure.Measure;
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.crs.EngineeringCRS Engineering}
+ *   {@link org.geotools.referencing.crs.DefaultEngineeringCRS Engineering}
  * </TD></TR></TABLE>
  *
  * @version $Id$

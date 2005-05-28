@@ -22,8 +22,6 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
-import java.util.Collections;
 import java.util.Map;
 
 // OpenGIS dependencies
@@ -34,42 +32,19 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
-import org.geotools.referencing.AbstractReferenceSystem;        // For javadoc
-import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
-
 
 /**
  * A coordinate reference system that is defined by its coordinate conversion from another
- * coordinate reference system but is not a projected coordinate reference system. This
- * category includes coordinate reference systems derived from a projected coordinate
- * reference system.
+ * coordinate reference system but is not a projected coordinate reference system.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link DefaultDerivedCRS}. 
  */
-public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
-                     implements org.opengis.referencing.crs.DerivedCRS
-{
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = -8149602276542469876L;
-
+public class DerivedCRS extends DefaultDerivedCRS {
     /**
      * Constructs a derived CRS from a name.
-     *
-     * @param  name The name.
-     * @param  method A description of the {@linkplain Conversion#getMethod method for the
-     *         conversion}.
-     * @param  base Coordinate reference system to base the derived CRS on.
-     * @param  baseToDerived The transform from the base CRS to returned CRS.
-     * @param  derivedCS The coordinate system for the derived CRS. The number
-     *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
-     * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
      */
     public DerivedCRS(final String                    name,
                       final OperationMethod         method,
@@ -78,26 +53,11 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
                       final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), method, base, baseToDerived, derivedCS);
+        super(name, method, base, baseToDerived, derivedCS);
     }
 
     /**
-     * Constructs a derived CRS from a set of properties. The properties are given unchanged
-     * to the {@linkplain GeneralDerivedCRS#GeneralDerivedCRS(Map, OperationMethod,
-     * CoordinateReferenceSystem, MathTransform, CoordinateSystem) super-class constructor}.
-     *
-     * @param  properties Name and other properties to give to the new derived CRS object and to
-     *         the underlying {@linkplain org.geotools.referencing.operation.Conversion conversion}.
-     * @param  method A description of the {@linkplain Conversion#getMethod method for the
-     *         conversion}.
-     * @param  base Coordinate reference system to base the derived CRS on.
-     * @param  baseToDerived The transform from the base CRS to returned CRS.
-     * @param  derivedCS The coordinate system for the derived CRS. The number
-     *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
-     * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     * Constructs a derived CRS from a set of properties.
      */
     public DerivedCRS(final Map                 properties,
                       final OperationMethod         method,
@@ -110,20 +70,7 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
     }
 
     /**
-     * Constructs a derived CRS from a {@linkplain DefiningConversion defining conversion}.
-     * The properties are given unchanged to the
-     * {@linkplain AbstractReferenceSystem#AbstractReferenceSystem(Map) super-class constructor}.
-     *
-     * @param  properties Name and other properties to give to the new derived CRS object.
-     * @param  conversionFromBase The {@linkplain DefiningConversion defining conversion}.
-     * @param  base Coordinate reference system to base the derived CRS on.
-     * @param  baseToDerived The transform from the base CRS to returned CRS.
-     * @param  derivedCS The coordinate system for the derived CRS. The number
-     *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
-     * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     * Constructs a derived CRS from a defining conversion.
      */
     public DerivedCRS(final Map                 properties,
                       final Conversion  conversionFromBase,
@@ -133,15 +80,5 @@ public class DerivedCRS extends org.geotools.referencing.crs.GeneralDerivedCRS
             throws MismatchedDimensionException
     {
         super(properties, conversionFromBase, base, baseToDerived, derivedCS);
-    }
-    
-    /**
-     * Returns a hash value for this derived CRS.
-     *
-     * @return The hash code value. This value doesn't need to be the same
-     *         in past or future versions of this class.
-     */
-    public int hashCode() {
-        return (int)serialVersionUID ^ super.hashCode();
     }
 }

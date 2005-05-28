@@ -56,6 +56,7 @@ import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.citation.CitationImpl;
 
 
@@ -384,7 +385,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
-            GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
+            GeographicCRS geoCRS = DefaultGeographicCRS.WGS84;
             CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
             
             final double   falseNorthing   = code.latitude >= 0.0 ? 0.0 : 10000000.0;
@@ -450,7 +451,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
-            GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
+            GeographicCRS geoCRS = DefaultGeographicCRS.WGS84;
             CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
           
             final double   centralMeridian = code.longitude;
@@ -514,7 +515,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
-            GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
+            GeographicCRS geoCRS = DefaultGeographicCRS.WGS84;
             CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
           
             final double   centralMeridian  = code.longitude;
@@ -579,7 +580,7 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
             return DefaultGeodeticDatum.WGS84;
         }
         public CoordinateReferenceSystem create(final Code code) throws FactoryException {
-            GeographicCRS geoCRS = org.geotools.referencing.crs.GeographicCRS.WGS84;
+            GeographicCRS geoCRS = DefaultGeographicCRS.WGS84;
             CartesianCS cartCS = DefaultCartesianCS.PROJECTED;
         
             final double   centralMeridian   = code.longitude;

@@ -937,8 +937,8 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
 
     /**
      * The provider for {@link NADCONTransform}. This provider will construct
-     * transforms from {@linkplain org.geotools.referencing.crs.GeographicCRS
-     * geographic} to {@linkplain org.geotools.referencing.crs.GeographicCRS
+     * transforms from {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS
+     * geographic} to {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS
      * geographic} coordinate reference systems.
      *
      * @version $Id$

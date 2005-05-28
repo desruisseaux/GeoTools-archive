@@ -47,8 +47,8 @@ import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.referencing.cs.DefaultCartesianCS;
-import org.geotools.referencing.crs.DerivedCRS;
-import org.geotools.referencing.crs.ProjectedCRS;
+import org.geotools.referencing.crs.DefaultDerivedCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.operation.OperationMethod;
 import org.geotools.referencing.operation.MathTransformFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -149,8 +149,8 @@ public final class ResampleTest extends GridCoverageTest {
                 fail(exception.getLocalizedMessage());
                 return null;
             }
-            return new ProjectedCRS("Stereographic", new OperationMethod(mt),
-                                    base, mt, DefaultCartesianCS.PROJECTED);
+            return new DefaultProjectedCRS("Stereographic", new OperationMethod(mt),
+                                           base, mt, DefaultCartesianCS.PROJECTED);
         } catch (NoSuchIdentifierException exception) {
             fail(exception.getLocalizedMessage());
             return null;
@@ -229,7 +229,7 @@ public final class ResampleTest extends GridCoverageTest {
         atr.preConcatenate(AffineTransform.getTranslateInstance(5, 5));
         MathTransform tr = ProjectiveTransform.create(atr);
         CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
-        crs = new DerivedCRS("F2", new OperationMethod(tr), crs, tr, crs.getCoordinateSystem());
+        crs = new DefaultDerivedCRS("F2", new OperationMethod(tr), crs, tr, crs.getCoordinateSystem());
         /*
          * Note: In current Resampler implementation, the affine transform effect tested
          *       on the first line below will not be visible with the simple viewer used

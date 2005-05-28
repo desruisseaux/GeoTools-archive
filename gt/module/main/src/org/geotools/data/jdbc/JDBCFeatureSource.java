@@ -39,7 +39,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.JTS.ReferencedEnvelope;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 import com.vividsolutions.jts.geom.Envelope;
 

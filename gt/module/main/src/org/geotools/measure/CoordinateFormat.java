@@ -50,7 +50,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.referencing.crs.AbstractCRS;
-import org.geotools.referencing.crs.TemporalCRS;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -127,8 +128,7 @@ public class CoordinateFormat extends Format {
 
     /**
      * Construct a new coordinate format with default locale and a two-dimensional
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS#WGS84 geographic (WGS 1984)}
-     * coordinate reference system.
+     * {@linkplain DefaultGeographicCRS#WGS84 geographic (WGS 1984)} coordinate reference system.
      */
     public CoordinateFormat() {
         this(Locale.getDefault());
@@ -136,13 +136,12 @@ public class CoordinateFormat extends Format {
 
     /**
      * Construct a new coordinate format for the specified locale and a two-dimensional
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS#WGS84 geographic (WGS 1984)}
-     * coordinate reference system.
+     * {@linkplain DefaultGeographicCRS#WGS84 geographic (WGS 1984)} coordinate reference system.
      *
      * @param locale The locale for formatting coordinates and numbers.
      */
     public CoordinateFormat(final Locale locale) {
-        this(locale, org.geotools.referencing.crs.GeographicCRS.WGS84);
+        this(locale, DefaultGeographicCRS.WGS84);
     }
 
     /**
@@ -232,7 +231,7 @@ public class CoordinateFormat extends Format {
                             toMillis = new Converter[formats.length];
                             epochs   = new long     [formats.length];
                         }
-                        toMillis[i] = unit.getConverterTo(TemporalCRS.MILLISECOND);
+                        toMillis[i] = unit.getConverterTo(DefaultTemporalCRS.MILLISECOND);
                         epochs  [i] = ((TemporalDatum) datum).getOrigin().getTime();
                         if (dateFormat == null) {
                             dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);

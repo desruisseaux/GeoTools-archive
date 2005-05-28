@@ -34,8 +34,8 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.crs.ProjectedCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
@@ -150,30 +150,30 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Test the {@link ProjectedCRS#createLinearConversion} method.
+     * Test the {@link DefaultProjectedCRS#createLinearConversion} method.
      * Note: this requires a working {@link MathTransformFactory}.
      */
     public void testCreateLinearConversion() throws FactoryException {
         final double                     EPS = 1E-12;
         final MathTransformFactory   factory = new MathTransformFactory();
         final ParameterValueGroup parameters = factory.getDefaultParameters("Mercator_1SP");
-        ProjectedCRS sourceCRS, targetCRS;
+        DefaultProjectedCRS sourceCRS, targetCRS;
         MathTransform transform;
         Matrix conversion;
 
         parameters.parameter("semi_major").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
         parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMinorAxis());
         transform = factory.createParameterizedTransform(parameters);
-        sourceCRS = new ProjectedCRS("source", new OperationMethod(transform),
-                    GeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        sourceCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
 
         parameters.parameter("false_easting" ).setValue(1000);
         parameters.parameter("false_northing").setValue(2000);
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
-                    GeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        targetCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
 
-        conversion = ProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
+        conversion = DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertEquals(new GeneralMatrix(new double[][] {
             {1,  0,  1000},
             {0,  1,  2000},
@@ -182,10 +182,10 @@ public class BasicTest extends TestCase {
 
         parameters.parameter("scale_factor").setValue(2);
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
-                    GeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        targetCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
 
-        conversion = ProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
+        conversion = DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertEquals(new GeneralMatrix(new double[][] {
             {2,  0,  1000},
             {0,  2,  2000},
@@ -194,9 +194,9 @@ public class BasicTest extends TestCase {
 
         parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new ProjectedCRS("source", new OperationMethod(transform),
-                    GeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
-        conversion = ProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
+        targetCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+                    DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
+        conversion = DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertNull(conversion);
     }
 }

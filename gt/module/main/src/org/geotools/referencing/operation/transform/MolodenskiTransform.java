@@ -517,9 +517,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
     /**
      * The provider for {@link MolodenskiTransform}. This provider will construct
-     * transforms from {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} to
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} coordinate reference
-     * systems.
+     * transforms from {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic}
+     * to {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic} coordinate
+     * reference systems.
      * <p>
      * <strong>Note:</strong>
      * The EPSG does not use src_semi_major, etc. parameters and instead uses 
@@ -739,9 +739,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
     /**
      * The provider for abridged {@link MolodenskiTransform}. This provider will construct
-     * transforms from {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} to
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic} coordinate reference
-     * systems. 
+     * transforms from {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic}
+     * to {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic} coordinate
+     * reference systems. 
      * <p>
      * <strong>Note:</strong>
      * The EPSG does not use src_semi_major, etc. parameters and instead uses 

@@ -66,6 +66,8 @@ import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Arguments;
 
@@ -220,9 +222,8 @@ public class CreationTest extends TestCase {
                 out.println(classification);
                 assertEquals(classification, ((MapProjection) mt).getParameterDescriptors().getName().getCode());
                 final ProjectedCRS projCRS =
-                        new org.geotools.referencing.crs.ProjectedCRS("Test", method,
-                            org.geotools.referencing.crs.GeographicCRS.WGS84, mt,
-                            DefaultCartesianCS.PROJECTED);
+                        new DefaultProjectedCRS("Test", method,
+                            DefaultGeographicCRS.WGS84, mt, DefaultCartesianCS.PROJECTED);
                 final Conversion conversion = projCRS.getConversionFromBase();
                 assertSame(mt, conversion.getMathTransform());
                 final OperationMethod projMethod = conversion.getMethod();

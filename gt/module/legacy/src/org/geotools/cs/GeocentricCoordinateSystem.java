@@ -51,7 +51,7 @@ import org.opengis.cs.CS_PrimeMeridian;
  *
  * @see org.opengis.cs.CS_GeocentricCoordinateSystem
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.GeocentricCRS}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultGeocentricCRS}.
  */
 public class GeocentricCoordinateSystem extends CoordinateSystem {
     /**
@@ -194,7 +194,7 @@ public class GeocentricCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_GeocentricCoordinateSystem#getHorizontalDatum()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.GeocentricCRS#getDatum}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultGeocentricCRS#getDatum}.
      */
     public HorizontalDatum getHorizontalDatum() {
         return datum;

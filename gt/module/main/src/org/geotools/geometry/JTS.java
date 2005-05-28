@@ -30,7 +30,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
@@ -204,11 +204,11 @@ public class JTS {
     public static Envelope toGeographic(Envelope env, CoordinateReferenceSystem crs)
             throws OperationNotFoundException, NoSuchElementException, FactoryException, TransformException
     {
-    	if (crs.equals(GeographicCRS.WGS84)) {
+    	if (crs.equals(DefaultGeographicCRS.WGS84)) {
             return env;
         }
         MathTransform transform = FactoryFinder.getCoordinateOperationFactory(null)
-                .createOperation(crs, GeographicCRS.WGS84).getMathTransform();
+                .createOperation(crs, DefaultGeographicCRS.WGS84).getMathTransform();
         return JTS.transform(env, transform);
     }
 }

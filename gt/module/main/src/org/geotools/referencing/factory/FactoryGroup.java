@@ -331,7 +331,7 @@ public class FactoryGroup {
     {
         final MathTransform mt;
         mt = createBaseToDerived(baseCRS, conversionFromBase.getParameterValues(), derivedCS, null);
-        return new org.geotools.referencing.crs.ProjectedCRS(
+        return new org.geotools.referencing.crs.DefaultProjectedCRS(
                     properties, conversionFromBase, baseCRS, mt, derivedCS);
     }
 

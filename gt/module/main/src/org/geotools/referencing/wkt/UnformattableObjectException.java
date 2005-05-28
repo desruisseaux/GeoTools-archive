@@ -23,7 +23,7 @@ package org.geotools.referencing.wkt;
 /**
  * Thrown by {@link Formattable#toWKT} when an object can't be formatted as WKT.
  * A formatting may fails because an object is too complex for the WKT format
- * capability (for example an {@linkplain org.geotools.referencing.crs.EngineeringCRS
+ * capability (for example an {@linkplain org.geotools.referencing.crs.DefaultEngineeringCRS
  * engineering CRS} with different unit for each axis), or because only some specific
  * implementations can be formatted as WKT.
  *

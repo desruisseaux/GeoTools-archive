@@ -60,6 +60,7 @@ import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -619,9 +620,9 @@ public final class CRSUtilities {
         StringBuffer buffer = new StringBuffer();
         try {
             crs = getCRS2D(crs);
-            if (!equalsIgnoreMetadata(org.geotools.referencing.crs.GeographicCRS.WGS84, crs)) {
+            if (!equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
                 final CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory(null)
-                        .createOperation(crs, org.geotools.referencing.crs.GeographicCRS.WGS84);
+                        .createOperation(crs, DefaultGeographicCRS.WGS84);
                 bounds = transform((MathTransform2D) op.getMathTransform(), bounds, null);
             }
             final AngleFormat fmt = new AngleFormat("DD°MM.m'");

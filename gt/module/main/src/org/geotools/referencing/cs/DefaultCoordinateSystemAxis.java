@@ -120,7 +120,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for geodetic longitudes in a
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic CRS}.
+     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic CRS}.
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      * The abbreviation is "&phi;" (phi). This axis is usually part of a
@@ -135,7 +135,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for geodetic latitudes in a
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic CRS}.
+     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic CRS}.
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      * The abbreviation is "&lambda;" (lambda). This axis is usually part of a
@@ -150,7 +150,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * The default axis for height values above the ellipsoid in a
-     * {@linkplain org.geotools.referencing.crs.GeographicCRS geographic CRS}.
+     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic CRS}.
      * Increasing ordinates values go {@linkplain AxisDirection#UP up}
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is lower case "h". This axis is usually part of a
@@ -180,7 +180,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for longitudes in a
-     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
      * {@linkplain DefaultSphericalCS spherical CS}.
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
@@ -196,7 +196,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for latitudes in a
-     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
      * {@linkplain DefaultSphericalCS spherical CS}.
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
@@ -212,7 +212,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for radius in a
-     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
      * {@linkplain DefaultSphericalCS spherical CS}.
      * Increasing ordinates values go {@linkplain AxisDirection#UP up}
      * and units are {@linkplain SI#METER metres}.
@@ -265,7 +265,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for <var>x</var> values in a
-     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
      * {@linkplain DefaultCartesianCS cartesian CS}.
      * Increasing ordinates values go toward prime meridian
      * and units are {@linkplain SI#METER metres}.
@@ -277,7 +277,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for <var>y</var> values in a
-     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
      * {@linkplain DefaultCartesianCS cartesian CS}.
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain SI#METER metres}.
@@ -289,7 +289,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for <var>z</var> values in a
-     * {@linkplain org.geotools.referencing.crs.GeocentricCRS geocentric CRS} using
+     * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric CRS} using
      * {@linkplain DefaultCartesianCS cartesian CS}.
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain SI#METER metres}.
@@ -301,7 +301,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for Easting values in a
-     * {@linkplain org.geotools.referencing.crs.ProjectedCRS projected CRS}.
+     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is upper case "E". This axis is usually part of a
@@ -316,7 +316,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for Westing values in a
-     * {@linkplain org.geotools.referencing.crs.ProjectedCRS projected CRS}.
+     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
      * Increasing ordinates values go {@linkplain AxisDirection#WEST West}
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is upper case "W".
@@ -330,7 +330,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for Northing values in a
-     * {@linkplain org.geotools.referencing.crs.ProjectedCRS projected CRS}.
+     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is upper case "N". This axis is usually part of a
@@ -345,7 +345,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     
     /**
      * Default axis info for Southing values in a
-     * {@linkplain org.geotools.referencing.crs.ProjectedCRS projected CRS}.
+     * {@linkplain org.geotools.referencing.crs.DefaultProjectedCRS projected CRS}.
      * Increasing ordinates values go {@linkplain AxisDirection#SOUTH South}
      * and units are {@linkplain SI#METER metres}.
      * The abbreviation is upper case "S".
@@ -541,7 +541,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * geodetic datum is used, the precise directions of the axes may therefore vary slightly
      * from this approximate direction.</P>
      *
-     * <P>Note that an {@link org.geotools.referencing.crs.EngineeringCRS} often requires
+     * <P>Note that an {@link org.geotools.referencing.crs.DefaultEngineeringCRS} often requires
      * specific descriptions of the directions of its coordinate system axes.</P>
      */
     public AxisDirection getDirection() {

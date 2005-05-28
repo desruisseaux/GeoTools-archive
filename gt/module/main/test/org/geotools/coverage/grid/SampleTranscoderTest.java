@@ -44,7 +44,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CategoryListTest;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 
 
@@ -151,7 +151,7 @@ public class SampleTranscoderTest extends TestCase {
         }
         final MathTransform identity = IdentityTransform.create(2);
         GridCoverage2D coverage;
-        coverage = new GridCoverage2D("Test", source, GeographicCRS.WGS84, identity,
+        coverage = new GridCoverage2D("Test", source, DefaultGeographicCRS.WGS84, identity,
                                       new GridSampleDimension[]{band}, null, null);
         /*
          * Apply the operation. The SampleTranscoder class is suppose to transform our
@@ -175,7 +175,7 @@ public class SampleTranscoderTest extends TestCase {
          * Compare the resulting values with the original data.
          */
         RenderedImage back = PlanarImage.wrapRenderedImage(target).getAsBufferedImage();
-        coverage = new GridCoverage2D("Test", back, GeographicCRS.WGS84, identity,
+        coverage = new GridCoverage2D("Test", back, DefaultGeographicCRS.WGS84, identity,
                                     new GridSampleDimension[]{band.geophysics(true)}, null, null);
 
         back = coverage.geophysics(false).getRenderedImage();

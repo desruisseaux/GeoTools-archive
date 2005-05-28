@@ -28,13 +28,14 @@ import java.util.Map;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
-
 /**
  * A coordinate reference system describing the position of points through two or more
  * independent coordinate reference systems.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Renamed as {@link DefaultCompoundCRS}.
  */
 public class CompoundCRS extends DefaultCompoundCRS {
     /**

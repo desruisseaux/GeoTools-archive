@@ -49,7 +49,7 @@ import org.opengis.referencing.operation.OperationMethod;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.referencing.crs.ProjectedCRS
+ * @see org.geotools.referencing.crs.DefaultProjectedCRS
  * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>
  */
 public class Projection extends Conversion implements org.opengis.referencing.operation.Projection {

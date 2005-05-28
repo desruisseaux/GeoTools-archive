@@ -43,7 +43,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.crs.AbstractCRS;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
@@ -273,8 +273,8 @@ public class BasicTest extends TestCase {
      */
     public void testCoordinateReferenceSystems() {
         // Test dimensions
-        assertEquals("WGS84 2D", 2, GeographicCRS.WGS84   .getCoordinateSystem().getDimension());
-        assertEquals("WGS84 3D", 3, GeographicCRS.WGS84_3D.getCoordinateSystem().getDimension());
+        assertEquals("WGS84 2D", 2, DefaultGeographicCRS.WGS84   .getCoordinateSystem().getDimension());
+        assertEquals("WGS84 3D", 3, DefaultGeographicCRS.WGS84_3D.getCoordinateSystem().getDimension());
 
         // Test WKT
         assertEquals("WGS84", "GEOGCS[\"WGS84\", " +
@@ -284,7 +284,7 @@ public class BasicTest extends TestCase {
                                 "UNIT[\"degree\", 0.017453292519943295], "+
                                 "AXIS[\"Geodetic longitude\", EAST], "+
                                 "AXIS[\"Geodetic latitude\", NORTH]]",
-                     GeographicCRS.WGS84.toWKT(0));
+                     DefaultGeographicCRS.WGS84.toWKT(0));
     }
 
     /**

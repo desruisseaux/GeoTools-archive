@@ -55,7 +55,7 @@ import org.opengis.cs.CS_LocalDatum;
  *
  * @see org.opengis.cs.CS_LocalCoordinateSystem
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.EngineeringCRS}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultEngineeringCRS}.
  */
 public class LocalCoordinateSystem extends CoordinateSystem {
     /**
@@ -203,7 +203,7 @@ public class LocalCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_LocalCoordinateSystem#getLocalDatum()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.EngineeringCRS#getDatum}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultEngineeringCRS#getDatum}.
      */
     public LocalDatum getLocalDatum() {
         return datum;

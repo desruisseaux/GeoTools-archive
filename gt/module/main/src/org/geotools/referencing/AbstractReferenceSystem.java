@@ -40,7 +40,7 @@ import org.geotools.resources.Utilities;
  * <p>
  * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
  * instantiate it. Typical applications should create instances of the most specific subclass with
- * {@link Default} prefix instead. An exception to this rule may occurs when it is not possible to
+ * {@code Default} prefix instead. An exception to this rule may occurs when it is not possible to
  * identify the exact type.
  *
  * @version $Id$

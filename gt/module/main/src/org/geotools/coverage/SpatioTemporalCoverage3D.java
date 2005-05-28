@@ -53,8 +53,8 @@ import org.geotools.factory.Hints;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.GeographicCRS;
-import org.geotools.referencing.crs.TemporalCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -105,10 +105,10 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
     private final Coverage coverage;
 
     /**
-     * The temporal coordinate system, as a Geotools implementation in order to gets
-     * the {@link TemporalCRS#toDate} and {@link TemporalCRS#toValue} methods.
+     * The temporal coordinate system, as a Geotools implementation in order to gets the
+     * {@link DefaultTemporalCRS#toDate} and {@link DefaultTemporalCRS#toValue} methods.
      */
-    private final TemporalCRS temporalCRS;
+    private final DefaultTemporalCRS temporalCRS;
 
     /**
      * The dimension of the temporal coordinate system.
@@ -136,7 +136,7 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
     /**
      * Constructs a new coverage. The coordinate reference system will be the same than the
      * wrapped coverage, which must be three dimensional. This CRS must have a
-     * {@link org.opengis.referencing.crs.TemporalCRS temporal} component.
+     * {@linkplain DefaultTemporalCRS temporal} component.
      *
      * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.
      * @param coverage The source coverage.
@@ -163,7 +163,7 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
             this.boundingBox       = source.boundingBox;
         } else {
             this.coverage = coverage;
-            temporalCRS = TemporalCRS.wrap(CRSUtilities.getTemporalCRS(crs));
+            temporalCRS = DefaultTemporalCRS.wrap(CRSUtilities.getTemporalCRS(crs));
             if (temporalCRS == null) {
                 throw new IllegalArgumentException( // TODO: localize
                         /*Resources.format(ResourceKeys.ERROR_BAD_COORDINATE_SYSTEM)*/);
@@ -223,7 +223,7 @@ control:    for (int p=0; p<=1; p++) {
 
     /**
      * Returns the {@linkplain #getEnvelope envelope} geographic bounding box.
-     * The bounding box coordinates uses the {@linkplain GeographicCRS#WGS84 WGS84} CRS.
+     * The bounding box coordinates uses the {@linkplain DefaultGeographicCRS#WGS84 WGS84} CRS.
      *
      * @return The geographic bounding box.
      * @throws TransformException if the envelope can't be transformed.
@@ -237,7 +237,7 @@ control:    for (int p=0; p<=1; p++) {
                     envelope.getMaximum(xDimension),
                     envelope.getMaximum(yDimension));
             final CoordinateReferenceSystem sourceCRS = CRSUtilities.getHorizontalCRS(crs);
-            final CoordinateReferenceSystem targetCRS = GeographicCRS.WGS84;
+            final CoordinateReferenceSystem targetCRS = DefaultGeographicCRS.WGS84;
             if (!CRSUtilities.equalsIgnoreMetadata(targetCRS, sourceCRS)) {
                 final CoordinateOperation      transform;
                 final CoordinateOperationFactory factory;

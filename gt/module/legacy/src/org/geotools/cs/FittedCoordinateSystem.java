@@ -46,7 +46,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *
  * @see org.opengis.cs.CS_FittedCoordinateSystem
  *
- * @deprecated Replaced by {@link org.opengis.referencing.crs.DerivedCRS}.
+ * @deprecated Replaced by {@link org.opengis.referencing.crs.DefaultDerivedCRS}.
  */
 public class FittedCoordinateSystem extends CoordinateSystem {
     /**
@@ -131,7 +131,7 @@ public class FittedCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_FittedCoordinateSystem#getBaseCoordinateSystem()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.DerivedCRS#getBaseCRS}.
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultDerivedCRS#getBaseCRS}.
      */
     public CoordinateSystem getBaseCoordinateSystem() {
         return base;
@@ -147,7 +147,7 @@ public class FittedCoordinateSystem extends CoordinateSystem {
      *
      * @see org.opengis.cs.CS_FittedCoordinateSystem#getToBase()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.crs.DerivedCRS#getConversionFromBase},
+     * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultDerivedCRS#getConversionFromBase},
      *             except that the transform needs to be inverted.
      */
     public MathTransform getToBase() {

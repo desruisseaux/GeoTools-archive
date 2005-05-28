@@ -46,10 +46,10 @@ import org.geotools.measure.Measure;
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
  * <TR><TD>
- *   {@link org.geotools.referencing.crs.GeocentricCRS  Geocentric},
- *   {@link org.geotools.referencing.crs.ProjectedCRS   Projected},
- *   {@link org.geotools.referencing.crs.EngineeringCRS Engineering},
- *   {@link org.geotools.referencing.crs.ImageCRS       Image}
+ *   {@link org.geotools.referencing.crs.DefaultGeocentricCRS  Geocentric},
+ *   {@link org.geotools.referencing.crs.DefaultProjectedCRS   Projected},
+ *   {@link org.geotools.referencing.crs.DefaultEngineeringCRS Engineering},
+ *   {@link org.geotools.referencing.crs.DefaultImageCRS       Image}
  * </TD></TR></TABLE>
  *
  * @version $Id$

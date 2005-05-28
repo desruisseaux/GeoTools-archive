@@ -36,7 +36,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.referencing.crs.GeographicCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /*
@@ -411,7 +411,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
                 if("GEO".equalsIgnoreCase(dataType)){
                     String geoDatumCode = String.valueOf(grt.getAttribute("geo_datum_code"));
                     if ("WGE".equalsIgnoreCase(geoDatumCode)){
-                        crs = GeographicCRS.WGS84;
+                        crs = DefaultGeographicCRS.WGS84;
                     }
                 }
             } catch(Exception ex){

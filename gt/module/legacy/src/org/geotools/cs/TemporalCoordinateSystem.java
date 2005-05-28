@@ -36,7 +36,7 @@ import org.geotools.units.Unit;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.TemporalCRS}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultTemporalCRS}.
  */
 public class TemporalCoordinateSystem extends CoordinateSystem {
     /**

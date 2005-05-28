@@ -54,7 +54,7 @@ import org.opengis.cs.CS_WGS84ConversionInfo;
  *
  * @see org.opengis.cs.CS_GeographicCoordinateSystem
  *
- * @deprecated Replaced by {@link org.geotools.referencing.crs.GeographicCRS}.
+ * @deprecated Replaced by {@link org.geotools.referencing.crs.DefaultGeographicCRS}.
  */
 public class GeographicCoordinateSystem extends HorizontalCoordinateSystem {
     /**
