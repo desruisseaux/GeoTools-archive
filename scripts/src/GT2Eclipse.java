@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -397,7 +398,13 @@ public class GT2Eclipse {
 		classpath.println("<classpath>");
 		String target;
 
-		Set targets = targets(dir);
+		Set targets = new HashSet();
+		try { // parse the buildResults.txt
+			targets.addAll( targets(dir) );
+		}
+		catch( Throwable t ){
+			System.out.println("Could not parse your buildReport.txt file!");
+		}
 		for (int t = 1; t < args.length; t++) {
 		    targets.add(args[t]);
 		}
