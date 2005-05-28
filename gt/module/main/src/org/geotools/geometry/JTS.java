@@ -81,6 +81,68 @@ public class JTS {
 
     /**
      * Transforms the Envelope using the MathTransform.
+     * The envelope is densified (extra points put around the outside edge) to provide 
+     * a 'better' new envelope for high deformed situations.
+     * 
+     * 
+     * @param envelope the envelope to transform
+     * @param transform the transformation to use
+     * @param npoints decification of each side of the rectange.
+     * @return a new Envelope
+     * @throws TransformException 
+     */
+    public static Envelope transform(Envelope envelope, MathTransform transform,int npoints) 
+    throws TransformException 
+	{          
+        npoints +=2;// for the corners.
+        
+        double[] coordsEnvPoly = new double[ (4*npoints)*2];
+        double[] newCoords = new double[ (4*npoints)*2];
+        
+        int offset=0;
+        for (int t=0;t<npoints;t++)
+        {
+        		//left side
+        	coordsEnvPoly[offset]  = envelope.getMinX();
+        	coordsEnvPoly[offset+1]  = envelope.getMinY() + (envelope.getMaxY()-envelope.getMinY() )/(npoints-1)*(t);
+ 
+        		//right side
+          	coordsEnvPoly[offset+2]  = envelope.getMaxX();
+        	coordsEnvPoly[offset+3]  = envelope.getMinY() + (envelope.getMaxY()-envelope.getMinY() )/(npoints-1)*(t);
+
+        	offset+=4;
+        }
+        
+        for (int t=0;t<npoints;t++)
+        {
+        		//bottom side
+         	coordsEnvPoly[offset]  = envelope.getMinX() + (envelope.getMaxX()-envelope.getMinX() )/(npoints-1)*(t);
+          	coordsEnvPoly[offset+1]  = envelope.getMinY();
+          	 
+      		//top side
+         	coordsEnvPoly[offset+2]  = envelope.getMinX() + (envelope.getMaxX()-envelope.getMinX() )/(npoints-1)*(t);
+          	coordsEnvPoly[offset+3]  = envelope.getMaxY();
+ 
+        	offset+=4;
+        }
+        
+        
+        transform.transform(coordsEnvPoly, 0, newCoords, 0, npoints*4);
+        
+        // now find the min/max of the result
+        Envelope result = new Envelope();
+   
+        for (int t=0;t<npoints*4;t++)
+        {
+        	result.expandToInclude( newCoords[t*2],newCoords[t*2+1]);
+        }
+        
+        return result;
+    }
+
+    
+    /**
+     * Transforms the Envelope using the MathTransform.
      * @param envelope the envelope to transform
      * @param transform the transformation to use
      * @return a new Envelope
