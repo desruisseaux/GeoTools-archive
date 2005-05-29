@@ -5,12 +5,12 @@
     <TITLE>package org.geotools.referencing.operation</TITLE>
   </HEAD>
   <BODY>
-  {@linkplain org.geotools.referencing.operation.CoordinateOperation Coordinate operation} implementation.
+  {@linkplain org.geotools.referencing.operation.AbstractCoordinateOperation Coordinate operation} implementation.
   An explanation for this package is provided in the {@linkplain org.opengis.referencing.operation OpenGIS&reg; javadoc}.
   The remaining discussion on this page is specific to the Geotools implementation.
   
   <H3>How to know the available {@linkplain org.opengis.referencing.operation.MathTransform math transforms}</H3>
-  <P ALIGN="justify">The {@linkplain org.geotools.referencing.operation.MathTransformFactory math transform factory}
+  <P ALIGN="justify">The {@linkplain org.geotools.referencing.operation.DefaultMathTransformFactory math transform factory}
   search for all math transforms in the class path, not just Geotools implementations. To be found, math transforms
   must be registered as services in its JAR file, more specifically in the following JAR entry:</P>
   
@@ -18,12 +18,12 @@
   <CODE>META-INF/services/org.geotools.referencing.operation.MathTransformProvider</CODE>
   </BLOCKQUOTE>
   
-  <P ALIGN="justify">{@link org.geotools.referencing.operation.MathTransformFactory}
+  <P ALIGN="justify">{@link org.geotools.referencing.operation.DefaultMathTransformFactory}
   can be run from the command line in order to gets the list of all registered math
   transform, as in the example below:</P>
   
   <BLOCKQUOTE>
-  <CODE>java org.geotools.referencing.operation.MathTransformFactory</CODE>
+  <CODE>java org.geotools.referencing.operation.DefaultMathTransformFactory</CODE>
   </BLOCKQUOTE>
 
   <P ALIGN="justify">This will print a table with the name of all math transforms.
@@ -32,7 +32,7 @@
   arguments expected by the "Mercator 1SP" map projection:</P>
   
   <BLOCKQUOTE>
-  <CODE>java org.geotools.referencing.operation.MathTransformFactory Mercator_1SP</CODE>
+  <CODE>java org.geotools.referencing.operation.DefaultMathTransformFactory Mercator_1SP</CODE>
   </BLOCKQUOTE>
 
   <P ALIGN="justify">Note that instead of the <CODE>"Mercator_1SP"</CODE> argument,

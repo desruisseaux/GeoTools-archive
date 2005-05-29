@@ -26,29 +26,29 @@ package org.geotools.parameter;
 import java.io.IOException;
 import java.io.Serializable;
 
+// OpenGIS dependencies
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+
+// Geotools dependencies
 import org.geotools.io.TableWriter;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
 
 
 /**
  * Abstract parameter value or group of parameter values.
- * <p>
- * This maps directly to opengis GeneralParameterValue, the name is changed to protect
- * developers from confusing the two.
- * </p>
+ *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.AbstractParameterDescriptor
+ * @see AbstractParameterDescriptor
  */
 public abstract class AbstractParameter extends Formattable
-           implements org.opengis.parameter.GeneralParameterValue, Serializable
+           implements GeneralParameterValue, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
@@ -61,7 +61,7 @@ public abstract class AbstractParameter extends Formattable
     final GeneralParameterDescriptor descriptor;
 
     /**
-     * Construct a parameter value from the specified descriptor.
+     * Constructs a parameter value from the specified descriptor.
      *
      * @param descriptor The abstract definition of this parameter or group of parameters.
      */

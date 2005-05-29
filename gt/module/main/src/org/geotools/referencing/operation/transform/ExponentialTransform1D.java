@@ -35,7 +35,8 @@ import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.parameter.ParameterReal;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.FloatParameter;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
@@ -63,7 +64,7 @@ import org.geotools.resources.cts.Resources;
  * @see LinearTransform1D
  */
 public class ExponentialTransform1D extends AbstractMathTransform
-                                implements MathTransform1D, Serializable
+                                 implements MathTransform1D, Serializable
 {
     /**
      * Serial number for interoperability with different versions.
@@ -148,8 +149,8 @@ public class ExponentialTransform1D extends AbstractMathTransform
     public ParameterValueGroup getParameterValues() {
         return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
             new ParameterValue[] {
-            new ParameterReal(Provider.BASE,  base),
-            new ParameterReal(Provider.SCALE, scale)});
+            new FloatParameter(Provider.BASE,  base),
+            new FloatParameter(Provider.SCALE, scale)});
     }
     
     /**
@@ -340,7 +341,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
          * The operation parameter descriptor for the {@link #scale scale} parameter value.
          * Valid values range is unrestricted. The default value is 1.
          */
-        public static final ParameterDescriptor SCALE = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor SCALE = new DefaultParameterDescriptor(
                 "scale", 1, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**

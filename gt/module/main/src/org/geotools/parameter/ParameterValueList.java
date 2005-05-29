@@ -66,13 +66,12 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
     private final List/*<GeneralParameterValue>*/ values;
 
     /**
-     * Construct a parameter list.
+     * Constructs a parameter list.
      *
      * @param descriptor The descriptor for this list.
      * @param values The parameter values for this list.
      */
-    public ParameterValueList(final ParameterDescriptorGroup descriptor, final List values)
-    {
+    public ParameterValueList(final ParameterDescriptorGroup descriptor, final List values) {
         this.descriptor = descriptor;
         this.values     = values;
     }
@@ -103,10 +102,9 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
 
     /**
      * Adds a {@linkplain ParameterValue parameter value} or an other
-     * {@linkplain org.opengis.parameter.ParameterGroup parameter group}
-     * to this group. If an existing parameter is already included for
-     * the same {@linkplain ParameterDescriptor#getName identifier}, then
-     * there is a choice:
+     * {@linkplain ParameterGroup parameter group} to this group. If an existing parameter
+     * is already included for the same {@linkplain ParameterDescriptor#getName identifier},
+     * then there is a choice:
      * <UL>
      *   <LI>For <code>{@linkplain GeneralParameterDescriptor#getMaximumOccurs maximumOccurs}
      *       == 1</code>, the new parameter will replace the existing parameter.</LI>

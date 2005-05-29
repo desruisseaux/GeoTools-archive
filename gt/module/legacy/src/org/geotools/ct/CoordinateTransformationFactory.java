@@ -76,7 +76,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
  *
  * @see org.opengis.ct.CT_CoordinateTransformationFactory
  *
- * @deprecated Replaced by org.geotools.referencing.operation.CoordinateOperationFactory
+ * @deprecated Replaced by org.geotools.referencing.operation.DefaultCoordinateOperationFactory
  */
 public class CoordinateTransformationFactory {
     /**

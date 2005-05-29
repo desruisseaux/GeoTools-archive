@@ -41,7 +41,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.operation.MathTransformFactory;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -90,7 +89,7 @@ public class Mercator extends MapProjection {
      * The {@link MathTransformProvider} for a {@link Mercator} 1SP projection.
      *
      * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -150,7 +149,7 @@ public class Mercator extends MapProjection {
      * The {@link MathTransformProvider} for a {@link Mercator} 2SP projection.
      *
      * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
-     * @see MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux

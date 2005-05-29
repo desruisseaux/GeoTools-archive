@@ -33,42 +33,9 @@ import org.opengis.referencing.operation.OperationMethod;
 
 
 /**
- * A {@linkplain org.geotools.referencing.operation.Conversion conversion} transforming
- * (<var>longitude</var>,<var>latitude</var>) coordinates to cartesian coordinates
- * (<var>x</var>,<var>y</var>).
- *
- * <P>An unofficial list of projections and their parameters can
- * be found <A HREF="http://www.remotesensing.org/geotiff/proj_list/">there</A>.
- * Most projections expect the following parameters:
- *  <code>"central_meridian"</code> (default to 0),
- *  <code>"latitude_of_origin"</code> (default to 0),
- *  <code>"scale_factor"</code> (default to 1),
- *  <code>"false_easting"</code> (default to 0) and
- *  <code>"false_northing"</code> (default to 0).</P>
- *
- * @version $Id$
- * @author Martin Desruisseaux
- *
- * @see org.geotools.referencing.crs.DefaultProjectedCRS
- * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>
+ * @deprecated Renamed as {@link DefaultProjection}.
  */
-public class Projection extends Conversion implements org.opengis.referencing.operation.Projection {
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = -7176751851369816864L;
-
-    /**
-     * Constructs a new projection with the same values than the specified one, together with the
-     * specified source and target CRS. While the source conversion can be an arbitrary one, it is
-     * typically a {@linkplain DefiningConversion defining conversion}.
-     *
-     * @param conversion The defining conversion.
-     * @param sourceCRS The source CRS.
-     * @param targetCRS The target CRS.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
-     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
-     */
+public class Projection extends DefaultProjection {
     public Projection(final org.opengis.referencing.operation.Conversion conversion,
                       final CoordinateReferenceSystem sourceCRS,
                       final CoordinateReferenceSystem targetCRS,
@@ -77,18 +44,6 @@ public class Projection extends Conversion implements org.opengis.referencing.op
         super(conversion, sourceCRS, targetCRS, transform);
     }
 
-    /**
-     * Constructs a projection from a set of properties. The properties given in argument
-     * follow the same rules than for the {@link CoordinateOperation} constructor.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
-     *                  reference system} to positions in the {@linkplain #getTargetCRS target
-     *                  coordinate reference system}.
-     * @param method    The operation method.
-     */
     public Projection(final Map                       properties,
                       final CoordinateReferenceSystem sourceCRS,
                       final CoordinateReferenceSystem targetCRS,

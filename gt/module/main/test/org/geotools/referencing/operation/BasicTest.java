@@ -31,6 +31,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
@@ -40,7 +41,8 @@ import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.datum.DefaultEllipsoid;
-import org.geotools.referencing.operation.OperationMethod;
+import org.geotools.referencing.operation.DefaultOperationMethod;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 
 
 /**
@@ -155,7 +157,7 @@ public class BasicTest extends TestCase {
      */
     public void testCreateLinearConversion() throws FactoryException {
         final double                     EPS = 1E-12;
-        final MathTransformFactory   factory = new MathTransformFactory();
+        final MathTransformFactory   factory = new DefaultMathTransformFactory();
         final ParameterValueGroup parameters = factory.getDefaultParameters("Mercator_1SP");
         DefaultProjectedCRS sourceCRS, targetCRS;
         MathTransform transform;
@@ -164,13 +166,13 @@ public class BasicTest extends TestCase {
         parameters.parameter("semi_major").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
         parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMinorAxis());
         transform = factory.createParameterizedTransform(parameters);
-        sourceCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+        sourceCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
                     DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
 
         parameters.parameter("false_easting" ).setValue(1000);
         parameters.parameter("false_northing").setValue(2000);
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+        targetCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
                     DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
 
         conversion = DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
@@ -182,7 +184,7 @@ public class BasicTest extends TestCase {
 
         parameters.parameter("scale_factor").setValue(2);
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+        targetCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
                     DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
 
         conversion = DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
@@ -194,7 +196,7 @@ public class BasicTest extends TestCase {
 
         parameters.parameter("semi_minor").setValue(DefaultEllipsoid.WGS84.getSemiMajorAxis());
         transform = factory.createParameterizedTransform(parameters);
-        targetCRS = new DefaultProjectedCRS("source", new OperationMethod(transform),
+        targetCRS = new DefaultProjectedCRS("source", new DefaultOperationMethod(transform),
                     DefaultGeographicCRS.WGS84, transform, DefaultCartesianCS.PROJECTED);
         conversion = DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, EPS);
         assertNull(conversion);

@@ -60,7 +60,7 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @todo This class is specific to Geotools implementation; it is better to avoid it if
  *       you can. It could be generalized a bit if we perform the same operations on
- *       {@link org.opengis.referencing.Operation.CoordinateOperation} interfaces instead
+ *       {@link org.opengis.referencing.operation.CoordinateOperation} interfaces instead
  *       of math transforms. We should revisit this issue after grid coverage API has been
  *       revisited (since grid coverage is a user of this class).
  *

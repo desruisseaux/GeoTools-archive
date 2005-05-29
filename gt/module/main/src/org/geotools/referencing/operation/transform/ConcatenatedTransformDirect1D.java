@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Martin Desruisseaux
  */
 final class ConcatenatedTransformDirect1D extends ConcatenatedTransformDirect
-                                          implements MathTransform1D
+                                       implements MathTransform1D
 {
     /**
      * Serial number for interoperability with different versions.

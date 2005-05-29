@@ -56,6 +56,7 @@ import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.Arguments;
@@ -952,16 +953,14 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
          * The operation parameter descriptor for the "Latitude_difference_file" 
          * parameter value. The default value is "conus.las".
          */
-        public static final ParameterDescriptor LAT_DIFF_FILE 
-            = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor LAT_DIFF_FILE = new DefaultParameterDescriptor(
                 "Latitude_difference_file", String.class, null, "conus.las");
         
         /**
          * The operation parameter descriptor for the "Longitude_difference_file" 
          * parameter value. The default value is "conus.los".
          */
-        public static final ParameterDescriptor LONG_DIFF_FILE 
-            = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor LONG_DIFF_FILE = new DefaultParameterDescriptor(
                 "Longitude_difference_file", String.class, null, "conus.los");
 
         /**

@@ -188,7 +188,7 @@ public final class Hints extends RenderingHints {
      * no method is found applicable. It may be for example that no
      * {@linkplain org.geotools.referencing.datum.BursaWolfParameters Bursa Wolf parameters} were
      * found for a datum shift. The default value is {@link Boolean#FALSE FALSE}, which means that
-     * {@linkplain org.geotools.referencing.operation.CoordinateOperationFactory coordinate
+     * {@linkplain org.geotools.referencing.operation.DefaultCoordinateOperationFactory coordinate
      * operation factory} throws an exception if such a case occurs. If this hint is set to
      * {@code TRUE}, then the user is strongly encouraged to check the
      * {@linkplain org.opengis.referencing.operation.CoordinateOperation#getPositionalAccuracy

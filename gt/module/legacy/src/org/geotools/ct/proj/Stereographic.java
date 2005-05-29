@@ -140,7 +140,6 @@ import org.geotools.resources.cts.Resources;
  * @deprecated Replaced by {@link org.geotools.referencing.operation.projection.Stereographic}.
  */
 public abstract class Stereographic extends PlanarProjection {
-
     /**
      * Informations about a {@link Stereographic} projection. The {@link #create} method infer
      * the kind of projection ({@link PolarStereographic} or {@link ObliqueStereographic} from

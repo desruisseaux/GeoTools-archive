@@ -21,7 +21,7 @@ import java.net.URI;
 import javax.units.Unit;
 
 import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptor;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 
@@ -34,13 +34,13 @@ import org.opengis.parameter.InvalidParameterValueException;
  */
 public class WMSParameterValue extends Parameter {
     private Object value;
-    private ParameterDescriptor descriptor;
+    private DefaultParameterDescriptor descriptor;
 
     /**
      * @param value
      * @param descriptor
      */
-    public WMSParameterValue(Object value, ParameterDescriptor descriptor) {
+    public WMSParameterValue(Object value, DefaultParameterDescriptor descriptor) {
         super(descriptor);
         this.value = value;
         this.descriptor = descriptor;

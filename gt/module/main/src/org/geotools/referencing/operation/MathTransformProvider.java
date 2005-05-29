@@ -43,12 +43,15 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.Projection;
 import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.cts.ResourceKeys;
@@ -57,22 +60,23 @@ import org.geotools.referencing.wkt.Formatter;
 
 
 /**
- * An {@linkplain OperationMethod operation method} capable to creates a {@linkplain MathTransform
- * math transform} from set of {@linkplain GeneralParameterValue parameter values}.
+ * An {@linkplain DefaultOperationMethod operation method} capable to creates a
+ * {@linkplain MathTransform math transform} from set of
+ * {@linkplain GeneralParameterValue parameter values}.
  * Implementations of this class should be listed in the following file:
  *
  * <blockquote>
  * <P><code>META-INF/services/org.geotools.referencing.operation.OperationProvider</code></P>
  * </blockquote>
- *
- * <P>The {@linkplain MathTransformFactory math transform factory} will parse this file in order
+ * <P>
+ * The {@linkplain DefaultMathTransformFactory math transform factory} will parse this file in order
  * to gets all available providers on a system. If this file is bundle in many JAR files, the
- * {@link MathTransformFactory math transform factory} will read all of them.</P>
+ * {@linkplain DefaultCoordinateOperationFactory math transform factory} will read all of them.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class MathTransformProvider extends OperationMethod {
+public abstract class MathTransformProvider extends DefaultOperationMethod {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -97,7 +101,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     /**
      * Constructs a math transform provider from a set of properties.
      * The properties map is given unchanged to the
-     * {@linkplain OperationMethod#OperationMethod(Map,int,int,ParameterDescriptorGroup)
+     * {@linkplain DefaultOperationMethod#DefaultOperationMethod(Map,int,int,ParameterDescriptorGroup)
      * super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -163,8 +167,8 @@ public abstract class MathTransformProvider extends OperationMethod {
                                                           final double       maximum,
                                                           final Unit         unit)
     {
-        return new org.geotools.parameter.ParameterDescriptor(
-                toMap(identifiers), defaultValue, minimum, maximum, unit, true);
+        return new DefaultParameterDescriptor(toMap(identifiers), defaultValue,
+                                              minimum, maximum, unit, true);
     }
 
     /**
@@ -181,8 +185,8 @@ public abstract class MathTransformProvider extends OperationMethod {
                                                                   final double       maximum,
                                                                   final Unit         unit)
     {
-        return new org.geotools.parameter.ParameterDescriptor(
-                toMap(identifiers), Double.NaN, minimum, maximum, unit, false);
+        return new DefaultParameterDescriptor(toMap(identifiers), Double.NaN,
+                                              minimum, maximum, unit, false);
     }
 
     /**
@@ -201,7 +205,7 @@ public abstract class MathTransformProvider extends OperationMethod {
     protected static ParameterDescriptorGroup createDescriptorGroup(
                 final Identifier[] identifiers, final GeneralParameterDescriptor[] parameters)
     {
-        return new org.geotools.parameter.ParameterDescriptorGroup(toMap(identifiers), parameters);
+        return new DefaultParameterDescriptorGroup(toMap(identifiers), parameters);
     }
 
     /**
@@ -518,7 +522,7 @@ public abstract class MathTransformProvider extends OperationMethod {
      * <code>this</code>, which is appropriate for the vast majority of cases. An exception is
      * affine transform, which provides different methods for different matrix sizes.
      */
-    protected org.opengis.referencing.operation.OperationMethod getMethod(final MathTransform mt) {
+    protected OperationMethod getMethod(final MathTransform mt) {
         return this;
     }
     

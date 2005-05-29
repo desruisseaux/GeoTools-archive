@@ -24,8 +24,9 @@ import java.util.Map;
 
 import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterReal;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
+import org.geotools.parameter.FloatParameter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 
@@ -155,7 +156,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
     
     public ParameterDescriptorGroup getParameters(){
         Param params[] = getParametersInfo();
-        ParameterDescriptor parameters[] = new ParameterDescriptor[ params.length ];
+        DefaultParameterDescriptor parameters[] = new DefaultParameterDescriptor[ params.length ];
         for( int i=0; i<params.length; i++ ){
             Param param = params[i];
             parameters[i] = new ParamDescriptor( params[i] );
@@ -163,7 +164,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
         Map properties = new HashMap();
         properties.put( "name", getDisplayName() );
         properties.put( "remarks", getDescription() );
-        return new org.geotools.parameter.ParameterDescriptorGroup(properties, parameters);
+        return new DefaultParameterDescriptorGroup(properties, parameters);
     }
 
     /**
@@ -174,7 +175,7 @@ public abstract class AbstractDataStoreFactory implements DataStoreFactorySpi {
     }
 }
 
-class ParamDescriptor extends ParameterDescriptor {
+class ParamDescriptor extends DefaultParameterDescriptor {
     private static final long serialVersionUID = 1L;
     Param param;
     public ParamDescriptor(Param param) {
@@ -183,7 +184,7 @@ class ParamDescriptor extends ParameterDescriptor {
     }
     public GeneralParameterValue createValue() {
         if (Double.TYPE.equals( getValueClass())) {
-            return new ParameterReal(this){
+            return new FloatParameter(this){
                 protected Object valueOf(String text) throws IOException {
                     return param.handle( text );
                 }

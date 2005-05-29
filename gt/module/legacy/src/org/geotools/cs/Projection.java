@@ -50,7 +50,7 @@ import org.opengis.cs.CS_ProjectionParameter;
  *
  * @see org.opengis.cs.CS_Projection
  *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.OperationMethod}.
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.DefaultOperationMethod}.
  */
 public class Projection extends Info {
     /**
@@ -204,7 +204,7 @@ public class Projection extends Info {
      * @see org.opengis.cs.CS_Projection#getNumParameters()
      * @see org.opengis.cs.CS_Projection#getParameter(int)
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.operation.Projection#getParameterValues}.
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.DefaultProjection#getParameterValues}.
      */
     public ParameterList getParameters() {
         return clone(parameters);

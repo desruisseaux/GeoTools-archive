@@ -40,6 +40,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;
@@ -77,7 +78,7 @@ import org.geotools.util.WeakHashSet;
  * @author Martin Desruisseaux
  */
 public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
-        implements org.opengis.referencing.operation.CoordinateOperationFactory
+                                                      implements CoordinateOperationFactory
 {
     /**
      * The identifier for an identity operation.
@@ -277,11 +278,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
         if (name==DATUM_SHIFT || name==ELLIPSOID_SHIFT) {
             properties = new HashMap(4);
             properties.put(NAME_PROPERTY, name);
-            properties.put(
-                  org.geotools.referencing.operation.CoordinateOperation.OPERATION_VERSION_PROPERTY,
-                  "(unknow)");
-            properties.put(
-                  org.geotools.referencing.operation.CoordinateOperation.POSITIONAL_ACCURACY_PROPERTY,
+            properties.put(AbstractCoordinateOperation.OPERATION_VERSION_PROPERTY, "(unknow)");
+            properties.put(AbstractCoordinateOperation.POSITIONAL_ACCURACY_PROPERTY,
                   new org.opengis.metadata.quality.PositionalAccuracy[] {
                       name==DATUM_SHIFT ? PositionalAccuracyImpl.DATUM_SHIFT_APPLIED
                                         : PositionalAccuracyImpl.DATUM_SHIFT_OMITTED});
@@ -314,7 +312,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     {
         final MathTransform transform = mtFactory.createAffineTransform(matrix);
         final Map properties = getProperties(name);
-        final Class type = properties.containsKey(org.geotools.referencing.operation.CoordinateOperation.POSITIONAL_ACCURACY_PROPERTY)
+        final Class type = properties.containsKey(AbstractCoordinateOperation.POSITIONAL_ACCURACY_PROPERTY)
                            ? Transformation.class : Conversion.class;
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
                 ProjectiveTransform.Provider.getMethod(transform.getSourceDimensions(),
@@ -410,8 +408,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                 }
             }
         }
-        operation = org.geotools.referencing.operation.Operation.create(properties,
-                    sourceCRS, targetCRS, transform, method, type);
+        operation = DefaultOperation.create(properties, sourceCRS, targetCRS, transform, method, type);
         operation = (CoordinateOperation) pool.canonicalize(operation);
         return operation;
     }
@@ -429,8 +426,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
             throws FactoryException
     {
         CoordinateOperation operation;
-        operation = new org.geotools.referencing.operation.ConcatenatedOperation(
-                        properties, operations, mtFactory);
+        operation = new DefaultConcatenatedOperation(properties, operations, mtFactory);
         operation = (CoordinateOperation) pool.canonicalize(operation);
         return operation;
     }

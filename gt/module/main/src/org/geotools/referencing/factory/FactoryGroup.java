@@ -68,6 +68,7 @@ import org.geotools.parameter.Parameters;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
@@ -227,9 +228,9 @@ public class FactoryGroup {
             return mtFactory.createParameterizedTransform(parameters);
         }
         final MathTransform transform;
-        if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
+        if (mtFactory instanceof DefaultMathTransformFactory) {
             // Special processing for Geotools implementation.
-            transform = ((org.geotools.referencing.operation.MathTransformFactory) mtFactory)
+            transform = ((DefaultMathTransformFactory) mtFactory)
                         .createParameterizedTransform(parameters, methods);
         } else {
             // Not a geotools implementation. Try to guess the method.

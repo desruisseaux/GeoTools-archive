@@ -39,7 +39,7 @@ import org.geotools.referencing.operation.GeneralMatrix;
  * @author Martin Desruisseaux
  */
 final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
-                                          implements MathTransform2D
+                                       implements MathTransform2D
 {
     /**
      * Serial number for interoperability with different versions.

@@ -86,7 +86,8 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
      * CoordinateReferenceSystem, MathTransform, CoordinateSystem) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
-     *         the underlying {@linkplain org.geotools.referencing.operation.Conversion conversion}.
+     *         the underlying {@linkplain org.geotools.referencing.operation.DefaultConversion
+     *         conversion}.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
      *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.

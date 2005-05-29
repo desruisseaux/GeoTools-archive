@@ -23,7 +23,6 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import org.geotools.referencing.operation.CoordinateOperationFactory;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;

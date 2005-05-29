@@ -23,11 +23,12 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
-import java.io.Serializable;
 import java.util.Map;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -38,17 +39,14 @@ import org.geotools.resources.rsc.Resources;
 
 /**
  * Abstract definition of a parameter or group of parameters used by an operation method.
- * <p>
- * This class maps directly to opengis GeneralParameterDescriptor - the name
- * has changed to prevent confusion.
- * </p>
+ *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see org.geotools.parameter.AbstractParameter
+ * @see AbstractParameter
  */
 public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObject
-        implements org.opengis.parameter.GeneralParameterDescriptor, Serializable
+           implements GeneralParameterDescriptor
 {
     /**
      * Serial number for interoperability with different versions.
@@ -62,7 +60,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
     private final int minimumOccurs;
 
     /**
-     * Construct a parameter from a set of properties. The properties map is given unchanged to the
+     * Constructs a parameter from a set of properties. The properties map is given unchanged to the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
@@ -86,20 +84,17 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
     }
 
     /**
-     * Creates a new instance of
-     * {@linkplain org.geotools.parameter.AbstractParameter parameter value or group}
-     * initialized with the
-     * {@linkplain org.geotools.parameter.ParameterDescriptor#getDefaultValue default value(s)}.
-     * The {@linkplain org.geotools.parameter.AbstractParameter#getDescriptor parameter value
-     * descriptor} for the created parameter value(s) will be <code>this</code> object.
+     * Creates a new instance of {@linkplain AbstractParameter parameter value or group} initialized
+     * with the {@linkplain DefaultParameterDescriptor#getDefaultValue default value(s)}.
+     * The {@linkplain AbstractParameter#getDescriptor parameter value descriptor} for the
+     * created parameter value(s) will be <code>this</code> object.
      * <p>
      * Example implementation:
      * <pre>
-     * <b>return</b> new {@link Parameter}(this);
+     * <b>return</b> new {@linkplain Parameter}(this);
      * </pre>
-     * </p>
      */
-    public abstract org.opengis.parameter.GeneralParameterValue createValue();
+    public abstract GeneralParameterValue createValue();
     
     /**
      * The minimum number of times that values for this parameter group or
@@ -113,9 +108,9 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
     }
 
     /**
-     * The maximum number of times that values for this parameter group or
-     * parameter can be included. For a {@linkplain ParameterDescriptor single parameter},
-     * the value is always 1. For a {@linkplain ParameterDescriptorGroup parameter group},
+     * The maximum number of times that values for this parameter group or parameter
+     * can be included. For a {@linkplain DefaultParameterDescriptor single parameter},
+     * the value is always 1. For a {@linkplain DefaultParameterDescriptorGroup parameter group},
      * it may vary.
      *
      * @see #getMinimumOccurs

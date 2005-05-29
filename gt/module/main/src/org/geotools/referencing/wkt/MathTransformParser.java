@@ -39,6 +39,7 @@ import org.opengis.referencing.operation.OperationMethod;
 // Geotools dependencies
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 import org.geotools.util.Singleton;
@@ -201,8 +202,8 @@ public class MathTransformParser extends AbstractParser {
          * search for the operation method later if the user ask for it.
          */
         try {
-            if (mtFactory instanceof org.geotools.referencing.operation.MathTransformFactory) {
-                return ((org.geotools.referencing.operation.MathTransformFactory) mtFactory)
+            if (mtFactory instanceof DefaultMathTransformFactory) {
+                return ((DefaultMathTransformFactory) mtFactory)
                        .createParameterizedTransform(parameters, method);
             }
             return mtFactory.createParameterizedTransform(parameters);

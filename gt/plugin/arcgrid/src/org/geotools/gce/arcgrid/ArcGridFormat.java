@@ -18,8 +18,8 @@ package org.geotools.gce.arcgrid;
 
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.stream.IOExchange;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -42,19 +42,19 @@ import java.util.HashMap;
  *         (simboss)</a>
  */
 public class ArcGridFormat extends AbstractGridFormat implements Format {
-    public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
+    public static final DefaultParameterDescriptor CRS = new DefaultParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //calss of the object we will pass
             null, //list of valid values not provided
             getDefaultCRS() //default value
         );
 
     /** Indicates whether the arcgrid data is compressed with GZIP */
-    public static final ParameterDescriptor COMPRESS = new ParameterDescriptor("Compressed",
+    public static final DefaultParameterDescriptor COMPRESS = new DefaultParameterDescriptor("Compressed",
             "Indicates whether the arcgrid data is compressed with GZIP",
             Boolean.FALSE, true);
 
     /** Indicates whether the arcgrid is in GRASS format */
-    public static final ParameterDescriptor GRASS = new ParameterDescriptor("GRASS",
+    public static final DefaultParameterDescriptor GRASS = new DefaultParameterDescriptor("GRASS",
             "Indicates whether arcgrid is in GRASS format", Boolean.FALSE, true);
 
     /**
@@ -78,12 +78,11 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
         mInfo = info;
 
         //reading parameters
-        readParameters = new ParameterGroup(new ParameterDescriptorGroup(
-                    mInfo,
-                    new GeneralParameterDescriptor[] { GRASS, COMPRESS, CRS }));
+        readParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(
+                    mInfo, new GeneralParameterDescriptor[] { GRASS, COMPRESS, CRS }));
 
         //reading parameters
-        writeParameters = new ParameterGroup(new ParameterDescriptorGroup(
+        writeParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(
                     mInfo, new GeneralParameterDescriptor[] { GRASS, COMPRESS }));
     }
 

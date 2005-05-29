@@ -175,8 +175,8 @@ public class TransverseMercator extends MapProjection {
     /**
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link TransverseMercator} projection.
-     * 
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux

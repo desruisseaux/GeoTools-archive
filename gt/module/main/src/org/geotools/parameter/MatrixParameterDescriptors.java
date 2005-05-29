@@ -67,9 +67,9 @@ import org.geotools.resources.cts.Resources;
  * @version $Id: MatrixParameterDescriptors.java 7846 2004-09-08 21:34:06Z jgarnett $
  * @author Martin Desruisseaux
  *
- * @see MatrixParameterValues
+ * @see MatrixParameters
  */
-public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
+public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -90,7 +90,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
     /**
      * The cached descriptors for each elements in a matrix. Descriptors do not depends
      * on matrix element values. Concequently, the same descriptors can be reused for all
-     * {@link MatrixParameterValues} instances.
+     * {@link MatrixParameters} instances.
      */
     private final ParameterDescriptor[] parameters = new ParameterDescriptor[CACHE_SIZE*CACHE_SIZE];
 
@@ -115,7 +115,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
     protected final char separator;
 
     /**
-     * Construct a parameter group with default name format matching
+     * Constructs a parameter group with default name format matching
      * <cite><A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well
      * Known Text</A></cite> usages.
      *
@@ -130,13 +130,13 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
          *       elements.
          */
         this(properties, new ParameterDescriptor[] {
-            new org.geotools.parameter.ParameterDescriptor("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
-            new org.geotools.parameter.ParameterDescriptor("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
+            new DefaultParameterDescriptor("num_row", DEFAULT_MATRIX_SIZE, 2, 50),
+            new DefaultParameterDescriptor("num_col", DEFAULT_MATRIX_SIZE, 2, 50)
         }, "elt_", '_');
     }
 
     /**
-     * Construct a parameter group. The properties map is given unchanged to the
+     * Constructs a parameter group. The properties map is given unchanged to the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      * The <code>parameters</code> array should contains parameters <strong>other</strong>
      * than matrix elements. The first parameter is assumed to be the number of rows, and
@@ -196,9 +196,8 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
     public final GeneralParameterDescriptor descriptor(final String name)
             throws ParameterNotFoundException
     {
-        return descriptor(name,
-                          ((Number) numRow.getMaximumValue()).intValue(),
-                          ((Number) numCol.getMaximumValue()).intValue());
+        return descriptor(name, ((Number) numRow.getMaximumValue()).intValue(),
+                                ((Number) numCol.getMaximumValue()).intValue());
     }
 
     /**
@@ -258,9 +257,8 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
     public final ParameterDescriptor descriptor(final int row, final int column)
             throws IndexOutOfBoundsException
     {
-        return descriptor(row, column,
-                          ((Number) numRow.getMaximumValue()).intValue(),
-                          ((Number) numCol.getMaximumValue()).intValue());
+        return descriptor(row, column, ((Number) numRow.getMaximumValue()).intValue(),
+                                       ((Number) numCol.getMaximumValue()).intValue());
     }
 
     /**
@@ -294,7 +292,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
          * is no need to synchronize since it is not a big deal if the same parameter is
          * constructed twice.
          */
-        param = new org.geotools.parameter.ParameterDescriptor(
+        param = new DefaultParameterDescriptor(
                 Collections.singletonMap(NAME_PROPERTY, prefix + row + separator + column),
                 Double.TYPE, null, org.geotools.parameter.Parameter.wrap(row==column ? 1.0 : 0.0),
                 null, null, Unit.ONE, true);
@@ -334,7 +332,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
                 parameters[k++] = descriptor(j,i, numRow, numCol);
             }
         }
-        assert k==parameters.length : k;
+        assert k == parameters.length : k;
         return new UnmodifiableArrayList(parameters);
     }
 
@@ -348,17 +346,17 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
     }
 
     /**
-     * Creates a new instance of {@linkplain MatrixParameterValues parameter values} with
+     * Creates a new instance of {@linkplain MatrixParameters parameter values} with
      * elements initialized to the 1 on the diagonal, and 0 everywere else. The returned
      * parameter group is extensible, i.e. the number of elements will depends upon the
      * value associated to the {@link #numRow} and {@link #numCol numCol} parameters.
      */
     public GeneralParameterValue createValue() {
-        return new MatrixParameterValues(this);
+        return new MatrixParameters(this);
     }
 
     /**
-     * Construct a matrix from a group of parameters.
+     * Constructs a matrix from a group of parameters.
      *
      * @param  parameters The group of parameters.
      * @return A matrix constructed from the specified group of parameters.
@@ -367,9 +365,9 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
     public Matrix getMatrix(final ParameterValueGroup parameters)
             throws InvalidParameterNameException
     {
-        if (parameters instanceof MatrixParameterValues) {
+        if (parameters instanceof MatrixParameters) {
             // More efficient implementation
-            return ((MatrixParameterValues) parameters).getMatrix();
+            return ((MatrixParameters) parameters).getMatrix();
         }
         // Fallback on the general case (others implementations)
         final ParameterValue numRowParam = parameters.parameter(numRow.getName().toString());
@@ -410,7 +408,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
         }
         return matrix;
     }
-    
+
     /**
      * Compares the specified object with this parameter group for equality.
      *
@@ -427,7 +425,7 @@ public class MatrixParameterDescriptors extends ParameterDescriptorGroup {
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this parameter.
      *

@@ -50,6 +50,8 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operation2D;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.resources.image.ImageUtilities;
 
 
@@ -635,14 +637,14 @@ public final class Interpolator2D extends GridCoverage2D {
         /**
          * The parameter descriptor for the interpolation type.
          */
-        public static final ParameterDescriptor TYPE = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor TYPE = new DefaultParameterDescriptor(
                 "Type", Object.class, null, "NearestNeighbor");
 
         /**
          * Constructs an "Interpolate" operation.
          */
         public Operation() {
-            super(new org.geotools.parameter.ParameterDescriptorGroup("Interpolate",
+            super(new DefaultParameterDescriptorGroup("Interpolate",
                   new ParameterDescriptor[] {SOURCE_0, TYPE}));
         }
 

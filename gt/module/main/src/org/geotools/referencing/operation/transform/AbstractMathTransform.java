@@ -41,6 +41,7 @@ import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.Operation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -84,8 +85,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     /**
      * Gets the dimension of input points.
      *
-     * @deprecated Renamed {@link #getSourceDimensions} for consistency with
-     *             {@link org.geotools.referencing.operation.OperationMethod}.
+     * @deprecated Renamed {@link #getSourceDimensions} for consistency with {@link OperationMethod}.
      */
     public final int getDimSource() {
         return getSourceDimensions();
@@ -99,8 +99,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     /**
      * Gets the dimension of output points.
      *
-     * @deprecated Renamed {@link #getTargetDimensions} for consistency with
-     *             {@link org.geotools.referencing.operation.OperationMethod}.
+     * @deprecated Renamed {@link #getTargetDimensions} for consistency with {@link OperationMethod}.
      */
     public final int getDimTarget() {
         return getTargetDimensions();
@@ -112,31 +111,30 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     public abstract int getTargetDimensions();
 
     /**
-     * Returns the parameter descriptors for this math transform,
-     * or <code>null</code> if unknow. This method is similar to
-     * {@link org.opengis.referencing.operation.OperationMethod#getParameters}, except
-     * that <code>MathTransform</code> returns parameters in standard units (usually
+     * Returns the parameter descriptors for this math transform, or <code>null</code> if unknow.
+     * This method is similar to {@link OperationMethod#getParameters}, except that
+     * <code>MathTransform</code> returns parameters in standard units (usually
      * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}).
      *
      * @return The parameter descriptors for this math transform, or <code>null</code>.
      *
-     * @see org.opengis.referencing.operation.OperationMethod#getParameters
+     * @see OperationMethod#getParameters
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
         return null;
     }
 
     /**
-     * Returns the parameter values for this math transform, or <code>null</code> if unknow. This
-     * method is similar to {@link org.geotools.referencing.operation.Operation#getParameterValues},
-     * except that <code>MathTransform</code> returns parameters in standard units (usually
+     * Returns the parameter values for this math transform, or <code>null</code> if unknow.
+     * This method is similar to {@link Operation#getParameterValues}, except that
+     * <code>MathTransform</code> returns parameters in standard units (usually
      * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}). Since this
      * method returns a copy of the parameter values, any change to a value will have no effect
      * on this math transform.
      *
      * @return A copy of the parameter values for this math transform, or <code>null</code>.
      *
-     * @see org.geotools.referencing.operation.Operation#getParameterValues
+     * @see Operation#getParameterValues
      */
     public ParameterValueGroup getParameterValues() {
         return null;

@@ -48,16 +48,17 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.parameter.MatrixParameterDescriptors;
-import org.geotools.parameter.MatrixParameterValues;
+import org.geotools.parameter.MatrixParameters;
 import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -114,7 +115,7 @@ public class ParameterTest extends TestCase {
      */
     public void testRangeIntegers() {
         Parameter param;
-        param = new Parameter(new ParameterDescriptor("Range", 15, -30, +40));
+        param = new Parameter(new DefaultParameterDescriptor("Range", 15, -30, +40));
         assertEquals(   "intValue", 15, param.intValue());
         assertEquals("doubleValue", 15, param.doubleValue(), 0.0);
         param.setValue(12);
@@ -150,7 +151,7 @@ public class ParameterTest extends TestCase {
      */
     public void testRangeDoubles() {
         Parameter param;
-        param = new Parameter(new ParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
+        param = new Parameter(new DefaultParameterDescriptor("Range", 15.0, -30.0, +40.0, null));
         assertEquals(   "intValue", 15, param.intValue());
         assertEquals("doubleValue", 15, param.doubleValue(), 0.0);
         param.setValue(12.0);
@@ -214,13 +215,13 @@ public class ParameterTest extends TestCase {
     }
 
     /**
-     * Test {@link ParameterDescriptor} construction.
+     * Test {@link DefaultParameterDescriptor} construction.
      */
     public void testParameterDescriptor() {
         ParameterDescriptor descriptor;
         Parameter           parameter;
 
-        descriptor = new ParameterDescriptor("Test", 12, 4, 20, SI.METER);
+        descriptor = new DefaultParameterDescriptor("Test", 12, 4, 20, SI.METER);
         parameter  = (Parameter) descriptor.createValue();
         assertEquals("name",         "Test",          descriptor.getName().getCode());
         assertEquals("unit",         SI.METER,        descriptor.getUnit());
@@ -257,14 +258,14 @@ public class ParameterTest extends TestCase {
             assertEquals("value", i/100,              parameter.doubleValue(SI.METER), 0);
         }
         try {
-            descriptor = new ParameterDescriptor("Test", 3, 4, 20);
+            descriptor = new DefaultParameterDescriptor("Test", 3, 4, 20);
             fail("setValue(< min)");
         } catch (InvalidParameterValueException exception) {
             // This is the expected exception.
             assertEquals("Test", exception.getParameterName());
         }
         try {
-            descriptor = new ParameterDescriptor("Test", 12, 20, 4);
+            descriptor = new DefaultParameterDescriptor("Test", 12, 20, 4);
             fail("ParameterDescriptor(min > max)");
         } catch (IllegalArgumentException exception) {
             // This is the expected exception.
@@ -280,7 +281,7 @@ public class ParameterTest extends TestCase {
         Set                 validValues;
 
         parameter  = new Parameter("Test", 14);
-        descriptor = (ParameterDescriptor) parameter.getDescriptor();
+        descriptor = (ParameterDescriptor)            parameter.getDescriptor();
         assertNull  ("unit",                          parameter.getUnit());
         assertEquals("intValue",     14,              parameter.intValue());
         assertEquals("doubleValue",  14,              parameter.doubleValue(), 0);
@@ -356,10 +357,10 @@ public class ParameterTest extends TestCase {
     public void testGroup() {
         final Integer ONE = new Integer(1);
         final ParameterDescriptor p1, p2, p3, p4;
-        p1 = new ParameterDescriptor(Collections.singletonMap("name", "1"),  Integer.class, null, ONE, null, null, null, true);
-        p2 = new ParameterDescriptor(Collections.singletonMap("name", "2"),  Integer.class, null, ONE, null, null, null, true);
-        p3 = new ParameterDescriptor(Collections.singletonMap("name", "3"), Integer.class, null, ONE, null, null, null, false);
-        p4 = new ParameterDescriptor(Collections.singletonMap("name", "4"), Integer.class, null, ONE, null, null, null, false) {
+        p1 = new DefaultParameterDescriptor(Collections.singletonMap("name", "1"), Integer.class, null, ONE, null, null, null, true);
+        p2 = new DefaultParameterDescriptor(Collections.singletonMap("name", "2"), Integer.class, null, ONE, null, null, null, true);
+        p3 = new DefaultParameterDescriptor(Collections.singletonMap("name", "3"), Integer.class, null, ONE, null, null, null, false);
+        p4 = new DefaultParameterDescriptor(Collections.singletonMap("name", "4"), Integer.class, null, ONE, null, null, null, false) {
             /**
              * We are cheating here: <code>maximumOccurs</code> should always be 1 for
              * <code>ParameterValue</code>. However, the Geotools implementation should
@@ -718,7 +719,7 @@ public class ParameterTest extends TestCase {
                 new MatrixParameterDescriptors(Collections.singletonMap("name", "Test"));
         for (int height=2; height<=size; height++) {
             for (int width=2; width<=size; width++) {
-                MatrixParameterValues parameters = (MatrixParameterValues) descriptor.createValue();
+                MatrixParameters parameters = (MatrixParameters) descriptor.createValue();
                 GeneralMatrix copy = (GeneralMatrix) matrix.clone();
                 copy.setSize(height, width);
                 parameters.setMatrix(copy);

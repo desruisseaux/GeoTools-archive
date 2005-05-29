@@ -84,7 +84,6 @@ import org.geotools.resources.cts.Resources;
  * @deprecated Replaced by {@linnk org.geotools.referencing.operation.projection.Mercator}.
  */
 public class Mercator extends CylindricalProjection {
-    
     /**
      * Standard Parallel used for the <code>Mercator_2SP</code> case.
      * Set to {@link Double#NaN} for the <code>Mercator_1SP</code> case.

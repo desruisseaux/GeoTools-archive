@@ -33,37 +33,9 @@ import org.opengis.referencing.operation.OperationMethod;
 
 
 /**
- * An operation on coordinates that usually includes a change of Datum. The parameters
- * of a coordinate transformation are empirically derived from data containing the coordinates
- * of a series of points in both coordinate reference systems. This computational process
- * is usually "over-determined", allowing derivation of error (or accuracy) estimates
- * for the transformation. Also, the stochastic nature of the parameters may result
- * in multiple (different) versions of the same coordinate transformation. 
- *  
- * @version $Id$
- * @author Martin Desruisseaux
- *
- * @see Conversion
+ * @deprecated Renamed as {@link DefaultTransformation}.
  */
-public class Transformation extends Operation
-                         implements org.opengis.referencing.operation.Transformation
-{
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = -7486704846151648971L;
-
-    /**
-     * Constructs a transformation from a set of properties. The properties given in argument
-     * follow the same rules than for the {@link CoordinateOperation} constructor.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS.
-     * @param targetCRS The target CRS.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
-     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
-     * @param method    The operation method.
-     */
+public class Transformation extends DefaultTransformation {
     public Transformation(final Map                       properties,
                           final CoordinateReferenceSystem sourceCRS,
                           final CoordinateReferenceSystem targetCRS,
@@ -71,6 +43,5 @@ public class Transformation extends Operation
                           final OperationMethod           method)
     {
         super(properties, sourceCRS, targetCRS, transform, method);
-        ensureNonNull(OPERATION_VERSION_PROPERTY, operationVersion);
     }
 }

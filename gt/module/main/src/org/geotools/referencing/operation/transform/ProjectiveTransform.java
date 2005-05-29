@@ -46,7 +46,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.MatrixParameterDescriptors;
-import org.geotools.parameter.MatrixParameterValues;
+import org.geotools.parameter.MatrixParameters;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
@@ -202,8 +202,8 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * @return A copy of the parameter values for this math transform.
      */
     static ParameterValueGroup getParameterValues(final Matrix matrix) {
-        final MatrixParameterValues values;
-        values = (MatrixParameterValues) Provider.PARAMETERS.createValue();        
+        final MatrixParameters values;
+        values = (MatrixParameters) Provider.PARAMETERS.createValue();        
         values.setMatrix(matrix);
         return values;
     }

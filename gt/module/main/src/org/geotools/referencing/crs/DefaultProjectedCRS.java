@@ -108,7 +108,8 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      * CoordinateReferenceSystem, MathTransform, CoordinateSystem) super-class constructor}.
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
-     *         the underlying {@linkplain org.geotools.referencing.operation.Projection projection}.
+     *         the underlying {@linkplain org.geotools.referencing.operation.DefaultProjection
+     *         projection}.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
      *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.

@@ -61,7 +61,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
  *
  * @see org.opengis.ct.CT_CoordinateTransformation
  *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation}.
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.AbstractCoordinateOperation}.
  */
 public class CoordinateTransformation extends Info {
     /**
@@ -156,7 +156,7 @@ public class CoordinateTransformation extends Info {
      *
      * @param locale The desired locale, or <code>null</code> for the default locale.
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getName}.
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.AbstractCoordinateOperation#getName}.
      */
     public String getName(final Locale locale) {
         final String name = super.getName().getCode();
@@ -174,7 +174,7 @@ public class CoordinateTransformation extends Info {
      *
      * @see org.opengis.ct.CT_CoordinateTransformation#getSourceCS()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getSourceCRS}.
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.AbstractCoordinateOperation#getSourceCRS}.
      */
     public CoordinateSystem getSourceCS() {
         return sourceCS;
@@ -185,7 +185,7 @@ public class CoordinateTransformation extends Info {
      *
      * @see org.opengis.ct.CT_CoordinateTransformation#getTargetCS()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getTargetCRS}.
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.AbstractCoordinateOperation#getTargetCRS}.
      */
     public CoordinateSystem getTargetCS() {
         return targetCS;
@@ -198,8 +198,8 @@ public class CoordinateTransformation extends Info {
      * @see org.opengis.ct.CT_CoordinateTransformation#getTransformType()
      *
      * @deprecated No direct replacement. Check for instance of
-     *             {@link org.geotools.referencing.operation.Conversion} or
-     *             {@link org.geotools.referencing.operation.Transformation} instead.
+     *             {@link org.opengis.referencing.operation.Conversion} or
+     *             {@link org.opengis.referencing.operation.Transformation} instead.
      */
     public TransformType getTransformType() {
         return type;
@@ -211,7 +211,7 @@ public class CoordinateTransformation extends Info {
      *
      * @see org.opengis.ct.CT_CoordinateTransformation#getMathTransform()
      *
-     * @deprecated Replaced by {@link org.geotools.referencing.operation.CoordinateOperation#getMathTransform}.
+     * @deprecated Replaced by {@link org.geotools.referencing.operation.AbstractCoordinateOperation#getMathTransform}.
      */
     public MathTransform getMathTransform() {
         if (transform!=null) {

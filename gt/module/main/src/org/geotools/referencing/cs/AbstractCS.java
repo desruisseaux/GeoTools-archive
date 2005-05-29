@@ -213,8 +213,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
             throws IllegalArgumentException, ConversionException
     {
         // Note: while this method signature declares Matrix as the return type,
-        //       CoordinateOperationFactory.createTransformationStep(GeocentricCRS,GeocentricCRS)
-        //       really expects a GeneralMatrix. Other transformation steps are generic enough.
+        // DefaultCoordinateOperationFactory.createTransformationStep(GeocentricCRS,GeocentricCRS)
+        // really expects a GeneralMatrix. Other transformation steps are generic enough.
         if (!Utilities.sameInterfaces(sourceCS.getClass(), targetCS.getClass(), CoordinateSystem.class)) {
             // TODO: localize
             throw new IllegalArgumentException("Incompatible type of coordinate systems.");

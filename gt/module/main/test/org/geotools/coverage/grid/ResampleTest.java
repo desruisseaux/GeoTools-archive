@@ -49,8 +49,8 @@ import org.opengis.referencing.operation.MathTransform;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
-import org.geotools.referencing.operation.OperationMethod;
-import org.geotools.referencing.operation.MathTransformFactory;
+import org.geotools.referencing.operation.DefaultOperationMethod;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.coverage.processing.GridCoverageProcessor2D;
 
@@ -136,7 +136,7 @@ public final class ResampleTest extends GridCoverageTest {
         try {
             final GeographicCRS  base = (GeographicCRS) coverage.getCoordinateReferenceSystem();
             final Ellipsoid ellipsoid = ((GeodeticDatum) base.getDatum()).getEllipsoid();
-            final MathTransformFactory factory = new MathTransformFactory();
+            final DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
             final ParameterValueGroup parameters = factory.getDefaultParameters("Oblique_Stereographic");
             parameters.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis());
             parameters.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis());
@@ -149,7 +149,7 @@ public final class ResampleTest extends GridCoverageTest {
                 fail(exception.getLocalizedMessage());
                 return null;
             }
-            return new DefaultProjectedCRS("Stereographic", new OperationMethod(mt),
+            return new DefaultProjectedCRS("Stereographic", new DefaultOperationMethod(mt),
                                            base, mt, DefaultCartesianCS.PROJECTED);
         } catch (NoSuchIdentifierException exception) {
             fail(exception.getLocalizedMessage());
@@ -229,7 +229,7 @@ public final class ResampleTest extends GridCoverageTest {
         atr.preConcatenate(AffineTransform.getTranslateInstance(5, 5));
         MathTransform tr = ProjectiveTransform.create(atr);
         CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem();
-        crs = new DefaultDerivedCRS("F2", new OperationMethod(tr), crs, tr, crs.getCoordinateSystem());
+        crs = new DefaultDerivedCRS("F2", new DefaultOperationMethod(tr), crs, tr, crs.getCoordinateSystem());
         /*
          * Note: In current Resampler implementation, the affine transform effect tested
          *       on the first line below will not be visible with the simple viewer used

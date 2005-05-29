@@ -39,12 +39,12 @@ import org.opengis.coverage.grid.GridGeometry;  // For javadoc
 import org.opengis.referencing.operation.MathTransform2D;
 
 // Geotools dependencies
-import org.geotools.referencing.crs.DefaultDerivedCRS;      // For javadoc
-import org.geotools.referencing.crs.DefaultGeographicCRS;   // For javadoc
-import org.geotools.referencing.cs.DefaultCartesianCS;      // For javadoc
-import org.geotools.referencing.datum.DefaultGeodeticDatum; // For javadoc
-import org.geotools.referencing.operation.OperationMethod;  // For javadoc
-import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
+import org.geotools.referencing.crs.DefaultDerivedCRS;            // For javadoc
+import org.geotools.referencing.crs.DefaultGeographicCRS;         // For javadoc
+import org.geotools.referencing.cs.DefaultCartesianCS;            // For javadoc
+import org.geotools.referencing.datum.DefaultGeodeticDatum;       // For javadoc
+import org.geotools.referencing.operation.DefaultOperationMethod; // For javadoc
+import org.geotools.coverage.grid.GridCoverage2D;                 // For javadoc
 
 
 /**
@@ -95,7 +95,7 @@ import org.geotools.coverage.grid.GridCoverage2D;           // For javadoc
  * MathTransform2D        realToGrid = grid.{@linkplain #getPolynomialTransform(int) getPolynomialTransform}(degree).inverse();
  * CoordinateReferenceSystem realCRS = DefaultGeographicCRS.WGS84;
  * CoordinateReferenceSystem gridCRS = new {@linkplain DefaultDerivedCRS}("The grid CRS",
- *         new {@linkplain OperationMethod#OperationMethod(MathTransform) OperationMethod}(realToGrid),
+ *         new {@linkplain DefaultOperationMethod#DefaultOperationMethod(MathTransform) DefaultOperationMethod}(realToGrid),
  *         realCRS,     <FONT color='#008000'>// The target ("real world") CRS</FONT>
  *         realToGrid,  <FONT color='#008000'>// How the grid CRS relates to the "real world" CRS</FONT>
  *         {@linkplain DefaultCartesianCS#GRID});

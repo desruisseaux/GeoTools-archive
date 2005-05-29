@@ -47,7 +47,7 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
-import org.geotools.referencing.operation.MathTransformFactory;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 
 
 /**
@@ -88,7 +88,7 @@ public class MathTransformTest extends TestCase {
     /**
      * The default math transform factory.
      */
-    private MathTransformFactory factory;
+    private DefaultMathTransformFactory factory;
 
     /**
      * Expected accuracy for tests on JTS objects.
@@ -101,7 +101,7 @@ public class MathTransformTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         random  = new Random(-3531834320875149028L);
-        factory = new MathTransformFactory();
+        factory = new DefaultMathTransformFactory();
     }
 
     /**

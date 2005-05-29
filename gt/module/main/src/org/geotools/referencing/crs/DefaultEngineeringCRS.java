@@ -145,8 +145,8 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * {@linkplain DefaultCoordinateSystemAxis#Y y}
      * axis in {@linkplain SI#METER metres}. At the difference of {@link #CARTESIAN_2D},
      * this coordinate system is treated specially by the default {@linkplain
-     * org.geotools.referencing.operation.CoordinateOperationFactory coordinate operation factory}
-     * with loose transformation rules: if no transformation path were found (for example
+     * org.geotools.referencing.operation.DefaultCoordinateOperationFactory coordinate operation
+     * factory} with loose transformation rules: if no transformation path were found (for example
      * through a {@linkplain DefaultDerivedCRS derived CRS}), then the transformation from this
      * CRS to any CRS with a compatible number of dimensions is assumed to be the identity
      * transform. This CRS is usefull as a kind of wildcard when no CRS were explicitly specified.
@@ -161,8 +161,8 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
      * {@linkplain DefaultCoordinateSystemAxis#Z z}
      * axis in {@linkplain SI#METER metres}. At the difference of {@link #CARTESIAN_3D},
      * this coordinate system is treated specially by the default {@linkplain
-     * org.geotools.referencing.operation.CoordinateOperationFactory coordinate operation factory}
-     * with loose transformation rules: if no transformation path were found (for example
+     * org.geotools.referencing.operation.DefaultCoordinateOperationFactory coordinate operation
+     * factory} with loose transformation rules: if no transformation path were found (for example
      * through a {@linkplain DefaultDerivedCRS derived CRS}), then the transformation from this
      * CRS to any CRS with a compatible number of dimensions is assumed to be the identity
      * transform. This CRS is usefull as a kind of wildcard when no CRS were explicitly specified.

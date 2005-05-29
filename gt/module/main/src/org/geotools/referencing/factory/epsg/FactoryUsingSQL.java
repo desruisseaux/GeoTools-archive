@@ -85,6 +85,8 @@ import org.geotools.measure.Units;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.NamedIdentifier;
@@ -93,6 +95,7 @@ import org.geotools.referencing.datum.AbstractDatum;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.Resources;
@@ -1616,7 +1619,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             if (!result.wasNull()) {
                 final Unit unit = buffered.createUnit(getString(result, 5, operation));
                 final Map properties = createProperties(name, null, remarks);
-                parameter = new org.geotools.parameter.ParameterDescriptor(properties,
+                parameter = new DefaultParameterDescriptor(properties,
                             value, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, unit, true);
             } else {
                 Object ref = getString(result, 4, operation);
@@ -1626,7 +1629,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     // Ignore: we will stores the reference as a file.
                     ref = new File((String) ref);
                 }
-                parameter = new org.geotools.parameter.ParameterDescriptor(name, remarks, ref, true);
+                parameter = new DefaultParameterDescriptor(name, remarks, ref, true);
             }
             descriptors.add(parameter);
         }
@@ -1668,12 +1671,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             }
             final Map properties = createProperties(name, code, remarks);
             if (formula != null) {
-                properties.put(org.geotools.referencing.operation.OperationMethod.FORMULA_PROPERTY,
-                               formula);
+                properties.put(DefaultOperationMethod.FORMULA_PROPERTY, formula);
             }
-            method = new org.geotools.referencing.operation.OperationMethod(properties,
-                     sourceDimensions, targetDimensions,
-                     new org.geotools.parameter.ParameterDescriptorGroup(properties, descriptors));
+            method = new DefaultOperationMethod(properties, sourceDimensions, targetDimensions,
+                     new DefaultParameterDescriptorGroup(properties, descriptors));
             returnValue = (OperationMethod) ensureSingleton(method, returnValue, code);
         }
         if (returnValue == null) {

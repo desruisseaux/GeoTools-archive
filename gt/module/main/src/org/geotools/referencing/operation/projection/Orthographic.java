@@ -71,7 +71,7 @@ public abstract class Orthographic extends MapProjection {
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link Orthographic} projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz

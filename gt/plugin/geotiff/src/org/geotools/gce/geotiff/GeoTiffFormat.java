@@ -22,8 +22,8 @@ import org.geotools.catalog.CatalogEntry;
 
 // Geotools dependencies
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 
 // GeoAPI dependencies
@@ -46,7 +46,7 @@ import java.util.HashMap;
  */
 public class GeoTiffFormat extends AbstractGridFormat implements Format {
     /** Indicates whether we need to rescale the input */
-    public static final ParameterDescriptor RESCALE = new ParameterDescriptor("Rescale",
+    public static final DefaultParameterDescriptor RESCALE = new DefaultParameterDescriptor("Rescale",
             "Indicates whether we need to rescale the input", Boolean.TRUE, true);
 
     /**
@@ -64,7 +64,7 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
             "http://www.remotesensing.org:16080/websites/geotiff/geotiff.html");
 
         //reading parameters
-        readParameters = new ParameterGroup(new ParameterDescriptorGroup(
+        readParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(
                     mInfo, new GeneralParameterDescriptor[] { RESCALE }));
     }
 

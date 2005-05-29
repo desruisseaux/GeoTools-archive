@@ -111,6 +111,7 @@ import org.geotools.referencing.datum.DefaultImageDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultTemporalDatum;
 import org.geotools.referencing.datum.DefaultVerticalDatum;
+import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.util.WeakHashSet;
 
 
@@ -125,7 +126,7 @@ import org.geotools.util.WeakHashSet;
  * @author Martin Desruisseaux
  */
 public class GeotoolsFactory extends AbstractFactory
-            implements CSFactory, DatumFactory, CRSFactory
+                          implements CSFactory, DatumFactory, CRSFactory
 {
     /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
@@ -914,9 +915,8 @@ public class GeotoolsFactory extends AbstractFactory
                                        MathTransform    baseToDerived,
                                        CoordinateSystem     derivedCS) throws FactoryException
     {
-        return createDerivedCRS(properties,
-                    new org.geotools.referencing.operation.OperationMethod(baseToDerived),
-                    base, baseToDerived, derivedCS);
+        return createDerivedCRS(properties, new DefaultOperationMethod(baseToDerived),
+                                base, baseToDerived, derivedCS);
     }
 
     /**
@@ -979,9 +979,8 @@ public class GeotoolsFactory extends AbstractFactory
                                            MathTransform toProjected,
                                            CartesianCS            cs) throws FactoryException
     {
-        return createProjectedCRS(properties,
-                    new org.geotools.referencing.operation.OperationMethod(toProjected),
-                    geoCRS, toProjected, cs);
+        return createProjectedCRS(properties, new DefaultOperationMethod(toProjected),
+                                  geoCRS, toProjected, cs);
     }
     
     /**

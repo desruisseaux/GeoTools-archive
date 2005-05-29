@@ -45,7 +45,8 @@ import org.opengis.referencing.operation.OperationMethod;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.parameter.ParameterReal;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.FloatParameter;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
@@ -217,8 +218,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             p.setValue(2);
             parameters[index++] = p;
         }
-        parameters[index++] = new ParameterReal(Provider.SEMI_MAJOR, a);
-        parameters[index++] = new ParameterReal(Provider.SEMI_MINOR, b);
+        parameters[index++] = new FloatParameter(Provider.SEMI_MAJOR, a);
+        parameters[index++] = new FloatParameter(Provider.SEMI_MINOR, b);
         return new org.geotools.parameter.ParameterGroup(descriptor, parameters);
     }
     
@@ -583,8 +584,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
          * The default value is 3, which is the value implied in OGC's WKT.
          */
-        private static final ParameterDescriptor DIM =
-                new org.geotools.parameter.ParameterDescriptor(
+        private static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_PROPERTY,
                                              new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
                     3, 2, 3, false);

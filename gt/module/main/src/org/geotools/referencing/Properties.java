@@ -33,6 +33,7 @@ import org.opengis.referencing.operation.CoordinateOperation;
 
 // Geotools dependencies
 import org.geotools.util.MapEntry;
+import org.geotools.referencing.operation.DefaultOperation;
 
 
 /**
@@ -110,14 +111,14 @@ final class Properties extends AbstractMap {
      * @todo Add properties for {@link IdentifiedObject} sub-interfaces.
      */
     private static final String[] KEYS = {
-        /*[0]*/AbstractIdentifiedObject.   NAME_PROPERTY,
-        /*[1]*/AbstractIdentifiedObject.   IDENTIFIERS_PROPERTY,
-        /*[2]*/AbstractIdentifiedObject.   ALIAS_PROPERTY,
-        /*[3]*/AbstractIdentifiedObject.   REMARKS_PROPERTY,
-        /*[4]*/org.geotools.referencing.operation.Operation.SCOPE_PROPERTY,
-        /*[5]*/org.geotools.referencing.operation.Operation.VALID_AREA_PROPERTY,
-        /*[6]*/org.geotools.referencing.operation.Operation.OPERATION_VERSION_PROPERTY,
-        /*[7]*/org.geotools.referencing.operation.Operation.POSITIONAL_ACCURACY_PROPERTY
+        /*[0]*/AbstractIdentifiedObject.NAME_PROPERTY,
+        /*[1]*/AbstractIdentifiedObject.IDENTIFIERS_PROPERTY,
+        /*[2]*/AbstractIdentifiedObject.ALIAS_PROPERTY,
+        /*[3]*/AbstractIdentifiedObject.REMARKS_PROPERTY,
+        /*[4]*/DefaultOperation.        SCOPE_PROPERTY,
+        /*[5]*/DefaultOperation.        VALID_AREA_PROPERTY,
+        /*[6]*/DefaultOperation.        OPERATION_VERSION_PROPERTY,
+        /*[7]*/DefaultOperation.        POSITIONAL_ACCURACY_PROPERTY
     };
 
     /**

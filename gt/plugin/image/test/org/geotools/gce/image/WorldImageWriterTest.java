@@ -25,8 +25,8 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.AbstractCRS;
-import org.geotools.referencing.operation.CoordinateOperation;
-import org.geotools.referencing.operation.CoordinateOperationFactory;
+import org.geotools.referencing.operation.AbstractCoordinateOperation;
+import org.geotools.referencing.operation.DefaultCoordinateOperationFactory;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.resources.*;
 import org.opengis.coverage.grid.*;
@@ -226,10 +226,10 @@ public class WorldImageWriterTest extends TestCase {
 		
           //getting an operation between source and destination crs
 
-        CoordinateOperationFactory operationFactory=new CoordinateOperationFactory(new Hints(Hints.LENIENT_DATUM_SHIFT,Boolean.TRUE));
-        CoordinateOperation operationMercator2WGS84=(CoordinateOperation) operationFactory.createOperation(mercator,
+        DefaultCoordinateOperationFactory operationFactory=new DefaultCoordinateOperationFactory(new Hints(Hints.LENIENT_DATUM_SHIFT,Boolean.TRUE));
+        AbstractCoordinateOperation operationMercator2WGS84=(AbstractCoordinateOperation) operationFactory.createOperation(mercator,
 				wgs84);
-//		CoordinateOperation operationWGS842Mercator=(CoordinateOperation) operationFactory.createOperation(wgs84,
+//		AbstractCoordinateOperation operationWGS842Mercator=(AbstractCoordinateOperation) operationFactory.createOperation(wgs84,
 //				mercator);
 
 //		MathTransform transformWGS842Mercator=operationWGS842Mercator.getMathTransform();

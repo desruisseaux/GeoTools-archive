@@ -40,7 +40,8 @@ import org.opengis.referencing.operation.Transformation;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.parameter.ParameterReal;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.FloatParameter;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
@@ -206,13 +207,13 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
                new ParameterValue[] {
                    dim,
-                   new ParameterReal(Provider.DX,             dx),
-                   new ParameterReal(Provider.DY,             dy),
-                   new ParameterReal(Provider.DZ,             dz),
-                   new ParameterReal(Provider.SRC_SEMI_MAJOR, a),
-                   new ParameterReal(Provider.SRC_SEMI_MINOR, b),
-                   new ParameterReal(Provider.TGT_SEMI_MAJOR, a+da),
-                   new ParameterReal(Provider.TGT_SEMI_MINOR, b+db)
+                   new FloatParameter(Provider.DX,             dx),
+                   new FloatParameter(Provider.DY,             dy),
+                   new FloatParameter(Provider.DZ,             dz),
+                   new FloatParameter(Provider.SRC_SEMI_MAJOR, a),
+                   new FloatParameter(Provider.SRC_SEMI_MINOR, b),
+                   new FloatParameter(Provider.TGT_SEMI_MAJOR, a+da),
+                   new FloatParameter(Provider.TGT_SEMI_MINOR, b+db)
                });
     }
     
@@ -537,8 +538,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * The number of geographic dimension (2 or 3). The default value is 2.
          */
-        public static final ParameterDescriptor DIM =
-                new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_PROPERTY,
                                              new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
                     2, 2, 3, false);

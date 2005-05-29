@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -127,7 +127,7 @@ public class WMSFormat implements Format {
         Map properties = new HashMap();
         properties.put("name", capabilities.getService().getName());
         properties.put("remarks", capabilities.getService().get_abstract());
-        return new ParameterGroup(new ParameterDescriptorGroup(properties, params));
+        return new ParameterGroup(new DefaultParameterDescriptorGroup(properties, params));
     }
 
 	/* (non-Javadoc)

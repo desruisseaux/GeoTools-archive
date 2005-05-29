@@ -19,8 +19,8 @@ package org.geotools.gce.image;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.*;
-import org.geotools.parameter.ParameterDescriptor;
-import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
@@ -48,14 +48,14 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
      * an output format in which we want to encode the image itself. PNG is
      * default output format.
      */
-    public static final ParameterDescriptor FORMAT = new ParameterDescriptor("Format",
+    public static final DefaultParameterDescriptor FORMAT = new DefaultParameterDescriptor("Format",
             "Indicates the output format for this image", "png", true);
-    public static final ParameterDescriptor CRS = new ParameterDescriptor("crs",
+    public static final DefaultParameterDescriptor CRS = new DefaultParameterDescriptor("crs",
             CoordinateReferenceSystem.class, //class of the object we will pass
             null, //list of valid values not provided
             getDefaultCRS() //default value
         );
-    public static final ParameterDescriptor ENVELOPE = new ParameterDescriptor("envelope",
+    public static final DefaultParameterDescriptor ENVELOPE = new DefaultParameterDescriptor("envelope",
             Envelope.class, null,
             new GeneralEnvelope(new double[] { 0, 0 }, new double[] { 1, 1 })); //default envelope to avoid exceptions in GridCoverage2D
 
@@ -79,11 +79,11 @@ public class WorldImageFormat extends AbstractGridFormat implements Format {
         mInfo = info;
 
         //reading parameters
-        readParameters = new ParameterGroup(new ParameterDescriptorGroup(
+        readParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(
                     mInfo, new GeneralParameterDescriptor[] { CRS, ENVELOPE }));
 
         //writing parameters
-        writeParameters = new ParameterGroup(new ParameterDescriptorGroup(
+        writeParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(
                     mInfo, new GeneralParameterDescriptor[] { FORMAT }));
     }
 

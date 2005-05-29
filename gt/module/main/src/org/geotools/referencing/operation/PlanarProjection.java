@@ -34,33 +34,9 @@ import org.opengis.referencing.operation.OperationMethod;
 
 
 /**
- * Base class for for azimuthal (or planar) map projections.
- *
- * @version $Id$
- * @author Martin Desruisseaux
- *
- * @see org.geotools.referencing.crs.DefaultProjectedCRS
- * @see <A HREF="http://mathworld.wolfram.com/AzimuthalProjection.html">Azimuthal projection on MathWorld</A>
+ * @deprecated Renamed as {@link DefaultPlanarProjection}.
  */
-public class PlanarProjection extends Projection
-                           implements org.opengis.referencing.operation.PlanarProjection
-{
-    /**
-     * Serial number for interoperability with different versions.
-     */
-    private static final long serialVersionUID = 8171256287775067736L;
-
-    /**
-     * Constructs a new projection with the same values than the specified one, together with the
-     * specified source and target CRS. While the source conversion can be an arbitrary one, it is
-     * typically a {@linkplain DefiningConversion defining conversion}.
-     *
-     * @param conversion The defining conversion.
-     * @param sourceCRS The source CRS.
-     * @param targetCRS The target CRS.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source CRS}
-     *                  to positions in the {@linkplain #getTargetCRS target CRS}.
-     */
+public class PlanarProjection extends DefaultPlanarProjection {
     public PlanarProjection(final Conversion                conversion,
                             final CoordinateReferenceSystem sourceCRS,
                             final CoordinateReferenceSystem targetCRS,
@@ -69,18 +45,6 @@ public class PlanarProjection extends Projection
         super(conversion, sourceCRS, targetCRS, transform);
     }
 
-    /**
-     * Constructs a projection from a set of properties. The properties given in argument
-     * follow the same rules than for the {@link CoordinateOperation} constructor.
-     *
-     * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
-     * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
-     *                  reference system} to positions in the {@linkplain #getTargetCRS target
-     *                  coordinate reference system}.
-     * @param method    The operation method.
-     */
     public PlanarProjection(final Map                       properties,
                             final CoordinateReferenceSystem sourceCRS,
                             final CoordinateReferenceSystem targetCRS,

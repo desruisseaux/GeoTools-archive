@@ -95,7 +95,7 @@ final class AffineTransform2D extends XAffineTransform
      * Gets the dimension of input points.
      *
      * @deprecated Renamed {@link #getSourceDimensions} for consistency with
-     *             {@link org.geotools.referencing.operation.OperationMethod}.
+     *             {@link org.opengis.referencing.operation.OperationMethod}.
      */
     public final int getDimSource() {
         return getSourceDimensions();
@@ -112,7 +112,7 @@ final class AffineTransform2D extends XAffineTransform
      * Gets the dimension of output points.
      *
      * @deprecated Renamed {@link #getTargetDimensions} for consistency with
-     *             {@link org.geotools.referencing.operation.OperationMethod}.
+     *             {@link org.opengis.referencing.operation.OperationMethod}.
      */
     public final int getDimTarget() {
         return getTargetDimensions();

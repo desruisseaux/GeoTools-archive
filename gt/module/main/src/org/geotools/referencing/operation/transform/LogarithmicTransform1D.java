@@ -35,7 +35,8 @@ import org.opengis.referencing.operation.MathTransform1D;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
-import org.geotools.parameter.ParameterReal;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.FloatParameter;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.MathTransformProvider;
@@ -144,8 +145,8 @@ public class LogarithmicTransform1D extends AbstractMathTransform
     public ParameterValueGroup getParameterValues() {
         return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
             new ParameterValue[] {
-            new ParameterReal(Provider.BASE,   base),
-            new ParameterReal(Provider.OFFSET, offset)});
+            new FloatParameter(Provider.BASE,   base),
+            new FloatParameter(Provider.OFFSET, offset)});
     }
     
     /**
@@ -299,14 +300,14 @@ public class LogarithmicTransform1D extends AbstractMathTransform
          * The operation parameter descriptor for the {@link #base base} parameter value.
          * Valid values range from 0 to infinity. The default value is 10.
          */
-        public static final ParameterDescriptor BASE = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor BASE = new DefaultParameterDescriptor(
                 "base", 10, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The operation parameter descriptor for the {@link #offset offset} parameter value.
          * Valid values range is unrestricted. The default value is 0.
          */
-        public static final ParameterDescriptor OFFSET = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor OFFSET = new DefaultParameterDescriptor(
                 "offset", 0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**

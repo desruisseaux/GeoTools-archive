@@ -64,6 +64,7 @@ import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
 
+
 /**
  * Oblique Mercator Projection. A conformal, oblique, cylindrical projection 
  * with the cylinder touching the ellipsoid (or sphere) along a great circle 
@@ -272,7 +273,7 @@ public class ObliqueMercator extends MapProjection {
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for an {@link ObliqueMercator} projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -392,7 +393,7 @@ public class ObliqueMercator extends MapProjection {
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a Hotine {@link ObliqueMercator} projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -452,7 +453,7 @@ public class ObliqueMercator extends MapProjection {
      * for a {@link ObliqueMercator} projection, specified with
      * two points on the central line (instead of a central point and azimuth).
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -569,7 +570,7 @@ public class ObliqueMercator extends MapProjection {
      * for a Hotine {@link ObliqueMercator} projection, specified with
      * two points on the central line (instead of a central point and azimuth).
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz

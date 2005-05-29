@@ -43,6 +43,7 @@ import javax.units.Unit;
 import org.opengis.parameter.InvalidParameterTypeException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.util.CodeList;
 
 // Geotools dependencies
@@ -64,12 +65,10 @@ import org.geotools.resources.cts.Resources;
  * @author Martin Desruisseaux
  * @author Jody Garnett (Refractions Research)
  *
- * @see org.geotools.parameter.ParameterDescriptor
- * @see org.geotools.parameter.ParameterGroup
+ * @see DefaultParameterDescriptor
+ * @see ParameterGroup
  */
-public class Parameter extends AbstractParameter
-                       implements org.opengis.parameter.ParameterValue
-{
+public class Parameter extends AbstractParameter implements ParameterValue {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -110,8 +109,8 @@ public class Parameter extends AbstractParameter
     private Unit unit;
 
     /**
-     * Constructs a parameter from the specified name and value. This convenience constructor
-     * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
+     * Constructs a parameter from the specified name and value. This convenience
+     * constructor creates a {@link DefaultParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code>
      * is to invokes {@link ParameterDescriptor#createValue}.
      *
@@ -119,14 +118,13 @@ public class Parameter extends AbstractParameter
      * @param value The parameter value.
      */
     public Parameter(final String name, final int value) {
-        this(new org.geotools.parameter.ParameterDescriptor(name,
-                 0, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        this(new DefaultParameterDescriptor(name, 0, Integer.MIN_VALUE, Integer.MAX_VALUE));
         this.value = wrap(value);
     }
 
     /**
-     * Constructs a parameter from the specified name and value. This convenience constructor
-     * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if such
+     * Constructs a parameter from the specified name and value. This convenience
+     * constructor creates a {@link DefaultParameterDescriptor} object. But if such
      * an object was available, then the preferred way to get a <code>ParameterValue</code> is
      * to invokes {@link ParameterDescriptor#createValue}.
      *
@@ -135,15 +133,15 @@ public class Parameter extends AbstractParameter
      * @param unit  The unit for the parameter value.
      */
     public Parameter(final String name, final double value, final Unit unit) {
-        this(new org.geotools.parameter.ParameterDescriptor(name,
-                 Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, normalize(unit)));
+        this(new DefaultParameterDescriptor(name, Double.NaN, Double.NEGATIVE_INFINITY,
+                                            Double.POSITIVE_INFINITY, normalize(unit)));
         this.value = wrap(value);
         this.unit  = unit;
     }
 
     /**
-     * Constructs a parameter from the specified enumeration. This convenience constructor
-     * creates a default {@link org.geotools.parameter.ParameterDescriptor} object. But if
+     * Constructs a parameter from the specified enumeration. This convenience
+     * constructor creates a {@link DefaultParameterDescriptor} object. But if
      * such an object was available, then the preferred way to get a <code>ParameterValue</code>
      * is to invokes {@link ParameterDescriptor#createValue}.
      *
@@ -151,7 +149,7 @@ public class Parameter extends AbstractParameter
      * @param value The parameter value.
      */
     public Parameter(final String name, final CodeList value) {
-        this(new org.geotools.parameter.ParameterDescriptor(name, value.getClass(), (CodeList)null));
+        this(new DefaultParameterDescriptor(name, value.getClass(), (CodeList)null));
         this.value = value;
     }
 

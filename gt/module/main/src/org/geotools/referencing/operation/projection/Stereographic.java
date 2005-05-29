@@ -164,7 +164,7 @@ public abstract class Stereographic extends MapProjection {
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link Stereographic} Oblique projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -248,7 +248,7 @@ public abstract class Stereographic extends MapProjection {
      * for a {@link Stereographic} Polar projection. This provider uses the
      * series equations for the inverse elliptical calculations.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -311,7 +311,7 @@ public abstract class Stereographic extends MapProjection {
      * of the projection from the Standard_Parallel_1 value. It also uses the
      * series equations for the inverse elliptical calculations.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -392,7 +392,7 @@ public abstract class Stereographic extends MapProjection {
      * the "latitude_of_origin" parameter to +90.0 degrees and uses the
      * itterative equations for the inverse elliptical calculations.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -459,7 +459,7 @@ public abstract class Stereographic extends MapProjection {
      * the "latitude_of_origin" parameter to -90.0 degrees and uses the
      * itterative equations for the inverse elliptical calculations.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -516,7 +516,7 @@ public abstract class Stereographic extends MapProjection {
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link Stereographic} (USGS equations) projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz

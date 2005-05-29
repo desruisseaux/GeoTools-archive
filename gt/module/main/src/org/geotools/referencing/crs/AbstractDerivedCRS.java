@@ -44,8 +44,10 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.parameter.Parameters;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.AbstractReferenceSystem;
-import org.geotools.referencing.operation.Operation;
+import org.geotools.referencing.operation.DefaultOperation;
+import org.geotools.referencing.operation.DefaultConversion;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
+import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -75,24 +77,24 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * A lock for avoiding never-ending recursivity in the <CODE>equals</CODE>
      * method. This lock is necessary because <CODE>AbstractDerivedCRS</CODE>
      * objects contain a {@link #conversionFromBase} field, which contains a
-     * {@link org.geotools.referencing.operation.Conversion#targetCRS} field
-     * set to this <CODE>AbstractDerivedCRS</CODE> object.
-     *
-     * <P>This field can be though as a <CODE>boolean</CODE> flag set to <CODE>true</CODE>
+     * {@link DefaultConversion#targetCRS} field set to this
+     * <CODE>AbstractDerivedCRS</CODE> object.
+     * <P>
+     * This field can be though as a <CODE>boolean</CODE> flag set to <CODE>true</CODE>
      * when a comparaison is in progress. A null value means <CODE>false</CODE>, and a non-null
-     * value means <CODE>true</CODE>. The non-null value is used for assertion.</P>
-     *
-     * <P>When an <CODE>equals</CODE> method is invoked, this <CODE>_COMPARING</CODE>
+     * value means <CODE>true</CODE>. The non-null value is used for assertion.
+     * <P>
+     * When an <CODE>equals</CODE> method is invoked, this <CODE>_COMPARING</CODE>
      * field is set to the originator (either the <CODE>AbstractDerivedCRS</CODE> or the
-     * {@link org.geotools.referencing.operation.CoordinateOperation} object where the
-     * comparaison begin).</P>
-     *
-     * <P><STRONG>DO NOT USE THIS FIELD. It is strictly for internal use by {@link #equals} and
-     * {@link org.geotools.referencing.operation.CoordinateOperation#equals} methods.</STRONG></P>
+     * {@link org.geotools.referencing.operation.AbstractCoordinateOperation} object where
+     * the comparaison begin).
+     * <P>
+     * <STRONG>DO NOT USE THIS FIELD. It is strictly for internal use by {@link #equals} and
+     * {@link org.geotools.referencing.operation.AbstractCoordinateOperation#equals} methods.</STRONG>
      *
      * @todo Hide this field from the javadoc. It is not possible to make it package-privated
-     *       because {@link org.geotools.referencing.operation.CoordinateOperation} lives in
-     *       a different package.
+     *       because {@link org.geotools.referencing.operation.AbstractCoordinateOperation}
+     *       lives in a different package.
      */
     public static AbstractIdentifiedObject _COMPARING;
 
@@ -134,8 +136,8 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
         ensureNonNull("baseToDerived",      baseToDerived);
         this.baseCRS = base;
         checkDimensions(base, baseToDerived, derivedCS);
-        org.geotools.referencing.operation.OperationMethod.checkDimensions(conversionFromBase.getMethod(), baseToDerived);
-        this.conversionFromBase = org.geotools.referencing.operation.Conversion.create(
+        DefaultOperationMethod.checkDimensions(conversionFromBase.getMethod(), baseToDerived);
+        this.conversionFromBase = DefaultConversion.create(
             /* definition */ conversionFromBase,
             /* sourceCRS  */ base,
             /* targetCRS  */ this,
@@ -161,14 +163,14 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * </table>
      *
      * <P>
-     * Additional properties for the {@link org.geotools.referencing.operation.Conversion} object
-     * to be created can be specified with the <code>"conversion."</code> prefix added in front of
-     * property names (example: <code>"conversion.remarks"</code>). The same applies for operation
-     * method, using the <code>"method."</code> prefix.
+     * Additional properties for the {@link DefaultConversion} object to be created can be
+     * specified with the <code>"conversion."</code> prefix added in front of property names
+     * (example: <code>"conversion.remarks"</code>). The same applies for operation method,
+     * using the <code>"method."</code> prefix.
      * </P>
      *
      * @param  properties Name and other properties to give to the new derived CRS object and to
-     *         the underlying {@link org.geotools.referencing.operation.Conversion conversion}.
+     *         the underlying {@linkplain DefaultConversion conversion}.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
      *         conversion}.
      * @param  base Coordinate reference system to base the derived CRS on.
@@ -199,8 +201,8 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
          * accurate than the one inferred from the MathTransform.
          */
         checkDimensions(base, baseToDerived, derivedCS);
-        org.geotools.referencing.operation.OperationMethod.checkDimensions(method, baseToDerived);
-        this.conversionFromBase = (Conversion) Operation.create(
+        DefaultOperationMethod.checkDimensions(method, baseToDerived);
+        this.conversionFromBase = (Conversion) DefaultOperation.create(
             /* properties */ new UnprefixedMap(properties, "conversion."),
             /* sourceCRS  */ base,
             /* targetCRS  */ this,
@@ -274,8 +276,8 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
             final AbstractDerivedCRS that = (AbstractDerivedCRS) object;
             if (equals(this.baseCRS, that.baseCRS, compareMetadata)) {
                 /*
-                 * Avoid never-ending recursivity: Conversion has a 'targetCRS' field (inherited
-                 * from the CoordinateOperation super-class) that is set to this AbstractDerivedCRS.
+                 * Avoid never-ending recursivity: Conversion has a 'targetCRS' field (inherited from
+                 * the AbstractCoordinateOperation super-class) that is set to this AbstractDerivedCRS.
                  */
                 synchronized (AbstractDerivedCRS.class) {
                     if (_COMPARING != null) {
@@ -306,8 +308,9 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
     public int hashCode() {
         /*
          * Do not invoke 'conversionFromBase.hashCode()' in order to avoid a never-ending loop.
-         * This is because Conversion has a 'sourceCRS' field (in the CoordinateOperation super-
-         * class), which is set to this AbstractDerivedCRS. Checking the identifier should be enough.
+         * This is because Conversion has a 'sourceCRS' field (in the AbstractCoordinateOperation
+         * super-class), which is set to this AbstractDerivedCRS. Checking the identifier should
+         * be enough.
          */
         return (int)serialVersionUID ^ baseCRS.hashCode() ^ conversionFromBase.getName().hashCode();
     }

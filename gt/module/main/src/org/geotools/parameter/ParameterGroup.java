@@ -41,6 +41,7 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.io.TableWriter;
@@ -53,7 +54,7 @@ import org.geotools.resources.cts.Resources;
 /**
  * A group of related parameter values. The same group can be repeated more than once in an
  * {@linkplain org.opengis.referencing.operation.Operation operation} or higher level
- * {@link org.opengis.parameter.ParameterValueGroup}, if those instances contain different
+ * {@link ParameterValueGroup}, if those instances contain different
  * values of one or more {@link ParameterValue}s which suitably distinquish among
  * those groups.
  *  
@@ -61,12 +62,10 @@ import org.geotools.resources.cts.Resources;
  * @author Martin Desruisseaux
  * @author Jody Garnett (Refractions Research)
  *
- * @see org.geotools.parameter.ParameterDescriptorGroup
- * @see org.geotools.parameter.Parameter
+ * @see DefaultParameterDescriptorGroup
+ * @see Parameter
  */
-public class ParameterGroup extends org.geotools.parameter.AbstractParameter
-                              implements org.opengis.parameter.ParameterValueGroup
-{
+public class ParameterGroup extends AbstractParameter implements ParameterValueGroup {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -91,7 +90,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     private transient List asList;
 
     /**
-     * Construct a parameter group from the specified descriptor.
+     * Constructs a parameter group from the specified descriptor.
      * All {@linkplain #values parameter values} will be initialized
      * to their default value.
      *
@@ -112,7 +111,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     }
 
     /**
-     * Construct a parameter group from the specified descriptor and list of parameters.
+     * Constructs a parameter group from the specified descriptor and list of parameters.
      *
      * @param descriptor The descriptor for this group.
      * @param values The list of parameter values.
@@ -142,10 +141,10 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     }
 
     /**
-     * Construct a parameter group from the specified list of parameters.
+     * Constructs a parameter group from the specified list of parameters.
      *
      * @param properties The properties for the
-     *        {@linkplain org.geotools.parameter.ParameterDescriptorGroup operation parameter group}
+     *        {@linkplain DefaultParameterDescriptorGroup operation parameter group}
      *        to construct from the list of parameters.
      * @param values The list of parameter values.
      *
@@ -181,9 +180,9 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         }
         ensureValidOccurs(values, occurences);
         final Set descriptors = occurences.keySet();
-        return new org.geotools.parameter.ParameterDescriptorGroup(properties,
-                                          (GeneralParameterDescriptor[]) descriptors.toArray(
-                                          new GeneralParameterDescriptor[descriptors.size()]));
+        return new DefaultParameterDescriptorGroup(properties,
+                   (GeneralParameterDescriptor[]) descriptors.toArray(
+                   new GeneralParameterDescriptor[descriptors.size()]));
     }
 
     /**
@@ -336,7 +335,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      * @throws ParameterNotFoundException if no {@linkplain ParameterDescriptorGroup descriptor}
      *         was found for the given name.
      */
-    public List/*<org.opengis.parameter.ParameterValueGroup>*/ groups(String name)
+    public List/*<ParameterValueGroup>*/ groups(String name)
             throws ParameterNotFoundException
     {
         ensureNonNull("name", name);
@@ -344,7 +343,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         final List groups = new ArrayList(Math.min(values.size(), 10));
         for (final Iterator it=values.iterator(); it.hasNext();) {
             final GeneralParameterValue value = (GeneralParameterValue) it.next();
-            if (value instanceof org.opengis.parameter.ParameterValueGroup) {
+            if (value instanceof ParameterValueGroup) {
                 if (AbstractIdentifiedObject.nameMatches(value.getDescriptor(), name)) {
                     groups.add(value);
                 }
@@ -367,7 +366,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     }
 
     /**
-     * Create a new group of the specified name. The specified name must be the
+     * Creates a new group of the specified name. The specified name must be the
      * {@linkplain Identifier#getCode identifier code} of a {@linkplain ParameterDescriptorGroup
      * descriptor group}.
      *
@@ -380,7 +379,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
      *         {@linkplain ParameterDescriptorGroup#getMaximumOccurs maximum number of occurences}
      *         of subgroups of the given name.
      */
-    public org.opengis.parameter.ParameterValueGroup addGroup(String name)
+    public ParameterValueGroup addGroup(String name)
             throws ParameterNotFoundException, InvalidParameterCardinalityException
     {
         final GeneralParameterDescriptor check = 
@@ -400,13 +399,12 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
             throw new InvalidParameterCardinalityException(Resources.format(
                 ResourceKeys.ERROR_TOO_MANY_OCCURENCES_$2, name, new Integer(count)), name);
         }
-        final org.opengis.parameter.ParameterValueGroup value =
-            (org.opengis.parameter.ParameterValueGroup) // Remove this cast for J2SE 1.5.
-            ((ParameterDescriptorGroup) check).createValue();
+        final ParameterValueGroup value = (ParameterValueGroup) // Remove this cast for J2SE 1.5
+              ((ParameterDescriptorGroup) check).createValue();
         values.add(value);
         return value;
     }
-    
+
     /**
      * Compares the specified object with this parameter for equality.
      *
@@ -423,7 +421,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this parameter.
      *
@@ -452,7 +450,7 @@ public class ParameterGroup extends org.geotools.parameter.AbstractParameter
     }
 
     /**
-     * Write the content of this parameter to the specified table.
+     * Writes the content of this parameter to the specified table.
      *
      * @param  table The table where to format the parameter value.
      * @throws IOException if an error occurs during output operation.

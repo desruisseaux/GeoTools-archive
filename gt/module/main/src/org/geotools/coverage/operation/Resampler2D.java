@@ -73,6 +73,8 @@ import org.geotools.coverage.processing.Operation2D;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.AbstractCoordinateOperationFactory;
 import org.geotools.referencing.operation.GeneralMatrix;
@@ -696,28 +698,28 @@ public final class Resampler2D extends GridCoverage2D {
          * The parameter descriptor for the interpolation type.
          */
         public static final ParameterDescriptor INTERPOLATION_TYPE =
-                new org.geotools.parameter.ParameterDescriptor(
+                new DefaultParameterDescriptor(
                 "InterpolationType", Object.class, null, "NearestNeighbor");
 
         /**
          * The parameter descriptor for the coordinate reference system.
          */
         public static final ParameterDescriptor COORDINATE_REFERENCE_SYSTEM =
-                new org.geotools.parameter.ParameterDescriptor(
+                new DefaultParameterDescriptor(
                 "CoordinateReferenceSystem", CoordinateReferenceSystem.class, null, null);
 
         /**
          * The parameter descriptor for the grid geometry.
          */
         public static final ParameterDescriptor GRID_GEOMETRY =
-                new org.geotools.parameter.ParameterDescriptor(
+                new DefaultParameterDescriptor(
                 "GridGeometry", GridGeometry2D.class, null, null);
 
         /**
          * Construct a "Resample" operation.
          */
         public Operation() {
-            super(new org.geotools.parameter.ParameterDescriptorGroup("Resample",
+            super(new DefaultParameterDescriptorGroup("Resample",
                   new ParameterDescriptor[] {SOURCE_0, INTERPOLATION_TYPE,
                           COORDINATE_REFERENCE_SYSTEM, GRID_GEOMETRY}));
         }

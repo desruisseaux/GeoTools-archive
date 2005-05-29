@@ -102,7 +102,7 @@ import org.opengis.referencing.FactoryException;
  *                <code>MathTransformFactory</code> but would introduces dependencies
  *                to the factory right inside the abstract math transform.
  *
- * @deprecated Replaced by {@link org.geotools.referencing.operation.MathTransformFactory}
+ * @deprecated Replaced by {@link org.geotools.referencing.operation.DefaultMathTransformFactory}
  *             in the <code>org.geotools.referencing.operation</code> package.
  */
 public class MathTransformFactory {

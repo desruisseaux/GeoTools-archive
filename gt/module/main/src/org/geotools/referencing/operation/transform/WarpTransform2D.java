@@ -49,6 +49,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.metadata.iso.citation.CitationImpl;
+import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.XArray;
@@ -562,15 +563,15 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         private static final long serialVersionUID = -7949539694656719923L;
 
         /** Descriptor for the "{@link WarpPolynomial#getDegree degree}" parameter value. */
-        public static final ParameterDescriptor DEGREE = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor DEGREE = new DefaultParameterDescriptor(
                 "degree", 2, 1, MAX_DEGREE);
 
         /** Descriptor for the "{@link WarpPolynomial#getXCoeffs xCoeffs}" parameter value. */
-        public static final ParameterDescriptor X_COEFFS = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor X_COEFFS = new DefaultParameterDescriptor(
                 "xCoeffs", float[].class, null, null);
 
         /** Descriptor for the "{@link WarpPolynomial#getYCoeffs yCoeffs}" parameter value. */
-        public static final ParameterDescriptor Y_COEFFS = new org.geotools.parameter.ParameterDescriptor(
+        public static final ParameterDescriptor Y_COEFFS = new DefaultParameterDescriptor(
                 "yCoeffs", float[].class, null, null);
 
         /** Descriptor for the "{@link WarpPolynomial#getPreScaleX preScaleX}" parameter value. */
@@ -586,10 +587,10 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         public static final ParameterDescriptor POST_SCALE_Y;
         static {
             final Float ONE = new Float(1);
-             PRE_SCALE_X = new org.geotools.parameter.ParameterDescriptor( "preScaleX", null, ONE, false);
-             PRE_SCALE_Y = new org.geotools.parameter.ParameterDescriptor( "preScaleY", null, ONE, false);
-            POST_SCALE_X = new org.geotools.parameter.ParameterDescriptor("postScaleX", null, ONE, false);
-            POST_SCALE_Y = new org.geotools.parameter.ParameterDescriptor("postScaleY", null, ONE, false);
+             PRE_SCALE_X = new DefaultParameterDescriptor( "preScaleX", null, ONE, false);
+             PRE_SCALE_Y = new DefaultParameterDescriptor( "preScaleY", null, ONE, false);
+            POST_SCALE_X = new DefaultParameterDescriptor("postScaleX", null, ONE, false);
+            POST_SCALE_Y = new DefaultParameterDescriptor("postScaleY", null, ONE, false);
         }
 
         /**

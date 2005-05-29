@@ -41,7 +41,7 @@ import org.opengis.referencing.operation.OperationMethod;
  * @author Martin Desruisseaux
  * @author Matthias Basler
  */
-public class DefiningConversion extends Conversion {
+public class DefiningConversion extends DefaultConversion {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -54,7 +54,7 @@ public class DefiningConversion extends Conversion {
 
     /**
      * Constructs a conversion from a set of properties. The properties given in argument
-     * follow the same rules than for the {@link CoordinateOperation} constructor.
+     * follow the same rules than for the {@link AbstractCoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param method The operation method.

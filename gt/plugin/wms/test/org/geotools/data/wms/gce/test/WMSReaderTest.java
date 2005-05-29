@@ -36,7 +36,7 @@ import org.geotools.data.wms.gce.WMSFormat;
 import org.geotools.data.wms.gce.WMSGridCoverageExchange;
 import org.geotools.data.wms.gce.WMSReader;
 import org.geotools.parameter.Parameter;
-import org.geotools.parameter.ParameterDescriptorGroup;
+import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.IdentifiedObject;
 import org.opengis.coverage.grid.GridCoverage;
@@ -83,7 +83,7 @@ public class WMSReaderTest extends TestCase {
     public void testRead() throws Exception {
     	ParameterValueGroup valueGroup = reader.getFormat().getReadParameters();
     	
-        ParameterDescriptorGroup descriptorGroup =  (ParameterDescriptorGroup) valueGroup.getDescriptor();
+        DefaultParameterDescriptorGroup descriptorGroup =  (DefaultParameterDescriptorGroup) valueGroup.getDescriptor();
 
         List paramDescriptors = descriptorGroup.descriptors();
         GeneralParameterValue[] generalParameterValues = new GeneralParameterValue[paramDescriptors.size()];
@@ -97,10 +97,10 @@ public class WMSReaderTest extends TestCase {
 
             if (parameterName.equals("LAYERS")) {
                 ParameterGroup groupValue = (ParameterGroup) generalParameterValue;
-                ParameterDescriptorGroup groupDesc = (ParameterDescriptorGroup) generalParameterValue
+                DefaultParameterDescriptorGroup groupDesc = (DefaultParameterDescriptorGroup) generalParameterValue
                     .getDescriptor();
 
-                ParameterDescriptorGroup layerGroup = (ParameterDescriptorGroup) paramDescriptor;
+                DefaultParameterDescriptorGroup layerGroup = (DefaultParameterDescriptorGroup) paramDescriptor;
                 
                 List layerDescriptors = layerGroup.descriptors();
                 GeneralParameterValue[] layerParameterValues = new GeneralParameterValue[layerDescriptors.size()];

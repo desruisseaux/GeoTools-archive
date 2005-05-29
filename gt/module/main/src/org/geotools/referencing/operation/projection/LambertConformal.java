@@ -126,7 +126,7 @@ public class LambertConformal extends MapProjection{
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link LambertConformal} 1SP projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -184,7 +184,7 @@ public class LambertConformal extends MapProjection{
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link LambertConformal} 2SP projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -274,7 +274,7 @@ public class LambertConformal extends MapProjection{
      * The {@link org.geotools.referencing.operation.MathTransformProvider}
      * for a {@link LambertConformal} 2SP Belgium projection.
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz
@@ -330,7 +330,7 @@ public class LambertConformal extends MapProjection{
      * for a {@link LambertConformal} 2SP projection, using ESRI parameters.
      * ESRI includes a scale_factor parameter. 
      *
-     * @see org.geotools.referencing.operation.MathTransformFactory
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$
      * @author Rueben Schulz

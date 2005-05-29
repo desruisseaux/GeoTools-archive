@@ -65,7 +65,7 @@ public class Parameters {
      * An empty parameter group. This group contains no parameters.
      */
     public static ParameterDescriptorGroup EMPTY_GROUP =
-            new org.geotools.parameter.ParameterDescriptorGroup("empty", // TODO: localize
+            new DefaultParameterDescriptorGroup("empty", // TODO: localize
             new GeneralParameterDescriptor[0]);
     
     /**
