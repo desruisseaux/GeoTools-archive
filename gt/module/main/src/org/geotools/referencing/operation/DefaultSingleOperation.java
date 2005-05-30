@@ -40,10 +40,6 @@ import org.opengis.referencing.operation.SingleOperation;
  * @author Martin Desruisseaux
  *
  * @since 2.1
- *
- * @todo This class will be removed in a future version. Caution: need to revisit
- *  AbstractCoordinateOperationFactory.concatenate(CoordinateOperation,CoordinateOperation)
- *  (see comment).
  */
 public class DefaultSingleOperation extends AbstractCoordinateOperation implements SingleOperation {
     /**
