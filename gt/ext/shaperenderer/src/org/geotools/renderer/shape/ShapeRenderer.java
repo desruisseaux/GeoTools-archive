@@ -181,11 +181,8 @@ public class ShapeRenderer {
 			try {
 				layerHasIndex[i]=useIndex(sds);
 			} catch (Exception e) {
-				try {
 					IndexInfo info=new IndexInfo(IndexInfo.TREE_NONE,null,null);
-				} catch (Exception e1) {
-					fireErrorEvent(e);
-				}
+                    LOGGER.fine("Exception while trying to use index"+e.getLocalizedMessage());
 			}
 		}
     }

@@ -24,6 +24,8 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Creates Geometry line objects for use by the ShapeRenderer.
@@ -40,6 +42,8 @@ public class MultiLineHandler implements ShapeHandler {
 	double spanx, spany;
 
 	private MathTransform mt;
+	
+	private static final GeometryFactory geomfac = new GeometryFactory();
 
 	/**
 	 * Create new instance
@@ -96,9 +100,9 @@ public class MultiLineHandler implements ShapeHandler {
 		Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1],
 				tmpbbox[3]);
 
-		if (!bbox.intersects(geomBBox)) {
-			return null;
-		}
+//		if (!bbox.intersects(geomBBox)) {
+//			return null;
+//		}
 
 		boolean bboxdecimate = geomBBox.getWidth() <= spanx
 				&& geomBBox.getHeight() <= spany;
@@ -112,7 +116,7 @@ public class MultiLineHandler implements ShapeHandler {
 		}
 		double[][] coords= new double[numParts][];
 		double[][] transformed = new double[numParts][];
-
+		LineString string;
 		int finish, start = 0;
 		int length = 0;
 		
@@ -157,16 +161,15 @@ public class MultiLineHandler implements ShapeHandler {
 				int readDoubles = 0;
 				int currentDoubles = 0;
 				int totalDoubles = length * 2;
-				for (; currentDoubles < totalDoubles;) {
+				while( currentDoubles < totalDoubles) {
 					coords[part][readDoubles] = buffer.getDouble();
 					readDoubles++;
 					currentDoubles++;
 					coords[part][readDoubles] = buffer.getDouble();
 					readDoubles++;
 					currentDoubles++;
-                    if( !intersection && bbox.contains(coords[0][0],coords[0][1]) 
-                            && bbox.contains(coords[0][2], coords[0][3]) )
-                        intersection=true;
+					intersection=bboxIntersectSegment(intersection, coords[part], currentDoubles);
+
 					if (currentDoubles > 3 && currentDoubles < totalDoubles - 1) {
 						if (Math.abs(coords[part][readDoubles - 4]
 								- coords[part][readDoubles - 2]) <= spanx
@@ -207,6 +210,80 @@ public class MultiLineHandler implements ShapeHandler {
 		}
 		return new SimpleGeometry(type, transformed, geomBBox);
 	}
+
+   public boolean bboxIntersectSegment(boolean intersection, double[] coords, int currentDoubles) {
+		if( intersection )
+			return true;
+		if( bbox.contains(coords[currentDoubles-2], coords[currentDoubles-1]) )
+			return true;
+		if( currentDoubles<4)
+			return false;
+		return intersect( coords[ currentDoubles-4 ], coords[ currentDoubles-3 ], 
+				coords[currentDoubles-2], coords[currentDoubles-1],
+				bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
+	}
+	/**
+	 * Uses Cohen Sutherland line clipping algorithm to determine intersection.  See 
+	 * Computer Graphics: Principles and Practice Foley, van Dam, Feiner, Hughes
+	 */
+    private boolean intersect( double x0, double y0, double x1, double y1, double xmin, double ymin, double xmax,
+            double ymax ) {
+        boolean accept = false, done = false;
+        int outcode0 = compOutCode(x0, y0, xmin, xmax, ymin, ymax);
+        int outcode1 = compOutCode(x1, y1, xmin, xmax, ymin, ymax);
+        do {
+            if (outcode0 == 0 || outcode1 == 0) // trivial accept and exit
+                accept = done = true;
+            else if ((outcode0 & outcode1) != 0) // logical and is true so trivial reject and exit
+                done = true;
+            else {
+            	// failed both tests so calculate the line segment to clip:
+            	//from an otside poin to the intersectin with clip edge.
+                double x, y;
+                //at least one endpoint is outside the clip rectangle so pick it.
+                int outcodeOut = outcode0 > 0 ? outcode0 : outcode1;
+                //Now find intersection point 
+                if ((outcodeOut & TOP) > 0) {
+                    x = x0 + (x1 - x0) * (ymax - y0) / (y1 - y0);
+                    y = ymax;
+                } else if ((outcodeOut & BOTTOM) > 0) {
+                    x = x0 + (x1 - x0) * (ymin - y0) / (y1 - y0);
+                    y = ymin;
+                } else if ((outcodeOut & RIGHT) > 0) {
+                    y = y0 + (y1 - y0) * (xmax - x0) / (x1 - x0);
+                    x = xmax;
+                } else {
+                    y = y0 + (y1 - y0) * (xmin - x0) / (x1 - x0);
+                    x = xmin;
+                }
+                if (outcodeOut == outcode0) {
+                    x0 = x;
+                    y0 = y;
+                    outcode0 = compOutCode(x0, y0, xmin, xmax, ymin, ymax);
+                } else {
+                    x1 = x;
+                    y1 = y;
+                    outcode1 = compOutCode(x1, y1, xmin, xmax, ymin, ymax);
+                }
+            }
+        } while( done == false );
+        return accept;
+    }
+
+    static final int TOP = 0x8, BOTTOM = 0x4, RIGHT = 0x2, LEFT = 0x1;
+
+    private int compOutCode( double x, double y, double xmin, double xmax, double ymin, double ymax ) {
+        int outcode = 0;
+        if (y > ymax)
+            outcode |= TOP;
+        if (y < ymin)
+            outcode |= BOTTOM;
+        if (x > xmax)
+            outcode |= RIGHT;
+        if (x < xmin)
+            outcode |= LEFT;
+        return outcode;
+    }
 
 	/**
 	 * @return

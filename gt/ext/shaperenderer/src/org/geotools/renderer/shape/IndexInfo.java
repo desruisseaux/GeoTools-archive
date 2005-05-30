@@ -43,7 +43,7 @@ public class IndexInfo {
 	private RTree rtree;
 	private QuadTree qtree;
 	
-	public IndexInfo(byte treeType, URL treeURL, URL shxURL) throws StoreException, IOException {
+	public IndexInfo(byte treeType, URL treeURL, URL shxURL) {
 		this.treeType=treeType;
 		this.treeURL=treeURL;
 		this.shxURL=shxURL;

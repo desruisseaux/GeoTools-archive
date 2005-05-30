@@ -33,7 +33,7 @@ import org.geotools.geometry.JTS;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.renderer.lite.RenderListener;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
@@ -105,7 +105,7 @@ public class Rendering2DTest extends TestCase {
     	return createTestStyle(null, null);
     }
     
-    Style createTestStyle(String polyName, String lineName) throws IllegalFilterException {
+    public static Style createTestStyle(String polyName, String lineName) throws IllegalFilterException {
     	if( polyName==null )
     		polyName="lakes";
     	if( lineName==null )
@@ -277,7 +277,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                DefaultGeographicCRS.WGS84, crs).getMathTransform();
+                GeographicCRS.WGS84, crs).getMathTransform();
 
         Envelope env = map.getLayerBounds();
 
@@ -362,7 +362,7 @@ public class Rendering2DTest extends TestCase {
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
         MathTransform t = FactoryFinder.getCoordinateOperationFactory(null).createOperation(
-                DefaultGeographicCRS.WGS84, crs).getMathTransform();
+                GeographicCRS.WGS84, crs).getMathTransform();
 
         Envelope env = map.getLayerBounds();
 
@@ -384,7 +384,7 @@ public class Rendering2DTest extends TestCase {
     /**
      * bounds may be null
      */
-    static void showRender( String testName, Object renderer, long timeOut, Envelope bounds )
+    public static void showRender( String testName, Object renderer, long timeOut, Envelope bounds )
             throws Exception {
 
         int w = 300, h = 300;
@@ -445,11 +445,57 @@ public class Rendering2DTest extends TestCase {
         }
     }
 
+    
+    private Style createDefQueryTestStyle() throws IllegalFilterException {
+        StyleFactory sFac = StyleFactory.createStyleFactory();
+
+        PointSymbolizer pointsym = sFac.createPointSymbolizer();
+        pointsym.setGraphic(sFac.getDefaultGraphic());
+        pointsym.setGeometryPropertyName("point");
+
+        Rule rulep = sFac.createRule();
+        rulep.setSymbolizers(new Symbolizer[]{pointsym});
+        FeatureTypeStyle ftsP = sFac.createFeatureTypeStyle();
+        ftsP.setRules(new Rule[]{rulep});
+        ftsP.setFeatureTypeName("querytest");
+
+        LineSymbolizer linesym = sFac.createLineSymbolizer();
+        linesym.setGeometryPropertyName("line");
+
+        Stroke myStroke = sFac.getDefaultStroke();
+        myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
+        myStroke.setWidth(filterFactory.createLiteralExpression(new Integer(3)));
+        LOGGER.info("got new Stroke " + myStroke);
+        linesym.setStroke(myStroke);
+
+        Rule rule2 = sFac.createRule();
+        rule2.setSymbolizers(new Symbolizer[]{linesym});
+        FeatureTypeStyle ftsL = sFac.createFeatureTypeStyle();
+        ftsL.setRules(new Rule[]{rule2});
+        ftsL.setFeatureTypeName("querytest");
+
+        PolygonSymbolizer polysym = sFac.createPolygonSymbolizer();
+        polysym.setGeometryPropertyName("polygon");
+        Fill myFill = sFac.getDefaultFill();
+        myFill.setColor(filterFactory.createLiteralExpression("#ff0000"));
+        polysym.setFill(myFill);
+        polysym.setStroke(sFac.getDefaultStroke());
+        Rule rule = sFac.createRule();
+        rule.setSymbolizers(new Symbolizer[]{polysym});
+        FeatureTypeStyle ftsPoly = sFac.createFeatureTypeStyle(new Rule[]{rule});
+        // ftsPoly.setRules(new Rule[]{rule});
+        ftsPoly.setFeatureTypeName("querytest");
+
+        Style style = sFac.createStyle();
+        style.setFeatureTypeStyles(new FeatureTypeStyle[]{ftsPoly, ftsL, ftsP});
+
+        return style;
+    }
     static ShapefileDataStore getLines() throws IOException{
     	return getLines("streams.shp");
     }
     
-    static ShapefileDataStore getLines(String filename) throws IOException{
+    public static ShapefileDataStore getLines(String filename) throws IOException{
     	URL url=TestData.getResource(Rendering2DTest.class, filename);
     	ShapefileDataStoreFactory factory=new ShapefileDataStoreFactory();
     	return (ShapefileDataStore) factory.createDataStore(url);
