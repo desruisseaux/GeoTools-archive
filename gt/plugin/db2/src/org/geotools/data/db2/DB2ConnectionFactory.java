@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.sql.ConnectionPoolDataSource;
+
 
 /**
  * A factory to create a DB2 Connection based on the needed parameters.
@@ -100,7 +102,8 @@ public class DB2ConnectionFactory {
         }
 
         ConnectionPoolManager manager = ConnectionPoolManager.getInstance();
-        ConnectionPool connectionPool = manager.getConnectionPool(poolDataSource);
+        ConnectionPool connectionPool = manager.getConnectionPool((ConnectionPoolDataSource) poolDataSource);
+
         LOGGER.info("Successfully obtained DB2 ConnectionPool");
 
         return connectionPool;
