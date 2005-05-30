@@ -66,6 +66,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDerivedCRS {
     /**
@@ -119,10 +121,10 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDerived} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     protected AbstractDerivedCRS(final Map                 properties,
                                  final Conversion  conversionFromBase,
@@ -177,10 +179,10 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDerived} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     protected AbstractDerivedCRS(final Map                 properties,
                                  final OperationMethod         method,
@@ -215,7 +217,7 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      *
-     * @todo What to do if <code>base</code> is not an instance of {@link SingleCRS}?
+     * @todo What to do if {@code base} is not an instance of {@link SingleCRS}?
      */
     private static Datum getDatum(final CoordinateReferenceSystem base) {
         ensureNonNull("base",  base);
@@ -263,10 +265,10 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
     /**
      * Compare this coordinate reference system with the specified object for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {

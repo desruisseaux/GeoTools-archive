@@ -141,6 +141,8 @@ import org.geotools.util.WeakHashSet;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GridCoverage2D extends AbstractGridCoverage implements RenderedCoverage {
     /**
@@ -1028,7 +1030,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      *
      * @param  coord The coordinate point where to evaluate.
      * @return A string with pixel coordinates and pixel values at the specified location,
-     *         or {@code null} if <code>coord</code> is outside coverage.
+     *         or {@code null} if {@code coord} is outside coverage.
      */
     public synchronized String getDebugString(final DirectPosition coord) {
         Point2D pixel = toPoint2D(coord);

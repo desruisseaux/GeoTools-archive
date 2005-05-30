@@ -61,6 +61,8 @@ import org.geotools.resources.gcs.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class AbstractGridCoverage extends AbstractCoverage implements GridCoverage {
     /**

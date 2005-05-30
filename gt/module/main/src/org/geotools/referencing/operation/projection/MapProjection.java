@@ -75,6 +75,8 @@ import org.geotools.resources.cts.Resources;
  * @author Martin Desruisseaux
  * @author Rueben Schulz
  *
+ * @since 2.0
+ *
  * @see <A HREF="http://mathworld.wolfram.com/MapProjection.html">Map projections on MathWorld</A>
  */
 public abstract class MapProjection extends AbstractMathTransform implements MathTransform2D,
@@ -118,7 +120,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     protected final double excentricitySquared;
 
     /**
-     * <code>true</code> if this projection is spherical. Spherical model has identical
+     * {@code true} if this projection is spherical. Spherical model has identical
      * {@linkplain #semiMajor semi major} and {@linkplain #semiMinor semi minor} axis
      * length, and an {@linkplain #excentricity excentricity} zero.
      *
@@ -182,7 +184,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     protected final double falseNorthing;
     
     /**
-     * Global scale factor. Default value <code>globalScale</code> is equal
+     * Global scale factor. Default value {@code globalScale} is equal
      * to {@link #semiMajor}&times;{@link #scaleFactor}.
      *
      * <strong>Consider this field as final</strong>. It is not final only
@@ -254,11 +256,11 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     /**
      * Returns the parameter value for the specified operation parameter. Values are
      * automatically converted into the standard units specified by the supplied
-     * <code>param</code> argument, except {@link NonSI#DEGREE_ANGLE degrees} which
+     * {@code param} argument, except {@link NonSI#DEGREE_ANGLE degrees} which
      * are converted to {@link SI#RADIAN radians}.
      *
      * @param  descriptors The value returned by
-     *         <code>getParameterDescriptors().descriptors()</code>.
+     *         {@code getParameterDescriptors().descriptors()}.
      * @param  param The parameter to look for.
      * @param  group The parameter value group to search into.
      * @return The requested parameter value, or {@code NaN} if {@code param} is
@@ -300,7 +302,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * like {@link #latitudeOfOrigin}.
      *
      * @param  y Latitude to check, in radians.
-     * @param  edge <code>true</code> to accept latitudes of &plusmn;&pi;/2.
+     * @param  edge {@code true} to accept latitudes of &plusmn;&pi;/2.
      * @throws IllegalArgumentException if the latitude is out of range.
      */
     static void ensureLatitudeInRange(final ParameterDescriptor name, double y, final boolean edge)
@@ -323,7 +325,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * like {@link #centralMeridian}.
      *
      * @param  x Longitude to verify, in radians.
-     * @param  edge <code>true</code> for accepting longitudes of &plusmn;&pi;.
+     * @param  edge {@code true} for accepting longitudes of &plusmn;&pi;.
      * @throws IllegalArgumentException if the longitude is out of range.
      */
     static void ensureLongitudeInRange(final ParameterDescriptor name, double x, final boolean edge)
@@ -346,7 +348,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * are automatically converted from radians to degrees if needed.
      *
      * @param descriptors The value returned by
-     *        <code>getParameterDescriptors().descriptors()</code>.
+     *        {@code getParameterDescriptors().descriptors()}.
      * @param descriptor  One of the {@link AbstractProvider} constants.
      * @param values      The group in which to set the value.
      * @param value       The value to set.
@@ -438,9 +440,9 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     /**
      * Check point for private use by {@link #checkTransform}. This class is necessary in order
-     * to avoid never-ending loop in <code>assert</code> statements (when an <code>assert</code>
-     * calls <code>transform(...)</code>, which calls <code>inverse.transform(...)</code>, which
-     * calls <code>transform(...)</code>, etc.).
+     * to avoid never-ending loop in {@code assert} statements (when an {@code assert}
+     * calls {@code transform(...)}, which calls {@code inverse.transform(...)}, which
+     * calls {@code transform(...)}, etc.).
      */
     private static final class CheckPoint extends Point2D.Double {
         public CheckPoint(final Point2D point) {
@@ -449,14 +451,14 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Check if the transform of <code>point</code> is close enough to <code>target</code>.
+     * Check if the transform of {@code point} is close enough to {@code target}.
      * "Close enough" means that the two points are separated by a distance shorter than
      * {@link #getToleranceForAssertions}. This method is used for assertions with J2SE 1.4.
      *
-     * @param point   Point to transform, in degrees if <code>inverse</code> is false.
-     * @param target  Point to compare to, in metres if <code>inverse</code> is false.
-     * @param inverse <code>true</code> for an inverse transform instead of a direct one.
-     * @return <code>true</code> if the two points are close enough.
+     * @param point   Point to transform, in degrees if {@code inverse} is false.
+     * @param target  Point to compare to, in metres if {@code inverse} is false.
+     * @param inverse {@code true} for an inverse transform instead of a direct one.
+     * @return {@code true} if the two points are close enough.
      */
     private boolean checkTransform(Point2D point, final Point2D target, final boolean inverse) {
         if (!(point instanceof CheckPoint)) try {
@@ -498,22 +500,22 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
     
     /**
-     * Transforms the specified coordinate and stores the result in <code>ptDst</code>.
-     * This method returns longitude as <var>x</var> values in the range <code>[-PI..PI]</code>
-     * and latitude as <var>y</var> values in the range <code>[-PI/2..PI/2]</code>. It will be
+     * Transforms the specified coordinate and stores the result in {@code ptDst}.
+     * This method returns longitude as <var>x</var> values in the range {@code [-PI..PI]}
+     * and latitude as <var>y</var> values in the range {@code [-PI/2..PI/2]}. It will be
      * checked by the caller, so this method doesn't need to performs this check.
      * <br><br>
      *
      * Input coordinates are also guarenteed to have the {@link #falseEasting} 
      * and {@link #falseNorthing} removed and be divided by {@link #globalScale}
      * before this method is invoked. After this method is invoked, the 
-     * {@link #centralMeridian} is added to the <code>x</code> results 
-     * in <code>ptDst</code>. This means that projections that implement this method 
+     * {@link #centralMeridian} is added to the {@code x} results 
+     * in {@code ptDst}. This means that projections that implement this method 
      * are performed on an ellipse (or sphere) with a semiMajor axis of 1.0.
      * <br><br>
      *
      * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
-     * standardization, described above, is handled by <code>pj_inv.c</code>.
+     * standardization, described above, is handled by {@code pj_inv.c}.
      * Therefore when porting projections from PROJ.4, the inverse transform
      * equations can be used directly here with minimal change.
      * In the equations of Snyder, {@link #falseEasting}, {@link #falseNorthing}
@@ -525,13 +527,13 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @param x     The easting of the coordinate, linear distance on a unit sphere or ellipse.
      * @param y     The northing of the coordinate, linear distance on a unit sphere or ellipse.
      * @param ptDst the specified coordinate point that stores the result of transforming
-     *              <code>ptSrc</code>, or <code>null</code>. Ordinates will be in
+     *              {@code ptSrc}, or {@code null}. Ordinates will be in
      *              <strong>radians</strong>.
-     * @return      the coordinate point after transforming <code>x</code>, <code>y</code> 
-     *              and storing the result in <code>ptDst</code>.
+     * @return      the coordinate point after transforming {@code x}, {@code y} 
+     *              and storing the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
      *
-     * @todo The <code>ptDst</code> argument will be removed and the return type changed if
+     * @todo The {@code ptDst} argument will be removed and the return type changed if
      * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
      * is implemented efficiently in a future J2SE release (maybe J2SE 1.6?).
      */
@@ -539,21 +541,21 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             throws ProjectionException;
     
     /**
-     * Transforms the specified coordinate and stores the result in <code>ptDst</code>.
+     * Transforms the specified coordinate and stores the result in {@code ptDst}.
      * This method is guaranteed to be invoked with values of <var>x</var> in the range
-     * <code>[-PI..PI]</code> and values of <var>y</var> in the range <code>[-PI/2..PI/2]</code>.
+     * {@code [-PI..PI]} and values of <var>y</var> in the range {@code [-PI/2..PI/2]}.
      * <br><br>
      * 
      * Coordinates are also guaranteed to have the {@link #centralMeridian} 
      * removed from <var>x</var> before this method is invoked. After this method 
-     * is invoked, the results in <code>ptDst</code> are multiplied by {@link #globalScale},
+     * is invoked, the results in {@code ptDst} are multiplied by {@link #globalScale},
      * and the {@link #falseEasting} and {@link #falseNorthing} are added.
      * This means that projections that implement this method are performed on an
      * ellipse (or sphere) with a semiMajor axis of 1.0. 
      * <br><br>
      *
      * In <A HREF="http://www.remotesensing.org/proj/">PROJ.4</A>, the same
-     * standardization, described above, is handled by <code>pj_fwd.c</code>.
+     * standardization, described above, is handled by {@code pj_fwd.c}.
      * Therefore when porting projections from PROJ.4, the forward transform equations can
      * be used directly here with minimal change. In the equations of Snyder,
      * {@link #falseEasting}, {@link #falseNorthing} and {@link #scaleFactor}
@@ -564,13 +566,13 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
      * @param x     The longitude of the coordinate, in <strong>radians</strong>.
      * @param y     The  latitude of the coordinate, in <strong>radians</strong>.
      * @param ptDst the specified coordinate point that stores the result of transforming
-     *              <code>ptSrc</code>, or <code>null</code>. Ordinates will be in a
+     *              {@code ptSrc}, or {@code null}. Ordinates will be in a
      *              dimensionless unit, as a linear distance on a unit sphere or ellipse.
-     * @return      the coordinate point after transforming <code>x</code>, <code>y</code>
-     *              and storing the result in <code>ptDst</code>.
+     * @return      the coordinate point after transforming {@code x}, {@code y}
+     *              and storing the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
      *
-     * @todo The <code>ptDst</code> argument will be removed and the return type changed if
+     * @todo The {@code ptDst} argument will be removed and the return type changed if
      * RFE <A HREF="http://developer.java.sun.com/developer/bugParade/bugs/4222792.html">4222792</A>
      * is implemented efficiently in a future J2SE release (maybe J2SE 1.6?).
      */
@@ -578,21 +580,21 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
             throws ProjectionException;
     
     /**
-     * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
+     * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      * <br><br>
      *
-     * This method standardizes the source <code>x</code> coordinate
+     * This method standardizes the source {@code x} coordinate
      * by removing the {@link #centralMeridian}, before invoking
      * <code>{@link #transformNormalized transformNormalized}(x, y, ptDst)</code>.
      * It also multiplies by {@link #globalScale} and adds the {@link #falseEasting} and
-     * {@link #falseNorthing} to the point returned by the <code>transformNormalized(...)</code>
+     * {@link #falseNorthing} to the point returned by the {@code transformNormalized(...)}
      * call.
      *
      * @param ptSrc the specified coordinate point to be transformed. Ordinates must be in degrees.
      * @param ptDst the specified coordinate point that stores the result of transforming
-     *              <code>ptSrc</code>, or <code>null</code>. Ordinates will be in metres.
-     * @return      the coordinate point after transforming <code>ptSrc</code> and storing
-     *              the result in <code>ptDst</code>.
+     *              {@code ptSrc}, or {@code null}. Ordinates will be in metres.
+     * @return      the coordinate point after transforming {@code ptSrc} and storing
+     *              the result in {@code ptDst}.
      * @throws ProjectionException if the point can't be transformed.
      */
     public final Point2D transform(final Point2D ptSrc, Point2D ptDst) throws ProjectionException {
@@ -724,8 +726,8 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     
     /**
      * Inverse of a map projection.  Will be created by {@link MapProjection#inverse()} only when
-     * first required. Implementation of <code>transform(...)</code> methods are mostly identical
-     * to <code>MapProjection.transform(...)</code>, except that they will invokes
+     * first required. Implementation of {@code transform(...)} methods are mostly identical
+     * to {@code MapProjection.transform(...)}, except that they will invokes
      * {@link MapProjection#inverseTransformNormalized} instead of
      * {@link MapProjection#transformNormalized}.
      *
@@ -741,24 +743,24 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         }
 
         /**
-         * Inverse transforms the specified <code>ptSrc</code>
-         * and stores the result in <code>ptDst</code>.
+         * Inverse transforms the specified {@code ptSrc}
+         * and stores the result in {@code ptDst}.
          * <br><br>
          *
-         * This method standardizes the <code>ptSrc</code> by removing the 
+         * This method standardizes the {@code ptSrc} by removing the 
          * {@link #falseEasting} and {@link #falseNorthing} and dividing by 
          * {@link #globalScale} before invoking 
          * <code>{@link #inverseTransformNormalized inverseTransformNormalized}(x, y, ptDst)</code>.
-         * It then adds the {@link #centralMeridian} to the <code>x</code> of the
-         * point returned by the <code>inverseTransformNormalized</code> call.
+         * It then adds the {@link #centralMeridian} to the {@code x} of the
+         * point returned by the {@code inverseTransformNormalized} call.
          *
          * @param ptSrc the specified coordinate point to be transformed.
          *              Ordinates must be in metres.
          * @param ptDst the specified coordinate point that stores the
-         *              result of transforming <code>ptSrc</code>, or
-         *              <code>null</code>. Ordinates will be in degrees.
-         * @return the coordinate point after transforming <code>ptSrc</code>
-         *         and stroring the result in <code>ptDst</code>.
+         *              result of transforming {@code ptSrc}, or
+         *              {@code null}. Ordinates will be in degrees.
+         * @return the coordinate point after transforming {@code ptSrc}
+         *         and stroring the result in {@code ptDst}.
          * @throws ProjectionException if the point can't be transformed.
          */
         public final Point2D transform(final Point2D ptSrc, Point2D ptDst)
@@ -966,7 +968,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
     }
 
     /**
-     * Returns <code>true</code> if the two specified value are equals.
+     * Returns {@code true} if the two specified value are equals.
      * Two {@link Double#NaN NaN} values are considered equals.
      */
     static boolean equals(final double value1, final double value2) {
@@ -1144,7 +1146,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
          * {@linkplain #getIdentifiers identifiers} will be the same than the parameter
          * ones.
          *
-         * @param parameters The set of parameters (never <code>null</code>).
+         * @param parameters The set of parameters (never {@code null}).
          */
         public AbstractProvider(final ParameterDescriptorGroup parameters) {
             super(2, 2, parameters);
@@ -1158,7 +1160,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         }
 
         /**
-         * Returns <code>true</code> is the parameters use a spherical datum.
+         * Returns {@code true} is the parameters use a spherical datum.
          */
         static boolean isSpherical(final ParameterValueGroup values) {
             try {
@@ -1175,7 +1177,7 @@ public abstract class MapProjection extends AbstractMathTransform implements Mat
         /**
          * Returns the parameter value for the specified operation parameter.
          * Values are automatically converted into the standard units specified
-         * by the supplied <code>param</code> argument.
+         * by the supplied {@code param} argument.
          *
          * @param  param The parameter to look for.
          * @param  group The parameter value group to search into.

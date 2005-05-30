@@ -35,20 +35,22 @@ import org.geotools.resources.cts.Resources;
 
 
 /**
- * An element in a <cite>Well Know Text</cite> (WKT). A <code>Element</code> is
+ * An element in a <cite>Well Know Text</cite> (WKT). A {@code Element} is
  * made of {@link String}, {@link Number} and other {@link Element}. For example:
  *
  * <blockquote><pre>
  * PRIMEM["Greenwich", 0.0, AUTHORITY["some authority", "Greenwich"]]
  * </pre></blockquote>
  *
- * Each <code>Element</code> object can contains an arbitrary amount of other elements.
+ * Each {@code Element} object can contains an arbitrary amount of other elements.
  * The result is a tree, which can be printed with {@link #print}.
  * Elements can be pull in a <cite>first in, first out</cite> order.
  *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class Element {    
     /**
@@ -63,7 +65,7 @@ public final class Element {
 
     /**
      * An ordered list of {@link String}s, {@link Number}s and other {@link Element}s.
-     * May be <code>null</code> if the keyword was not followed by a pair of brackets
+     * May be {@code null} if the keyword was not followed by a pair of brackets
      * (e.g. "NORTH").
      */
     private final List list;
@@ -81,7 +83,7 @@ public final class Element {
     }
 
     /**
-     * Constructs a new <code>Element</code>.
+     * Constructs a new {@code Element}.
      *
      * @param  text       The text to parse.
      * @param  position   In input, the position where to start parsing from.
@@ -175,8 +177,8 @@ public final class Element {
     }
 
     /**
-     * Returns <code>true</code> if the next non-whitespace character is the specified separator.
-     * Search is performed in string <code>text</code> from position <code>position</code>. If the
+     * Returns {@code true} if the next non-whitespace character is the specified separator.
+     * Search is performed in string {@code text} from position {@code position}. If the
      * separator is found, then the position is set to the first character after the separator.
      * Otherwise, the position is set on the first non-blank character.
      *
@@ -184,8 +186,8 @@ public final class Element {
      * @param  position   In input, the position where to start parsing from.
      *                    In output, the first character after the separator.
      * @param  separator  The character to search.
-     * @return <code>true</code> if the next non-whitespace character is the separator,
-     *         or <code>false</code> otherwise.
+     * @return {@code true} if the next non-whitespace character is the separator,
+     *         or {@code false} otherwise.
      */
     private static boolean parseOptionalSeparator(final String        text,
                                                   final ParsePosition position,
@@ -242,11 +244,11 @@ public final class Element {
     /**
      * Returns a {@link ParseException} with the specified cause. A localized string
      * <code>"Error in <{@link #keyword}>"</code> will be prepend to the message.
-     * The error index will be the starting index of this <code>Element</code>.
+     * The error index will be the starting index of this {@code Element}.
      *
-     * @param  cause   The cause of the failure, or <code>null</code> if none.
-     * @param  message The message explaining the cause of the failure, or <code>null</code>
-     *                 for reusing the same message than <code>cause</code>.
+     * @param  cause   The cause of the failure, or {@code null} if none.
+     * @param  message The message explaining the cause of the failure, or {@code null}
+     *                 for reusing the same message than {@code cause}.
      * @return The exception to be thrown.
      */
     public ParseException parseFailed(final Exception cause, String message) {
@@ -338,7 +340,7 @@ public final class Element {
      *
      * @param  factory   The name of the factory method.
      * @param  exception The exception to trim.
-     * @return <code>exception</code> for convenience.
+     * @return {@code exception} for convenience.
      */
     private static ParseException trim(final String factory, final ParseException exception) {
         StackTraceElement[] trace = exception.getStackTrace();
@@ -364,7 +366,7 @@ public final class Element {
      *
      * @param  key The parameter name. Used for formatting
      *         an error message if no number are found.
-     * @return The next {@link Number} on the list as a <code>double</code>.
+     * @return The next {@link Number} on the list as a {@code double}.
      * @throws ParseException if no more number is available.
      */
     public double pullDouble(final String key) throws ParseException {
@@ -385,7 +387,7 @@ public final class Element {
      *
      * @param  key The parameter name. Used for formatting
      *         an error message if no number are found.
-     * @return The next {@link Number} on the list as an <code>int</code>.
+     * @return The next {@link Number} on the list as an {@code int}.
      * @throws ParseException if no more number is available, or the number
      *         is not an integer.
      */
@@ -446,7 +448,7 @@ public final class Element {
      *
      * @param  key The element name (e.g. <code>"PRIMEM"</code>).
      * @return The next {@link Element} on the list,
-     *         or <code>null</code> if no more element is available.
+     *         or {@code null} if no more element is available.
      */
     public Element pullOptionalElement(String key) {
         key = key.toUpperCase();
@@ -488,7 +490,7 @@ public final class Element {
     }
 
     /**
-     * Returns the next element, or <code>null</code> if there is no more
+     * Returns the next element, or {@code null} if there is no more
      * element. The element is <strong>not</strong> removed from the list.
      */
     public Object peek() {
@@ -517,7 +519,7 @@ public final class Element {
     }
 
     /**
-     * Print this <code>Element</code> as a tree.
+     * Print this {@code Element} as a tree.
      * This method is used for debugging purpose only.
      *
      * @param  out    The output stream.

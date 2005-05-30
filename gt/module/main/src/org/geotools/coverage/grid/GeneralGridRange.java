@@ -42,6 +42,8 @@ import org.geotools.resources.gcs.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GeneralGridRange implements GridRange, Serializable {
     /**
@@ -204,7 +206,7 @@ public class GeneralGridRange implements GridRange, Serializable {
     
     /**
      * Returns the number of integer grid coordinates along the specified dimension.
-     * This is equals to <code>getUpper(dimension)-getLower(dimension)</code>.
+     * This is equals to {@code getUpper(dimension)-getLower(dimension)}.
      */
     public int getLength(final int dimension) {
         return index[dimension+index.length/2] - index[dimension];
@@ -231,8 +233,8 @@ public class GeneralGridRange implements GridRange, Serializable {
     /**
      * Returns a new grid range that encompass only some dimensions of this grid range.
      * This method copy this grid range's index into a new grid range, beginning at
-     * dimension <code>lower</code> and extending to dimension <code>upper-1</code>.
-     * Thus the dimension of the subgrid range is <code>upper-lower</code>.
+     * dimension {@code lower} and extending to dimension {@code upper-1}.
+     * Thus the dimension of the subgrid range is {@code upper-lower}.
      *
      * @param  lower The first dimension to copy, inclusive.
      * @param  upper The last  dimension to copy, exclusive.

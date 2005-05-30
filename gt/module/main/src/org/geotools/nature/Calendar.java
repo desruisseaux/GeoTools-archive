@@ -45,6 +45,8 @@ import java.util.TimeZone;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class Calendar {
     /**
@@ -65,7 +67,7 @@ public final class Calendar {
     private static double JULIAN_DAY_1970 = 2451544.5-10957;
 
     /**
-     * Interdit la création de classes <code>Cycles</code> par l'utilisateur.
+     * Interdit la création de classes {@code Cycles} par l'utilisateur.
      */
     private Calendar() {
     }

@@ -34,6 +34,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class IdentifierImpl extends MetadataEntity implements Identifier {
     /**
@@ -98,7 +100,7 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
      * When appropriate, the edition is identified by the effective date, coded using
      * ISO 8601 date format.
      *
-     * @return The version, or <code>null</code> if not available.
+     * @return The version, or {@code null} if not available.
      */
     public String getVersion() {
         return version;
@@ -116,7 +118,7 @@ public class IdentifierImpl extends MetadataEntity implements Identifier {
      * Organization or party responsible for definition and maintenance of the
      * {@linkplain #getCode code}.
      *
-     * @return The authority, or <code>null</code> if not available.
+     * @return The authority, or {@code null} if not available.
      */
     public Citation getAuthority() {
         return authority;        

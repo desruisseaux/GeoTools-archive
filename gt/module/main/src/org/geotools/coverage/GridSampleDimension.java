@@ -77,7 +77,7 @@ import org.geotools.util.NumberRange;
  *   [10..210] : temperature to be converted into Celsius degrees through a linear equation
  * </pre></blockquote>
  *
- * In this example, sample values in range <code>[10..210]</code> defines a quantitative category,
+ * In this example, sample values in range {@code [10..210]} defines a quantitative category,
  * while all others categories are qualitative. The difference between those two kinds of category
  * is that the {@link Category#getSampleToGeophysics} method returns a non-null transform if and
  * only if the category is quantitative.
@@ -89,6 +89,8 @@ import org.geotools.util.NumberRange;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GridSampleDimension implements SampleDimension, Serializable {
     /**
@@ -102,7 +104,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     private static final String[] EMPTY_METADATA = new String[0];
 
     /**
-     * A sample dimension wrapping the list of categories <code>CategoryList.inverse</code>.
+     * A sample dimension wrapping the list of categories {@code CategoryList.inverse}.
      * This object is constructed and returned by {@link #geophysics}. Constructed when first
      * needed, but serialized anyway because it may be a user-supplied object.
      */
@@ -110,7 +112,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 
     /**
      * The category list for this sample dimension, or {@code null} if this sample
-     * dimension has no category. This field is read by <code>SampleTranscoder</code> only.
+     * dimension has no category. This field is read by {@code SampleTranscoder} only.
      */
     final CategoryList categories;
 
@@ -123,9 +125,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * <br><br>
      * Assertions:
      *  <ul>
-     *    <li><code>isGeophysics</code> == <code>categories.isScaled(true)</code>.</li>
-     *    <li><code>isGeophysics</code> != <code>categories.isScaled(false)</code>, except
-     *        if <code>categories.geophysics(true) == categories.geophysics(false)</code></li>
+     *    <li>{@code isGeophysics} == {@code categories.isScaled(true)}.</li>
+     *    <li>{@code isGeophysics} != {@code categories.isScaled(false)}, except
+     *        if {@code categories.geophysics(true) == categories.geophysics(false)}</li>
      * </ul>
      */
     private final boolean isGeophysics;
@@ -143,9 +145,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * An arbitrary number of quantitative categories is allowed, providing their sample
      * value ranges do not overlap.
      * <br><br>
-     * If <code>sampleToGeophysics</code> is non-null, then <code>hasQuantitative</code>
+     * If {@code sampleToGeophysics} is non-null, then {@code hasQuantitative}
      * <strong>must</strong> be true.  However, the opposite do not hold in all cases: a
-     * {@code true} value doesn't means that <code>sampleToGeophysics</code> should
+     * {@code true} value doesn't means that {@code sampleToGeophysics} should
      * be non-null.
      */
     private final boolean hasQuantitative;
@@ -214,7 +216,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @param names  Sequence of category names for the values contained in a sample dimension,
      *               as {@link String} or {@link InternationalString} objects.
      * @param colors Color to assign to each category. This array must have the same
-     *               length than <code>names</code>.
+     *               length than {@code names}.
      */
     public GridSampleDimension(final CharSequence[] names, final Color[] colors) {
         // TODO: 'list(...)' should be inlined there if only Sun was to fix RFE #4093999
@@ -507,7 +509,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *                    May be {@code null} if no category has units.
      *                    This unit apply to values obtained after the
      *                    {@link #getSampleToGeophysics sampleToGeophysics} transformation.
-     * @throws IllegalArgumentException if <code>categories</code> contains incompatible
+     * @throws IllegalArgumentException if {@code categories} contains incompatible
      *         categories. If may be the case for example if two or more categories have
      *         overlapping ranges of sample values.
      */
@@ -711,7 +713,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
     /**
      * Returns all categories in this sample dimension. Note that a {@link Category} object may
      * apply to an arbitrary range of sample values.    Consequently, the first element in this
-     * collection may not be directly related to the sample value <code>0</code>.
+     * collection may not be directly related to the sample value {@code 0}.
      *
      * @return The list of categories in this sample dimension, or {@code null} if none.
      *
@@ -758,12 +760,12 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *
      * <ul>
      *   <li>If {@link #getSampleToGeophysics} returns {@code null}, then
-     *       <code>getNoDataValues()</code> returns {@code null} as well.
+     *       {@code getNoDataValues()} returns {@code null} as well.
      *       This means that this sample dimension contains no category or contains
      *       only qualitative categories (e.g. a band from a classified image).</li>
      *
      *   <li>If {@link #getSampleToGeophysics} returns an identity transform,
-     *       then <code>getNoDataValues()</code> returns {@code null}.
+     *       then {@code getNoDataValues()} returns {@code null}.
      *       This means that sample value in this sample dimension are already
      *       expressed in geophysics values and that all "no data" values (if any)
      *       have already been converted into {@code NaN} values.</li>
@@ -924,10 +926,10 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * applied when necessary. More specifically:
      *
      * <ul>
-     *   <li>If <code>value</code> maps a qualitative category, then the
+     *   <li>If {@code value} maps a qualitative category, then the
      *       category name is returned as of {@link Category#getName}.</li>
      *
-     *   <li>Otherwise, if <code>value</code> maps a quantitative category, then the value is
+     *   <li>Otherwise, if {@code value} maps a quantitative category, then the value is
      *       transformed into a geophysics value as with the {@link #getSampleToGeophysics()
      *       sampleToGeophysics} transform, the result is formatted as a number and the unit
      *       symbol is appened.</li>
@@ -1216,8 +1218,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
      * @param  numBands The number of bands for the color model (usually 1). The returned color
-     *         model will renderer only the <code>visibleBand</code> and ignore the others, but
-     *         the existence of all <code>numBands</code> will be at least tolerated. Supplemental
+     *         model will renderer only the {@code visibleBand} and ignore the others, but
+     *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
      *         in the <code>{@link #getRange}</code> range. May be {@code null} if this
@@ -1241,8 +1243,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
      * @param  numBands The number of bands for the color model (usually 1). The returned color
-     *         model will renderer only the <code>visibleBand</code> and ignore the others, but
-     *         the existence of all <code>numBands</code> will be at least tolerated. Supplemental
+     *         model will renderer only the {@code visibleBand} and ignore the others, but
+     *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @param  type The data type that has to be used for the sample model
      * @return The requested color model, suitable for {@link RenderedImage} objects with values

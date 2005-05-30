@@ -36,6 +36,8 @@ import java.util.Arrays;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Andrea Aime
+ *
+ * @since 2.0
  */
 final class MultiBandsIndexColorModel extends IndexColorModel {
     /**
@@ -55,18 +57,18 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
      * @param size      The size of the color component arrays.
      * @param cmap      The array of color components.
      * @param start     The starting offset of the first color component.
-     * @param hasalpha  Indicates whether alpha values are contained in the <code>cmap</code> array.
+     * @param hasalpha  Indicates whether alpha values are contained in the {@code cmap} array.
      * @param transparent  The index of the fully transparent pixel.
      * @param transferType The data type of the array used to represent pixel values. The
-     *                     data type must be either <code>DataBuffer.TYPE_BYTE</code> or
-     *                     <code>DataBuffer.TYPE_USHORT</code>.
+     *                     data type must be either {@code DataBuffer.TYPE_BYTE} or
+     *                     {@code DataBuffer.TYPE_USHORT}.
      * @param numBands     The number of bands.
      * @param visibleBands The band to display.
      *
-     * @throws IllegalArgumentException if <code>bits</code> is less than 1 or greater than 16.
-     * @throws IllegalArgumentException if <code>size</code> is less than 1.
-     * @throws IllegalArgumentException if <code>transferType</code> is not one of
-     *         <code>DataBuffer.TYPE_BYTE</code> or <code>DataBuffer.TYPE_USHORT</code>.
+     * @throws IllegalArgumentException if {@code bits} is less than 1 or greater than 16.
+     * @throws IllegalArgumentException if {@code size} is less than 1.
+     * @throws IllegalArgumentException if {@code transferType} is not one of
+     *         {@code DataBuffer.TYPE_BYTE} or {@code DataBuffer.TYPE_USHORT}.
      */
     public MultiBandsIndexColorModel(final int bits,
                                      final int size,
@@ -138,7 +140,7 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
 
     /**
      * Returns the red color component for the specified pixel, scaled
-     * from 0 to 255 in the default RGB <code>ColorSpace</code>, sRGB.
+     * from 0 to 255 in the default RGB {@code ColorSpace}, sRGB.
      */
     public int getRed(final Object inData) {
         final int pixel;
@@ -164,7 +166,7 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
 
     /**
      * Returns the green color component for the specified pixel, scaled
-     * from 0 to 255 in the default RGB <code>ColorSpace</code>, sRGB.
+     * from 0 to 255 in the default RGB {@code ColorSpace}, sRGB.
      */
     public int getGreen(final Object inData) {
         final int pixel;
@@ -190,7 +192,7 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
     
     /**
      * Returns the blue color component for the specified pixel, scaled
-     * from 0 to 255 in the default RGB <code>ColorSpace</code>, sRGB.
+     * from 0 to 255 in the default RGB {@code ColorSpace}, sRGB.
      */
     public int getBlue(final Object inData) {
         final int pixel;
@@ -247,34 +249,34 @@ final class MultiBandsIndexColorModel extends IndexColorModel {
     }
 
     /**
-     * Creates a <code>WritableRaster</code> with the specified width 
-     * and height that has a data layout (<code>SampleModel</code>) 
-     * compatible with this <code>ColorModel</code>.
+     * Creates a {@code WritableRaster} with the specified width 
+     * and height that has a data layout ({@code SampleModel}) 
+     * compatible with this {@code ColorModel}.
      */
     public WritableRaster createCompatibleWritableRaster(final int width, final int height) {
         return Raster.createBandedRaster(transferType, width, height, numBands, null);
     }
 
     /**
-     * Returns <code>true</code> if <code>raster</code> is compatible 
-     * with this <code>ColorModel</code>.
+     * Returns {@code true} if {@code raster} is compatible 
+     * with this {@code ColorModel}.
      */
     public boolean isCompatibleRaster(final Raster raster) {
         return isCompatibleSampleModel(raster.getSampleModel());
     }
     
     /**
-     * Creates a <code>SampleModel</code> with the specified 
+     * Creates a {@code SampleModel} with the specified 
      * width and height that has a data layout compatible with 
-     * this <code>ColorModel</code>.  
+     * this {@code ColorModel}.  
      */
     public SampleModel createCompatibleSampleModel(final int width, final int height) {
         return new BandedSampleModel(transferType, width, height, numBands);
     }
     
     /** 
-     * Checks if the specified <code>SampleModel</code> is compatible 
-     * with this <code>ColorModel</code>.
+     * Checks if the specified {@code SampleModel} is compatible 
+     * with this {@code ColorModel}.
      */
     public boolean isCompatibleSampleModel(final SampleModel sm) {
         return (sm instanceof ComponentSampleModel)                  &&

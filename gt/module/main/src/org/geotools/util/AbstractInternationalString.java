@@ -47,10 +47,12 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class AbstractInternationalString implements InternationalString {
     /**
-     * The string in the {@linkplain Locale#getDefault system default} locale, or <code>null</code>
+     * The string in the {@linkplain Locale#getDefault system default} locale, or {@code null}
      * if this string has not yet been determined. This is the default string returned by
      * {@link #toString()} and others methods from the {@link CharSequence} interface.
      *
@@ -73,7 +75,7 @@ public abstract class AbstractInternationalString implements InternationalString
      *
      * @param  name   Argument name.
      * @param  object User argument.
-     * @throws IllegalArgumentException if <code>object</code> is null.
+     * @throws IllegalArgumentException if {@code object} is null.
      */
     static void ensureNonNull(final String name, final Object object)
             throws IllegalArgumentException
@@ -119,12 +121,12 @@ public abstract class AbstractInternationalString implements InternationalString
     /**
      * Returns a subsequence of the string in the {@linkplain Locale#getDefault default locale}.
      * The subsequence is a {@link String} object starting with the character value at the specified
-     * index and ending with the character value at index <code>end - 1</code>.
+     * index and ending with the character value at index {@code end - 1}.
      * 
      * @param   start The start index, inclusive.
      * @param   end   The end index, exclusive.
      * @return  The specified subsequence.
-     * @throws  IndexOutOfBoundsException  if <code>start</code> or <code>end</code> is
+     * @throws  IndexOutOfBoundsException  if {@code start} or {@code end} is
      *          out of range.
      */
     public CharSequence subSequence(final int start, final int end) {
@@ -142,7 +144,7 @@ public abstract class AbstractInternationalString implements InternationalString
      * then some default locale is used. The default locale is implementation-dependent. It
      * may or may not be the {@linkplain Locale#getDefault() system default}).
      *
-     * @param  locale The desired locale for the string to be returned, or <code>null</code>
+     * @param  locale The desired locale for the string to be returned, or {@code null}
      *         for a string in the implementation default locale.
      * @return The string in the given locale if available, or in the default locale otherwise.
      */

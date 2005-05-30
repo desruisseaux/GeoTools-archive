@@ -32,6 +32,8 @@ import javax.units.TransformedUnit;
  *
  * @version $Id$
  * @author Desruisseaux
+ *
+ * @since 2.1
  */
 public final class Units {
     /**

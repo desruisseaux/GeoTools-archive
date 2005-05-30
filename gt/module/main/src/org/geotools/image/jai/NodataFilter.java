@@ -47,10 +47,12 @@ import org.geotools.resources.XMath;
  * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class NodataFilter extends AreaOpImage {
     /**
-     * Shared instance of {@link #distances} for the common case where <code>padding==1</code>.
+     * Shared instance of {@link #distances} for the common case where {@code padding==1}.
      */
     private static double[] sharedDistances;
 

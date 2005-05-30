@@ -55,6 +55,8 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultGeocentricCRS extends AbstractSingleCRS implements GeocentricCRS {
     /**

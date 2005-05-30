@@ -43,6 +43,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class OnLineResourceImpl extends MetadataEntity implements OnLineResource {
     /**
@@ -164,7 +166,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     
     /**
      * Returns the name of an application profile that can be used with the online resource.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public String getApplicationProfile() {
         return applicationProfile;
@@ -180,7 +182,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
 
     /**
      * Returns the detailed text description of what the online resource is/does.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public InternationalString getDescription() {
         return description;
@@ -196,7 +198,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     
     /**
      * Returns the code for function performed by the online resource.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public OnLineFunction getFunction() {
         return function;
@@ -229,7 +231,7 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
     
     /**
      * Returns the connection protocol to be used. 
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public String getProtocol() {
         final URI linkage = this.linkage;

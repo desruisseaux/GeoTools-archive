@@ -85,6 +85,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see javax.media.jai.PerspectiveTransform
  * @see java.awt.geom.AffineTransform
  * @see <A HREF="http://mathworld.wolfram.com/AffineTransformation.html">Affine transformation on MathWorld</A>
@@ -163,15 +165,15 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
 
     /**
      * Creates a matrix that keep only a subset of the ordinate values.
-     * The dimension of source coordinates is <code>sourceDim</code> and
-     * the dimension of target coordinates is <code>toKeep.length</code>.
+     * The dimension of source coordinates is {@code sourceDim} and
+     * the dimension of target coordinates is {@code toKeep.length}.
      *
      * @param  sourceDim the dimension of source coordinates.
      * @param  toKeep the indices of ordinate values to keep.
      * @return The matrix to give to the {@link #create(Matrix)}
      *         method in order to create the transform.
-     * @throws IndexOutOfBoundsException if a value of <code>toKeep</code>
-     *         is lower than 0 or not smaller than <code>sourceDim</code>.
+     * @throws IndexOutOfBoundsException if a value of {@code toKeep}
+     *         is lower than 0 or not smaller than {@code sourceDim}.
      */
     public static Matrix createSelectMatrix(final int sourceDim, final int[] toKeep)
             throws IndexOutOfBoundsException
@@ -223,7 +225,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * Transforms an array of floating point coordinates by this matrix. Point coordinates
      * must have a dimension equals to <code>{@link Matrix#getNumCol}-1</code>. For example,
      * for square matrix of size 4&times;4, coordinate points are three-dimensional and
-     * stored in the arrays starting at the specified offset (<code>srcOff</code>) in the order
+     * stored in the arrays starting at the specified offset ({@code srcOff}) in the order
      * <code>[x<sub>0</sub>, y<sub>0</sub>, z<sub>0</sub>,
      *        x<sub>1</sub>, y<sub>1</sub>, z<sub>1</sub>...,
      *        x<sub>n</sub>, y<sub>n</sub>, z<sub>n</sub>]</code>.
@@ -280,7 +282,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * Transforms an array of floating point coordinates by this matrix. Point coordinates
      * must have a dimension equals to <code>{@link Matrix#getNumCol}-1</code>. For example,
      * for square matrix of size 4&times;4, coordinate points are three-dimensional and
-     * stored in the arrays starting at the specified offset (<code>srcOff</code>) in the order
+     * stored in the arrays starting at the specified offset ({@code srcOff}) in the order
      * <code>[x<sub>0</sub>, y<sub>0</sub>, z<sub>0</sub>,
      *        x<sub>1</sub>, y<sub>1</sub>, z<sub>1</sub>...,
      *        x<sub>n</sub>, y<sub>n</sub>, z<sub>n</sub>]</code>.

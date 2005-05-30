@@ -31,13 +31,15 @@ import java.util.Set;
  * A map whose keys are derived from an other map. The keys are derived only when
  * requested, which make it possible to backup potentially large maps. Implementations
  * need only to overrides {@link #baseToDerived} and {@link #derivedToBase} methods.
- * This set do not supports <code>null</code> key, since <code>null</code> is used
- * when no mapping from {@linkplain #base} to <code>this</code> exists.
+ * This set do not supports {@code null} key, since {@code null} is used
+ * when no mapping from {@linkplain #base} to {@code this} exists.
  * This class is serializable if the underlying {@linkplain #base} set is serializable
  * too.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public abstract class DerivedMap extends AbstractMap implements Serializable {
     /**
@@ -79,11 +81,11 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
     /**
      * Transforms a key from the {@linkplain #base} map to a key in this map.
      * If there is no key in the derived map for the specified base key,
-     * then this method returns <code>null</code>.
+     * then this method returns {@code null}.
      *
      * @param  key A ley from the {@linkplain #base} map.
-     * @return The key that this view should contains instead of <code>key</code>,
-     *         or <code>null</code>.
+     * @return The key that this view should contains instead of {@code key},
+     *         or {@code null}.
      */
     protected abstract Object baseToDerived(final Object key);
 
@@ -105,32 +107,32 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
     }
 
     /**
-     * Returns <code>true</code> if this map contains no key-value mappings.
+     * Returns {@code true} if this map contains no key-value mappings.
      *
-     * @return <code>true</code> if this map contains no key-value mappings.
+     * @return {@code true} if this map contains no key-value mappings.
      */
     public boolean isEmpty() {
 	return base.isEmpty() || super.isEmpty();
     }
 
     /**
-     * Returns <code>true</code> if this map maps one or more keys to this value.
+     * Returns {@code true} if this map maps one or more keys to this value.
      * The default implementation invokes
      * <code>{@linkplain #base}.containsValue(value)</code>.
      * 
-     * @return <code>true</code> if this map maps one or more keys to this value.
+     * @return {@code true} if this map maps one or more keys to this value.
      */
     public boolean containsValue(final Object value) {
         return base.containsValue(value);
     }
 
     /**
-     * Returns <code>true</code> if this map contains a mapping for the specified key.
+     * Returns {@code true} if this map contains a mapping for the specified key.
      * The default implementation invokes
      * <code>{@linkplain #base}.containsKey({@linkplain #derivedToBase derivedToBase}(key))</code>.
      *
      * @param  key key whose presence in this map is to be tested.
-     * @return <code>true</code> if this map contains a mapping for the specified key.
+     * @return {@code true} if this map contains a mapping for the specified key.
      */
     public boolean containsKey(final Object key) {
         return base.containsKey(derivedToBase(key));
@@ -155,10 +157,10 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      *
      * @param  key key with which the specified value is to be associated.
      * @param  value value to be associated with the specified key.
-     * @return previous value associated with specified key, or <code>null</code>
+     * @return previous value associated with specified key, or {@code null}
      *	       if there was no mapping for key.
      * @throws UnsupportedOperationException if the {@linkplain #base} map doesn't
-     *         supports the <code>put</code> operation.
+     *         supports the {@code put} operation.
      */
     public Object put(final Object key, final Object value) throws UnsupportedOperationException {
         return base.put(derivedToBase(key), value);
@@ -170,10 +172,10 @@ public abstract class DerivedMap extends AbstractMap implements Serializable {
      * <code>{@linkplain #base}.remove({@linkplain #derivedToBase derivedToBase}(key))</code>.
      *
      * @param  key key whose mapping is to be removed from the map.
-     * @return previous value associated with specified key, or <code>null</code>
+     * @return previous value associated with specified key, or {@code null}
      *	       if there was no entry for key.
      * @throws UnsupportedOperationException if the {@linkplain #base} map doesn't
-     *         supports the <code>remove</code> operation.
+     *         supports the {@code remove} operation.
      */
     public Object remove(final Object key) throws UnsupportedOperationException {
         return base.remove(derivedToBase(key));

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 
+// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 
@@ -34,6 +35,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class NumberedLineWriter extends FilterWriter {
     /**
@@ -70,12 +73,12 @@ public class NumberedLineWriter extends FilterWriter {
     private int current = 1;
 
     /**
-     * <code>true</code> if we are about to write a new line.
+     * {@code true} if we are about to write a new line.
      */
     private boolean newLine = true;
 
     /**
-     * <code>true</code> if we are waiting for a '\n' character.
+     * {@code true} if we are waiting for a '\n' character.
      */
     private boolean waitLF;
 

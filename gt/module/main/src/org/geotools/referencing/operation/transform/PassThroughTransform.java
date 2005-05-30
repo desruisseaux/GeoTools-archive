@@ -50,6 +50,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see DimensionFilter
  */
 public class PassThroughTransform extends AbstractMathTransform implements Serializable {
@@ -86,8 +88,8 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      * @param firstAffectedOrdinate Index of the first affected ordinate.
      * @param subTransform The sub transform.
      * @param numTrailingOrdinates Number of trailing ordinates to pass through.
-     *        Affected ordinates will range from <code>firstAffectedOrdinate</code>
-     *        inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
+     *        Affected ordinates will range from {@code firstAffectedOrdinate}
+     *        inclusive to {@code dimTarget-numTrailingOrdinates} exclusive.
      */
     protected PassThroughTransform(final int firstAffectedOrdinate,
                                    final MathTransform subTransform,
@@ -125,8 +127,8 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      * @param  firstAffectedOrdinate Index of the first affected ordinate.
      * @param  subTransform The sub transform.
      * @param  numTrailingOrdinates Number of trailing ordinates to pass through.
-     *         Affected ordinates will range from <code>firstAffectedOrdinate</code>
-     *         inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
+     *         Affected ordinates will range from {@code firstAffectedOrdinate}
+     *         inclusive to {@code dimTarget-numTrailingOrdinates} exclusive.
      * @return A pass through transform with the following dimensions:<br>
      *         <pre>
      * Source: firstAffectedOrdinate + subTransform.getSourceDimensions() + numTrailingOrdinates
@@ -402,7 +404,7 @@ public class PassThroughTransform extends AbstractMathTransform implements Seria
      * @return The WKT element name.
      *
      * @todo The {@link #numTrailingOrdinates} parameter is not part of OpenGIS specification.
-     *       We should returns a more complex WKT when <code>numTrailingOrdinates != 0</code>,
+     *       We should returns a more complex WKT when {@code numTrailingOrdinates != 0},
      *       using an affine transform to change the coordinates order.
      */
     protected String formatWKT(final Formatter formatter) {

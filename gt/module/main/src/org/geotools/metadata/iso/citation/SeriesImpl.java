@@ -36,6 +36,8 @@ import org.geotools.util.SimpleInternationalString;
  *
  * @author Jody Garnett
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class SeriesImpl extends MetadataEntity implements Series {
     /**

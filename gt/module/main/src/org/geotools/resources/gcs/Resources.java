@@ -60,7 +60,7 @@ public class Resources extends ResourceBundle {
     /**
      * Returns resources in the given locale.
      *
-     * @param  locale The locale, or <code>null</code> for the default locale.
+     * @param  locale The locale, or {@code null} for the default locale.
      * @return Resources in the given locale.
      * @throws MissingResourceException if resources can't be found.
      */
@@ -99,7 +99,7 @@ public class Resources extends ResourceBundle {
     
     /**
      * Gets a string for the given key are replace all occurence of "{0}"
-     * with values of <code>arg0</code>.
+     * with values of {@code arg0}.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute to "{0}".
@@ -115,7 +115,7 @@ public class Resources extends ResourceBundle {
     
     /**
      * Gets a string for the given key are replace all occurence of "{0}",
-     * "{1}", with values of <code>arg0</code>, <code>arg1</code>.
+     * "{1}", with values of {@code arg0}, {@code arg1}.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute to "{0}".
@@ -133,7 +133,7 @@ public class Resources extends ResourceBundle {
     
     /**
      * Gets a string for the given key are replace all occurence of "{0}",
-     * "{1}", with values of <code>arg0</code>, <code>arg1</code>, etc.
+     * "{1}", with values of {@code arg0}, {@code arg1}, etc.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute to "{0}".
@@ -153,7 +153,7 @@ public class Resources extends ResourceBundle {
     
     /**
      * Gets a string for the given key are replace all occurence of "{0}",
-     * "{1}", with values of <code>arg0</code>, <code>arg1</code>, etc.
+     * "{1}", with values of {@code arg0}, {@code arg1}, etc.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute to "{0}".

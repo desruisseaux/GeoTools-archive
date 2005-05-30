@@ -50,12 +50,12 @@ import org.geotools.coverage.grid.GridCoverage2D;                 // For javadoc
 /**
  * A factory for {@link MathTransform2D} backed by a <cite>grid of localization</cite>.
  * A grid of localization is a two-dimensional array of coordinate points. The grid size
- * is <code>width</code>&nbsp;&times;&nbsp;<code>height</code>. Input coordinates are
+ * is {@code width}&nbsp;&times;&nbsp;{@code height}. Input coordinates are
  * (<var>i</var>,<var>j</var>) index in the grid, where <var>i</var> must be in the range
- * <code>[0..width-1]</code> and <var>j</var> in the range <code>[0..height-1]</code> inclusive.
+ * {@code [0..width-1]} and <var>j</var> in the range {@code [0..height-1]} inclusive.
  * Output coordinates are the values stored in the grid of localization at the specified index.
  * <p>
- * The <code>LocalizationGrid</code> class is usefull when the
+ * The {@code LocalizationGrid} class is usefull when the
  * "{@linkplain GridGeometry#getGridToCoordinateSystem grid to coordinate system}"
  * transform for a coverage is not some kind of global mathematical relationship like an
  * {@linkplain AffineTransform affine transform}. Instead, the "real world" coordinates
@@ -134,18 +134,20 @@ import org.geotools.coverage.grid.GridCoverage2D;                 // For javadoc
  * @author Martin Desruisseaux
  * @author Alessio Fabiani
  *
+ * @since 2.0
+ *
  * @see org.opengis.referencing.crs.DerivedCRS
  */
 public class LocalizationGrid {
     /**
      * <var>x</var> (usually longitude) offset relative to an entry.
-     * Points are stored in {@link #grid} as <code>(x,y)</code> pairs.
+     * Points are stored in {@link #grid} as {@code (x,y)} pairs.
      */
     private static final int X_OFFSET = LocalizationGridTransform2D.X_OFFSET;
 
     /**
      * <var>y</var> (usually latitude) offset relative to an entry.
-     * Points are stored in {@link #grid} as <code>(x,y)</code> pairs.
+     * Points are stored in {@link #grid} as {@code (x,y)} pairs.
      */
     private static final int Y_OFFSET = LocalizationGridTransform2D.Y_OFFSET;
 
@@ -167,7 +169,7 @@ public class LocalizationGrid {
 
     /**
      * Grid of coordinate points.
-     * Points are stored as <code>(x,y)</code> pairs.
+     * Points are stored as {@code (x,y)} pairs.
      */
     private double[] grid;
 
@@ -187,7 +189,7 @@ public class LocalizationGrid {
 
     /**
      * Constructs an initially empty localization grid. All "real worlds"
-     * coordinates are initially set to <code>(NaN,NaN)</code>.
+     * coordinates are initially set to {@code (NaN,NaN)}.
      *
      * @param width  Number of grid's columns.
      * @param height Number of grid's rows.
@@ -262,9 +264,9 @@ public class LocalizationGrid {
      * Set a point in this localization grid.
      *
      * @param sourceX  <var>x</var> coordinates in grid coordinates,
-     *                 in the range <code>[0..width-1]</code> inclusive.
+     *                 in the range {@code [0..width-1]} inclusive.
      * @param sourceY  <var>y</var> coordinates in grid coordinates.
-     *                 in the range <code>[0..height-1]</code> inclusive.
+     *                 in the range {@code [0..height-1]} inclusive.
      * @param targetX  <var>x</var> coordinates in "real world" coordinates.
      * @param targetY  <var>y</var> coordinates in "real world" coordinates.
      * @throws IndexOutOfBoundsException If the source coordinates is not in this grid's range.
@@ -285,7 +287,7 @@ public class LocalizationGrid {
      *
      * @param transform The transform to apply.
      * @param region The bounding rectangle (in grid coordinate) for region where to
-     *        apply the transform, or <code>null</code> to transform the whole grid.
+     *        apply the transform, or {@code null} to transform the whole grid.
      */
     public synchronized void transform(final AffineTransform transform, final Rectangle region) {
         assert X_OFFSET  == 0 : X_OFFSET;
@@ -310,8 +312,8 @@ public class LocalizationGrid {
     }
 
     /**
-     * Returns <code>true</code> if this localization grid
-     * contains at least one <code>NaN</code> value.
+     * Returns {@code true} if this localization grid
+     * contains at least one {@code NaN} value.
      */
     public synchronized boolean isNaN() {
         for (int i=grid.length; --i>=0;) {
@@ -323,12 +325,12 @@ public class LocalizationGrid {
     }
 
     /**
-     * Returns <code>true</code> if all coordinates in this grid are increasing or decreasing.
-     * More specifically, returns <code>true</code> if the following conditions are meets:
+     * Returns {@code true} if all coordinates in this grid are increasing or decreasing.
+     * More specifically, returns {@code true} if the following conditions are meets:
      * <ul>
-     *   <li>Coordinates in a row must be increasing or decreasing. If <code>strict</code> is
-     *       <code>true</code>, then coordinates must be strictly increasing or decreasing (i.e.
-     *       equals value are not accepted). <code>NaN</code> values are always ignored.</li>
+     *   <li>Coordinates in a row must be increasing or decreasing. If {@code strict} is
+     *       {@code true}, then coordinates must be strictly increasing or decreasing (i.e.
+     *       equals value are not accepted). {@code NaN} values are always ignored.</li>
      *   <li>Coordinates in all rows must be increasing, or coordinates in all rows must be
      *       decreasing.</li>
      *   <li>Idem for columns (Coordinates in a columns must be increasing or decreasing,
@@ -337,9 +339,9 @@ public class LocalizationGrid {
      *
      * <var>x</var> and <var>y</var> coordinates are tested independently.
      *
-     * @param  strict <code>true</code> to require strictly increasing or decreasing order,
-     *         or <code>false</code> to accept values that are equals.
-     * @return <code>true</code> if coordinates are increasing or decreasing in the same
+     * @param  strict {@code true} to require strictly increasing or decreasing order,
+     *         or {@code false} to accept values that are equals.
+     * @return {@code true} if coordinates are increasing or decreasing in the same
      *         direction for all rows and columns.
      */
     public synchronized boolean isMonotonic(final boolean strict) {
@@ -380,10 +382,10 @@ public class LocalizationGrid {
      * @param grid   The {link #grid} array.
      * @param offset The first element to test.
      * @param num    The number of elements to test.
-     * @param step   The amount to increment <code>offset</code> in order to reach the next element.
+     * @param step   The amount to increment {@code offset} in order to reach the next element.
      * @param flags  A combinaison of {@link #INCREASING}, {@link #DECREASING} and {@link #EQUALS}
      *               that specify which ordering are accepted.
-     * @return       0 if the array is unordered. Otherwise, returns <code>flags</code> with maybe
+     * @return       0 if the array is unordered. Otherwise, returns {@code flags} with maybe
      *               one of {@link #INCREASING} or {@link #DECREASING} flags cleared.
      */
     private static int testOrder(final double[] grid, int offset, int num, final int step, int flags) {
@@ -438,8 +440,8 @@ public class LocalizationGrid {
      *
      * @param index     The offset of the ordinate to test.
      *                  Should be {@link #X_OFFSET} or {@link #Y_OFFSET}.
-     * @param vertical  <code>true</code> to scan the grid vertically, or
-     *                  <code>false</code> to scan the grid horizontally.
+     * @param vertical  {@code true} to scan the grid vertically, or
+     *                  {@code false} to scan the grid horizontally.
      */
     private void removeSingularities(final int index, final boolean vertical) {
         final int step, val1, val2;
@@ -507,7 +509,7 @@ public class LocalizationGrid {
      * @param grid The {link #grid} array.
      * @param offset The first element.
      * @param num    The number of element.
-     * @param step   The amount to increment <code>offset</code> in order to reach the next element.
+     * @param step   The amount to increment {@code offset} in order to reach the next element.
      */
     private static void replaceSingularity(final double[] grid, int offset, int num, final int step) {
         final double increment = (grid[offset+(num-1)*step] - grid[offset])/((double)(num-1));
@@ -551,9 +553,9 @@ public class LocalizationGrid {
      * @param coeff  An array of length 6 in which to store plane's coefficients.
      *               Coefficients will be store in the following order:
      *
-     *                  <code>coeff[0 + offset] = cx;</code>
-     *                  <code>coeff[2 + offset] = cy;</code>
-     *                  <code>coeff[4 + offset] = c;</code>
+     *                  {@code coeff[0 + offset] = cx;}
+     *                  {@code coeff[2 + offset] = cy;}
+     *                  {@code coeff[4 + offset] = c;}
      */
     private void fitPlane(final int offset, final double[] coeff) {
         /*

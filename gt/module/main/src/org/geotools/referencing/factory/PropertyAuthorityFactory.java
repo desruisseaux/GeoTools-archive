@@ -63,6 +63,8 @@ import org.geotools.util.SimpleInternationalString;
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
     /**
@@ -228,8 +230,8 @@ public class PropertyAuthorityFactory extends AbstractAuthorityFactory {
      * Gets a description of the object corresponding to a code.
      *
      * @param  code Value allocated by authority.
-     * @return A description of the object, or <code>null</code> if the object
-     *         corresponding to the specified <code>code</code> has no description.
+     * @return A description of the object, or {@code null} if the object
+     *         corresponding to the specified {@code code} has no description.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the query failed for some other reason.
      */

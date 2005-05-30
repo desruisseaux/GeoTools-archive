@@ -26,6 +26,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.util.Arrays;
 
+// Geotools dependencies
 import org.geotools.resources.XMath;
 
 
@@ -40,6 +41,8 @@ import org.geotools.resources.XMath;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class ColorUtilities {
     /**
@@ -54,20 +57,20 @@ public final class ColorUtilities {
     }
 
     /**
-     * Returns a subarray of the specified color array. The <code>lower</code> and
-     * <code>upper</code> index will be clamb into the <code>palette</code> range.
+     * Returns a subarray of the specified color array. The {@code lower} and
+     * {@code upper} index will be clamb into the {@code palette} range.
      * If they are completly out of range, or if they would result in an empty array,
-     * then <code>null</code> is returned.
+     * then {@code null} is returned.
      *
      * This method is used by {@link org.geotools.cv.SampleDimension} as an heuristic
      * approach for distributing palette colors into a list of categories.
      *
-     * @param  palette The color array (may be <code>null</code>).
+     * @param  palette The color array (may be {@code null}).
      * @param  lower  The lower index, inclusive.
      * @param  upper  The upper index, inclusive.
-     * @return The subarray (may be <code>palette</code> if the original array already fit),
-     *         or <code>null</code> if the <code>lower</code> and <code>upper</code> index
-     *         are out of <code>palette</code> bounds.
+     * @return The subarray (may be {@code palette} if the original array already fit),
+     *         or {@code null} if the {@code lower} and {@code upper} index
+     *         are out of {@code palette} bounds.
      */
     public static Color[] subarray(final Color[] palette, int lower, int upper) {
         if (palette != null) {
@@ -86,14 +89,14 @@ public final class ColorUtilities {
     }
 
     /**
-     * Copy <code>colors</code> into array <code>ARGB</code> from index <code>lower</code>
-     * inclusive to index <code>upper</code> exclusive. If <code>upper-lower</code> is not
-     * equals to the length of <code>colors</code> array, then colors will be interpolated.
+     * Copy {@code colors} into array {@code ARGB} from index {@code lower}
+     * inclusive to index {@code upper} exclusive. If {@code upper-lower} is not
+     * equals to the length of {@code colors} array, then colors will be interpolated.
      *
-     * @param colors Colors to copy into the <code>ARGB</code> array.
+     * @param colors Colors to copy into the {@code ARGB} array.
      * @param ARGB   Array of integer to write ARGB values to.
-     * @param lower  Index (inclusive) of the first element of <code>ARGB</code> to change.
-     * @param upper  Index (exclusive) of the last  element of <code>ARGB</code> to change.
+     * @param lower  Index (inclusive) of the first element of {@code ARGB} to change.
+     * @param upper  Index (exclusive) of the last  element of {@code ARGB} to change.
      */
     public static void expand(final Color[] colors, final int[] ARGB,
                               final int lower, final int upper)
@@ -186,8 +189,8 @@ public final class ColorUtilities {
 
     /**
      * Returns a suggered bit count for an {@link IndexColorModel} of
-     * <code>mapSize</code> colors. This method returns 1, 2, 4, 8 or
-     * 16 according the value of <code>mapSize</code>. It is guaranteed
+     * {@code mapSize} colors. This method returns 1, 2, 4, 8 or
+     * 16 according the value of {@code mapSize}. It is guaranteed
      * that the following relation is hold:
      *
      * <center><pre>(1 << getBitCount(mapSize)) >= mapSize</pre></center>
@@ -203,7 +206,7 @@ public final class ColorUtilities {
 
     /**
      * Returns a suggered type for an {@link IndexColorModel}
-     * of <code>mapSize</code> colors. This method returns
+     * of {@code mapSize} colors. This method returns
      * {@link DataBuffer#TYPE_BYTE} or {@link DataBuffer#TYPE_USHORT}.
      */
     private static int getTransferType(final int mapSize) {
@@ -212,7 +215,7 @@ public final class ColorUtilities {
 
     /**
      * Transform a color from XYZ color space to LAB. The color are transformed
-     * in place. This method returns <code>color</code> for convenience.
+     * in place. This method returns {@code color} for convenience.
      * Reference: http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
      */
     private static float[] XYZtoLAB(final float[] color) {

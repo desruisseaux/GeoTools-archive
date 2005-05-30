@@ -22,16 +22,16 @@ package org.geotools.image.io;
 // Input/output
 import java.io.IOException;
 import java.io.OutputStream;
-
 import javax.imageio.stream.ImageOutputStream;
 
 
 /**
- * Wrap an {@link ImageOutputStream} into a
- * standard {@link java.io.OutputStream}.
+ * Wraps an {@link ImageOutputStream} into a standard {@link java.io.OutputStream}.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class OutputStreamAdapter extends OutputStream {
     /**
@@ -55,7 +55,7 @@ final class OutputStreamAdapter extends OutputStream {
     }
     
     /**
-     * Writes <code>b.length</code> bytes from the specified byte array.
+     * Writes {@code b.length} bytes from the specified byte array.
      * @throws IOException if an I/O error occurs.
      */
     public void write(final byte[] b) throws IOException {
@@ -63,7 +63,7 @@ final class OutputStreamAdapter extends OutputStream {
     }
     
     /**
-     * Writes <code>len</code> bytes from the specified byte array.
+     * Writes {@code len} bytes from the specified byte array.
      * @throws IOException if an I/O error occurs.
      */
     public void write(final byte[] b, final int off, final int len) throws IOException {

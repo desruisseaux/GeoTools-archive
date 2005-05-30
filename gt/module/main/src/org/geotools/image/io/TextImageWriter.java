@@ -33,15 +33,17 @@ import javax.imageio.spi.ImageWriterSpi;
  *
  * TODO: NOT YET IMPLEMENTED
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 abstract class TextImageWriter extends ImageWriter {
     /**
-     * Constructs a <code>TextImageWriter</code>.
+     * Constructs a {@code TextImageWriter}.
      *
-     * @param originatingProvider The <code>ImageWriterSpi</code> that
-     *        is constructing this object, or <code>null</code>.
+     * @param originatingProvider The {@code ImageWriterSpi} that
+     *        is constructing this object, or {@code null}.
      */
     protected TextImageWriter(final ImageWriterSpi provider) {
         super(provider);
@@ -54,7 +56,7 @@ abstract class TextImageWriter extends ImageWriter {
     //  {write(image.getRenderedImage(), new AffineTransform(), new Theme[0], param);}
     
     /**
-     * Returns always <code>null</code> since
+     * Returns always {@code null} since
      * this encoder doesn't support meta-data.
      */
     public IIOMetadata getDefaultStreamMetadata(ImageWriteParam param) {
@@ -62,7 +64,7 @@ abstract class TextImageWriter extends ImageWriter {
     }
     
     /**
-     * Returns always <code>null</code> since
+     * Returns always {@code null} since
      * this encoder doesn't support meta-data.
      */
     public IIOMetadata getDefaultImageMetadata(ImageTypeSpecifier imageType,
@@ -72,7 +74,7 @@ abstract class TextImageWriter extends ImageWriter {
     }
     
     /**
-     * Returns always <code>inData</code> since
+     * Returns always {@code inData} since
      * this encoder doesn't support meta-data.
      */
     public IIOMetadata convertStreamMetadata(IIOMetadata inData, ImageWriteParam param) {
@@ -80,7 +82,7 @@ abstract class TextImageWriter extends ImageWriter {
     }
     
     /**
-     * Returns always <code>inData</code> since
+     * Returns always {@code inData} since
      * this encoder doesn't support meta-data.
      */
     public IIOMetadata convertImageMetadata(IIOMetadata        inData,

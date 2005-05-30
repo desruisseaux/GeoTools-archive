@@ -61,6 +61,8 @@ import org.geotools.util.UnsupportedImplementationException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultGeographicCRS extends AbstractSingleCRS implements GeographicCRS {
     /**
@@ -122,7 +124,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @return The distance between {@code coord1} and {@code coord2}.
      * @throws UnsupportedOperationException if this coordinate reference system can't compute
      *         distances.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.

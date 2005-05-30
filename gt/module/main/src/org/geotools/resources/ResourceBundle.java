@@ -40,8 +40,8 @@ import java.util.logging.Logger;
  * {link java.util.ResourceBundle} implementation using integers instead
  * of strings for resource keys. Because it doesn't use strings, this
  * implementation avoids adding all those string constants to
- * <code>.class</code> files and runtime images. Developers still have
- * meaningful labels in their code (e.g. <code>DIMENSION_MISMATCH</code>)
+ * {@code .class} files and runtime images. Developers still have
+ * meaningful labels in their code (e.g. {@code DIMENSION_MISMATCH})
  * through a set of constants defined in interfaces. This approach
  * furthermore gives the benefit of compile-time safety. Because integer
  * constants are inlined right into class files at compile time, the
@@ -50,6 +50,8 @@ import java.util.logging.Logger;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class ResourceBundle extends java.util.ResourceBundle {
     /**
@@ -74,12 +76,12 @@ public class ResourceBundle extends java.util.ResourceBundle {
 
     /**
      * The array of resources.  Keys are an array index. For example, the value
-     * for key "14" is <code>values[14]</code>. This array will be loaded only
+     * for key "14" is {@code values[14]}. This array will be loaded only
      * when first needed.  We should not load it at construction time, because
-     * some <code>ResourceBundle</code> objects will never ask for values. This
+     * some {@code ResourceBundle} objects will never ask for values. This
      * is particularly the case for ancestor classes of
-     * <code>Resources_fr_CA</code>, <code>Resources_en</code>,
-     * <code>Resources_de</code>, etc., which will only be used
+     * {@code Resources_fr_CA}, {@code Resources_en},
+     * {@code Resources_de}, etc., which will only be used
      * if a key has not been found in the subclass.
      */
     private String[] values;
@@ -160,7 +162,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * Ensures that resource values are loaded.
      * If they are not, load them immediately.
      *
-     * @param  key Key for the requested resource, or <code>null</code>
+     * @param  key Key for the requested resource, or {@code null}
      *         if all resources are requested. This key is used mostly
      *         for constructing messages.
      * @return The resources.
@@ -255,7 +257,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * object for the given key.
      *
      * @param key the key for the desired object
-     * @exception NullPointerException if <code>key</code> is <code>null</code>
+     * @exception NullPointerException if {@code key} is {@code null}
      * @return the object for the given key, or null
      */
     protected final Object handleGetObject(final String key) {
@@ -271,10 +273,10 @@ public class ResourceBundle extends java.util.ResourceBundle {
     }
 
     /**
-     * Make sure that the <code>text</code> string is not longer than
-     * <code>maxLength</code> characters. If <code>text</code> is not
+     * Make sure that the {@code text} string is not longer than
+     * {@code maxLength} characters. If {@code text} is not
      * longer, it is returned unchanged (except for trailing blanks,
-     * which are removed). If <code>text</code> is longer, it will be
+     * which are removed). If {@code text} is longer, it will be
      * cut somewhere in the middle. This method tries to cut between two
      * words and replace the missing words with "(...)". For example,
      * the following string:
@@ -291,9 +293,9 @@ public class ResourceBundle extends java.util.ResourceBundle {
      * </blockquote>
      *
      * @param  text The sentence to summarize if it is too long.
-     * @param  maxLength The maximum length allowed for <code>text</code>.
-     *         If <code>text</code> is longer, it will be summarized.
-     * @return A sentence not longer than <code>maxLength</code>.
+     * @param  maxLength The maximum length allowed for {@code text}.
+     *         If {@code text} is longer, it will be summarized.
+     * @return A sentence not longer than {@code maxLength}.
      */
     private static String summarize(String text, int maxLength) {
         text=text.trim();
@@ -336,16 +338,16 @@ public class ResourceBundle extends java.util.ResourceBundle {
     }
 
     /**
-     * Returns <code>arguments</code> as an array. If <code>arguments</code>
+     * Returns {@code arguments} as an array. If {@code arguments}
      * is already an array, this array or a copy of this array will be returned.
-     * If <code>arguments</code> is not an array, it will be placed in an array
+     * If {@code arguments} is not an array, it will be placed in an array
      * of length 1. In any case, all the array's elements will be checked for
      * {@link String} objects. Any strings of length greater than
      * {@link #MAX_STRING_LENGTH} will be reduced using the
      * {@link #summarize} method.
      *
      * @param  arguments The object to check.
-     * @return <code>arguments</code> as an array.
+     * @return {@code arguments} as an array.
      */
     private static Object[] toArray(final Object arguments) {
         Object[] array;
@@ -420,10 +422,10 @@ public class ResourceBundle extends java.util.ResourceBundle {
      *     return f.format(arg0);
      * </pre></blockquote>
      *
-     * If <code>arg0</code> is not already an array, it will be placed into
+     * If {@code arg0} is not already an array, it will be placed into
      * an array of length 1. Using {@link MessageFormat}, all occurrences of
      * "{0}", "{1}", "{2}" in the resource string will be replaced by
-     * <code>arg0[0]</code>, <code>arg0[1]</code>, <code>arg0[2]</code>, etc.
+     * {@code arg0[0]}, {@code arg0[1]}, {@code arg0[2]}, etc.
      *
      * @param  key The key for the desired string.
      * @param  arg0 A single object or an array of objects to be formatted and
@@ -449,13 +451,13 @@ public class ResourceBundle extends java.util.ResourceBundle {
                  * Construct a new {@link MessageFormat} for formatting the
                  * arguments. There are two possible {@link Locale} we could use:
                  * default locale or resource bundle locale. If the default locale
-                 * uses the same language as this <code>ResourceBundle</code>
+                 * uses the same language as this {@code ResourceBundle}
                  * locale, then we will use the default locale. This allows
                  * dates and numbers to be formatted according to user conventions
-                 * (e.g. French Canada) even if the <code>ResourceBundle</code>
+                 * (e.g. French Canada) even if the {@code ResourceBundle}
                  * locale is different (e.g. standard French). However, if
                  * languages don't match, then we will use
-                 * <code>ResourceBundle</code> locale for better coherence.
+                 * {@code ResourceBundle} locale for better coherence.
                  */
                 Locale locale = Locale.getDefault();
                 final Locale resourceLocale = getLocale();
@@ -477,7 +479,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
 
     /**
      * Gets a string for the given key and replaces all occurrences of "{0}",
-     * "{1}", with values of <code>arg0</code>, <code>arg1</code>, etc.
+     * "{1}", with values of {@code arg0}, {@code arg1}, etc.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute for "{0}".
@@ -495,7 +497,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
 
     /**
      * Gets a string for the given key and replaces all occurrences of "{0}",
-     * "{1}", with values of <code>arg0</code>, <code>arg1</code>, etc.
+     * "{1}", with values of {@code arg0}, {@code arg1}, etc.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute for "{0}".
@@ -515,7 +517,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
 
     /**
      * Gets a string for the given key and replaces all occurrences of "{0}",
-     * "{1}", with values of <code>arg0</code>, <code>arg1</code>, etc.
+     * "{1}", with values of {@code arg0}, {@code arg1}, etc.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute for "{0}".
@@ -537,7 +539,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
 
     /**
      * Gets a string for the given key and replaces all occurrences of "{0}",
-     * "{1}", with values of <code>arg0</code>, <code>arg1</code>, etc.
+     * "{1}", with values of {@code arg0}, {@code arg1}, etc.
      *
      * @param  key The key for the desired string.
      * @param  arg0 Value to substitute for "{0}".
@@ -575,7 +577,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
      *
      * @param  level The log record level.
      * @param  key   The resource key.
-     * @param  arg0  The parameter for the log message, or <code>null</code>.
+     * @param  arg0  The parameter for the log message, or {@code null}.
      * @return The log record.
      */
     public LogRecord getLogRecord(final Level level, final int key,

@@ -54,10 +54,10 @@ import org.geotools.resources.cts.Resources;
  * This implementation provides transforms for three cases of the lambert conic 
  * conformal projection:
  * <ul>
- *   <li><code>Lambert_Conformal_Conic_1SP</code> (EPSG code 9801)</li>
- *   <li><code>Lambert_Conformal_Conic_2SP</code> (EPSG code 9802)</li>
- *   <li><code>Lambert_Conic_Conformal_2SP_Belgium</code> (EPSG code 9803)</li>
- *   <li><code>Lambert_Conformal_Conic</code> - An alias for the ESRI 2SP case
+ *   <li>{@code Lambert_Conformal_Conic_1SP} (EPSG code 9801)</li>
+ *   <li>{@code Lambert_Conformal_Conic_2SP} (EPSG code 9802)</li>
+ *   <li>{@code Lambert_Conic_Conformal_2SP_Belgium} (EPSG code 9803)</li>
+ *   <li>{@code Lambert_Conformal_Conic} - An alias for the ESRI 2SP case
  *       that includes a scale_factor parameter</li>
  * </ul>
  *
@@ -84,6 +84,8 @@ import org.geotools.resources.cts.Resources;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public class LambertConformal extends MapProjection{
     /** 
@@ -108,17 +110,17 @@ public class LambertConformal extends MapProjection{
     private final double n,F,rho0;
     
     /**
-     * <code>true</code> for 2SP, or <code>false</code> for 1SP projection.
+     * {@code true} for 2SP, or {@code false} for 1SP projection.
      */
     private final boolean sp2;
     
     /**
-     * <code>true</code> for Belgium 2SP.
+     * {@code true} for Belgium 2SP.
      */
     private final boolean belgium;
     
     /**
-     * <code>true</code> for ESRI 2SP parameters.
+     * {@code true} for ESRI 2SP parameters.
      */
     private final boolean esri;
     
@@ -386,8 +388,8 @@ public class LambertConformal extends MapProjection{
      *
      * @param  parameters The parameter values in standard units.
      * @param  expected The expected parameter descriptors.
-     * @param  sp2 <code>true</code> for 2SP, or <code>false</code> for 1SP.
-     * @param  belgium <code>true</code> for the Belgium 2SP case.
+     * @param  sp2 {@code true} for 2SP, or {@code false} for 1SP.
+     * @param  belgium {@code true} for the Belgium 2SP case.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
      */
     LambertConformal(final ParameterValueGroup parameters, final Collection expected,
@@ -484,7 +486,7 @@ public class LambertConformal extends MapProjection{
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -521,7 +523,7 @@ public class LambertConformal extends MapProjection{
      
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-     * and stores the result in <code>ptDst</code>.
+     * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -562,7 +564,7 @@ public class LambertConformal extends MapProjection{
     public int hashCode() {
         /*
          * This code should be computed fast. Consequently, we do not use all fields
-         * in this object.  Two <code>LambertConformal</code> objects with different
+         * in this object.  Two {@code LambertConformal} objects with different
          * {@link #phi1} and {@link #phi2} should compute a F value different enough.
          */
         final long code = Double.doubleToLongBits(F);

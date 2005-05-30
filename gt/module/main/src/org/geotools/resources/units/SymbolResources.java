@@ -21,7 +21,7 @@
  *
  *                   THIS IS A TEMPORARY CLASS
  *
- *    This is a placeholder for future <code>Unit</code> class.
+ *    This is a placeholder for future {@code Unit} class.
  *    This skeleton will be removed when the real classes from
  *    JSR-108: Units specification will be publicly available.
  */
@@ -98,8 +98,8 @@ public class SymbolResources extends java.util.ResourceBundle {
      * pour répondre aux exigences de la classe {@link java.util.ResourceBundle}
      * et n'a généralement pas besoin d'être appellée directement.
      *
-     * @param  key Clé désignant la ressouce désirée (ne doit pas être <code>null</code>).
-     * @return La ressource demandée, ou <code>null</code> si aucune ressource n'est
+     * @param  key Clé désignant la ressouce désirée (ne doit pas être {@code null}).
+     * @return La ressource demandée, ou {@code null} si aucune ressource n'est
      *         définie pour cette clé.
      */
     protected final Object handleGetObject(final String key) {

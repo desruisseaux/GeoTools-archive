@@ -89,6 +89,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     /**
@@ -97,7 +99,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     static final int DEFAULT_MAX = 20;
 
     /**
-     * The underlying authority factory. This field may be <code>null</code> if this object was
+     * The underlying authority factory. This field may be {@code null} if this object was
      * created by the {@linkplain #BufferedAuthorityFactory(FactoryGroup,int) package protected
      * constructor}. In this case, the subclass is responsible for creating the backing store
      * when {@link DeferredAuthorityFactory#createBackingStore} is invoked.
@@ -123,19 +125,19 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Constructs an instance wrapping the specified factory with a default number
      * of entries to keep by strong reference.
      *
-     * @param factory The factory to cache. Can not be <code>null</code>.
+     * @param factory The factory to cache. Can not be {@code null}.
      */
     public BufferedAuthorityFactory(final AbstractAuthorityFactory factory) {
         this(factory, DEFAULT_MAX);
     }
 
     /**
-     * Constructs an instance wrapping the specified factory. The <code>maxStrongReferences</code>
+     * Constructs an instance wrapping the specified factory. The {@code maxStrongReferences}
      * argument specify the maximum number of objects to keep by strong reference. If a greater
      * amount of objects are created, then the strong references for the oldest ones are replaced
      * by weak references.
      *
-     * @param factory The factory to cache. Can not be <code>null</code>.
+     * @param factory The factory to cache. Can not be {@code null}.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      */
     public BufferedAuthorityFactory(AbstractAuthorityFactory factory,
@@ -244,7 +246,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the set of authority codes of the given type. The <code>type</code>
+     * Returns the set of authority codes of the given type. The {@code type}
      * argument specify the base class.
      *
      * @param  type The spatial reference objects type.
@@ -263,9 +265,9 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Gets a description of the object corresponding to a code.
      *
      * @param  code Value allocated by authority.
-     * @return A description of the object, or <code>null</code> if the object
-     *         corresponding to the specified <code>code</code> has no description.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @return A description of the object, or {@code null} if the object
+     *         corresponding to the specified {@code code} has no description.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the query failed for some other reason.
      */
     public synchronized InternationalString getDescriptionText(final String code)

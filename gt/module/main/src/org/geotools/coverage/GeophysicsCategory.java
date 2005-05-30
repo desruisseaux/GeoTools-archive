@@ -43,10 +43,12 @@ import org.geotools.util.NumberRange;
 /**
  * A "geophysics" view of a category. Sample values in this category are equal to geophysics
  * values.   By definition, the {@link #getSampleToGeophysics} method for this class returns
- * the identity transform, or <code>null</code> if this category is a qualitative one.
+ * the identity transform, or {@code null} if this category is a qualitative one.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class GeophysicsCategory extends Category {
     /**
@@ -58,7 +60,7 @@ final class GeophysicsCategory extends Category {
      * Creates a new instance of geophysics category.
      *
      * @param  inverse The originating {@link Category}.
-     * @param  isQuantitative <code>true</code> if the originating category is quantitative.
+     * @param  isQuantitative {@code true} if the originating category is quantitative.
      * @throws TransformException if a transformation failed.
      */
     GeophysicsCategory(Category inverse, boolean isQuantitative) throws TransformException {
@@ -126,14 +128,14 @@ final class GeophysicsCategory extends Category {
     /**
      * Returns a transform from sample values to geophysics values, which (by definition)
      * is an identity transformation. If this category is not a quantitative one, then
-     * this method returns <code>null</code>.
+     * this method returns {@code null}.
      */
     public MathTransform1D getSampleToGeophysics() {
         return isQuantitative() ? LinearTransform1D.IDENTITY : null;
     }
     
     /**
-     * Returns <code>true</code> if this category is quantitative.
+     * Returns {@code true} if this category is quantitative.
      */
     public boolean isQuantitative() {
         assert !(inverse instanceof GeophysicsCategory) : inverse;
@@ -161,7 +163,7 @@ final class GeophysicsCategory extends Category {
     }
 
     /**
-     * If <code>false</code>, returns a category with the original sample values.
+     * If {@code false}, returns a category with the original sample values.
      */
     public Category geophysics(final boolean toGeophysics) {
         assert !(inverse instanceof GeophysicsCategory) : inverse;
@@ -173,7 +175,7 @@ final class GeophysicsCategory extends Category {
 
     /**
      * Range of geophysics values computed from the range of the {@linkplain #inverse indexed
-     * category}. The <code>inverse.transform</code> transformation is used for computing the
+     * category}. The {@code inverse.transform} transformation is used for computing the
      * inclusive and exclusive minimum and maximum values of this range.  We compute both the
      * inclusive and exclusive values because we can't rely on the default implementation, which
      * looks for the nearest representable number. For example is the range of index values is 0
@@ -194,18 +196,18 @@ final class GeophysicsCategory extends Category {
 
         /**
          * The minimal value to be returned by {@link #getMinimum(boolean)} when the
-         * <code>inclusive</code> flag is the opposite of {@link #isMinIncluded()}.
+         * {@code inclusive} flag is the opposite of {@link #isMinIncluded()}.
          */
         private final double minimum2;
 
         /**
          * The maximal value to be returned by {@link #getMaximum(boolean)} when the
-         * <code>inclusive</code> flag is the opposite of {@link #isMaxIncluded()}.
+         * {@code inclusive} flag is the opposite of {@link #isMaxIncluded()}.
          */
         private final double maximum2;
 
         /**
-         * Construct a range of <code>double</code> values.
+         * Construct a range of {@code double} values.
          */
         public Range(final double minimum,  final boolean isMinIncluded,
                      final double maximum,  final boolean isMaxIncluded,

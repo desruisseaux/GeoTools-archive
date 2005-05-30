@@ -42,6 +42,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements SpatialTemporalExtent {
     /**
@@ -76,7 +78,7 @@ public class SpatialTemporalExtentImpl extends TemporalExtentImpl implements Spa
      * Returns the spatial extent component of composite
      * spatial and temporal extent.
      *
-     * @return The list of geographic extents (never <code>null</code>).
+     * @return The list of geographic extents (never {@code null}).
      */
     public synchronized Collection getSpatialExtent() {
         return spatialExtent = nonNullCollection(spatialExtent, GeographicExtent.class);

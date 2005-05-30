@@ -25,6 +25,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+// Geotools dependencies
 import org.geotools.resources.XMath;
 
 
@@ -32,14 +33,16 @@ import org.geotools.resources.XMath;
  * Utility methods for affine transforms. This class provides a set
  * of public static methods working on any {@link AffineTransform}.
  * <br><br>
- * Class <code>XAffineTransform</code> overrides all mutable methods
+ * Class {@code XAffineTransform} overrides all mutable methods
  * of {@link AffineTransform} in order to check for permission before
  * changing the transform's state. If {@link #checkPermission} is
- * defined to always throw an exception, then <code>XAffineTransform</code>
+ * defined to always throw an exception, then {@code XAffineTransform}
  * is immutable.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public abstract class XAffineTransform extends AffineTransform {
     /**
@@ -53,8 +56,8 @@ public abstract class XAffineTransform extends AffineTransform {
     private static final double EPS = 1E-6;
 
     /**
-     * Constructs a new <code>XAffineTransform</code> that is a
-     * copy of the specified <code>AffineTransform</code> object.
+     * Constructs a new {@code XAffineTransform} that is a
+     * copy of the specified {@code AffineTransform} object.
      */
     protected XAffineTransform(final AffineTransform tr) {
         super(tr);
@@ -62,7 +65,7 @@ public abstract class XAffineTransform extends AffineTransform {
 
     /**
      * Check if the caller is allowed to change this
-     * <code>XAffineTransform</code>'s state.
+     * {@code XAffineTransform}'s state.
      */
     protected abstract void checkPermission();
 
@@ -190,8 +193,8 @@ public abstract class XAffineTransform extends AffineTransform {
 
     /**
      * Returns a rectangle which entirely contains the direct transform of
-     * <code>bounds</code>. This operation is equivalent to
-     * <code>createTransformedShape(bounds).getBounds2D()</code>.
+     * {@code bounds}. This operation is equivalent to
+     * {@code createTransformedShape(bounds).getBounds2D()}.
      *
      * @param transform Affine transform to use.
      * @param bounds    Rectangle to transform. This rectangle will not be
@@ -199,7 +202,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * @param dest      Rectangle in which to place the result.  If null, a new
      *                  rectangle will be created.
      *
-     * @return The direct transform of the <code>bounds</code> rectangle.
+     * @return The direct transform of the {@code bounds} rectangle.
      */
     public static Rectangle2D transform(final AffineTransform transform,
                                         final Rectangle2D     bounds,
@@ -227,8 +230,8 @@ public abstract class XAffineTransform extends AffineTransform {
 
     /**
      * Returns a rectangle which entirely contains the inverse transform of 
-     * <code>bounds</code>. This operation is equivalent to
-     * <code>createInverse().createTransformedShape(bounds).getBounds2D()</code>.
+     * {@code bounds}. This operation is equivalent to
+     * {@code createInverse().createTransformedShape(bounds).getBounds2D()}.
      *
      * @param transform Affine transform to use.
      * @param bounds    Rectangle to transform. This rectangle will not be
@@ -236,7 +239,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * @param dest      Rectangle in which to place the result.  If null, a new
      *                  rectangle will be created.
      *
-     * @return The inverse transform of the <code>bounds</code> rectangle.
+     * @return The inverse transform of the {@code bounds} rectangle.
      * @throws NoninvertibleTransformException if the affine transform can't be
      *         inverted.
      */
@@ -275,7 +278,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * @param dest      Point in which to place the result.  If null, a new
      *                  point will be created.
      *
-     * @return The inverse transform of the <code>source</code> point.
+     * @return The inverse transform of the {@code source} point.
      * @throws NoninvertibleTransformException if the affine transform can't be
      *         inverted.
      */

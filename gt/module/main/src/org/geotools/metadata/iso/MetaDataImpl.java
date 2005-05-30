@@ -54,6 +54,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class MetaDataImpl extends MetadataEntity implements MetaData {
     /**
@@ -62,7 +64,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     private static final long serialVersionUID = 4280620497868178687L;
     
     /**
-     * Unique identifier for this metadata file, or <code>null</code> if none.
+     * Unique identifier for this metadata file, or {@code null} if none.
      */
     private String fileIdentifier;
 
@@ -192,14 +194,14 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     }
 
     /**
-     * Returns the unique identifier for this metadata file, or <code>null</code> if none.
+     * Returns the unique identifier for this metadata file, or {@code null} if none.
      */
     public String getFileIdentifier() {
         return fileIdentifier;
     }
 
     /**
-     * Set the unique identifier for this metadata file, or <code>null</code> if none.
+     * Set the unique identifier for this metadata file, or {@code null} if none.
      */
     public synchronized void setFileIdentifier(final String newValue) {
         checkWritePermission();

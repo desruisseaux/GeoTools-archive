@@ -19,7 +19,7 @@
  */
 package org.geotools.resources.image;
 
-// Images and AWT
+// J2SE dependencies
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.ColorModel;
@@ -45,12 +45,14 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+// JAI dependencies
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.TileComputationListener;
 import javax.media.jai.TileRequest;
 import javax.media.jai.TileScheduler;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.renderer.ResourceKeys;
@@ -74,6 +76,8 @@ import org.geotools.util.WeakValueHashMap;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class DeferredPlanarImage extends PlanarImage
                             implements WritableRenderedImage, TileObserver, TileComputationListener
@@ -133,14 +137,14 @@ public final class DeferredPlanarImage extends PlanarImage
      * a 1000&times;1000 tile). The actual {@link #delay} will be shorter if the tiles are
      * smaller; for example the delay is four time smaller for a 500&times;500 tile.  When
      * a requested tile is not yet available, the {@link #getTile} method will wait for a
-     * maximum of <code>DELAY</code> milliseconds in case the tile computation would be very
+     * maximum of {@code DELAY} milliseconds in case the tile computation would be very
      * fast. Set the delay to 0 in order to disable this feature.
      */
     private static final int DELAY = 500;
 
     /**
      * The delay (in milliseconds) to wait for a tile. When a requested tile is not yet available,
-     * the {@link #getTile} method will wait for a maximum of <code>delay</code> milliseconds in
+     * the {@link #getTile} method will wait for a maximum of {@code delay} milliseconds in
      * case the tile computation would be very fast. Set the delay to 0 in order to disable this
      * feature.
      */
@@ -152,7 +156,7 @@ public final class DeferredPlanarImage extends PlanarImage
     private final PlanarImage image;
 
     /**
-     * The tile observers, or <code>null</code> if none.
+     * The tile observers, or {@code null} if none.
      */
     private TileObserver[] observers;
 
@@ -178,7 +182,7 @@ public final class DeferredPlanarImage extends PlanarImage
     private transient Raster[] pendings;
    
     /**
-     * Construct a new instance of <code>DeferredPlanarImage</code>.
+     * Construct a new instance of {@code DeferredPlanarImage}.
      *
      * @param source The source image.
      */
@@ -206,7 +210,7 @@ public final class DeferredPlanarImage extends PlanarImage
 
     /**
      * Returns the indice in {@link #requests} and {@link #pendings} array for the given tile.
-     * The <code>x</code> index varies fastest.
+     * The {@code x} index varies fastest.
      */
     private int getTileIndice(final int tileX, final int tileY) {
         assert tileX>=getMinTileX() && tileX<=getMaxTileX() : tileX;
@@ -525,7 +529,7 @@ public final class DeferredPlanarImage extends PlanarImage
     }
 
     /**
-     * Checks out a tile for writing. Since <code>DeferredPlanarImage</code> are not really
+     * Checks out a tile for writing. Since {@code DeferredPlanarImage} are not really
      * writable, this method throws an {@link UnsupportedOperationException}.
      */
     public WritableRaster getWritableTile(final int tileX, final int tileY) {
@@ -533,7 +537,7 @@ public final class DeferredPlanarImage extends PlanarImage
     }
 
     /**
-     * Relinquishes the right to write to a tile. Since <code>DeferredPlanarImage</code> are
+     * Relinquishes the right to write to a tile. Since {@code DeferredPlanarImage} are
      * not really writable, this method throws an {@link IllegalStateException} (the state is
      * really illegal since {@link #getWritableTile} should never have succeeded).
      */
@@ -595,7 +599,7 @@ public final class DeferredPlanarImage extends PlanarImage
 
     /**
      * Sets a rectangle of the image to the contents of the raster. Since
-     * <code>DeferredPlanarImage</code> are not really writable, this method
+     * {@code DeferredPlanarImage} are not really writable, this method
      * throws an {@link UnsupportedOperationException}.
      */
     public void setData(Raster r) {
@@ -605,7 +609,7 @@ public final class DeferredPlanarImage extends PlanarImage
     /**
      * Provides a hint that this image will no longer be accessed from a reference in user space.
      * <strong>NOTE: this method dispose the image given to the constructor as well!</strong>.
-     * This is because <code>DeferredPlanarImage</code> is used as a "view" of an other
+     * This is because {@code DeferredPlanarImage} is used as a "view" of an other
      * image, and the user shouldn't know that he is not using directly the other image.
      */
     public synchronized void dispose() {

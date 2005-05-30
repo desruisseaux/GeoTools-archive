@@ -44,6 +44,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * 
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class DirectPosition2D extends Point2D.Double implements DirectPosition, Serializable {
     /**

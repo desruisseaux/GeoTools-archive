@@ -35,6 +35,8 @@ package org.geotools.nature;
  * @version $Id$
  * @author Bernard Pelchat
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class SeaWater {
     /*
@@ -277,7 +279,7 @@ public final class SeaWater {
      * Compute volumic anomaly as a function of salinity, temperature and pressure.
      * Volumic anomaly is defined as the sea water sample's volume minus a standard
      * sample's volume, where the standard sample is a sample of salinity 35, temperature
-     * 0°C and the same pressure. In pseudo-code, <code>volumeAnomaly</code> is equivalent
+     * 0°C and the same pressure. In pseudo-code, {@code volumeAnomaly} is equivalent
      * to <code>{@link #volume volume}(S,T,P)-{@link #volume volume}(35,0,P)</code>.
      *
      * @param S Salinity PSS-78 (0 to 42)
@@ -315,8 +317,8 @@ public final class SeaWater {
     }
 
     /**
-     * <code>dsal(RT,XT)</code> function for derivative
-     * of <code>sal(RT,XT)</code> with <var>RT</var>.
+     * {@code dsal(RT,XT)} function for derivative
+     * of {@code sal(RT,XT)} with <var>RT</var>.
      */
     private static double dsal(double RT, double XT) {
         return polynome(RT,PSS78_G) + (XT/(1.0+PSS78_K*XT)) * polynome(RT,PSS78_H);
@@ -326,7 +328,7 @@ public final class SeaWater {
      * Compute salinity as a function of conductivity, temperature and pressure.
      *
      * @param C Conductivity in mS/cm (milli-Siemmens by centimeters). Multiply
-     *          par {@link #STANDARD_CONDUCTIVITY} if <code>C</code> is not a
+     *          par {@link #STANDARD_CONDUCTIVITY} if {@code C} is not a
      *          real conductivity, but instead the ratio between the sample's
      *          conductivity and the standard sample's conductivity.
      * @param T Temperature ITS-68 (-2 to 40°C)

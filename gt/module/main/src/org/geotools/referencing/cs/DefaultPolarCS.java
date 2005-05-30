@@ -34,7 +34,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 /**
  * A two-dimensional coordinate system in which position is specified by the distance from the
  * origin and the angle between the line from the origin to a point and a reference direction.
- * A <code>PolarCS</code> shall have two {@linkplain #getAxis axis}.
+ * A {@code PolarCS} shall have two {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -44,6 +44,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see DefaultCylindricalCS
  */
@@ -97,7 +99,7 @@ public class DefaultPolarCS extends AbstractCS implements PolarCS {
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */

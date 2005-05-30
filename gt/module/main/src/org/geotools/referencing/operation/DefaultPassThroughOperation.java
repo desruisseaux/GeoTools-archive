@@ -45,6 +45,8 @@ import org.geotools.util.UnsupportedImplementationException;
  *  
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultPassThroughOperation extends DefaultSingleOperation implements PassThroughOperation {
     /**
@@ -60,8 +62,8 @@ public class DefaultPassThroughOperation extends DefaultSingleOperation implemen
     /**
      * Constructs a single operation from a set of properties. The properties given in argument
      * follow the same rules than for the {@link AbstractCoordinateOperation} constructor.
-     * Affected ordinates will range from <code>firstAffectedOrdinate</code>
-     * inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
+     * Affected ordinates will range from {@code firstAffectedOrdinate}
+     * inclusive to {@code dimTarget-numTrailingOrdinates} exclusive.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceCRS The source CRS.

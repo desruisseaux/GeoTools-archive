@@ -33,6 +33,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  * 
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class DirectPosition1D implements DirectPosition, Serializable, Cloneable {
     /**

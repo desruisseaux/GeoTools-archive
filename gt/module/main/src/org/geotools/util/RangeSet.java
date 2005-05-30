@@ -39,10 +39,10 @@ import org.opengis.util.Cloneable;
 
 
 /**
- * An ordered set of ranges. <code>RangeSet</code> objects store an arbitrary number of
- * {@linkplain Range ranges} in any Java's primitives (<code>int</code>, <code>float</code>,
+ * An ordered set of ranges. {@code RangeSet} objects store an arbitrary number of
+ * {@linkplain Range ranges} in any Java's primitives ({@code int}, {@code float},
  * etc.) or any {@linkplain Comparable comparable} objects. Ranges may be added in any order.
- * When a range is added, <code>RangeSet</code> first looks for an existing range overlapping the
+ * When a range is added, {@code RangeSet} first looks for an existing range overlapping the
  * specified range. If an overlapping range is found, ranges are merged as of {@link Range#union}.
  * Consequently, ranges returned by {@link #iterator} may not be the same than added ranges.
  * <br><br>
@@ -52,6 +52,8 @@ import org.opengis.util.Cloneable;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Andrea Aime
+ *
+ * @since 2.0
  */
 public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Serializable {
     /**
@@ -109,37 +111,37 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     private final Class type;
 
     /**
-     * Ce champ a une valeur identique à <code>type</code>, sauf
-     * si <code>elementType</code> est un type primitif. Dans ce
+     * Ce champ a une valeur identique à {@code type}, sauf
+     * si {@code elementType} est un type primitif. Dans ce
      * cas, il sera <code>{@link Number}.class</code>.
      */
     private final Class relaxedType;
 
     /**
-     * Le type des données utilisé dans le tableau <code>array</code>.
-     * Il s'agira souvent du même type que <code>type</code>, sauf si
+     * Le type des données utilisé dans le tableau {@code array}.
+     * Il s'agira souvent du même type que {@code type}, sauf si
      * ce dernier était le "wrapper" d'un des types primitifs du Java.
-     * Dans ce cas, <code>elementType</code> sera ce type primitif.
+     * Dans ce cas, {@code elementType} sera ce type primitif.
      */
     private final Class elementType;
 
     /**
-     * The primitive type, as one of <code>DOUBLE</code>, <code>FLOAT</code>, <code>LONG</code>,
-     * <code>INTEGER</code>, <code>SHORT</code>, <code>BYTE</code>, <code>CHARACTER</code> or
-     * <code>OTHER</code> enumeration.
+     * The primitive type, as one of {@code DOUBLE}, {@code FLOAT}, {@code LONG},
+     * {@code INTEGER}, {@code SHORT}, {@code BYTE}, {@code CHARACTER} or
+     * {@code OTHER} enumeration.
      */
     private final byte indexType;
 
     /**
      * Tableau d'intervalles.   Il peut s'agir d'un tableau d'un des types primitifs
-     * du Java   (par exemple <code>int[]</code> ou <code>float[]</code>),   ou d'un
-     * tableau de type <code>Comparable[]</code>. Les éléments de ce tableau doivent
+     * du Java   (par exemple {@code int[]} ou {@code float[]}),   ou d'un
+     * tableau de type {@code Comparable[]}. Les éléments de ce tableau doivent
      * obligatoirement être en ordre strictement croissant et sans doublon.
      * <br><br>
      * La longueur de ce tableau est le double du nombre d'intervalles.  Il aurait
      * été plus efficace d'utiliser une variable séparée  (pour ne pas être obligé
      * d'agrandir ce tableau à chaque ajout d'un intervalle), mais malheureusement
-     * le J2SE 1.4 ne nous fournit pas de méthode <code>Arrays.binarySearch</code>
+     * le J2SE 1.4 ne nous fournit pas de méthode {@code Arrays.binarySearch}
      * qui nous permettent de spécifier les limites du tableau  (voir RFE #4306897
      * à http://developer.java.sun.com/developer/bugParade/bugs/4306897.html).
      */
@@ -153,22 +155,22 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     private int modCount;
 
     /**
-     * <code>true</code> if and only if the element class represents a primitive type.
-     * This is equivalents to <code>elementType.isPrimitive()</code> and is computed
+     * {@code true} if and only if the element class represents a primitive type.
+     * This is equivalents to {@code elementType.isPrimitive()} and is computed
      * once for ever for performance reason.
      */
     private final boolean isPrimitive;
 
     /**
-     * <code>true</code> if we should invoke {@link ClassChanger#toNumber}
+     * {@code true} if we should invoke {@link ClassChanger#toNumber}
      * before to store a value into the array. It will be the case if the
-     * array <code>array</code> contains primitive elements and the type
-     * <code>type</code> is not the corresponding wrapper.
+     * array {@code array} contains primitive elements and the type
+     * {@code type} is not the corresponding wrapper.
      */
     private final boolean useClassChanger;
 
     /**
-     * <code>true</code> if instances of {@link NumberRange} should be created instead
+     * {@code true} if instances of {@link NumberRange} should be created instead
      * of {@link Range}.
      */
     private final boolean isNumeric;
@@ -178,7 +180,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  type The class of the range elements. It must be a primitive
      *         type or a class implementing {@link Comparable}.
-     * @throws IllegalArgumentException if <code>type</code> is not a
+     * @throws IllegalArgumentException if {@code type} is not a
      *         primitive type or a class implementing {@link Comparable}.
      */
     public RangeSet(Class type) throws IllegalArgumentException {
@@ -244,12 +246,12 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      * range will be merged as of {@link Range#union}.
      * <br><br>
      * Note: current version do not support open interval (i.e.
-     *       <code>Range.is[Min/Max]Included()</code> must return
-     *       <code>true</code>). It may be fixed in a future version.
+     *       {@code Range.is[Min/Max]Included()} must return
+     *       {@code true}). It may be fixed in a future version.
      *
-     * @param r The range to add. The <code>RangeSet</code> class
+     * @param r The range to add. The {@code RangeSet} class
      *          will never modify the supplied {@link Range} object.
-     * @return <code>true</code> if this set changed as a result of the call.
+     * @return {@code true} if this set changed as a result of the call.
      * @throws ClassCastException if the argument is not a {@link Range} object.
      *
      * @task TODO: support open intervals.
@@ -270,8 +272,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(Comparable lower, Comparable upper) throws IllegalArgumentException {
         if (!relaxedType.isAssignableFrom(lower.getClass())) {
@@ -423,8 +425,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(byte lower, byte upper) throws IllegalArgumentException {
         return add(new Byte(lower), new Byte(upper));
@@ -437,8 +439,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(short lower, short upper) throws IllegalArgumentException {
         return add(new Short(lower), new Short(upper));
@@ -451,8 +453,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(int lower, int upper) throws IllegalArgumentException {
         return add(new Integer(lower), new Integer(upper));
@@ -465,8 +467,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(long lower, long upper) throws IllegalArgumentException {
         return add(new Long(lower), new Long(upper));
@@ -479,8 +481,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(float lower, float upper) throws IllegalArgumentException {
         return add(new Float(lower), new Float(upper));
@@ -493,8 +495,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param  lower The lower value, inclusive.
      * @param  upper The upper value, inclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean add(double lower, double upper) throws IllegalArgumentException {
         return add(new Double(lower), new Double(upper));
@@ -505,8 +507,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param lower The lower value to remove, exclusive.
      * @param upper The upper value to remove, exclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(Comparable lower, Comparable upper) throws IllegalArgumentException {
         if (!relaxedType.isAssignableFrom(lower.getClass())) {
@@ -647,8 +649,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param lower The lower value to remove, exclusive.
      * @param upper The upper value to remove, exclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(byte lower, byte upper) throws IllegalArgumentException {
         return remove(new Byte(lower), new Byte(upper));
@@ -659,8 +661,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param lower The lower value to remove, exclusive.
      * @param upper The upper value to remove, exclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(short lower, short upper) throws IllegalArgumentException {
         return remove(new Short(lower), new Short(upper));
@@ -671,8 +673,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param lower The lower value to remove, exclusive.
      * @param upper The upper value to remove, exclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(int lower, int upper) throws IllegalArgumentException {
         return remove(new Integer(lower), new Integer(upper));
@@ -683,8 +685,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param lower The lower value to remove, exclusive.
      * @param upper The upper value to remove, exclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(long lower, long upper) throws IllegalArgumentException {
         return remove(new Long(lower), new Long(upper));
@@ -695,8 +697,8 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param lower The lower value to remove, exclusive.
      * @param upper The upper value to remove, exclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(float lower, float upper) throws IllegalArgumentException {
         return remove(new Float(lower), new Float(upper));
@@ -707,17 +709,17 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
      *
      * @param lower The lower value to remove, exclusive.
      * @param upper The upper value to remove, exclusive.
-     * @return <code>true</code> if this set changed as a result of the call.
-     * @throws IllegalArgumentException if <code>lower</code> is greater than <code>upper</code>.
+     * @return {@code true} if this set changed as a result of the call.
+     * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}.
      */
     public boolean remove(double lower, double upper) throws IllegalArgumentException {
         return remove(new Double(lower), new Double(upper));
     }
 
     /**
-     * Retourne l'index de l'élément <code>value</code> dans le tableau <code>array</code>.
-     * Cette méthode interprète le tableau <code>array</code> comme un tableau d'un des types
-     * intrinsèques du Java, et appelle la méthode <code>Arrays.binarySearch</code> appropriée.
+     * Retourne l'index de l'élément {@code value} dans le tableau {@code array}.
+     * Cette méthode interprète le tableau {@code array} comme un tableau d'un des types
+     * intrinsèques du Java, et appelle la méthode {@code Arrays.binarySearch} appropriée.
      *
      * @param value The value to search. This value must have been converted with
      *        {@link #toNumber} prior to call this method.
@@ -785,13 +787,13 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     }
 
     /**
-     * Returns a {@linkplain Range#getMinValue range's minimum value} as a <code>double</code>.
-     * The <code>index</code> can be any value from 0 inclusive to the set's {@link #size size}
-     * exclusive. The returned values always increase with <code>index</code>.
+     * Returns a {@linkplain Range#getMinValue range's minimum value} as a {@code double}.
+     * The {@code index} can be any value from 0 inclusive to the set's {@link #size size}
+     * exclusive. The returned values always increase with {@code index}.
      *
      * @param  index The range index, from 0 inclusive to {@link #size size} exclusive.
      * @return The minimum value for the range at the specified index.
-     * @throws IndexOutOfBoundsException if <code>index</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code index} is out of bounds.
      * @throws ClassCastException if range elements are not convertible to numbers.
      */
     public final double getMinValueAsDouble(int index) throws IndexOutOfBoundsException,
@@ -803,13 +805,13 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     }
 
     /**
-     * Returns a {@linkplain Range#getMaxValue range's maximum value} as a <code>double</code>.
-     * The <code>index</code> can be any value from 0 inclusive to the set's {@link #size size}
-     * exclusive. The returned values always increase with <code>index</code>.
+     * Returns a {@linkplain Range#getMaxValue range's maximum value} as a {@code double}.
+     * The {@code index} can be any value from 0 inclusive to the set's {@link #size size}
+     * exclusive. The returned values always increase with {@code index}.
      *
      * @param  index The range index, from 0 inclusive to {@link #size size} exclusive.
      * @return The maximum value for the range at the specified index.
-     * @throws IndexOutOfBoundsException if <code>index</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code index} is out of bounds.
      * @throws ClassCastException if range elements are not convertible to numbers.
      */
     public final double getMaxValueAsDouble(int index) throws IndexOutOfBoundsException,
@@ -822,7 +824,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
 
     /**
      * If the specified value is inside a range, returns the index of this range.
-     * Otherwise, returns <code>-1</code>.
+     * Otherwise, returns {@code -1}.
      *
      * @param  value The value to search.
      * @return The index of the range which contains this value, or -1 if there is no such range.
@@ -843,7 +845,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
     }
 
     /**
-     * Returns <code>true</code> if this set contains the specified element.
+     * Returns {@code true} if this set contains the specified element.
      */
     public boolean contains(final Object object) {
         final Range range = (Range) object;
@@ -887,7 +889,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
 
     /**
      * Returns a view of the portion of this sorted set whose elements range
-     * from <code>lower</code>, inclusive, to <code>upper</code>, exclusive.
+     * from {@code lower}, inclusive, to {@code upper}, exclusive.
      *
      * @param  lower Low endpoint (inclusive) of the sub set.
      * @param  upper High endpoint (exclusive) of the sub set. 
@@ -899,7 +901,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
 
     /**
      * Returns a view of the portion of this sorted set whose elements are
-     * strictly less than <code>upper</code>.
+     * strictly less than {@code upper}.
      *
      * @param  upper High endpoint (exclusive) of the headSet.
      * @return A view of the specified initial range of this sorted set.
@@ -910,7 +912,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
 
     /**
      * Returns a view of the portion of this sorted set whose elements are
-     * greater than or equal to <code>lower</code>.
+     * greater than or equal to {@code lower}.
      *
      * @param  lower Low endpoint (inclusive) of the tailSet. 
      * @return A view of the specified final range of this sorted set.
@@ -952,7 +954,7 @@ public class RangeSet extends AbstractSet implements SortedSet, Cloneable, Seria
         private int position;
 
         /**
-         * Returns <code>true</code> if the iteration has more elements.
+         * Returns {@code true} if the iteration has more elements.
          */
         public boolean hasNext() {
             return position<length;

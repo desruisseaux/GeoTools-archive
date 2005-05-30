@@ -60,6 +60,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see LogarithmicTransform1D
  * @see LinearTransform1D
  */
@@ -230,15 +232,15 @@ public class ExponentialTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Concatenates in an optimized way a {@link MathTransform} <code>other</code> to this
-     * <code>MathTransform</code>. This implementation can optimize some concatenation with
+     * Concatenates in an optimized way a {@link MathTransform} {@code other} to this
+     * {@code MathTransform}. This implementation can optimize some concatenation with
      * {@link LinearTransform1D} and {@link LogarithmicTransform1D}.
      *
      * @param  other The math transform to apply.
-     * @param  applyOtherFirst <code>true</code> if the transformation order is <code>other</code>
-     *         followed by <code>this</code>, or <code>false</code> if the transformation order is
-     *         <code>this</code> followed by <code>other</code>.
-     * @return The combined math transform, or <code>null</code> if no optimized combined
+     * @param  applyOtherFirst {@code true} if the transformation order is {@code other}
+     *         followed by {@code this}, or {@code false} if the transformation order is
+     *         {@code this} followed by {@code other}.
+     * @return The combined math transform, or {@code null} if no optimized combined
      *         transform is available.
      */
     MathTransform concatenate(final MathTransform other, final boolean applyOtherFirst) {
@@ -262,14 +264,14 @@ public class ExponentialTransform1D extends AbstractMathTransform
     }
 
     /**
-     * Concatenates in an optimized way a {@link LogarithmicTransform1D} <code>other</code> to this
-     * <code>ExponentialTransform1D</code>.
+     * Concatenates in an optimized way a {@link LogarithmicTransform1D} {@code other} to this
+     * {@code ExponentialTransform1D}.
      *
      * @param  other The math transform to apply.
-     * @param  applyOtherFirst <code>true</code> if the transformation order is <code>other</code>
-     *         followed by <code>this</code>, or <code>false</code> if the transformation order is
-     *         <code>this</code> followed by <code>other</code>.
-     * @return The combined math transform, or <code>null</code> if no optimized combined
+     * @param  applyOtherFirst {@code true} if the transformation order is {@code other}
+     *         followed by {@code this}, or {@code false} if the transformation order is
+     *         {@code this} followed by {@code other}.
+     * @return The combined math transform, or {@code null} if no optimized combined
      *         transform is available.
      */
     MathTransform concatenateLog(final LogarithmicTransform1D other, final boolean applyOtherFirst) {

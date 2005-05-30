@@ -66,6 +66,8 @@ import org.geotools.resources.gcs.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class ParameterWriter extends FilterWriter {
     /**
@@ -193,11 +195,11 @@ public class ParameterWriter extends FilterWriter {
     }
 
     /**
-     * Implementation of public <code>format</code> methods.
+     * Implementation of public {@code format} methods.
      *
-     * @param  name The group name, usually <code>descriptor.getCode().getName()</code>.
+     * @param  name The group name, usually {@code descriptor.getCode().getName()}.
      * @param  descriptor The parameter descriptor. Should be equals to
-     *         <code>values.getDescriptor()</code> if <code>values</code> is non null.
+     *         {@code values.getDescriptor()} if {@code values} is non null.
      * @param  values The parameter values, or {@code null} if none.
      * @throws IOException if an error occured will writing to the stream.
      */
@@ -501,7 +503,7 @@ trim:   for (int column=hide.length; --column>=1;) {
     }
 
     /**
-     * Returns the current locale. Newly constructed <code>ParameterWriter</code>
+     * Returns the current locale. Newly constructed {@code ParameterWriter}
      * use the {@linkplain Locale#getDefault system default}.
      */
     public Locale getLocale() {
@@ -522,7 +524,7 @@ trim:   for (int column=hide.length; --column>=1;) {
 
     /**
      * Format the specified value as a string. This method is automatically invoked
-     * by <code>format(...)</code> methods. The default implementation format
+     * by {@code format(...)} methods. The default implementation format
      * {@link Number}, {@link Date} and {@link Angle} object according the
      * {@linkplain #getLocale current locale}. This method can been overriden if
      * more objects need to be formatted in a special way.

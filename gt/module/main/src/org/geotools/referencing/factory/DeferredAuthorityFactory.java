@@ -45,6 +45,8 @@ import org.geotools.referencing.factory.FactoryGroup;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
                                             implements OptionalFactory

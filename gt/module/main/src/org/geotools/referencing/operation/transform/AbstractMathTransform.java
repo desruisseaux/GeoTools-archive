@@ -64,16 +64,18 @@ import org.geotools.resources.cts.ResourceKeys;
 
 /**
  * Provides a default implementation for most methods required by the
- * {@link MathTransform} interface. <code>AbstractMathTransform</code>
+ * {@link MathTransform} interface. {@code AbstractMathTransform}
  * provides a convenient base class from which other transform classes
- * can be easily derived. In addition, <code>AbstractMathTransform</code>
+ * can be easily derived. In addition, {@code AbstractMathTransform}
  * implements methods required by the {@link MathTransform2D} interface,
- * but <strong>does not</strong> implements <code>MathTransform2D</code>.
+ * but <strong>does not</strong> implements {@code MathTransform2D}.
  * Subclasses must declare <code>implements&nbsp;MathTransform2D</code>
  * themself if they know to maps two-dimensional coordinate systems.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public abstract class AbstractMathTransform extends Formattable implements MathTransform {
     /**
@@ -111,12 +113,12 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     public abstract int getTargetDimensions();
 
     /**
-     * Returns the parameter descriptors for this math transform, or <code>null</code> if unknow.
+     * Returns the parameter descriptors for this math transform, or {@code null} if unknow.
      * This method is similar to {@link OperationMethod#getParameters}, except that
-     * <code>MathTransform</code> returns parameters in standard units (usually
+     * {@code MathTransform} returns parameters in standard units (usually
      * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}).
      *
-     * @return The parameter descriptors for this math transform, or <code>null</code>.
+     * @return The parameter descriptors for this math transform, or {@code null}.
      *
      * @see OperationMethod#getParameters
      */
@@ -125,14 +127,14 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
-     * Returns the parameter values for this math transform, or <code>null</code> if unknow.
+     * Returns the parameter values for this math transform, or {@code null} if unknow.
      * This method is similar to {@link Operation#getParameterValues}, except that
-     * <code>MathTransform</code> returns parameters in standard units (usually
+     * {@code MathTransform} returns parameters in standard units (usually
      * {@linkplain SI#METER meters} or {@linkplain NonSI#DEGREE_ANGLE degrees}). Since this
      * method returns a copy of the parameter values, any change to a value will have no effect
      * on this math transform.
      *
-     * @return A copy of the parameter values for this math transform, or <code>null</code>.
+     * @return A copy of the parameter values for this math transform, or {@code null}.
      *
      * @see Operation#getParameterValues
      */
@@ -142,7 +144,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     
     /**
      * Tests whether this transform does not move any points.
-     * The default implementation always returns <code>false</code>.
+     * The default implementation always returns {@code false}.
      */
     public boolean isIdentity() {
         return false;
@@ -164,7 +166,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
     
     /**
-     * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
+     * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      * The default implementation invokes {@link #transform(double[],int,double[],int,int)}
      * using a temporary array of doubles.
      *
@@ -198,8 +200,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
     
     /**
-     * Transforms the specified <code>ptSrc</code> and stores the result
-     * in <code>ptDst</code>. The default implementation invokes
+     * Transforms the specified {@code ptSrc} and stores the result
+     * in {@code ptDst}. The default implementation invokes
      * {@link #transform(double[],int,double[],int,int)}.
      */
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
@@ -281,7 +283,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * quadratic curves using three points for each shape's segments.
      *
      * @param  shape Shape to transform.
-     * @return Transformed shape, or <code>shape</code> if
+     * @return Transformed shape, or {@code shape} if
      *         this transform is the identity transform.
      * @throws IllegalStateException if this transform doesn't map 2D coordinate systems.
      * @throws TransformException if a transform failed.
@@ -300,10 +302,10 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      *
      * @param  shape  Forme géométrique à transformer.
      * @param  preTr  Transformation affine à appliquer <em>avant</em> de transformer la forme
-     *                <code>shape</code>, ou <code>null</code> pour ne pas en appliquer.
+     *                {@code shape}, ou {@code null} pour ne pas en appliquer.
      *                Cet argument sera surtout utile lors des transformations inverses.
      * @param  postTr Transformation affine à appliquer <em>après</em> avoir transformée la
-     *                forme <code>shape</code>, ou <code>null</code> pour ne pas en appliquer.
+     *                forme {@code shape}, ou {@code null} pour ne pas en appliquer.
      *                Cet argument sera surtout utile lors des transformations directes.
      * @param quadDir Direction des courbes quadratiques ({@link ShapeUtilities#HORIZONTAL}
      *                ou {@link ShapeUtilities#PARALLEL}).
@@ -476,7 +478,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     
     /**
      * Gets the derivative of this transform at a point. The default implementation
-     * ensure that <code>point</code> has a valid dimension. Next, it try to delegate
+     * ensure that {@code point} has a valid dimension. Next, it try to delegate
      * the work to an other method:
      *
      * <ul>
@@ -490,10 +492,10 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * Otherwise, a {@link TransformException} is thrown.
      *
      * @param  point The coordinate point where to evaluate the derivative.
-     * @return The derivative at the specified point (never <code>null</code>).
+     * @return The derivative at the specified point (never {@code null}).
      * @throws NullPointerException if the derivative dependents on coordinate
-     *         and <code>point</code> is <code>null</code>.
-     * @throws MismatchedDimensionException if <code>point</code> doesn't have
+     *         and {@code point} is {@code null}.
+     * @throws MismatchedDimensionException if {@code point} doesn't have
      *         the expected dimension.
      * @throws TransformException if the derivative can't be evaluated at the
      *         specified point.
@@ -525,7 +527,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     
     /**
      * Creates the inverse transform of this object.
-     * The default implementation returns <code>this</code> if this transform is an identity
+     * The default implementation returns {@code this} if this transform is an identity
      * transform, and throws a {@link NoninvertibleTransformException} otherwise. Subclasses
      * should override this method.
      */
@@ -538,35 +540,35 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     }
 
     /**
-     * Concatenates in an optimized way a {@link MathTransform} <code>other</code> to this
-     * <code>MathTransform</code>. A new math transform is created to perform the combined
-     * transformation. The <code>applyOtherFirst</code> value determine the transformation
+     * Concatenates in an optimized way a {@link MathTransform} {@code other} to this
+     * {@code MathTransform}. A new math transform is created to perform the combined
+     * transformation. The {@code applyOtherFirst} value determine the transformation
      * order as bellow:
      *
      * <ul>
-     *   <li>If <code>applyOtherFirst</code> is <code>true</code>, then transforming a point
+     *   <li>If {@code applyOtherFirst} is {@code true}, then transforming a point
      *       <var>p</var> by the combined transform is equivalent to first transforming
-     *       <var>p</var> by <code>other</code> and then transforming the result by the
-     *       original transform <code>this</code>.</li>
-     *   <li>If <code>applyOtherFirst</code> is <code>false</code>, then transforming a point
+     *       <var>p</var> by {@code other} and then transforming the result by the
+     *       original transform {@code this}.</li>
+     *   <li>If {@code applyOtherFirst} is {@code false}, then transforming a point
      *       <var>p</var> by the combined transform is equivalent to first transforming
-     *       <var>p</var> by the original transform <code>this</code> and then transforming
-     *       the result by <code>other</code>.</li>
+     *       <var>p</var> by the original transform {@code this} and then transforming
+     *       the result by {@code other}.</li>
      * </ul>
      *
      * If no special optimization is available for the combined transform, then this method
-     * returns <code>null</code>.  In the later case, the concatenation will be prepared by
+     * returns {@code null}.  In the later case, the concatenation will be prepared by
      * {@link MathTransformFactory} using a generic {@link ConcatenatedTransform}.
      *
-     * The default implementation always returns <code>null</code>. This method is ought to be
+     * The default implementation always returns {@code null}. This method is ought to be
      * overrided by subclasses capable of concatenating some combinaison of transforms in a
      * special way. Examples are {@link ExponentialTransform1D} and {@link LogarithmicTransform1D}.
      *
      * @param  other The math transform to apply.
-     * @param  applyOtherFirst <code>true</code> if the transformation order is <code>other</code>
-     *         followed by <code>this</code>, or <code>false</code> if the transformation order is
-     *         <code>this</code> followed by <code>other</code>.
-     * @return The combined math transform, or <code>null</code> if no optimized combined
+     * @param  applyOtherFirst {@code true} if the transformation order is {@code other}
+     *         followed by {@code this}, or {@code false} if the transformation order is
+     *         {@code this} followed by {@code other}.
+     * @return The combined math transform, or {@code null} if no optimized combined
      *         transform is available.
      */
     MathTransform concatenate(final MathTransform other, final boolean applyOtherFirst) {
@@ -582,8 +584,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     
     /**
      * Compares the specified object with this math transform for equality.
-     * The default implementation checks if <code>object</code> is an instance
-     * of the same class than <code>this</code> and use the same parameter descriptor.
+     * The default implementation checks if {@code object} is an instance
+     * of the same class than {@code this} and use the same parameter descriptor.
      * Subclasses should override this method in order to compare internal fields.
      */
     public boolean equals(final Object object) {
@@ -636,7 +638,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
 
     /**
      * Checks if source coordinates need to be copied before to apply the transformation.
-     * This convenience method is provided for <code>transform(...)</code> method implementation.
+     * This convenience method is provided for {@code transform(...)} method implementation.
      * This method make the following assumptions:
      * <BR><BR>
      * <UL>
@@ -692,9 +694,9 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
 
     /**
      * Wrap the specified matrix in a Geotools implementation of {@link Matrix}.
-     * If <code>matrix</code> is already an instance of <code>GeneralMatrix</code>,
+     * If {@code matrix} is already an instance of {@code GeneralMatrix},
      * then it is returned unchanged. Otherwise, all elements are copied in a new
-     * <code>GeneralMatrix</code> object.
+     * {@code GeneralMatrix} object.
      */
     static GeneralMatrix wrap(final Matrix matrix) {
         if (matrix instanceof GeneralMatrix) {
@@ -733,7 +735,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     protected abstract class Inverse extends AbstractMathTransform implements Serializable {
         /**
          * Serial number for interoperability with different versions. This serial number is
-         * especilly important for inner classes, since the default <code>serialVersionUID</code>
+         * especilly important for inner classes, since the default {@code serialVersionUID}
          * computation will not produce consistent results across implementations of different
          * Java compiler. This is because different compilers may generate different names for
          * synthetic members used in the implementation of inner classes. See:
@@ -787,7 +789,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         /**
          * Returns the inverse of this math transform, which is the enclosing math transform.
          * This method is declared final because some implementation assume that the inverse
-         * of <code>this</code> is always <code>AbstractMathTransform.this</code>.
+         * of {@code this} is always {@code AbstractMathTransform.this}.
          */
         public final MathTransform inverse() {
             return AbstractMathTransform.this;
@@ -812,8 +814,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         /**
          * Compares the specified object with this inverse math
          * transform for equality. The default implementation tests
-         * if <code>object</code> in an instance of the same class
-         * than <code>this</code>, and then test their enclosing
+         * if {@code object} in an instance of the same class
+         * than {@code this}, and then test their enclosing
          * math transforms.
          */
         public boolean equals(final Object object) {

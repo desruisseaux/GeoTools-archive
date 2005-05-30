@@ -53,10 +53,10 @@ import org.geotools.util.SimpleInternationalString;
 /**
  * A category delimited by a range of sample values. A categogy may be either
  * <em>qualitative</em> or <em>quantitative</em>.   For exemple, a classified
- * image may have a qualitative category defining sample value <code>0</code>
- * as water. An other qualitative category may defines sample value <code>1</code>
+ * image may have a qualitative category defining sample value {@code 0}
+ * as water. An other qualitative category may defines sample value {@code 1}
  * as forest, etc.  An other image may define elevation data as sample values
- * in the range <code>[0..100]</code>.   The later is a <em>quantitative</em>
+ * in the range {@code [0..100]}.   The later is a <em>quantitative</em>
  * category, because sample values are related to some measurement in the real
  * world. For example, elevation data may be related to an altitude in metres
  * through the following linear relation:
@@ -80,14 +80,16 @@ import org.geotools.util.SimpleInternationalString;
  * More general equation are allowed. For example, <cite>SeaWiFS</cite> images
  * use a logarithmic transform. General transformations are expressed with a
  * {@link MathTransform1D} object. In the special case where the transformation
- * is a linear one (as in the formula above), then a <code>Category</code> object
+ * is a linear one (as in the formula above), then a {@code Category} object
  * may be understood as the interval between two breakpoints in the JAI's
  * {@linkplain PiecewiseDescriptor piecewise} operation.
  * <br><br>
- * All <code>Category</code> objects are immutable and thread-safe.
+ * All {@code Category} objects are immutable and thread-safe.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see GridSampleDimension
  * @see PiecewiseDescriptor
@@ -155,26 +157,26 @@ public class Category implements Serializable {
     
     /**
      * The minimal sample value (inclusive). This category is made of all values
-     * in the range <code>minimum</code> to <code>maximum</code> inclusive.
+     * in the range {@code minimum} to {@code maximum} inclusive.
      *
      * If this category is an instance of {@code GeophysicsCategory},
      * then this field is the minimal geophysics value in this category.
-     * For qualitative categories, the geophysics value is one of <code>NaN</code> values.
+     * For qualitative categories, the geophysics value is one of {@code NaN} values.
      */
     final double minimum;
     
     /**
      * The maximal sample value (inclusive). This category is made of all values
-     * in the range <code>minimum</code> to <code>maximum</code> inclusive.
+     * in the range {@code minimum} to {@code maximum} inclusive.
      *
      * If this category is an instance of {@code GeophysicsCategory},
      * then this field is the maximal geophysics value in this category.
-     * For qualitative categories, the geophysics value is one of <code>NaN</code> values.
+     * For qualitative categories, the geophysics value is one of {@code NaN} values.
      */
     final double maximum;
 
     /**
-     * The range of values <code>[minimum..maximum]</code>.
+     * The range of values {@code [minimum..maximum]}.
      * May be computed only when first requested, or may be
      * user-supplied (which is why it must be serialized).
      */
@@ -235,7 +237,7 @@ public class Category implements Serializable {
     }
     
     /**
-     * Constructs a qualitative category for sample value <code>sample</code>.
+     * Constructs a qualitative category for sample value {@code sample}.
      *
      * @param  name    The category name as a {@link String} or {@link InternationalString} object.
      * @param  color   The category color, or {@code null} for a default color.
@@ -251,11 +253,11 @@ public class Category implements Serializable {
     }
     
     /**
-     * Constructs a qualitative category for sample value <code>sample</code>.
+     * Constructs a qualitative category for sample value {@code sample}.
      *
      * @param  name    The category name as a {@link String} or {@link InternationalString} object.
      * @param  color   The category color, or {@code null} for a default color.
-     * @param  sample  The sample value as a double. May be one of <code>NaN</code> values.
+     * @param  sample  The sample value as a double. May be one of {@code NaN} values.
      */
     public Category(final CharSequence name,
                     final Color        color,
@@ -421,7 +423,7 @@ public class Category implements Serializable {
     /**
      * Constructs a qualitative or quantitative category for samples in the specified range.
      * Sample values (usually integers) will be converted into geophysics values (usually
-     * floating-point) through the <code>sampleToGeophysics</code> transform.
+     * floating-point) through the {@code sampleToGeophysics} transform.
      *
      * @param  name    The category name as a {@link String} or {@link InternationalString} object.
      * @param  colors  A set of colors for this category. This array may have any length;
@@ -520,7 +522,7 @@ public class Category implements Serializable {
      * be invoked outside {@link GeophysicsCategory} constructor.</strong>
      *
      * @param  inverse The originating {@link Category}.
-     * @param  isQuantitative <code>true</code> if the originating category is quantitative.
+     * @param  isQuantitative {@code true} if the originating category is quantitative.
      * @throws TransformException if a transformation failed.
      *
      * @todo The algorithm for finding minimum and maximum values is very simple for
@@ -627,13 +629,13 @@ public class Category implements Serializable {
     }
 
     /**
-     * Returns a <code>double</code> value for the specified number. If <code>direction</code>
+     * Returns a {@code double} value for the specified number. If {@code direction}
      * is non-zero, then this method will returns the closest representable number of type
-     * <code>type</code> before or after the double value.
+     * {@code type} before or after the double value.
      *
-     * @param type      The range element class. <code>number</code> must be
+     * @param type      The range element class. {@code number} must be
      *                  an instance of this class (this will not be checked).
-     * @param number    The number to transform to a <code>double</code> value.
+     * @param number    The number to transform to a {@code double} value.
      * @param direction -1 to return the previous representable number,
      *                  +1 to return the next representable number, or
      *                   0 to return the number with no change.
@@ -648,9 +650,9 @@ public class Category implements Serializable {
     
     /**
      * Returns a NaN number for the specified category number. Valid NaN numbers have
-     * bit fields ranging from <code>0x7f800001</code> through <code>0x7fffffff</code>
-     * or <code>0xff800001</code> through <code>0xffffffff</code>. The standard {@link
-     * Float#NaN} has bit fields <code>0x7fc00000</code>.
+     * bit fields ranging from {@code 0x7f800001} through {@code 0x7fffffff}
+     * or {@code 0xff800001} through {@code 0xffffffff}. The standard {@link
+     * Float#NaN} has bit fields {@code 0x7fc00000}.
      *
      * @param  index The category number, from -2097152 to 2097151 inclusive. This number
      *               doesn't need to matches sample values.    Different categories don't
@@ -675,7 +677,7 @@ public class Category implements Serializable {
     
     /**
      * Convert an array of colors to an array of ARGB values.
-     * If <code>colors</code> is null, then a default array
+     * If {@code colors} is null, then a default array
      * will be returned.
      *
      * @param  colors The array of colors to convert (may be null).
@@ -695,7 +697,7 @@ public class Category implements Serializable {
     }
 
     /**
-     * Returns ARGB values for the specified color. If <code>color</code>
+     * Returns ARGB values for the specified color. If {@code color}
      * is null, a default ARGB code will be returned.
      */
     private static int[] toARGB(Color color, final int sample) {
@@ -752,11 +754,11 @@ public class Category implements Serializable {
     }
     
     /**
-     * Returns <code>true</code> if this category is quantitative. A quantitative category
+     * Returns {@code true} if this category is quantitative. A quantitative category
      * has a non-null {@link #getSampleToGeophysics() sampleToGeophysics} transform.
      *
-     * @return <code>true</code> if this category is quantitative, or
-     *         <code>false</code> if this category is qualitative.
+     * @return {@code true} if this category is quantitative, or
+     *         {@code false} if this category is qualitative.
      */
     public boolean isQuantitative() {
         return !Double.isNaN(inverse.minimum) && !Double.isNaN(inverse.maximum);
@@ -772,7 +774,7 @@ public class Category implements Serializable {
      *               all sample values. An array of length 0 or a {@code null}
      *               array means that some default colors should be used (usually
      *               a gradient from opaque black to opaque white).
-     * @return A category with the new color palette, or <code>this</code>
+     * @return A category with the new color palette, or {@code this}
      *         if the new colors are identical to the current ones.
      */
     public Category recolor(final Color[] colors) {
@@ -816,28 +818,28 @@ public class Category implements Serializable {
     }
 
     /**
-     * If <code>true</code>, returns the geophysics companion of this category.   By definition, a
+     * If {@code true}, returns the geophysics companion of this category.   By definition, a
      * <cite>geophysics category</cite> is a category with a {@linkplain #getRange range of sample
      * values} transformed in such a way that the {@link #getSampleToGeophysics sampleToGeophysics}
      * transform is always the identity transform, or {@code null} if no such transform existed
      * in the first place. In other words, the range of sample values in a geophysics category maps
      * directly the "real world" values without the need for any transformation.
      * <br><br>
-     * <code>Category</code> objects live by pair: a <cite>geophysics</cite> one (used for
+     * {@code Category} objects live by pair: a <cite>geophysics</cite> one (used for
      * computation) and a <cite>non-geophysics</cite> one (used for packing data, usually as
-     * integers). The <code>geo</code> argument specifies which object from the pair is wanted,
+     * integers). The {@code geo} argument specifies which object from the pair is wanted,
      * regardless if this method is invoked on the geophysics or non-geophysics instance of the
-     * pair. In other words, the result of <code>geophysics(b1).geophysics(b2).geophysics(b3)</code>
-     * depends only on the value in the last call (<code>b3</code>).
+     * pair. In other words, the result of {@code geophysics(b1).geophysics(b2).geophysics(b3)}
+     * depends only on the value in the last call ({@code b3}).
      * <br><br>
      * Newly constructed categories are non-geophysics (i.e. a {@linkplain #getSampleToGeophysics
      * sample to geophysics} transform must be applied in order to gets geophysics values).
      *
-     * @param  geo <code>true</code> to get a category with an identity
+     * @param  geo {@code true} to get a category with an identity
      *         {@linkplain #getSampleToGeophysics transform} and a {@linkplain #getRange range of
-     *         sample values} matching the geophysics values, or <code>false</code> to get back the
-     *         original category (the one constructed with <code>new Category(...)</code>).
-     * @return The category. Never {@code null}, but may be <code>this</code>.
+     *         sample values} matching the geophysics values, or {@code false} to get back the
+     *         original category (the one constructed with {@code new Category(...)}).
+     * @return The category. Never {@code null}, but may be {@code this}.
      *
      * @see GridSampleDimension#geophysics
      * @see org.geotools.coverage.grid.GridCoverage2D#geophysics
@@ -933,9 +935,9 @@ public class Category implements Serializable {
     }
 
     /**
-     * Returns the object to use after deserialization. This is usually <code>this</code>.
+     * Returns the object to use after deserialization. This is usually {@code this}.
      * However, if an identical object was previously deserialized, then this method replace
-     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
+     * {@code this} by the previously deserialized object in order to reduce memory usage.
      * This is correct only for immutable objects.
      * <br><br>
      * NOTE: we keep this method private for two reasons:
@@ -943,8 +945,8 @@ public class Category implements Serializable {
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class
      *       should be exceptional, it is better to play safe.</li>
      *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
-     *       serialized alone; it is always encapsulated in a <code>Category</code>. Concequently,
-     *       if <code>Category</code> has been canonicalized, then {@code GeophysicsCategory} has
+     *       serialized alone; it is always encapsulated in a {@code Category}. Concequently,
+     *       if {@code Category} has been canonicalized, then {@code GeophysicsCategory} has
      *       been canonicalized too.</li>
      * </ul>
      *
@@ -956,7 +958,7 @@ public class Category implements Serializable {
     }
 
     /**
-     * Returns the object to write during serialization. This is usually <code>this</code>.
+     * Returns the object to write during serialization. This is usually {@code this}.
      * However, if identical objects are found in the same graph during serialization, then
      * they will be replaced by a single instance in order to reduce the amount of data sent
      * to the output stream. This is correct only for immutable objects.
@@ -966,12 +968,12 @@ public class Category implements Serializable {
      *   <li>The user may have created a mutable subclass. Since the need to subclass this class
      *       should be exceptional, it is better to play safe.</li>
      *   <li>{@code GeophysicsCategory} should not inherit it. {@code GeophysicsCategory} is never
-     *       serialized alone; it is always encapsulated in a <code>Category</code>. Concequently,
-     *       if <code>Category</code> has been canonicalized, then {@code GeophysicsCategory} has
+     *       serialized alone; it is always encapsulated in a {@code Category}. Concequently,
+     *       if {@code Category} has been canonicalized, then {@code GeophysicsCategory} has
      *       been canonicalized too.</li>
      * </ul>
      *
-     * @return The object to serialize (usually <code>this</code>).
+     * @return The object to serialize (usually {@code this}).
      * @throws ObjectStreamException if this object can't be replaced.
      */
     private Object writeReplace() throws ObjectStreamException {

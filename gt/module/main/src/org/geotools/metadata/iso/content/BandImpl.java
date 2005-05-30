@@ -38,6 +38,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class BandImpl extends RangeDimensionImpl implements Band {
     /**
@@ -64,32 +66,32 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Wavelength at which the response is the highest.
-     * <code>null</code> if unspecified.
+     * {@code null} if unspecified.
      */
     private Number peakResponse;
 
     /**
      * Maximum number of significant bits in the uncompressed representation for the value
      * in each band of each pixel.
-     * <code>null</code> if unspecified.
+     * {@code null} if unspecified.
      */
     private Integer bitsPerValue;
 
     /**
      * Number of discrete numerical values in the grid data.
-     * <code>null</code> if unspecified.
+     * {@code null} if unspecified.
      */
     private Integer toneGradation;
 
     /**
      * Scale factor which has been applied to the cell value.
-     * <code>null</code> if unspecified.
+     * {@code null} if unspecified.
      */
     private Number scaleFactor;
 
     /**
      * The physical value corresponding to a cell value of zero.
-     * <code>null</code> if unspecified.
+     * {@code null} if unspecified.
      */
     private Number offset;
 
@@ -101,7 +103,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Returns the longest wavelength that the sensor is capable of collecting within
-     * a designated band. Returns <code>null</code> if unspecified.
+     * a designated band. Returns {@code null} if unspecified.
      */
     public Number getMaxValue() {
         return maxValue;
@@ -109,7 +111,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Set the longest wavelength that the sensor is capable of collecting within a
-     * designated band. Returns <code>null</code> if unspecified.
+     * designated band. Returns {@code null} if unspecified.
      */
     public synchronized void setMaxValue(final Number newValue) {
         checkWritePermission();
@@ -154,7 +156,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Returns the wavelength at which the response is the highest.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public Number getPeakResponse() {
         return peakResponse;
@@ -171,7 +173,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
     /**
      * Returns the maximum number of significant bits in the uncompressed
      * representation for the value in each band of each pixel.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public Integer getBitsPerValue() {
         return bitsPerValue;
@@ -188,7 +190,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Returns the number of discrete numerical values in the grid data.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public Integer getToneGradation() {
         return toneGradation;
@@ -204,7 +206,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Returns the scale factor which has been applied to the cell value.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public Number getScaleFactor() {
         return scaleFactor;
@@ -220,7 +222,7 @@ public class BandImpl extends RangeDimensionImpl implements Band {
 
     /**
      * Returns the physical value corresponding to a cell value of zero.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public Number getOffset() {
         return offset;

@@ -19,11 +19,11 @@
  */
 package org.geotools.image.io;
 
-// Miscellaneous
+// J2SE dependencies
 import java.util.Arrays;
-
 import javax.imageio.IIOException;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -32,7 +32,7 @@ import org.geotools.resources.gcs.Resources;
 
 /**
  * List of data records in an image. One instance of this class is created by
- * {@link TextRecordImageReader} for every image in a file. A <code>RecordList</code>
+ * {@link TextRecordImageReader} for every image in a file. A {@code RecordList}
  * contains a list of records where each record contains data for one pixel. A record
  * contains usually the following information:
  *
@@ -42,41 +42,43 @@ import org.geotools.resources.gcs.Resources;
  * </li>
  *
  * Those information can appear in arbitrary columns, providing that the column order
- * stay the same for every record in a particular <code>RecordList</code> instance.
+ * stay the same for every record in a particular {@code RecordList} instance.
  * Records can appear in arbitrary order.
  * <br><br>
- * Data can be floating point value (<code>float</code> type). Current implementation
+ * Data can be floating point value ({@code float} type). Current implementation
  * expects pixels distributed on a regular grid. The grid interval will be automatically
  * computed when needed. The interval computation should be accurate even if there is
  * missing and/or duplicated records.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class RecordList {
     /**
-     * Valeurs minimales des colonnes, ou <code>null</code> si
+     * Valeurs minimales des colonnes, ou {@code null} si
      * ces valeurs ne sont pas encore connues.  La longueur de
      * de ce tableau est égale à {@link #dataColumnCount}.
      */
     private double[] min;
     
     /**
-     * Valeurs maximales des colonnes, ou <code>null</code> si
+     * Valeurs maximales des colonnes, ou {@code null} si
      * ces valeurs ne sont pas encore connues.  La longueur de
      * de ce tableau est égale à {@link #dataColumnCount}.
      */
     private double[] max;
     
     /**
-     * Intervals entre les données, ou <code>null</code> si ces valeurs
+     * Intervals entre les données, ou {@code null} si ces valeurs
      * n'ont pas encore été calculées. La valeur 0 signifie que l'interval
      * pour une colonne en particulier n'a pas encore été calculée.
      */
     private float[] interval;
     
     /**
-     * Tableau des valeurs lues,  ou <code>null</code> si les
+     * Tableau des valeurs lues,  ou {@code null} si les
      * valeurs n'ont pas encore été lues. Ce tableau contient
      * une suite de lignes qui ont chacun un nombre de colonnes
      * égal à {@link #dataColumnCount}.
@@ -86,7 +88,7 @@ final class RecordList {
     /**
      * Nombre de colonnes retenues lors de la lecture, ou -1 si ce nombre
      * n'est pas encore connu. Ce nombre de colonnes peut être égal ou
-     * inférieur à <code>min.length</code> et <code>max.length</code>.
+     * inférieur à {@code min.length} et {@code max.length}.
      */
     private int columnCount = -1;
     
@@ -104,7 +106,7 @@ final class RecordList {
     private int expectedLineCount = 1024;
     
     /**
-     * Construit un <code>ImageData</code> initiallement vide.
+     * Construit un {@code ImageData} initiallement vide.
      * La première ligne de données lue déterminera le nombre
      * de colonnes qui seront retenus pour toutes les lignes
      * suivantes.
@@ -113,8 +115,8 @@ final class RecordList {
     }
     
     /**
-     * Construit un <code>ImageData</code> initiallement vide.
-     * Pour chaque ligne lue, seule les <code>columnCount</code>
+     * Construit un {@code ImageData} initiallement vide.
+     * Pour chaque ligne lue, seule les {@code columnCount}
      * premières colonnes seront retenus.
      *
      * @param columnCount Nombre de colonnes à retenir lors de la lecture.
@@ -130,7 +132,7 @@ final class RecordList {
     /**
      * Ajoute une ligne de données.  Si la ligne est plus courte que la longueur
      * attendues, les colonnes manquantes seront considérées comme contenant des
-     * <code>NaN</code>.   Si elle est plus longue que la longueur attendue, les
+     * {@code NaN}.   Si elle est plus longue que la longueur attendue, les
      * colonnes en trop seront ignorées.
      */
     public void add(final double[] line) {
@@ -250,7 +252,7 @@ final class RecordList {
         Arrays.sort(array);
         /*
          * Elimine les doublons. Lorsque des doublons seront trouvés, ils iront de
-         * <code>lower</code> à <code>upper</code> <strong>inclusivement</strong>.
+         * {@code lower} à {@code upper} <strong>inclusivement</strong>.
          */
         int upper = count-1;
         int lower = count;

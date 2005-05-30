@@ -64,6 +64,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public class StereographicOblique extends Stereographic {    
     /**
@@ -111,7 +113,7 @@ public class StereographicOblique extends Stereographic {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -133,7 +135,7 @@ public class StereographicOblique extends Stereographic {
         
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-     * and stores the result in <code>ptDst</code>.
+     * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -226,9 +228,9 @@ public class StereographicOblique extends Stereographic {
      */
     static final class Spherical extends StereographicOblique {
         /**
-         * A constant used in the transformations. This constant hides the <code>k0</code>
-         * constant from the ellipsoidal case. The spherical and ellipsoidal <code>k0</code>
-         * are not computed in the same way, and we preserve the ellipsoidal <code>k0</code>
+         * A constant used in the transformations. This constant hides the {@code k0}
+         * constant from the ellipsoidal case. The spherical and ellipsoidal {@code k0}
+         * are not computed in the same way, and we preserve the ellipsoidal {@code k0}
          * in {@link Stereographic} in order to allow assertions to work.
          */
         private static final double k0 = 2;
@@ -253,7 +255,7 @@ public class StereographicOblique extends Stereographic {
         
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-         * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+         * and stores the result in {@code ptDst} (linear distance on a unit sphere).
          */
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException 
@@ -284,7 +286,7 @@ public class StereographicOblique extends Stereographic {
         
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-         * and stores the result in <code>ptDst</code>.
+         * and stores the result in {@code ptDst}.
          */
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException 
@@ -320,7 +322,7 @@ public class StereographicOblique extends Stereographic {
     /**
      * Provides the transform equations for the Oblique Stereographic (EPSG code 9809).
      * The formulas used below are not from the EPSG, but rather those of the 
-     * "Oblique Stereographic Alternative" in the <code>libproj4</code> package 
+     * "Oblique Stereographic Alternative" in the {@code libproj4} package 
      * written by Gerald Evenden. His work is acknowledged here and greatly appreciated. 
      * <br><br>
      * 
@@ -330,10 +332,10 @@ public class StereographicOblique extends Stereographic {
      * <br><br>
      * 
      * <strong>References:</strong><ul>
-     *   <li><code>libproj4</code> is available at
+     *   <li>{@code libproj4} is available at
      *       <A HREF="http://members.bellatlantic.net/~vze2hc4d/proj4/">libproj4 Miscellanea</A><br>
-     *        Relevent files are: <code>PJ_sterea.c</code>, <code>pj_gauss.c</code>,
-     *        <code>pj_fwd.c</code>, <code>pj_inv.c</code> and <code>lib_proj.h</code></li>
+     *        Relevent files are: {@code PJ_sterea.c}, {@code pj_gauss.c},
+     *        {@code pj_fwd.c}, {@code pj_inv.c} and {@code lib_proj.h}</li>
      *   <li>Gerald Evenden. <A HREF="http://members.bellatlantic.net/~vze2hc4d/proj4/sterea.pdf">
      *       "Supplementary PROJ.4 Notes - Oblique Stereographic Alternative"</A></li>
      *   <li>"Coordinate Conversions and Transformations including Formulas",
@@ -400,7 +402,7 @@ public class StereographicOblique extends Stereographic {
         
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-         * and stores the result in <code>ptDst</code>.
+         * and stores the result in {@code ptDst}.
          */
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException 
@@ -424,7 +426,7 @@ public class StereographicOblique extends Stereographic {
         
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-         * and stores the result in <code>ptDst</code>.
+         * and stores the result in {@code ptDst}.
          */
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException 

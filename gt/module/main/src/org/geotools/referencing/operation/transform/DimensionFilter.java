@@ -58,6 +58,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @todo This class is specific to Geotools implementation; it is better to avoid it if
  *       you can. It could be generalized a bit if we perform the same operations on
  *       {@link org.opengis.referencing.operation.CoordinateOperation} interfaces instead
@@ -346,7 +348,7 @@ public class DimensionFilter {
         /*
          * Special case for the pass through transform:  if at least one input dimension
          * belong to the passthrough's sub-transform, then delegates part of the work to
-         * <code>subTransform(passThrough.transform, ...)</code>
+         * {@code subTransform(passThrough.transform, ...)}
          */
         if (transform instanceof PassThroughTransform) {
             final PassThroughTransform passThrough = (PassThroughTransform) transform;

@@ -55,6 +55,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see DefaultOperation
  */
 public class DefaultOperationMethod extends AbstractIdentifiedObject implements OperationMethod {
@@ -93,7 +95,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     protected final int targetDimensions;
 
     /**
-     * The set of parameters, or <code>null</code> if none.
+     * The set of parameters, or {@code null} if none.
      */
     private final ParameterDescriptorGroup parameters;
 
@@ -133,7 +135,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     /**
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
-     * This code should have been merged with <code>getProperties</code> above.
+     * This code should have been merged with {@code getProperties} above.
      */
     private static ParameterDescriptorGroup getDescriptor(final MathTransform transform) {
         ParameterDescriptorGroup descriptor = null;
@@ -154,7 +156,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters, or <code>null</code> or an empty array if none.
+     * @param parameters The set of parameters, or {@code null} or an empty array if none.
      *
      * @deprecated Use the method expecting a parameter group instead.
      */
@@ -167,8 +169,8 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     }
 
     /**
-     * Utility method used to kludge <code>GeneralParameterDescriptor[]</code>
-     * into a <code>ParameterDescriptorGroup</code>.
+     * Utility method used to kludge {@code GeneralParameterDescriptor[]}
+     * into a {@code ParameterDescriptorGroup}.
      * This is a work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
@@ -201,7 +203,7 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters, or <code>null</code> if none.
+     * @param parameters The set of parameters, or {@code null} if none.
      */
     public DefaultOperationMethod(final Map properties,
                                   final int sourceDimensions,
@@ -283,13 +285,13 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
 
     /**
      * Compare this operation method with the specified object for equality.
-     * If <code>compareMetadata</code> is <code>true</code>, then all available
+     * If {@code compareMetadata} is {@code true}, then all available
      * properties are compared including {@linkplain #getFormula formula}.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {
@@ -334,8 +336,8 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
      * Check if an operation method and a math transform have a compatible number of source
      * and target dimensions. This convenience method is provided for argument checking.
      *
-     * @param  method    The operation method to compare to the math transform, or <code>null</code>.
-     * @param  transform The math transform to compare to the operation method, or <code>null</code>.
+     * @param  method    The operation method to compare to the math transform, or {@code null}.
+     * @param  transform The math transform to compare to the operation method, or {@code null}.
      * @throws MismatchedDimensionException if the number of dimensions are incompatibles.
      */
     public static void checkDimensions(final OperationMethod method,

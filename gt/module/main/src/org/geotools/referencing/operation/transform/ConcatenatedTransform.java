@@ -50,6 +50,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class ConcatenatedTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -95,7 +97,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     
     /**
      * Returns the underlying matrix for the specified transform,
-     * or <code>null</code> if the matrix is unavailable.
+     * or {@code null} if the matrix is unavailable.
      */
     private static GeneralMatrix getMatrix(final MathTransform transform) {
         if (transform instanceof LinearTransform) {
@@ -114,7 +116,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     
     /**
      * Tests if one math transform is the inverse of the other. This implementation
-     * can't detect every case. It just detect the case when <code>tr2</code> is an
+     * can't detect every case. It just detect the case when {@code tr2} is an
      * instance of {@link AbstractMathTransform.Inverse}.
      *
      * @todo We could make this test more general (just compare with tr2.inverse(),
@@ -297,7 +299,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     }
     
     /**
-     * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
+     * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException
@@ -371,7 +373,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * Gets the derivative of this transform at a point.
      *
      * @param  point The coordinate point where to evaluate the derivative.
-     * @return The derivative at the specified point (never <code>null</code>).
+     * @return The derivative at the specified point (never {@code null}).
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
     public Matrix derivative(final DirectPosition point) throws TransformException {

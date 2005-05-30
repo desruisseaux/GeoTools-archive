@@ -38,7 +38,7 @@ import org.geotools.measure.Measure;
 /**
  * A one-dimensional coordinate system containing a single time axis, used to describe the
  * temporal position of a point in the specified time units from a specified time origin.
- * A <code>TimeCS</code> shall have one {@linkplain #getAxis axis}.
+ * A {@code TimeCS} shall have one {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -48,6 +48,8 @@ import org.geotools.measure.Measure;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultTimeCS extends AbstractCS implements TimeCS {
     /**
@@ -87,7 +89,7 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts only temporal directions (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */
@@ -100,7 +102,7 @@ public class DefaultTimeCS extends AbstractCS implements TimeCS {
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
-     * @return The time difference between <code>coord1</code> and <code>coord2</code>.
+     * @return The time difference between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
     public Measure distance(final double[] coord1, final double[] coord2)

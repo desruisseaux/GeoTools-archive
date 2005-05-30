@@ -56,6 +56,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellipsoid {
     /**
@@ -65,7 +67,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     
     /**
      * WGS 1984 ellipsoid with axis in {@linkplain SI#METER metres}. This ellipsoid is used
-     * in GPS systems and is the default for most <code>org.geotools</code> packages.
+     * in GPS systems and is the default for most {@code org.geotools} packages.
      */
     public static final DefaultEllipsoid WGS84 =
             createFlattenedSphere("WGS84", 6378137.0, 298.257223563, SI.METER);
@@ -119,7 +121,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @param semiMajorAxis     The equatorial radius.
      * @param semiMinorAxis     The polar radius.
      * @param inverseFlattening The inverse of the flattening value.
-     * @param ivfDefinitive     <code>true</code> if the inverse flattening is definitive.
+     * @param ivfDefinitive     {@code true} if the inverse flattening is definitive.
      * @param unit              The units of the semi-major and semi-minor axis values.
      */
     protected DefaultEllipsoid(final Map     properties,
@@ -245,13 +247,13 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     }
     
     /**
-     * Checks the argument validity. Argument <code>value</code> should be
+     * Checks the argument validity. Argument {@code value} should be
      * greater than zero.
      *
      * @param  name  Argument name.
      * @param  value Argument value.
-     * @return <code>value</code>.
-     * @throws IllegalArgumentException if <code>value</code> is not greater
+     * @return {@code value}.
+     * @throws IllegalArgumentException if {@code value} is not greater
      *         than  0.
      */
     static double check(final String name, final double value) throws IllegalArgumentException {
@@ -309,7 +311,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      *
      * <var>ivf</var>&nbsp;=&nbsp;<var>r</var><sub>e</sub>/(<var>r</var><sub>e</sub>-<var>r</var><sub>p</sub>).
      *
-     * For perfect spheres (i.e. if {@link #isSphere} returns <code>true</code>),
+     * For perfect spheres (i.e. if {@link #isSphere} returns {@code true}),
      * the {@link Double#POSITIVE_INFINITY} value is used.
      *
      * @return The inverse flattening value.
@@ -324,8 +326,8 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * radius whenever asked. Other ellipsoids use the polar radius to calculate the IVF whenever
      * asked. This distinction can be important to avoid floating-point rounding errors.
      *
-     * @return <code>true</code> if the {@linkplain #getInverseFlattening inverse flattening} is
-     *         definitive, or <code>false</code> if the {@linkplain #getSemiMinorAxis polar radius}
+     * @return {@code true} if the {@linkplain #getInverseFlattening inverse flattening} is
+     *         definitive, or {@code false} if the {@linkplain #getSemiMinorAxis polar radius}
      *         is definitive.
      */
     public boolean isIvfDefinitive() {
@@ -333,11 +335,11 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     }
 
     /**
-     * <code>true</code> if the ellipsoid is degenerate and is actually a sphere. The sphere is
+     * {@code true} if the ellipsoid is degenerate and is actually a sphere. The sphere is
      * completely defined by the {@linkplain #getSemiMajorAxis semi-major axis}, which is the
      * radius of the sphere.
      *
-     * @return <code>true</code> if the ellipsoid is degenerate and is actually a sphere.
+     * @return {@code true} if the ellipsoid is degenerate and is actually a sphere.
      */
     public boolean isSphere() {
         return semiMajorAxis == semiMinorAxis;
@@ -462,10 +464,10 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     /**
      * Compare this ellipsoid with the specified object for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {

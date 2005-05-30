@@ -27,10 +27,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.ScopedName;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -40,6 +43,8 @@ import org.opengis.util.ScopedName;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see NameFactory
  */
@@ -74,7 +79,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
     /**
      * The sequence of local name for this {@linkplain GenericName generic name}.
      * Since this object is itself a locale name, this list is always a singleton
-     * containing only <code>this</code>. It will be built only when first needed.
+     * containing only {@code this}. It will be built only when first needed.
      */
     private transient List parsedNames;
 
@@ -85,7 +90,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * method will be used in order to fetch an unlocalized name. Otherwise, the
      * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
      *
-     * @param name The local name (never <code>null</code>).
+     * @param name The local name (never {@code null}).
      */
     public LocalName(final CharSequence name) {
         this(null, name);
@@ -99,7 +104,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * methods in this class may have the wrong semantic).
      *
      * @param asScopedName The view of this object as a scoped name.
-     * @param name         The local name (never <code>null</code>).
+     * @param name         The local name (never {@code null}).
      */
     LocalName(final ScopedName asScopedName, final CharSequence name) {
         this.asScopedName = asScopedName;
@@ -121,9 +126,9 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * version of this name. In other words, the following relation shall be respected:
      * <blockquote><table border='0'><tr>
      *   <td nowrap>{@link ScopedName#asLocalName}</td>
-     *   <td nowrap><code>.getScope() ==</code></td>
+     *   <td nowrap>{@code .getScope() ==}</td>
      *   <td nowrap align="right">{@link ScopedName}</td>
-     *   <td nowrap><code>.getScope()</code></td>
+     *   <td nowrap>{@code .getScope()}</td>
      * </tr><tr>
      *   <td align="center"><font size=2>(a locale name)</font></td>
      *   <td>&nbsp;</td>
@@ -138,7 +143,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
     /**
      * Returns the sequence of local name for this {@linkplain GenericName generic name}.
      * Since this object is itself a locale name, this method always returns a singleton
-     * containing only <code>this</code>.
+     * containing only {@code this}.
      */
     public List getParsedNames() {
         // No need to sychronize: it is not a big deal if this object is built twice.
@@ -150,7 +155,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
 
     /**
      * Returns a view of this object as a scoped name,
-     * or <code>null</code> if this name has no scope.
+     * or {@code null} if this name has no scope.
      */
     public ScopedName asScopedName() {
         return asScopedName;
@@ -158,7 +163,7 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
 
     /**
      * Returns a view of this object as a local name. Since this object is already
-     * a local name, this method always returns <code>this</code>.
+     * a local name, this method always returns {@code this}.
      */
     public org.opengis.util.LocalName asLocalName() {
         return this;

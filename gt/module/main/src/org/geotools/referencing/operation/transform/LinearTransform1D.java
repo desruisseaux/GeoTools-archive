@@ -43,11 +43,13 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * {@linkplain #offset} + {@linkplain #scale}&times;<var>x</var></p>
  *
  * This class is the same as a 2&times;2 affine transform. However, this specialized
- * <code>LinearTransform1D</code> class is faster. It is defined there because extensively
+ * {@code LinearTransform1D} class is faster. It is defined there because extensively
  * used by {@link org.geotools.coverage.grid.GridCoverage2D}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  *
  * @see LogarithmicTransform1D
  * @see ExponentialTransform1D
@@ -85,8 +87,8 @@ public class LinearTransform1D extends AbstractMathTransform
      * Instances should be created using the {@linkplain #create factory method}, which
      * may returns optimized implementations for some particular argument values.
      *
-     * @param scale  The <code>scale</code>  term in the linear equation.
-     * @param offset The <code>offset</code> term in the linear equation.
+     * @param scale  The {@code scale}  term in the linear equation.
+     * @param offset The {@code offset} term in the linear equation.
      */
     protected LinearTransform1D(final double scale, final double offset) {
         this.scale   = scale;
@@ -96,8 +98,8 @@ public class LinearTransform1D extends AbstractMathTransform
     /**
      * Constructs a new linear transform.
      *
-     * @param scale  The <code>scale</code>  term in the linear equation.
-     * @param offset The <code>offset</code> term in the linear equation.
+     * @param scale  The {@code scale}  term in the linear equation.
+     * @param offset The {@code offset} term in the linear equation.
      */
     public static LinearTransform1D create(final double scale, final double offset) {
         if (scale == 0) {

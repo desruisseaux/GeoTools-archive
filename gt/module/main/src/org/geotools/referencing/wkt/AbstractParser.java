@@ -51,12 +51,14 @@ import org.geotools.resources.cts.Resources;
  * @author Remi Eve
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
  */
 public abstract class AbstractParser extends Format {
     /**
-     * Set to <code>true</code> if parsing of number in scientific notation is allowed.
+     * Set to {@code true} if parsing of number in scientific notation is allowed.
      * The way to achieve that is currently a hack, because {@link NumberFormat} has no
      * API for managing that as of J2SE 1.5.
      *

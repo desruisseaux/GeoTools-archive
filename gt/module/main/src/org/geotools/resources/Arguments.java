@@ -43,7 +43,7 @@ import org.geotools.resources.rsc.Resources;
 
 /**
  * A helper class for parsing command-line arguments. Instance of this class
- * are usually created inside <code>main</code> methods. For example:
+ * are usually created inside {@code main} methods. For example:
  *
  * <blockquote><pre>
  * public static void main(String[] args) {
@@ -59,6 +59,8 @@ import org.geotools.resources.rsc.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class Arguments {
     /**
@@ -68,7 +70,7 @@ public class Arguments {
 
     /**
      * Command-line arguments. Elements are set to
-     * <code>null</code> after they have been processed.
+     * {@code null} after they have been processed.
      */
     private final String[] arguments;
 
@@ -156,7 +158,7 @@ public class Arguments {
      * Returns the specified locale.
      *
      * @param  locale The programmatic locale string (e.g. "fr_CA").
-     * @return The locale, or the default one if <code>locale</code> was null.
+     * @return The locale, or the default one if {@code locale} was null.
      * @throws IllegalArgumentException if the locale string is invalid.
      */
     private Locale getLocale(final String locale) throws IllegalArgumentException {
@@ -176,14 +178,14 @@ public class Arguments {
     /**
      * Returns an optional string value from the command line. This method should be called
      * exactly once for each parameter. Second invocation for the same parameter will returns
-     * <code>null</code>, unless the same parameter appears many times on the command line.
+     * {@code null}, unless the same parameter appears many times on the command line.
      * <br><br>
      * Paramater may be instructions like "-encoding cp850" or "-encoding=cp850".
      * Both forms (with or without "=") are accepted. Spaces around the '=' character,
      * if any, are ignored.
      *
      * @param  name The parameter name (e.g. "-encoding"). Name are case-insensitive.
-     * @return The parameter value, of <code>null</code> if there is no parameter
+     * @return The parameter value, of {@code null} if there is no parameter
      *         given for the specified name.
      */
     public String getOptionalString(final String name) {
@@ -251,7 +253,7 @@ public class Arguments {
      * arguments in portable scripts.
      *
      * @param  name The parameter name. Name are case-insensitive.
-     * @return The parameter value, of <code>null</code> if there is no parameter
+     * @return The parameter value, of {@code null} if there is no parameter
      *         given for the specified name.
      */
     public Integer getOptionalInteger(final String name) {
@@ -290,7 +292,7 @@ public class Arguments {
      * arguments in portable scripts.
      *
      * @param  name The parameter name. Name are case-insensitive.
-     * @return The parameter value, of <code>null</code> if there is no parameter
+     * @return The parameter value, of {@code null} if there is no parameter
      *         given for the specified name.
      */
     public Double getOptionalDouble(final String name) {
@@ -327,7 +329,7 @@ public class Arguments {
      * The value, if defined, must be "true" or "false".
      *
      * @param  name The parameter name. Name are case-insensitive.
-     * @return The parameter value, of <code>null</code> if there is no parameter
+     * @return The parameter value, of {@code null} if there is no parameter
      *         given for the specified name.
      */
     public Boolean getOptionalBoolean(final String name) {
@@ -358,13 +360,13 @@ public class Arguments {
     }
 
     /**
-     * Returns <code>true</code> if the specified flag is set on the command line.
+     * Returns {@code true} if the specified flag is set on the command line.
      * This method should be called exactly once for each flag. Second invocation
-     * for the same flag will returns <code>false</code> (unless the same flag
+     * for the same flag will returns {@code false} (unless the same flag
      * appears many times on the command line).
      *
      * @param  name The flag name.
-     * @return <code>true</code> if this flag appears on the command line, or <code>false</code>
+     * @return {@code true} if this flag appears on the command line, or {@code false}
      *         otherwise.
      */
     public boolean getFlag(final String name) {
@@ -428,7 +430,7 @@ public class Arguments {
      * greater than the specified maximum, then this method invokes {@link #illegalArgument}.
      *
      * @param  max Maximum remaining arguments autorized.
-     * @return An array of remaining arguments. Will never be longer than <code>max</code>.
+     * @return An array of remaining arguments. Will never be longer than {@code max}.
      */
     public String[] getRemainingArguments(final int max) {
         int count=0;
@@ -453,7 +455,7 @@ public class Arguments {
      * method if they want a different behavior.
      * <br><br>
      * This method <em>is not</em> invoked when an anormal error occured (for
-     * example an unexpected <code>NullPointerException</code> in some of developper's
+     * example an unexpected {@code NullPointerException} in some of developper's
      * module). If such an error occurs, the normal exception mechanism will be used.
      *
      * @param exception An exception with a message describing the user's error.

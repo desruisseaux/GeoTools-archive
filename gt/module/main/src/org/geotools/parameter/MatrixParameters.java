@@ -53,6 +53,8 @@ import org.geotools.resources.XArray;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see MatrixParameterDescriptors
  */
 public class MatrixParameters extends ParameterGroup implements ParameterDescriptorGroup {
@@ -89,7 +91,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     }
 
     /**
-     * Returns a description of this parameter value group. Returns always <code>this</code>,
+     * Returns a description of this parameter value group. Returns always {@code this},
      * since the description depends on <code>"num_row"</code> and <code>"num_col"</code>
      * parameter values.
      */
@@ -225,8 +227,8 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      *
      * @param  row    The row indice.
      * @param  column The column indice
-     * @return The parameter value for the specified matrix element (never <code>null</code>).
-     * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
+     * @return The parameter value for the specified matrix element (never {@code null}).
+     * @throws IndexOutOfBoundsException if {@code row} or {@code column} is out of bounds.
      */
     public final ParameterValue parameter(final int row, final int column)
             throws IndexOutOfBoundsException
@@ -242,7 +244,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * @param  numRow The maximum number of rows.
      * @param  numCol The maximum number of columns.
      * @return The parameter value for the specified matrix element.
-     * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code row} or {@code column} is out of bounds.
      */
     private ParameterValue parameter(final int row,    final int column,
                                      final int numRow, final int numCol)
@@ -284,7 +286,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Returns the parameters values in this group. The amount of parameters depends
      * on the value of <code>"num_row"</code> and <code>"num_col"</code> parameters.
      * The parameter array will contains only matrix elements which have been requested at
-     * least once by one of <code>parameter(...)</code> methods. Never requested elements
+     * least once by one of {@code parameter(...)} methods. Never requested elements
      * are left to their default value and omitted from the returned array.
      */
     public List/*<GeneralParameterValue>*/ values() {

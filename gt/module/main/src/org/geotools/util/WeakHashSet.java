@@ -30,26 +30,29 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+// Geotools dependencies
 import org.geotools.resources.XArray;
 
 
 /**
- * A set of objects hold by weak references. An entry in a <code>WeakHashSet</code>
+ * A set of objects hold by weak references. An entry in a {@code WeakHashSet}
  * will automatically be removed when it is no longer in ordinary use. More precisely,
  * the presence of a entry will not prevent the entry from being discarded by the
  * garbage collector, that is, made finalizable, finalized, and then reclaimed.
  * When an entry has been discarded it is effectively removed from the set, so
  * this class behaves somewhat differently than other {@link Set} implementations.
  * <br><br>
- * <code>WeakHashSet</code> has a  {@link #get}  method that is not part of the
- * {@link Set} interface. This <code>get</code> method fetch an entry from this
+ * {@code WeakHashSet} has a  {@link #get}  method that is not part of the
+ * {@link Set} interface. This {@code get} method fetch an entry from this
  * set that is equals to the supplied object.   This is a convenient way to use
- * <code>WeakHashSet</code> as a pool of immutable objects.
+ * {@code WeakHashSet} as a pool of immutable objects.
  * <br><br>
- * The <code>WeakHashSet</code> class is thread-safe.
+ * The {@code WeakHashSet} class is thread-safe.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  *
  * @see WeakHashMap
  */
@@ -70,7 +73,7 @@ public class WeakHashSet extends AbstractSet {
      */
     private final class Entry extends WeakReference {
         /**
-         * The next entry, or <code>null</code> if there is none.
+         * The next entry, or {@code null} if there is none.
          */
         Entry next;
 
@@ -130,7 +133,7 @@ public class WeakHashSet extends AbstractSet {
     private static final long HOLD_TIME = 20*1000L;
 
     /**
-     * Construct a <code>WeakHashSet</code>.
+     * Construct a {@code WeakHashSet}.
      */
     public WeakHashSet() {
         table = new Entry[MIN_CAPACITY];
@@ -185,8 +188,8 @@ public class WeakHashSet extends AbstractSet {
     /**
      * Rehash {@link #table}.
      *
-     * @param augmentation <code>true</code> if this method is invoked
-     *        for augmenting {@link #table}, or <code>false</code> if
+     * @param augmentation {@code true} if this method is invoked
+     *        for augmenting {@link #table}, or {@code false} if
      *        it is invoked for making the table smaller.
      */
     private void rehash(final boolean augmentation)
@@ -232,7 +235,7 @@ public class WeakHashSet extends AbstractSet {
     }
 
     /**
-     * Check if this <code>WeakHashSet</code> is valid. This method counts the
+     * Check if this {@code WeakHashSet} is valid. This method counts the
      * number of elements and compare it to {@link #count}. If the check fails,
      * the number of elements is corrected (if we didn't, an {@link AssertionError}
      * would be thrown for every operations after the first error,  which make
@@ -263,10 +266,10 @@ public class WeakHashSet extends AbstractSet {
     }
 
     /**
-     * Returns <code>true</code> if this set contains the specified element.
+     * Returns {@code true} if this set contains the specified element.
      *
      * @param  obj Object to be checked for containment in this set.
-     * @return <code>true</code> if this set contains the specified element.
+     * @return {@code true} if this set contains the specified element.
      */
     public boolean contains(final Object obj) {
         return obj==null || get(obj)!=null;
@@ -274,8 +277,8 @@ public class WeakHashSet extends AbstractSet {
 
     /**
      * Returns an object equals to the specified object, if present. If
-     * this set doesn't contains any object equals to <code>obj</code>,
-     * then this method returns <code>null</code>.
+     * this set doesn't contains any object equals to {@code obj},
+     * then this method returns {@code null}.
      *
      * @see #canonicalize(Object)
      */
@@ -288,7 +291,7 @@ public class WeakHashSet extends AbstractSet {
      * if it is present
      *
      * @param  obj element to be removed from this set, if present.
-     * @return <code>true</code> if the set contained the specified element.
+     * @return {@code true} if the set contained the specified element.
      */
     public synchronized boolean remove(final Object obj) {
         return intern(obj, REMOVE) != null;
@@ -297,10 +300,10 @@ public class WeakHashSet extends AbstractSet {
     /**
      * Adds the specified element to this set if it is not already present.
      * If this set already contains the specified element, the call leaves
-     * this set unchanged and returns <code>false</code>.
+     * this set unchanged and returns {@code false}.
      *
      * @param  obj Element to be added to this set.
-     * @return <code>true</code> if this set did not already
+     * @return {@code true} if this set did not already
      *         contain the specified element.
      */
     public synchronized boolean add(final Object obj) {
@@ -314,9 +317,9 @@ public class WeakHashSet extends AbstractSet {
     /** The "intern" operation.  */  private static final int INTERN = +2;
 
     /**
-     * Returns an object equals to <code>obj</code> if such an object already
-     * exist in this <code>WeakHashSet</code>. Otherwise, add <code>obj</code>
-     * to this <code>WeakHashSet</code>. This method is equivalents to the
+     * Returns an object equals to {@code obj} if such an object already
+     * exist in this {@code WeakHashSet}. Otherwise, add {@code obj}
+     * to this {@code WeakHashSet}. This method is equivalents to the
      * following code:
      *
      * <blockquote><pre>
@@ -337,8 +340,8 @@ public class WeakHashSet extends AbstractSet {
         assert valid() : count;
         if (obj != null) {
             /*
-             * Check if <code>obj</code> is already contained in this
-             * <code>WeakHashSet</code>. If yes, returns the element.
+             * Check if {@code obj} is already contained in this
+             * {@code WeakHashSet}. If yes, returns the element.
              */
             final int hash = obj.hashCode() & 0x7FFFFFFF;
             int index = hash % table.length;
@@ -358,7 +361,7 @@ public class WeakHashSet extends AbstractSet {
             if (operation >= ADD) {
                 /*
                  * Check if the table need to be rehashed,
-                 * and add <code>obj</code> to the table.
+                 * and add {@code obj} to the table.
                  */
                 if (count >= threshold) {
                     rehash(true);
@@ -373,9 +376,9 @@ public class WeakHashSet extends AbstractSet {
     }
 
     /**
-     * Returns an object equals to <code>obj</code> if such an object already
-     * exist in this <code>WeakHashSet</code>. Otherwise, add <code>obj</code>
-     * to this <code>WeakHashSet</code>. This method is equivalents to the
+     * Returns an object equals to {@code obj} if such an object already
+     * exist in this {@code WeakHashSet}. Otherwise, add {@code obj}
+     * to this {@code WeakHashSet}. This method is equivalents to the
      * following code:
      *
      * <blockquote><pre>

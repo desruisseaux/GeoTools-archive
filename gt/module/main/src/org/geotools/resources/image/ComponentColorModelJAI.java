@@ -37,26 +37,28 @@ import javax.media.jai.iterator.RectIter;
  * This lead to the following problems:
  *
  * <ul>
- *   <li>{@link ComponentColorModel} support <code>float</code> and <code>double</code>
+ *   <li>{@link ComponentColorModel} support {@code float} and {@code double}
  *       datatypes since J2SE 1.4 only. The workaround for J2SE 1.3 is to use the
  *       {@link FloatDoubleColorModel} provided with JAI 1.1.</li>
  *   <li>{@link FloatDoubleColorModel} ignore the new API in {@link ColorSpace}, especially
- *       the <code>getMinValue</code> and <code>getMaxValue</code> methods. Consequently,
- *       rendering of any image using our custom <code>ScaledColorSpace</code> is wrong.</li>
+ *       the {@code getMinValue} and {@code getMaxValue} methods. Consequently,
+ *       rendering of any image using our custom {@code ScaledColorSpace} is wrong.</li>
  *   <li>{@link ComponentColorModel} uses {@link java.awt.image.DataBufferFloat} and {@link
  *       java.awt.image.DataBufferDouble}, which are unknown to JAI 1.1. Consequently, trying
  *       to use {@link RectIter} with one of those will throw {@link ClassCastException}.</li>
  * </ul>
  *
  * The work around it to use J2SE's {@link ComponentColorModel} (which work with our custom
- * {@link ColorSpace}) and override its <code>createCompatibleSampleModel</code> in order to
+ * {@link ColorSpace}) and override its {@code createCompatibleSampleModel} in order to
  * returns {@link ComponentSampleModelJAI} instead of {@link ComponentSampleModel} when
- * <code>float</code> or <code>double</code> datatype is requested.
+ * {@code float} or {@code double} datatype is requested.
  *
  * @todo Remove this patch when JAI will recognize J2SE 1.4 classes.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class ComponentColorModelJAI extends ComponentColorModel {
     /**
@@ -108,11 +110,11 @@ public class ComponentColorModelJAI extends ComponentColorModel {
     }
     
     /**
-     * Returns the <code>String</code> representation of the contents of
-     * this <code>ColorModel</code>object.
+     * Returns the {@code String} representation of the contents of
+     * this {@code ColorModel}object.
      *
-     * @return a <code>String</code> representing the contents of this
-     * <code>ColorModel</code> object.
+     * @return a {@code String} representing the contents of this
+     * {@code ColorModel} object.
      */
     public String toString() {
        return new String("ComponentColorModelJAI: #pixelBits = "+pixel_bits

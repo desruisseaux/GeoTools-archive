@@ -27,10 +27,12 @@ import java.util.Arrays;
  * A one dimensional, constant transform. Output values are set to a constant value regardless
  * of input values. This class is really a special case of {@link LinearTransform1D} in which
  * <code>{@link #scale} = 0</code> and <code>{@link #offset} = constant</code>. However, this
- * specialized <code>ConstantTransform1D</code> class is faster.
+ * specialized {@code ConstantTransform1D} class is faster.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class ConstantTransform1D extends LinearTransform1D {
     /**
@@ -41,7 +43,7 @@ final class ConstantTransform1D extends LinearTransform1D {
     /**
      * Constructs a new constant transform.
      *
-     * @param offset The <code>offset</code> term in the linear equation.
+     * @param offset The {@code offset} term in the linear equation.
      */
     protected ConstantTransform1D(final double offset) {
         super(0, offset);

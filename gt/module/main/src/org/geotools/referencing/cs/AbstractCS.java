@@ -66,6 +66,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see DefaultCoordinateSystemAxis
  * @see javax.units.Unit
  * @see org.geotools.referencing.datum.AbstractDatum
@@ -83,7 +85,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     private final CoordinateSystemAxis[] axis;
 
     /**
-     * The unit for measuring distance in this coordinate system, or <code>null</code> if none.
+     * The unit for measuring distance in this coordinate system, or {@code null} if none.
      * Will be computed only when first needed.
      */
     private transient Unit distanceUnit;
@@ -140,9 +142,9 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. This method is invoked at construction time for checking argument validity. The
-     * default implementation returns <code>true</code> for all axis directions. Subclass will
+     * default implementation returns {@code true} for all axis directions. Subclass will
      * overrides this method in order to put more restrictions on allowed axis directions.
      */
     protected boolean isCompatibleDirection(final AxisDirection direction) {
@@ -162,7 +164,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      *
      * @param  dimension The zero based index of axis.
      * @return The axis at the specified dimension.
-     * @throws IndexOutOfBoundsException if <code>dimension</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code dimension} is out of bounds.
      */
     public CoordinateSystemAxis getAxis(final int dimension) throws IndexOutOfBoundsException {
         return axis[dimension];
@@ -189,8 +191,8 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * ({@linkplain AxisDirection#EAST EAST},{@linkplain AxisDirection#NORTH NORTH}
      * are taken in account.
      *
-     * <P><STRONG>Example:</STRONG> If coordinates in <code>sourceCS</code> are
-     * (<var>x</var>,<var>y</var>) pairs in metres and coordinates in <code>targetCS</code>
+     * <P><STRONG>Example:</STRONG> If coordinates in {@code sourceCS} are
+     * (<var>x</var>,<var>y</var>) pairs in metres and coordinates in {@code targetCS}
      * are (-<var>y</var>,<var>x</var>) pairs in centimetres, then the transformation
      * can be performed as below:</P>
      *
@@ -202,7 +204,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      *
      * @param  sourceCS The source coordinate system.
      * @param  targetCS The target coordinate system.
-     * @return The conversion from <code>sourceCS</code> to <code>targetCS</code> as
+     * @return The conversion from {@code sourceCS} to {@code targetCS} as
      *         an affine transform. Only axis orientation and units are taken in account.
      * @throws IllegalArgumentException if axis doesn't matches, or the CS doesn't have the
      *         same geometry.
@@ -333,7 +335,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @return The distance between {@code coord1} and {@code coord2}.
      * @throws UnsupportedOperationException if this coordinate system can't compute distances.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      *
@@ -348,10 +350,10 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     /**
      * Compares the specified object with this coordinate system for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {

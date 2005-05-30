@@ -62,6 +62,8 @@ import java.net.URLDecoder;
  * @version $Id$
  * @author James McGill
  * @author Simone Giannecchiin (simboss)
+ *
+ * @since 2.0
  */
 public class TestData {
     /**
@@ -70,7 +72,7 @@ public class TestData {
      *
      * @param caller The class of the object associated with named data.
      * @param name of test data to load.
-     * @return The reader, or <code>null</code> if the named test data are not found.
+     * @return The reader, or {@code null} if the named test data are not found.
      * @throws IOException if an error occurs during an input operation.
      */
     public static final BufferedReader getReader(final Class caller, final String name)
@@ -89,7 +91,7 @@ public class TestData {
      *
      * @param host Object associated with named data
      * @param name of test data to load
-     * @return The reader, or <code>null</code> if the named test data are not found.
+     * @return The reader, or {@code null} if the named test data are not found.
      * @throws IOException if an error occurs during an input operation.
      */
     public static final BufferedReader getReader(final Object host, final String name)
@@ -132,7 +134,7 @@ public class TestData {
     }
 
     /**
-     * Access to <code>getResource(caller, path)</code> as a {@link File}.
+     * Access to {@code getResource(caller, path)} as a {@link File}.
      * <p>
      * You can access the test-data directory with:
      * <pre><code>
@@ -157,7 +159,7 @@ public class TestData {
         throw new FileNotFoundException("Could not locate test-data: "+path);
     }
     /**
-     * Access to <code>getResource(caller, path)</code> as a {@link File}.
+     * Access to {@code getResource(caller, path)} as a {@link File}.
      * <p>
      * You can access the test-data directory with:
      * <pre><code>

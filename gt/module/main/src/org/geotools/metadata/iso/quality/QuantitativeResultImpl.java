@@ -40,6 +40,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class QuantitativeResultImpl extends ResultImpl implements QuantitativeResult {
     /**
@@ -53,17 +55,17 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     private double[] values;
 
     /**
-     * Value type for reporting a data quality result, or <code>null</code> if none.
+     * Value type for reporting a data quality result, or {@code null} if none.
      */
     private Class valueType;
 
     /**
-     * Value unit for reporting a data quality result, or <code>null</code> if none.
+     * Value unit for reporting a data quality result, or {@code null} if none.
      */
     private Unit valueUnit;
 
     /**
-     * Statistical method used to determine the value, or <code>null</code> if none.
+     * Statistical method used to determine the value, or {@code null} if none.
      */
     private InternationalString errorStatistic;
 
@@ -100,14 +102,14 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     }
 
     /**
-     * Value type for reporting a data quality result, or <code>null</code> if none.
+     * Value type for reporting a data quality result, or {@code null} if none.
      */
     public Class getValueType()  {
         return valueType;
     }
 
     /**
-     * Set the value type for reporting a data quality result, or <code>null</code> if none.
+     * Set the value type for reporting a data quality result, or {@code null} if none.
      *
      * @todo Verify if the value is of the requested type.
      */
@@ -117,14 +119,14 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     }
     
     /**
-     * Value unit for reporting a data quality result, or <code>null</code> if none.
+     * Value unit for reporting a data quality result, or {@code null} if none.
      */
     public Unit getValueUnit()  {
         return valueUnit;
     }
 
     /**
-     * Set the value unit for reporting a data quality result, or <code>null</code> if none.
+     * Set the value unit for reporting a data quality result, or {@code null} if none.
      */
     public synchronized void setValueUnit(final Unit newValue) {
         checkWritePermission();
@@ -132,14 +134,14 @@ public class QuantitativeResultImpl extends ResultImpl implements QuantitativeRe
     }
 
     /**
-     * Statistical method used to determine the value, or <code>null</code> if none.
+     * Statistical method used to determine the value, or {@code null} if none.
      */
     public InternationalString getErrorStatistic()  {
         return errorStatistic;
     }
 
     /**
-     * Set the statistical method used to determine the value, or <code>null</code> if none.
+     * Set the statistical method used to determine the value, or {@code null} if none.
      */
     public synchronized void setErrorStatistic(final InternationalString newValue) {
         checkWritePermission();

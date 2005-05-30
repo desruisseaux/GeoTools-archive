@@ -52,6 +52,8 @@ import org.geotools.referencing.factory.PropertyAuthorityFactory;
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class FactoryUsingWKT extends DeferredAuthorityFactory {
     /**

@@ -87,11 +87,13 @@ import org.geotools.resources.cts.Resources;
  * Parser for
  * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
  * Known Text</cite> (WKT)</A>. This parser can parse {@linkplain MathTransform math transform}
- * objects as well, which is part of the WKT's <code>FITTED_CS</code> element.
+ * objects as well, which is part of the WKT's {@code FITTED_CS} element.
  *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
@@ -285,7 +287,7 @@ public class Parser extends MathTransformParser {
      *
      * @todo All sequences of <code>if ("FOO".equals(keyword))</code> in this method
      *       and other methods of this class and subclasses, could be optimized with
-     *       a <code>switch</code> statement.
+     *       a {@code switch} statement.
      */
     protected Object parse(final Element element) throws ParseException {
         final Object key = element.peek();
@@ -373,9 +375,9 @@ public class Parser extends MathTransformParser {
      *
      * @param  parent The parent element.
      * @param  unit The contextual unit. Usually {@link NonSI#DEGREE_ANGLE} or {@link SI#METRE}.
-     * @param  required <code>true</code> if the axis is mandatory,
-     *         or <code>false</code> if it is optional.
-     * @return The "AXIS" element as a {@link CoordinateSystemAxis} object, or <code>null</code>
+     * @param  required {@code true} if the axis is mandatory,
+     *         or {@code false} if it is optional.
+     * @return The "AXIS" element as a {@link CoordinateSystemAxis} object, or {@code null}
      *         if the axis was not required and there is no axis object.
      * @throws ParseException if the "AXIS" element can't be parsed.
      */
@@ -476,7 +478,7 @@ public class Parser extends MathTransformParser {
      *
      * @param  parent The parent element.
      * @return The "TOWGS84" element as a {@link BursaWolfParameters} object,
-     *         or <code>null</code> if no "TOWGS84" has been found.
+     *         or {@code null} if no "TOWGS84" has been found.
      * @throws ParseException if the "TOWGS84" can't be parsed.
      */
     private static BursaWolfParameters parseToWGS84(final Element parent)
@@ -538,9 +540,9 @@ public class Parser extends MathTransformParser {
      * </code></blockquote>
      *
      * @param  parent The parent element.
-     * @param  ellipsoid The ellipsoid, or <code>null</code> if none.
-     * @param  linearUnit The linear unit of the parent PROJCS element, or <code>null</code>.
-     * @param  angularUnit The angular unit of the parent GEOCS element, or <code>null</code>.
+     * @param  ellipsoid The ellipsoid, or {@code null} if none.
+     * @param  linearUnit The linear unit of the parent PROJCS element, or {@code null}.
+     * @param  angularUnit The angular unit of the parent GEOCS element, or {@code null}.
      * @return The "PROJECTION" element as a {@link ParameterValueGroup} object.
      * @throws ParseException if the "PROJECTION" element can't be parsed.
      */
@@ -964,7 +966,7 @@ public class Parser extends MathTransformParser {
      * <code>{@linkplain ProjectedCRS}.class</code> for element "{@code PROJCS}".
      *
      * @param  element The WKT element name.
-     * @return The GeoAPI class of the specified element, or <code>null</code> if unknow.
+     * @return The GeoAPI class of the specified element, or {@code null} if unknow.
      */
     public static Class getClassOf(String element) {
         // No need to synchronize.
@@ -997,7 +999,7 @@ public class Parser extends MathTransformParser {
     /**
      * Read WKT strings from the {@linkplain System#in standard input stream} and
      * reformat them to the {@linkplain System#out standard output stream}. The
-     * input is read until it reach the end-of-file (<code>[Ctrl-Z]</code> if
+     * input is read until it reach the end-of-file ({@code [Ctrl-Z]} if
      * reading from the keyboard), or until an unparsable WKT has been hit.
      * Optional arguments are:
      *

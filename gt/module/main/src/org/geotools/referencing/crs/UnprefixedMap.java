@@ -31,11 +31,13 @@ import org.geotools.util.DerivedMap;
 /**
  * A map without the <code>"conversion."</code> prefix in front of property keys. This
  * implementation performs a special processing for the <code>{@linkplain #prefix}.name</code>
- * key: if it doesn't exists, then the plain <code>name</code> key is used. In other words,
+ * key: if it doesn't exists, then the plain {@code name} key is used. In other words,
  * this map inherits the <code>"name"</code> property from the {@linkplain #base} map.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class UnprefixedMap extends DerivedMap {
     /**
@@ -44,9 +46,9 @@ final class UnprefixedMap extends DerivedMap {
     private final String prefix;
 
     /**
-     * <code>true</code> if the <code>{@linkplain #prefix}.name</code> property exists
+     * {@code true} if the <code>{@linkplain #prefix}.name</code> property exists
      * in the {@linkplain #base base} map. This class will inherit the name and alias
-     * from the {@linkplain #base base} map only if this field is set to <code>false</code>.
+     * from the {@linkplain #base base} map only if this field is set to {@code false}.
      */
     private final boolean hasName, hasAlias;
 
@@ -80,11 +82,11 @@ final class UnprefixedMap extends DerivedMap {
 
     /**
      * Remove the prefix from the specified key. If the key doesn't begins with
-     * the prefix, then this method returns <code>null</code>.
+     * the prefix, then this method returns {@code null}.
      *
      * @param  key A key from the {@linkplain #base} map.
-     * @return The key that this view should contains instead of <code>key</code>,
-     *         or <code>null</code>.
+     * @return The key that this view should contains instead of {@code key},
+     *         or {@code null}.
      */
     protected Object baseToDerived(final Object key) {
         final int length = prefix.length();
@@ -113,7 +115,7 @@ final class UnprefixedMap extends DerivedMap {
     }
 
     /**
-     * Returns <code>true</code> if the specified candidate is <code>"name"</code>
+     * Returns {@code true} if the specified candidate is <code>"name"</code>
      * or <code>"alias"</code> without prefix. Key starting with <code>"name_"</code>
      * or <code>"alias_"</code> are accepted as well.
      */
@@ -123,7 +125,7 @@ final class UnprefixedMap extends DerivedMap {
     }
 
     /**
-     * Returns <code>true</code> if the specified candidate matched
+     * Returns {@code true} if the specified candidate matched
      * the specified key name.
      */
     private static boolean keyMatches(final String key, final String candidate) {

@@ -55,6 +55,8 @@ import org.geotools.referencing.datum.DefaultVerticalDatum;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS {
     /**

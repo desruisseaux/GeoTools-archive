@@ -84,6 +84,8 @@ import org.geotools.resources.image.ImageUtilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Remi Eve
+ *
+ * @since 2.1
  */
 public class Combine extends PointOpImage {
     /**

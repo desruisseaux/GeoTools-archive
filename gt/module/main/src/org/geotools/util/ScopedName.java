@@ -27,21 +27,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
 
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+
 
 /**
  * Fully qualified identifier for an object.
- * A <code>ScopedName</code> contains a {@link LocalName} as
+ * A {@code ScopedName} contains a {@link LocalName} as
  * {@linkplain #asLocalName head} and a {@linkplain GenericName},
  * which may be a {@link LocalName} or an other {@link org.opengis.util.ScopedName},
  * as {@linkplain #getScope tail}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see NameFactory
  */
@@ -81,7 +86,7 @@ public class ScopedName extends org.geotools.util.GenericName
      * <code>{@linkplain CharSequence#toString toString}()</code> method will be used.
      *
      * @param scope The scope (or "tail") of the variable.
-     * @param name  The head (never <code>null</code>).
+     * @param name  The head (never {@code null}).
      */
     public ScopedName(final GenericName scope,
                       final CharSequence name)
@@ -98,7 +103,7 @@ public class ScopedName extends org.geotools.util.GenericName
      *
      * @param scope     The scope (or "tail") of the variable.
      * @param separator The separator character (usually <code>':'</code> or <code>'/'</code>).
-     * @param name      The head (never <code>null</code>).
+     * @param name      The head (never {@code null}).
      */
     public ScopedName(final GenericName scope,
                       final char    separator,
@@ -127,7 +132,7 @@ public class ScopedName extends org.geotools.util.GenericName
 
     /**
      * Returns a view of this object as a scoped name. Since this object is already
-     * a scoped name, this method always returns <code>this</code>.
+     * a scoped name, this method always returns {@code this}.
      */
     public org.opengis.util.ScopedName asScopedName() {
         return this;

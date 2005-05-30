@@ -32,26 +32,28 @@ import java.util.logging.Logger;
  * 
  * @version $Id$
  * @author Andres Aimes
+ *
+ * @since 2.0
  */
 public class NIOUtilities {
     /**
-     * <code>true</code> if a warning has already been logged.
+     * {@code true} if a warning has already been logged.
      */
     private static boolean warned = false;
 
     /**
      * Do not allows instantiation of this class.
      *
-     * @task TODO: This constructor will become private when <code>NIOBufferUtils</code>
+     * @task TODO: This constructor will become private when {@code NIOBufferUtils}
      *             will have been removed.
      */
     protected NIOUtilities() {
     }
 
     /**
-     * Really closes a <code>MappedByteBuffer</code> without the need to wait for garbage
+     * Really closes a {@code MappedByteBuffer} without the need to wait for garbage
      * collection. Any problems with closing a buffer on Windows (the problem child in this
-     * case) will be logged as <code>SEVERE</code> to the logger of the package name. To
+     * case) will be logged as {@code SEVERE} to the logger of the package name. To
      * force logging of errors, set the System property "org.geotools.io.debugBuffer" to "true".
      *
      * @param  buffer The buffer to close.

@@ -37,6 +37,8 @@ import java.util.Date;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public abstract class ClassChanger {
     /**
@@ -103,7 +105,7 @@ public abstract class ClassChanger {
      *
      * @param  object Object to convert (may be null).
      * @return The object's numerical value.
-     * @throws ClassCastException if <code>object</code> is not of the expected class.
+     * @throws ClassCastException if {@code object} is not of the expected class.
      */
     protected abstract Number convert(final Comparable object) throws ClassCastException;
 
@@ -141,7 +143,7 @@ public abstract class ClassChanger {
      *
      * @param  converter The {@link ClassChanger} to add.
      * @throws IllegalStateException if an other {@link ClassChanger} was already
-     *         registered for the same <code>source</code> class. This is usually
+     *         registered for the same {@code source} class. This is usually
      *         not a concern since the registration usually take place during the
      *         class initialization ("static" constructor).
      */
@@ -173,7 +175,7 @@ public abstract class ClassChanger {
      *
      * @param  source The class.
      * @return The class changer for the specified class.
-     * @throws ClassNotFoundException if <code>source</code> is not a registered class.
+     * @throws ClassNotFoundException if {@code source} is not a registered class.
      */
     private static synchronized ClassChanger getClassChanger(final Class source)
         throws ClassNotFoundException
@@ -191,7 +193,7 @@ public abstract class ClassChanger {
      * transformation is known. The source class is a {@link Comparable} subclass
      * that will be specified as input to {@link #convert}. The target class is a
      * {@link Number} subclass that will be returned as output by {@link #convert}.
-     * If no suitable mapping is found, then <code>source</code> is returned.
+     * If no suitable mapping is found, then {@code source} is returned.
      */
     public static synchronized Class getTransformedClass(final Class source) {
         if (source != null) {
@@ -210,10 +212,10 @@ public abstract class ClassChanger {
      * value of the specified date object as a {@link Long}.
      *
      * @param  object Object to convert (may be null).
-     * @return <code>null</code> if <code>object</code> was null; otherwise
-     *         <code>object</code> if the supplied object is already an instance
+     * @return {@code null} if {@code object} was null; otherwise
+     *         {@code object} if the supplied object is already an instance
      *         of {@link Number}; otherwise a new number with the numerical value.
-     * @throws ClassNotFoundException if <code>object</code> is not an instance
+     * @throws ClassNotFoundException if {@code object} is not an instance
      *         of a registered class.
      */
     public static Number toNumber(final Comparable object)
@@ -238,7 +240,7 @@ public abstract class ClassChanger {
      *
      * @param  value  The numerical value (may be null).
      * @param  classe The desired classe for return value.
-     * @throws ClassNotFoundException if <code>classe</code> is not a registered class.
+     * @throws ClassNotFoundException if {@code classe} is not a registered class.
      */
     public static Comparable toComparable(final Number value, final Class classe)
         throws ClassNotFoundException
@@ -310,7 +312,7 @@ public abstract class ClassChanger {
     }
 
     /**
-     * Returns the class of the widest type. Numbers <code>n1</code> and <code>n2</code>
+     * Returns the class of the widest type. Numbers {@code n1} and {@code n2}
      * must be instance of any of {@link Byte}, {@link Short}, {@link Integer}, {@link Long},
      * {@link Float} or {@link Double} types. At most one of the argument can be null.
      */
@@ -320,7 +322,7 @@ public abstract class ClassChanger {
     }
 
     /**
-     * Returns the class of the widest type. Classes <code>c1</code> and <code>c2</code>
+     * Returns the class of the widest type. Classes {@code c1} and {@code c2}
      * must be of any of {@link Byte}, {@link Short}, {@link Integer}, {@link Long},
      * {@link Float} or {@link Double} types. At most one of the argument can be null.
      */
@@ -331,7 +333,7 @@ public abstract class ClassChanger {
     }
 
     /**
-     * Returns the class of the finest type. Classes <code>c1</code> and <code>c2</code>
+     * Returns the class of the finest type. Classes {@code c1} and {@code c2}
      * must be of any of {@link Byte}, {@link Short}, {@link Integer}, {@link Long},
      * {@link Float} or {@link Double} types. At most one of the argument can be null.
      */

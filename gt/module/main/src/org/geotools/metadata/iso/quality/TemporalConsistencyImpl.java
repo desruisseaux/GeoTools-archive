@@ -32,6 +32,8 @@ import org.opengis.metadata.quality.TemporalConsistency;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class TemporalConsistencyImpl extends TemporalAccuracyImpl implements TemporalConsistency {
     /**

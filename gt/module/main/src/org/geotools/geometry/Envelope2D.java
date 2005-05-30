@@ -39,6 +39,8 @@ import org.geotools.resources.cts.ResourceKeys;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneable {
     /**

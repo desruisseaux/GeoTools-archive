@@ -45,6 +45,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see AbstractParameterDescriptor
  */
 public abstract class AbstractParameter extends Formattable
@@ -85,7 +87,7 @@ public abstract class AbstractParameter extends Formattable
      *
      * @param  name   Argument name.
      * @param  object User argument.
-     * @throws IllegalArgumentException if <code>object</code> is null.
+     * @throws IllegalArgumentException if {@code object} is null.
      */
     static void ensureNonNull(final String name, final Object object)
             throws IllegalArgumentException
@@ -103,7 +105,7 @@ public abstract class AbstractParameter extends Formattable
      * @param  name  Argument name.
      * @param  array The array to look at.
      * @param  index Index of the element to check.
-     * @throws IllegalArgumentException if <code>array[i]</code> is null.
+     * @throws IllegalArgumentException if {@code array[i]} is null.
      */
     static void ensureNonNull(final String name, final Object[] array, final int index)
         throws IllegalArgumentException
@@ -118,8 +120,8 @@ public abstract class AbstractParameter extends Formattable
      * Verify that the specified value is of the specified class.
      *
      * @param  valueClass the expected class.
-     * @param  value The expected value, or <code>null</code>.
-     * @throws IllegalArgumentException if <code>value</code> is non-null and has a non-assignable
+     * @param  value The expected value, or {@code null}.
+     * @throws IllegalArgumentException if {@code value} is non-null and has a non-assignable
      *         class.
      */
     static void ensureValidClass(final Class valueClass, final Object value)
@@ -158,8 +160,8 @@ public abstract class AbstractParameter extends Formattable
     /**
      * Compares the specified object with this parameter for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {

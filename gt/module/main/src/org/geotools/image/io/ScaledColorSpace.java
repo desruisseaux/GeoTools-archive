@@ -30,6 +30,8 @@ import org.geotools.resources.Utilities;
  *
  * @author Martin Desruisseaux
  * @version $Id$
+ *
+ * @since 2.1
  */
 final class ScaledColorSpace extends ColorSpace {
     /**

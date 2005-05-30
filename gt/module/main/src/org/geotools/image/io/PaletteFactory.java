@@ -19,7 +19,7 @@
  */
 package org.geotools.image.io;
 
-// Colors
+// J2SE dependencies
 import java.awt.Color;
 import java.awt.image.IndexColorModel;
 import java.io.BufferedReader;
@@ -35,9 +35,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
 import javax.imageio.IIOException;
 
+// Geotools dependencies
 import org.geotools.io.DefaultFileFilter;
 import org.geotools.io.LineFormat;
 import org.geotools.resources.gcs.ResourceKeys;
@@ -72,10 +72,12 @@ import org.geotools.resources.image.ColorUtilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class PaletteFactory {
     /**
-     * The parent factory, or <code>null</code> if there is none.
+     * The parent factory, or {@code null} if there is none.
      * The parent factory will be queried if a palette was not
      * found in current factory.
      */
@@ -83,14 +85,14 @@ public class PaletteFactory {
     
     /**
      * The class loader from which to load the palette definition files.
-     * If <code>null</code>, loading will occurs from the system current
+     * If {@code null}, loading will occurs from the system current
      * working directory.
      */
     private final ClassLoader loader;
     
     /**
      * The base directory from which to search for palette definition files.
-     * If <code>null</code>, then the working directory (".") is assumed.
+     * If {@code null}, then the working directory (".") is assumed.
      */
     private final File directory;
     
@@ -101,34 +103,34 @@ public class PaletteFactory {
     
     /**
      * The charset to use for parsing files, or
-     * <code>null</code> for the current default.
+     * {@code null} for the current default.
      */
     private final Charset charset;
     
     /**
      * The locale to use for parsing files. or
-     * <code>null</code> for the current default.
+     * {@code null} for the current default.
      */
     private final Locale locale;
     
     /**
      * Construct a palette factory.
      *
-     * @param parent    The parent factory, or <code>null</code> if there is none.
+     * @param parent    The parent factory, or {@code null} if there is none.
      *                  The parent factory will be queried if a palette was not
      *                  found in current factory.
      * @param loader    The class loader from which to load the palette definition files.
-     *                  If <code>null</code>, loading will occurs from the system current
+     *                  If {@code null}, loading will occurs from the system current
      *                  working directory.
      * @param directory The base directory from which to search for palette definition files.
-     *                  If <code>null</code>, then <code>"."</code> is assumed.
-     * @param extension File name extension, or <code>null</code> if there is no extension
+     *                  If {@code null}, then <code>"."</code> is assumed.
+     * @param extension File name extension, or {@code null} if there is no extension
      *                  to add to filename. If non-null, this extension will be automatically
      *                  appended to filename. It should starts with the character <code>'.'</code>.
      * @param charset   The charset to use for parsing files, or
-     *                  <code>null</code> for the current default.
+     *                  {@code null} for the current default.
      * @param locale    The locale to use for parsing files. or
-     *                  <code>null</code> for the current default.
+     *                  {@code null} for the current default.
      */
     public PaletteFactory(final PaletteFactory parent,
                           final ClassLoader    loader,
@@ -152,7 +154,7 @@ public class PaletteFactory {
      * Returns the list of available palette names. Any item in this list can be specified as
      * argument to {@link #getColors(String)} or {@link #getIndexColorModel(String)} methods.
      *
-     * @return The list of available palette name, or <code>null</code> if this method
+     * @return The list of available palette name, or {@code null} if this method
      *         is unable to fetch this information.
      */
     public String[] getAvailableNames() {
@@ -181,7 +183,7 @@ public class PaletteFactory {
 
     /**
      * Transforms an {@link URL} into a {@link File}. If the URL can't be
-     * interpreted as a file, then this method returns <code>null</code>.
+     * interpreted as a file, then this method returns {@code null}.
      */
     private static File toFile(final URL url) {
         if (url!=null && url.getProtocol().equalsIgnoreCase("file")) {
@@ -196,7 +198,7 @@ public class PaletteFactory {
      * @param  The palette's name to load. This name doesn't need to contains a path
      *         or an extension. Path and extension are set according value specified
      *         at construction time.
-     * @return A buffered reader to read <code>name</code>.
+     * @return A buffered reader to read {@code name}.
      * @throws IOException if an I/O error occured.
      */
     private BufferedReader getReader(String name) throws IOException {
@@ -266,7 +268,7 @@ public class PaletteFactory {
      * @param  name The palette's name to load. This name doesn't need to contains a path
      *              or an extension. Path and extension are set according value specified
      *              at construction time.
-     * @return The set of colors, or <code>null</code> if the set was not found.
+     * @return The set of colors, or {@code null} if the set was not found.
      * @throws IOException if an error occurs during reading.
      * @throws IIOException if an error occurs during parsing.
      */
@@ -284,7 +286,7 @@ public class PaletteFactory {
      * Load colors from an URL.
      *
      * @param  url The palette's URL.
-     * @return The set of colors, or <code>null</code> if the set was not found.
+     * @return The set of colors, or {@code null} if the set was not found.
      * @throws IOException if an error occurs during reading.
      * @throws IIOException if an error occurs during parsing.
      */
@@ -302,7 +304,7 @@ public class PaletteFactory {
      * @param  name The palette's name to load. This name doesn't need to contains a path
      *              or an extension. Path and extension are set according value specified
      *              at construction time.
-     * @return The index color model, or <code>null</code> if the palettes was not found.
+     * @return The index color model, or {@code null} if the palettes was not found.
      * @throws IOException if an error occurs during reading.
      * @throws IIOException if an error occurs during parsing.
      */
@@ -312,15 +314,15 @@ public class PaletteFactory {
     
     /**
      * Load an index color model from a definition file.
-     * The returned model will use index from <code>lower</code> inclusive to
-     * <code>upper</code> exclusive. Other index will have transparent color.
+     * The returned model will use index from {@code lower} inclusive to
+     * {@code upper} exclusive. Other index will have transparent color.
      *
      * @param  The palette's name to load. This name doesn't need to contains a path
      *         or an extension. Path and extension are set according value specified
      *         at construction time.
      * @param  lower Palette's lower index (inclusive).
      * @param  upper Palette's upper index (exclusive).
-     * @return The index color model, or <code>null</code> if the palettes was not found.
+     * @return The index color model, or {@code null} if the palettes was not found.
      * @throws IOException if an error occurs during reading.
      * @throws IIOException if an error occurs during parsing.
      */
@@ -339,7 +341,7 @@ public class PaletteFactory {
     }
     
     /**
-     * Vérifie que la valeur <code>value</code> spécifiée
+     * Vérifie que la valeur {@code value} spécifiée
      * est dans la plage [0..255] inclusivement.
      *
      * @throws ParseException si le nombre n'est pas dans la plage [0..255].

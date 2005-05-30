@@ -24,6 +24,7 @@ import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
@@ -33,6 +34,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class ExpandedTabWriter extends FilterWriter {
     /**
@@ -62,7 +65,7 @@ public class ExpandedTabWriter extends FilterWriter {
      *
      * @param  out a Writer object to provide the underlying stream.
      * @param  tabWidth The tab width. Must be greater than 0.
-     * @throws IllegalArgumentException if <code>tabWidth</code>
+     * @throws IllegalArgumentException if {@code tabWidth}
      *         is not greater than 0.
      */
     public ExpandedTabWriter(Writer out, int tabWidth) throws IllegalArgumentException {
@@ -74,7 +77,7 @@ public class ExpandedTabWriter extends FilterWriter {
      * Sets the tab width.
      *
      * @param  tabWidth The tab width. Must be greater than 0.
-     * @throws IllegalArgumentException if <code>tabWidth</code>
+     * @throws IllegalArgumentException if {@code tabWidth}
      *         is not greater than 0.
      */
     public void setTabWidth(final int tabWidth) throws IllegalArgumentException {

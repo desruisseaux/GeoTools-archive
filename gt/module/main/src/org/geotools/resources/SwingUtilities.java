@@ -51,7 +51,7 @@ import org.geotools.resources.gui.Resources;
  * their work to the corresponding method in {@link JOptionPane}, with two differences:
  *
  * <ul>
- *   <li><code>SwingUtilities</code>'s method may be invoked from any thread. If they
+ *   <li>{@code SwingUtilities}'s method may be invoked from any thread. If they
  *       are invoked from a non-Swing thread, execution will be delegate to the Swing
  *       thread and the calling thread will block until completion.</li>
  *   <li>If a parent component is a {@link JDesktopPane}, dialogs will be rendered as
@@ -60,6 +60,8 @@ import org.geotools.resources.gui.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class SwingUtilities {
     /**
@@ -73,24 +75,24 @@ public final class SwingUtilities {
      * Insert a Swing component into a frame. The kind of frame depends on the owner:
      *
      * <ul>
-     *   <li>If <code>owner</code> or one of its parent is a {@link JDesktopPane},
-     *       then <code>panel</code> is added into a {@link JInternalFrame}.</li>
-     *   <li>If <code>owner</code> or one of its parent is a {@link Frame} or a {@link Dialog},
-     *       then <code>panel</code> is added into a {@link JDialog}.</li>
-     *   <li>Otherwise, <code>panel</code> is added into a {@link JFrame}.</li>
+     *   <li>If {@code owner} or one of its parent is a {@link JDesktopPane},
+     *       then {@code panel} is added into a {@link JInternalFrame}.</li>
+     *   <li>If {@code owner} or one of its parent is a {@link Frame} or a {@link Dialog},
+     *       then {@code panel} is added into a {@link JDialog}.</li>
+     *   <li>Otherwise, {@code panel} is added into a {@link JFrame}.</li>
      * </ul>
      *
-     * @param  owner The frame's owner, or <code>null</code> if none.
+     * @param  owner The frame's owner, or {@code null} if none.
      * @param  panel The panel to insert into a frame.
      * @param  title The frame's title.
      * @param  listener A listener to receives frame events.  If non-null, then this listener will
      *         be registered to whatever kind of frame this method will constructs. In the special
      *         case where this method constructs an {@linkplain JInternalFrame internal frame} and
-     *         the <code>listener</code> is not an instance of {@link InternalFrameListener}, then
-     *         this method will wrap the <code>listener</code> into an
-     *         <code>InternalFrameListener</code>.
+     *         the {@code listener} is not an instance of {@link InternalFrameListener}, then
+     *         this method will wrap the {@code listener} into an
+     *         {@code InternalFrameListener}.
      * @return The frame. This frame is not initially visible. The method
-     *         <code>Component.setVisible(true)</code> must be invoked
+     *         {@code Component.setVisible(true)} must be invoked
      *         in order to show the frame.
      */
     public static Component toFrame(Component owner,
@@ -148,7 +150,7 @@ public final class SwingUtilities {
      * @param  owner  The parent component. Dialog will apears on top of this owner.
      * @param  dialog The dialog content to show.
      * @param  title  The title string for the dialog.
-     * @return <code>true</code> if user clicked "Ok", <code>false</code> otherwise.
+     * @return {@code true} if user clicked "Ok", {@code false} otherwise.
      */
     public static boolean showOptionDialog(final Component owner,
                                            final Object   dialog,
@@ -164,11 +166,11 @@ public final class SwingUtilities {
      * @param  owner  The parent component. Dialog will apears on top of this owner.
      * @param  dialog The dialog content to show.
      * @param  title  The title string for the dialog.
-     * @param  reset  Action to execute when user press "Reset", or <code>null</code>
-     *                if there is no "Reset" button. If <code>reset</code> is an
+     * @param  reset  Action to execute when user press "Reset", or {@code null}
+     *                if there is no "Reset" button. If {@code reset} is an
      *                instance of {@link Action}, the button label will be set
      *                according the action's properties.
-     * @return <code>true</code> if user clicked "Ok", <code>false</code> otherwise.
+     * @return {@code true} if user clicked "Ok", {@code false} otherwise.
      */
     public static boolean showOptionDialog(final Component      owner,
                                            final Object        dialog,
@@ -288,7 +290,7 @@ public final class SwingUtilities {
      *                 {@link JOptionPane#WARNING_MESSAGE},
      *                 {@link JOptionPane#QUESTION_MESSAGE} or
      *                 {@link JOptionPane#PLAIN_MESSAGE}).
-     * @return <code>true</code> if user clicked on "Yes", <code>false</code> otherwise.
+     * @return {@code true} if user clicked on "Yes", {@code false} otherwise.
      */
     public static boolean showConfirmDialog(final Component owner,
                                             final Object  message,
@@ -329,7 +331,7 @@ public final class SwingUtilities {
      * distribué sur plusieurs lignes.
      *
      * @param owner Composante pour laquelle on construit une étiquette.
-     *              L'étiquette aura la même largeur que <code>owner</code>.
+     *              L'étiquette aura la même largeur que {@code owner}.
      * @param text  Texte à placer dans l'étiquette.
      */
     public static JComponent getMultilineLabelFor(final JComponent owner, final String text) {

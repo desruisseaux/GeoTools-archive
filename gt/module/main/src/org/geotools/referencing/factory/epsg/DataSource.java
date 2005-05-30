@@ -54,6 +54,8 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public interface DataSource extends javax.sql.DataSource {
     /**

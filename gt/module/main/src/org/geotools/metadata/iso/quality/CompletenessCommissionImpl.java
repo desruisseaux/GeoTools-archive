@@ -31,6 +31,8 @@ import org.opengis.metadata.quality.CompletenessCommission;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class CompletenessCommissionImpl extends CompletenessImpl implements CompletenessCommission {
     /**

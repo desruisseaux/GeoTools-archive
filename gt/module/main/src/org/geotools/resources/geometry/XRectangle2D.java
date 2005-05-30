@@ -29,21 +29,24 @@ import java.io.Serializable;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
 /**
  * Serializable, high-performance double-precision rectangle. Instead of using
- * <code>x</code>, <code>y</code>, <code>width</code> and <code>height</code>,
+ * {@code x}, {@code y}, {@code width} and {@code height},
  * this class store rectangle's coordinates into the following fields:
  * {@link #xmin}, {@link #xmax}, {@link #ymin} et {@link #ymax}. Methods likes
- * <code>contains</code> and <code>intersects</code> are faster, which make this
+ * {@code contains} and {@code intersects} are faster, which make this
  * class more appropriate for using intensively inside a loop. Furthermore, this
  * class work correctly with {@linkplain Double#POSITIVE_INFINITY infinites} and
  * {@linkplain Double#NaN NaN} values.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
@@ -57,7 +60,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * {@link java.lang.Double#NEGATIVE_INFINITY},  while the {@link #getMaxX} and
      * {@link #getMaxY} methods return always {@link java.lang.Double#POSITIVE_INFINITY}.
      * This rectangle can be used as argument in the {@link XRectangle2D} constructor for
-     * initializing a new <code>XRectangle2D</code> to infinite bounds.
+     * initializing a new {@code XRectangle2D} to infinite bounds.
      */
     public static final Rectangle2D INFINITY = new Infinite();
     
@@ -117,7 +120,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /** Maximal <var>y</var> coordinate. */ protected double ymax;
 
     /**
-     * Construct a default rectangle. Initial coordinates are <code>(0,0,0,0)</code>.
+     * Construct a default rectangle. Initial coordinates are {@code (0,0,0,0)}.
      */
     public XRectangle2D() {
     }
@@ -136,9 +139,9 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     /**
      * Construct a rectangle with the same coordinates than the supplied rectangle.
      *
-     * @param rect The rectangle, or <code>null</code> in none (in which case this constructor
+     * @param rect The rectangle, or {@code null} in none (in which case this constructor
      *             is equivalents to the no-argument constructor). Use {@link #INFINITY} for
-     *             initializing this <code>XRectangle2D</code> with infinite bounds.
+     *             initializing this {@code XRectangle2D} with infinite bounds.
      */
     public XRectangle2D(final Rectangle2D rect) {
         if (rect != null) {
@@ -163,12 +166,12 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
     
     /**
-     * Determines whether the <code>RectangularShape</code> is empty.
-     * When the <code>RectangularShape</code> is empty, it encloses no
+     * Determines whether the {@code RectangularShape} is empty.
+     * When the {@code RectangularShape} is empty, it encloses no
      * area.
      *
-     * @return <code>true</code> if the <code>RectangularShape</code> is empty;
-     *      <code>false</code> otherwise.
+     * @return {@code true} if the {@code RectangularShape} is empty;
+     *      {@code false} otherwise.
      */
     public boolean isEmpty() {
         return !(xmin<xmax && ymin<ymax);
@@ -176,7 +179,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
 
     /**
      * Returns the X coordinate of the upper left corner of
-     * the framing rectangle in <code>double</code> precision.
+     * the framing rectangle in {@code double} precision.
      *
      * @return the x coordinate of the upper left corner of the framing rectangle.
      */
@@ -186,7 +189,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
 
     /**
      * Returns the Y coordinate of the upper left corner of
-     * the framing rectangle in <code>double</code> precision.
+     * the framing rectangle in {@code double} precision.
      *
      * @return the y coordinate of the upper left corner of the framing rectangle.
      */
@@ -196,7 +199,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     
     /**
      * Returns the width of the framing rectangle in
-     * <code>double</code> precision.
+     * {@code double} precision.
      * @return the width of the framing rectangle.
      */
     public double getWidth() {
@@ -204,7 +207,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Returns the height of the framing rectangle in <code>double</code> precision.
+     * Returns the height of the framing rectangle in {@code double} precision.
      *
      * @return the height of the framing rectangle.
      */
@@ -255,15 +258,15 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Sets the location and size of this <code>Rectangle2D</code>
+     * Sets the location and size of this {@code Rectangle2D}
      * to the specified double values.
      *
      * @param x the <var>x</var> coordinates to which to set the
-     *        location of the upper left corner of this <code>Rectangle2D</code>
+     *        location of the upper left corner of this {@code Rectangle2D}
      * @param y the <var>y</var> coordinates to which to set the
-     *        location of the upper left corner of this <code>Rectangle2D</code>
-     * @param width the value to use to set the width of this <code>Rectangle2D</code>
-     * @param height the value to use to set the height of this <code>Rectangle2D</code>
+     *        location of the upper left corner of this {@code Rectangle2D}
+     * @param width the value to use to set the width of this {@code Rectangle2D}
+     * @param height the value to use to set the height of this {@code Rectangle2D}
      */
     public void setRect(final double x, final double y, final double width, final double height) {
         this.xmin = x;
@@ -273,10 +276,10 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Sets this <code>Rectangle2D</code> to be the same as the
-     * specified <code>Rectangle2D</code>.
+     * Sets this {@code Rectangle2D} to be the same as the
+     * specified {@code Rectangle2D}.
      *
-     * @param r the specified <code>Rectangle2D</code>
+     * @param r the specified {@code Rectangle2D}
      */
     public void setRect(final Rectangle2D r) {
         this.xmin = r.getMinX();
@@ -286,7 +289,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Tests if the interior of this <code>Rectangle2D</code>
+     * Tests if the interior of this {@code Rectangle2D}
      * intersects the interior of a specified set of rectangular
      * coordinates.
      *
@@ -296,9 +299,9 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *        of the specified set of rectangular coordinates
      * @param width the width of the specified set of rectangular coordinates
      * @param height the height of the specified set of rectangular coordinates
-     * @return <code>true</code> if this <code>Rectangle2D</code>
+     * @return {@code true} if this {@code Rectangle2D}
      * intersects the interior of a specified set of rectangular
-     * coordinates; <code>false</code> otherwise.
+     * coordinates; {@code false} otherwise.
      */
     public boolean intersects(final double x,     final double y,
                               final double width, final double height)
@@ -317,7 +320,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * {@linkplain Double#POSITIVE_INFINITY infinites} and {@linkplain Double#NaN NaN} values.
      *
      * @param  rect the specified rectangle.
-     * @return <code>true</code> if this shape and the specified rectangle intersect each other.
+     * @return {@code true} if this shape and the specified rectangle intersect each other.
      *
      * @see #intersectInclusive(Rectangle2D, Rectangle2D)
      */
@@ -354,7 +357,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *
      * @param  rect1 The first rectangle to test.
      * @param  rect2 The second rectangle to test.
-     * @return <code>true</code> if the interior and/or the edge of the two specified rectangles
+     * @return {@code true} if the interior and/or the edge of the two specified rectangles
      *         intersects.
      */
     public static boolean intersectInclusive(final Rectangle2D rect1, final Rectangle2D rect2) {
@@ -373,8 +376,8 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Tests if the interior of the <code>Shape</code> intersects the interior of a specified
-     * rectangle. This method might conservatively return <code>true</code> when there is a high
+     * Tests if the interior of the {@code Shape} intersects the interior of a specified
+     * rectangle. This method might conservatively return {@code true} when there is a high
      * probability that the rectangle and the shape intersect, but the calculations to accurately
      * determine this intersection are prohibitively expensive. This is similar to
      * {@link Shape#intersects(Rectangle2D)}, except that this method tests also rectangle with
@@ -388,7 +391,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *
      * @param shape The shape.
      * @param rect  The rectangle to test for inclusion.
-     * @return <code>true</code> if the interior of the shape and  the interior of the specified
+     * @return {@code true} if the interior of the shape and  the interior of the specified
      *         rectangle intersect, or are both highly likely to intersect.
      */
     public static boolean intersectInclusive(final Shape shape, final Rectangle2D rect) {
@@ -410,7 +413,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Tests if the interior of this <code>Rectangle2D</code> entirely
+     * Tests if the interior of this {@code Rectangle2D} entirely
      * contains the specified set of rectangular coordinates.
      *
      * @param x the <var>x</var> coordinates of the upper left corner
@@ -419,9 +422,9 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *          of the specified set of rectangular coordinates
      * @param width the width of the specified set of rectangular coordinates
      * @param height the height of the specified set of rectangular coordinates
-     * @return <code>true</code> if this <code>Rectangle2D</code>
+     * @return {@code true} if this {@code Rectangle2D}
      *         entirely contains specified set of rectangular
-     *         coordinates; <code>false</code> otherwise.
+     *         coordinates; {@code false} otherwise.
      */
     public boolean contains(final double x,     final double y,
                             final double width, final double height)
@@ -440,7 +443,7 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      * {@linkplain Double#NaN NaN} values.
      *
      * @param  rect the specified rectangle.
-     * @return <code>true</code> if this shape entirely contains the specified rectangle.
+     * @return {@code true} if this shape entirely contains the specified rectangle.
      */
     public boolean contains(final Rectangle2D rect) {
         if (!(xmin<xmax && ymin<ymax)) {
@@ -455,24 +458,24 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Tests if a specified coordinate is inside the boundary of this <code>Rectangle2D</code>.
+     * Tests if a specified coordinate is inside the boundary of this {@code Rectangle2D}.
      *
      * @param x the <var>x</var> coordinates to test.
      * @param y the <var>y</var> coordinates to test.
-     * @return <code>true</code> if the specified coordinates are
-     *         inside the boundary of this <code>Rectangle2D</code>;
-     *         <code>false</code> otherwise.
+     * @return {@code true} if the specified coordinates are
+     *         inside the boundary of this {@code Rectangle2D};
+     *         {@code false} otherwise.
      */
     public boolean contains(final double x, final double y) {
         return (x>=xmin && y>=ymin && x<xmax && y<ymax);
     }
 
     /**
-     * Tests if the interior of the <code>inner</code> rectangle is contained in the interior
-     * and/or the edge of the <code>outter</code> rectangle. This method is similar to
+     * Tests if the interior of the {@code inner} rectangle is contained in the interior
+     * and/or the edge of the {@code outter} rectangle. This method is similar to
      * {@link #contains(Rectangle2D)} except for the following points:
      * <ul>
-     *   <li>This method doesn't test only the <em>interiors</em> of <code>outter</code>.
+     *   <li>This method doesn't test only the <em>interiors</em> of {@code outter}.
      *       It tests for the edges as well.</li>
      *   <li>This method tests also rectangle with zero {@linkplain Rectangle2D#getWidth width} or
      *       {@linkplain Rectangle2D#getHeight height} (which are {@linkplain Rectangle2D#isEmpty
@@ -488,10 +491,10 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
      *
      * @param  outter The first rectangle to test.
      * @param  inner The second rectangle to test.
-     * @return <code>true</code> if the interior of <code>inner</code> is inside the interior
-     *         and/or the edge of <code>outter</code>.
+     * @return {@code true} if the interior of {@code inner} is inside the interior
+     *         and/or the edge of {@code outter}.
      *
-     * @todo Check for negative width or height (should returns <code>false</code>).
+     * @todo Check for negative width or height (should returns {@code false}).
      */
     public static boolean containsInclusive(final Rectangle2D outter, final Rectangle2D inner) {
         return outter.getMinX() <= inner.getMinX() && outter.getMaxX() >= inner.getMaxX() &&
@@ -500,11 +503,11 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
 
     /**
      * Determines where the specified coordinates lie with respect
-     * to this <code>Rectangle2D</code>.
+     * to this {@code Rectangle2D}.
      * This method computes a binary OR of the appropriate mask values
-     * indicating, for each side of this <code>Rectangle2D</code>,
+     * indicating, for each side of this {@code Rectangle2D},
      * whether or not the specified coordinates are on the same side
-     * of the edge as the rest of this <code>Rectangle2D</code>.
+     * of the edge as the rest of this {@code Rectangle2D}.
      *
      * @return the logical OR of all appropriate out codes.
      *
@@ -526,13 +529,13 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Returns a new <code>Rectangle2D</code> object representing the
-     * intersection of this <code>Rectangle2D</code> with the specified
-     * <code>Rectangle2D</code>.
+     * Returns a new {@code Rectangle2D} object representing the
+     * intersection of this {@code Rectangle2D} with the specified
+     * {@code Rectangle2D}.
      *
-     * @param  rect the <code>Rectangle2D</code> to be intersected with this <code>Rectangle2D</code>
-     * @return the largest <code>Rectangle2D</code> contained in both the specified
-     *         <code>Rectangle2D</code> and in this <code>Rectangle2D</code>.
+     * @param  rect the {@code Rectangle2D} to be intersected with this {@code Rectangle2D}
+     * @return the largest {@code Rectangle2D} contained in both the specified
+     *         {@code Rectangle2D} and in this {@code Rectangle2D}.
      */
     public Rectangle2D createIntersection(final Rectangle2D rect) {
         final XRectangle2D r=new XRectangle2D();
@@ -544,15 +547,15 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
     
     /**
-     * Returns a new <code>Rectangle2D</code> object representing the
-     * union of this <code>Rectangle2D</code> with the specified
-     * <code>Rectangle2D</code>.
+     * Returns a new {@code Rectangle2D} object representing the
+     * union of this {@code Rectangle2D} with the specified
+     * {@code Rectangle2D}.
      *
-     * @param rect the <code>Rectangle2D</code> to be combined with
-     *             this <code>Rectangle2D</code>
-     * @return the smallest <code>Rectangle2D</code> containing both
-     *         the specified <code>Rectangle2D</code> and this
-     *         <code>Rectangle2D</code>.
+     * @param rect the {@code Rectangle2D} to be combined with
+     *             this {@code Rectangle2D}
+     * @return the smallest {@code Rectangle2D} containing both
+     *         the specified {@code Rectangle2D} and this
+     *         {@code Rectangle2D}.
      */
     public Rectangle2D createUnion(final Rectangle2D rect) {
         final XRectangle2D r=new XRectangle2D();
@@ -565,17 +568,17 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
 
     /**
      * Adds a point, specified by the double precision arguments
-     * <code>x</code> and <code>y</code>, to this <code>Rectangle2D</code>.
-     * The resulting <code>Rectangle2D</code> is the smallest <code>Rectangle2D</code>
-     * that contains both the original <code>Rectangle2D</code> and the specified point.
+     * {@code x} and {@code y}, to this {@code Rectangle2D}.
+     * The resulting {@code Rectangle2D} is the smallest {@code Rectangle2D}
+     * that contains both the original {@code Rectangle2D} and the specified point.
      * <p>
-     * After adding a point, a call to <code>contains</code> with the
+     * After adding a point, a call to {@code contains} with the
      * added point as an argument does not necessarily return
-     * <code>true</code>. The <code>contains</code> method does not
-     * return <code>true</code> for points on the right or bottom
+     * {@code true}. The {@code contains} method does not
+     * return {@code true} for points on the right or bottom
      * edges of a rectangle. Therefore, if the added point falls on
      * the left or bottom edge of the enlarged rectangle,
-     * <code>contains</code> returns <code>false</code> for that point.
+     * {@code contains} returns {@code false} for that point.
      */
     public void add(final double x, final double y) {
         if (x<xmin) xmin=x;
@@ -585,11 +588,11 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Adds a <code>Rectangle2D</code> object to this <code>Rectangle2D</code>.
-     * The resulting <code>Rectangle2D</code> is the union of the two
-     * <code>Rectangle2D</code> objects.
+     * Adds a {@code Rectangle2D} object to this {@code Rectangle2D}.
+     * The resulting {@code Rectangle2D} is the union of the two
+     * {@code Rectangle2D} objects.
      *
-     * @param rect the <code>Rectangle2D</code> to add to this <code>Rectangle2D</code>.
+     * @param rect the {@code Rectangle2D} to add to this {@code Rectangle2D}.
      */
     public void add(final Rectangle2D rect) {
         double t;
@@ -600,9 +603,9 @@ public class XRectangle2D extends Rectangle2D implements Serializable {
     }
 
     /**
-     * Returns the <code>String</code> representation of this <code>Rectangle2D</code>.
+     * Returns the {@code String} representation of this {@code Rectangle2D}.
      *
-     * @return a <code>String</code> representing this <code>Rectangle2D</code>.
+     * @return a {@code String} representing this {@code Rectangle2D}.
      */
     public String toString() {
         final StringBuffer buffer = new StringBuffer(Utilities.getShortClassName(this));

@@ -34,6 +34,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 class ConcatenatedTransformDirect extends ConcatenatedTransform {
     /**
@@ -60,7 +62,7 @@ class ConcatenatedTransformDirect extends ConcatenatedTransform {
     }
     
     /**
-     * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
+     * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException

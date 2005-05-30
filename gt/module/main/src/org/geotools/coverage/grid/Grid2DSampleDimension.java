@@ -57,6 +57,8 @@ import org.geotools.util.SimpleInternationalString;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class Grid2DSampleDimension extends GridSampleDimension {
     /**

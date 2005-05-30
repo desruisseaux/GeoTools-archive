@@ -32,6 +32,8 @@ import java.util.Iterator;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class LazySet extends AbstractSet {
     /**
@@ -99,7 +101,7 @@ public final class LazySet extends AbstractSet {
     }
 
     /**
-     * Returns <code>true</code> if an element exists at the given index.
+     * Returns {@code true} if an element exists at the given index.
      * The element is not loaded immediately.
      *
      * <strong>NOTE: This method is for use by iterators only.</strong>

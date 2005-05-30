@@ -41,6 +41,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class AddressImpl extends MetadataEntity implements Address {
     /**
@@ -86,7 +88,7 @@ public class AddressImpl extends MetadataEntity implements Address {
 
     /**
      * Return the state, province of the location.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public InternationalString getAdministrativeArea() {
         return administrativeArea;
@@ -102,7 +104,7 @@ public class AddressImpl extends MetadataEntity implements Address {
 
     /**
      * Returns the city of the location
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public InternationalString getCity() {
         return city;
@@ -118,7 +120,7 @@ public class AddressImpl extends MetadataEntity implements Address {
 
     /**
      * Returns the country of the physical address.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public InternationalString getCountry() {
         return country;
@@ -161,7 +163,7 @@ public class AddressImpl extends MetadataEntity implements Address {
     
     /**
      * Returns ZIP or other postal code.
-     * Returns <code>null</code> if unspecified.
+     * Returns {@code null} if unspecified.
      */
     public String getPostalCode() {
         return postalCode;

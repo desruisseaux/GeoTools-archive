@@ -80,6 +80,8 @@ import org.geotools.resources.cts.ResourceKeys;
  * @author Martin Desruisseaux
  * @author Alessio Fabiani
  *
+ * @since 2.1
+ *
  * @see LocalizationGrid#getPolynomialTransform(int)
  * @see Warp
  * @see javax.media.jai.WarpOpImage
@@ -310,7 +312,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
      * source to target CRS. Note that JAI's {@linkplain javax.media.jai.operator.WarpDescriptor
      * warp operation} needs a warp object with the opposite semantic (i.e. the image warp must
      * transforms coordinates from target to source CRS). Consequently, consider invoking
-     * <code>getWarp(transform.inverse())</code> if the warp object is going to be used in an
+     * {@code getWarp(transform.inverse())} if the warp object is going to be used in an
      * image reprojection.
      *
      * @param name The image or {@linkplain org.geotools.coverage.grid.GridCoverage2D coverage}

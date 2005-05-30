@@ -118,6 +118,8 @@ import org.geotools.util.ScopedName;
  * @author Yann Cézard
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public class FactoryUsingSQL extends AbstractAuthorityFactory {
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +134,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * listed here.
      *
      * @param  code The code.
-     * @return The unit, or <code>null</code> if the code is unrecognized.
+     * @return The unit, or {@code null} if the code is unrecognized.
      */
     private static Unit getUnit(final int code) {
         switch (code) {
@@ -210,7 +212,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * {@link #createEllipsoid}
      * {@link #createUnit}
      *
-     * The order is significant: it is the key for a <code>switch</code> statement.
+     * The order is significant: it is the key for a {@code switch} statement.
      *
      * @see #createObject
      * @see #lastObjectType
@@ -287,7 +289,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     private final Set safetyGuard = new HashSet();
 
     /**
-     * The buffered authority factory, or <code>null</code> if none. This field is set
+     * The buffered authority factory, or {@code null} if none. This field is set
      * to a different value by {@link DefaultFactory} only, which will point toward a
      * buffered factory wrapping this {@code FactoryUsingSQL} for efficienty.
      */
@@ -386,7 +388,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the set of authority codes of the given type. The <code>type</code>
+     * Returns the set of authority codes of the given type. The {@code type}
      * argument specify the base class. For example:
      * <ul>
      *   <li><strong><code>{@linkplain CoordinateReferenceSystem}.class&nbsp;</code></strong>
@@ -401,7 +403,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      *       {@link #createProjectedCRS createProjectedCRS}.</li>
      * </ul>
      *
-     * @param  type The spatial reference objects type (may be <code>Object.class</code>).
+     * @param  type The spatial reference objects type (may be {@code Object.class}).
      * @return The set of authority codes for spatial reference objects of the given type.
      *         If this factory doesn't contains any object of the given type, then this method
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
@@ -415,9 +417,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * Gets a description of the object corresponding to a code.
      *
      * @param  code Value allocated by authority.
-     * @return A description of the object, or <code>null</code> if the object
-     *         corresponding to the specified <code>code</code> has no description.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @return A description of the object, or {@code null} if the object
+     *         corresponding to the specified {@code code} has no description.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the query failed for some other reason.
      */
     public InternationalString getDescriptionText(String code) throws FactoryException {
@@ -524,15 +526,15 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
 
     /**
      * Make sure that an object constructed from the database is not incoherent.
-     * If the code supplied to a <code>createFoo</code> method exists in the database,
+     * If the code supplied to a {@code createFoo} method exists in the database,
      * then we should find only one record. However, we will do a paranoiac check and
-     * verify if there is more records, using a <code>while (results.next())</code>
-     * loop instead of <code>if (results.next())</code>. This method is invoked in
+     * verify if there is more records, using a {@code while (results.next())}
+     * loop instead of {@code if (results.next())}. This method is invoked in
      * the loop for making sure that, if there is more than one record (which should
      * never happen), at least they have identical contents.
      *
      * @param  newValue The newly constructed object.
-     * @param  oldValue The object previously constructed, or <code>null</code> if none.
+     * @param  oldValue The object previously constructed, or {@code null} if none.
      * @param  code The EPSG code (for formatting error message).
      * @throws FactoryException if a duplication has been detected.
      */
@@ -567,7 +569,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      *
      * @param  name The name for the {@link IndentifiedObject} to construct.
      * @param  code The EPSG code of the object to construct.
-     * @param  remarks Remarks, or <code>null</code> if none.
+     * @param  remarks Remarks, or {@code null} if none.
      * @return The name together with a set of properties.
      */
     private Map createProperties(final String name, final String code, String remarks)
@@ -635,9 +637,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      *
      * @param  name  The name for the {@link IndentifiedObject} to construct.
      * @param  code  The EPSG code of the object to construct.
-     * @param  area  The area of use, or <code>null</code> if none.
-     * @param  scope The scope, or <code>null</code> if none.
-     * @param  remarks Remarks, or <code>null</code> if none.
+     * @param  area  The area of use, or {@code null} if none.
+     * @param  scope The scope, or {@code null} if none.
+     * @param  remarks Remarks, or {@code null} if none.
      * @return The name together with a set of properties.
      */
     private Map createProperties(final String name, final String code,
@@ -993,15 +995,15 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
 
     /** 
      * Returns Bursa-Wolf parameters for a geodetic datum. If the specified datum has
-     * no conversion informations, then this method will returns <code>null</code>.
+     * no conversion informations, then this method will returns {@code null}.
      *  
      * @param  code The EPSG code of the {@link GeodeticDatum}.
      * @param  toClose The result set to close if this method is going to invokes
      *         {@link #createDatum} recursively. This hack is necessary because many
      *         JDBC drivers do not support multiple result sets for the same statement.
      *         The result set is closed if an only if this method returns a non-null value.
-     * @return an array of Bursa-Wolf parameters (in which case <code>toClose</code> has
-     *         been closed), or <code>null</code> (in which case <code>toClose</code> has
+     * @return an array of Bursa-Wolf parameters (in which case {@code toClose} has
+     *         been closed), or {@code null} (in which case {@code toClose} has
      *         <strong>not</strong> been closed).
      */
     private BursaWolfParameters[] createBursaWolfParameters(final String    code,
@@ -1196,7 +1198,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * Returns a {@linkplain CoordinateSystemAxis coordinate system axis} from a code.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @todo Not yet implemented.

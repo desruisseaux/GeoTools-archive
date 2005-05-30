@@ -150,10 +150,10 @@ import org.geotools.resources.cts.Resources;
  * 
  * <strong>References:</strong>
  * <ul>
- *   <li><code>libproj4</code> is available at
+ *   <li>{@code libproj4} is available at
  *       <A HREF="http://members.bellatlantic.net/~vze2hc4d/proj4/">libproj4 Miscellanea</A><br>
- *        Relevent files are: <code>PJ_omerc.c</code>, <code>pj_tsfn.c</code>,
- *        <code>pj_fwd.c</code>, <code>pj_inv.c</code> and <code>lib_proj.h</code></li>
+ *        Relevent files are: {@code PJ_omerc.c}, {@code pj_tsfn.c},
+ *        {@code pj_fwd.c}, {@code pj_inv.c} and {@code lib_proj.h}</li>
  *   <li> John P. Snyder (Map Projections - A Working Manual,
  *        U.S. Geological Survey Professional Paper 1395, 1987)</li>
  *   <li> "Coordinate Conversions and Transformations including Formulas",
@@ -168,6 +168,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author  Rueben Schulz
+ *
+ * @since 2.1
  */
 public class ObliqueMercator extends MapProjection {
     /**
@@ -258,13 +260,13 @@ public class ObliqueMercator extends MapProjection {
     private double u_c;
     
     /**
-     * <code>true</code> if using two points on the central line to specify 
+     * {@code true} if using two points on the central line to specify 
      * the azimuth.
      */
     private final boolean twoPoint;
     
     /**
-     * <code>true</code> for hotine oblique mercator, or <code>false</code> 
+     * {@code true} for hotine oblique mercator, or {@code false} 
      * for the oblique mercator case. 
      */
     private final boolean hotine;

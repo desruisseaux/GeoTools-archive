@@ -43,7 +43,7 @@ import org.geotools.resources.XArray;
  * cells are stored in memory until {@link #flush()} is invoked. When invoked,
  * {@link #flush()} copy cell's contents to the underlying stream while replacing
  * tabulations by some amount of spaces. The exact number of spaces is computed
- * from cell's widths. <code>TableWriter</code> produces correct output when
+ * from cell's widths. {@code TableWriter} produces correct output when
  * displayed with a monospace font.
  * <br><br>
  * For example, the following code...
@@ -68,6 +68,8 @@ import org.geotools.resources.XArray;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class TableWriter extends FilterWriter {
     /**
@@ -144,7 +146,7 @@ public class TableWriter extends FilterWriter {
 
     /**
      * List of {@link Cell} objects, from left to right and top to bottom.
-     * By convention, a <code>null</code> value or a {@link Cell} object
+     * By convention, a {@code null} value or a {@link Cell} object
      * with <code>{@link Cell#text}==null</code> are move to the next line.
      */
     private final List cells = new ArrayList();
@@ -188,15 +190,15 @@ public class TableWriter extends FilterWriter {
     private final String rightBorder;
 
     /**
-     * Tells if cells can span more than one line. If <code>true</code>,
+     * Tells if cells can span more than one line. If {@code true},
      * then EOL characters likes '\n' move to the next line <em>inside</em>
-     * the current cell. If <code>false</code>, then EOL characters move to
-     * the next table's row. Default value is <code>false</code>.
+     * the current cell. If {@code false}, then EOL characters move to
+     * the next table's row. Default value is {@code false}.
      */
     private boolean multiLinesCells;
 
     /**
-     * <code>true</code> if this <code>TableWriter</code>
+     * {@code true} if this {@code TableWriter}
      * has been constructed with the no-arg constructor.
      */
     private final boolean stringOnly;
@@ -213,11 +215,11 @@ public class TableWriter extends FilterWriter {
      * unless the underlying stream use the correct codepage (e.g.
      * <code>OutputStreamWriter(System.out,&nbsp;"Cp437")</code>).
      * To display the appropriate codepage for a Windows NT console,
-     * type <code>chcp</code> on the command line.
+     * type {@code chcp} on the command line.
      *
      * @param out Writer object to provide the underlying stream,
-     *        or <code>null</code> if there is no underlying stream.
-     *        If <code>out</code> is null, then the {@link #toString}
+     *        or {@code null} if there is no underlying stream.
+     *        If {@code out} is null, then the {@link #toString}
      *        method is the only way to get the table's content.
      */
     public TableWriter(final Writer out) {
@@ -233,8 +235,8 @@ public class TableWriter extends FilterWriter {
      * amount of spaces as column separator.
      *
      * @param out Writer object to provide the underlying stream,
-     *        or <code>null</code> if there is no underlying stream.
-     *        If <code>out</code> is null, then the {@link #toString}
+     *        or {@code null} if there is no underlying stream.
+     *        If {@code out} is null, then the {@link #toString}
      *        method is the only way to get the table's content.
      * @param spaces Amount of white spaces to use as column separator.
      */
@@ -246,8 +248,8 @@ public class TableWriter extends FilterWriter {
      * Create a new table writer with the specified column separator.
      *
      * @param out Writer object to provide the underlying stream,
-     *        or <code>null</code> if there is no underlying stream.
-     *        If <code>out</code> is null, then the {@link #toString}
+     *        or {@code null} if there is no underlying stream.
+     *        If {@code out} is null, then the {@link #toString}
      *        method is the only way to get the table's content.
      * @param separator String to write between columns. Drawing box characters
      *        are treated specially. For example <code>" \\u2502 "</code> can be
@@ -330,18 +332,18 @@ public class TableWriter extends FilterWriter {
     /**
      * Set the desired behavior for EOL and tabulations characters.
      * <ul>
-     *   <li>If <code>true</code>, EOL (<code>'\r'</code>, <code>'\n'</code> or
+     *   <li>If {@code true}, EOL (<code>'\r'</code>, <code>'\n'</code> or
      *       <code>"\r\n"</code>) and tabulations (<code>'\t'</code>) characters
      *       are copied straight into the current cell, which mean that next write
      *       operations will continue inside the same cell.</li>
-     *   <li>If <code>false</code>, then tabulations move to next column and EOL move
+     *   <li>If {@code false}, then tabulations move to next column and EOL move
      *       to the first cell of next row (i.e. tabulation and EOL are equivalent to
      *       {@link #nextColumn()} and {@link #nextLine()} calls respectively).</li>
      * </ul>
-     * The default value is <code>false</code>.
+     * The default value is {@code false}.
      *
-     * @param multiLines <code>true</code> true if EOL are used for line feeds inside
-     *        current cells, or <code>false</code> if EOL move to the next row.
+     * @param multiLines {@code true} true if EOL are used for line feeds inside
+     *        current cells, or {@code false} if EOL move to the next row.
      */
     public void setMultiLinesCells(final boolean multiLines) {
         synchronized (lock) {
@@ -745,7 +747,7 @@ public class TableWriter extends FilterWriter {
      *
      * @param  out Flot vers où écrire les données.
      * @throws IOException si une erreur est survenue lors de l'écriture dans
-     *         <code>out</code>.
+     *         {@code out}.
      */
     private void flushTo(final Writer out) throws IOException {
         final String columnSeparator = this.separator;
@@ -754,11 +756,11 @@ public class TableWriter extends FilterWriter {
         final int          cellCount = cells.size();
         for (int cellIndex=0; cellIndex<cellCount; cellIndex++) {
             /*
-             * Copie dans  <code>currentLine</code>  toutes les données qui seront à écrire
-             * sur la ligne courante de la table. Ces données excluent le <code>null</code>
-             * terminal.  La liste <code>currentLine</code> ne contiendra donc initialement
+             * Copie dans  {@code currentLine}  toutes les données qui seront à écrire
+             * sur la ligne courante de la table. Ces données excluent le {@code null}
+             * terminal.  La liste {@code currentLine} ne contiendra donc initialement
              * aucun élément nul, mais ses éléments seront progressivement modifiés (et mis
-             * à <code>null</code>) pendant l'écriture de la ligne dans la boucle qui suit.
+             * à {@code null}) pendant l'écriture de la ligne dans la boucle qui suit.
              */
             Cell lineFill = null;
             int currentCount = 0;
@@ -777,7 +779,7 @@ public class TableWriter extends FilterWriter {
             Arrays.fill(currentLine, currentCount, currentLine.length, lineFill);
             /*
              * La boucle suivante sera exécutée tant qu'il reste des lignes à écrire
-             * (c'est-à-dire tant qu'au moins un élément de <code>currentLine</code>
+             * (c'est-à-dire tant qu'au moins un élément de {@code currentLine}
              * est non-nul). Si une cellule contient un texte avec des caractères EOL,
              * alors cette cellule devra s'écrire sur plusieurs lignes dans la cellule
              * courante.
@@ -803,7 +805,7 @@ public class TableWriter extends FilterWriter {
                     if (end >= 0) {
                         /*
                          * Si un retour chariot a été trouvé, n'écrit que la première
-                         * ligne de la cellule. L'élément <code>currentLine[j]</code>
+                         * ligne de la cellule. L'élément {@code currentLine[j]}
                          * sera modifié pour ne contenir que les lignes restantes qui
                          * seront écrites lors d'un prochain passage dans la boucle.
                          */
@@ -878,8 +880,8 @@ public class TableWriter extends FilterWriter {
     }
 
     /**
-     * Checks if <code>array</code> contains
-     * only <code>null</code> elements.
+     * Checks if {@code array} contains
+     * only {@code null} elements.
      */
     private static boolean isEmpty(final Object[] array) {
         for (int i=array.length; --i>=0;) {

@@ -32,6 +32,8 @@ import org.opengis.metadata.quality.GriddedDataPositionalAccuracy;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class GriddedDataPositionalAccuracyImpl extends PositionalAccuracyImpl
         implements GriddedDataPositionalAccuracy

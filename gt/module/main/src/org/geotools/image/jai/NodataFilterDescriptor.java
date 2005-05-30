@@ -30,6 +30,8 @@ import javax.media.jai.util.Range;
  *
  * @version $Id$
  * @author Lionel Flahaut 
+ *
+ * @since 2.1
  */
 public class NodataFilterDescriptor extends OperationDescriptorImpl {
     /**

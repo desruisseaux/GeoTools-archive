@@ -74,6 +74,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class CoordinateFormat extends Format {
     /**
@@ -89,19 +91,19 @@ public class CoordinateFormat extends Format {
     /**
      * The formats to use for formatting. This array's length must be equals
      * to the {@linkplain #getCoordinateReferenceSystem coordinate system}'s
-     * dimension. This array is never <code>null</code>.
+     * dimension. This array is never {@code null}.
      */
     private Format[] formats;
 
     /**
-     * The type for each value in the <code>formats</code> array.
+     * The type for each value in the {@code formats} array.
      * Types are: 0=number, 1=longitude, 2=latitude, 3=other angle,
-     * 4=date, 5=ellapsed time. This array is never <code>null</code>.
+     * 4=date, 5=ellapsed time. This array is never {@code null}.
      */
     private byte[] types;
 
     /**
-     * Constants for the <code>types</code> array.
+     * Constants for the {@code types} array.
      */
     private static final byte LONGITUDE=1, LATITUDE=2, ANGLE=3, DATE=4, TIME=5;
 
@@ -336,11 +338,11 @@ public class CoordinateFormat extends Format {
      * {@linkplain #getCoordinateReferenceSystem coordinate reference system}'s dimension,
      * exclusive. This method returns a direct reference to the internal format; any change
      * to the returned {@link Format} object will change the formatting for this
-     * <code>CoordinateFormat</code> object.
+     * {@code CoordinateFormat} object.
      *
      * @param  dimension The dimension for the ordinate to format.
      * @return The format for the given dimension.
-     * @throws IndexOutOfBoundsException if <code>dimension</code> is out of range.
+     * @throws IndexOutOfBoundsException if {@code dimension} is out of range.
      */
     public Format getFormat(final int dimension) throws IndexOutOfBoundsException {
         return formats[dimension];
@@ -352,7 +354,7 @@ public class CoordinateFormat extends Format {
      *
      * @param  point The position to format.
      * @return The formatted position.
-     * @throws IllegalArgumentException if this <code>CoordinateFormat</code>
+     * @throws IllegalArgumentException if this {@code CoordinateFormat}
      *         cannot format the given object.
      */
     public String format(final DirectPosition point) {
@@ -366,10 +368,10 @@ public class CoordinateFormat extends Format {
      *
      * @param point      The position to format.
      * @param toAppendTo Where the text is to be appended.
-     * @param position   A <code>FieldPosition</code> identifying a field in the formatted text,
-     *                   or <code>null</code> if none.
-     * @return The string buffer passed in as <code>toAppendTo</code>, with formatted text appended.
-     * @throws IllegalArgumentException if this <code>CoordinateFormat</code>
+     * @param position   A {@code FieldPosition} identifying a field in the formatted text,
+     *                   or {@code null} if none.
+     * @return The string buffer passed in as {@code toAppendTo}, with formatted text appended.
+     * @throws IllegalArgumentException if this {@code CoordinateFormat}
      *         cannot format the given object.
      */
     public StringBuffer format(final DirectPosition  point,
@@ -416,11 +418,11 @@ public class CoordinateFormat extends Format {
      *
      * @param object     The {@link DirectPosition} to format.
      * @param toAppendTo Where the text is to be appended.
-     * @param position   A <code>FieldPosition</code> identifying a field in the formatted text,
-     *                   or <code>null</code> if none.
-     * @return The string buffer passed in as <code>toAppendTo</code>, with formatted text appended.
-     * @throws NullPointerException if <code>toAppendTo</code> is null.
-     * @throws IllegalArgumentException if this <code>CoordinateFormat</code>
+     * @param position   A {@code FieldPosition} identifying a field in the formatted text,
+     *                   or {@code null} if none.
+     * @return The string buffer passed in as {@code toAppendTo}, with formatted text appended.
+     * @throws NullPointerException if {@code toAppendTo} is null.
+     * @throws IllegalArgumentException if this {@code CoordinateFormat}
      *         cannot format the given object.
      */
     public StringBuffer format(final Object        object,

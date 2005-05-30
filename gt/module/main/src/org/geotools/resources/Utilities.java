@@ -31,12 +31,14 @@ import java.util.logging.Logger;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class Utilities {
     /**
      * An array of strings containing only white spaces. Strings' lengths are
-     * equal to their index + 1 in the <code>spacesFactory</code> array.
-     * For example, <code>spacesFactory[4]</code> contains a string of
+     * equal to their index + 1 in the {@code spacesFactory} array.
+     * For example, {@code spacesFactory[4]} contains a string of
      * length 5.  Strings are constructed only when first needed.
      */
     private static final String[] spacesFactory = new String[20];
@@ -56,10 +58,10 @@ public final class Utilities {
     }
 
     /**
-     * Returns <code>true</code> if the two specified objects implements exactly the same set of
-     * interfaces. Only interfaces assignable to <code>base</code> are compared. Declaration order
+     * Returns {@code true} if the two specified objects implements exactly the same set of
+     * interfaces. Only interfaces assignable to {@code base} are compared. Declaration order
      * doesn't matter. For example in ISO 19111, different interfaces exist for different coordinate
-     * system geometries (<code>CartesianCS</code>, <code>PolarCS</code>, etc.). We can check if two
+     * system geometries ({@code CartesianCS}, {@code PolarCS}, etc.). We can check if two
      * CS implementations has the same geometry with the following code:
      *
      * <blockquote><code>
@@ -114,7 +116,7 @@ compare:for (int i=0; i<c1.length; i++) {
      * This method tries to return a pre-allocated string if possible.
      *
      * @param  length The string length. Negative values are clamped to 0.
-     * @return A string of length <code>length</code> filled with white spaces.
+     * @return A string of length {@code length} filled with white spaces.
      */
     public static String spaces(int length) {
         // No need to synchronize.  In the unlikely event of two threads
@@ -147,7 +149,7 @@ compare:for (int i=0; i<c1.length; i++) {
      * array according Java language usage,  for example "double[]" instead
      * of "[D".
      *
-     * @param  classe The object class (may be <code>null</code>).
+     * @param  classe The object class (may be {@code null}).
      * @return A short class name for the specified object.
      */
     public static String getShortName(Class classe) {
@@ -179,7 +181,7 @@ compare:for (int i=0; i<c1.length; i++) {
      * omit the package name. For example, it will return "String" instead
      * of "java.lang.String" for a {@link String} object.
      *
-     * @param  object The object (may be <code>null</code>).
+     * @param  object The object (may be {@code null}).
      * @return A short class name for the specified object.
      */
     public static String getShortClassName(final Object object) {

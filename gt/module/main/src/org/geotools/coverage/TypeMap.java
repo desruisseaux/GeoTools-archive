@@ -53,6 +53,8 @@ import org.geotools.util.NumberRange;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class TypeMap {
     /**

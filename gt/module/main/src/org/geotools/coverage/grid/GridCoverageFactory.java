@@ -50,6 +50,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  *
  * @author Martin Desruisseaux
  * @version $Id$
+ *
+ * @since 2.1
  */
 public class GridCoverageFactory {
     /**

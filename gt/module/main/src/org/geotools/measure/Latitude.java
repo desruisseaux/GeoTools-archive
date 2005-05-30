@@ -28,6 +28,8 @@ package org.geotools.measure;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see Longitude
  * @see AngleFormat
  */
@@ -57,13 +59,13 @@ public final class Latitude extends Angle {
     }
     
     /**
-     * Constructs a newly allocated <code>Latitude</code> object that
+     * Constructs a newly allocated {@code Latitude} object that
      * represents the latitude value represented by the string.   The
      * string should represents an angle in either fractional degrees
      * (e.g. 45.5°) or degrees with minutes and seconds (e.g. 45°30').
      * The hemisphere (N or S) is optional (default to North).
      *
-     * @param  theta A string to be converted to a <code>Latitude</code>.
+     * @param  theta A string to be converted to a {@code Latitude}.
      * @throws NumberFormatException if the string does not contain a parsable latitude.
      */
     public Latitude(final String theta) throws NumberFormatException {

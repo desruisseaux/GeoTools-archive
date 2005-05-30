@@ -57,8 +57,8 @@ import org.geotools.resources.cts.Resources;
  * <br><br>
  *
  * This implementation handles both the 1 and 2 stardard parallel cases.
- * For <code>Mercator_1SP</code> (EPSG code 9804), the line of contact is the equator. 
- * For <code>Mercator_2SP</code> (EPSG code 9805) lines of contact are symmetrical 
+ * For {@code Mercator_1SP} (EPSG code 9804), the line of contact is the equator. 
+ * For {@code Mercator_2SP} (EPSG code 9805) lines of contact are symmetrical 
  * about the equator.
  * <br><br>
  *
@@ -77,11 +77,13 @@ import org.geotools.resources.cts.Resources;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public class Mercator extends MapProjection {
     /**
-     * Standard Parallel used for the <code>Mercator_2SP</code> case.
-     * Set to {@link Double#NaN} for the <code>Mercator_1SP</code> case.
+     * Standard Parallel used for the {@code Mercator_2SP} case.
+     * Set to {@link Double#NaN} for the {@code Mercator_1SP} case.
      */
     protected final double standardParallel;
 
@@ -300,7 +302,7 @@ public class Mercator extends MapProjection {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
@@ -321,7 +323,7 @@ public class Mercator extends MapProjection {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-     * and stores the result in <code>ptDst</code>.
+     * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
@@ -361,7 +363,7 @@ public class Mercator extends MapProjection {
 
 	/**
 	 * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-         * and stores the result in <code>ptDst</code> using equations for a Sphere.
+         * and stores the result in {@code ptDst} using equations for a Sphere.
 	 */
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
@@ -386,7 +388,7 @@ public class Mercator extends MapProjection {
 
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-         * and stores the result in <code>ptDst</code> using equations for a sphere.
+         * and stores the result in {@code ptDst} using equations for a sphere.
          */
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException

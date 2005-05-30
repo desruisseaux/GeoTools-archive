@@ -37,6 +37,8 @@ import org.opengis.metadata.content.ImagingCondition;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class ImageDescriptionImpl extends CoverageDescriptionImpl implements ImageDescription {
     /**
@@ -80,13 +82,13 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
     
     /**
      * Count of the number the number of lossy compression cycles performed on the image.
-     * <code>null</code> if the information is not provided.
+     * {@code null} if the information is not provided.
      */
     private Integer compressionGenerationQuantity;
     
     /**
      * Indication of whether or not triangulation has been performed upon the image.
-     * <code>null</code> if the information is not provided.
+     * {@code null} if the information is not provided.
      */
     private Boolean triangulationIndicator;
     
@@ -221,7 +223,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
 
     /**
      * Returns the count of the number the number of lossy compression cycles performed on the
-     * image. Returns <code>null</code> if the information is not provided.
+     * image. Returns {@code null} if the information is not provided.
      */
     public Integer getCompressionGenerationQuantity() {
         return compressionGenerationQuantity;
@@ -237,7 +239,7 @@ public class ImageDescriptionImpl extends CoverageDescriptionImpl implements Ima
 
     /**
      * Returns the indication of whether or not triangulation has been performed upon the image.
-     * Returns <code>null</code> if the information is not provided.
+     * Returns {@code null} if the information is not provided.
      */
     public Boolean getTriangulationIndicator() {
         return triangulationIndicator;

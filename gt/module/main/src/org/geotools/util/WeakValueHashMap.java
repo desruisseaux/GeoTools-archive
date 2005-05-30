@@ -30,19 +30,22 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
 /**
  * A hashtable-based {@link Map} implementation with <em>weak values</em>. An entry in a
- * <code>WeakValueHashMap</code> will automatically be removed when its value is no longer
+ * {@code WeakValueHashMap} will automatically be removed when its value is no longer
  * in ordinary use. This class is similar to the standard {@link WeakHashMap} class provided
  * is J2SE, except that weak references are hold on values instead of keys.
  * <br><br>
- * The <code>WeakValueHashMap</code> class is thread-safe.
+ * The {@code WeakValueHashMap} class is thread-safe.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  *
  * @see WeakHashMap
  * @see WeakHashSet
@@ -70,7 +73,7 @@ public class WeakValueHashMap extends AbstractMap {
         Object key;
 
         /**
-         * The next entry, or <code>null</code> if there is none.
+         * The next entry, or {@code null} if there is none.
          */
         Entry next;
 
@@ -179,7 +182,7 @@ public class WeakValueHashMap extends AbstractMap {
     private static final long HOLD_TIME = 20*1000L;
 
     /**
-     * Construct a <code>WeakValueHashMap</code>.
+     * Construct a {@code WeakValueHashMap}.
      */
     public WeakValueHashMap() {
         table = new Entry[MIN_CAPACITY];
@@ -234,8 +237,8 @@ public class WeakValueHashMap extends AbstractMap {
     /**
      * Rehash {@link #table}.
      *
-     * @param augmentation <code>true</code> if this method is invoked
-     *        for augmenting {@link #table}, or <code>false</code> if
+     * @param augmentation {@code true} if this method is invoked
+     *        for augmenting {@link #table}, or {@code false} if
      *        it is invoked for making the table smaller.
      */
     private void rehash(final boolean augmentation) {
@@ -280,7 +283,7 @@ public class WeakValueHashMap extends AbstractMap {
     }
 
     /**
-     * Check if this <code>WeakValueHashMap</code> is valid. This method counts the
+     * Check if this {@code WeakValueHashMap} is valid. This method counts the
      * number of elements and compare it to {@link #count}. If the check fails,
      * the number of elements is corrected (if we didn't, an {@link AssertionError}
      * would be thrown for every operations after the first error,  which make
@@ -311,21 +314,21 @@ public class WeakValueHashMap extends AbstractMap {
     }
 
     /**
-     * Returns <code>true</code> if this map maps one or more keys to this value.
+     * Returns {@code true} if this map maps one or more keys to this value.
      *
      * @param value value whose presence in this map is to be tested.
-     * @return <code>true</code> if this map maps one or more keys to this value.
+     * @return {@code true} if this map maps one or more keys to this value.
      */
     public synchronized boolean containsValue(final Object value) {
         return super.containsValue(value);
     }
 
     /**
-     * Returns <code>true</code> if this map contains a mapping for the specified key.
+     * Returns {@code true} if this map contains a mapping for the specified key.
      *
      * @param key key whose presence in this map is to be tested.
-     * @return <code>true</code> if this map contains a mapping for the specified key.
-     * @throws NullPointerException If key is <code>null</code>.
+     * @return {@code true} if this map contains a mapping for the specified key.
+     * @throws NullPointerException If key is {@code null}.
      */
     public boolean containsKey(final Object key) {
         return get(key) != null;
@@ -333,11 +336,11 @@ public class WeakValueHashMap extends AbstractMap {
 
     /**
      * Returns the value to which this map maps the specified key. Returns
-     * <code>null</code> if the map contains no mapping for this key.
+     * {@code null} if the map contains no mapping for this key.
      *
      * @param  key Key whose associated value is to be returned.
      * @return The value to which this map maps the specified key.
-     * @throws NullPointerException if the key is <code>null</code>.
+     * @throws NullPointerException if the key is {@code null}.
      */
     public synchronized Object get(final Object key) {
         assert WeakCollectionCleaner.DEFAULT.isAlive();
@@ -358,8 +361,8 @@ public class WeakValueHashMap extends AbstractMap {
         assert WeakCollectionCleaner.DEFAULT.isAlive();
         assert valid() : count;
         /*
-         * Check if <code>obj</code> is already contained in this
-         * <code>WeakValueHashMap</code>. If yes, clear it.
+         * Check if {@code obj} is already contained in this
+         * {@code WeakValueHashMap}. If yes, clear it.
          */
         Object oldValue = null;
         final int hash = key.hashCode() & 0x7FFFFFFF;
@@ -388,10 +391,10 @@ public class WeakValueHashMap extends AbstractMap {
      *
      * @param  key key with which the specified value is to be associated.
      * @param  value value to be associated with the specified key.
-     * @return previous value associated with specified key, or <code>null</code>
+     * @return previous value associated with specified key, or {@code null}
      *	       if there was no mapping for key.
      * 
-     * @throws NullPointerException if the key or the value is <code>null</code>.
+     * @throws NullPointerException if the key or the value is {@code null}.
      */
     public Object put(final Object key, final Object value) {
         if (value == null) {
@@ -405,7 +408,7 @@ public class WeakValueHashMap extends AbstractMap {
      * Removes the mapping for this key from this map if present.
      *
      * @param key key whose mapping is to be removed from the map.
-     * @return previous value associated with specified key, or <code>null</code>
+     * @return previous value associated with specified key, or {@code null}
      *	       if there was no entry for key.
      */
     public Object remove(final Object key) {

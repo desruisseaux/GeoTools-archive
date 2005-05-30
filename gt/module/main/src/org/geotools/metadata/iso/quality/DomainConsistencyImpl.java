@@ -32,6 +32,8 @@ import org.opengis.metadata.quality.DomainConsistency;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class DomainConsistencyImpl extends LogicalConsistencyImpl implements DomainConsistency {
     /**

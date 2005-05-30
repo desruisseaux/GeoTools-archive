@@ -35,6 +35,8 @@ import org.geotools.metadata.iso.MetadataEntity;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class GeographicExtentImpl extends MetadataEntity implements GeographicExtent {
     /**
@@ -65,7 +67,7 @@ public class GeographicExtentImpl extends MetadataEntity implements GeographicEx
      * Indication of whether the bounding polygon encompasses an area covered by the data
      * (<cite>inclusion</cite>) or an area where data is not present (<cite>exclusion</cite>).
      *
-     * @return <code>true</code> for inclusion, or <code>false</code> for exclusion.
+     * @return {@code true} for inclusion, or {@code false} for exclusion.
      */    
     public boolean getInclusion() {
         return inclusion;

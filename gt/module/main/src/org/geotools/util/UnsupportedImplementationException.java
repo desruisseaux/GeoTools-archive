@@ -31,6 +31,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class UnsupportedImplementationException extends UnsupportedOperationException {
     /**

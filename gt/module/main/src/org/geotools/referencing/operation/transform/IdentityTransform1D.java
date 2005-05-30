@@ -26,6 +26,8 @@ package org.geotools.referencing.operation.transform;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class IdentityTransform1D extends LinearTransform1D {
     /**

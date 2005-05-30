@@ -78,6 +78,8 @@ import org.geotools.util.MonolineFormatter;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see DataSource
  */
 public class DefaultFactory extends DeferredAuthorityFactory {
@@ -102,7 +104,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     private DataSource datasource;
 
     /**
-     * The shutdown hook, or <code>null</code> if none.
+     * The shutdown hook, or {@code null} if none.
      */
     private Thread shutdown;
 
@@ -324,8 +326,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     }
 
     /**
-     * Called when this factory is added to the given <code>category</code> of the given
-     * <code>registry</code>  The object may already be registered under another category.
+     * Called when this factory is added to the given {@code category} of the given
+     * {@code registry}  The object may already be registered under another category.
      */
     public synchronized void onRegistration(final ServiceRegistry registry, final Class category) {
         super.onRegistration(registry, category);
@@ -353,8 +355,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     }
 
     /**
-     * Called when this factory is removed from the given <code>category</code> of the given
-     * <code>registry</code>.  The object may still be registered under another category.
+     * Called when this factory is removed from the given {@code category} of the given
+     * {@code registry}.  The object may still be registered under another category.
      */
     public synchronized void onDeregistration(final ServiceRegistry registry, final Class category) {
         if (shutdown != null) {

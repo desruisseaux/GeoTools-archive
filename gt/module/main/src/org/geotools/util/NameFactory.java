@@ -38,6 +38,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author  Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class NameFactory {
     /**
@@ -113,7 +115,7 @@ public final class NameFactory {
      * and the specified separator character.
      *
      * @param names     The local names as an array of strings.
-     * @param length    The valid length of <code>names</code> array.
+     * @param length    The valid length of {@code names} array.
      * @param separator The separator character to use.
      */
     private static GenericName create(final CharSequence[] names,

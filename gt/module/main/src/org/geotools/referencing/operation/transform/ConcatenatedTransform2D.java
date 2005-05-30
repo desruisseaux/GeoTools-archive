@@ -29,6 +29,8 @@ import org.opengis.referencing.operation.MathTransform2D;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class ConcatenatedTransform2D extends ConcatenatedTransform implements MathTransform2D {
     /**

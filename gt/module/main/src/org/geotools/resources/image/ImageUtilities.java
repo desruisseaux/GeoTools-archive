@@ -60,6 +60,8 @@ import org.geotools.resources.gcs.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class ImageUtilities {
     /**
@@ -108,7 +110,7 @@ public final class ImageUtilities {
      * All parameters are initially set equal to those of the
      * given {@link RenderedImage}, and then the tile size is
      * updated according the image's size.  This method never
-     * returns <code>null</code>.
+     * returns {@code null}.
      */
     public static ImageLayout getImageLayout(final RenderedImage image) {
         return getImageLayout(image, true);
@@ -116,10 +118,10 @@ public final class ImageUtilities {
 
     /**
      * Returns an {@link ImageLayout} for the specified image.
-     * If <code>initToImage</code> is <code>true</code>, then
+     * If {@code initToImage} is {@code true}, then
      * All parameters are initially set equal to those of the
      * given {@link RenderedImage} and the returned layout is
-     * never <code>null</code>.
+     * never {@code null}.
      */
     private static ImageLayout getImageLayout(final RenderedImage image, final boolean initToImage) {
         if (image == null) {
@@ -162,7 +164,7 @@ public final class ImageUtilities {
      *   <li>{@link JAI#KEY_IMAGE_LAYOUT} with a proposed tile size.</li>
      * </ul>
      *
-     * This method may returns <code>null</code>
+     * This method may returns {@code null}
      * if no rendering hints is proposed.
      */
     public static RenderingHints getRenderingHints(final RenderedImage image) {
@@ -172,8 +174,8 @@ public final class ImageUtilities {
 
     /**
      * Suggest a tile size for the specified image size. On input,
-     * <code>size</code> is the image's size. On output, it is the
-     * tile size. This method returns <code>size</code> for convenience.
+     * {@code size} is the image's size. On output, it is the
+     * tile size. This method returns {@code size} for convenience.
      */
     public static Dimension toTileSize(final Dimension size) {
         Dimension defaultSize = JAI.getDefaultTileSize();
@@ -187,8 +189,8 @@ public final class ImageUtilities {
     }
 
     /**
-     * Suggest a tile size close to <code>tileSize</code> for the specified
-     * <code>imageSize</code>. If this method can't suggest a size, then it
+     * Suggest a tile size close to {@code tileSize} for the specified
+     * {@code imageSize}. If this method can't suggest a size, then it
      * returns 0.
      */
     private static int toTileSize(final int imageSize, final int tileSize) {
@@ -223,15 +225,15 @@ public final class ImageUtilities {
 
     /**
      * Compute a new {@link ImageLayout} which is the intersection of the specified
-     * <code>ImageLayout</code> and all <code>RenderedImage</code>s in the supplied
+     * {@code ImageLayout} and all {@code RenderedImage}s in the supplied
      * list. If the {@link ImageLayout#getMinX minX}, {@link ImageLayout#getMinY minY},
      * {@link ImageLayout#getWidth width} and {@link ImageLayout#getHeight height}
-     * properties are not defined in the <code>layout</code>, then they will be inherited
+     * properties are not defined in the {@code layout}, then they will be inherited
      * from the <strong>first</strong> source for consistency with {@link OpImage} constructor.
      *
      * @param  layout The original layout. This object will not be modified.
      * @param  sources The list of sources {@link RenderedImage}.
-     * @return A new <code>ImageLayout</code>, or the original <code>layout</code> if no
+     * @return A new {@code ImageLayout}, or the original {@code layout} if no
      *         change was needed.
      */
     public static ImageLayout createIntersection(final ImageLayout layout, final List sources) {
@@ -342,14 +344,14 @@ public final class ImageUtilities {
      * a convenient workaround until Sun fix the bug.
      * <br><br>
      * <strong>Implementation note:</strong> the current implementation assume that factories
-     * for native implementations are declared in the <code>com.sun.media.jai.mlib</code>
+     * for native implementations are declared in the {@code com.sun.media.jai.mlib}
      * package, while factories for pure java implementations are declared in the
-     * <code>com.sun.media.jai.opimage</code> package. It work for Sun's 1.1.2 implementation,
+     * {@code com.sun.media.jai.opimage} package. It work for Sun's 1.1.2 implementation,
      * but may change in future versions. If this method doesn't recognize the package, it does
      * nothing.
      *
      * @param operation The operation name (e.g. "Affine").
-     * @param allowed <code>false</code> to disallow native acceleration.
+     * @param allowed {@code false} to disallow native acceleration.
      */
     public synchronized static void allowNativeAcceleration(final String operation,
                                                             final boolean  allowed)
@@ -408,8 +410,8 @@ public final class ImageUtilities {
      * future versions. If this method doesn't recognize the class name, it does nothing.
      *
      * @param format The format name (e.g. "png").
-     * @param writer <code>false</code> to set the reader, or <code>true</code> to set the writer.
-     * @param allowed <code>false</code> to disallow native acceleration.
+     * @param writer {@code false} to set the reader, or {@code true} to set the writer.
+     * @param allowed {@code false} to disallow native acceleration.
      */
     public synchronized static void allowNativeCodec(final String format,
                                                      final boolean writer,

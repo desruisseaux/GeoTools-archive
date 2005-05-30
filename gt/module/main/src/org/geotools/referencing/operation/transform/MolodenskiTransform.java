@@ -77,6 +77,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class MolodenskiTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -95,8 +97,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     private final boolean abridged;
 
     /**
-     * <code>true</code> for a 3D transformation, or
-     * <code>false</code> for a 2D transformation.
+     * {@code true} for a 3D transformation, or
+     * {@code false} for a 2D transformation.
      */
     private final boolean source3D, target3D;
     
@@ -111,25 +113,25 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
     private final double a, b;
     
     /**
-     * Difference in the semi-major (<code>da = target a - source a</code>) and semi-minor
-     * (<code>db = target b - source b</code>) axes of the target and source ellipsoids.
+     * Difference in the semi-major ({@code da = target a - source a}) and semi-minor
+     * ({@code db = target b - source b}) axes of the target and source ellipsoids.
      */
     private final double da, db;
     
     /**
-     * Difference between the flattenings (<code>df = target f - source f</code>)
+     * Difference between the flattenings ({@code df = target f - source f})
      * of the target and source ellipsoids.
      */
     private final double df;
     
     /**
      * Ratio of the Semi-major (<var>a</var>) semi-minor (<var>b/<var>) axis 
-     * values (<code>a_b = a/b</code> and <code>b_a = b/a</code>).
+     * values ({@code a_b = a/b} and {@code b_a = b/a}).
      */
     private final double b_a, a_b;
     
     /**
-     * Some more constants (<code>daa = da*a</code> and <code>da_a = da/a</code>).
+     * Some more constants (<code>daa = da*a</code> and {@code da_a = da/a}).
      */
     private final double daa, da_a;
     
@@ -156,10 +158,10 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * @param abridged {@code true} for the abridged formula, or {@code false} for the complete one.
      * @param a        The source semi-major axis length in meters.
      * @param b        The source semi-minor axis length in meters.
-     * @param source3D <code>true</code> if the source has a height.
+     * @param source3D {@code true} if the source has a height.
      * @param ta       The target semi-major axis length in meters.
      * @param tb       The target semi-minor axis length in meters.
-     * @param target3D <code>true</code> if the target has a height.
+     * @param target3D {@code true} if the target has a height.
      * @param dx       The <var>x</var> translation in meters.
      * @param dy       The <var>y</var> translation in meters.
      * @param dz       The <var>z</var> translation in meters.
@@ -246,7 +248,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      *               in the source array.
      * @param dstPts the array into which the transformed point
      *               coordinates are returned. May be the same
-     *               than <code>srcPts</code>.
+     *               than {@code srcPts}.
      * @param dstOff the offset to the location of the first
      *               transformed point that is stored in the
      *               destination array.
@@ -286,7 +288,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      *               in the source array.
      * @param dstPts the array into which the transformed point
      *               coordinates are returned. May be the same
-     *               than <code>srcPts</code>.
+     *               than {@code srcPts}.
      * @param dstOff the offset to the location of the first
      *               transformed point that is stored in the
      *               destination array.
@@ -654,7 +656,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          *
          * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
          * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-         * @param parameters       The set of parameters (never <code>null</code>).
+         * @param parameters       The set of parameters (never {@code null}).
          */
         Provider(final int sourceDimensions,
                  final int targetDimensions,
@@ -784,7 +786,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          *
          * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
          * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-         * @param parameters       The set of parameters (never <code>null</code>).
+         * @param parameters       The set of parameters (never {@code null}).
          */
         private ProviderAbridged(final int sourceDimensions,
                                  final int targetDimensions,

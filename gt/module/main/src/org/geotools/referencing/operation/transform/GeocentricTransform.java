@@ -61,6 +61,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Frank Warmerdam
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class GeocentricTransform extends AbstractMathTransform implements Serializable {
     /**
@@ -73,7 +75,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * are enabled (JDK 1.4 only), then every coordinates transformed with
      * {@link #inverseTransform} will be transformed again with {@link #mathTransform}.
      * If the distance between the resulting position and the original position
-     * is greater than <code>MAX_ERROR</code>, then a {@link AssertionError} is thrown.
+     * is greater than {@code MAX_ERROR}, then a {@link AssertionError} is thrown.
      */
     private static final double MAX_ERROR = 0.01;
     
@@ -118,8 +120,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     private final double ep2;
     
     /**
-     * <code>true</code> if geographic coordinates include an ellipsoidal
-     * height (i.e. are 3-D), or <code>false</code> if they are strictly 2-D.
+     * {@code true} if geographic coordinates include an ellipsoidal
+     * height (i.e. are 3-D), or {@code false} if they are strictly 2-D.
      */
     private final boolean hasHeight;
     
@@ -132,9 +134,9 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * Constructs a transform from the specified ellipsoid.
      *
      * @param ellipsoid The ellipsoid.
-     * @param hasHeight <code>true</code> if geographic coordinates
+     * @param hasHeight {@code true} if geographic coordinates
      *                  include an ellipsoidal height (i.e. are 3-D),
-     *                  or <code>false</code> if they are only 2-D.
+     *                  or {@code false} if they are only 2-D.
      */
     public GeocentricTransform(final Ellipsoid ellipsoid, final boolean hasHeight) {
         this(ellipsoid.getSemiMajorAxis(),
@@ -148,9 +150,9 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
      * @param semiMajor The semi-major axis length.
      * @param semiMinor The semi-minor axis length.
      * @param units     The axis units.
-     * @param hasHeight <code>true</code> if geographic coordinates
+     * @param hasHeight {@code true} if geographic coordinates
      *                  include an ellipsoidal height (i.e. are 3-D),
-     *                  or <code>false</code> if they are only 2-D.
+     *                  or {@code false} if they are only 2-D.
      */
     public GeocentricTransform(final double  semiMajor,
                                final double  semiMinor,
@@ -425,7 +427,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     
     /**
      * Transform the last half if the specified array and returns
-     * the distance with the first half. Array <code>points</code>
+     * the distance with the first half. Array {@code points}
      * must have a length of 6.
      */
     private double checkTransform(final double[] points) {
@@ -634,7 +636,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          *
          * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
          * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-         * @param parameters The set of parameters (never <code>null</code>).
+         * @param parameters The set of parameters (never {@code null}).
          */
         Provider(final int sourceDimensions,
                  final int targetDimensions,
@@ -668,7 +670,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
 
         /**
          * Returns the operation method for the specified math transform. This method is invoked
-         * automatically after <code>createMathTransform</code>. The default implementation returns
+         * automatically after {@code createMathTransform}. The default implementation returns
          * an operation with source dimensions that matches the math transform source dimensions.
          */
         protected OperationMethod getMethod(final MathTransform mt) {
@@ -723,7 +725,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          *
          * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
          * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-         * @param parameters The set of parameters (never <code>null</code>).
+         * @param parameters The set of parameters (never {@code null}).
          */
         ProviderInverse(final int sourceDimensions,
                         final int targetDimensions,
@@ -747,7 +749,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
 
         /**
          * Returns the operation method for the specified math transform. This method is invoked
-         * automatically after <code>createMathTransform</code>. The default implementation returns
+         * automatically after {@code createMathTransform}. The default implementation returns
          * an operation with target dimensions that matches the math transform target dimensions.
          */
         protected OperationMethod getMethod(final MathTransform mt) {

@@ -46,20 +46,22 @@ import java.util.StringTokenizer;
 
 /**
  * Resource compiler. This class is run from the command line at compile time
- * only. <code>ResourceCompiler</code> scans for <code>.properties</code> files
- * and copies their content to <code>.utf</code> files using UTF8 encoding. It
+ * only. {@code ResourceCompiler} scans for {@code .properties} files
+ * and copies their content to {@code .utf} files using UTF8 encoding. It
  * also checks for key validity (making sure that the same set of keys is
  * defined in every language) and checks values for {@link MessageFormat}
  * compatibility.
- * Finally, it creates a <code>ResourceKeys.java</code> source file declaring
+ * Finally, it creates a {@code ResourceKeys.java} source file declaring
  * resource keys as integer constants.
  * <br><br>
- * <code>ResourceCompiler</code> and all <code>ResourceKeys</code> classes
+ * {@code ResourceCompiler} and all {@code ResourceKeys} classes
  * don't need to be included in the final JAR file. They are used at
  * compile time only and no other classes should keep reference to them.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class ResourceCompiler implements Comparator {
     /**
@@ -106,17 +108,17 @@ final class ResourceCompiler implements Comparator {
     private final Map resources = new HashMap();
 
     /**
-     * Construct a new <code>ResourceCompiler</code>.  This method will
-     * immediately look for a <code>ResourceKeys.class</code> file. If
+     * Construct a new {@code ResourceCompiler}.  This method will
+     * immediately look for a {@code ResourceKeys.class} file. If
      * one is found, integer keys are loaded in order to reuse the same values.
      *
      * @param directory The resource directory. This directory should or
      *                  will contain the following input and output files:
      *      <ul>
-     *        <li><code>resources*.properties</code> (mandatory input)</li>
-     *        <li><code>ResourceKeys.class</code>    (optional  input)</li>
-     *        <li><code>resources*.utf</code>                 (output)</li>
-     *        <li><code>ResourceKeys.class</code>             (output)</li>
+     *        <li>{@code resources*.properties} (mandatory input)</li>
+     *        <li>{@code ResourceKeys.class}    (optional  input)</li>
+     *        <li>{@code resources*.utf}                 (output)</li>
+     *        <li>{@code ResourceKeys.class}             (output)</li>
      *      </ul>
      *
      * @throws IOException if an input/output operation failed.
@@ -186,7 +188,7 @@ final class ResourceCompiler implements Comparator {
     }
 
     /**
-     * Load all properties from a <code>.properties</code> file. Resource
+     * Load all properties from a {@code .properties} file. Resource
      * keys are checked for naming conventions (i.e. resources expecting some
      * arguments must have a key ending with "_$n" where "n" is the number of
      * arguments). This method transforms resource values into legal
@@ -292,7 +294,7 @@ final class ResourceCompiler implements Comparator {
 
     /**
      * Write UTF file. Method {@link #loadPropertyFile} should
-     * be invoked beforehand to <code>writeUTFFile</code>.
+     * be invoked beforehand to {@code writeUTFFile}.
      *
      * @param  file The destination file.
      * @throws IOException if an input/output operation failed.
@@ -328,11 +330,11 @@ final class ResourceCompiler implements Comparator {
 
     /**
      * Make a file path relative to the classpath.  The file path may be
-     * relative (to current <code>chdir</code>) or absolute. This method
-     * finds the canonical form of <code>path</code> and compares it with
+     * relative (to current {@code chdir}) or absolute. This method
+     * finds the canonical form of {@code path} and compares it with
      * canonical forms of every path in the classpath.  If a classpath
-     * matches the beginning of <code>path</code>, then the corresponding
-     * part of <code>path</code> is removed.  If there is more than one
+     * matches the beginning of {@code path}, then the corresponding
+     * part of {@code path} is removed.  If there is more than one
      * match, the one resulting in the shortest relative path is chosen.
      */
     private static String toRelative(final File path) throws IOException {
@@ -421,8 +423,8 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     /**
      * Print a message to the error output stream {@link System#err}.
      *
-     * @param file      File that produced the error, or <code>null</code> if none.
-     * @param key       Resource key that produced the error, or <code>null</code> if none.
+     * @param file      File that produced the error, or {@code null} if none.
+     * @param key       Resource key that produced the error, or {@code null} if none.
      * @param message   The message string.
      * @param exception An optional exception that is the cause of this warning.
      */
@@ -457,7 +459,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     }
 
     /**
-     * Write <code>count</code> spaces to the <code>out</code> stream.
+     * Write {@code count} spaces to the {@code out} stream.
      * @throws IOException if an input/output operation failed.
      */
     private static void writeWhiteSpaces(final Writer out, int count) throws IOException {
@@ -485,7 +487,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
         out.write(";\n\n\n");
         out.write("/**\n"                                                                  +
                   " * Resource keys. This interface is used when compiling sources, but\n" +
-                  " * no dependencies to <code>ResourceKeys</code> should appear in any\n" +
+                  " * no dependencies to {@code ResourceKeys} should appear in any\n" +
                   " * resulting class files.  Since Java compiler inlines final integer\n" +
                   " * values, using long identifiers will not bloat constant pools of\n"   +
                   " * classes compiled against the interface, provided that no class\n"    +
@@ -524,9 +526,9 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     }
 
     /**
-     * Compare two resource keys. Object <code>o1</code> and <code>o2</code>
+     * Compare two resource keys. Object {@code o1} and {@code o2}
      * are usually {@link String} objects representing resource keys (for
-     * example, "<code>MISMATCHED_DIMENSION</code>").  This method compares
+     * example, "{@code MISMATCHED_DIMENSION}").  This method compares
      * strings in the same manner as {@link String#compareTo}, except that
      * strings starting with one of the prefixes enumerated in {@link #ORDER}
      * will appear last in the sorted array.

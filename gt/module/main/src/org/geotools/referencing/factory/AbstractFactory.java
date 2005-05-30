@@ -53,6 +53,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class AbstractFactory extends org.geotools.factory.AbstractFactory implements Factory {
     /**
@@ -95,7 +97,7 @@ public class AbstractFactory extends org.geotools.factory.AbstractFactory implem
      *
      * @param  name   Argument name.
      * @param  object User argument.
-     * @throws InvalidParameterValueException if <code>object</code> is null.
+     * @throws InvalidParameterValueException if {@code object} is null.
      */
     protected static void ensureNonNull(final String name, final Object object)
         throws IllegalArgumentException

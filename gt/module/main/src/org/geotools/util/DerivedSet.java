@@ -30,13 +30,15 @@ import java.util.Set;
  * A set whose values are derived from an other set. The values are derived only when
  * requested, which make it possible to backup potentially large sets. Implementations
  * need only to overrides {@link #baseToDerived} and {@link #derivedToBase} methods.
- * This set do not supports <code>null</code> value, since <code>null</code> is used
- * when no mapping from {@linkplain #base} to <code>this</code> exists.
+ * This set do not supports {@code null} value, since {@code null} is used
+ * when no mapping from {@linkplain #base} to {@code this} exists.
  * This class is serializable if the underlying {@linkplain #base} set is serializable
  * too.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public abstract class DerivedSet extends AbstractSet implements Serializable {
     /**
@@ -64,11 +66,11 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
     /**
      * Transforms a value in the {@linkplain #base} set to a value in this set.
      * If there is no mapping in the derived set for the specified element,
-     * then this method returns <code>null</code>.
+     * then this method returns {@code null}.
      *
      * @param  element A value in the {@linkplain #base} set.
-     * @return The value that this view should contains instead of <code>element</code>,
-     *         or <code>null</code>.
+     * @return The value that this view should contains instead of {@code element},
+     *         or {@code null}.
      */
     protected abstract Object baseToDerived(final Object element);
 
@@ -106,21 +108,21 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
     }
 
     /**
-     * Returns <code>true</code> if this set contains no elements.
+     * Returns {@code true} if this set contains no elements.
      *
-     * @return <code>true</code> if this set contains no elements.
+     * @return {@code true} if this set contains no elements.
      */
     public boolean isEmpty() {
         return base.isEmpty() || super.isEmpty();
     }
 
     /**
-     * Returns <code>true</code> if this set contains the specified element.
+     * Returns {@code true} if this set contains the specified element.
      * The default implementation invokes
      * <code>{@linkplain #base}.contains({@linkplain #derivedToBase derivedToBase}(element))</code>.
      *
      * @param  element object to be checked for containment in this set.
-     * @return <code>true</code> if this set contains the specified element.
+     * @return {@code true} if this set contains the specified element.
      */
     public boolean contains(final Object element) {
         return base.contains(derivedToBase(element));
@@ -132,9 +134,9 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * <code>{@linkplain #base}.add({@linkplain #derivedToBase derivedToBase}(element))</code>.
      *
      * @param  element element whose presence in this set is to be ensured.
-     * @return <code>true</code> if the set changed as a result of the call.
+     * @return {@code true} if the set changed as a result of the call.
      * @throws UnsupportedOperationException if the {@linkplain #base} set doesn't
-     *         supports the <code>add</code> operation.
+     *         supports the {@code add} operation.
      */
     public boolean add(final Object element) throws UnsupportedOperationException {
         return base.add(derivedToBase(element));
@@ -146,9 +148,9 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * <code>{@linkplain #base}.remove({@linkplain #derivedToBase derivedToBase}(element))</code>.
      *
      * @param  element element to be removed from this set, if present.
-     * @return <code>true</code> if the set contained the specified element.
+     * @return {@code true} if the set contained the specified element.
      * @throws UnsupportedOperationException if the {@linkplain #base} set doesn't
-     *         supports the <code>remove</code> operation.
+     *         supports the {@code remove} operation.
      */
     public boolean remove(final Object element) throws UnsupportedOperationException {
         return base.remove(derivedToBase(element));
@@ -164,7 +166,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
         private final Iterator iterator;
 
         /**
-         * The next element to be returned, or <code>null</code>.
+         * The next element to be returned, or {@code null}.
          */
         private transient Object next;
 
@@ -176,7 +178,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
         }
 
         /**
-         * Returns <code>true</code> if the iteration has more elements.
+         * Returns {@code true} if the iteration has more elements.
          */
         public boolean hasNext() {
             while (next == null) {
@@ -204,7 +206,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
          * Removes from the underlying set the last element returned by the iterator.
          *
          * @throws UnsupportedOperationException if the {@linkplain #base} set doesn't
-         *         supports the <code>remove</code> operation.
+         *         supports the {@code remove} operation.
          */
         public void remove() {
             iterator.remove();

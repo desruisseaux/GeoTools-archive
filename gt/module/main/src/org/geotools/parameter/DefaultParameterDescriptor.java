@@ -56,6 +56,8 @@ import org.geotools.resources.rsc.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see Parameter
  * @see DefaultParameterDescriptorGroup
  */
@@ -76,9 +78,9 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     /**
      * The class that describe the type of the parameter, maybe as a primitive. This is the
      * value class that the user specified at construction time.  This is usually identical
-     * to <code>valueClass</code>. However, some optimization may be done for some primitive
+     * to {@code valueClass}. However, some optimization may be done for some primitive
      * types, for example a special implementation of {@link Parameter} for the
-     * <code>double</code> type.
+     * {@code double} type.
      */
     private final Class primitiveClass;
 
@@ -280,7 +282,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Returns the enumeration found in the specified <code>CodeList</code> class.
+     * Returns the enumeration found in the specified {@code CodeList} class.
      * Returns {@code null} if no values were found.
      */
     private static CodeList[] getCodeLists(final Class type) {
@@ -364,7 +366,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param maximum The maximum parameter value, or {@code null}.
      * @param unit    The unit for default, minimum and maximum values.
      *
-     * @deprecated Use the constructor with <code>required</code> as the last argument
+     * @deprecated Use the constructor with {@code required} as the last argument
      *             instead. This is just a change in the order of arguments, which was
      *             performed for consistency with other constructors.
      *
@@ -434,7 +436,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * Creates a new instance of {@linkplain org.geotools.parameter.Parameter parameter value}
      * initialized with the {@linkplain #getDefaultValue default value}.
      * The {@linkplain org.geotools.parameter.Parameter#getDescriptor parameter value
-     * descriptor} for the created parameter value will be <code>this</code> object.
+     * descriptor} for the created parameter value will be {@code this} object.
      *
      * <P>If the {@linkplain #getValueClass value class} specified at construction time was
      * a primitive type (e.g. <code>Double.{@linkplain Double#TYPE TYPE}</code> instead
@@ -452,7 +454,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
 
     /**
      * Returns the class that describe the type of the parameter. If the value class specified
-     * at construction time was a primitive type (e.g. <code>double</code>), it is converted to
+     * at construction time was a primitive type (e.g. {@code double}), it is converted to
      * the corresponding wrapper class (e.g. {@link Double}).
      *
      * @return The parameter value class (never a primitive type).
@@ -526,7 +528,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     /**
      * Compares the specified object with this parameter for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
+     * @param  object The object to compare to {@code this}.
      * @param  compareMetadata {@code true} for performing a strict comparaison, or
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both objects are equal.

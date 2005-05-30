@@ -30,10 +30,12 @@ import java.util.Locale;
  * Simple operations on arrays. This class provides a central place for
  * inserting and deleting elements in an array, as well as resizing the array.
  * This class may be removed if JavaSoft provide some language construct
- * functionally equivalent to C/C++'s <code>realloc</code>.
+ * functionally equivalent to C/C++'s {@code realloc}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class XArray {
     /**
@@ -44,22 +46,22 @@ public final class XArray {
 
     /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it stands.
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it stands.
      *
      * @param  array Table to copy
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     private static Object doResize(final Object array, final int length) {
         final int current = array == null ? 0 : Array.getLength(array);
@@ -74,23 +76,23 @@ public final class XArray {
 
     /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static Object[] resize(final Object[] array, final int length) {
         return (Object[]) doResize(array, length);
@@ -98,23 +100,23 @@ public final class XArray {
 
     /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static double[] resize(final double[] array, final int length) {
         return (double[]) doResize(array, length);
@@ -122,23 +124,23 @@ public final class XArray {
 
     /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static float[] resize(final float[] array, final int length) {
         return (float[]) doResize(array, length);
@@ -146,23 +148,23 @@ public final class XArray {
 
     /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static long[] resize(final long[] array, final int length) {
         return (long[]) doResize(array, length);
@@ -170,23 +172,23 @@ public final class XArray {
 
     /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static int[] resize(final int[] array, final int length) {
         return (int[]) doResize(array, length);
@@ -194,23 +196,23 @@ public final class XArray {
 
    /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static short[] resize(final short[] array, final int length) {
         return (short[]) doResize(array, length);
@@ -218,23 +220,23 @@ public final class XArray {
 
    /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static byte[] resize(final byte[] array, final int length) {
         return (byte[]) doResize(array, length);
@@ -242,23 +244,23 @@ public final class XArray {
 
    /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static char[] resize(final char[] array, final int length) {
         return (char[]) doResize(array, length);
@@ -266,23 +268,23 @@ public final class XArray {
 
     /**
      * Returns a new table which contains the same elements as
-     * <code>array</code> but with the <code>length</code> specified.
-     * If the desired <code>length</code> is longer than the initial
-     * length of the <code>array</code> table, the returned table will contain
-     * all the elements of <code>array</code> as well as the elements
-     * initialised to <code>null</code> at the end of the table. If, on the
-     * contrary, the desired <code>length</code> is shorter than the initial
-     * length of the <code>array</code> table, the table will be truncated
-     * (that is to say the surplus <code>array</code> elements will be
-     * forgotten). If the length of <code>array</code> is equal to
-     * <code>length</code>, then <code>array</code> will be returned as it
+     * {@code array} but with the {@code length} specified.
+     * If the desired {@code length} is longer than the initial
+     * length of the {@code array} table, the returned table will contain
+     * all the elements of {@code array} as well as the elements
+     * initialised to {@code null} at the end of the table. If, on the
+     * contrary, the desired {@code length} is shorter than the initial
+     * length of the {@code array} table, the table will be truncated
+     * (that is to say the surplus {@code array} elements will be
+     * forgotten). If the length of {@code array} is equal to
+     * {@code length}, then {@code array} will be returned as it
      * stands.
      *
      * @param  array Table to copy.
      * @param  length Length of the desired table.
-     * @return Table of the same type as <code>array</code>, of length
-     *         <code>length</code> and containing the data from
-     *         <code>array</code>.
+     * @return Table of the same type as {@code array}, of length
+     *         {@code length} and containing the data from
+     *         {@code array}.
      */
     public static boolean[] resize(final boolean[] array, final int length) {
         return (boolean[]) doResize(array, length);
@@ -292,13 +294,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     private static Object doRemove(final Object array, final int index, final int length) {
@@ -316,12 +318,12 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab the elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent <code>array</code> elements can be moved forward.
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent {@code array} elements can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static Object[] remove(final Object[] array, final int index, final int length) {
@@ -332,13 +334,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static double[] remove(final double[] array, final int index, final int length) {
@@ -349,13 +351,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static float[] remove(final float[] array, final int index, final int length) {
@@ -366,13 +368,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static long[] remove(final long[] array, final int index, final int length) {
@@ -383,13 +385,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static int[] remove(final int[] array, final int index, final int length) {
@@ -400,13 +402,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static short[] remove(final short[] array, final int index, final int length) {
@@ -417,13 +419,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static byte[] remove(final byte[] array, final int index, final int length) {
@@ -434,13 +436,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static char[] remove(final char[] array, final int index, final int length) {
@@ -451,13 +453,13 @@ public final class XArray {
      * Grabs elements from the middle of a table.
      *
      * @param array   Table from which to grab elements.
-     * @param index   <code>array</code> index of the first element to grab.
-     *                All subsequent elements of <code>array</code>
+     * @param index   {@code array} index of the first element to grab.
+     *                All subsequent elements of {@code array}
      *                can be moved forward.
      * @param length  Number of elements to grab.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                extracted elements.  This method can directly return 
-     *                <code>dst</code>, but most often it returns a newly created
+     *                {@code dst}, but most often it returns a newly created
      *                table.
      */
     public static boolean[] remove(final boolean[] array, final int index, final int length) {
@@ -469,14 +471,14 @@ public final class XArray {
      * up of null elements.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     private static Object doInsert(final Object array, final int index, final int length) {
@@ -495,14 +497,14 @@ public final class XArray {
      * up of null elements.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static Object[] insert(final Object[] array, final int index, final int length) {
@@ -514,14 +516,14 @@ public final class XArray {
      * up of zeros.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static double[] insert(final double[] array, final int index, final int length) {
@@ -533,14 +535,14 @@ public final class XArray {
      * up of zeros.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static float[] insert(final float[] array, final int index, final int length) {
@@ -552,14 +554,14 @@ public final class XArray {
      * up of zeros.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static long[] insert(final long[] array, final int index, final int length) {
@@ -571,14 +573,14 @@ public final class XArray {
      * up of zeros.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static int[] insert(final int[] array, final int index, final int length) {
@@ -590,14 +592,14 @@ public final class XArray {
      * up of zeros.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static short[] insert(final short[] array, final int index, final int length) {
@@ -609,14 +611,14 @@ public final class XArray {
      * up of zeros.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static byte[] insert(final byte[] array, final int index, final int length) {
@@ -628,14 +630,14 @@ public final class XArray {
      * up of zeros.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static char[] insert(final char[] array, final int index, final int length) {
@@ -644,17 +646,17 @@ public final class XArray {
 
      /**
      * Inserts spaces into the middle of a table.  These "spaces" will be made
-     * up of <code>false</code>.
+     * up of {@code false}.
      *
      * @param array   Table in which to insert spaces.
-     * @param index   <code>array</code> index where spaces should be inserted.
-     *                All <code>array</code> elements which have an index equal
-     *                to or higher than <code>index</code> will be moved
+     * @param index   {@code array} index where spaces should be inserted.
+     *                All {@code array} elements which have an index equal
+     *                to or higher than {@code index} will be moved
      *                forward.
      * @param length  Number of spaces to insert.
-     * @return        Table which contains the <code>array</code> data with the
+     * @return        Table which contains the {@code array} data with the
      *                additional space. This method can directly return
-     *                <code>dst</code>, but most often it returns a newly
+     *                {@code dst}, but most often it returns a newly
      *                created table.
      */
     public static boolean[] insert(final boolean[] array, final int index, final int length) {
@@ -662,21 +664,21 @@ public final class XArray {
     }
 
     /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Table to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Table to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     private static Object doInsert(final Object src, final int src_pos,
@@ -694,21 +696,21 @@ public final class XArray {
     }
 
     /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static Object[] insert(final Object[] src, final int src_pos,
@@ -718,21 +720,21 @@ public final class XArray {
     }
 
      /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static double[] insert(final double[] src, final int src_pos,
@@ -742,21 +744,21 @@ public final class XArray {
     }
 
      /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static float[] insert(final float[] src, final int src_pos,
@@ -766,21 +768,21 @@ public final class XArray {
     }
 
      /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static long[] insert(final long[] src, final int src_pos,
@@ -790,21 +792,21 @@ public final class XArray {
     }
 
      /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static int[] insert(final int[] src, final int src_pos,
@@ -814,21 +816,21 @@ public final class XArray {
     }
 
    /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static short[] insert(final short[] src, final int src_pos,
@@ -838,21 +840,21 @@ public final class XArray {
     }
 
      /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static byte[] insert(final byte[] src, final int src_pos,
@@ -862,21 +864,21 @@ public final class XArray {
     }
 
     /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static char[] insert(final char[] src, final int src_pos,
@@ -886,21 +888,21 @@ public final class XArray {
     }
 
      /**
-     * Inserts a table slice into another table.  The <code>src</code> table
-     * will be entirely or partially inserted into the <code>dst</code> table.
+     * Inserts a table slice into another table.  The {@code src} table
+     * will be entirely or partially inserted into the {@code dst} table.
      *
-     * @param src     Tablea to insert into <code>dst</code>.
-     * @param src_pos Index of the first data item of <code>src</code> to
-     *                insert into <code>dst</code>.
-     * @param dst     Table in which to insert <code>src</code> data.
-     * @param dst_pos <code>dst</code> index in which to insert
-     *                <code>src</code> data. All elements of 
-     *                <code>dst</code> whose index is equal to or greater than
-     *                <code>dst_pos</code> will be moved forward.
-     * @param length  Number of <code>src</code> data items to insert.
-     * @return        Table which contains the combination of <code>src</code>
-     *                and <code>dst</code>. This method can directly return 
-     *                <code>dst</code>, but never <code>src</code>. It most
+     * @param src     Tablea to insert into {@code dst}.
+     * @param src_pos Index of the first data item of {@code src} to
+     *                insert into {@code dst}.
+     * @param dst     Table in which to insert {@code src} data.
+     * @param dst_pos {@code dst} index in which to insert
+     *                {@code src} data. All elements of 
+     *                {@code dst} whose index is equal to or greater than
+     *                {@code dst_pos} will be moved forward.
+     * @param length  Number of {@code src} data items to insert.
+     * @return        Table which contains the combination of {@code src}
+     *                and {@code dst}. This method can directly return 
+     *                {@code dst}, but never {@code src}. It most
      *                often returns a newly created table.
      */
     public static boolean[] insert(final boolean[] src, final int src_pos,
@@ -966,7 +968,7 @@ public final class XArray {
 
     /**
      * Returns {@code true} if all elements in the specified array are in increasing order.
-     * Since <code>NaN</code> values are unordered, they may appears anywhere in the array; they
+     * Since {@code NaN} values are unordered, they may appears anywhere in the array; they
      * will be ignored. This method is usefull in assertions.
      */
     public static boolean isSorted(final float[] array) {
@@ -985,7 +987,7 @@ public final class XArray {
 
     /**
      * Returns {@code true} if all elements in the specified array are in increasing order.
-     * Since <code>NaN</code> values are unordered, they may appears anywhere in the array; they
+     * Since {@code NaN} values are unordered, they may appears anywhere in the array; they
      * will be ignored. This method is usefull in assertions.
      */
     public static boolean isSorted(final double[] array) {

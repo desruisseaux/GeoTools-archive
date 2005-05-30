@@ -70,6 +70,8 @@ import org.geotools.util.NameFactory;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultEngineeringCRS extends AbstractSingleCRS implements EngineeringCRS {
     /**
@@ -100,7 +102,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
 
         /**
          * Compares the specified object to this CRS for equality. This method is overriden
-         * because, otherwise, <code>CARTESIAN_xD</code> and <code>GENERIC_xD</code> would
+         * because, otherwise, {@code CARTESIAN_xD} and {@code GENERIC_xD} would
          * be considered equals when metadata are ignored.
          */
         public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {

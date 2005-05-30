@@ -34,6 +34,8 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @version $Id$
  * @author John Grange
  *
+ * @since 2.1
+ *
  * @todo Since this class is constructed through the service provider API rather than directly
  *       instantiated by the user, we need some way to pass the schema information to this class.
  *       one possible approach is to set the schema if preferences. Maybe a better was is to look

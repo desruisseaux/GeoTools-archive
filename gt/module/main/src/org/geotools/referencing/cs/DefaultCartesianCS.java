@@ -40,7 +40,7 @@ import org.geotools.measure.Measure;
  * A 1-, 2-, or 3-dimensional coordinate system. Gives the position of points relative to
  * orthogonal straight axes in the 2- and 3-dimensional cases. In the 1-dimensional case,
  * it contains a single straight coordinate axis. In the multi-dimensional case, all axes
- * shall have the same length unit of measure. A <code>CartesianCS</code> shall have one,
+ * shall have the same length unit of measure. A {@code CartesianCS} shall have one,
  * two, or three {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
@@ -54,6 +54,8 @@ import org.geotools.measure.Measure;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see DefaultAffineCS
  */
@@ -205,7 +207,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @return The distance between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
     public Measure distance(final double[] coord1, final double[] coord2)

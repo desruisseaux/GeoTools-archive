@@ -47,6 +47,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class DataIdentificationImpl extends IdentificationImpl implements DataIdentification {
     /**
@@ -82,14 +84,14 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
 
     /**
      * Minimum bounding rectangle within which data is available.
-     * Only one of <code>getGeographicBox()</code> and {@link #getGeographicDescription()}
+     * Only one of {@code getGeographicBox()} and {@link #getGeographicDescription()}
      * should be provided.
      */
     private Collection geographicBox;
 
     /**
      * Description of the geographic area within which data is available.
-     * Only one of {@link #getGeographicBox()} and <code>getGeographicDescription()</code>
+     * Only one of {@link #getGeographicBox()} and {@code getGeographicDescription()}
      * should be provided.
      */
     private Collection geographicDescription;
@@ -207,7 +209,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
     
     /**
      * Minimum bounding rectangle within which data is available.
-     * Only one of <code>getGeographicBox()</code> and {@link #getGeographicDescription()}
+     * Only one of {@code getGeographicBox()} and {@link #getGeographicDescription()}
      * should be provided.
      */
     public synchronized Collection getGeographicBox() {
@@ -223,7 +225,7 @@ public class DataIdentificationImpl extends IdentificationImpl implements DataId
 
     /**
      * Description of the geographic area within which data is available.
-     * Only one of {@link #getGeographicBox()} and <code>getGeographicDescription()</code>
+     * Only one of {@link #getGeographicBox()} and {@code getGeographicDescription()}
      * should be provided.
      */
     public synchronized Collection getGeographicDescription() {

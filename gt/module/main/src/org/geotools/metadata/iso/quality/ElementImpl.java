@@ -45,6 +45,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class ElementImpl extends MetadataEntity implements Element {
     /**
@@ -58,7 +60,7 @@ public class ElementImpl extends MetadataEntity implements Element {
     private Collection namesOfMeasure;
 
     /**
-     * Code identifying a registered standard procedure, or <code>null</code> if none.
+     * Code identifying a registered standard procedure, or {@code null} if none.
      */
     private Identifier measureIdentification;
 
@@ -68,7 +70,7 @@ public class ElementImpl extends MetadataEntity implements Element {
     private InternationalString measureDescription;
 
     /**
-     * Type of method used to evaluate quality of the dataset, or <code>null</code> if unspecified.
+     * Type of method used to evaluate quality of the dataset, or {@code null} if unspecified.
      */
     private EvaluationMethodType evaluationMethodType;
 
@@ -78,14 +80,14 @@ public class ElementImpl extends MetadataEntity implements Element {
     private InternationalString evaluationMethodDescription;
 
     /**
-     * Reference to the procedure information, or <code>null</code> if none.
+     * Reference to the procedure information, or {@code null} if none.
      */
     private Citation evaluationProcedure;
 
     /**
      * Date or range of dates on which a data quality measure was applied.
      * The array length is 1 for a single date, or 2 for a range. Returns
-     * <code>null</code> if this information is not available.
+     * {@code null} if this information is not available.
      */
     private long date1, date2;
 
@@ -124,7 +126,7 @@ public class ElementImpl extends MetadataEntity implements Element {
     }
 
     /**
-     * Returns the code identifying a registered standard procedure, or <code>null</code> if none.
+     * Returns the code identifying a registered standard procedure, or {@code null} if none.
      */
     public Identifier getMeasureIdentification() {
         return measureIdentification;
@@ -155,7 +157,7 @@ public class ElementImpl extends MetadataEntity implements Element {
 
     /**
      * Returns the type of method used to evaluate quality of the dataset,
-     * or <code>null</code> if unspecified.
+     * or {@code null} if unspecified.
      */
     public EvaluationMethodType getEvaluationMethodType() {
         return evaluationMethodType;
@@ -185,7 +187,7 @@ public class ElementImpl extends MetadataEntity implements Element {
     }
 
     /**
-     * Returns the reference to the procedure information, or <code>null</code> if none.
+     * Returns the reference to the procedure information, or {@code null} if none.
      */
     public Citation getEvaluationProcedure() {
         return evaluationProcedure;
@@ -202,7 +204,7 @@ public class ElementImpl extends MetadataEntity implements Element {
     /**
      * Returns the date or range of dates on which a data quality measure was applied.
      * The array length is 1 for a single date, or 2 for a range. Returns
-     * <code>null</code> if this information is not available.
+     * {@code null} if this information is not available.
      */
     public synchronized Date[] getDate() {
         if (date1 == Long.MIN_VALUE) {

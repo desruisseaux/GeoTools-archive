@@ -46,6 +46,8 @@ import org.geotools.util.UnsupportedImplementationException;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see AbstractCS
  * @see org.geotools.referencing.datum.AbstractDatum
  */
@@ -83,7 +85,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
 
     /**
      * Returns the unit used for all axis. If not all axis uses the same unit,
-     * then this method returns <code>null</code>. This method is often used
+     * then this method returns {@code null}. This method is often used
      * for Well Know Text (WKT) formatting.
      */
     final Unit getUnit() {
@@ -107,7 +109,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @return The distance between {@code coord1} and {@code coord2}.
      * @throws UnsupportedOperationException if this coordinate reference system can't compute
      *         distances.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
@@ -123,13 +125,13 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
 
     /**
      * Compare this coordinate reference system with the specified object for equality.
-     * If <code>compareMetadata</code> is <code>true</code>, then all available properties are
+     * If {@code compareMetadata} is {@code true}, then all available properties are
      * compared including {@linkplain #getValidArea valid area} and {@linkplain #getScope scope}.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {

@@ -55,7 +55,7 @@ import org.geotools.resources.cts.Resources;
  *
  * <strong>References:</strong><ul>
  *   <li> Proj-4.4.7 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
- *        Relevant files are: <code>PJ_ortho.c</code>, <code>pj_fwd.c</code> and <code>pj_inv.c</code>.</li>
+ *        Relevant files are: {@code PJ_ortho.c}, {@code pj_fwd.c} and {@code pj_inv.c}.</li>
  *   <li> John P. Snyder (Map Projections - A Working Manual,
  *        U.S. Geological Survey Professional Paper 1395, 1987)</li>
  * </ul>
@@ -65,6 +65,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public abstract class Orthographic extends MapProjection {
     /**

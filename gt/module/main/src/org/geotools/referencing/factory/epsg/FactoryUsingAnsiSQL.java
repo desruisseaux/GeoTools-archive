@@ -56,6 +56,8 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  * @author Didier Richard
+ *
+ * @since 2.1
  */
 public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
     /**

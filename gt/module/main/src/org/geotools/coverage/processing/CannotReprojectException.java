@@ -26,6 +26,8 @@ package org.geotools.coverage.processing;
  *
  * @version $Id$
  * @author  Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class CannotReprojectException extends RuntimeException {
     /**

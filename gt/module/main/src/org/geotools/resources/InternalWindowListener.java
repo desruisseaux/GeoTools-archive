@@ -35,6 +35,8 @@ import javax.swing.event.InternalFrameListener;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class InternalWindowListener implements InternalFrameListener {
     /**

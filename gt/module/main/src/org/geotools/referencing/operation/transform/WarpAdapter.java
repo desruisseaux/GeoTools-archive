@@ -45,6 +45,8 @@ import org.geotools.resources.gcs.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class WarpAdapter extends Warp {
     /**
@@ -59,7 +61,7 @@ final class WarpAdapter extends Warp {
     private final MathTransform2D inverse;
     
     /**
-     * Constructs a new <code>WarpAdapter</code> using the given transform.
+     * Constructs a new {@code WarpAdapter} using the given transform.
      *
      * @param name    The coverage name. Used for formatting error message.
      * @param inverse The <strong>inverse</strong> of the transformation to apply for projecting

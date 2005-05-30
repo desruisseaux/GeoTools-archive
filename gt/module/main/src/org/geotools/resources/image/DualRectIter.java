@@ -22,6 +22,7 @@ package org.geotools.resources.image;
 // J2SE dependencies
 import java.awt.image.RasterFormatException;
 
+// JAI dependencies
 import javax.media.jai.OpImage;
 import javax.media.jai.iterator.RectIter;
 import javax.media.jai.iterator.WritableRectIter;
@@ -34,6 +35,8 @@ import javax.media.jai.iterator.WritableRectIter;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  *
  * @todo This implementation is referenced in a public API.
  *       Consider moving it somewhere else.
@@ -69,8 +72,8 @@ public final class DualRectIter implements WritableRectIter {
      *
      * @param  src The source iterator.
      * @param  dst The destination iterator.
-     * @return An iterator that read sample from <code>src</code> and write sample
-     *         to <code>dst</code>. If <code>src==dst</code>, then the destination
+     * @return An iterator that read sample from {@code src} and write sample
+     *         to {@code dst}. If {@code src==dst}, then the destination
      *         iterator itself is returned.
      */
     public static WritableRectIter create(final RectIter src, final WritableRectIter dst) {

@@ -52,6 +52,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see java.awt.geom.Point2D
  */
 public final class GeneralDirectPosition implements DirectPosition, Serializable {

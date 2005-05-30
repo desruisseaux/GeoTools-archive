@@ -40,6 +40,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class ContactImpl extends MetadataEntity implements Contact {
     /**
@@ -177,7 +179,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
 
     /**
      * Returns the physical and email address at which the organization or individual may be contacted.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public Address getAddress() {
         return address;
@@ -193,7 +195,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
     
     /**
      * Returns supplemental instructions on how or when to contact the individual or organization.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public InternationalString getContactInstructions() {
         return contactInstructions;
@@ -209,7 +211,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
 
     /**
      * Return on-line information that can be used to contact the individual or organization.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public OnLineResource getOnLineResource() {
         return onLineResource;
@@ -225,7 +227,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
 
     /**
      * Returns telephone numbers at which the organization or individual may be contacted.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public Telephone getPhone() {
         return phone;
@@ -242,7 +244,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
     /**
      * Returns time period (including time zone) when individuals can contact the organization or
      * individual. 
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public InternationalString getHoursOfService() {
         return hoursOfService;

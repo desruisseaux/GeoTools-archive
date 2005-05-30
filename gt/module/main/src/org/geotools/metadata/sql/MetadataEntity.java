@@ -40,6 +40,8 @@ import java.sql.SQLException;
  * @version $Id$
  * @author Touraïvane
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class MetadataEntity implements InvocationHandler {
     /**

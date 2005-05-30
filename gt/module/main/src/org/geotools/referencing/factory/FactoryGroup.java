@@ -84,6 +84,8 @@ import org.geotools.resources.XArray;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class FactoryGroup {
     /**
@@ -205,13 +207,13 @@ public class FactoryGroup {
 
     /**
      * Creates a transform from a group of parameters and add the method used to a list.
-     * This variant of <code>createParameterizedTransform(...)</code> provide a way for
+     * This variant of {@code createParameterizedTransform(...)} provide a way for
      * the client to keep trace of any {@linkplain OperationMethod operation method}
      * used by this factory. 
      *
      * @param  parameters The parameter values.
      * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or <code>null</code> if none.
+     *                 or {@code null} if none.
      * @return The parameterized transform.
      * @throws NoSuchIdentifierException if there is no transform registered for the method.
      * @throws FactoryException if the object creation failed. This exception is thrown
@@ -259,7 +261,7 @@ public class FactoryGroup {
      * @param  parameters The parameter values for the transform.
      * @param  derivedCS the target coordinate system.
      * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or <code>null</code> if none.
+     *                 or {@code null} if none.
      * @return The parameterized transform.
      * @throws NoSuchIdentifierException if there is no transform registered for the method.
      * @throws FactoryException if the object creation failed. This exception is thrown
@@ -370,10 +372,10 @@ public class FactoryGroup {
      * {@linkplain GeographicCRS geographic} and a {@linkplain VerticalCRS vertical} CRS,
      * and if the vertical CRS datum type is {@linkplain VerticalDatumType#ELLIPSOIDAL height
      * above the ellipsoid}, then this method converts the compound CRS in a single 3D CRS.
-     * Otherwise, the <code>crs</code> argument is returned unchanged.
+     * Otherwise, the {@code crs} argument is returned unchanged.
      *
      * @param  crs The compound CRS to converts in a 3D geographic CRS.
-     * @return The 3D geographic CRS, or <code>crs</code> if the conversion can't be applied.
+     * @return The 3D geographic CRS, or {@code crs} if the conversion can't be applied.
      * @throws FactoryException if the object creation failed.
      *
      * @todo Consider extensions of this method to projected CRS if it is usefull for GEOT-401.

@@ -60,10 +60,10 @@ import org.geotools.resources.Utilities;
  * factory} implementation.
  *
  * <P>To declare a factory implementation, a services subdirectory is placed within the
- * <code>META-INF</code> directory that is present in every JAR file. This directory
+ * {@code META-INF} directory that is present in every JAR file. This directory
  * contains a file for each factory interface that has one or more implementation classes
  * present in the JAR file. For example, if the JAR file contained a class named
- * <code>com.mycompany.DatumFactoryImpl</code> which implements the {@link DatumFactory}
+ * {@code com.mycompany.DatumFactoryImpl} which implements the {@link DatumFactory}
  * interface, the JAR file would contain a file named:</P>
  *
  * <blockquote><pre>META-INF/services/org.opengis.referencing.datum.DatumFactory</pre></blockquote>
@@ -87,6 +87,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class FactoryFinder {
     /**
@@ -377,7 +379,7 @@ public final class FactoryFinder {
     /**
      * Sets a pairwise ordering between two vendors. If one or both vendors are not
      * currently registered, or if the desired ordering is already set, nothing happens
-     * and <code>false</code> is returned.
+     * and {@code false} is returned.
      * <p>
      * The example below said that an ESRI implementation (if available) is
      * preferred over the Geotools one:
@@ -385,8 +387,8 @@ public final class FactoryFinder {
      * <blockquote><code>FactoryFinder.setVendorOrdering("ESRI", "Geotools");</code></blockquote>
      *
      * @param  vendor1 The preferred vendor.
-     * @param  vendor2 The vendor to which <code>vendor1</code> is preferred.
-     * @return <code>true</code> if the ordering was set for at least one category.
+     * @param  vendor2 The vendor to which {@code vendor1} is preferred.
+     * @return {@code true} if the ordering was set for at least one category.
      */
     public static boolean setVendorOrdering(final String vendor1, final String vendor2) {
         return getServiceRegistry().setOrdering(Factory.class, true,
@@ -397,11 +399,11 @@ public final class FactoryFinder {
     /**
      * Unsets a pairwise ordering between two vendors. If one or both vendors are not
      * currently registered, or if the desired ordering is already unset, nothing happens
-     * and <code>false</code> is returned.
+     * and {@code false} is returned.
      *
      * @param  vendor1 The preferred vendor.
-     * @param  vendor2 The vendor to which <code>vendor1</code> is preferred.
-     * @return <code>true</code> if the ordering was unset for at least one category.
+     * @param  vendor2 The vendor to which {@code vendor1} is preferred.
+     * @return {@code true} if the ordering was unset for at least one category.
      */
     public static boolean unsetVendorOrdering(final String vendor1, final String vendor2) {
         return getServiceRegistry().setOrdering(Factory.class, false,
@@ -421,7 +423,7 @@ public final class FactoryFinder {
             this.vendor = vendor;
         }
 
-        /** Returns <code>true</code> if the specified provider is built by the vendor. */
+        /** Returns {@code true} if the specified provider is built by the vendor. */
         public boolean filter(final Object provider) {
             return CitationImpl.titleMatches(((Factory)provider).getVendor(), vendor);
         }
@@ -430,7 +432,7 @@ public final class FactoryFinder {
     /**
      * Sets a pairwise ordering between two authorities. If one or both authorities are not
      * currently registered, or if the desired ordering is already set, nothing happens
-     * and <code>false</code> is returned.
+     * and {@code false} is returned.
      * <p>
      * The example below said that EPSG {@linkplain AuthorityFactory authority factories}
      * are preferred over ESRI ones:
@@ -438,8 +440,8 @@ public final class FactoryFinder {
      * <blockquote><code>FactoryFinder.setAuthorityOrdering("EPSG", "ESRI");</code></blockquote>
      *
      * @param  authority1 The preferred authority.
-     * @param  authority2 The authority to which <code>authority1</code> is preferred.
-     * @return <code>true</code> if the ordering was set for at least one category.
+     * @param  authority2 The authority to which {@code authority1} is preferred.
+     * @return {@code true} if the ordering was set for at least one category.
      */
     public static boolean setAuthorityOrdering(final String authority1, final String authority2) {
         return getServiceRegistry().setOrdering(AuthorityFactory.class, true,
@@ -450,11 +452,11 @@ public final class FactoryFinder {
     /**
      * Unsets a pairwise ordering between two authorities. If one or both authorities are not
      * currently registered, or if the desired ordering is already unset, nothing happens
-     * and <code>false</code> is returned.
+     * and {@code false} is returned.
      *
      * @param  authority1 The preferred authority.
-     * @param  authority2 The vendor to which <code>authority1</code> is preferred.
-     * @return <code>true</code> if the ordering was unset for at least one category.
+     * @param  authority2 The vendor to which {@code authority1} is preferred.
+     * @return {@code true} if the ordering was unset for at least one category.
      */
     public static boolean unsetAuthorityOrdering(final String authority1, final String authority2) {
         return getServiceRegistry().setOrdering(AuthorityFactory.class, false,
@@ -474,7 +476,7 @@ public final class FactoryFinder {
             this.authority = authority;
         }
 
-        /** Returns <code>true</code> if the specified provider is for the authority. */
+        /** Returns {@code true} if the specified provider is for the authority. */
         public boolean filter(final Object provider) {
             return CitationImpl.titleMatches(((AuthorityFactory)provider).getAuthority(), authority);
         }
@@ -502,8 +504,8 @@ public final class FactoryFinder {
      * state of a system, usually for debugging purpose.
      *
      * @param  out The output stream where to format the list.
-     * @param  locale The locale for the list, or <code>null</code>.
-     * @throws IOException if an error occurs while writting to <code>out</code>.
+     * @param  locale The locale for the list, or {@code null}.
+     * @throws IOException if an error occurs while writting to {@code out}.
      *
      * @todo Localize the title line.
      */
@@ -557,15 +559,15 @@ public final class FactoryFinder {
      * </TABLE>
      *
      * <P><strong>Note for Windows users:</strong> If the output contains strange
-     * symbols, try to supply an "<code>-encoding</code>" argument. Example:</P>
+     * symbols, try to supply an "{@code -encoding}" argument. Example:</P>
      *
      * <blockquote><code>
      * java org.geotools.referencing.FactoryFinder -encoding Cp850
      * </code></blockquote>
      *
      * <P>The codepage number (850 in the previous example) can be obtained from the DOS
-     * commande line using the "<code>chcp</code>" command with no arguments.
-     * This <code>-encoding</code> argument need to be supplied only once.</P>
+     * commande line using the "{@code chcp}" command with no arguments.
+     * This {@code -encoding} argument need to be supplied only once.</P>
      *
      * @param args Command line arguments.
      */

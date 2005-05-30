@@ -29,6 +29,8 @@ import javax.media.jai.registry.RenderedRegistryMode;
  *
  * @version $Id$
  * @author Lionel Flahaut
+ *
+ * @since 2.1
  */
 public class HysteresisDescriptor extends OperationDescriptorImpl {
     /**

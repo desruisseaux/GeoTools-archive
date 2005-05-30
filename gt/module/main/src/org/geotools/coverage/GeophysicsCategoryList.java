@@ -46,6 +46,8 @@ import org.geotools.resources.XMath;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class GeophysicsCategoryList extends CategoryList {
     /**
@@ -75,7 +77,7 @@ final class GeophysicsCategoryList extends CategoryList {
     
     /**
      * Locale used for creating {@link #format} last time.
-     * May be <code>null</code> if default locale was requested.
+     * May be {@code null} if default locale was requested.
      */
     private transient Locale locale;
     
@@ -97,7 +99,7 @@ final class GeophysicsCategoryList extends CategoryList {
      *                    instances of {@link GeophysicsCategory}
      *                    (most of the time, but not always).
      * @param  unit       The unit information for all quantitative categories.
-     *                    May be <code>null</code> if no category has units.
+     *                    May be {@code null} if no category has units.
      * @param inverse     The {@link CategoryList} which is constructing this
      *                    {@link GeophysicsCategoryList}.
      *
@@ -114,8 +116,8 @@ final class GeophysicsCategoryList extends CategoryList {
     /**
      * Compute the smallest number of fraction digits necessary to resolve all
      * quantitative values. This method assume that geophysics values in the range
-     * <code>Category.geophysics(true).getRange</code> are stored as integer sample
-     * values in the range <code>Category.geophysics(false).getRange</code>.
+     * {@code Category.geophysics(true).getRange} are stored as integer sample
+     * values in the range {@code Category.geophysics(false).getRange}.
      */
     private static int getFractionDigitCount(final Category[] categories) {
         int ndigits = 0;
@@ -136,8 +138,8 @@ final class GeophysicsCategoryList extends CategoryList {
     }
 
     /**
-     * If <code>toGeophysics</code> is <code>false</code>, cancel the action of a previous
-     * call to <code>geophysics(true)</code>. This method always returns a list of categories
+     * If {@code toGeophysics} is {@code false}, cancel the action of a previous
+     * call to {@code geophysics(true)}. This method always returns a list of categories
      * in which <code>{@link Category#geophysics(boolean) Category.geophysics}(toGeophysics)</code>
      * has been invoked for each category.
      */
@@ -149,7 +151,7 @@ final class GeophysicsCategoryList extends CategoryList {
     
     /**
      * Returns the unit information for quantitative categories in this list.
-     * May returns <code>null</code>  if there is no quantitative categories
+     * May returns {@code null}  if there is no quantitative categories
      * in this list, or if there is no unit information.
      */
     public Unit getUnits() {
@@ -159,16 +161,16 @@ final class GeophysicsCategoryList extends CategoryList {
     /**
      * Formatte la valeur spécifiée selon les conventions locales. Le nombre sera
      * écrit avec un nombre de chiffres après la virgule approprié pour la catégorie.
-     * Le symbole des unités sera ajouté après le nombre si <code>writeUnit</code>
-     * est <code>true</code>.
+     * Le symbole des unités sera ajouté après le nombre si {@code writeUnit}
+     * est {@code true}.
      *
      * @param  value Valeur du paramètre géophysique à formatter.
      * @param  writeUnit Indique s'il faut écrire le symbole des unités après le nombre.
      *         Cet argument sera ignoré si aucune unité n'avait été spécifiée au constructeur.
-     * @param  locale Conventions locales à utiliser, ou <code>null</code> pour les conventions par
+     * @param  locale Conventions locales à utiliser, ou {@code null} pour les conventions par
      *         défaut.
      * @param  buffer Le buffer dans lequel écrire la valeur.
-     * @return Le buffer <code>buffer</code> dans lequel auront été écrit la valeur et les unités.
+     * @return Le buffer {@code buffer} dans lequel auront été écrit la valeur et les unités.
      */
     synchronized StringBuffer format(final double value, final boolean writeUnits,
                                      final Locale locale, StringBuffer buffer)

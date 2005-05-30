@@ -104,6 +104,8 @@ import org.geotools.util.NumberRange;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class CoverageStack extends AbstractCoverage {
     /**
@@ -334,7 +336,7 @@ public class CoverageStack extends AbstractCoverage {
     private final int zDimension;
     
     /**
-     * <code>true</code> if interpolations are allowed.
+     * {@code true} if interpolations are allowed.
      */
     private boolean interpolationEnabled = true;
     
@@ -883,7 +885,7 @@ public class CoverageStack extends AbstractCoverage {
      * that no interpolation is necessary.
      *
      * @param  z The z value.
-     * @return <code>true</code> if data were found.
+     * @return {@code true} if data were found.
      * @throws PointOutsideCoverageException if the <var>z</var> value is outside the allowed range.
      * @throws CannotEvaluateException if the operation failed for some other reason.
      */
@@ -1216,7 +1218,7 @@ public class CoverageStack extends AbstractCoverage {
     }
     
     /**
-     * Returns <code>true</code> if interpolation are enabled in the <var>z</var> value dimension.
+     * Returns {@code true} if interpolation are enabled in the <var>z</var> value dimension.
      * Interpolations are enabled by default.
      */
     public boolean isInterpolationEnabled() {

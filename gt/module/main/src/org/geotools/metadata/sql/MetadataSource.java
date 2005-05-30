@@ -67,12 +67,14 @@ import org.geotools.util.SimpleInternationalString;
  * Telephone      telephone  = (Telephone) source.getEntry(Telephone.class, id);
  * </PRE></BLOCKQUOTE>
  *
- * where <code>id</code> is the primary key value for the desired record in the
- * <code>CI_Telephone</code> table.
+ * where {@code id} is the primary key value for the desired record in the
+ * {@code CI_Telephone} table.
  *
  * @author Touraïvane
  * @author Olivier Kartotaroeno
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class MetadataSource {
     /**
@@ -108,7 +110,7 @@ public class MetadataSource {
     /**
      * The map from GeoAPI names to ISO names. For example the GeoAPI
      * {@link org.opengis.metadata.citation.Citation} interface maps
-     * to the ISO 19115 <code>CI_Citation</code> name.
+     * to the ISO 19115 {@code CI_Citation} name.
      */
     private final Properties geoApiToIso = new Properties();
 

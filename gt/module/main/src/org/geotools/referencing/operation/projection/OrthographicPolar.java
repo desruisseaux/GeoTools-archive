@@ -58,10 +58,12 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @version $Id$
  * @author  Rueben Schulz
+ *
+ * @since 2.1
  */
 public class OrthographicPolar extends Orthographic {
     /**
-     * <code>true</code> if this projection is for the north pole, or <code>false</code>
+     * {@code true} if this projection is for the north pole, or {@code false}
      * if it is for the south pole.
      */
     private final boolean northPole;
@@ -86,7 +88,7 @@ public class OrthographicPolar extends Orthographic {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere). 
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere). 
      */
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
@@ -114,7 +116,7 @@ public class OrthographicPolar extends Orthographic {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-     * and stores the result in <code>ptDst</code>.
+     * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException

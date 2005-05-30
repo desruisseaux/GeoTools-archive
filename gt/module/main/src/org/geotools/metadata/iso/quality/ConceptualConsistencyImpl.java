@@ -32,6 +32,8 @@ import org.opengis.metadata.quality.ConceptualConsistency;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class ConceptualConsistencyImpl extends LogicalConsistencyImpl
         implements ConceptualConsistency

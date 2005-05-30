@@ -33,8 +33,10 @@ import java.nio.charset.Charset;
  * and stream position. This class can't be public for now, because I
  * can't figure out how to implement reliably {@link #readLine}.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class LineReader extends LineNumberReader {
     /**
@@ -70,7 +72,7 @@ final class LineReader extends LineNumberReader {
      * Convenience method for creating a buffered reader from an input stream.
      *
      * @param in The input stream.
-     * @param charset The charset, or <code>null</code> for the locale default.
+     * @param charset The charset, or {@code null} for the locale default.
      */
     protected LineReader(final InputStream in, final Charset charset) {
         super(charset!=null ? new InputStreamReader(in, charset) : new InputStreamReader(in));

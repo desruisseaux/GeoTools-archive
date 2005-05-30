@@ -42,6 +42,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class ExtendedElementInformationImpl extends MetadataEntity
         implements ExtendedElementInformation
@@ -92,7 +94,7 @@ public class ExtendedElementInformationImpl extends MetadataEntity
 
     /**
      * Maximum occurrence of the extended element.
-     * Returns <code>null</code> if it doesn't apply, for example if the
+     * Returns {@code null} if it doesn't apply, for example if the
      * {@linkplain #getDataType data type} is {@linkplain Datatype#ENUMERATION enumeration},
      * {@linkplain Datatype#CODE_LIST code list} or {@linkplain Datatype#CODE_LIST_ELEMENT
      * code list element}.
@@ -101,7 +103,7 @@ public class ExtendedElementInformationImpl extends MetadataEntity
 
     /**
      * Valid values that can be assigned to the extended element.
-     * Returns <code>null</code> if it doesn't apply, for example if the
+     * Returns {@code null} if it doesn't apply, for example if the
      * {@linkplain #getDataType data type} is {@linkplain Datatype#ENUMERATION enumeration},
      * {@linkplain Datatype#CODE_LIST code list} or {@linkplain Datatype#CODE_LIST_ELEMENT
      * code list element}.
@@ -173,7 +175,7 @@ public class ExtendedElementInformationImpl extends MetadataEntity
     /**
      * Short form suitable for use in an implementation method such as XML or SGML.
      * NOTE: other methods may be used.
-     * Returns <code>null</code> if the {@linkplain #getDataType data type}
+     * Returns {@code null} if the {@linkplain #getDataType data type}
      * is {@linkplain Datatype#CODE_LIST_ELEMENT code list element}.
      */
     public String getShortName()  {
@@ -269,7 +271,7 @@ public class ExtendedElementInformationImpl extends MetadataEntity
 
     /**
      * Maximum occurrence of the extended element.
-     * Returns <code>null</code> if it doesn't apply, for example if the
+     * Returns {@code null} if it doesn't apply, for example if the
      * {@linkplain #getDataType data type} is {@linkplain Datatype#ENUMERATION enumeration},
      * {@linkplain Datatype#CODE_LIST code list} or {@linkplain Datatype#CODE_LIST_ELEMENT
      * code list element}.
@@ -288,7 +290,7 @@ public class ExtendedElementInformationImpl extends MetadataEntity
 
     /**
      * Valid values that can be assigned to the extended element.
-     * Returns <code>null</code> if it doesn't apply, for example if the
+     * Returns {@code null} if it doesn't apply, for example if the
      * {@linkplain #getDataType data type} is {@linkplain Datatype#ENUMERATION enumeration},
      * {@linkplain Datatype#CODE_LIST code list} or {@linkplain Datatype#CODE_LIST_ELEMENT
      * code list element}.

@@ -22,6 +22,7 @@ package org.geotools.util;
 // JAI dependencies
 import javax.media.jai.util.Range;
 
+// Geotools dependencies
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.XMath;
 
@@ -32,6 +33,8 @@ import org.geotools.resources.XMath;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class NumberRange extends Range {
     /**
@@ -40,7 +43,7 @@ public class NumberRange extends Range {
     private static final long serialVersionUID = -818167965963008231L;
 
     /**
-     * Construct an inclusive range of <code>byte</code> values.
+     * Construct an inclusive range of {@code byte} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -50,7 +53,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of <code>byte</code> values.
+     * Construct a range of {@code byte} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -65,7 +68,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of <code>short</code> values.
+     * Construct an inclusive range of {@code short} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -75,7 +78,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of <code>short</code> values.
+     * Construct a range of {@code short} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -90,7 +93,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of <code>int</code> values.
+     * Construct an inclusive range of {@code int} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -100,7 +103,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of <code>int</code> values.
+     * Construct a range of {@code int} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -115,7 +118,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of <code>long</code> values.
+     * Construct an inclusive range of {@code long} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -125,7 +128,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of <code>long</code> values.
+     * Construct a range of {@code long} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -140,7 +143,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of <code>float</code> values.
+     * Construct an inclusive range of {@code float} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -150,7 +153,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of <code>float</code> values.
+     * Construct a range of {@code float} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -165,7 +168,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct an inclusive range of <code>double</code> values.
+     * Construct an inclusive range of {@code double} values.
      *
      * @param minimum The minimum value, inclusive.
      * @param maximum The maximum value, <strong>inclusive</strong>.
@@ -175,7 +178,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Construct a range of <code>double</code> values.
+     * Construct a range of {@code double} values.
      *
      * @param minimum The minimum value.
      * @param isMinIncluded Defines whether the minimum value is included in the Range.
@@ -231,11 +234,11 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Wrap the specified {@link Range} in a <code>NumberRange</code> object. If the specified
-     * range is already an instance of <code>NumberRange</code>, then it is returned unchanged.
+     * Wrap the specified {@link Range} in a {@code NumberRange} object. If the specified
+     * range is already an instance of {@code NumberRange}, then it is returned unchanged.
      *
      * @param  range The range to wrap
-     * @return The same range than <code>range</code> as a <code>NumberRange</code> object.
+     * @return The same range than {@code range} as a {@code NumberRange} object.
      */
     public static NumberRange wrap(final Range range) {
         if (range instanceof NumberRange) {
@@ -251,7 +254,7 @@ public class NumberRange extends Range {
      *
      * @param  type The class to cast to. Must be one of {@link Byte}, {@link Short},
      *              {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @return The casted range, or <code>this</code>.
+     * @return The casted range, or {@code this}.
      */
     private static NumberRange cast(final Range r, final Class type) {
         if (r==null || type.equals(r.getElementClass())) {
@@ -267,7 +270,7 @@ public class NumberRange extends Range {
      *
      * @param  type The class to cast to. Must be one of {@link Byte}, {@link Short},
      *              {@link Integer}, {@link Long}, {@link Float} or {@link Double}.
-     * @return The casted range, or <code>this</code> if this range already uses
+     * @return The casted range, or {@code this} if this range already uses
      *         the specified type.
      */
     public NumberRange castTo(final Class type) {
@@ -275,14 +278,14 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Returns <code>true</code> if the specified value is within this range.
+     * Returns {@code true} if the specified value is within this range.
      */
     public boolean contains(final Comparable value) {
         return contains((Number) value);
     }
 
     /**
-     * Returns <code>true</code> if the specified value is within this range.
+     * Returns {@code true} if the specified value is within this range.
      */
     public boolean contains(final Number value) {
         final Class type = ClassChanger.getWidestClass(getElementClass(), value.getClass());
@@ -330,7 +333,7 @@ public class NumberRange extends Range {
      * Returns the union of this range with the given range.
      * Widening conversions will be applied as needed.
      *
-     * @todo The return type will be changed to <code>NumberRange</code> when J2SE 1.5
+     * @todo The return type will be changed to {@code NumberRange} when J2SE 1.5
      *       will be available. We should then search for NumberRange.warp(...) in all
      *       client classes; some 'warp' may no longer be needed.
      */
@@ -350,7 +353,7 @@ public class NumberRange extends Range {
      * Returns the intersection of this range with the given range.
      * Widening conversions will be applied as needed.
      *
-     * @todo The return type will be changed to <code>NumberRange</code> when J2SE 1.5
+     * @todo The return type will be changed to {@code NumberRange} when J2SE 1.5
      *       will be available. We should then search for NumberRange.warp(...) in all
      *       client classes; some 'warp' may no longer be needed.
      */
@@ -399,7 +402,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Returns the {@linkplain #getMinValue minimum value} as a <code>double</code>.
+     * Returns the {@linkplain #getMinValue minimum value} as a {@code double}.
      * If this range is unbounded, then {@link Double#NEGATIVE_INFINITY} is returned.
      */
     public double getMinimum() {
@@ -412,8 +415,8 @@ public class NumberRange extends Range {
      * exclusive state. If this range is unbounded, then {@link Double#NEGATIVE_INFINITY} is
      * returned.
      *
-     * @param  inclusive <code>true</code> for the minimum value inclusive,
-     *         or <code>false</code> for the minimum value exclusive.
+     * @param  inclusive {@code true} for the minimum value inclusive,
+     *         or {@code false} for the minimum value exclusive.
      * @return The minimum value, inclusive or exclusive as requested.
      */
     public double getMinimum(final boolean inclusive) {
@@ -425,7 +428,7 @@ public class NumberRange extends Range {
     }
 
     /**
-     * Returns the {@linkplain #getMaxValue maximum value} as a <code>double</code>.
+     * Returns the {@linkplain #getMaxValue maximum value} as a {@code double}.
      * If this range is unbounded, then {@link Double#POSITIVE_INFINITY} is returned.
      */
     public double getMaximum() {
@@ -438,8 +441,8 @@ public class NumberRange extends Range {
      * exclusive state. If this range is unbounded, then {@link Double#POSITIVE_INFINITY} is
      * returned.
      *
-     * @param  inclusive <code>true</code> for the maximum value inclusive,
-     *         or <code>false</code> for the maximum value exclusive.
+     * @param  inclusive {@code true} for the maximum value inclusive,
+     *         or {@code false} for the maximum value exclusive.
      * @return The maximum value, inclusive or exclusive as requested.
      */
     public double getMaximum(final boolean inclusive) {

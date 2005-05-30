@@ -52,6 +52,8 @@ import org.geotools.resources.CRSUtilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class TransformedCoverage extends AbstractCoverage {
     /**
@@ -141,7 +143,7 @@ public class TransformedCoverage extends AbstractCoverage {
      * @param  index Index for sample dimension to retrieve. Indices are numbered 0 to
      *         (<var>{@linkplain #getNumSampleDimensions n}</var>-1).
      * @return Sample dimension information for the coverage.
-     * @throws IndexOutOfBoundsException if <code>index</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code index} is out of bounds.
      */
     public SampleDimension getSampleDimension(final int index) throws IndexOutOfBoundsException {
         return coverage.getSampleDimension(index);
@@ -174,7 +176,7 @@ public class TransformedCoverage extends AbstractCoverage {
      * Returns the value vector for a given point in the coverage.
      *
      * @param  coord The coordinate point where to evaluate.
-     * @throws PointOutsideCoverageException if <code>coord</code> is outside coverage.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
     public final Object evaluate(final DirectPosition coord)

@@ -24,19 +24,22 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
+// Geotools dependencies
 import org.geotools.resources.Utilities;
 
 
 /**
  * A thread invoking {@link Reference#clear} on each enqueded reference.
- * This is usefull only if <code>Reference</code> subclasses has overriden
- * their <code>clear()</code> method in order to perform some cleaning.
+ * This is usefull only if {@code Reference} subclasses has overriden
+ * their {@code clear()} method in order to perform some cleaning.
  * This thread is used by {@link WeakHashSet} and {@link WeakValueHashMap},
  * which remove their entry from the collection when {@link Reference#clear}
  * is invoked.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class WeakCollectionCleaner extends Thread {
     /**

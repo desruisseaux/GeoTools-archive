@@ -33,6 +33,8 @@ import javax.units.Unit;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class Spheroid extends DefaultEllipsoid {
     /**
@@ -45,7 +47,7 @@ final class Spheroid extends DefaultEllipsoid {
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
      * @param radius        The equatorial and polar radius.
-     * @param ivfDefinitive <code>true</code> if the inverse flattening is definitive.
+     * @param ivfDefinitive {@code true} if the inverse flattening is definitive.
      * @param unit          The units of the radius value.
      */
     protected Spheroid(Map properties, double radius, boolean ivfDefinitive, Unit unit) {

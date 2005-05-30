@@ -21,7 +21,7 @@
  *
  *                   THIS IS A TEMPORARY CLASS
  *
- *    This is a placeholder for future <code>Unit</code> class.
+ *    This is a placeholder for future {@code Unit} class.
  *    This skeleton will be removed when the real classes from
  *    JSR-108: Units specification will be publicly available.
  */
@@ -69,8 +69,8 @@ public class Prefix extends SymbolResources {
     }
 
     /**
-     * Retourne la valeur associée à la clée spécifiée, ou <code>key</code> s'il
-     * n'y en a pas. A la différence de <code>format(String)</code>, cette méthode
+     * Retourne la valeur associée à la clée spécifiée, ou {@code key} s'il
+     * n'y en a pas. A la différence de {@code format(String)}, cette méthode
      * ne lance pas d'exception si la resource n'est pas trouvée.
      */
     public static String localize(final String key) {

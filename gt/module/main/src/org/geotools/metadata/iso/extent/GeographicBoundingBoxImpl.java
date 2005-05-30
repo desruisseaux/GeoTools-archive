@@ -36,6 +36,8 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         implements GeographicBoundingBox

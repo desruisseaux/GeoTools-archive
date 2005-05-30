@@ -28,6 +28,8 @@ package org.geotools.coverage.grid;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class InvalidGridGeometryException extends IllegalStateException {
     /**

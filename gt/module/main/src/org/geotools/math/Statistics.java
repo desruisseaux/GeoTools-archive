@@ -37,7 +37,7 @@ import org.opengis.util.Cloneable;
  * and {@linkplain #standardDeviation standard deviation}. Statistics are computed on the fly;
  * the sample values are never stored in memory.
  *
- * An instance of <code>Statistics</code> is initially empty (i.e. all statistical values are set
+ * An instance of {@code Statistics} is initially empty (i.e. all statistical values are set
  * to {@link Double#NaN NaN}). The statistics are updated every time an {@link #add(double)}
  * method is invoked with a non-{@linkplain Double#NaN NaN} value. A typical usage of this
  * class is:
@@ -55,6 +55,8 @@ import org.opengis.util.Cloneable;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class Statistics implements Cloneable, Serializable {
     /**
@@ -126,8 +128,8 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Update statistics for the specified sample. This <code>add</code>
-     * method is usually invoked inside a <code>for</code> loop.
+     * Update statistics for the specified sample. This {@code add}
+     * method is usually invoked inside a {@code for} loop.
      *
      * @param sample The sample value. {@link Double#NaN NaN} values are ignored.
      *
@@ -151,8 +153,8 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Update statistics for the specified sample. This <code>add</code>
-     * method is usually invoked inside a <code>for</code> loop.
+     * Update statistics for the specified sample. This {@code add}
+     * method is usually invoked inside a {@code for} loop.
      *
      * @param sample The sample value.
      *
@@ -169,11 +171,11 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Update statistics with all samples from the specified <code>stats</code>. Invoking this
+     * Update statistics with all samples from the specified {@code stats}. Invoking this
      * method is equivalent (except for rounding errors)  to invoking {@link #add(double) add}
-     * for all samples that were added to <code>stats</code>.
+     * for all samples that were added to {@code stats}.
      *
-     * @param stats The statistics to be added to <code>this</code>, or <code>null</code> if none.
+     * @param stats The statistics to be added to {@code this}, or {@code null} if none.
      */
     public void add(final Statistics stats) {
         if (stats != null) {
@@ -188,7 +190,7 @@ public class Statistics implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the number of {@link Double#NaN NaN} samples.  <code>NaN</code> samples are
+     * Returns the number of {@link Double#NaN NaN} samples.  {@code NaN} samples are
      * ignored in all other statitical computation. This method count them for information
      * purpose only.
      */
@@ -249,7 +251,7 @@ public class Statistics implements Cloneable, Serializable {
 
     /**
      * Retourne l'écart type des échantillons par rapport à la moyenne. Si les données
-     * fournies aux différentes méthodes <code>add(...)</code> se distribuent selon une
+     * fournies aux différentes méthodes {@code add(...)} se distribuent selon une
      * loi normale, alors l'écart type est la distance de part et d'autre de la moyenne
      * dans lequel se trouveraient environ 84% des données. Le tableau ci-dessous donne
      * le pourcentage approximatif des données que l'on trouve de part et d'autre de la
@@ -263,12 +265,12 @@ public class Statistics implements Cloneable, Serializable {
      *   <tr><td>&nbsp;3.0&nbsp;</td><td>&nbsp;99.9%&nbsp;</td></tr>
      * </table>
      *
-     * @param allPopulation La valeur <code>true</code> indique que les données fournies
-     *        aux différentes méthodes <code>add(...)</code> représentent l'ensemble de
-     *        la polulation. La valeur <code>false</code> indique que ces données ne
+     * @param allPopulation La valeur {@code true} indique que les données fournies
+     *        aux différentes méthodes {@code add(...)} représentent l'ensemble de
+     *        la polulation. La valeur {@code false} indique que ces données ne
      *        représentent qu'un échantillon de la population, ce qui est généralement le
-     *        cas. Si le nombre de données est élevé, alors les valeurs <code>true</code>
-     *        et <code>false</code> donneront sensiblement les mêmes résultats.
+     *        cas. Si le nombre de données est élevé, alors les valeurs {@code true}
+     *        et {@code false} donneront sensiblement les mêmes résultats.
      */
     public double standardDeviation(final boolean allPopulation) {
         return Math.sqrt((sum2 - sum*sum/n) / (allPopulation ? n : n-1));
@@ -334,7 +336,7 @@ public class Statistics implements Cloneable, Serializable {
      *     Écart-type: 6.489
      * </pre></blockquote>
      *
-     * If <code>tabulations</code> is true, then labels (e.g. "Minimum") and values
+     * If {@code tabulations} is true, then labels (e.g. "Minimum") and values
      * (e.g. "6.853") are separated by tabulations. Otherwise, they are separated
      * by spaces.
      */
@@ -383,13 +385,13 @@ public class Statistics implements Cloneable, Serializable {
 
         /**
          * Last value given to an {@link #add(double) add} method as
-         * a <code>double</code>, or {@link Double#NaN NaN} if none.
+         * a {@code double}, or {@link Double#NaN NaN} if none.
          */
         private double last = Double.NaN;
 
         /**
          * Last value given to an {@link #add(long) add}
-         * method as a <code>long</code>, or 0 if none.
+         * method as a {@code long}, or 0 if none.
          */
         private long lastAsLong;
 
@@ -449,7 +451,7 @@ public class Statistics implements Cloneable, Serializable {
          * Update statistics for the specified sample. The {@link #getDeltaStatistics delta}
          * statistics are updated with <code>sample - sample<sub>last</sub></code> value,
          * where <code>sample<sub>last</sub></code> is the last value given to the previous
-         * call of an <code>add(...)</code> method.
+         * call of an {@code add(...)} method.
          */
         public void add(final double sample) {
             super.add(sample);
@@ -462,7 +464,7 @@ public class Statistics implements Cloneable, Serializable {
          * Update statistics for the specified sample. The {@link #getDeltaStatistics delta}
          * statistics are updated with <code>sample - sample<sub>last</sub></code> value,
          * where <code>sample<sub>last</sub></code> is the last value given to the previous
-         * call of an <code>add(...)</code> method.
+         * call of an {@code add(...)} method.
          */
         public void add(final long sample) {
             super.add(sample);
@@ -480,15 +482,15 @@ public class Statistics implements Cloneable, Serializable {
         }
 
         /**
-         * Update statistics with all samples from the specified <code>stats</code>. Invoking this
+         * Update statistics with all samples from the specified {@code stats}. Invoking this
          * method is equivalent (except for rounding errors)  to invoking {@link #add(double) add}
-         * for all samples that were added to <code>stats</code>.  The <code>stats</code> argument
-         * must be an instance of <code>Statistics.Delta</code>.
+         * for all samples that were added to {@code stats}.  The {@code stats} argument
+         * must be an instance of {@code Statistics.Delta}.
          *
-         * @param  stats The statistics to be added to <code>this</code>,
-         *         or <code>null</code> if none.
-         * @throws ClassCastException If <code>stats</code> is not an instance of
-         *         <code>Statistics.Delta</code>.
+         * @param  stats The statistics to be added to {@code this},
+         *         or {@code null} if none.
+         * @throws ClassCastException If {@code stats} is not an instance of
+         *         {@code Statistics.Delta}.
          */
         public void add(final Statistics stats) throws ClassCastException {
             if (stats != null) {

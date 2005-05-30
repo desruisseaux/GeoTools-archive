@@ -48,7 +48,7 @@ import org.opengis.referencing.operation.MathTransform;
 /**
  * A parser that performs string replacements before to delegate the work to an other parser.
  * String replacements are specified through calls to the {@link #addDefinition addDefinition}
- * method. In the example below, the <code>WGS84</code> string in the {@linkplain #parseObject
+ * method. In the example below, the {@code WGS84} string in the {@linkplain #parseObject
  * parseObject} call is expanded into the full <code>GEOGCS["WGS84", ...</code> string before
  * to be parsed.
  *
@@ -59,6 +59,8 @@ import org.opengis.referencing.operation.MathTransform;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class Preprocessor extends Format {
     /**
@@ -108,7 +110,7 @@ public class Preprocessor extends Format {
      * @param object     The object to format.
      * @param toAppendTo Where the text is to be appended.
      * @param position   Identification of a field in the formatted text.
-     * @return The string buffer passed in as <code>toAppendTo</code>,
+     * @return The string buffer passed in as {@code toAppendTo},
      *         with formatted text appended
      */
     public StringBuffer format(final Object        object,
@@ -125,7 +127,7 @@ public class Preprocessor extends Format {
      *
      * @param  wkt The text to parse.
      * @param  position The index of the first character to parse.
-     * @return The parsed object, or <code>null</code> in case of failure.
+     * @return The parsed object, or {@code null} in case of failure.
      */
     public Object parseObject(final String wkt, final ParsePosition position) {
         /*
@@ -171,10 +173,10 @@ public class Preprocessor extends Format {
      *   <LI>A name declared in some previous call to
      *       <code>{@linkplain #addDefinition addDefinition}(name, ...)</code>.</LI>
      *   <LI>A Well Know Text, which may contains itself shortcuts declared in
-     *       previous call to <code>addDefinition</code>. This text is given to
+     *       previous call to {@code addDefinition}. This text is given to
      *       the underlying {@link #parser}.</LI>
      *   <LI>Any services provided by subclasses. For example a subclass way recognize
-     *       some authority code like <code>EPSG:6326</code>.</LI>
+     *       some authority code like {@code EPSG:6326}.</LI>
      * </UL>
      *
      * @param  text The text, as a name, a WKT to parse, or an authority code.
@@ -327,7 +329,7 @@ public class Preprocessor extends Format {
     }
 
     /**
-     * Adds a predefined Well Know Text (WKT). The <code>value</code> argument given to this method
+     * Adds a predefined Well Know Text (WKT). The {@code value} argument given to this method
      * can contains itself other definitions specified in some previous calls to this method.
      *
      * @param  name The name for the definition to be added.
@@ -408,7 +410,7 @@ public class Preprocessor extends Format {
     }
 
     /**
-     * Returns <code>true</code> if the specified text is a valid identifier.
+     * Returns {@code true} if the specified text is a valid identifier.
      */
     private static boolean isIdentifier(final String text) {
         for (int i=text.length(); --i>=0;) {
@@ -429,7 +431,7 @@ public class Preprocessor extends Format {
         /**
          * The definition as a string. This string should not contains anymore
          * shortcut to substitute by an other WKT (i.e. compound definitions
-         * must be resolved before to construct a <code>Definition</code> object).
+         * must be resolved before to construct a {@code Definition} object).
          */
         public final String asString;
 

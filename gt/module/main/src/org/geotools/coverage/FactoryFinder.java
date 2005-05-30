@@ -37,6 +37,8 @@ import org.geotools.resources.LazySet;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class FactoryFinder {
     /**

@@ -41,6 +41,8 @@ import org.geotools.util.WeakValueHashMap;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class LookupTableFactory {
     /**
@@ -85,7 +87,7 @@ final class LookupTableFactory {
      * @param  sourceType The source data type. Should be one of {@link DataBuffer} constants.
      * @param  targetType The target data type. Should be one of {@link DataBuffer} constants.
      * @param  transforms The math transforms to apply.
-     * @return The lookup table, or <code>null</code> if this method can't build a lookup
+     * @return The lookup table, or {@code null} if this method can't build a lookup
      *         table for the supplied parameters.
      * @throws TransformException if a transformation failed.
      */
@@ -239,7 +241,7 @@ final class LookupTableFactory {
 
     /**
      * Returns a hash code value for this key. This is for internal use by
-     * <code>LookupTableFactory</code> and is public only as an implementation side effect.
+     * {@code LookupTableFactory} and is public only as an implementation side effect.
      */
     public int hashCode() {
         int code = sourceType + 37*targetType;
@@ -251,7 +253,7 @@ final class LookupTableFactory {
 
     /**
      * Compare the specified object with this key for equality. This is for internal use by
-     * <code>LookupTableFactory</code> and is public only as an implementation side effect.
+     * {@code LookupTableFactory} and is public only as an implementation side effect.
      */
     public boolean equals(final Object other) {
         if (other instanceof LookupTableFactory) {

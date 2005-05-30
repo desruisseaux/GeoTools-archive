@@ -50,6 +50,8 @@ import org.geotools.resources.geometry.XRectangle2D;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**

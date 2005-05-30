@@ -64,6 +64,8 @@ import org.geotools.util.WeakValueHashMap;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
     /**
@@ -317,7 +319,7 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
      * @param source The source grid coverage.
      * @param result The resulting grid coverage.
      * @param operationName the operation name.
-     * @param fromCache <code>true</code> if the result has been fetch from the cache.
+     * @param fromCache {@code true} if the result has been fetch from the cache.
      */
     private static void log(final GridCoverage2D source,
                             final GridCoverage2D result,
@@ -386,14 +388,14 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
      * </pre></blockquote>
      *
      * <strong>Note for Windows users:</strong> If the output contains strange
-     * symbols, try to supply an "<code>-encoding</code>" argument. Example:
+     * symbols, try to supply an "{@code -encoding}" argument. Example:
      *
      * <blockquote><pre>
      * java org.geotools.coverage.processing.GridCoverageProcessor2D -encoding Cp850
      * </pre></blockquote>
      *
      * The codepage number (850 in the previous example) can be obtained from the DOS
-     * commande line by entering the "<code>chcp</code>" command with no arguments.
+     * commande line by entering the "{@code chcp}" command with no arguments.
      */
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);

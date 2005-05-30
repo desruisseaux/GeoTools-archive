@@ -36,6 +36,8 @@ import javax.media.jai.CRIFImpl;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class CombineCRIF extends CRIFImpl {
     /**

@@ -37,6 +37,8 @@ import org.geotools.referencing.operation.GeneralMatrix;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
                                        implements MathTransform2D
@@ -79,8 +81,8 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
     }
     
     /**
-     * Transforms the specified <code>ptSrc</code>
-     * and stores the result in <code>ptDst</code>.
+     * Transforms the specified {@code ptSrc}
+     * and stores the result in {@code ptDst}.
      */
     public Point2D transform(final Point2D ptSrc, Point2D ptDst) throws TransformException {
         assert isValid();
@@ -100,7 +102,7 @@ final class ConcatenatedTransformDirect2D extends ConcatenatedTransformDirect
      * Gets the derivative of this transform at a point.
      *
      * @param  point The coordinate point where to evaluate the derivative.
-     * @return The derivative at the specified point (never <code>null</code>).
+     * @return The derivative at the specified point (never {@code null}).
      * @throws TransformException if the derivative can't be evaluated at the specified point.
      */
     public Matrix derivative(final Point2D point) throws TransformException {

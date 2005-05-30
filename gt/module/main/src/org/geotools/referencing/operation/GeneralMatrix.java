@@ -43,6 +43,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see javax.vecmath.GMatrix
  * @see java.awt.geom.AffineTransform
  * @see javax.media.jai.PerspectiveTransform
@@ -58,7 +60,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     
     /**
      * Constructs a square identity matrix of size
-     * <code>size</code>&nbsp;&times;&nbsp;<code>size</code>.
+     * {@code size}&nbsp;&times;&nbsp;{@code size}.
      */
     public GeneralMatrix(final int size) {
         super(size,size);
@@ -66,7 +68,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     
     /**
      * Constructs a matrix of size
-     * <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code>.
+     * {@code numRow}&nbsp;&times;&nbsp;{@code numCol}.
      * Elements on the diagonal <var>j==i</var> are set to 1.
      */
     public GeneralMatrix(final int numRow, final int numCol) {
@@ -74,11 +76,11 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     }
     
     /**
-     * Constructs a <code>numRow</code>&nbsp;&times;&nbsp;<code>numCol</code> matrix
-     * initialized to the values in the <code>matrix</code> array. The array values
+     * Constructs a {@code numRow}&nbsp;&times;&nbsp;{@code numCol} matrix
+     * initialized to the values in the {@code matrix} array. The array values
      * are copied in one row at a time in row major fashion. The array should be
      * exactly <code>numRow*numCol</code> in length. Note that because row and column
-     * numbering begins with zero, <code>row</code> and <code>numCol</code> will be
+     * numbering begins with zero, {@code row} and {@code numCol} will be
      * one larger than the maximum possible matrix index values.
      */
     public GeneralMatrix(final int numRow, final int numCol, final double[] matrix) {
@@ -193,8 +195,8 @@ public class GeneralMatrix extends GMatrix implements Matrix {
      *
      * @param  srcAxis The set of axis direction for source coordinate system.
      * @param  dstAxis The set of axis direction for destination coordinate system.
-     * @throws IllegalArgumentException If <code>dstAxis</code> contains some axis
-     *         not found in <code>srcAxis</code>, or if some colinear axis were found.
+     * @throws IllegalArgumentException If {@code dstAxis} contains some axis
+     *         not found in {@code srcAxis}, or if some colinear axis were found.
      */
     public GeneralMatrix(final AxisDirection[] srcAxis,
                          final AxisDirection[] dstAxis)
@@ -225,8 +227,8 @@ public class GeneralMatrix extends GMatrix implements Matrix {
      * @param dstAxis   Axis direction for each dimension of the destination region.
      * @throws MismatchedDimensionException if the envelope dimension doesn't
      *         matches the axis direction array length.
-     * @throws IllegalArgumentException If <code>dstAxis</code> contains some axis
-     *         not found in <code>srcAxis</code>, or if some colinear axis were found.
+     * @throws IllegalArgumentException If {@code dstAxis} contains some axis
+     *         not found in {@code srcAxis}, or if some colinear axis were found.
      */
     public GeneralMatrix(final Envelope srcRegion, final AxisDirection[] srcAxis,
                          final Envelope dstRegion, final AxisDirection[] dstAxis)
@@ -237,8 +239,8 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     /**
      * Implementation of constructors expecting envelope and/or axis directions.
      *
-     * @param validRegions   <code>true</code> if source and destination regions must
-     *        be taken in account. If <code>false</code>, then source and destination
+     * @param validRegions   {@code true} if source and destination regions must
+     *        be taken in account. If {@code false}, then source and destination
      *        regions will be ignored and may be null.
      */
     private GeneralMatrix(final Envelope srcRegion, final AxisDirection[] srcAxis,
@@ -254,8 +256,8 @@ public class GeneralMatrix extends GMatrix implements Matrix {
          * Map source axis to destination axis.  If no axis is moved (for example if the user
          * want to transform (NORTH,EAST) to (SOUTH,EAST)), then source and destination index
          * will be equal.   If some axis are moved (for example if the user want to transform
-         * (NORTH,EAST) to (EAST,NORTH)),  then ordinates at index <code>srcIndex</code> will
-         * have to be moved at index <code>dstIndex</code>.
+         * (NORTH,EAST) to (EAST,NORTH)),  then ordinates at index {@code srcIndex} will
+         * have to be moved at index {@code dstIndex}.
          */
         setZero();
         for (int dstIndex=0; dstIndex<dstAxis.length; dstIndex++) {
@@ -363,7 +365,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     }
     
     /**
-     * Returns <code>true</code> if this matrix is an affine transform.
+     * Returns {@code true} if this matrix is an affine transform.
      * A transform is affine if the matrix is square and last row contains
      * only zeros, except in the last column which contains 1.
      */
@@ -382,7 +384,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
     }
     
     /**
-     * Returns <code>true</code> if this matrix is an identity matrix.
+     * Returns {@code true} if this matrix is an identity matrix.
      */
     public final boolean isIdentity() {
         final int numRow = getNumRow();

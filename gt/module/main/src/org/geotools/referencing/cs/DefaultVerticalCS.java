@@ -40,7 +40,7 @@ import org.geotools.measure.Measure;
  * coordinate system is usually dependent on the Earth's gravity field, perhaps loosely as when
  * atmospheric pressure is the basis for the vertical coordinate system axis. An exact definition
  * is deliberately not provided as the complexities of the subject fall outside the scope of this
- * specification. A <code>VerticalCS</code> shall have one {@linkplain #getAxis axis}.
+ * specification. A {@code VerticalCS} shall have one {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -51,6 +51,8 @@ import org.geotools.measure.Measure;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
     /**
@@ -110,7 +112,7 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts only vertical directions (i.e.
      * {@link AxisDirection#UP UP} and {@link AxisDirection#DOWN DOWN}).
      */
@@ -123,7 +125,7 @@ public class DefaultVerticalCS extends AbstractCS implements VerticalCS {
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @return The distance between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
     public Measure distance(final double[] coord1, final double[] coord2)

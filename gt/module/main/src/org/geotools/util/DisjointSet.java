@@ -30,10 +30,10 @@ import java.util.Set;
 
 
 /**
- * A set which is disjoint from others <code>DisjointSet</code>s. Two sets are
+ * A set which is disjoint from others {@code DisjointSet}s. Two sets are
  * disjoint (or <em>mutually exclusive</em) if their intersection is the empty
- * set. Adding an element to a <code>DisjointSet</code> remove it from any other
- * mutually exclusive <code>DisjointSet</code>. Optionnaly, <code>DisjointSet</code>s
+ * set. Adding an element to a {@code DisjointSet} remove it from any other
+ * mutually exclusive {@code DisjointSet}. Optionnaly, {@code DisjointSet}s
  * may also have a trash set receiving removed elements. The example below
  * creates 3 mutually exclusive sets with a trash:
  *
@@ -47,10 +47,12 @@ import java.util.Set;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class DisjointSet extends AbstractSet {
     /**
-     * The underlying map. <code>add</code> and <code>remove</code> operations
+     * The underlying map. {@code add} and {@code remove} operations
      * on this set are translated into {@link Map} operations as below:
      * <br><br>
      * <strong>Adding a new element to this {@link Set}:</strong>
@@ -58,10 +60,10 @@ public class DisjointSet extends AbstractSet {
      *   <li>Puts the corresponding key-value pair in the underlying {@link Map}, where:
      *     <ul>
      *       <li>the key is the element to add;</li>
-     *       <li>the value is this <code>DisjointSet</code>.</li>
+     *       <li>the value is this {@code DisjointSet}.</li>
      *     </ul>
      *     If an other value was mapped to the key, the old value is discarted.
-     *     This is equivalents to removing the element from an other <code>DisjointSet</code>
+     *     This is equivalents to removing the element from an other {@code DisjointSet}
      *     prior to add it to this set (in other words, moving the element).</li>
      * </ul>
      * <br>
@@ -69,13 +71,13 @@ public class DisjointSet extends AbstractSet {
      * <ul>
      *   <li>If the element is not an existing key in the underlying map, nothing is done.</li>
      *   <li>Otherwise, if the element is a key mapping a different value than this
-     *       <code>DisjointSet</code>, then the element is assumed to belongs to an
-     *       other <code>DisjointSet</code> and nothing is done.</li>
-     *   <li>Otherwise, puts the key-value pair with the <code>trash</code> value
+     *       {@code DisjointSet}, then the element is assumed to belongs to an
+     *       other {@code DisjointSet} and nothing is done.</li>
+     *   <li>Otherwise, puts the key-value pair with the {@code trash} value
      *       in the underlying {@link Map}. This is equivalent to moving the
      *       element from this set to the "trash" set. Note that if the operation
      *       is applied on the "trash" set itself or if this set doesn't have a
-     *       trash (<code>trash==null</code>), then the element is effectively
+     *       trash ({@code trash==null}), then the element is effectively
      *       removed from the underlying map.</li>
      * </ul>
      */
@@ -83,20 +85,20 @@ public class DisjointSet extends AbstractSet {
 
     /**
      * The set where to move removed elements,
-     * or <code>null</code> if there is none.
+     * or {@code null} if there is none.
      */
     private final DisjointSet trash;
 
     /**
      * Construct a initially empty set. There is initially no other set mutually
      * exclusive with this one. Mutually exclusive sets must be created using the
-     * <code>DisjointSet(DisjointSet)</code> constructor with this newly created
+     * {@code DisjointSet(DisjointSet)} constructor with this newly created
      * set as argument.
      * <br><br>
-     * <code>DisjointSet</code>s constructed using this constructor has no trash.
+     * {@code DisjointSet}s constructed using this constructor has no trash.
      * All remove operations on this set really remove all references to the
      * removed element, like a usual {@link Set}. This is opposed to moving the
-     * element to a "trash" set, which is allowed by the <code>DisjointSet(true)</code>
+     * element to a "trash" set, which is allowed by the {@code DisjointSet(true)}
      * constructor.
      */
     public DisjointSet() {
@@ -106,12 +108,12 @@ public class DisjointSet extends AbstractSet {
     /**
      * Construct a initially empty set with an optional trash set. There is initially
      * no other set mutually exclusive with this one. Mutually exclusive sets must be
-     * created using the <code>DisjointSet(DisjointSet)</code> constructor with this
+     * created using the {@code DisjointSet(DisjointSet)} constructor with this
      * newly created set as argument.
      *
-     * @param hasTrash If <code>true</code>, all {@linkplain #remove remove} operations
+     * @param hasTrash If {@code true}, all {@linkplain #remove remove} operations
      *        will add removed elements to a trash set (thus, really just moving the
-     *        element to the trash). If <code>false</code>, there is no trash and this
+     *        element to the trash). If {@code false}, there is no trash and this
      *        constructor behave like the no-argument constructor.
      * @see #getTrash
      */
@@ -122,10 +124,10 @@ public class DisjointSet extends AbstractSet {
 
     /**
      * Construct a new set mutually exclusive with the specified set. All sets mutually
-     * exclusive with <code>disjointSet</code> will also be mutually exclusive with the
-     * newly created set. If <code>disjointSet</code> has a trash set, the newly created
-     * set will use the same trash (i.e. all <code>remove</code> operations will really
-     * move the element to the trash set). Otherwise, the new <code>DisjointSet</code>
+     * exclusive with {@code disjointSet} will also be mutually exclusive with the
+     * newly created set. If {@code disjointSet} has a trash set, the newly created
+     * set will use the same trash (i.e. all {@code remove} operations will really
+     * move the element to the trash set). Otherwise, the new {@code DisjointSet}
      * have no trash.
      *
      * @param disjointSet The set to be disjoint from.
@@ -144,7 +146,7 @@ public class DisjointSet extends AbstractSet {
     }
 
     /**
-     * Returns the trash set, or <code>null</code> if there is none.
+     * Returns the trash set, or {@code null} if there is none.
      * The trash set receive all elements removed from this set.
      */
     public Set getTrash() {
@@ -168,10 +170,10 @@ public class DisjointSet extends AbstractSet {
     }
 
     /**
-     * Returns <code>true</code> if this set contains the specified element.
+     * Returns {@code true} if this set contains the specified element.
      *
      * @param  element Object to be checked for containment in this set.
-     * @return <code>true</code> if this set contains the specified element.
+     * @return {@code true} if this set contains the specified element.
      */
     public boolean contains(final Object element) {
         synchronized (map) {
@@ -185,7 +187,7 @@ public class DisjointSet extends AbstractSet {
      * exclusive set.
      *
      * @param  element Element whose presence in this set is to be ensured.
-     * @return <code>true</code> if the set changed as a result of the call.
+     * @return {@code true} if the set changed as a result of the call.
      */
     public boolean add(final Object element) {
         synchronized (map) {
@@ -195,11 +197,11 @@ public class DisjointSet extends AbstractSet {
 
     /**
      * Removes a single instance of the specified element from this set,
-     * if it is present. If this <code>DisjointSet</code> has a trash set,
+     * if it is present. If this {@code DisjointSet} has a trash set,
      * the removed element will be added to the trash set.
      *
      * @param  element Element to be removed from this set.
-     * @return <code>true</code> if the set changed as a result of the call.
+     * @return {@code true} if the set changed as a result of the call.
      */
     public boolean remove(final Object element) {
         synchronized (map) {
@@ -216,11 +218,11 @@ public class DisjointSet extends AbstractSet {
     }
 
     /**
-     * Returns <code>true</code> if this set contains
+     * Returns {@code true} if this set contains
      * all of the elements in the specified collection.
      *
      * @param c collection to be checked for containment in this collection.
-     * @return <code>true</code> if this set contains all of the elements in
+     * @return {@code true} if this set contains all of the elements in
      *         the specified collection.
      */
     public boolean containsAll(final Collection c) {
@@ -234,7 +236,7 @@ public class DisjointSet extends AbstractSet {
      * All of the elements will be removed from mutually exclusive sets.
      *
      * @param c collection whose elements are to be added to this set.
-     * @return <code>true</code> if this set changed as a result of the call.
+     * @return {@code true} if this set changed as a result of the call.
      */
     public boolean addAll(final Collection c) {
         synchronized (map) {
@@ -244,11 +246,11 @@ public class DisjointSet extends AbstractSet {
 
     /**
      * Removes from this set all of its elements that are contained in
-     * the specified collection.  If this <code>DisjointSet</code> has
+     * the specified collection.  If this {@code DisjointSet} has
      * a trash set, all removed elements will be added to the trash set.
      *
      * @param  c elements to be removed from this set.
-     * @return <code>true</code> if this set changed as a result of the call.
+     * @return {@code true} if this set changed as a result of the call.
      */
     public boolean removeAll(final Collection c) {
         synchronized (map) {
@@ -258,11 +260,11 @@ public class DisjointSet extends AbstractSet {
 
     /**
      * Retains only the elements in this set that are contained in the specified
-     * collection. If this <code>DisjointSet</code> has a trash set, all removed
+     * collection. If this {@code DisjointSet} has a trash set, all removed
      * elements will be added to the trash set.
      *
      * @param  c elements to be retained in this collection.
-     * @return <code>true</code> if this collection changed as a result of the call.
+     * @return {@code true} if this collection changed as a result of the call.
      */
     public boolean retainAll(final Collection c) {
         synchronized (map) {
@@ -271,7 +273,7 @@ public class DisjointSet extends AbstractSet {
     }
 
     /**
-     * Removes all of the elements from this set. If this <code>DisjointSet</code>
+     * Removes all of the elements from this set. If this {@code DisjointSet}
      * has a trash set, all removed elements will be added to the trash set.
      */
     public void clear() {
@@ -355,13 +357,13 @@ public class DisjointSet extends AbstractSet {
 
         /**
          * Entry for the next element to return, or
-         * <code>null</code> if there is no more element.
+         * {@code null} if there is no more element.
          */
         private Map.Entry prefetch;
 
         /**
          * Entry to remove if the {@link #remove} operation is invoked,
-         * or <code>null</code> if this iterator is not in a legal state
+         * or {@code null} if this iterator is not in a legal state
          * for element removing. An element can be removed only after a
          * {@link #next} call and only if this call still synchronized
          * with the {@link Iterator#next} call on the underlying map's
@@ -378,8 +380,8 @@ public class DisjointSet extends AbstractSet {
 
         /**
          * Returns the {@link #prefetch} entry.  If this entry was
-         * <code>null</code>, fetch the next entry. If there is no
-         * more entries, returns <code>null</code>.
+         * {@code null}, fetch the next entry. If there is no
+         * more entries, returns {@code null}.
          */
         private Map.Entry prefetch() {
             toRemove = null;
@@ -396,7 +398,7 @@ public class DisjointSet extends AbstractSet {
         }
 
         /**
-         * Returns <code>true</code> if the iteration has more elements.
+         * Returns {@code true} if the iteration has more elements.
          */
         public boolean hasNext() {
             return prefetch()!=null;

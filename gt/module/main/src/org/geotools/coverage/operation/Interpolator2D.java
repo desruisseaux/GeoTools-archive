@@ -63,6 +63,8 @@ import org.geotools.resources.image.ImageUtilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class Interpolator2D extends GridCoverage2D {
     /**

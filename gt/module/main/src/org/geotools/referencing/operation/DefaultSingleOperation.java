@@ -39,6 +39,8 @@ import org.opengis.referencing.operation.SingleOperation;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @todo This class will be removed in a future version. Caution: need to revisit
  *  AbstractCoordinateOperationFactory.concatenate(CoordinateOperation,CoordinateOperation)
  *  (see comment).

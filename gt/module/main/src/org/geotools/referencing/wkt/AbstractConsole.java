@@ -42,6 +42,8 @@ import org.opengis.referencing.operation.MathTransform;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class AbstractConsole implements Runnable {
     /**
@@ -75,12 +77,12 @@ public abstract class AbstractConsole implements Runnable {
     private String prompt = "crs>";
 
     /**
-     * The last line read, or <code>null</code> if none.
+     * The last line read, or {@code null} if none.
      */
     private transient String line;
 
     /**
-     * Set to <code>true</code> if {@link #stop()} was invoked.
+     * Set to {@code true} if {@link #stop()} was invoked.
      */
     private transient volatile boolean stop;
     
@@ -156,7 +158,7 @@ public abstract class AbstractConsole implements Runnable {
     }
 
     /**
-     * Adds a predefined Well Know Text (WKT). The <code>value</code> argument given to this method
+     * Adds a predefined Well Know Text (WKT). The {@code value} argument given to this method
      * can contains itself other definitions specified in some previous calls to this method. This
      * method do nothing if the {@linkplain #parser} is not an instance of {@link Preprocessor}.
      *
@@ -173,8 +175,8 @@ public abstract class AbstractConsole implements Runnable {
 
     /**
      * Load all definitions from the specified stream. Definitions are key-value pairs
-     * in the form <code>name = wkt</code> (without the <code>SET</code> keyword). The
-     * result is the same than invoking the <code>SET</code> instruction for each line
+     * in the form {@code name = wkt} (without the {@code SET} keyword). The
+     * result is the same than invoking the {@code SET} instruction for each line
      * in the specified stream. This method is used for loading predefined objects like
      * the database used by {@link org.geotools.referencing.factory.PropertyAuthorityFactory}.
      *
@@ -209,14 +211,14 @@ public abstract class AbstractConsole implements Runnable {
     }
 
     /**
-     * Returns the command-line prompt, or <code>null</code> if there is none.
+     * Returns the command-line prompt, or {@code null} if there is none.
      */
     public String getPrompt() {
         return prompt;
     }
 
     /**
-     * Set the command-line prompt, or <code>null</code> for none.
+     * Set the command-line prompt, or {@code null} for none.
      */
     public void setPrompt(final String prompt) {
         this.prompt = prompt;
@@ -225,10 +227,10 @@ public abstract class AbstractConsole implements Runnable {
     /**
      * Read the next line from the specified input stream. Empty lines
      * and comment lines are skipped. If there is no more line to read,
-     * then this method returns <code>null</code>.
+     * then this method returns {@code null}.
      *
      * @param  in The input stream to read from.
-     * @return The next non-empty and non-commented line, or <code>null</code> if none.
+     * @return The next non-empty and non-commented line, or {@code null} if none.
      * @throws IOException if the reading failed.
      */
     private static String readLine(final LineNumberReader in) throws IOException {
@@ -250,7 +252,7 @@ public abstract class AbstractConsole implements Runnable {
 
     /**
      * Process instructions from the {@linkplain #in input stream} specified at construction
-     * time. All lines are read until the end of stream (<code>[Ctrl-Z]</code> for input from
+     * time. All lines are read until the end of stream ({@code [Ctrl-Z]} for input from
      * the keyboard), or until {@link #stop()} is invoked. Non-empty and non-comment lines are
      * given to the {@link #execute} method. Errors are catched and printed to the
      * {@linkplain #err error stream}.

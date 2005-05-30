@@ -47,6 +47,8 @@ import org.opengis.referencing.operation.ConicProjection;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see DefaultTransformation
  */
 public class DefaultConversion extends DefaultOperation implements Conversion {

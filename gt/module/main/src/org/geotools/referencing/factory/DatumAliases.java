@@ -96,6 +96,8 @@ import org.geotools.resources.XArray;
  * @author Rueben Schulz
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @todo Invokes {@link #freeUnused} automatically after some amount of time, in order to release
  *       memory for unusued aliases. A timer should be set in {@code reload()} method.
  */

@@ -38,7 +38,7 @@ import org.geotools.measure.Measure;
  * A one-dimensional coordinate system that consists of the points that lie on the single axis
  * described. The associated ordinate is the distance from the specified origin to the point
  * along the axis. Example: usage of the line feature representing a road to describe points
- * on or along that road. A <code>LinearCS</code> shall have one
+ * on or along that road. A {@code LinearCS} shall have one
  * {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
@@ -49,6 +49,8 @@ import org.geotools.measure.Measure;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultLinearCS extends AbstractCS implements LinearCS {
     /**
@@ -83,7 +85,7 @@ public class DefaultLinearCS extends AbstractCS implements LinearCS {
      *
      * @param  coord1 Coordinates of the first point.
      * @param  coord2 Coordinates of the second point.
-     * @return The distance between <code>coord1</code> and <code>coord2</code>.
+     * @return The distance between {@code coord1} and {@code coord2}.
      * @throws MismatchedDimensionException if a coordinate doesn't have the expected dimension.
      */
     public Measure distance(final double[] coord1, final double[] coord2)

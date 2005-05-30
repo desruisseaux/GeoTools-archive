@@ -72,6 +72,8 @@ import org.geotools.util.NameFactory;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class AbstractIdentifiedObject extends Formattable implements IdentifiedObject, Serializable {
     /**
@@ -162,7 +164,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     private static final Identifier[] NO_IDENTIFIER = new Identifier[0];
 
     /**
-     * The name for this object or code. Should never be <code>null</code>.
+     * The name for this object or code. Should never be {@code null}.
      */
     private final Identifier name;
 
@@ -178,7 +180,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     private final Identifier[] identifiers;
 
     /**
-     * Comments on or information about this object, or <code>null</code> if none.
+     * Comments on or information about this object, or {@code null} if none.
      */
     private final InternationalString remarks;
 
@@ -256,15 +258,15 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
 
     /**
      * Constructs an object from a set of properties and copy unrecognized properties in the
-     * specified map. The <code>properties</code> argument is treated as in the {@linkplain
+     * specified map. The {@code properties} argument is treated as in the {@linkplain
      * AbstractIdentifiedObject#AbstractIdentifiedObject(Map) one argument constructor}. All
-     * properties unknow to this <code>AbstractIdentifiedObject</code> constructor are copied
-     * in the <code>subProperties</code> map, after their key has been normalized (usually
+     * properties unknow to this {@code AbstractIdentifiedObject} constructor are copied
+     * in the {@code subProperties} map, after their key has been normalized (usually
      * lower case, leading and trailing space removed).
      *
-     * <P>If <code>localizables</code> is non-null, then all keys listed in this argument are
+     * <P>If {@code localizables} is non-null, then all keys listed in this argument are
      * treated as localizable one (i.e. may have a suffix like "_fr", "_de", etc.). Localizable
-     * properties are stored in the <code>subProperties</code> map as {@link InternationalString}
+     * properties are stored in the {@code subProperties} map as {@link InternationalString}
      * objects.</P>
      *
      * @param properties    Set of properties. Should contains at least <code>"name"</code>.
@@ -544,7 +546,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Returns <code>true</code> if either the {@linkplain #getName primary name} or at least
+     * Returns {@code true} if either the {@linkplain #getName primary name} or at least
      * one {@linkplain #getAlias alias} matches the specified string. This method performs the
      * search in the following order:
      * <ul>
@@ -554,23 +556,23 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * </ul>
      *
      * @param  name The name to compare.
-     * @return <code>true</code> if the primary name of at least one alias
-     *         matches the specified <code>name</code>.
+     * @return {@code true} if the primary name of at least one alias
+     *         matches the specified {@code name}.
      */
     public boolean nameMatches(final String name) {
         return nameMatches(this, alias, name);
     }
 
     /**
-     * Returns <code>true</code> if either the {@linkplain #getName primary name} or at least
+     * Returns {@code true} if either the {@linkplain #getName primary name} or at least
      * one {@linkplain #getAlias alias} matches the specified string. This method performs the
      * same check than the {@linkplain #nameMatches(String) non-static method} on arbitrary
      * object implementing the OpenGIS interface.
      *
      * @param  object The object to check.
      * @param  name The name.
-     * @return <code>true</code> if the primary name of at least one alias
-     *         matches the specified <code>name</code>.
+     * @return {@code true} if the primary name of at least one alias
+     *         matches the specified {@code name}.
      */
     public static boolean nameMatches(final IdentifiedObject object,
                                       final String name)
@@ -583,15 +585,15 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Implementation of <code>nameMatches</code> method.
+     * Implementation of {@code nameMatches} method.
      *
      * @param  object The object to check.
-     * @param  alias  The list of alias in <code>object</code> (may be <code>null</code>).
+     * @param  alias  The list of alias in {@code object} (may be {@code null}).
      *                This method will never modify this list. Concequently, it may be a
      *                direct reference to an internal array.
      * @param  name The name.
-     * @return <code>true</code> if the primary name of at least one alias
-     *         matches the specified <code>name</code>.
+     * @return {@code true} if the primary name of at least one alias
+     *         matches the specified {@code name}.
      */
     private static boolean nameMatches(final IdentifiedObject object,
                                        final GenericName[] alias, String name)
@@ -617,8 +619,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     /**
      * Compares the specified object with this object for equality.
      *
-     * @param  object The other object (may be <code>null</code>).
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The other object (may be {@code null}).
+     * @return {@code true} if both objects are equal.
      */
     public final boolean equals(final Object object) {
         return (object instanceof AbstractIdentifiedObject) &&
@@ -628,14 +630,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     /**
      * Compare this object with the specified object for equality.
      *
-     * If <code>compareMetadata</code> is <code>true</code>, then all available properties
+     * If {@code compareMetadata} is {@code true}, then all available properties
      * are compared including {@linkplain #getName name}, {@linkplain #getRemarks remarks},
      * {@linkplain #getIdentifiers identifiers code}, etc.
      *
-     * If <code>compareMetadata</code> is <code>false</code>, then this method compare
+     * If {@code compareMetadata} is {@code false}, then this method compare
      * only the properties needed for computing transformations. In other words,
-     * <code>sourceCS.equals(targetCS, false)</code> returns <code>true</code> only if
-     * the transformation from <code>sourceCS</code> to <code>targetCS</code> is
+     * {@code sourceCS.equals(targetCS, false)} returns {@code true} only if
+     * the transformation from {@code sourceCS} to {@code targetCS} is
      * the identity transform, no matter what {@link #getName} saids.
      * <P>
      * Some subclasses (especially {@link org.geotools.referencing.datum.AbstractDatum}
@@ -646,10 +648,10 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * except the name. The name comparaison may be loose however, i.e. we may
      * accept a name matching an alias.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object!=null && object.getClass().equals(getClass())) {
@@ -665,16 +667,16 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare two Geotools's <code>AbstractIdentifiedObject</code> objects for equality. This
+     * Compare two Geotools's {@code AbstractIdentifiedObject} objects for equality. This
      * method is equivalent to {@code object1.<b>equals</b>(object2, <var>compareMetadata</var>)}
      * except that one or both arguments may be null. This convenience method is provided for
-     * implementation of <code>equals</code> in subclasses.
+     * implementation of {@code equals} in subclasses.
      *
-     * @param  object1 The first object to compare (may be <code>null</code>).
-     * @param  object2 The second object to compare (may be <code>null</code>).
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object1 The first object to compare (may be {@code null}).
+     * @param  object2 The second object to compare (may be {@code null}).
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     static boolean equals(final AbstractIdentifiedObject object1,
                           final AbstractIdentifiedObject object2,
@@ -684,14 +686,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare two OpenGIS's <code>IdentifiedObject</code> objects for equality. This convenience
-     * method is provided for implementation of <code>equals</code> in subclasses.
+     * Compare two OpenGIS's {@code IdentifiedObject} objects for equality. This convenience
+     * method is provided for implementation of {@code equals} in subclasses.
      *
-     * @param  object1 The first object to compare (may be <code>null</code>).
-     * @param  object2 The second object to compare (may be <code>null</code>).
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object1 The first object to compare (may be {@code null}).
+     * @param  object2 The second object to compare (may be {@code null}).
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     protected static boolean equals(final IdentifiedObject object1,
                                     final IdentifiedObject object2,
@@ -703,14 +705,14 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare two array of OpenGIS's <code>IdentifiedObject</code> objects for equality. This
-     * convenience method is provided for implementation of <code>equals</code> in subclasses.
+     * Compare two array of OpenGIS's {@code IdentifiedObject} objects for equality. This
+     * convenience method is provided for implementation of {@code equals} in subclasses.
      *
-     * @param  array1 The first array to compare (may be <code>null</code>).
-     * @param  array2 The second array to compare (may be <code>null</code>).
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both arrays are equal.
+     * @param  array1 The first array to compare (may be {@code null}).
+     * @param  array2 The second array to compare (may be {@code null}).
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both arrays are equal.
      */
     protected static boolean equals(final IdentifiedObject[] array1,
                                     final IdentifiedObject[] array2,
@@ -749,7 +751,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @param  name   Argument name.
      * @param  object User argument.
-     * @throws InvalidParameterValueException if <code>object</code> is null.
+     * @throws InvalidParameterValueException if {@code object} is null.
      */
     protected static void ensureNonNull(final String name, final Object object)
             throws IllegalArgumentException
@@ -767,7 +769,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * @param  name  Argument name.
      * @param  array User argument.
      * @param  index Index of the element to check.
-     * @throws InvalidParameterValueException if <code>array[i]</code> is null.
+     * @throws InvalidParameterValueException if {@code array[i]} is null.
      */
     protected static void ensureNonNull(final String name, final Object[] array, final int index)
             throws IllegalArgumentException
@@ -783,7 +785,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * This is a convenience method for subclass constructors.
      *
      * @param  unit Unit to check.
-     * @throws IllegalArgumentException if <code>unit</code> is not a temporal unit.
+     * @throws IllegalArgumentException if {@code unit} is not a temporal unit.
      */
     protected static void ensureTimeUnit(final Unit unit) throws IllegalArgumentException {
         if (!SI.SECOND.isCompatible(unit)) {
@@ -797,7 +799,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * This is a convenience method for subclass constructors.
      *
      * @param  unit Unit to check.
-     * @throws IllegalArgumentException if <code>unit</code> is not a linear unit.
+     * @throws IllegalArgumentException if {@code unit} is not a linear unit.
      */
     protected static void ensureLinearUnit(final Unit unit) throws IllegalArgumentException {
         if (!SI.METER.isCompatible(unit)) {
@@ -811,7 +813,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * This is a convenience method for subclass constructors.
      *
      * @param  unit Unit to check.
-     * @throws IllegalArgumentException if <code>unit</code> is not an angular unit.
+     * @throws IllegalArgumentException if {@code unit} is not an angular unit.
      */
     protected static void ensureAngularUnit(final Unit unit) throws IllegalArgumentException {
         if (!SI.RADIAN.isCompatible(unit) && !Unit.ONE.equals(unit)) {

@@ -78,6 +78,8 @@ import org.geotools.resources.CRSUtilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class SpatioTemporalCoverage3D extends AbstractCoverage {
     /**
@@ -215,7 +217,7 @@ control:    for (int p=0; p<=1; p++) {
      * @param  index Index for sample dimension to retrieve. Indices are numbered 0 to
      *         (<var>{@linkplain #getNumSampleDimensions n}</var>-1).
      * @return Sample dimension information for the coverage.
-     * @throws IndexOutOfBoundsException if <code>index</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code index} is out of bounds.
      */
     public SampleDimension getSampleDimension(final int index) throws IndexOutOfBoundsException {
         return coverage.getSampleDimension(index);
@@ -308,9 +310,9 @@ control:    for (int p=0; p<=1; p++) {
      *
      * @param  point The coordinate point where to evaluate.
      * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code point} or {@code time} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
     public final boolean[] evaluate(final Point2D point, final Date time, boolean[] dest)
@@ -331,9 +333,9 @@ control:    for (int p=0; p<=1; p++) {
      *
      * @param  point The coordinate point where to evaluate.
      * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code point} or {@code time} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
     public final byte[] evaluate(final Point2D point, final Date time, byte[] dest)
@@ -354,9 +356,9 @@ control:    for (int p=0; p<=1; p++) {
      *
      * @param  point The coordinate point where to evaluate.
      * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code point} or {@code time} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
     public final int[] evaluate(final Point2D point, final Date time, int[] dest)
@@ -377,9 +379,9 @@ control:    for (int p=0; p<=1; p++) {
      *
      * @param  point The coordinate point where to evaluate.
      * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code point} or {@code time} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
     public final float[] evaluate(final Point2D point, final Date time, float[] dest)
@@ -400,9 +402,9 @@ control:    for (int p=0; p<=1; p++) {
      *
      * @param  point The coordinate point where to evaluate.
      * @param  time  The date where to evaluate.
-     * @param  dest  An array in which to store values, or <code>null</code> to create a new array.
-     * @return The <code>dest</code> array, or a newly created array if <code>dest</code> was null.
-     * @throws PointOutsideCoverageException if <code>point</code> or <code>time</code> is outside coverage.
+     * @param  dest  An array in which to store values, or {@code null} to create a new array.
+     * @return The {@code dest} array, or a newly created array if {@code dest} was null.
+     * @throws PointOutsideCoverageException if {@code point} or {@code time} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
     public final double[] evaluate(final Point2D point, final Date time, double[] dest)
@@ -422,7 +424,7 @@ control:    for (int p=0; p<=1; p++) {
      * Returns the value vector for a given point in the coverage.
      *
      * @param  coord The coordinate point where to evaluate.
-     * @throws PointOutsideCoverageException if <code>coord</code> is outside coverage.
+     * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
     public final Object evaluate(final DirectPosition coord)
@@ -482,9 +484,9 @@ control:    for (int p=0; p<=1; p++) {
      * if any.
      *
      * @param  time The date where to evaluate.
-     * @return The grid coverage at the specified time, or <code>null</code>
+     * @return The grid coverage at the specified time, or {@code null}
      *         if the requested date fall in a hole in the data.
-     * @throws PointOutsideCoverageException if <code>time</code> is outside coverage.
+     * @throws PointOutsideCoverageException if {@code time} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      *
      * @see #getRenderableImage(Date)
@@ -524,7 +526,7 @@ control:    for (int p=0; p<=1; p++) {
      */
     private final class Renderable extends AbstractCoverage.Renderable {
         /**
-         * Construct a <code>Renderable</code> object for the supplied date.
+         * Construct a {@code Renderable} object for the supplied date.
          */
         public Renderable(final Date date) {
             super(xDimension, yDimension);
@@ -552,7 +554,7 @@ control:    for (int p=0; p<=1; p++) {
      * Subclasses should overrides this method in order to provides a pixel size better suited to
      * their data.
      *
-     * @return The default pixel size, or <code>null</code> if no default is provided.
+     * @return The default pixel size, or {@code null} if no default is provided.
      */
     protected Dimension2D getDefaultPixelSize() {
         return null;

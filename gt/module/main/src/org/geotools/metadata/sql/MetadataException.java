@@ -30,10 +30,12 @@ import java.sql.SQLException;
  * @version $Id$
  * @author Touraïvane
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class MetadataException extends RuntimeException {
     /**
-     * Constructs an instance of <code>MetadataException</code> with the specified
+     * Constructs an instance of {@code MetadataException} with the specified
      * detail message.
      *
      * @param message The detail message.
@@ -43,7 +45,7 @@ public class MetadataException extends RuntimeException {
     }
 
     /**
-     * Constructs an instance of <code>MetadataException</code> with the specified cause.
+     * Constructs an instance of {@code MetadataException} with the specified cause.
      *
      * @param message The detail message.
      * @param cause The cause of this exception.

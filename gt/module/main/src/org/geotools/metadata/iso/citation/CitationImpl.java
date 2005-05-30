@@ -58,6 +58,8 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett
+ *
+ * @since 2.1
  */
 public class CitationImpl extends MetadataEntity implements Citation {
     /**
@@ -326,30 +328,30 @@ public class CitationImpl extends MetadataEntity implements Citation {
 
     /**
      * Information about the series, or aggregate dataset, of which the dataset is a part.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     private Series series;
 
     /**
      * Other information required to complete the citation that is not recorded elsewhere.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     private InternationalString otherCitationDetails;
 
     /**
      * Common title with holdings note. Note: title identifies elements of a series
      * collectively, combined with information about what volumes are available at the
-     * source cited. Returns <code>null</code> if there is no title.
+     * source cited. Returns {@code null} if there is no title.
      */
     private InternationalString collectiveTitle;
 
     /**
-     * International Standard Book Number, or <code>null</code> if none.
+     * International Standard Book Number, or {@code null} if none.
      */
     private String ISBN;
 
     /**
-     * International Standard Serial Number, or <code>null</code> if none.
+     * International Standard Serial Number, or {@code null} if none.
      */
     private String ISSN;
 
@@ -420,13 +422,13 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
-     * Returns <code>true</code> if the {@linkplain #getTitle title} or any
+     * Returns {@code true} if the {@linkplain #getTitle title} or any
      * {@linkplain #getAlternateTitles alternate title} in the given citation
      * matches the given string.
      *
      * @param  citation The citation to check for.
      * @param  title The title or alternate title to compare.
-     * @return <code>true</code> in the title or alternate title matche the given string.
+     * @return {@code true} in the title or alternate title matche the given string.
      */
     public static boolean titleMatches(final Citation citation, String title) {
         title = title.trim();
@@ -514,14 +516,14 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
-     * Returns the date of the edition, or <code>null</code> if none.
+     * Returns the date of the edition, or {@code null} if none.
      */
     public synchronized Date getEditionDate() {
         return (editionDate!=Long.MIN_VALUE) ? new Date(editionDate) : null;
     }
 
     /**
-     * Set the date of the edition, or <code>null</code> if none.
+     * Set the date of the edition, or {@code null} if none.
      *
      * @todo Use an unmodifiable {@link Date} here.
      */
@@ -596,7 +598,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
 
     /**
      * Returns the information about the series, or aggregate dataset, of which the dataset is
-     * a part. Returns <code>null</code> if none.
+     * a part. Returns {@code null} if none.
      */
     public Series getSeries() {
         return series;
@@ -604,7 +606,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
 
     /**
      * Set the information about the series, or aggregate dataset, of which the dataset is
-     * a part. Set to <code>null</code> if none.
+     * a part. Set to {@code null} if none.
      */
     public synchronized void setSeries(final Series newValue) {
         checkWritePermission();
@@ -613,7 +615,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
 
     /**
      * Returns other information required to complete the citation that is not recorded elsewhere.
-     * Returns <code>null</code> if none.
+     * Returns {@code null} if none.
      */
     public InternationalString getOtherCitationDetails() {
         return otherCitationDetails;
@@ -621,7 +623,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
 
     /**
      * Set other information required to complete the citation that is not recorded elsewhere.
-     * Set to <code>null</code> if none.
+     * Set to {@code null} if none.
      */
     public synchronized void setOtherCitationDetails(final InternationalString newValue) {
         checkWritePermission();
@@ -631,7 +633,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
     /**
      * Returns the common title with holdings note. Note: title identifies elements of a series
      * collectively, combined with information about what volumes are available at the
-     * source cited. Returns <code>null</code> if there is no title.
+     * source cited. Returns {@code null} if there is no title.
      */
     public InternationalString getCollectiveTitle() {
         return collectiveTitle;
@@ -640,7 +642,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
     /**
      * Set the common title with holdings note. Note: title identifies elements of a series
      * collectively, combined with information about what volumes are available at the
-     * source cited. Set to <code>null</code> if there is no title.
+     * source cited. Set to {@code null} if there is no title.
      */
     public synchronized void setCollectiveTitle(final InternationalString newValue) {
         checkWritePermission();
@@ -648,14 +650,14 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
-     * Returns the International Standard Book Number, or <code>null</code> if none.
+     * Returns the International Standard Book Number, or {@code null} if none.
      */
     public String getISBN() {
         return ISBN;
     }
 
     /**
-     * Set the International Standard Book Number, or <code>null</code> if none.
+     * Set the International Standard Book Number, or {@code null} if none.
      */
     public synchronized void setISBN(final String newValue) {
         checkWritePermission();
@@ -663,14 +665,14 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
-     * Returns the International Standard Serial Number, or <code>null</code> if none.
+     * Returns the International Standard Serial Number, or {@code null} if none.
      */
     public String getISSN() {
         return ISSN;
     }
 
     /**
-     * Set the International Standard Serial Number, or <code>null</code> if none.
+     * Set the International Standard Serial Number, or {@code null} if none.
      */
     public synchronized void setISSN(final String newValue) {
         checkWritePermission();

@@ -50,6 +50,8 @@ import org.geotools.resources.geometry.XAffineTransform;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class AffineTransform2D extends XAffineTransform
                            implements MathTransform2D, LinearTransform, Formattable {
@@ -73,7 +75,7 @@ final class AffineTransform2D extends XAffineTransform
     
     /**
      * Throws an {@link UnsupportedOperationException} when a mutable method
-     * is invoked, since <code>AffineTransform2D</code> must be immutable.
+     * is invoked, since {@code AffineTransform2D} must be immutable.
      */
     protected void checkPermission() {
         throw new UnsupportedOperationException(
@@ -126,7 +128,7 @@ final class AffineTransform2D extends XAffineTransform
     }
     
     /**
-     * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
+     * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
     public DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst) {
         if (ptDst == null) {

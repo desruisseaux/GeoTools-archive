@@ -70,6 +70,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultProjectedCRS extends AbstractDerivedCRS implements ProjectedCRS {
     /**
@@ -87,10 +89,10 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDeviced} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     public DefaultProjectedCRS(final String                 name,
                                final OperationMethod      method,
@@ -116,10 +118,10 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDeviced} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     public DefaultProjectedCRS(final Map              properties,
                                final OperationMethod      method,
@@ -142,10 +144,10 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the projected CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDerived} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     public DefaultProjectedCRS(final Map                 properties,
                                final Conversion  conversionFromBase,
@@ -173,14 +175,14 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      * <P>Then the conversion between two projected CRS can sometime be represented as a linear
      * conversion. For example if only false easting/northing differ, than the coordinate conversion
      * is simply a translation. If no linear conversion has been found between the two CRS, then
-     * this method returns <code>null</code>.</P>
+     * this method returns {@code null}.</P>
      *
      * @param  sourceCRS The source coordinate reference system.
      * @param  targetCRS The target coordinate reference system.
      * @param  errorTolerance Relative error tolerance for considering two parameter values as
      *         equal. This is usually a small number like 1E-12.
-     * @return The conversion from <code>sourceCRS</code> to <code>targetCRS</code> as an
-     *         affine transform, or <code>null</code> if no linear transform has been found.
+     * @return The conversion from {@code sourceCRS} to {@code targetCRS} as an
+     *         affine transform, or {@code null} if no linear transform has been found.
      */
     public static Matrix createLinearConversion(final ProjectedCRS sourceCRS,
                                                 final ProjectedCRS targetCRS,

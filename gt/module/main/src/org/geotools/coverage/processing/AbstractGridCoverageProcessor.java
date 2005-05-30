@@ -66,6 +66,8 @@ import org.geotools.resources.gcs.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
                                                  implements GridCoverageProcessor
@@ -193,7 +195,7 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * @param  operationName Name of the operation to be applied to the grid coverage..
      * @param  source The source grid coverage.
      * @return The result as a grid coverage.
-     * @throws OperationNotFoundException if there is no operation named <code>operationName</code>.
+     * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      *
      * @see #doOperation(Operation,ParameterValueGroup)
      */
@@ -214,7 +216,7 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * @param  argumentName1  The name of the first parameter to set.
      * @param  argumentValue1 The value for the first parameter.
      * @return The result as a grid coverage.
-     * @throws OperationNotFoundException if there is no operation named <code>operationName</code>.
+     * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
      *
      * @see #doOperation(Operation,ParameterValueGroup)
@@ -244,7 +246,7 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * @param  argumentName2  The name of the second parameter to set.
      * @param  argumentValue2 The value for the second parameter.
      * @return The result as a grid coverage.
-     * @throws OperationNotFoundException if there is no operation named <code>operationName</code>.
+     * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
      *
      * @see #doOperation(Operation,ParameterValueGroup)
@@ -278,7 +280,7 @@ public abstract class AbstractGridCoverageProcessor extends PropertySourceImpl
      * @param  argumentName3  The name of the third parameter to set.
      * @param  argumentValue3 The value for the third parameter.
      * @return The result as a grid coverage.
-     * @throws OperationNotFoundException if there is no operation named <code>operationName</code>.
+     * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
      *
      * @see #doOperation(Operation,ParameterValueGroup)

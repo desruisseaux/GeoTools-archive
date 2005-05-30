@@ -50,16 +50,18 @@ import org.geotools.resources.gcs.Resources;
  * This base class provides a convenient way to get {@link BufferedReader} for
  * reading lines.
  * <br><br>
- * <code>TextImageReader</code> accepts many input types, including {@link File},
+ * {@code TextImageReader} accepts many input types, including {@link File},
  * {@link URL}, {@link Reader}, {@link InputStream} and {@link ImageInputStream}.
  * The {@link Spi} provider automatically advises those input types. The above
- * cited <code>Spi</code> provided also provides a convenient way to control the
+ * cited {@code Spi} provided also provides a convenient way to control the
  * character encoding, with the {@link Spi#charset charset} field. Developer can
  * gain yet more control on character encoding by overriding the {@link #getCharset}
  * method.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class TextImageReader extends SimpleImageReader {
     /**
@@ -104,10 +106,10 @@ public abstract class TextImageReader extends SimpleImageReader {
     /**
      * Returns the data type which most closely represents the "raw"
      * internal data of the image. Default implementation returns the
-     * <code>rawImageType</code> argument provided at construction time.
+     * {@code rawImageType} argument provided at construction time.
      *
      * @param  imageIndex The index of the image to be queried.
-     * @return The data type (<code>TYPE_FLOAT</code> by default).
+     * @return The data type ({@code TYPE_FLOAT} by default).
      * @throws IOException If an error occurs reading the format information
      *         from the input source.
      */
@@ -123,9 +125,9 @@ public abstract class TextImageReader extends SimpleImageReader {
      * pour déterminer l'encodage d'une façon plus élaborée.
      *
      * @param  input Flot à lire.
-     * @return Encodage du flot à lire, ou <code>null</code> pour utiliser
+     * @return Encodage du flot à lire, ou {@code null} pour utiliser
      *         l'encodage par défaut de la plateforme locale.
-     * @throws IOException si une lecture du flot <code>input</code> était
+     * @throws IOException si une lecture du flot {@code input} était
      *         nécessaire et a échoué.
      *
      * @see Spi#charset
@@ -179,7 +181,7 @@ public abstract class TextImageReader extends SimpleImageReader {
      * Cette méthode ne construira un nouveau objet {@link Reader} que la première fois
      * où elle sera appelée. Tous les appels subséquents retourneront le {@link Reader}
      * ouvert. En conséquent, ce flot <strong>ne doit pas</strong> être fermé. Les méthodes
-     * <code>setInput(...)</code> et {@link #reset()} s'occuperont de le fermer si nécessaire.
+     * {@code setInput(...)} et {@link #reset()} s'occuperont de le fermer si nécessaire.
      *
      * @return {@link #getInput} sous forme de flot {@link LineNumberReader} si possible,
      *         ou {@link BufferedReader} sinon.
@@ -248,12 +250,12 @@ public abstract class TextImageReader extends SimpleImageReader {
     }
     
     /**
-     * Retourne la position du flot spécifié, ou <code>-1</code> si cette position est
+     * Retourne la position du flot spécifié, ou {@code -1} si cette position est
      * inconnue. Note: la position retournée est <strong>approximative</strong>.  Elle
      * est utile pour afficher un rapport des progrès, mais sans plus.
      *
      * @param  reader Flot dont on veut connaître la position.
-     * @return Position approximative du flot, ou <code>-1</code>
+     * @return Position approximative du flot, ou {@code -1}
      *         si cette position n'a pas pu être obtenue.
      * @throws IOException si l'opération a échouée.
      */
@@ -264,11 +266,11 @@ public abstract class TextImageReader extends SimpleImageReader {
     /**
      * Retourne une chaîne de caractères donnant la position actuelle du flot. La
      * chaîne retournée sera par exemple "Ligne 14 dans le fichier HUV18204.asc".
-     * Cette méthode retourne <code>null</code> si la position du flot n'a pas pu
+     * Cette méthode retourne {@code null} si la position du flot n'a pas pu
      * être déterminée.
      *
      * @param message Un message optionel à placer après la position, ou
-     *        <code>null</code> s'il n'y en a pas.
+     *        {@code null} s'il n'y en a pas.
      */
     protected String getPositionString(final String message) {
         final String file;
@@ -324,7 +326,7 @@ public abstract class TextImageReader extends SimpleImageReader {
      * Service provider interface (SPI) for {@link TextImageReader}s. This
      * SPI provides a convenient way to control the {@link TextImageReader}
      * character encoding: the {@link #charset} field. For example, many
-     * <code>Spi</code> subclasses will put the following line in their
+     * {@code Spi} subclasses will put the following line in their
      * constructor:
      *
      * <blockquote><pre>
@@ -353,7 +355,7 @@ public abstract class TextImageReader extends SimpleImageReader {
         private static final String[] EXTENSIONS = new String[] {"txt","asc","dat"};
         
         /**
-         * Encodage des caractères à lire, ou <code>null</code> pour utiliser l'encodage
+         * Encodage des caractères à lire, ou {@code null} pour utiliser l'encodage
          * par défaut de la plateforme locale.  Ce champ est initialement nul et devrait
          * être initialisé par les classes dérivées qui souhaite utiliser un encodage
          * spécifique.
@@ -366,7 +368,7 @@ public abstract class TextImageReader extends SimpleImageReader {
          * Conventions locales à utiliser pour lire les nombres.  Par exemple
          * la valeur {@link Locale#US} signifie que les nombres seront écrits
          * en utilisant le point comme séparateur décimal (entre autres
-         * conventions). La valeur <code>null</code> signifie qu'il faudra
+         * conventions). La valeur {@code null} signifie qu'il faudra
          * utiliser les conventions locales par défaut au moment ou une image
          * sera lue.
          *
@@ -394,13 +396,13 @@ public abstract class TextImageReader extends SimpleImageReader {
          *
          * <ul>
          *   <li>Image format names ({@link #names}):
-         *       An array of lenght 1 containing the <code>name</code> argument.
+         *       An array of lenght 1 containing the {@code name} argument.
          *
          *   <li>MIME type ({@link #MIMETypes}):
-         *       An array of length 1 containing the <code>mime</code> argument.
+         *       An array of length 1 containing the {@code mime} argument.
          *
          *   <li>File suffixes ({@link #suffixes}):
-         *       "<code>.txt</code>", "<code>.asc</code>" et "<code>.dat</code>"
+         *       "{@code .txt}", "{@code .asc}" et "{@code .dat}"
          *       (uppercase and lowercase).</li>
          *
          *   <li>Input types ({@link #inputTypes}):
@@ -410,8 +412,8 @@ public abstract class TextImageReader extends SimpleImageReader {
          * Others fields should be set by subclasses
          * (usually in their constructors).
          *
-         * @param name Format name, or <code>null</code> to let {@link #names} unset.
-         * @param mime MIME type, or <code>null</code> to let {@link #MIMETypes} unset.
+         * @param name Format name, or {@code null} to let {@link #names} unset.
+         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
          */
         public Spi(final String name, final String mime) {
             if (name!=null) {
@@ -428,12 +430,12 @@ public abstract class TextImageReader extends SimpleImageReader {
          * Vérifie si le flot spécifié semble être un fichier ASCII lisible.
          * Cette méthode tente simplement de lire les premières lignes du fichier.
          * La valeur retournée par cette méthode n'est qu'à titre indicative.
-         * <code>true</code> n'implique pas que la lecture va forcément réussir,
-         * et <code>false</code> n'implique pas que la lecture va obligatoirement
+         * {@code true} n'implique pas que la lecture va forcément réussir,
+         * et {@code false} n'implique pas que la lecture va obligatoirement
          * échouer.
          *
          * @param  source Source dont on veut tester la lisibilité.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         * @return {@code true} si la source <u>semble</u> être lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         public boolean canDecodeInput(final Object source) throws IOException {
@@ -444,16 +446,16 @@ public abstract class TextImageReader extends SimpleImageReader {
          * Vérifie si le flot spécifié semble être un fichier ASCII lisible.
          * Cette méthode tente simplement de lire les premières lignes du fichier.
          * La valeur retournée par cette méthode n'est qu'à titre indicative.
-         * <code>true</code> n'implique pas que la lecture va forcément réussir,
-         * et <code>false</code> n'implique pas que la lecture va obligatoirement
+         * {@code true} n'implique pas que la lecture va forcément réussir,
+         * et {@code false} n'implique pas que la lecture va obligatoirement
          * échouer.
          *
          * @param  source Source dont on veut tester la lisibilité.
          * @param  readAheadLimit Nombre maximal de caractères à lire. Si ce
          *         nombre est dépassé sans que cette méthode ait pu déterminer
          *         si la source est lisible ou pas, alors cette méthode retourne
-         *         <code>false</code>.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         *         {@code false}.
+         * @return {@code true} si la source <u>semble</u> être lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         public boolean canDecodeInput(final Object source,
@@ -492,15 +494,15 @@ public abstract class TextImageReader extends SimpleImageReader {
          * Cette méthode tente simplement de lire la première ligne du fichier.
          *
          * @param  input Source dont on veut tester la lisibilité.
-         * @param  canClose <code>true</code> si on peut fermer le flot après avoir vérifié sa
-         *         première ligne. Si cet argument est <code>false</code>, alors cette méthode
+         * @param  canClose {@code true} si on peut fermer le flot après avoir vérifié sa
+         *         première ligne. Si cet argument est {@code false}, alors cette méthode
          *         utilisera {@link InputStream#mark} et {@link InputStream#reset} si ces
          *         opérations sont autorisées.
          * @param  readAheadLimit Nombre maximal de caractères à lire. Si ce
          *         nombre est dépassé sans que cette méthode ait pu déterminer
          *         si la source est lisible ou pas, alors cette méthode retourne
-         *         <code>false</code>.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         *         {@code false}.
+         * @return {@code true} si la source <u>semble</u> être lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         private boolean canDecodeInput(final InputStream input,
@@ -535,8 +537,8 @@ public abstract class TextImageReader extends SimpleImageReader {
          * @param  readAheadLimit Nombre maximal de caractères à lire. Si ce
          *         nombre est dépassé sans que cette méthode ait pu déterminer
          *         si la source est lisible ou pas, alors cette méthode retourne
-         *         <code>false</code>.
-         * @return <code>true</code> si la source <u>semble</u> être lisible.
+         *         {@code false}.
+         * @return {@code true} si la source <u>semble</u> être lisible.
          * @throws IOException si une erreur est survenue lors de la lecture.
          */
         private boolean canDecodeReader(final Reader input,
@@ -578,7 +580,7 @@ public abstract class TextImageReader extends SimpleImageReader {
          *
          * @param  line Une des premières lignes du flot à lire.
          * @return {@link Boolean#TRUE} si la ligne peut être décodée, {@link Boolean#FALSE}
-         *         si elle ne peut pas être décodée ou <code>null</code> si on ne sait pas
+         *         si elle ne peut pas être décodée ou {@code null} si on ne sait pas
          *         encore. Dans ce dernier cas, cette méthode sera appelée une nouvelle fois
          *         avec la ligne suivante en argument.
          */

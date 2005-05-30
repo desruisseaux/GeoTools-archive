@@ -28,11 +28,13 @@ package org.geotools.image.jai;
  * <code>values[0]*row[0] + values[1]*row[1] + values[2]*row[2] + ... + row[sourceBands]</code>.
  *
  * This interface provides a hook where non-linear transformations can be performed before the
- * linear one. For example, the <code>transformSamples</code> method could substitutes some
+ * linear one. For example, the {@code transformSamples} method could substitutes some
  * values by their logarithm.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public interface CombineTransform {
     /**

@@ -26,10 +26,12 @@ import org.geotools.util.UnsupportedImplementationException;
 /**
  * Adapter for implementations which doesn't extends {@link Formattable}. This includes
  * especially {@link org.geotools.referencing.operation.transform.AffineTransform2D}.
- * This method looks for a <code>toWKT()</code> method using reflection.
+ * This method looks for a {@code toWKT()} method using reflection.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 final class Adapter extends Formattable {
     /**
@@ -63,7 +65,7 @@ final class Adapter extends Formattable {
             throw exception;
         }
         // TODO: Not yet implemented. We should insert the WKT in the formatter
-        //       as pre-formatted text, and returns <code>null</code>.
+        //       as pre-formatted text, and returns {@code null}.
         throw new UnsupportedImplementationException(classe);
     }
 }

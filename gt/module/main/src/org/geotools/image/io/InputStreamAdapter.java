@@ -22,16 +22,16 @@ package org.geotools.image.io;
 // Input/output
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.imageio.stream.ImageInputStream;
 
 
 /**
- * Wrap an {@link ImageInputStream} into a
- * standard {@link java.io.InputStream}.
+ * Wraps an {@link ImageInputStream} into a standard {@link java.io.InputStream}.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class InputStreamAdapter extends InputStream {
     /**
@@ -63,7 +63,7 @@ final class InputStreamAdapter extends InputStream {
     }
     
     /**
-     * Reads up to <code>len</code> bytes of data from the input stream.
+     * Reads up to {@code len} bytes of data from the input stream.
      * @throws IOException if an I/O error occurs.
      */
     public int read(final byte[] b, final int off, final int len) throws IOException {
@@ -71,7 +71,7 @@ final class InputStreamAdapter extends InputStream {
     }
     
     /**
-     * Skips over and discards <code>n</code> bytes of data from this input stream.
+     * Skips over and discards {@code n} bytes of data from this input stream.
      * @throws IOException if an I/O error occurs.
      */
     public long skip(final long n) throws IOException {
@@ -79,7 +79,7 @@ final class InputStreamAdapter extends InputStream {
     }
     
     /**
-     * Returns always <code>true</code>.
+     * Returns always {@code true}.
      * @throws IOException if an I/O error occurs.
      */
     public boolean markSupported() {
@@ -96,7 +96,7 @@ final class InputStreamAdapter extends InputStream {
     
     /**
      * Repositions this stream to the position at the time
-     * the <code>mark</code> method was last called.
+     * the {@code mark} method was last called.
      * @throws IOException if an I/O error occurs.
      */
     public void reset() throws IOException {

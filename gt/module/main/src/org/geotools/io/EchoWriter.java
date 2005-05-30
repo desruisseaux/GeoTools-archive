@@ -33,6 +33,8 @@ import java.io.Writer;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class EchoWriter extends FilterWriter {
     /**

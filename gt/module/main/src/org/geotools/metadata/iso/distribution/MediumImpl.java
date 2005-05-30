@@ -43,6 +43,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class MediumImpl extends MetadataEntity implements Medium {
     /**
@@ -57,7 +59,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
 
     /**
      * Density at which the data is recorded.
-     * Returns <code>null</code> if unknown.
+     * Returns {@code null} if unknown.
      * If non-null, then the number should be greater than zero.
      */
     private Collection densities;
@@ -69,7 +71,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
 
     /**
      * Number of items in the media identified.
-     * Returns <code>null</code> if unknown.
+     * Returns {@code null} if unknown.
      */
     private Integer volumes;
 
@@ -121,7 +123,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
 
     /**
      * Returns the number of items in the media identified.
-     * Returns <code>null</code> if unknown.
+     * Returns {@code null} if unknown.
      */
     public Integer getVolumes() {
         return volumes;
@@ -129,7 +131,7 @@ public class MediumImpl extends MetadataEntity implements Medium {
 
     /**
      * Set the number of items in the media identified.
-     * Returns <code>null</code> if unknown.
+     * Returns {@code null} if unknown.
      */
     public synchronized void setVolumes(final Integer newValue) {
         checkWritePermission();

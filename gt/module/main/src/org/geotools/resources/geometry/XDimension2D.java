@@ -27,10 +27,12 @@ import java.io.Serializable;
 /**
  * Implement float and double version of {@link Dimension2D}. This class
  * is only temporary; it will disappear if <em>JavaSoft</em> implements
- * <code>Dimension2D.Float</code> and <code>Dimension2D.Double</code>.
+ * {@code Dimension2D.Float} and {@code Dimension2D.Double}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class XDimension2D {
     /**
@@ -42,7 +44,7 @@ public final class XDimension2D {
     /**
      * Implement float version of {@link Dimension2D}. This class is
      * temporary;  it will disappear if <em>JavaSoft</em> implements
-     * <code>Dimension2D.Float</code> and <code>Dimension2D.Double</code>.
+     * {@code Dimension2D.Float} and {@code Dimension2D.Double}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -111,7 +113,7 @@ public final class XDimension2D {
     /**
      * Implement double version of {@link Dimension2D}. This class is
      * temporary; it will disappear if <em>JavaSoft</em> implements
-     * <code>Dimension2D.Float</code> and <code>Dimension2D.Double</code>.
+     * {@code Dimension2D.Float} and {@code Dimension2D.Double}.
      *
      * @version $Id$
      * @author Martin Desruisseaux

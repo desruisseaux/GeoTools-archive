@@ -60,12 +60,14 @@ import com.vividsolutions.jts.geom.MultiLineString;
  *
  * <br>
  * Note: This class is not thread-safe. If geodetic calculations are needed in a multi-threads
- * environment, create one instance of <code>GeodeticCalculator</code> for each thread even
+ * environment, create one instance of {@code GeodeticCalculator} for each thread even
  * if the computations are performed with the same ellipsoid.
  *
  * @version $Id$
  * @author Daniele Franzoni
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GeodeticCalculator {
     /**
@@ -110,8 +112,8 @@ public class GeodeticCalculator {
     /**
      * GPNHRI parameters computed from the ellipsoid.
      *
-     * <code>f</code> if the flattening of the referenced ellipsoid. <code>f2</code>,
-     * <code>f3</code> and <code>f4</code> are <var>f<sup>2</sup></var>,
+     * {@code f} if the flattening of the referenced ellipsoid. {@code f2},
+     * {@code f3} and {@code f4} are <var>f<sup>2</sup></var>,
      * <var>f<sup>3</sup></var> and <var>f<sup>4</sup></var> respectively.
      */
     private final double fo, f, f2, f3, f4;
@@ -147,13 +149,13 @@ public class GeodeticCalculator {
 
     /**
      * Tell if the destination point is valid.
-     * <code>false</code> if {@link #long2} and {@link #lat2} need to be computed.
+     * {@code false} if {@link #long2} and {@link #lat2} need to be computed.
      */
     private boolean destinationValid;
 
     /**
      * Tell if the azimuth and the distance are valids.
-     * <code>false</code> if {@link #distance} and {@link #azimuth} need to be computed.
+     * {@code false} if {@link #distance} and {@link #azimuth} need to be computed.
      */
     private boolean directionValid;
 
@@ -170,13 +172,13 @@ public class GeodeticCalculator {
     }
 
     /**
-     * Checks the latidude validity. The argument <code>latidude</code> should be
+     * Checks the latidude validity. The argument {@code latidude} should be
      * greater or equal than -90 degrees and lower or equals than +90 degrees. As
      * a convenience, this method returns the latitude in radians.
      *
      * @param  latitude The latitude value in <strong>degrees</strong>.
      * @return The latitude value in <strong>radians</strong>.
-     * @throws IllegalArgumentException if <code>latitude</code> is not between -90 and +90 degrees.
+     * @throws IllegalArgumentException if {@code latitude} is not between -90 and +90 degrees.
      */
     private static double checkLatitude(final double latitude) throws IllegalArgumentException {
         if (latitude>=Latitude.MIN_VALUE && latitude<=Latitude.MAX_VALUE) {
@@ -187,13 +189,13 @@ public class GeodeticCalculator {
     }
 
     /** 
-     * Checks the longitude validity. The argument <code>longitude</code> should be
+     * Checks the longitude validity. The argument {@code longitude} should be
      * greater or equal than -180 degrees and lower or equals than +180 degrees. As
      * a convenience, this method returns the longitude in radians.
      *
      * @param  longitude The longitude value in <strong>degrees</strong>.
      * @return The longitude value in <strong>radians</strong>.
-     * @throws IllegalArgumentException if <code>longitude</code> is not
+     * @throws IllegalArgumentException if {@code longitude} is not
      *                                  between -180 and +180 degrees.
      */
     private static double checkLongitude(final double longitude) throws IllegalArgumentException {
@@ -205,13 +207,13 @@ public class GeodeticCalculator {
     }
 
     /** 
-     * Checks the azimuth validity. The argument <code>azimuth</code>  should be
+     * Checks the azimuth validity. The argument {@code azimuth}  should be
      * greater or equal than -180 degrees and lower or equals than +180 degrees.
      * As a convenience, this method returns the azimuth in radians.
      *
      * @param  azimuth The azimuth value in <strong>degrees</strong>.
      * @return The azimuth value in <strong>radians</strong>.
-     * @throws IllegalArgumentException if <code>azimuth</code> is not
+     * @throws IllegalArgumentException if {@code azimuth} is not
      *                                  between -180 and +180 degrees.
      */
     private static double checkAzimuth(final double azimuth) throws IllegalArgumentException {
@@ -223,11 +225,11 @@ public class GeodeticCalculator {
     }
 
     /** 
-     * Checks the orthodromic distance validity. Arguments <code>orthodromicDistance</code>  
+     * Checks the orthodromic distance validity. Arguments {@code orthodromicDistance}  
      * should be greater or equal than 0 and lower or equals than the maximum orthodromic distance.
      *
      * @param  distance The orthodromic distance value.
-     * @throws IllegalArgumentException if <code>orthodromic distance</code> is not between
+     * @throws IllegalArgumentException if {@code orthodromic distance} is not between
      *                                  0 and the maximum orthodromic distance.
      */
     private void checkOrthodromicDistance(final double distance)
@@ -242,11 +244,11 @@ public class GeodeticCalculator {
     }
 
     /** 
-     * Checks the number of verteces in a curve. Arguments <code>numberOfPoints</code>  
+     * Checks the number of verteces in a curve. Arguments {@code numberOfPoints}  
      * should be not negative.
      *
      * @param  numberOfPonits The number of verteces in a curve.
-     * @throws IllegalArgumentException if <code>numberOfVerteces</code> is negative.
+     * @throws IllegalArgumentException if {@code numberOfVerteces} is negative.
      */
     private static void checkNumberOfPoints(final int numberOfPoints)
             throws IllegalArgumentException

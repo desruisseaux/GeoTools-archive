@@ -30,10 +30,12 @@ import java.util.NoSuchElementException;
  *
  * @author Martin Desruisseaux
  * @version $Id$
+ *
+ * @since 2.1
  */
 public class Singleton extends AbstractSet {
     /**
-     * The element, or <code>null</code> if this set is empty.
+     * The element, or {@code null} if this set is empty.
      */
     private Object element;
 
@@ -51,7 +53,7 @@ public class Singleton extends AbstractSet {
     }
 
     /**
-     * Returns <code>true</code> if this singleton contains no elements.<p>
+     * Returns {@code true} if this singleton contains no elements.<p>
      */
     public boolean isEmpty() {
 	return element == null;
@@ -71,7 +73,7 @@ public class Singleton extends AbstractSet {
     }
 
     /**
-     * Returns <code>true</code> if this singleton contains the specified element.
+     * Returns {@code true} if this singleton contains the specified element.
      */
     public boolean contains(final Object object) {
         return element!=null && element.equals(object);
@@ -129,7 +131,7 @@ public class Singleton extends AbstractSet {
      */
     private final class Iter implements Iterator {
         /**
-         * <code>false</code> if this iterator is done.
+         * {@code false} if this iterator is done.
          */
         private boolean hasNext;
 
@@ -141,7 +143,7 @@ public class Singleton extends AbstractSet {
         }
  
         /**
-         * Returns <code>true</code> if there is more element to return.
+         * Returns {@code true} if there is more element to return.
          */
         public boolean hasNext() {
             return hasNext;

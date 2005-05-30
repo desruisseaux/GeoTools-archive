@@ -30,6 +30,8 @@ import org.opengis.coverage.grid.GridCoverage;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public interface RenderedCoverage extends GridCoverage, PropertySource {
     /**

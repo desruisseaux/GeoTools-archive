@@ -76,6 +76,8 @@ import org.geotools.util.WeakHashSet;
  * @version $Id$
  * @author <A HREF="http://www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                                                       implements CoordinateOperationFactory
@@ -232,8 +234,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * axis order (e.g. transforming from (NORTH,WEST) to (EAST,NORTH)) are taken
      * in account.
      * <br><br>
-     * Example: If coordinates in <code>sourceCS</code> are (x,y) pairs in metres and
-     * coordinates in <code>targetCS</code> are (-y,x) pairs in centimetres, then the
+     * Example: If coordinates in {@code sourceCS} are (x,y) pairs in metres and
+     * coordinates in {@code targetCS} are (-y,x) pairs in centimetres, then the
      * transformation can be performed as below:
      *
      * <pre><blockquote>
@@ -244,7 +246,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *
      * @param  sourceCS The source coordinate system.
      * @param  targetCS The target coordinate system.
-     * @return The transformation from <code>sourceCS</code> to <code>targetCS</code> as
+     * @return The transformation from {@code sourceCS} to {@code targetCS} as
      *         an affine transform. Only axis orientation and units are taken in account.
      * @throws OperationNotFoundException If the affine transform can't be constructed.
      *
@@ -267,7 +269,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
     /**
      * Returns the specified identifier in a map to be given to coordinate operation constructors.
-     * In the special case where the <code>name</code> identifier is {@link #DATUM_SHIFT} or
+     * In the special case where the {@code name} identifier is {@link #DATUM_SHIFT} or
      * {@link #ELLIPSOID_SHIFT}, the map will contains extra informations like positional
      * accuracy.
      *
@@ -292,7 +294,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     /**
      * Creates a coordinate operation from a matrix, which usually describes an affine tranform.
      * A default {@link OperationMethod} object is given to this transform. In the special case
-     * where the <code>name</code> identifier is {@link #DATUM_SHIFT} or {@link #ELLIPSOID_SHIFT},
+     * where the {@code name} identifier is {@link #DATUM_SHIFT} or {@link #ELLIPSOID_SHIFT},
      * the operation will be an instance of {@link Transformation} instead of the usual
      * {@link Conversion}.
      *
@@ -371,14 +373,14 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     /**
      * Creates a coordinate operation from a math transform.
      * If the specified math transform is already a coordinate operation, and if source
-     * and target CRS match, then <code>transform</code> is returned with no change.
+     * and target CRS match, then {@code transform} is returned with no change.
      * Otherwise, a new coordinate operation is created.
      *
      * @param  properties The properties to give to the operation.
      * @param  sourceCRS  The source coordinate reference system.
      * @param  targetCRS  The destination coordinate reference system.
      * @param  transform  The math transform.
-     * @param  method     The operation method, or <code>null</code>.
+     * @param  method     The operation method, or {@code null}.
      * @param  type       The required super-class (e.g. <code>{@link Transformation}.class</code>).
      * @return A coordinate operation using the specified math transform.
      * @throws FactoryException if the operation can't be constructed.
@@ -437,9 +439,9 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * {@link ConcatenatedOperation}. If a concatenated operation is created, it
      * will get an automatically generated name.
      *
-     * @param  step1 The first  step, or <code>null</code> for the identity operation.
-     * @param  step2 The second step, or <code>null</code> for the identity operation.
-     * @return A concatenated operation, or <code>null</code> if all arguments was nul.
+     * @param  step1 The first  step, or {@code null} for the identity operation.
+     * @param  step2 The second step, or {@code null} for the identity operation.
+     * @return A concatenated operation, or {@code null} if all arguments was nul.
      * @throws FactoryException if the operation can't be constructed.
      */
     protected CoordinateOperation concatenate(final CoordinateOperation step1,
@@ -483,10 +485,10 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      * creating an {@link ConcatenatedOperation}. If a concatenated operation is created, it
      * will get an automatically generated name.
      *
-     * @param  step1 The first  step, or <code>null</code> for the identity operation.
-     * @param  step2 The second step, or <code>null</code> for the identity operation.
-     * @param  step3 The third  step, or <code>null</code> for the identity operation.
-     * @return A concatenated operation, or <code>null</code> if all arguments were null.
+     * @param  step1 The first  step, or {@code null} for the identity operation.
+     * @param  step2 The second step, or {@code null} for the identity operation.
+     * @param  step3 The third  step, or {@code null} for the identity operation.
+     * @return A concatenated operation, or {@code null} if all arguments were null.
      * @throws FactoryException if the operation can't be constructed.
      */
     protected CoordinateOperation concatenate(final CoordinateOperation step1,
@@ -527,7 +529,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
     /**
      * Returns the dimension of the specified coordinate system,
-     * or <code>0</code> if the coordinate system is null.
+     * or {@code 0} if the coordinate system is null.
      */
     static int getDimension(final CoordinateReferenceSystem crs) {
         return (crs!=null) ? crs.getCoordinateSystem().getDimension() : 0;
@@ -595,7 +597,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     /**
      * Returns a temporary name for object derived from the specified one.
      *
-     * @param source The CRS to base name on, or <code>null</code> if none.
+     * @param source The CRS to base name on, or {@code null} if none.
      *
      * @todo Find better names, and localize.
      */
@@ -610,7 +612,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     /**
      * Returns a temporary name for object derived from a concatenation.
      *
-     * @param source The CRS to base name on, or <code>null</code> if none.
+     * @param source The CRS to base name on, or {@code null} if none.
      */
     static Map getTemporaryName(final CoordinateReferenceSystem source,
                                 final CoordinateReferenceSystem target)
@@ -626,9 +628,9 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *
      * @param  object1 The first object to compare (may be null).
      * @param  object2 The second object to compare (may be null).
-     * @return <code>true</code> if both objects are equals.
+     * @return {@code true} if both objects are equals.
      *
-     * @todo This method may be insuffisient, since it will returns <code>false</code> for
+     * @todo This method may be insuffisient, since it will returns {@code false} for
      *       two different implementations, even if they encapsulate the same data values.
      */
     static boolean equalsIgnoreMetadata(final IdentifiedObject object1,
@@ -657,7 +659,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *
      * @param  name   Argument name.
      * @param  object User argument.
-     * @throws IllegalArgumentException if <code>object</code> is null.
+     * @throws IllegalArgumentException if {@code object} is null.
      */
     protected static void ensureNonNull(final String name, final Object object)
             throws IllegalArgumentException

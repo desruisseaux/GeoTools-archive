@@ -32,6 +32,8 @@ import java.util.AbstractList;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class UnmodifiableArrayList extends AbstractList implements Serializable {
     /**
@@ -114,7 +116,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
     }
 
     /**
-     * Returns <code>true</code> if this collection contains the specified element.
+     * Returns {@code true} if this collection contains the specified element.
      * This method is overriden only for performance reason (the default implementation
      * would work as well).
      */

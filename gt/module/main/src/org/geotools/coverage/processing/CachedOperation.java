@@ -49,6 +49,8 @@ import org.geotools.parameter.Parameters;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class CachedOperation {
     /**

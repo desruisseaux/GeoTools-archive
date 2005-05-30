@@ -48,6 +48,8 @@ import org.geotools.resources.cts.Resources;
  *  
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class ParameterValueList extends AbstractList implements RandomAccess, Serializable {
     /**
@@ -110,16 +112,16 @@ final class ParameterValueList extends AbstractList implements RandomAccess, Ser
      *       == 1</code>, the new parameter will replace the existing parameter.</LI>
      *   <LI>For <code>{@linkplain GeneralParameterDescriptor#getMaximumOccurs maximumOccurs}
      *       &gt; 1</code>, the new parameter will be added. If adding the new parameter will
-     *       increase the number past what is allowable by <code>maximumOccurs</code>, then
+     *       increase the number past what is allowable by {@code maximumOccurs}, then
      *       an {@link IllegalStateException} will be thrown.</LI>
      * </UL>
      * 
      * @param  parameter New parameter to be added to this group.
-     * @return <code>true</code> if this object changed as a result of this call.
+     * @return {@code true} if this object changed as a result of this call.
      * @throws IllegalArgumentException if the specified parameter is not allowable by the
      *         groups descriptor.
      * @throws InvalidParameterCardinalityException if adding this parameter would result in
-     *         more parameters than allowed by <code>maximumOccurs</code>.
+     *         more parameters than allowed by {@code maximumOccurs}.
      */
     public boolean add(final GeneralParameterValue parameter) {
         modCount++;

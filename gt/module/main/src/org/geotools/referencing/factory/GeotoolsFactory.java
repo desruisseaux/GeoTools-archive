@@ -124,6 +124,8 @@ import org.geotools.util.WeakHashSet;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GeotoolsFactory extends AbstractFactory
                           implements CSFactory, DatumFactory, CRSFactory
@@ -711,10 +713,10 @@ public class GeotoolsFactory extends AbstractFactory
 
     /**
      * Creates a compound coordinate reference system from an ordered
-     * list of <code>CoordinateReferenceSystem</code> objects.
+     * list of {@code CoordinateReferenceSystem} objects.
      *
      * @param  properties Name and other properties to give to the new object.
-     * @param  elements ordered array of <code>CoordinateReferenceSystem</code> objects.
+     * @param  elements ordered array of {@code CoordinateReferenceSystem} objects.
      * @throws FactoryException if the object creation failed.
      */
     public CompoundCRS createCompoundCRS(Map                       properties,

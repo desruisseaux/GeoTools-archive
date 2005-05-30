@@ -40,6 +40,8 @@ import org.opengis.referencing.operation.CylindricalProjection;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see org.geotools.referencing.crs.DefaultProjectedCRS
  * @see <A HREF="http://mathworld.wolfram.com/CylindricalProjection.html">Cylindrical projection on MathWorld</A>
  */
@@ -73,8 +75,8 @@ public class DefaultCylindricalProjection extends DefaultProjection implements C
      * follow the same rules than for the {@link AbstractCoordinateOperation} constructor.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
-     * @param sourceCRS The source CRS, or <code>null</code> if not available.
-     * @param targetCRS The target CRS, or <code>null</code> if not available.
+     * @param sourceCRS The source CRS, or {@code null} if not available.
+     * @param targetCRS The target CRS, or {@code null} if not available.
      * @param transform Transform from positions in the {@linkplain #getSourceCRS source coordinate
      *                  reference system} to positions in the {@linkplain #getTargetCRS target
      *                  coordinate reference system}.

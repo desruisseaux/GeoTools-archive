@@ -35,6 +35,8 @@ import javax.units.ConversionException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 class SexagesimalConverter extends Converter {
     /**
@@ -88,14 +90,14 @@ class SexagesimalConverter extends Converter {
     }
 
     /**
-     * Returns this converter derivative for the specified <code>x</code> value.
+     * Returns this converter derivative for the specified {@code x} value.
      */
     public final double derivative(double x) {
         return 1;
     }
 
     /**
-     * Returns <code>false</code> since this converter is non-linear.
+     * Returns {@code false} since this converter is non-linear.
      */
     public final boolean isLinear() {
         return false;

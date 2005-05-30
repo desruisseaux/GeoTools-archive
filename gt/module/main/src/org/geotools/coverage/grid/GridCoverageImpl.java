@@ -61,7 +61,7 @@ public class GridCoverageImpl extends AbstractGridCoverage
 {
 
 	/**
-	 * Comment for <code>serialVersionUID</code>
+	 * Comment for {@code serialVersionUID}
 	 */
 	private static final long serialVersionUID = 1L;
 

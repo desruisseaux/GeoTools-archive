@@ -40,6 +40,8 @@ import org.opengis.referencing.operation.OperationMethod;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Matthias Basler
+ *
+ * @since 2.1
  */
 public class DefiningConversion extends DefaultConversion {
     /**

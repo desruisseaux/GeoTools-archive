@@ -20,8 +20,6 @@
  */
 package org.geotools.util;
 
-// Miscellaneous
-
 
 /**
  * Monitor the progress of some lengthly operation. This interface makes no
@@ -32,8 +30,8 @@ package org.geotools.util;
  * Additionnaly, this interface provides support for non-fatal warning and
  * exception reports.
  * <br><br>
- * All <code>ProgressListener</code> implementations are multi-thread safe,  even the
- * <cite>Swing</cite> implemention. <code>ProgressListener</code> can be invoked from
+ * All {@code ProgressListener} implementations are multi-thread safe,  even the
+ * <cite>Swing</cite> implemention. {@code ProgressListener} can be invoked from
  * any thread, which never need to be the <cite>Swing</cite>'s thread. This is usefull
  * for performing lenghtly operation in a background thread. Example:
  *
@@ -56,6 +54,8 @@ package org.geotools.util;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see org.geotools.gui.headless.ProgressPrinter
  * @see org.geotools.gui.headless.ProgressMailer
  * @see org.geotools.gui.swing.ProgressWindow
@@ -65,7 +65,7 @@ public interface ProgressListener {
     /**
      * Retourne le message d'écrivant l'opération
      * en cours. Si aucun message n'a été définie,
-     * retourne <code>null</code>.
+     * retourne {@code null}.
      */
     public abstract String getDescription();
 
@@ -75,7 +75,7 @@ public interface ProgressListener {
      * de l'opération. Toutefois, cette méthode peut aussi
      * être appelée à tout moment pendant l'opération sans
      * que cela affecte le pourcentage accompli. La valeur
-     * <code>null</code> signifie qu'on ne souhaite plus
+     * {@code null} signifie qu'on ne souhaite plus
      * afficher de description.
      */
     public abstract void setDescription(final String description);
@@ -114,9 +114,9 @@ public interface ProgressListener {
      * @param source Chaîne de caractère décrivant la source de l'avertissement.
      *        Il s'agira par exemple du nom du fichier dans lequel une anomalie
      *        a été détectée. Peut être nul si la source n'est pas connue.
-     * @param margin Texte à placer dans la marge de l'avertissement <code>warning</code>,
-     *        ou <code>null</code> s'il n'y en a pas. Il s'agira le plus souvent du numéro
-     *        de ligne où s'est produite l'erreur dans le fichier <code>source</code>.
+     * @param margin Texte à placer dans la marge de l'avertissement {@code warning},
+     *        ou {@code null} s'il n'y en a pas. Il s'agira le plus souvent du numéro
+     *        de ligne où s'est produite l'erreur dans le fichier {@code source}.
      * @param warning Message d'avertissement à écrire.
      */
     public abstract void warningOccurred(String source, String margin, String warning);

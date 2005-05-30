@@ -44,6 +44,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class GeoreferenceableImpl extends GridSpatialRepresentationImpl implements Georeferenceable {
     /**

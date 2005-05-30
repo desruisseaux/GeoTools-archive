@@ -22,12 +22,15 @@ package org.geotools.geometry;
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 
-import org.geotools.referencing.FactoryFinder;
+// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.Cloneable;
+
+// Geotools dependencies
+import org.geotools.referencing.FactoryFinder;
 
 
 /**
@@ -36,6 +39,8 @@ import org.opengis.util.Cloneable;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public abstract class Geometry implements org.opengis.spatialschema.geometry.Geometry, Serializable {
     /**

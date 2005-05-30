@@ -94,12 +94,14 @@ import org.geotools.resources.cts.Resources;
  * Creates {@linkplain CoordinateOperation coordinate operations}. This factory is capable to find
  * coordinate {@linkplain Transformation transformations} or {@linkplain Conversion conversions}
  * between two {@linkplain CoordinateReferenceSystem coordinate reference systems}. It delegates
- * most of its work to one or many of <code>createOperationStep</code> methods. Subclasses can
+ * most of its work to one or many of {@code createOperationStep} methods. Subclasses can
  * override those methods in order to extend the factory capability to some more CRS.
  *
  * @version $Id$
  * @author <A HREF="http://www.opengis.org">OpenGIS</A>
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperationFactory {
     /**
@@ -114,7 +116,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * <ul>
      *   <li><code>"Abridged_Molodenski"</code> for the abridged Molodenski transformation.</li>
      *   <li><code>"Molodenski"</code> for the Molodenski transformation.</li>
-     *   <li><code>null</code> for performing datum shifts is geocentric coordinates.</li>
+     *   <li>{@code null} for performing datum shifts is geocentric coordinates.</li>
      * </ul>
      */
     private final String molodenskiMethod;
@@ -198,14 +200,14 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * default is returned. If no operation exists, then the exception is thrown.
      *
      * <P>The default implementation inspects the CRS and delegates the work to one or
-     * many <code>createOperationStep(...)</code> methods. This method fails if no path
+     * many {@code createOperationStep(...)} methods. This method fails if no path
      * between the CRS is found.</P>
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
-     * @throws OperationNotFoundException if no operation path was found from <code>sourceCRS</code>
-     *         to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
+     * @throws OperationNotFoundException if no operation path was found from {@code sourceCRS}
+     *         to {@code targetCRS}.
      * @throws FactoryException if the operation creation failed for some other reason.
      */
     public CoordinateOperation createOperation(final CoordinateReferenceSystem sourceCRS,
@@ -393,11 +395,11 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
      * @param  method the algorithmic method for conversion or transformation
-     * @throws OperationNotFoundException if no operation path was found from <code>sourceCRS</code>
-     *         to <code>targetCRS</code>.
+     * @throws OperationNotFoundException if no operation path was found from {@code sourceCRS}
+     *         to {@code targetCRS}.
      * @throws FactoryException if the operation creation failed for some other reason.
      *
-     * @deprecated Current implementation ignore the <code>method</code> argument.
+     * @deprecated Current implementation ignore the {@code method} argument.
      */
     public CoordinateOperation createOperation(final CoordinateReferenceSystem sourceCRS,
                                                final CoordinateReferenceSystem targetCRS,
@@ -421,7 +423,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     /**
      * Makes sure that the specified geocentric CRS uses standard axis,
      * prime meridian and the specified datum.
-     * If <code>crs</code> already meets all those conditions, then it is
+     * If {@code crs} already meets all those conditions, then it is
      * returned unchanged. Otherwise, a new normalized geocentric CRS is
      * created and returned.
      *
@@ -454,12 +456,12 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * (longitude and latitude in degrees). Optionally, this method can
      * also make sure that the CRS use the Greenwich prime meridian.
      * Other datum properties are left unchanged.
-     * If <code>crs</code> already meets all those conditions, then it is
+     * If {@code crs} already meets all those conditions, then it is
      * returned unchanged. Otherwise, a new normalized geographic CRS is
      * created and returned.
      *
      * @param  crs The geographic coordinate reference system to normalize.
-     * @param  forceGreenwich <code>true</code> for forcing the Greenwich prime meridian.
+     * @param  forceGreenwich {@code true} for forcing the Greenwich prime meridian.
      * @return The normalized coordinate reference system.
      * @throws FactoryException if the construction of a new CRS was needed but failed.
      */
@@ -520,7 +522,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     }
 
     /**
-     * Returns <code>true</code> if the specified coordinate system
+     * Returns {@code true} if the specified coordinate system
      * use standard axis and units.
      *
      * @param crs  The coordinate system to test.
@@ -568,7 +570,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * @param  targetCS The target coordinate system.
      * @param  sourcePM The source prime meridian.
      * @param  targetPM The target prime meridian.
-     * @return The transformation from <code>sourceCS</code> to <code>targetCS</code> as
+     * @return The transformation from {@code sourceCS} to {@code targetCS} as
      *         an affine transform. Only axis orientation, units and prime meridian are
      *         taken in account.
      * @throws OperationNotFoundException If the affine transform can't be constructed.
@@ -638,12 +640,12 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * <P>Then the conversion between two projected CRS can sometime be represented as a linear
      * conversion. For example if only false easting/northing differ, than the coordinate conversion
      * is simply a translation. If no linear conversion has been found between the two CRS, then
-     * this method returns <code>null</code>.</P>
+     * this method returns {@code null}.</P>
      *
      * @param  sourceCRS The source coordinate reference system.
      * @param  targetCRS The target coordinate reference system.
-     * @return The conversion from <code>sourceCRS</code> to <code>targetCRS</code> as an
-     *         affine transform, or <code>null</code> if no linear transform has been found.
+     * @return The conversion from {@code sourceCRS} to {@code targetCRS} as an
+     *         affine transform, or {@code null} if no linear transform has been found.
      *
      * @todo Delete and replace by a static import when we
      *       will be allowed to compile against J2SE 1.5.
@@ -672,7 +674,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final TemporalCRS sourceCRS,
@@ -725,7 +727,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final VerticalCRS sourceCRS,
@@ -754,7 +756,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo Implement GEOT-352 here.
@@ -775,12 +777,12 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     /**
      * Creates an operation between two geographic coordinate reference systems. The default
      * implementation can adjust axis order and orientation (e.g. transforming from
-     * <code>(NORTH,WEST)</code> to <code>(EAST,NORTH)</code>), performs units conversion
+     * {@code (NORTH,WEST)} to {@code (EAST,NORTH)}), performs units conversion
      * and apply datum shifts if needed.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo When rotating the prime meridian, we should ensure that
@@ -899,16 +901,16 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * it performs three steps:
      *
      * <ul>
-     *   <li>Unproject from <code>sourceCRS</code> to its base
+     *   <li>Unproject from {@code sourceCRS} to its base
      *       {@linkplain GeographicCRS geographic CRS}.</li>
      *   <li>Convert the source to target base geographic CRS.</li>
      *   <li>Project from the base {@linkplain GeographicCRS geographic CRS}
-     *       to the <code>targetCRS</code>.</li>
+     *       to the {@code targetCRS}.</li>
      * </ul>
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final ProjectedCRS sourceCRS,
@@ -954,13 +956,13 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * sourceCRS  &rarr;  {@linkplain ProjectedCRS#getBaseCRS baseCRS}  &rarr;  targetCRS
      * </pre></blockquote>
      *
-     * where the conversion from <code>baseCRS</code> to <code>targetCRS</code> is obtained
+     * where the conversion from {@code baseCRS} to {@code targetCRS} is obtained
      * from <code>targetCRS.{@linkplain ProjectedCRS#getConversionFromBase
      * getConversionFromBase()}</code>.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final GeographicCRS sourceCRS,
@@ -982,14 +984,14 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * sourceCRS  &rarr;  {@linkplain ProjectedCRS#getBaseCRS baseCRS}  &rarr;  targetCRS
      * </pre></blockquote>
      *
-     * where the conversion from <code>sourceCRS</code> to <code>baseCRS</code> is obtained
+     * where the conversion from {@code sourceCRS} to {@code baseCRS} is obtained
      * from the inverse of
      * <code>sourceCRS.{@linkplain ProjectedCRS#getConversionFromBase
      * getConversionFromBase()}</code>.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo Provides a non-null method.
@@ -1019,7 +1021,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo Rotation of prime meridian not yet implemented.
@@ -1106,7 +1108,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final GeographicCRS sourceCRS,
@@ -1151,7 +1153,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final GeocentricCRS sourceCRS,
@@ -1183,17 +1185,17 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      *
      * @todo (GEOT-401) This method work for some simple cases (e.g. no datum change), and give up
      *       otherwise. Before to give up at the end of this method, we should try the following:
      *       <ul>
-     *         <li>Maybe <code>sourceCRS</code> uses a non-ellipsoidal height. We should replace
+     *         <li>Maybe {@code sourceCRS} uses a non-ellipsoidal height. We should replace
      *             the non-ellipsoidal height by an ellipsoidal one, create a transformation step
      *             for that (to be concatenated), and then try again this operation step.</li>
      *
-     *         <li>Maybe <code>sourceCRS</code> contains some extra axis, like a temporal CRS.
+     *         <li>Maybe {@code sourceCRS} contains some extra axis, like a temporal CRS.
      *             We should revisit this code in other to lets supplemental ordinates to be
      *             pass through or removed.</li>
      *       </ul>
@@ -1233,7 +1235,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final SingleCRS   sourceCRS,
@@ -1262,7 +1264,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     protected CoordinateOperation createOperationStep(final CompoundCRS sourceCRS,
@@ -1316,7 +1318,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * @param  sources   The source CRS components.
      * @param  targetCRS Output coordinate reference system.
      * @param  targets   The target CRS components.
-     * @return A coordinate operation from <code>sourceCRS</code> to <code>targetCRS</code>.
+     * @return A coordinate operation from {@code sourceCRS} to {@code targetCRS}.
      * @throws FactoryException If the operation can't be constructed.
      */
     private CoordinateOperation createOperationStep(final CoordinateReferenceSystem sourceCRS,
@@ -1444,9 +1446,9 @@ search: for (int j=0; j<targets.length; j++) {
     }
 
     /**
-     * Returns <code>true</code> if a transformation path from <code>sourceCRS</code> to
-     * <code>targetCRS</code> is likely to requires a tri-dimensional geodetic CRS as an
-     * intermediate step. More specifically, this method returns <code>false</code> if at
+     * Returns {@code true} if a transformation path from {@code sourceCRS} to
+     * {@code targetCRS} is likely to requires a tri-dimensional geodetic CRS as an
+     * intermediate step. More specifically, this method returns {@code false} if at
      * lest one of the following conditions is meet:
      *
      * <ul>
@@ -1514,7 +1516,7 @@ search: for (int j=0; j<targets.length; j++) {
      *
      * @param  object1 The first object to compare (may be null).
      * @param  object2 The second object to compare (may be null).
-     * @return <code>true</code> if both objects are equals.
+     * @return {@code true} if both objects are equals.
      */
     private static boolean equalsIgnorePrimeMeridian(GeodeticDatum object1,
                                                      GeodeticDatum object2)
@@ -1529,13 +1531,13 @@ search: for (int j=0; j<targets.length; j++) {
     }
 
     /**
-     * Returns <code>true</code> if either the primary name or at least
+     * Returns {@code true} if either the primary name or at least
      * one alias matches the specified string.
      *
      * @param  object The object to check.
      * @param  name The name.
-     * @return <code>true</code> if the primary name of at least one alias
-     *         matches the specified <code>name</code>.
+     * @return {@code true} if the primary name of at least one alias
+     *         matches the specified {@code name}.
      *
      * @todo Delete and replace by a static import when we
      *       will be allowed to compile against J2SE 1.5.

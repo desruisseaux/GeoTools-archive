@@ -140,6 +140,8 @@ import org.geotools.resources.geometry.XAffineTransform;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class AbstractCoverage extends PropertySourceImpl implements Coverage {
     /**
@@ -356,7 +358,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
-     *         throws if the coverage data type can't be converted to <code>boolean</code> by an
+     *         throws if the coverage data type can't be converted to {@code boolean} by an
      *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public boolean[] evaluate(final DirectPosition coord, boolean[] dest)
@@ -391,7 +393,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
-     *         throws if the coverage data type can't be converted to <code>byte</code> by an
+     *         throws if the coverage data type can't be converted to {@code byte} by an
      *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public byte[] evaluate(final DirectPosition coord, byte[] dest)
@@ -426,7 +428,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
-     *         throws if the coverage data type can't be converted to <code>int</code> by an
+     *         throws if the coverage data type can't be converted to {@code int} by an
      *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public int[] evaluate(final DirectPosition coord, int[] dest)
@@ -460,7 +462,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
-     *         throws if the coverage data type can't be converted to <code>float</code> by an
+     *         throws if the coverage data type can't be converted to {@code float} by an
      *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public float[] evaluate(final DirectPosition coord, float[] dest)
@@ -494,7 +496,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @throws CannotEvaluateException if the values can't be computed at the specified coordinate.
      *         More specifically, {@link PointOutsideCoverageException} is thrown if the evaluation
      *         failed because the input point has invalid coordinates. This exception may also be
-     *         throws if the coverage data type can't be converted to <code>double</code> by an
+     *         throws if the coverage data type can't be converted to {@code double} by an
      *         identity or widening conversion. Subclasses may relax this constraint if appropriate.
      */
     public double[] evaluate(DirectPosition coord, double[] dest)
@@ -569,7 +571,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * x} and {@link #yAxis y} ordinates will be ignored, since they will vary for each pixel
          * to be evaluated. Other ordinates, if any, should be set to a fixed value. For example
          * a coverage may be three-dimensional, where the third dimension is the time axis. In
-         * such case, <code>coordinate.ord[2]</code> should be set to the point in time where
+         * such case, {@code coordinate.ord[2]} should be set to the point in time where
          * to evaluate the coverage. By default, all ordinates are initialized to 0. Subclasses
          * should set the desired values in their constructor if needed.
          */
@@ -670,10 +672,10 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
         }
         
         /**
-         * Creates a rendered image with width <code>width</code> and height <code>height</code>
-         * in pixels. If <code>width</code> is 0, it will be computed automatically from
-         * <code>height</code>. Conversely, if <code>height</code> is 0, il will be computed
-         * automatically from <code>width</code>.
+         * Creates a rendered image with width {@code width} and height {@code height}
+         * in pixels. If {@code width} is 0, it will be computed automatically from
+         * {@code height}. Conversely, if {@code height} is 0, il will be computed
+         * automatically from {@code width}.
          *
          * The default implementation creates a render context with {@link #createRenderContext}
          * and invokes {@link #createRendering(RenderContext)}.
@@ -870,7 +872,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
 
         /**
          * Returns the number of elements per value at each position. This is the maximum
-         * value plus 1 allowed in <code>getElements(...)</code> methods invocation. The
+         * value plus 1 allowed in {@code getElements(...)} methods invocation. The
          * default implementation returns the number of sample dimensions in the coverage.
          */
         public int getNumElements() {
@@ -882,7 +884,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * This method is automatically invoked at rendering time for populating an
          * image tile, providing that the rendered image is created using the
          * "{@link ImageFunctionDescriptor ImageFunction}" operator and the image
-         * type is not <code>double</code>. The default implementation invokes
+         * type is not {@code double}. The default implementation invokes
          * {@link AbstractCoverage#evaluate(DirectPosition,float[])} recursively.
          */
         public void getElements(final float startX, final float startY,
@@ -911,7 +913,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
          * This method is automatically invoked at rendering time for populating an
          * image tile, providing that the rendered image is created using the
          * "{@link ImageFunctionDescriptor ImageFunction}" operator and the image type
-         * is <code>double</code>. The default implementation invokes
+         * is {@code double}. The default implementation invokes
          * {@link AbstractCoverage#evaluate(DirectPosition,double[])} recursively.
          */
         public void getElements(final double startX, final double startY,
@@ -1006,7 +1008,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * The results are equivalent to those that occur when the program loses its last reference to
      * this coverage, the garbage collector discovers this, and finalize is called. This can be
      * used as a hint in situations where waiting for garbage collection would be overly
-     * conservative. The results of referencing a coverage after a call to <code>dispose()</code>
+     * conservative. The results of referencing a coverage after a call to {@code dispose()}
      * are undefined.
      *
      * @see PlanarImage#dispose

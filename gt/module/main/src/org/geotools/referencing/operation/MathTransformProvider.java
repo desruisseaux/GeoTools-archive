@@ -66,7 +66,7 @@ import org.geotools.referencing.wkt.Formatter;
  * Implementations of this class should be listed in the following file:
  *
  * <blockquote>
- * <P><code>META-INF/services/org.geotools.referencing.operation.OperationProvider</code></P>
+ * <P>{@code META-INF/services/org.geotools.referencing.operation.OperationProvider}</P>
  * </blockquote>
  * <P>
  * The {@linkplain DefaultMathTransformFactory math transform factory} will parse this file in order
@@ -75,6 +75,8 @@ import org.geotools.referencing.wkt.Formatter;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public abstract class MathTransformProvider extends DefaultOperationMethod {
     /**
@@ -89,7 +91,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      *
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters (never <code>null</code>).
+     * @param parameters The set of parameters (never {@code null}).
      */
     public MathTransformProvider(final int sourceDimensions,
                                  final int targetDimensions,
@@ -107,7 +109,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param sourceDimensions Number of dimensions in the source CRS of this operation method.
      * @param targetDimensions Number of dimensions in the target CRS of this operation method.
-     * @param parameters The set of parameters (never <code>null</code>).
+     * @param parameters The set of parameters (never {@code null}).
      */
     public MathTransformProvider(final Map properties,
                                  final int sourceDimensions,
@@ -137,7 +139,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * <code>{@linkplain org.opengis.referencing.operation.Projection}.class</code>,
      * <cite>etc</cite>.
      *
-     * The default implementation returns <code>Operation.class</code>.
+     * The default implementation returns {@code Operation.class}.
      * Subclass should overrides this methods and returns the appropriate
      * OpenGIS interface type (<strong>not</strong> the implementation type).
      */
@@ -150,7 +152,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * identified by codes provided by one or more authorities. Common authorities are
      * {@link CitationImpl#OGC OGC} and {@link CitationImpl#EPSG EPSG} for example.
      *
-     * <P>The first entry in the <code>identifiers</code> array is both the
+     * <P>The first entry in the {@code identifiers} array is both the
      * {@linkplain ParameterDescriptor#getName main name} and the
      * {@linkplain ParameterDescriptor#getIdentifiers identifiers}.
      * All others are {@linkplain ParameterDescriptor#getAlias aliases}.</P>
@@ -194,13 +196,13 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * identified by codes provided by one or more authorities. Common authorities are
      * {@link CitationImpl#OGC OGC} and {@link CitationImpl#EPSG EPSG} for example.
      *
-     * <P>The first entry in the <code>identifiers</code> array is both the
+     * <P>The first entry in the {@code identifiers} array is both the
      * {@linkplain ParameterDescriptorGroup#getName main name} and the
      * {@linkplain ParameterDescriptorGroup#getIdentifiers identifiers}.
      * All others are {@linkplain ParameterDescriptorGroup#getAlias aliases}.</P>
      *
      * @param identifiers  The operation identifiers. Most contains at least one entry.
-     * @param parameters   The set of parameters, or <code>null</code> or an empty array if none.
+     * @param parameters   The set of parameters, or {@code null} or an empty array if none.
      */
     protected static ParameterDescriptorGroup createDescriptorGroup(
                 final Identifier[] identifiers, final GeneralParameterDescriptor[] parameters)
@@ -247,7 +249,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      *
      * @param  values The parameters values to check.
      * @return The parameter values to use for {@linkplain MathTransform math transform}
-     *         construction. May be different than the supplied <code>values</code>
+     *         construction. May be different than the supplied {@code values}
      *         argument if some missing values needed to be filled with default values.
      * @throws InvalidParameterNameException if a parameter name is unknow.
      * @throws InvalidParameterValueException if a parameter has an invalid value.
@@ -279,7 +281,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
     }
 
     /**
-     * Implementation of <code>ensureValidValues</code>, to be invoked recursively
+     * Implementation of {@code ensureValidValues}, to be invoked recursively
      * if the specified values contains sub-groups of values. This method copy all
      * values from the user-supplied parameter values into the provider-supplied
      * one. The provider one should understand alias, and performs name conversion
@@ -518,8 +520,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
 
     /**
      * Returns the operation method for the specified math transform. This method is invoked
-     * automatically after <code>createMathTransform</code>. The default implementation returns
-     * <code>this</code>, which is appropriate for the vast majority of cases. An exception is
+     * automatically after {@code createMathTransform}. The default implementation returns
+     * {@code this}, which is appropriate for the vast majority of cases. An exception is
      * affine transform, which provides different methods for different matrix sizes.
      */
     protected OperationMethod getMethod(final MathTransform mt) {

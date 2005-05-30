@@ -65,6 +65,8 @@ import org.geotools.resources.cts.Resources;
  * @author Martin Desruisseaux
  * @author Jody Garnett (Refractions Research)
  *
+ * @since 2.1
+ *
  * @see DefaultParameterDescriptor
  * @see ParameterGroup
  */
@@ -104,14 +106,14 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     private Object value;
 
     /**
-     * The unit of measure for the value, or <code>null</code> if it doesn't apply.
+     * The unit of measure for the value, or {@code null} if it doesn't apply.
      */
     private Unit unit;
 
     /**
      * Constructs a parameter from the specified name and value. This convenience
      * constructor creates a {@link DefaultParameterDescriptor} object. But if such
-     * an object was available, then the preferred way to get a <code>ParameterValue</code>
+     * an object was available, then the preferred way to get a {@code ParameterValue}
      * is to invokes {@link ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
@@ -125,7 +127,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     /**
      * Constructs a parameter from the specified name and value. This convenience
      * constructor creates a {@link DefaultParameterDescriptor} object. But if such
-     * an object was available, then the preferred way to get a <code>ParameterValue</code> is
+     * an object was available, then the preferred way to get a {@code ParameterValue} is
      * to invokes {@link ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
@@ -142,7 +144,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     /**
      * Constructs a parameter from the specified enumeration. This convenience
      * constructor creates a {@link DefaultParameterDescriptor} object. But if
-     * such an object was available, then the preferred way to get a <code>ParameterValue</code>
+     * such an object was available, then the preferred way to get a {@code ParameterValue}
      * is to invokes {@link ParameterDescriptor#createValue}.
      *
      * @param name  The parameter name.
@@ -170,7 +172,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *
      * @param  descriptor The abstract definition of this parameter.
      * @param  value The parameter value.
-     * @throws InvalidParameterValueException if the type of <code>value</code> is inappropriate
+     * @throws InvalidParameterValueException if the type of {@code value} is inappropriate
      *         for this parameter, or if the value is illegal for some other reason (for example
      *         the value is numeric and out of range).
      */
@@ -239,7 +241,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
 
     /**
      * Ensures that the given value is valid according the specified parameter descriptor.
-     * This convenience method ensures that <code>value</code> is assignable to the
+     * This convenience method ensures that {@code value} is assignable to the
      * {@linkplain ParameterDescriptor#getValueClass expected class}, is between the
      * {@linkplain ParameterDescriptor#getMinimumValue minimum} and
      * {@linkplain ParameterDescriptor#getMaximumValue maximum} values and is one of the
@@ -247,7 +249,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * If the value fails any of those tests, then an exception is thrown.
      *
      * @param  descriptor The parameter descriptor to check against.
-     * @param  value The value to check, or <code>null</code>.
+     * @param  value The value to check, or {@code null}.
      * @throws InvalidParameterValueException if the parameter value is invalid.
      */
     public static void ensureValidValue(final ParameterDescriptor descriptor, final Object value)
@@ -292,10 +294,10 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     /**
      * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}.
      * If the parameter value has no unit (for example because it is a {@link String} type),
-     * then this method returns <code>null</code>. Note that "no unit" doesn't means
+     * then this method returns {@code null}. Note that "no unit" doesn't means
      * "dimensionless".
      *
-     * @return The unit of measure, or <code>null</code> if none.
+     * @return The unit of measure, or {@code null} if none.
      *
      * @see #doubleValue()
      * @see #doubleValueList()
@@ -326,7 +328,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *
      * @param  unit The unit of measure for the value to be returned.
      * @return The numeric value represented by this parameter after conversion to type
-     *         <code>double</code> and conversion to <code>unit</code>.
+     *         {@code double} and conversion to {@code unit}.
      * @throws InvalidParameterTypeException if the value is not a numeric type.
      * @throws IllegalArgumentException if the specified unit is invalid for this parameter.
      *
@@ -351,7 +353,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * Returns the numeric value of the coordinate operation parameter with its
      * associated {@linkplain #getUnit unit of measure}.
      *
-     * @return The numeric value represented by this parameter after conversion to type <code>double</code>.
+     * @return The numeric value represented by this parameter after conversion to type {@code double}.
      * @throws InvalidParameterTypeException if the value is not a numeric type.
      *
      * @see #getUnit
@@ -374,7 +376,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * Returns the positive integer value of an operation parameter, usually used
      * for a count. An integer value does not have an associated unit of measure.
      *
-     * @return The numeric value represented by this parameter after conversion to type <code>int</code>.
+     * @return The numeric value represented by this parameter after conversion to type {@code int}.
      * @throws InvalidParameterTypeException if the value is not an integer type.
      *
      * @see #setValue(int)
@@ -441,8 +443,8 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      *
      * @param  unit The unit of measure for the value to be returned.
      * @return The sequence of values represented by this parameter after conversion to type
-     *         <code>double</code> and conversion to <code>unit</code>.
-     * @throws InvalidParameterTypeException if the value is not an array of <code>double</code>s.
+     *         {@code double} and conversion to {@code unit}.
+     * @throws InvalidParameterTypeException if the value is not an array of {@code double}s.
      * @throws IllegalArgumentException if the specified unit is invalid for this parameter.
      *
      * @see #getUnit
@@ -472,7 +474,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * list, where each value has the same associated {@linkplain Unit unit of measure}.
      *
      * @return The sequence of values represented by this parameter.
-     * @throws InvalidParameterTypeException if the value is not an array of <code>double</code>s.
+     * @throws InvalidParameterTypeException if the value is not an array of {@code double}s.
      *
      * @see #getUnit
      * @see #setValue(Object)
@@ -495,7 +497,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * usually used for counts. These integer values do not have an associated unit of measure.
      *
      * @return The sequence of values represented by this parameter.
-     * @throws InvalidParameterTypeException if the value is not an array of <code>int</code>s.
+     * @throws InvalidParameterTypeException if the value is not an array of {@code int}s.
      *
      * @see #setValue(Object)
      * @see #intValue
@@ -562,8 +564,8 @@ public class Parameter extends AbstractParameter implements ParameterValue {
 
     /**
      * Returns the parameter value as an object. The object type is typically a {@link Double},
-     * {@link Integer}, {@link Boolean}, {@link String}, {@link URI}, <code>double[]</code> or
-     * <code>int[]</code>.
+     * {@link Integer}, {@link Boolean}, {@link String}, {@link URI}, {@code double[]} or
+     * {@code int[]}.
      *
      * @return The parameter value as an object.
      *
@@ -658,11 +660,11 @@ public class Parameter extends AbstractParameter implements ParameterValue {
 
     /**
      * Set the parameter value as an object. The object type is typically a {@link Double},
-     * {@link Integer}, {@link Boolean}, {@link String}, {@link URI}, <code>double[]</code>
-     * or <code>int[]</code>.
+     * {@link Integer}, {@link Boolean}, {@link String}, {@link URI}, {@code double[]}
+     * or {@code int[]}.
      *
      * @param  value The parameter value.
-     * @throws InvalidParameterValueException if the type of <code>value</code> is inappropriate
+     * @throws InvalidParameterValueException if the type of {@code value} is inappropriate
      *         for this parameter, or if the value is illegal for some other reason (for example
      *         the value is numeric and out of range).
      *
@@ -706,8 +708,8 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     /**
      * Compares the specified object with this parameter for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final Object object) {
         if (super.equals(object)) {

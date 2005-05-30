@@ -60,61 +60,63 @@ import org.geotools.resources.cts.Resources;
  * Instructions include:
  *
  * <table>
- *   <tr><td nowrap valign="top"><P><code>SET</code> <var>name</var> <code>=</code> <var>wkt</var></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code SET} <var>name</var> {@code =} <var>wkt</var></P></td><td>
  *   <P align="justify">Set the specified <var>name</var> as a shortcut for the specified Well Know
  *   Text (<var>wkt</var>). This WKT can contains other shortcuts defined previously.</P></td></tr>
  *
- *   <tr><td nowrap valign="top"><P><code>transform = </code> <var>wkt</var></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code transform = } <var>wkt</var></P></td><td>
  *   <P align="justify">Set explicitly a {@linkplain MathTransform math transform} to use for
  *   coordinate transformations. This instruction is a more direct alternative to the usage of
- *   <code>source crs</code> and <code>target crs</code> instruction.</P></td></tr>
+ *   {@code source crs} and {@code target crs} instruction.</P></td></tr>
  *
- *   <tr><td nowrap valign="top"><P><code>source crs = </code> <var>wkt</var></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code source crs = } <var>wkt</var></P></td><td>
  *   <P align="justify">Set the source {@linkplain CoordinateReferenceSystem coordinate reference
  *   system} to the specified object. This object can be specified as a Well Know Text
  *   (<var>wkt</var>) or as a shortcut previously set.</P></td></tr>
  *
- *   <tr><td nowrap valign="top"><P><code>target crs = </code> <var>wkt</var></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code target crs = } <var>wkt</var></P></td><td>
  *   <P align="justify">Set the target {@linkplain CoordinateReferenceSystem coordinate reference
  *   system} to the specified object. This object can be specified as a Well Know Text
  *   (<var>wkt</var>) or as a shortcut previously set. Once both source and target
  *   CRS are specified a {@linkplain MathTransform math transform} from source to
  *   target CRS is automatically infered.</P></td></tr>
  *
- *   <tr><td nowrap valign="top"><P><code>source pt = </code> <var>coord</var></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code source pt = } <var>coord</var></P></td><td>
  *   <P align="justify">Transforms the specified coordinates from source CRS to target CRS
  *   and prints the result.</P>
  *
- *   <tr><td nowrap valign="top"><P><code>target pt = </code> <var>coord</var></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code target pt = } <var>coord</var></P></td><td>
  *   <P align="justify">Inverse transforms the specified coordinates from target CRS to source CRS
  *   and prints the result.</P>
  *
- *   <tr><td nowrap valign="top"><P><code>test tolerance = </code> <var>vector</var></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code test tolerance = } <var>vector</var></P></td><td>
  *   <P align="justify">Set the maximum difference between the transformed source point and the
- *   target point. Once this value is set, every occurence of the <code>target pt</code> instruction
+ *   target point. Once this value is set, every occurence of the {@code target pt} instruction
  *   will trig this comparaison. If a greater difference is found, an exception is thrown or a
  *   message is printed to the error stream.</P>
  *
- *   <tr><td nowrap valign="top"><P><code>print set</code></P></td><td>
- *   <P align="justify">Prints the set of shortcuts defined in previous calls to <code>SET</code>
+ *   <tr><td nowrap valign="top"><P>{@code print set}</P></td><td>
+ *   <P align="justify">Prints the set of shortcuts defined in previous calls to {@code SET}
  *   instruction.</P></td></tr>
  *
- *   <tr><td nowrap valign="top"><P><code>print crs</code></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code print crs}</P></td><td>
  *   <P align="justify">Prints the source and target
  *   {@linkplain CoordinateReferenceSystem coordinate reference system},
  *   {@linkplain MathTransform math transform} and its inverse
  *   as Well Know Text (wkt).</P></td></tr>
  *
- *   <tr><td nowrap valign="top"><P><code>print pts</code></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code print pts}</P></td><td>
  *   <P align="justify">Prints the source and target points, their transformed points, and
  *   the distance between them.</P></td></tr>
  *
- *   <tr><td nowrap valign="top"><P><code>exit</code></P></td><td>
+ *   <tr><td nowrap valign="top"><P>{@code exit}</P></td><td>
  *   <P align="justify">Quit the console.</P></td></tr>
  * </table>
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class Console extends AbstractConsole {
     /**
@@ -123,8 +125,8 @@ public class Console extends AbstractConsole {
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
 
     /**
-     * The number separator in vectors. Usually <code>,</code>, but could
-     * also be <code>;</code> if the coma is already used as the decimal
+     * The number separator in vectors. Usually {@code ,}, but could
+     * also be {@code ;} if the coma is already used as the decimal
      * separator.
      */
     private final String numberSeparator;
@@ -136,17 +138,17 @@ public class Console extends AbstractConsole {
                   FactoryFinder.getCoordinateOperationFactory(null);
 
     /**
-     * The source and target CRS, or <code>null</code> if not yet determined.
+     * The source and target CRS, or {@code null} if not yet determined.
      */
     private CoordinateReferenceSystem sourceCRS, targetCRS;
     
     /**
-     * Source and target coordinate points, or <code>null</code> if not yet determined.
+     * Source and target coordinate points, or {@code null} if not yet determined.
      */
     private DirectPosition sourcePosition, targetPosition;
 
     /**
-     * The math transform, or <code>null</code> if not yet determined.
+     * The math transform, or {@code null} if not yet determined.
      */
     private MathTransform transform;
 
@@ -409,7 +411,7 @@ public class Console extends AbstractConsole {
     }
 
     /**
-     * Executes the "<code>print crs</code>" instruction.
+     * Executes the "{@code print crs}" instruction.
      * @todo Localize
      */
     private void printCRS() throws FactoryException, IOException {
@@ -519,7 +521,7 @@ public class Console extends AbstractConsole {
      * Print the specified point to the specified table.
      * This helper method is for use by {@link #printPts}.
      *
-     * @param  point The point to print, or <code>null</code> if none.
+     * @param  point The point to print, or {@code null} if none.
      * @throws IOException if an error occured while writting to the output stream.
      */
     private void print(final DirectPosition point, final TableWriter table) throws IOException {
@@ -586,8 +588,8 @@ public class Console extends AbstractConsole {
     ///////////////////////////////////////////////////////////
 
     /**
-     * Invoked automatically when the <code>target pt</code> instruction were executed and a
-     * <code>test tolerance</code> were previously set. The default implementation compares
+     * Invoked automatically when the {@code target pt} instruction were executed and a
+     * {@code test tolerance} were previously set. The default implementation compares
      * the transformed source point with the expected target point. If a mismatch greater than
      * the tolerance error is found, an exception is thrown. Subclasses may overrides this
      * method in order to performs more tests.

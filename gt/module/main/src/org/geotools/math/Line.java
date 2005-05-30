@@ -34,15 +34,17 @@ import org.opengis.util.Cloneable;
  * Equation of a line in a two dimensional space (<var>x</var>,<var>y</var>).
  * A line has an equation of the form <var>y</var>=<var>a</var><var>x</var>+<var>b</var>.
  * At the difference of {@link Line2D} (which are bounded by (<var>x1</var>,<var>y1</var>)
- * and (<var>x2</var>,<var>y2</var>) points), <code>Line</code> objects extends toward infinity.
+ * and (<var>x2</var>,<var>y2</var>) points), {@code Line} objects extends toward infinity.
  *
- * The equation parameters for a <code>Line</code> object can bet set at construction
- * time or using one of the <code>setLine(...)</code> methods. The <var>y</var> value
+ * The equation parameters for a {@code Line} object can bet set at construction
+ * time or using one of the {@code setLine(...)} methods. The <var>y</var> value
  * can be computed for a given <var>x</var> value using the {@link #y} method. Method
  * {@link #x} compute the converse and should work even if the line is vertical.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  *
  * @see Point2D
  * @see Line2D
@@ -166,7 +168,7 @@ public class Line implements Cloneable, Serializable {
     }
 
     /**
-     * Given a set of data points <code>x[0..ndata-1]</code>, <code>y[0..ndata-1]</code>,
+     * Given a set of data points {@code x[0..ndata-1]}, {@code y[0..ndata-1]},
      * fit them to a straight line <var>y</var>=<var>b</var>+<var>m</var><var>x</var> in
      * a least-squares senses. This method assume that the <var>x</var> values are precise
      * and all uncertainty is in <var>y</var>.
@@ -311,10 +313,10 @@ public class Line implements Cloneable, Serializable {
 
     /**
      * Returns the intersection point between this line and the specified one.
-     * If both lines are parallel, then this method returns <code>null</code>.
+     * If both lines are parallel, then this method returns {@code null}.
      *
      * @param  line The line to intersect.
-     * @return The intersection point, or <code>null</code>.
+     * @return The intersection point, or {@code null}.
      */
     public Point2D intersectionPoint(final Line line) {
         double x, y;
@@ -340,12 +342,12 @@ public class Line implements Cloneable, Serializable {
 
     /**
      * Returns the intersection point between this line and the specified bounded line.
-     * If both lines are parallel or if the specified <code>line</code> doesn't reach
+     * If both lines are parallel or if the specified {@code line} doesn't reach
      * this line (since {@link Line2D} do not extends toward infinities), then this
-     * method returns <code>null</code>.
+     * method returns {@code null}.
      *
      * @param  line The bounded line to intersect.
-     * @return The intersection point, or <code>null</code>.
+     * @return The intersection point, or {@code null}.
      */
     public Point2D intersectionPoint(final Line2D line) {
         final double x1 = line.getX1();
@@ -399,7 +401,7 @@ public class Line implements Cloneable, Serializable {
      * Returns the nearest point on this line from the specified point.
      *
      * @param  point An arbitrary point.
-     * @return The point on this line which is the nearest of the specified <code>point</code>.
+     * @return The point on this line which is the nearest of the specified {@code point}.
      */
     public Point2D nearestColinearPoint(final Point2D point) {
         if (!Double.isInfinite(slope)) {
@@ -417,16 +419,16 @@ public class Line implements Cloneable, Serializable {
      * such a way that:
      * <ul>
      *   <li>Both points are on this line.</li>
-     *   <li>The distance between any of the two points and the specified <code>summit</code>
-     *       is exactly <code>sideLength</code>.</li>
+     *   <li>The distance between any of the two points and the specified {@code summit}
+     *       is exactly {@code sideLength}.</li>
      * </ul>
      *
      * @param  summit The summit of the isosceles triangle.
      * @param  sideLength The length for the two sides of the isosceles triangle.
-     * @return The base of the isoscele triangle, colinear with this line, or <code>null</code>
+     * @return The base of the isoscele triangle, colinear with this line, or {@code null}
      *         if the base can't be computed. If non-null, then the triangle is the figure formed
      *         by joining (<var>x1</var>,<var>y1</var>), (<var>x2</var>,<var>y2</var>) and
-     *         <code>summit</code>. 
+     *         {@code summit}. 
      */
     public Line2D isoscelesTriangleBase(final Point2D summit, double sideLength) {
         sideLength *= sideLength;

@@ -95,7 +95,7 @@ import org.geotools.resources.cts.Resources;
  * <br><br>
  *
  * NOTE: formulas used below are not those of Snyder, but rather those
- *       from the <code>proj4</code> package of the USGS survey, which
+ *       from the {@code proj4} package of the USGS survey, which
  *       have been reproduced verbatim. USGS work is acknowledged here.
  * <br><br>
  *
@@ -115,6 +115,8 @@ import org.geotools.resources.cts.Resources;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public class TransverseMercator extends MapProjection {
     /**
@@ -126,7 +128,7 @@ public class TransverseMercator extends MapProjection {
     private final double esp;
     
     /**
-     * Meridian distance at the <code>latitudeOfOrigin</code>.
+     * Meridian distance at the {@code latitudeOfOrigin}.
      * Used for calculations for the ellipsoid.
      */
     private final double ml0;
@@ -274,7 +276,7 @@ public class TransverseMercator extends MapProjection {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -310,7 +312,7 @@ public class TransverseMercator extends MapProjection {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-     * and stores the result in <code>ptDst</code>.
+     * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -471,7 +473,7 @@ public class TransverseMercator extends MapProjection {
     
     /**
      * Calculates the meridian distance. This is the distance along the central 
-     * meridian from the equator to <code>phi</code>. Accurate to < 1e-5 meters 
+     * meridian from the equator to {@code phi}. Accurate to < 1e-5 meters 
      * when used in conjuction with typical major axis values.
      *
      * @param phi latitude to calculate meridian distance for.
@@ -490,7 +492,7 @@ public class TransverseMercator extends MapProjection {
     }
     
     /**
-     * Calculates the latitude (<code>phi</code>) from a meridian distance.
+     * Calculates the latitude ({@code phi}) from a meridian distance.
      * Determines phi to TOL (1e-11) radians, about 1e-6 seconds.
      * 
      * @param arg meridian distance to calulate latitude for.
@@ -525,11 +527,11 @@ public class TransverseMercator extends MapProjection {
      *
      * UTM projection (zones numbered from 1 to 60):<br>
      * <br>
-     *        <code>getZone(-177, 6);</code><br>
+     *        {@code getZone(-177, 6);}<br>
      * <br>
      * MTM projection (zones numbered from 1 to 120):<br>
      * <br>
-     *        <code>getZone(-52.5, -3);</code><br>
+     *        {@code getZone(-52.5, -3);}<br>
      *
      * @param  centralLongitudeZone1 Longitude in the middle of zone 1, in degrees
      *         relative to Greenwich. Positive longitudes are toward east, and negative

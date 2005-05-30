@@ -129,6 +129,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Rueben Schulz 
  *
+ * @since 2.1
+ *
  * @todo the transform code does not deal with the case where grids cross +- 180 degrees.
  */
 public class NADCONTransform extends AbstractMathTransform implements Serializable {
@@ -202,7 +204,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
     private LocalizationGrid gridShift = null;
 
     /**
-     * The {@link #gridShift} values as a <code>LocalizationGridTransform2D</code>.
+     * The {@link #gridShift} values as a {@code LocalizationGridTransform2D}.
      * Used for interpolating shift values.
      */
     private MathTransform gridShiftTransform = null;
@@ -660,7 +662,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * @param srcOff the offset to the first point to be transformed in the
      *        source array.
      * @param dstPts the array into which the transformed point coordinates are
-     *        returned. May be the same than <code>srcPts</code>.
+     *        returned. May be the same than {@code srcPts}.
      * @param dstOff the offset to the location of the first transformed point
      *        that is stored in the destination array.
      * @param numPts the number of point objects to be transformed.
@@ -718,7 +720,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * @param srcOff the offset to the first point to be transformed in the
      *        source array.
      * @param dstPts the array into which the transformed point coordinates are
-     *        returned. May be the same than <code>srcPts</code>.
+     *        returned. May be the same than {@code srcPts}.
      * @param dstOff the offset to the location of the first transformed point
      *        that is stored in the destination array.
      * @param numPts the number of point objects to be transformed.
@@ -808,7 +810,7 @@ public class NADCONTransform extends AbstractMathTransform implements Serializab
      * Compares the specified object with this math transform for equality.
      *
      * @param object the object to compare to
-     * @return <code>true</code> if the objects are equal.
+     * @return {@code true} if the objects are equal.
      */
     public final boolean equals(final Object object) {
         if (object == this) {

@@ -48,8 +48,10 @@ import org.geotools.util.CheckedHashSet;
  * The default implementation of {@link #clone() clone()} is suffisient for must uses.
  * However, subclasses are required to overrides the {@link #freeze} method.</P>
  *
+ * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux
+ *
  * @since 2.1
  */
 public class MetadataEntity implements java.lang.Cloneable, Serializable {
@@ -65,8 +67,8 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
 
     /**
      * An unmodifiable copy of this metadata. Will be created only when first needed.
-     * If <code>null</code>, then no unmodifiable entity is available.
-     * If <code>this</code>, then this entity is itself unmodifiable.
+     * If {@code null}, then no unmodifiable entity is available.
+     * If {@code this}, then this entity is itself unmodifiable.
      */
     private transient MetadataEntity unmodifiable;
 
@@ -77,8 +79,8 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
     }
 
     /**
-     * Returns <code>true</code> if this metadata entity is modifiable.
-     * This method returns <code>false</code> if {@link #unmodifiable()}
+     * Returns {@code true} if this metadata entity is modifiable.
+     * This method returns {@code false} if {@link #unmodifiable()}
      * has been invoked on this object.
      */
     public boolean isModifiable() {
@@ -88,7 +90,7 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
     /**
      * Returns an unmodifiable copy of this metadata. Any attempt to modify an attribute of the
      * returned object will throw an {@link UnsupportedOperationException}. If this metadata is
-     * already unmodifiable, then this method returns <code>this</code>.
+     * already unmodifiable, then this method returns {@code this}.
      *
      * @return An unmodifiable copy of this metadata.
      */
@@ -121,7 +123,7 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
      * following heuristic tests:<br>
      *
      * <ul>
-     *   <li>If the specified object is an instance of <code>MetadataEntity</code>, then
+     *   <li>If the specified object is an instance of {@code MetadataEntity}, then
      *       {@link #unmodifiable()} is invoked on this object.</li>
      *   <li>Otherwise, if the object is a {@linkplain Cloneable cloneable}
      *       {@linkplain Collection collection}, then the collection is cloned and all its
@@ -226,7 +228,7 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
     }
 
     /**
-     * Check if changes in the metadata are allowed. All <code>setFoo(...)</code> methods in
+     * Check if changes in the metadata are allowed. All {@code setFoo(...)} methods in
      * sub-classes should invoke this method before to apply any change.
      *
      * @throws UnsupportedOperationException if this metadata is unmodifiable.

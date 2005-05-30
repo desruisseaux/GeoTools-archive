@@ -19,11 +19,10 @@
  */
 package org.geotools.io;
 
-// File filters
+// J2SE dependencies
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.regex.Pattern;
-
 import javax.swing.filechooser.FileFilter;
 
 
@@ -32,6 +31,8 @@ import javax.swing.filechooser.FileFilter;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class DefaultFileFilter extends FileFilter implements java.io.FileFilter, FilenameFilter {
     /**
@@ -94,7 +95,7 @@ public class DefaultFileFilter extends FileFilter implements java.io.FileFilter,
      * Tests if a specified file matches the pattern.
      *
      * @param  file The file to be tested.
-     * @return <code>true</code> if and only if
+     * @return {@code true} if and only if
      *         the name matches the pattern.
      */
     public boolean accept(final File file) {
@@ -106,7 +107,7 @@ public class DefaultFileFilter extends FileFilter implements java.io.FileFilter,
      *
      * @param  dir    the directory in which the file was found.
      * @param  name   the name of the file.
-     * @return <code>true</code> if and only if
+     * @return {@code true} if and only if
      *         the name matches the pattern.
      */
     public boolean accept(File dir, String name) {

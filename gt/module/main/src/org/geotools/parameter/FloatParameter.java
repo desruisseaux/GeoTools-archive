@@ -44,14 +44,16 @@ import org.geotools.resources.cts.Resources;
  * A parameter value as a floating point (double precision) number.
  * This class provides the same functionalities than {@link Parameter}, except that:
  * <ul>
- *   <li>Values are always floating point numbers of type <code>double</code>.</li>
+ *   <li>Values are always floating point numbers of type {@code double}.</li>
  *   <li>Units are the same than the {@linkplain ParameterDescriptor#getUnit default units}.</li>
  * </ul>
- * When those conditions are meet, <code>ParameterRealValue</code> is slightly more efficient
- * than <code>ParameterValue</code> since it avoid the creation of {@link Double} objects.
+ * When those conditions are meet, {@code ParameterRealValue} is slightly more efficient
+ * than {@code ParameterValue} since it avoid the creation of {@link Double} objects.
  *  
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see DefaultParameterDescriptor
  * @see ParameterGroup
@@ -73,7 +75,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * must be <code>{@linkplain Double}.class</code>.
      *
      * @param  descriptor The abstract definition of this parameter.
-     * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
+     * @throws IllegalArgumentException if the value class is not {@code Double.class}.
      */
     public FloatParameter(final ParameterDescriptor descriptor) {
         super(descriptor);
@@ -94,7 +96,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      *
      * @param  descriptor The abstract definition of this parameter.
      * @param  value The parameter value.
-     * @throws IllegalArgumentException if the value class is not <code>Double.class</code>.
+     * @throws IllegalArgumentException if the value class is not {@code Double.class}.
      */
     public FloatParameter(final ParameterDescriptor descriptor, final double value) {
         this(descriptor);
@@ -105,7 +107,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * Returns the unit of measure of the {@linkplain #doubleValue() parameter value}. The default
      * implementation always delegates to {@link ParameterDescriptor#getUnit}.
      *
-     * @return The unit of measure, or <code>null</code> if none.
+     * @return The unit of measure, or {@code null} if none.
      */
     public Unit getUnit() {
         return ((ParameterDescriptor) descriptor).getUnit();
@@ -117,7 +119,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      *
      * @param  unit The unit of measure for the value to be returned.
      * @return The numeric value represented by this parameter after conversion to type
-     *         <code>double</code> and conversion to <code>unit</code>.
+     *         {@code double} and conversion to {@code unit}.
      * @throws IllegalArgumentException if the specified unit is invalid for this parameter.
      */
     public double doubleValue(final Unit unit) throws IllegalArgumentException {
@@ -138,7 +140,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * Returns the numeric value of the coordinate operation parameter with its
      * associated {@linkplain #getUnit unit of measure}.
      *
-     * @return The numeric value represented by this parameter after conversion to type <code>double</code>.
+     * @return The numeric value represented by this parameter after conversion to type {@code double}.
      */
     public double doubleValue() {
         return value;
@@ -147,14 +149,14 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
     /**
      * Returns the numeric value rounded to the nearest integer.
      *
-     * @return The numeric value represented by this parameter after conversion to type <code>int</code>.
+     * @return The numeric value represented by this parameter after conversion to type {@code int}.
      */
     public int intValue() {
         return (int)Math.round(value);
     }
 
     /**
-     * Returns <code>true</code> if the value is different from 0, <code>false</code> otherwise.
+     * Returns {@code true} if the value is different from 0, {@code false} otherwise.
      *
      * @return The boolean value represented by this parameter.
      */
@@ -176,7 +178,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      *
      * @param  unit The unit of measure for the value to be returned.
      * @return The sequence of values represented by this parameter after conversion to type
-     *         <code>double</code> and conversion to <code>unit</code>.
+     *         {@code double} and conversion to {@code unit}.
      * @throws IllegalArgumentException if the specified unit is invalid for this parameter.
      */
     public double[] doubleValueList(final Unit unit) throws IllegalArgumentException {
@@ -289,7 +291,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
      * Set the parameter value as a {@link Double} object.
      *
      * @param  value The parameter value.
-     * @throws InvalidParameterValueException if the type of <code>value</code> is inappropriate
+     * @throws InvalidParameterValueException if the type of {@code value} is inappropriate
      *         for this parameter, or if the value is illegal for some other reason (for example
      *         the value is numeric and out of range).
      */
@@ -309,8 +311,8 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
     /**
      * Compares the specified object with this parameter for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final Object object) {
         if (super.equals(object)) {

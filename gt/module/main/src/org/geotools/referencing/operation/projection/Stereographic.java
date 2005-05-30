@@ -139,6 +139,8 @@ import org.geotools.resources.cts.Resources;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public abstract class Stereographic extends MapProjection {
         

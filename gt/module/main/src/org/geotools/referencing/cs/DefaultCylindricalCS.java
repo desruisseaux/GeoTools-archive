@@ -35,7 +35,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  * A three-dimensional coordinate system consisting of a
  * {@linkplain DefaultPolarCS polar coordinate system} extended by a straight
  * coordinate axis perpendicular to the plane spanned by the polar coordinate system.
- * A <code>CylindricalCS</code> shall have three {@linkplain #getAxis axis}.
+ * A {@code CylindricalCS} shall have three {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -45,6 +45,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see DefaultPolarCS
  */
@@ -89,7 +91,7 @@ public class DefaultCylindricalCS extends AbstractCS implements CylindricalCS {
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */

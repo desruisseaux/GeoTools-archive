@@ -56,12 +56,14 @@ import org.geotools.resources.image.DualRectIter;
 /**
  * An image that contains transformed samples.   It may be sample values after their
  * transformation to geophyics values, or the converse. Images are created using the
- * <code>SampleTranscoder.CRIF</code> inner class, where "CRIF" stands for
+ * {@code SampleTranscoder.CRIF} inner class, where "CRIF" stands for
  * {@link java.awt.image.renderable.ContextualRenderedImageFactory}. The image
  * operation name is "org.geotools.SampleTranscode".
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class SampleTranscoder extends PointOpImage {
     /**
@@ -78,7 +80,7 @@ final class SampleTranscoder extends PointOpImage {
     private final CategoryList[] categories;
     
     /**
-     * Constructs a new <code>SampleTranscoder</code>.
+     * Constructs a new {@code SampleTranscoder}.
      *
      * @param image      The source image.
      * @param categories The category lists, one for each image's band.
@@ -153,7 +155,7 @@ final class SampleTranscoder extends PointOpImage {
      *
      *     <code>{@link GridSampleDimension#geophysics geophysics}(!isGeophysics)</code>,
      *
-     * where <code>isGeophysics</code> is the previous state of the sample dimension.
+     * where {@code isGeophysics} is the previous state of the sample dimension.
      */
     private static final class Descriptor extends OperationDescriptorImpl {
         /**
@@ -175,7 +177,7 @@ final class SampleTranscoder extends PointOpImage {
         }
 
         /**
-         * Returns <code>true</code> if the parameters are valids. This implementation check
+         * Returns {@code true} if the parameters are valids. This implementation check
          * that the number of bands in the source image is equals to the number of supplied
          * sample dimensions, and that all sample dimensions has categories.
          *
@@ -236,8 +238,8 @@ final class SampleTranscoder extends PointOpImage {
         }
 
         /**
-         * Checks if all categories in <code>categories1</code> are
-         * equals to the inverse of <code>categories2</code>.
+         * Checks if all categories in {@code categories1} are
+         * equals to the inverse of {@code categories2}.
          */
         private static boolean isInverse(final CategoryList[] categories1,
                                          final CategoryList[] categories2)

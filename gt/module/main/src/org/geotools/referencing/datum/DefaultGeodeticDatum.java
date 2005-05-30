@@ -54,6 +54,8 @@ import org.geotools.referencing.wkt.Formatter;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see Ellipsoid
  * @see PrimeMeridian
  */
@@ -101,7 +103,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
     private final PrimeMeridian primeMeridian;
     
     /**
-     * Bursa Wolf parameters for datum shifts, or <code>null</code> if none.
+     * Bursa Wolf parameters for datum shifts, or {@code null} if none.
      */
     private final BursaWolfParameters[] bursaWolf;
 
@@ -188,7 +190,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
 
     /**
      * Returns Bursa Wolf parameters for a datum shift toward the specified target,
-     * or <code>null</code> if none.
+     * or {@code null} if none.
      */
     public BursaWolfParameters getBursaWolfParameters(final GeodeticDatum target) {
         if (bursaWolf != null) {
@@ -204,12 +206,12 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
 
     /**
      * Returns a matrix that can be used to define a transformation to the specified datum.
-     * If no transformation path is found, then this method returns <code>null</code>.
+     * If no transformation path is found, then this method returns {@code null}.
      *
      * @param  source The source datum.
      * @param  target The target datum.
-     * @return An affine transform from <code>source</code> to <code>target</code>,
-     *         or <code>null</code> if none.
+     * @return An affine transform from {@code source} to {@code target},
+     *         or {@code null} if none.
      *
      * @see BursaWolfParameters#getAffineTransform
      */
@@ -221,14 +223,14 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
 
     /**
      * Returns a matrix that can be used to define a transformation to the specified datum.
-     * If no transformation path is found, then this method returns <code>null</code>.
+     * If no transformation path is found, then this method returns {@code null}.
      *
      * @param  source The source datum.
      * @param  target The target datum.
-     * @param  exclusion The set of datum to exclude from the search, or <code>null</code>.
+     * @param  exclusion The set of datum to exclude from the search, or {@code null}.
      *         This is used in order to avoid recursivity.
-     * @return An affine transform from <code>source</code> to <code>target</code>,
-     *         or <code>null</code> if none.
+     * @return An affine transform from {@code source} to {@code target},
+     *         or {@code null} if none.
      *
      * @see BursaWolfParameters#getAffineTransform
      */
@@ -321,9 +323,9 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
     }
     
     /**
-     * Returns <code>true</code> if the specified object is equals (at least on
+     * Returns {@code true} if the specified object is equals (at least on
      * computation purpose) to the {@link #WGS84} datum. This method may conservatively
-     * returns <code>false</code> if the specified datum is uncertain (for example
+     * returns {@code false} if the specified datum is uncertain (for example
      * because it come from an other implementation).
      */
     public static boolean isWGS84(final Datum datum) {
@@ -337,10 +339,10 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
     /**
      * Compare this datum with the specified object for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {

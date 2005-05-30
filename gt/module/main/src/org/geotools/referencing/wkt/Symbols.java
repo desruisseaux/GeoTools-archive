@@ -30,6 +30,8 @@ import java.util.Locale;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class Symbols {
     /* ----------------------------------------------------------
@@ -89,7 +91,7 @@ public class Symbols {
 
     /**
      * List of caracters acceptable as opening bracket. The closing bracket must
-     * be the character in the <code>closingBrackets</code> array at the same index
+     * be the character in the {@code closingBrackets} array at the same index
      * than the opening bracket.
      */
     final char[] openingBrackets = {'[', '('};
@@ -151,13 +153,13 @@ public class Symbols {
 
     /**
      * A set of symbols with parameters between square brackets,
-     * like <code>[...]</code>.
+     * like {@code [...]}.
      */
     public static final Symbols SQUARE_BRACKETS = DEFAULT;
 
     /**
      * A set of symbols with parameters between parentheses,
-     * like <code>(...)</code>.
+     * like {@code (...)}.
      */
     public static final Symbols CURLY_BRACKETS = new Symbols();
     static {

@@ -42,33 +42,33 @@ import org.geotools.resources.cts.Resources;
  * containing any characters, with a special meaning for the following characters:
  *
  * <blockquote><table cellpadding="3">
- *     <tr><td><code>D</code></td><td>&nbsp;&nbsp;The integer part of degrees</td></tr>
- *     <tr><td><code>d</code></td><td>&nbsp;&nbsp;The fractional part of degrees</td></tr>
- *     <tr><td><code>M</code></td><td>&nbsp;&nbsp;The integer part of minutes</td></tr>
- *     <tr><td><code>m</code></td><td>&nbsp;&nbsp;The fractional part of minutes</td></tr>
- *     <tr><td><code>S</code></td><td>&nbsp;&nbsp;The integer part of seconds</td></tr>
- *     <tr><td><code>s</code></td><td>&nbsp;&nbsp;The fractional part of seconds</td></tr>
- *     <tr><td><code>.</code></td><td>&nbsp;&nbsp;The decimal separator</td></tr>
+ *     <tr><td>{@code D}</td><td>&nbsp;&nbsp;The integer part of degrees</td></tr>
+ *     <tr><td>{@code d}</td><td>&nbsp;&nbsp;The fractional part of degrees</td></tr>
+ *     <tr><td>{@code M}</td><td>&nbsp;&nbsp;The integer part of minutes</td></tr>
+ *     <tr><td>{@code m}</td><td>&nbsp;&nbsp;The fractional part of minutes</td></tr>
+ *     <tr><td>{@code S}</td><td>&nbsp;&nbsp;The integer part of seconds</td></tr>
+ *     <tr><td>{@code s}</td><td>&nbsp;&nbsp;The fractional part of seconds</td></tr>
+ *     <tr><td>{@code .}</td><td>&nbsp;&nbsp;The decimal separator</td></tr>
  * </table></blockquote>
  * <br>
- * Upper-case letters <code>D</code>, <code>M</code> and <code>S</code> are for the integer
+ * Upper-case letters {@code D}, {@code M} and {@code S} are for the integer
  * parts of degrees, minutes and seconds respectively. They must appear in this order (e.g.
  * "<code>M'D</code>" is illegal because "M" and "S" are inverted; "<code>D°S</code>" is
- * illegal too because there is no "M" between "D" and "S"). Lower-case letters <code>d</code>,
- * <code>m</code> and <code>s</code> are for fractional parts of degrees, minutes and seconds
+ * illegal too because there is no "M" between "D" and "S"). Lower-case letters {@code d},
+ * {@code m} and {@code s} are for fractional parts of degrees, minutes and seconds
  * respectively. Only one of those may appears in a pattern, and it must be the last special
  * symbol (e.g. "<code>D.dd°MM'</code>" is illegal because "d" is followed by "M";
- * "<code>D.mm</code>" is illegal because "m" is not the fractional part of "D").
+ * "{@code D.mm}" is illegal because "m" is not the fractional part of "D").
  * <br><br>
- * The number of occurrence of <code>D</code>, <code>M</code>, <code>S</code> and their
+ * The number of occurrence of {@code D}, {@code M}, {@code S} and their
  * lower-case counterpart is the number of digits to format. For example, "DD.ddd" will
  * format angle with two digits for the integer part and three digits for the fractional
  * part (e.g. 4.4578 will be formatted as "04.458"). Separator characters like <code>°</code>,
  * <code>'</code> and <code>"</code> and inserted "as-is" in the formatted string (except the
- * decimal separator dot ("<code>.</code>"), which is replaced by the local-dependent decimal
- * separator). Separator characters may be completely omitted; <code>AngleFormat</code> will
+ * decimal separator dot ("{@code .}"), which is replaced by the local-dependent decimal
+ * separator). Separator characters may be completely omitted; {@code AngleFormat} will
  * still differentiate degrees, minutes and seconds fields according the pattern. For example,
- * "<code>0480439</code>" with the pattern "<code>DDDMMmm</code>" will be parsed as 48°04.39'.
+ * "{@code 0480439}" with the pattern "{@code DDDMMmm}" will be parsed as 48°04.39'.
  * <br><br>
  * The following table gives some examples of legal patterns.
  *
@@ -76,9 +76,9 @@ import org.geotools.resources.cts.Resources;
  * <tr><th>Pattern                </th>  <th>Example   </th></tr>
  * <tr><td><code>DD°MM'SS" </code></td>  <td>48°30'00" </td></tr>
  * <tr><td><code>DD°MM'    </code></td>  <td>48°30'    </td></tr>
- * <tr><td><code>DD.ddd    </code></td>  <td>48.500    </td></tr>
- * <tr><td><code>DDMM      </code></td>  <td>4830      </td></tr>
- * <tr><td><code>DDMMSS    </code></td>  <td>483000    </td></tr>
+ * <tr><td>{@code DD.ddd    }</td>  <td>48.500    </td></tr>
+ * <tr><td>{@code DDMM      }</td>  <td>4830      </td></tr>
+ * <tr><td>{@code DDMMSS    }</td>  <td>483000    </td></tr>
  * </table></blockquote>
  *
  * @see Angle
@@ -87,6 +87,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class AngleFormat extends Format {
     /**
@@ -175,24 +177,24 @@ public class AngleFormat extends Format {
     /**
      * Nombre minimal d'espaces que doivent occuper les parties
      * entières des degrés (0), minutes (1) et secondes (2). Le
-     * champs <code>widthDecimal</code> indique la largeur fixe
+     * champs {@code widthDecimal} indique la largeur fixe
      * que doit avoir la partie décimale. Il s'appliquera au
-     * dernier champs non-zero dans <code>width0..2</code>.
+     * dernier champs non-zero dans {@code width0..2}.
      */
     private int width0=1, width1=2, width2=0, widthDecimal=0;
     
     /**
-     * Caractères à insérer au début (<code>prefix</code>) et à la
-     * suite des degrés, minutes et secondes (<code>suffix0..2</code>).
-     * Ces champs doivent être <code>null</code> s'il n'y a rien à insérer.
+     * Caractères à insérer au début ({@code prefix}) et à la
+     * suite des degrés, minutes et secondes ({@code suffix0..2}).
+     * Ces champs doivent être {@code null} s'il n'y a rien à insérer.
      */
     private String prefix=null, suffix0="\u00B0", suffix1="'", suffix2="\"";
     
     /**
      * Indique s'il faut utiliser le séparateur décimal pour séparer la partie
-     * entière de la partie fractionnaire. La valeur <code>false</code> indique
+     * entière de la partie fractionnaire. La valeur {@code false} indique
      * que les parties entières et fractionnaires doivent être écrites ensembles
-     * (par exemple 34867 pour 34.867). La valeur par défaut est <code>true</code>.
+     * (par exemple 34867 pour 34.867). La valeur par défaut est {@code true}.
      */
     private boolean decimalSeparator=true;
     
@@ -204,7 +206,7 @@ public class AngleFormat extends Format {
     private final DecimalFormat numberFormat;
     
     /**
-     * Objet à transmetre aux méthodes <code>DecimalFormat.format</code>.
+     * Objet à transmetre aux méthodes {@code DecimalFormat.format}.
      * Ce paramètre existe simplement pour éviter de créer cet objet trop
      * souvent, alors qu'on ne s'y intéresse pas.
      */
@@ -272,14 +274,14 @@ public class AngleFormat extends Format {
     }
 
     /**
-     * Construct a new <code>AngleFormat</code> for the specified locale.
+     * Construct a new {@code AngleFormat} for the specified locale.
      */
     public static AngleFormat getInstance(final Locale locale) {
         return new AngleFormat("D\u00B0MM.m'", locale);
     }
 
     /**
-     * Construct a new <code>AngleFormat</code> using
+     * Construct a new {@code AngleFormat} using
      * the current default locale and a default pattern.
      */
     public AngleFormat() {
@@ -287,7 +289,7 @@ public class AngleFormat extends Format {
     }
     
     /**
-     * Construct a new <code>AngleFormat</code> using the
+     * Construct a new {@code AngleFormat} using the
      * current default locale and the specified pattern.
      *
      * @param  pattern Pattern to use for parsing and formatting angle.
@@ -299,7 +301,7 @@ public class AngleFormat extends Format {
     }
     
     /**
-     * Construct a new <code>AngleFormat</code>
+     * Construct a new {@code AngleFormat}
      * using the specified pattern and locale.
      *
      * @param  pattern Pattern to use for parsing and formatting angle.
@@ -312,7 +314,7 @@ public class AngleFormat extends Format {
     }
     
     /**
-     * Construct a new <code>AngleFormat</code>
+     * Construct a new {@code AngleFormat}
      * using the specified pattern and decimal symbols.
      *
      * @param  pattern Pattern to use for parsing and formatting angle.
@@ -471,7 +473,7 @@ public class AngleFormat extends Format {
      * @param  angle      Angle to format, in degrees.
      * @param  toAppendTo Where the text is to be appended.
      * @param  pos        An optional {@link FieldPosition} identifying a field
-     *                    in the formatted text, or <code>null</code> if this
+     *                    in the formatted text, or {@code null} if this
      *                    information is not wanted. This field position shall
      *                    be constructed with one of the following constants:
      *                    {@link #DEGREES_FIELD},
@@ -479,7 +481,7 @@ public class AngleFormat extends Format {
      *                    {@link #SECONDS_FIELD} or
      *                    {@link #HEMISPHERE_FIELD}.
      *
-     * @return The string buffer passed in as <code>toAppendTo</code>, with formatted text appended.
+     * @return The string buffer passed in as {@code toAppendTo}, with formatted text appended.
      */
     public synchronized StringBuffer format(final double angle,
                                             StringBuffer toAppendTo,
@@ -567,10 +569,10 @@ public class AngleFormat extends Format {
      * @param value Valeur à écrire.
      * @param toAppendTo Buffer dans lequel écrire le champs.
      * @param pos Objet dans lequel mémoriser les index des premiers
-     *        et derniers caractères écrits, ou <code>null</code>
+     *        et derniers caractères écrits, ou {@code null}
      *        pour ne pas mémoriser ces index.
      * @param w Nombre de minimal caractères de la partie entière.
-     * @param last <code>true</code> si ce champs est le dernier,
+     * @param last {@code true} si ce champs est le dernier,
      *        et qu'il faut donc écrire la partie décimale.
      * @param s Suffix à écrire après le nombre (peut être nul).
      */
@@ -607,16 +609,16 @@ public class AngleFormat extends Format {
     /**
      * Formats an angle, a latitude or a longitude and appends the resulting text
      * to a given string buffer. The string will be formatted according the pattern
-     * set in the last call to {@link #applyPattern}. The argument <code>obj</code>
+     * set in the last call to {@link #applyPattern}. The argument {@code obj}
      * shall be an {@link Angle} object or one of its derived class ({@link Latitude},
-     * {@link Longitude}). If <code>obj</code> is a {@link Latitude} object, then a
+     * {@link Longitude}). If {@code obj} is a {@link Latitude} object, then a
      * symbol "N" or "S" will be appended to the end of the string (the symbol will
-     * be choosen according the angle's sign). Otherwise, if <code>obj</code> is a
+     * be choosen according the angle's sign). Otherwise, if {@code obj} is a
      * {@link Longitude} object, then a symbol "E" or "W" will be appended to the
      * end of the string. Otherwise, no hemisphere symbol will be appended.
      * <br><br>
      * Strictly speaking, formatting ordinary numbers is not the
-     * <code>AngleFormat</code>'s job. Nevertheless, this method
+     * {@code AngleFormat}'s job. Nevertheless, this method
      * accept {@link Number} objects. This capability is provided
      * only as a convenient way to format altitude numbers together
      * with longitude and latitude angles.
@@ -624,7 +626,7 @@ public class AngleFormat extends Format {
      * @param  obj        {@link Angle} or {@link Number} object to format.
      * @param  toAppendTo Where the text is to be appended.
      * @param  pos        An optional {@link FieldPosition} identifying a field
-     *                    in the formatted text, or <code>null</code> if this
+     *                    in the formatted text, or {@code null} if this
      *                    information is not wanted. This field position shall
      *                    be constructed with one of the following constants:
      *                    {@link #DEGREES_FIELD},
@@ -632,9 +634,9 @@ public class AngleFormat extends Format {
      *                    {@link #SECONDS_FIELD} or
      *                    {@link #HEMISPHERE_FIELD}.
      *
-     * @return The string buffer passed in as <code>toAppendTo</code>, with
+     * @return The string buffer passed in as {@code toAppendTo}, with
      *         formatted text appended.
-     * @throws IllegalArgumentException if <code>obj</code> if not an object
+     * @throws IllegalArgumentException if {@code obj} if not an object
      *         of class {@link Angle} or {@link Number}.
      */
     public synchronized StringBuffer format(final Object obj,
@@ -679,7 +681,7 @@ public class AngleFormat extends Format {
      *                    En sortie, les index du champs demandé. Ce paramètre
      *                    peut être nul si cette information n'est pas désirée.
      *
-     * @return Le buffer <code>toAppendTo</code> par commodité.
+     * @return Le buffer {@code toAppendTo} par commodité.
      */
     synchronized StringBuffer format(final double number, final int type,
                                      StringBuffer toAppendTo,
@@ -715,7 +717,7 @@ public class AngleFormat extends Format {
      * @param north       Caractères à écrire si l'angle est positif ou nul.
      * @param south       Caractères à écrire si l'angle est négatif.
      *
-     * @return Le buffer <code>toAppendTo</code> par commodité.
+     * @return Le buffer {@code toAppendTo} par commodité.
      */
     private StringBuffer format(final double angle,
                                 StringBuffer toAppendTo,
@@ -746,16 +748,16 @@ public class AngleFormat extends Format {
      *
      * @param  source Chaîne dans laquelle on doit sauter le suffix.
      * @param  pos En entré, l'index du premier caractère à considérer dans la
-     *         chaîne <code>pos</code>. En sortie, l'index du premier caractère
+     *         chaîne {@code pos}. En sortie, l'index du premier caractère
      *         suivant le suffix (c'est-à-dire index à partir d'où continuer la
      *         lecture après l'appel de cette méthode). Si le suffix n'a pas été
-     *         reconnu, alors cette méthode retourne par convention <code>SYMBOLS.length</code>.
+     *         reconnu, alors cette méthode retourne par convention {@code SYMBOLS.length}.
      * @param  field Champs à vérifier de préférences. Par exemple la valeur 1 signifie que les
      *         suffix des minutes et des secondes devront être vérifiés avant celui des degrés.
      * @return Le numéro du champs correspondant au suffix qui vient d'être extrait:
      *         -1 pour le préfix de l'angle, 0 pour le suffix des degrés, 1 pour le
      *         suffix des minutes et 2 pour le suffix des secondes. Si le texte n'a
-     *         pas été reconnu, retourne <code>SYMBOLS.length</code>.
+     *         pas été reconnu, retourne {@code SYMBOLS.length}.
      */
     private int skipSuffix(final String source, final ParsePosition pos, int field) {
         /*
@@ -803,8 +805,8 @@ public class AngleFormat extends Format {
      * Parse a string as an angle. This method can parse an angle even if it
      * doesn't comply exactly to the expected pattern. For example, this method
      * will parse correctly string "<code>48°12.34'</code>" even if the expected
-     * pattern was "<code>DDMM.mm</code>" (i.e. the string should have been
-     * "<code>4812.34</code>"). Spaces between degrees, minutes and secondes
+     * pattern was "{@code DDMM.mm}" (i.e. the string should have been
+     * "{@code 4812.34}"). Spaces between degrees, minutes and secondes
      * are ignored. If the string ends with an hemisphere symbol "N" or "S",
      * then this method returns an object of class {@link Latitude}. Otherwise,
      * if the string ends with an hemisphere symbol "E" or "W", then this method
@@ -834,7 +836,7 @@ public class AngleFormat extends Format {
      * @param source           Chaîne de caractères à lire.
      * @param pos              Position à partir d'où interpréter la chaîne.
      * @param spaceAsSeparator Indique si l'espace est accepté comme séparateur
-     *                         à l'intérieur d'un angle. La valeur <code>true</code>
+     *                         à l'intérieur d'un angle. La valeur {@code true}
      *                         fait que l'angle "45 30" sera interprété comme "45°30".
      * @return L'angle lu.
      */
@@ -1222,7 +1224,7 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
      *
      * @param  source Chaîne de caractères à interpréter.
      * @param  pos    Position à partir d'où commencer l'interprétation
-     *                de la chaîne <code>source</code>.
+     *                de la chaîne {@code source}.
      * @return Le nombre lu comme objet {@link Number}.
      */
     final Number parseNumber(final String source, final ParsePosition pos) {
@@ -1236,10 +1238,10 @@ BigBoss:    switch (skipSuffix(source, pos, DEGREES_FIELD)) {
      *
      * @param  source Chaîne de caractères qui était à interpréter.
      * @param  pos Position à laquelle s'est terminée l'interprétation de la
-     *         chaîne <code>source</code>.
-     * @param  isCoordinate <code>false</code> si on interprétait un angle,
-     *         ou <code>true</code> si on interprétait une coordonnée.
-     * @throws ParseException Si la chaîne <code>source</code> n'a pas été
+     *         chaîne {@code source}.
+     * @param  isCoordinate {@code false} si on interprétait un angle,
+     *         ou {@code true} si on interprétait une coordonnée.
+     * @throws ParseException Si la chaîne {@code source} n'a pas été
      *         interprétée dans sa totalité.
      */
     static void checkComplete(final String source,

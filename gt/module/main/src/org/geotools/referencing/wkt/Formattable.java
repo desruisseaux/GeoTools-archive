@@ -46,6 +46,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
  */
@@ -93,7 +95,7 @@ public class Formattable {
      * following syntax:
      *
      * <blockquote>
-     * <code>java org.geotools.referencing.wkt.Formattable -identation=</code><var>&lt;preferred
+     * {@code java org.geotools.referencing.wkt.Formattable -identation=}<var>&lt;preferred
      * indentation&gt;</var>
      * </blockquote>
      *
@@ -149,7 +151,7 @@ public class Formattable {
 
     /**
      * Returns a WKT for this object using the specified indentation and authority.
-     * If <code>strict</code> is true, then an exception is thrown if the WKT contains
+     * If {@code strict} is true, then an exception is thrown if the WKT contains
      * invalid keywords.
      */
     private String toWKT(final Citation authority, final int indentation, final boolean strict)
@@ -196,7 +198,7 @@ public class Formattable {
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
      * Known Text</cite> (WKT)</A> element. This method is automatically invoked by
      * {@link Formatter#append(Formattable)}. Element name and authority code must not be
-     * formatted here. For example for a <code>GEOGCS</code> element
+     * formatted here. For example for a {@code GEOGCS} element
      * ({@link org.geotools.referencing.crs.DefaultGeographicCRS}), the formatter will invokes
      * this method for completing the WKT at the insertion point show below:
      *

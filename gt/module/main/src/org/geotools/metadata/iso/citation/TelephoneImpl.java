@@ -34,6 +34,8 @@ import org.geotools.resources.Utilities;
  *
  * @author Jody Garnett
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class TelephoneImpl extends MetadataEntity implements Telephone {
     /**

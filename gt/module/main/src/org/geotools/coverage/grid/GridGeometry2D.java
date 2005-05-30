@@ -63,6 +63,8 @@ import org.geotools.resources.gcs.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GridGeometry2D extends GeneralGridGeometry {
     /**

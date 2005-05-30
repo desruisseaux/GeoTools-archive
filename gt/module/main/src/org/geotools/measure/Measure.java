@@ -30,6 +30,8 @@ import org.geotools.resources.Utilities;
  * A scalar with an unit.
  *
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class Measure extends Number {
     /**

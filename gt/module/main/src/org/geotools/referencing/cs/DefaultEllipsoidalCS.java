@@ -39,7 +39,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 /**
  * A two- or three-dimensional coordinate system in which position is specified by geodetic
  * latitude, geodetic longitude, and (in the three-dimensional case) ellipsoidal height. An
- * <code>EllipsoidalCS</code> shall have two or three {@linkplain #getAxis axis}.
+ * {@code EllipsoidalCS} shall have two or three {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -50,6 +50,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
     /**
@@ -160,7 +162,7 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts only the following directions:
      * {@link AxisDirection#NORTH NORTH}, {@link AxisDirection#SOUTH SOUTH},
      * {@link AxisDirection#EAST  EAST},  {@link AxisDirection#WEST  WEST},

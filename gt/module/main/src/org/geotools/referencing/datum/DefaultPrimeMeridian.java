@@ -45,6 +45,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements PrimeMeridian {
     /**
@@ -69,7 +71,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     private final Unit angularUnit;
 
     /**
-     * Constructs a prime meridian from a name. The <code>greenwichLongitude</code> value
+     * Constructs a prime meridian from a name. The {@code greenwichLongitude} value
      * is assumed in {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *
      * @param name                The datum name.
@@ -108,7 +110,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
 
     /**
      * Longitude of the prime meridian measured from the Greenwich meridian, positive eastward.
-     * The <code>greenwichLongitude</code> initial value is zero, and that value shall be used
+     * The {@code greenwichLongitude} initial value is zero, and that value shall be used
      * when the {@linkplain #getName meridian name} value is "Greenwich".
      *
      * @return The prime meridian Greenwich longitude, in {@linkplain #getAngularUnit angular unit}.
@@ -120,7 +122,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     /**
      * Returns the longitude value relative to the Greenwich Meridian, expressed in the specified
      * units. This convenience method makes it easier to obtain longitude in degrees
-     * (<code>getGreenwichLongitude(NonSI.DEGREE_ANGLE)</code>), regardless of the underlying
+     * ({@code getGreenwichLongitude(NonSI.DEGREE_ANGLE)}), regardless of the underlying
      * angular units of this prime meridian.
      *
      * @param targetUnit The unit in which to express longitude.
@@ -139,10 +141,10 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     /**
      * Compare this prime meridian with the specified object for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {

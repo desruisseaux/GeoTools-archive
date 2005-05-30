@@ -67,6 +67,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id: MatrixParameterDescriptors.java 7846 2004-09-08 21:34:06Z jgarnett $
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see MatrixParameters
  */
 public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup {
@@ -138,7 +140,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
     /**
      * Constructs a parameter group. The properties map is given unchanged to the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
-     * The <code>parameters</code> array should contains parameters <strong>other</strong>
+     * The {@code parameters} array should contains parameters <strong>other</strong>
      * than matrix elements. The first parameter is assumed to be the number of rows, and
      * the second parameter the number of columns. All extra parameters are ignored.
      *
@@ -170,7 +172,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
      * @param  name  The parameter name. To be used for formatting error message.
      * @param  index The indice to check.
      * @param  upper The upper range value, exclusive.
-     * @throws IndexOutOfBoundsException if <code>index</code> is outside the expected range.
+     * @throws IndexOutOfBoundsException if {@code index} is outside the expected range.
      */
     static void checkIndice(final String name, final int index, final int upper)
             throws IndexOutOfBoundsException
@@ -252,7 +254,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
      * @param  row    The row indice.
      * @param  column The column indice
      * @return The parameter descriptor for the specified matrix element.
-     * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code row} or {@code column} is out of bounds.
      */
     public final ParameterDescriptor descriptor(final int row, final int column)
             throws IndexOutOfBoundsException
@@ -269,7 +271,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
      * @param  numRow The maximum number of rows.
      * @param  numCol The maximum number of columns.
      * @return The parameter descriptor for the specified matrix element.
-     * @throws IndexOutOfBoundsException if <code>row</code> or <code>column</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code row} or {@code column} is out of bounds.
      */
     final ParameterDescriptor descriptor(final int row,    final int column,
                                          final int numRow, final int numCol)
@@ -412,10 +414,10 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
     /**
      * Compares the specified object with this parameter group for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {

@@ -21,7 +21,7 @@
  *
  *                   THIS IS A TEMPORARY CLASS
  *
- *    This is a placeholder for future <code>Unit</code> class.
+ *    This is a placeholder for future {@code Unit} class.
  *    This skeleton will be removed when the real classes from
  *    JSR-108: Units specification will be publicly available.
  */

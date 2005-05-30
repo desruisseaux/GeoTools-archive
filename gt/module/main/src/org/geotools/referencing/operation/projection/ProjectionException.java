@@ -29,6 +29,8 @@ import org.opengis.referencing.operation.TransformException;
  * @version $Id$
  * @author André Gosselin
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class ProjectionException extends TransformException {
     /**

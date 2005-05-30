@@ -38,11 +38,13 @@ import org.geotools.referencing.operation.DefaultOperation;
 
 /**
  * An immutable map fetching all properties from the specified identified object.
- * Calls to <code>get</code> methods are forwarded to the appropriate
+ * Calls to {@code get} methods are forwarded to the appropriate
  * {@link IdentifiedObject} method.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class Properties extends AbstractMap {
     /**

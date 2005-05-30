@@ -49,6 +49,8 @@ import org.geotools.util.SimpleInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleParty {
     /**
@@ -237,7 +239,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
 
     /**
      * Returns the name of the responsible person- surname, given name, title separated by a delimiter.
-     * Only one of <code>individualName</code>, {@link #getOrganisationName organisationName}
+     * Only one of {@code individualName}, {@link #getOrganisationName organisationName}
      * and {@link #getPositionName positionName} should be provided.
      */
     public String getIndividualName() {
@@ -246,7 +248,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
     
     /**
      * Set the name of the responsible person- surname, given name, title separated by a delimiter.
-     * Only one of <code>individualName</code>, {@link #getOrganisationName organisationName}
+     * Only one of {@code individualName}, {@link #getOrganisationName organisationName}
      * and {@link #getPositionName positionName} should be provided.
      */
     public synchronized void setIndividualName(final String newValue) {
@@ -276,7 +278,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
     /**
      * Returns the role or position of the responsible person
      * Only one of {@link #getIndividualName individualName},
-     * {@link #getOrganisationName organisationName} and <code>positionName</code>
+     * {@link #getOrganisationName organisationName} and {@code positionName}
      * should be provided.
      */
     public InternationalString getPositionName() {
@@ -286,7 +288,7 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
     /**
      * set the role or position of the responsible person
      * Only one of {@link #getIndividualName individualName},
-     * {@link #getOrganisationName organisationName} and <code>positionName</code>
+     * {@link #getOrganisationName organisationName} and {@code positionName}
      * should be provided.
      */
     public synchronized void setPositionName(final InternationalString newValue) {

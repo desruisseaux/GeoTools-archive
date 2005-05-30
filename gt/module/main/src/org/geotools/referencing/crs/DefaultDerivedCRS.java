@@ -48,6 +48,8 @@ import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS {
     /**
@@ -65,10 +67,10 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDeviced} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     public DefaultDerivedCRS(final String                    name,
                              final OperationMethod         method,
@@ -94,10 +96,10 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDeviced</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDeviced} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     public DefaultDerivedCRS(final Map                 properties,
                              final OperationMethod         method,
@@ -120,10 +122,10 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
      * @param  baseToDerived The transform from the base CRS to returned CRS.
      * @param  derivedCS The coordinate system for the derived CRS. The number
      *         of axes must match the target dimension of the transform
-     *         <code>baseToDerived</code>.
+     *         {@code baseToDerived}.
      * @throws MismatchedDimensionException if the source and target dimension of
-     *         <code>baseToDerived</code> don't match the dimension of <code>base</code>
-     *         and <code>derivedCS</code> respectively.
+     *         {@code baseToDerived} don't match the dimension of {@code base}
+     *         and {@code derivedCS} respectively.
      */
     public DefaultDerivedCRS(final Map                 properties,
                              final Conversion  conversionFromBase,

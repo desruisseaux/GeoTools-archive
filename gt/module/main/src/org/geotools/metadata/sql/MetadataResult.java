@@ -37,6 +37,8 @@ import java.util.logging.Logger;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @todo Automatically close the ResultSet after some delay (e.g. 2 minutes).
  */
 final class MetadataResult {
@@ -51,7 +53,7 @@ final class MetadataResult {
     private final PreparedStatement statement;
 
     /**
-     * The results, or <code>null</code> if not yet determined.
+     * The results, or {@code null} if not yet determined.
      */
     private ResultSet results;
 

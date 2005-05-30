@@ -49,8 +49,10 @@ import org.geotools.resources.gcs.Resources;
 /**
  * An image decoder for matrix of floating-point numbers.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class TextMatrixImageReader extends TextImageReader {
     /**
@@ -77,7 +79,7 @@ public class TextMatrixImageReader extends TextImageReader {
     private int expectedHeight;
     
     /**
-     * <code>true</code> if {@link #data} contains all data, or <code>false</code>
+     * {@code true} if {@link #data} contains all data, or {@code false}
      * if {@link #data} contains only the first line. This field has no signification
      * if {@link #data} is null.
      */
@@ -136,8 +138,8 @@ public class TextMatrixImageReader extends TextImageReader {
      * Load data. No subsampling is performed.
      *
      * @param  imageIndex the index of the image to be read.
-     * @param  all <code>true</code> to read all data, or <code>false</code> to read only the first line.
-     * @return <code>true</code> if reading has been aborted.
+     * @param  all {@code true} to read all data, or {@code false} to read only the first line.
+     * @return {@code true} if reading has been aborted.
      * @throws IOException If an error occurs reading the width information from the input source.
      */
     private boolean load(final int imageIndex, final boolean all) throws IOException {
@@ -239,7 +241,7 @@ public class TextMatrixImageReader extends TextImageReader {
     }
     
     /**
-     * Reads the image indexed by <code>imageIndex</code>.
+     * Reads the image indexed by {@code imageIndex}.
      *
      * @param  imageIndex  The index of the image to be retrieved.
      * @param  param       Parameters used to control the reading process, or null.
@@ -346,7 +348,7 @@ public class TextMatrixImageReader extends TextImageReader {
      *
      * @param  imageIndex The image index.
      * @param  bandIndex The band index.
-     * @return The expected range of values, or <code>null</code> if unknow.
+     * @return The expected range of values, or {@code null} if unknow.
      * @throws IOException If an error occurs reading the data information from the input source.
      */
     public Range getExpectedRange(final int imageIndex, final int bandIndex) throws IOException {
@@ -391,10 +393,10 @@ public class TextMatrixImageReader extends TextImageReader {
      * }
      * </pre></blockquote>
      *
-     * (Note: fields <code>vendorName</code> and <code>version</code> are only informatives).
+     * (Note: fields {@code vendorName} and {@code version} are only informatives).
      * There is no need to override any method in this example. However, developers
      * can gain more control by creating subclasses of {@link TextMatrixImageReader}
-     * <strong>and</strong> <code>Spi</code> and overriding some of their methods.
+     * <strong>and</strong> {@code Spi} and overriding some of their methods.
      *
      * @version 1.0
      * @author Martin Desruisseaux
@@ -414,13 +416,13 @@ public class TextMatrixImageReader extends TextImageReader {
          *
          * <ul>
          *   <li>Image format names ({@link #names}):
-         *       An array of lenght 1 containing the <code>name</code> argument.
+         *       An array of lenght 1 containing the {@code name} argument.
          *
          *   <li>MIME type ({@link #MIMETypes}):
-         *       An array of length 1 containing the <code>mime</code> argument.
+         *       An array of length 1 containing the {@code mime} argument.
          *
          *   <li>File suffixes ({@link #suffixes}):
-         *       "<code>.txt</code>", "<code>.asc</code>" et "<code>.dat</code>"
+         *       "{@code .txt}", "{@code .asc}" et "{@code .dat}"
          *       (uppercase and lowercase).</li>
          *
          *   <li>Input types ({@link #inputTypes}):
@@ -428,8 +430,8 @@ public class TextMatrixImageReader extends TextImageReader {
          *       {@link java.io.InputStream} et {@link javax.imageio.stream.ImageInputStream}.</li>
          * </ul>
          *
-         * @param name Format name, or <code>null</code> to let {@link #names} unset.
-         * @param mime MIME type, or <code>null</code> to let {@link #MIMETypes} unset.
+         * @param name Format name, or {@code null} to let {@link #names} unset.
+         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
          */
         public Spi(final String name, final String mime) {
             super(name, mime);

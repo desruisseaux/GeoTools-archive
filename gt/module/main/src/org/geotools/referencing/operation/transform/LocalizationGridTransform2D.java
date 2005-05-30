@@ -62,7 +62,7 @@ import org.geotools.resources.cts.Resources;
  * <code>x</sub>input</sub>&nbsp;=&nbsp;[0..width-1]</code> and
  * <code>y</sub>input</sub>&nbsp;=&nbsp;[0..height-1]</code> inclusive,
  *
- * where <code>width</code> and <code>height</code> are the number of columns and
+ * where {@code width} and {@code height} are the number of columns and
  * rows in the grid of localization. Output coordinates are the values stored in
  * the grid of localization at the specified index. If input coordinates (index)
  * are non-integer values, then output coordinates are interpolated using a bilinear
@@ -72,6 +72,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  *
  * @todo This class should extends {@link WarpTransform2D} and constructs a
  *       {@link javax.media.jai.WarpGrid} the first time the {@link WarpTransform2D#getWarp()}
@@ -92,13 +94,13 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
     private static final int MAX_ITER = 40;
 
     /**
-     * Set to <code>true</code> for a conservative (and maybe slower) algorithm
+     * Set to {@code true} for a conservative (and maybe slower) algorithm
      * in {@link #inverseTransform}.
      */
     private static final boolean CONSERVATIVE = true;
 
     /**
-     * Set to <code>true</code> for forcing {@link #inverseTransform} to returns
+     * Set to {@code true} for forcing {@link #inverseTransform} to returns
      * a value instead of throwing an exception if the transform do not converge.
      * This is a temporary flag until we find why the inverse transform fails to
      * converge in some case.
@@ -117,13 +119,13 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
 
     /**
      * <var>x</var> (usually longitude) offset relative to an entry.
-     * Points are stored in {@link #grid} as <code>(x,y)</code> pairs.
+     * Points are stored in {@link #grid} as {@code (x,y)} pairs.
      */
     static final int X_OFFSET = 0;
 
     /**
      * <var>y</var> (usually latitude) offset relative to an entry.
-     * Points are stored in {@link #grid} as <code>(x,y)</code> pairs.
+     * Points are stored in {@link #grid} as {@code (x,y)} pairs.
      */
     static final int Y_OFFSET = 1;
 
@@ -145,7 +147,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
                
     /**
      * Grid of coordinate points.
-     * Points are stored as <code>(x,y)</code> pairs.
+     * Points are stored as {@code (x,y)} pairs.
      */
     private final double[] grid;
 
@@ -164,7 +166,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      *
      * @param width  Number of grid's columns.
      * @param height Number of grid's rows.
-     * @param grid   The localization grid as an array of <code>(x,y)</code> coordinates.
+     * @param grid   The localization grid as an array of {@code (x,y)} coordinates.
      *               This array is not cloned; this is the caller's responsability to ensure
      *               that it will not be modified as long as this transformation is strongly
      *               reachable.
@@ -441,7 +443,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      *
      * @param source The "real world" coordinate to transform.
      * @param target A pre-allocated destination point. <strong>This point
-     *               can't be the same than <code>source</code>!<strong>
+     *               can't be the same than {@code source}!<strong>
      * @param tr In input, the affine transform to use for the first step.
      *        In output, the last affine transform used for the transformation.
      *
@@ -487,7 +489,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
              * we are stuck in a never-ending loop. If yes, then it will try to minimize
              * the following function:
              *
-             *     <code>transform(target).distance(source)</code>.
+             *     {@code transform(target).distance(source)}.
              */
             final int x0 = previousX;
             final int y0 = previousY;
@@ -568,7 +570,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
      * for the transformation of a point which shouldn't be found in the grid.
      *
      * @param  source The source coordinate point.
-     * @param  target The target coordinate point (should not be <code>null</code>).
+     * @param  target The target coordinate point (should not be {@code null}).
      * @throws NoninvertibleTransformException if the transform is non-invertible.
      *
      * @todo Current implementation project an inside point on the nearest border.
@@ -653,7 +655,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * @param srcPts the array containing the source point coordinates.
          * @param srcOff the offset to the first point to be transformed in the source array.
          * @param dstPts the array into which the transformed point coordinates are returned.
-         *               May be the same than <code>srcPts</code>.
+         *               May be the same than {@code srcPts}.
          * @param dstOff the offset to the location of the first transformed
          *               point that is stored in the destination array.
          * @param numPts the number of point objects to be transformed.
@@ -691,7 +693,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * @param srcPts the array containing the source point coordinates.
          * @param srcOff the offset to the first point to be transformed in the source array.
          * @param dstPts the array into which the transformed point coordinates are returned.
-         *               May be the same than <code>srcPts</code>.
+         *               May be the same than {@code srcPts}.
          * @param dstOff the offset to the location of the first transformed
          *               point that is stored in the destination array.
          * @param numPts the number of point objects to be transformed.

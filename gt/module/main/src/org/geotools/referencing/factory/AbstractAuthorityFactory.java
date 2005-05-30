@@ -86,12 +86,14 @@ import org.geotools.util.NameFactory;
  * object has a code number ID. For example, the EPSG code for a WGS84 Lat/Lon coordinate
  * system is '4326'.
  * <br><br>
- * The default implementation for all <code>createFoo</code> methods ultimately invokes
+ * The default implementation for all {@code createFoo} methods ultimately invokes
  * {@link #createObject}, which may be the only method that a subclass need to override.
  * However, other methods may be overriden as well for better performances.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public abstract class AbstractAuthorityFactory extends AbstractFactory
         implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory
@@ -161,7 +163,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * the object type from its code. 
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createCoordinateReferenceSystem
@@ -179,7 +181,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createGeodeticDatum
@@ -200,7 +202,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createDatum createDatum}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createEngineeringCRS
@@ -219,7 +221,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createDatum createDatum}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createImageCRS
@@ -238,7 +240,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createDatum createDatum}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createVerticalCRS
@@ -257,7 +259,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createDatum createDatum}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createTemporalCRS
@@ -276,7 +278,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createDatum createDatum}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createEllipsoid
@@ -298,7 +300,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createGeodeticDatum
@@ -317,7 +319,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createGeodeticDatum
@@ -336,7 +338,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public Extent createExtent(final String code) throws FactoryException {
@@ -390,7 +392,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public CoordinateSystem createCoordinateSystem(final String code) throws FactoryException {
@@ -408,7 +410,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public CartesianCS createCartesianCS(final String code) throws FactoryException {
@@ -426,7 +428,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public PolarCS createPolarCS(final String code) throws FactoryException {
@@ -444,7 +446,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public CylindricalCS createCylindricalCS(final String code) throws FactoryException {
@@ -462,7 +464,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public SphericalCS createSphericalCS(final String code) throws FactoryException {
@@ -480,7 +482,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public EllipsoidalCS createEllipsoidalCS(final String code) throws FactoryException {
@@ -498,7 +500,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public VerticalCS createVerticalCS(final String code) throws FactoryException {
@@ -516,7 +518,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * <code>{@linkplain #createCoordinateSystem createCoordinateSystem}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public TimeCS createTimeCS(final String code) throws FactoryException {
@@ -533,7 +535,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
@@ -552,7 +554,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * The default implementation invokes <code>{@linkplain #createObject createObject}(code)</code>.
      *
      * @param  code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public Unit createUnit(final String code) throws FactoryException {
@@ -573,7 +575,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * know he is asking for a {@linkplain GeographicCRS geographic coordinate reference system}).
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see #createGeographicCRS
@@ -597,7 +599,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Creates a 3D coordinate reference system from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public CompoundCRS createCompoundCRS(final String code) throws FactoryException {
@@ -613,7 +615,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Creates a derived coordinate reference system from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public DerivedCRS createDerivedCRS(final String code) throws FactoryException {
@@ -629,7 +631,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Create a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public EngineeringCRS createEngineeringCRS(final String code) throws FactoryException {
@@ -645,7 +647,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Returns a {@linkplain GeographicCRS geographic coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see org.opengis.referencing.datum.DatumAuthorityFactory#createGeodeticDatum
@@ -680,7 +682,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Create a {@linkplain ImageCRS image coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
     public ImageCRS createImageCRS(final String code) throws FactoryException {
@@ -696,7 +698,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Returns a {@linkplain ProjectedCRS projected coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see org.opengis.referencing.datum.DatumAuthorityFactory#createGeodeticDatum
@@ -714,7 +716,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Create a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see org.opengis.referencing.datum.DatumAuthorityFactory#createTemporalDatum
@@ -732,7 +734,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * Create a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
      *
      * @param code Value allocated by authority.
-     * @throws NoSuchAuthorityCodeException if the specified <code>code</code> was not found.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      *
      * @see org.opengis.referencing.datum.DatumAuthorityFactory#createVerticalDatum
@@ -748,7 +750,7 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
 
     /**
      * Releases resources immediately instead of waiting for the garbage collector.
-     * Once a factory has been disposed, further <code>create(...)</code> invocations
+     * Once a factory has been disposed, further {@code create(...)} invocations
      * may throw a {@link FactoryException}. Disposing a previously-disposed factory,
      * however, has no effect.
      *
@@ -760,12 +762,12 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
 
     /**
      * Creates an exception for an unknow authority code. This convenience method is provided
-     * for implementation of <code>createXXX</code> methods.
+     * for implementation of {@code createXXX} methods.
      *
      * @param  type  The GeoAPI interface that was to be created
-     *               (e.g. <code>CoordinateReferenceSystem.class</code>).
+     *               (e.g. {@code CoordinateReferenceSystem.class}).
      * @param  code  The unknow authority code.
-     * @param  cause The cause of this error, or <code>null</code>.
+     * @param  cause The cause of this error, or {@code null}.
      * @return An exception initialized with an error message built
      *         from the specified informations.
      */
@@ -807,10 +809,10 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
 
     /**
      * Creates an exception for an unknow authority code. This convenience method is provided
-     * for implementation of <code>createXXX</code> methods.
+     * for implementation of {@code createXXX} methods.
      *
      * @param  type  The GeoAPI interface that was to be created
-     *               (e.g. <code>CoordinateReferenceSystem.class</code>).
+     *               (e.g. {@code CoordinateReferenceSystem.class}).
      * @param  code  The unknow authority code.
      * @return An exception initialized with an error message built
      *         from the specified informations.
@@ -828,8 +830,8 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
-     * Called when this factory is added to the given <code>category</code> of the given
-     * <code>registry</code>. The factory may already be registered under another category
+     * Called when this factory is added to the given {@code category} of the given
+     * {@code registry}. The factory may already be registered under another category
      * or categories.
      * <br><br>
      * This method is invoked automatically when this factory is registered as a plugin,
@@ -838,8 +840,8 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      * {@linkplain AuthorityFactory#getAuthority authority}, and set the ordering
      * according the priority given at construction time.
      *
-     * @param registry a <code>ServiceRegistry</code> where this factory has been registered.
-     * @param category a <code>Class</code> object indicating the registry category under which
+     * @param registry a {@code ServiceRegistry} where this factory has been registered.
+     * @param category a {@code Class} object indicating the registry category under which
      *                 this object has been registered.
      *
      * @see #MINIMUM_PRIORITY

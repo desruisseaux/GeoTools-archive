@@ -54,6 +54,8 @@ import org.geotools.referencing.AbstractIdentifiedObject;
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class Parameters {
     /**
@@ -86,10 +88,10 @@ public class Parameters {
      * @param type
      * @return count of type in group
      *
-     * @deprecated Use <code>ParameterValueGroup.groups(type.getName().getCode())</code>
+     * @deprecated Use {@code ParameterValueGroup.groups(type.getName().getCode())}
      *             instead. It allows to fetch groups by name independently of the actual
      *             descriptor implementation. The returned list can be used for many operation,
-     *             including fetching the count with <code>size()</code>.
+     *             including fetching the count with {@code size()}.
      *
      * @see ParameterValueGroup#groups
      */ 

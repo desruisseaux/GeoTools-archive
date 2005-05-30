@@ -35,6 +35,8 @@ import javax.media.jai.JAI;
  *
  * @version $Id$
  * @author Lionel Flahaut
+ *
+ * @since 2.1
  */
 public class NodataFilterCRIF extends CRIFImpl {
     /**

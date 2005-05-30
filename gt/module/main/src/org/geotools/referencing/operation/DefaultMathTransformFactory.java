@@ -70,14 +70,14 @@ import org.geotools.util.WeakHashSet;
  * Low level factory for creating {@linkplain MathTransform math transforms}.
  * Many high level GIS applications will never need to use this factory directly;
  * they can use a {@linkplain DefaultCoordinateOperationFactory coordinate operation factory}
- * instead. However, the <code>MathTransformFactory</code> interface can be used directly
+ * instead. However, the {@code MathTransformFactory} interface can be used directly
  * by applications that wish to transform other types of coordinates (e.g. color coordinates,
  * or image pixel coordinates).
  * <P>
  * A {@linkplain MathTransform math transform} is an object that actually does
  * the work of applying formulae to coordinate values. The math transform does
  * not know or care how the coordinates relate to positions in the real world.
- * This lack of semantics makes implementing <code>MathTransformFactory</code>
+ * This lack of semantics makes implementing {@code MathTransformFactory}
  * significantly easier than it would be otherwise.
  *
  * For example the affine transform applies a matrix to the coordinates
@@ -89,7 +89,7 @@ import org.geotools.util.WeakHashSet;
  * Because {@linkplain MathTransform math transforms} have low semantic value
  * (but high mathematical value), programmers who do not have much knowledge
  * of how GIS applications use coordinate systems, or how those coordinate
- * systems relate to the real world can implement <code>MathTransformFactory</code>.
+ * systems relate to the real world can implement {@code MathTransformFactory}.
  * The low semantic content of {@linkplain MathTransform math transforms} also
  * means that they will be useful in applications that have nothing to do with
  * GIS coordinates. For example, a math transform could be used to map color
@@ -102,6 +102,8 @@ import org.geotools.util.WeakHashSet;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultMathTransformFactory implements MathTransformFactory {
     /**
@@ -214,7 +216,7 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
  
         /**
          * Returns the generic math transform method as a projection method,
-         * or <code>null</code> if the specified method is not an operation
+         * or {@code null} if the specified method is not an operation
          * method of the expected type. Returning null will force the filtered
          * set to skip it.
          */
@@ -320,13 +322,13 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
 
     /**
      * Creates a transform from a group of parameters and add the method used to a list.
-     * This variant of <code>createParameterizedTransform(...)</code> provide a way for
+     * This variant of {@code createParameterizedTransform(...)} provide a way for
      * the client to keep trace of any {@linkplain OperationMethod operation method}
      * used by this factory. 
      *
      * @param  parameters The parameter values.
      * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or <code>null</code> if none.
+     *                 or {@code null} if none.
      * @return The parameterized transform.
      * @throws NoSuchIdentifierException if there is no transform registered for the method.
      * @throws FactoryException if the object creation failed. This exception is thrown
@@ -359,13 +361,13 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
     
     /**
      * Creates an affine transform from a matrix.
-     * If the transform's input dimension is <code>M</code>, and output dimension
-     * is <code>N</code>, then the matrix will have size <code>[N+1][M+1]</code>.
+     * If the transform's input dimension is {@code M}, and output dimension
+     * is {@code N}, then the matrix will have size {@code [N+1][M+1]}.
      * The +1 in the matrix dimensions allows the matrix to do a shift, as well as
-     * a rotation. The <code>[M][j]</code> element of the matrix will be the j'th
-     * ordinate of the moved origin. The <code>[i][N]</code> element of the matrix
-     * will be 0 for <var>i</var> less than <code>M</code>, and 1 for <var>i</var>
-     * equals <code>M</code>.
+     * a rotation. The {@code [M][j]} element of the matrix will be the j'th
+     * ordinate of the moved origin. The {@code [i][N]} element of the matrix
+     * will be 0 for <var>i</var> less than {@code M}, and 1 for <var>i</var>
+     * equals {@code M}.
      *
      * @param matrix The matrix used to define the affine transform.
      * @return The affine transform.
@@ -416,8 +418,8 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
      * @param  firstAffectedOrdinate The lowest index of the affected ordinates.
      * @param  subTransform Transform to use for affected ordinates.
      * @param  numTrailingOrdinates Number of trailing ordinates to pass through.
-     *         Affected ordinates will range from <code>firstAffectedOrdinate</code>
-     *         inclusive to <code>dimTarget-numTrailingOrdinates</code> exclusive.
+     *         Affected ordinates will range from {@code firstAffectedOrdinate}
+     *         inclusive to {@code dimTarget-numTrailingOrdinates} exclusive.
      * @return A pass through transform with the following dimensions:<br>
      *         <pre>
      * Source: firstAffectedOrdinate + subTransform.getSourceDimensions() + numTrailingOrdinates
@@ -458,7 +460,7 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
      * Known Text</cite> (WKT)</A>.
      *
      * @param  text Math transform encoded in Well-Known Text format.
-     * @return The math transform (never <code>null</code>).
+     * @return The math transform (never {@code null}).
      * @throws FactoryException if the Well-Known Text can't be parsed,
      *         or if the math transform creation failed from some other reason.
      */
@@ -524,15 +526,15 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
      * <CODE>"9624"</CODE> for the affine transform method).</P>
      *
      * <P><strong>Note for Windows users:</strong> If the output contains strange
-     * symbols, try to supply an "<code>-encoding</code>" argument. Example:</P>
+     * symbols, try to supply an "{@code -encoding}" argument. Example:</P>
      *
      * <blockquote><code>
      * java org.geotools.referencing.operation.DefaultMathTransformFactory -encoding Cp850
      * </code></blockquote>
      *
      * <P>The codepage number (850 in the previous example) can be obtained from the DOS
-     * commande line using the "<code>chcp</code>" command with no arguments.
-     * This <code>-encoding</code> argument need to be supplied only once.</P>
+     * commande line using the "{@code chcp}" command with no arguments.
+     * This {@code -encoding} argument need to be supplied only once.</P>
      *
      * @param args Command line arguments.
      */

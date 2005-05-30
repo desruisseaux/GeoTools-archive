@@ -48,6 +48,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class GrowableInternationalString extends AbstractInternationalString implements Serializable {
     /**
@@ -62,7 +64,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     private static final Map LOCALES = new HashMap();
 
     /**
-     * The string values in different locales (never <code>null</code>).
+     * The string values in different locales (never {@code null}).
      * Keys are {@link Locale} objects and values are {@link String}s.
      */
     private Map localMap;
@@ -101,7 +103,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
     /**
      * Add a string for the given locale.
      *
-     * @param  locale The locale for the <code>string</code> value, or <code>null</code>.
+     * @param  locale The locale for the {@code string} value, or {@code null}.
      * @param  string The localized string.
      * @throws IllegalArgumentException if a different string value was already set for
      *         the given locale.
@@ -138,11 +140,11 @@ public class GrowableInternationalString extends AbstractInternationalString imp
      * Add a string for the given property key. This is a convenience method for constructing an
      * {@code AbstractInternationalString} during iteration through the
      * {@linkplain java.util.Map.Entry entries} in a {@link Map}. It infers the {@link Locale}
-     * from the property <code>key</code>, using the following steps:
+     * from the property {@code key}, using the following steps:
      * <ul>
-     *   <li>If the <code>key</code> do not starts with the specified <code>prefix</code>, then
-     *       this method do nothing and returns <code>false</code>.</li>
-     *   <li>Otherwise, the characters after the <code>prefix</code> are parsed as an ISO language
+     *   <li>If the {@code key} do not starts with the specified {@code prefix}, then
+     *       this method do nothing and returns {@code false}.</li>
+     *   <li>Otherwise, the characters after the {@code prefix} are parsed as an ISO language
      *       and country code, and the {@link #add(Locale,String)} method is
      *       invoked.</li>
      * </ul>
@@ -152,10 +154,10 @@ public class GrowableInternationalString extends AbstractInternationalString imp
      * <code>"remarks_fr_CA"</code> property key stands for remarks in
      * {@linkplain Locale#CANADA_FRENCH French Canadian}.</P>
      *
-     * @param  prefix The prefix to skip at the begining of the <code>key</code>.
+     * @param  prefix The prefix to skip at the begining of the {@code key}.
      * @param  key The property key.
-     * @param  string The localized string for the specified <code>key</code>.
-     * @return <code>true</code> if the key has been recognized, or <code>false</code> otherwise.
+     * @param  string The localized string for the specified {@code key}.
+     * @return {@code true} if the key has been recognized, or {@code false} otherwise.
      * @throws IllegalArgumentException if the locale after the prefix is an illegal code, or a
      *         different string value was already set for the given locale.
      */
@@ -198,7 +200,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
      * Returns a canonical instance of the given locale.
      *
      * @param  locale The locale to canonicalize.
-     * @return The canonical instance of <code>locale</code>.
+     * @return The canonical instance of {@code locale}.
      */
     private static synchronized Locale canonicalize(final Locale locale) {
         /**
@@ -248,14 +250,14 @@ public class GrowableInternationalString extends AbstractInternationalString imp
 
     /**
      * Returns a string in the specified locale. If there is no string for the specified
-     * <code>locale</code>, then this method search for a locale without the
+     * {@code locale}, then this method search for a locale without the
      * {@linkplain Locale#getVariant variant} part. If no string are found,
      * then this method search for a locale without the {@linkplain Locale#getCountry country}
      * part. For example if the <code>"fr_CA"</code> locale was requested but not found, then
-     * this method looks for the <code>"fr"</code> locale. The <code>null</code> locale
+     * this method looks for the <code>"fr"</code> locale. The {@code null} locale
      * (which stand for unlocalized message) is tried last.
      *
-     * @param  locale The locale to look for, or <code>null</code>.
+     * @param  locale The locale to look for, or {@code null}.
      * @return The string in the specified locale, or in a default locale.
      */
     public String toString(Locale locale) {

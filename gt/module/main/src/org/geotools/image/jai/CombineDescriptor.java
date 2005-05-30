@@ -41,6 +41,8 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class CombineDescriptor extends OperationDescriptorImpl {
     /**

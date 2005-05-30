@@ -62,6 +62,8 @@ import org.geotools.resources.cts.Resources;
  * @author Martin Desruisseaux
  * @author Jody Garnett (Refractions Research)
  *
+ * @since 2.1
+ *
  * @see DefaultParameterDescriptorGroup
  * @see Parameter
  */
@@ -191,7 +193,7 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
      * @param values The list of parameter values.
      * @param occurences A map of the number of occurences of a value for each descriptor.
      *        The key must be {@link GeneralParameterDescriptor} instances and the values
-     *        must be <code>int[]</code> array of length 1 initialized with the 0 value.
+     *        must be {@code int[]} array of length 1 initialized with the 0 value.
      *
      * @throws IllegalStateException if the number of {@linkplain ParameterValue parameter}
      *         occurences doesn't matches the number declared in the
@@ -235,7 +237,7 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
 
     /**
      * Returns the values in this group. Changes in this list are reflected on this
-     * <code>ParameterValueGroup</code>. The returned list supports the
+     * {@code ParameterValueGroup}. The returned list supports the
      * {@link List#add(Object) add} operation.
      */
     public List values() {
@@ -408,8 +410,8 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
     /**
      * Compares the specified object with this parameter for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final Object object) {
         if (object == this) {

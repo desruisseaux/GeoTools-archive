@@ -37,11 +37,13 @@ import org.geotools.resources.XMath;
  *           c<sub>n</sub>&times;<var>x</var><sup>n</sup></code>.
  *
  * The static method {@link #roots(double[])} can be used for computing the root of a polynomial
- * equation without creating a <code>Polygon</code> object.
+ * equation without creating a {@code Polygon} object.
  *
  * @version $Id$
  * @author Ken Turkiwski
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class Polynom implements Serializable {
     /**
@@ -209,7 +211,7 @@ public class Polynom implements Serializable {
      * where <var>n</var> is the array length minus 1.
      *
      * @param  c The coefficients for the polynomial equation.
-     * @return The roots. This array may have any length up to <code>n-1</code>.
+     * @return The roots. This array may have any length up to {@code n-1}.
      * @throws UnsupportedOperationException if there is more coefficients than this method
      *         can handle.
      */

@@ -50,6 +50,8 @@ import org.geotools.referencing.AbstractReferenceSystem;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS {
     /**

@@ -37,6 +37,8 @@ import org.opengis.referencing.operation.Matrix;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public interface LinearTransform extends MathTransform {
     /**

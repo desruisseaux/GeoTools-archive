@@ -49,6 +49,8 @@ import javax.media.jai.iterator.RandomIterFactory;
  * @version $Id$
  * @author Lionel Flahaut
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class Hysteresis extends UntiledOpImage {
     /**

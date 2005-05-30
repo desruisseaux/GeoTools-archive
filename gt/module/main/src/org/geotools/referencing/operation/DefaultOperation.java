@@ -61,6 +61,8 @@ import org.geotools.util.UnsupportedImplementationException;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see DefaultOperationMethod
  */
 public class DefaultOperation extends DefaultSingleOperation implements Operation {
@@ -123,7 +125,7 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      * @param method    The operation method, or {@code null}.
      * @param type      The minimal type as <code>{@linkplain Conversion}.class</code>,
      *                  <code>{@linkplain Projection}.class</code>, etc. This method may
-     *                  create an instance of a subclass of <code>type</code>.
+     *                  create an instance of a subclass of {@code type}.
      *
      * @see DefaultConversion#create
      */
@@ -201,7 +203,7 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
      *
      * @param  mt The math transform for which parameters are desired.
      * @param  descriptor The descriptor to search for.
-     * @param  required <code>true</code> if an exception must be thrown if parameters are unknow.
+     * @param  required {@code true} if an exception must be thrown if parameters are unknow.
      * @return The parameter values, or null.
      * @throws UnsupportedImplementationException if the math transform implementation do not
      *         provide information about parameters.
@@ -232,13 +234,13 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
 
     /**
      * Compare this operation method with the specified object for equality.
-     * If <code>compareMetadata</code> is <code>true</code>, then all available properties
+     * If {@code compareMetadata} is {@code true}, then all available properties
      * are compared including {@linkplain DefaultOperationMethod#getFormula formula}.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {

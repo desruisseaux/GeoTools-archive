@@ -33,9 +33,11 @@ import org.opengis.util.Cloneable;
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @todo Provides synchronization facility on arbitrary lock, for use with the metadata package.
  *       The lock would be the metadata that owns this collection. Be carefull to update the lock
- *       after a clone (this work my be done in <code>MetadataEntity.unmodifiable(Object)</code>).
+ *       after a clone (this work my be done in {@code MetadataEntity.unmodifiable(Object)}).
  */
 public class CheckedArrayList extends ArrayList implements Cloneable {
     /**
@@ -65,7 +67,7 @@ public class CheckedArrayList extends ArrayList implements Cloneable {
      * Checks the type of the specified object. The default implementation ensure
      * that the object is assignable to the type specified at construction time.
      *
-     * @param  element the object to check, or <code>null</code>.
+     * @param  element the object to check, or {@code null}.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
     protected void ensureValidType(final Object element) throws IllegalArgumentException {
@@ -78,7 +80,7 @@ public class CheckedArrayList extends ArrayList implements Cloneable {
     /**
      * Checks the type of all elements in the specified collection.
      *
-     * @param  collection the collection to check, or <code>null</code>.
+     * @param  collection the collection to check, or {@code null}.
      * @throws IllegalArgumentException if at least one element is not of the expected type.
      */
     private void ensureValid(final Collection collection) throws IllegalArgumentException {
@@ -107,7 +109,7 @@ public class CheckedArrayList extends ArrayList implements Cloneable {
      * Appends the specified element to the end of this list.
      *
      * @param  element element to be appended to this list.
-     * @return always <code>true</code>.
+     * @return always {@code true}.
      * @throws IllegalArgumentException if the specified element is not of the expected type.
      */
     public boolean add(final Object element) {
@@ -133,7 +135,7 @@ public class CheckedArrayList extends ArrayList implements Cloneable {
      * in the order that they are returned by the specified Collection's Iterator.
      *
      * @param collection the elements to be inserted into this list.
-     * @return <code>true</code> if this list changed as a result of the call.
+     * @return {@code true} if this list changed as a result of the call.
      * @throws IllegalArgumentException if at least one element is not of the expected type.
      */
     public boolean addAll(final Collection collection) {
@@ -147,7 +149,7 @@ public class CheckedArrayList extends ArrayList implements Cloneable {
      *
      * @param index index at which to insert first element fromm the specified collection.
      * @param collection elements to be inserted into this list.
-     * @return <code>true</code> if this list changed as a result of the call.
+     * @return {@code true} if this list changed as a result of the call.
      * @throws IllegalArgumentException if at least one element is not of the expected type.
      */
     public boolean addAll(final int index, final Collection collection) {

@@ -70,6 +70,8 @@ import org.geotools.util.WeakValueHashMap;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class NamedIdentifier implements Identifier, GenericName, Serializable {
     /**
@@ -132,12 +134,12 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     private final String version;
 
     /**
-     * Comments on or information about this identifier, or <code>null</code> if none.
+     * Comments on or information about this identifier, or {@code null} if none.
      */
     private final InternationalString remarks;
 
     /**
-     * The name of this identifier as a generic name. If <code>null</code>, will
+     * The name of this identifier as a generic name. If {@code null}, will
      * be constructed only when first needed. This field is serialized (instead
      * of being recreated after deserialization) because it may be a user-supplied
      * value.
@@ -227,7 +229,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * @param authority The authority (e.g. {@link CitationImpl#OGC OGC}
      *                  or {@link CitationImpl#EPSG EPSG}).
      * @param code      The code. This parameter is mandatory.
-     * @param version   The version, or <code>null</code> if none.
+     * @param version   The version, or {@code null} if none.
      */
     public NamedIdentifier(final Citation authority, final String code, final String version) {
         this(toMap(authority, code, version));
@@ -249,14 +251,14 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     }
 
     /**
-     * Implementation of the constructor. The remarks in the <code>properties</code> will be
-     * parsed only if the <code>standalone</code> argument is set to <code>true</code>, i.e.
-     * this identifier is being constructed as a standalone object. If <code>false</code>, then
+     * Implementation of the constructor. The remarks in the {@code properties} will be
+     * parsed only if the {@code standalone} argument is set to {@code true}, i.e.
+     * this identifier is being constructed as a standalone object. If {@code false}, then
      * this identifier is assumed to be constructed from inside the {@link AbstractIdentifiedObject}
      * constructor.
      *
      * @param properties The properties to parse, as described in the public constructor.
-     * @param <code>standalone</code> <code>true</code> for parsing "remarks" as well.
+     * @param {@code standalone} {@code true} for parsing "remarks" as well.
      *
      * @throws InvalidParameterValueException if a property has an invalid value.
      * @throws IllegalArgumentException if a property is invalid for some other reason.
@@ -383,7 +385,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      *
      * @param  name   Argument name.
      * @param  object User argument.
-     * @throws InvalidParameterValueException if <code>object</code> is null.
+     * @throws InvalidParameterValueException if {@code object} is null.
      */
     private static void ensureNonNull(final String name, final Object object)
         throws IllegalArgumentException
@@ -407,7 +409,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * Organization or party responsible for definition and maintenance of the
      * {@linkplain #getCode code}.
      *
-     * @return The authority, or <code>null</code> if not available.
+     * @return The authority, or {@code null} if not available.
      */
     public Citation getAuthority() {
         return authority;
@@ -419,14 +421,14 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * uses versions. When appropriate, the edition is identified by the effective date,
      * coded using ISO 8601 date format.
      *
-     * @return The version, or <code>null</code> if not available.
+     * @return The version, or {@code null} if not available.
      */
     public String getVersion() {
         return version;
     }
 
     /**
-     * Comments on or information about this identifier, or <code>null</code> if none.
+     * Comments on or information about this identifier, or {@code null} if none.
      */
     public InternationalString getRemarks() {
         return remarks;
@@ -485,7 +487,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     
     /**
      * Returns the scope (name space) of this generic name. If this name has no scope
-     * (e.g. is the root), then this method returns <code>null</code>.
+     * (e.g. is the root), then this method returns {@code null}.
      */
     public GenericName getScope() {
         return getName().getScope();
@@ -493,7 +495,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     
     /**
      * Returns a view of this object as a scoped name,
-     * or <code>null</code> if this name has no scope.
+     * or {@code null} if this name has no scope.
      */
     public ScopedName asScopedName() {
         return getName().asScopedName();
@@ -530,7 +532,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     /**
      * Returns a string representation of this generic name. This string representation
      * is local-independant. It contains all elements listed by {@link #getParsedNames}
-     * separated by an arbitrary character (usually <code>:</code> or <code>/</code>).
+     * separated by an arbitrary character (usually {@code :} or {@code /}).
      */
     public String toString() {
         return getName().toString();

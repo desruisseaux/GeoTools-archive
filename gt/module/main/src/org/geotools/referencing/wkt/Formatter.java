@@ -67,6 +67,8 @@ import org.geotools.resources.cts.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.0
+ *
  * @see <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">Well Know Text specification</A>
  * @see <A HREF="http://gdal.velocet.ca/~warmerda/wktproblems.html">OGC WKT Coordinate System Issues</A>
  */
@@ -82,7 +84,7 @@ public class Formatter {
     Citation authority = CitationImpl.OGC;
 
     /**
-     * The unit for formatting measures, or <code>null</code> for the "natural" unit of each WKT
+     * The unit for formatting measures, or {@code null} for the "natural" unit of each WKT
      * element. This value is set for example by "GEOGCS", which force its enclosing "PRIMEM" to
      * take the same units than itself.
      */
@@ -122,21 +124,21 @@ public class Formatter {
 
     /**
      * The amount of space to write on the left side of each line. This amount is increased
-     * by <code>indentation</code> every time a {@link Formattable} object is appended in a
+     * by {@code indentation} every time a {@link Formattable} object is appended in a
      * new indentation level.
      */
     private int margin;
 
     /**
-     * <code>true</code> if a new line were requested during the execution
+     * {@code true} if a new line were requested during the execution
      * of {@link #append(Formattable)}. This is used to determine if
-     * <code>UNIT</code> and <code>AUTHORITY</code> elements should appears
+     * {@code UNIT} and {@code AUTHORITY} elements should appears
      * on a new line too.
      */
     private boolean lineChanged;
 
     /**
-     * <code>true</code> if the WKT is invalid.
+     * {@code true} if the WKT is invalid.
      */
     private boolean invalidWKT;
 
@@ -196,7 +198,7 @@ public class Formatter {
     /**
      * Add a separator to the buffer, if needed.
      *
-     * @param newLine if <code>true</code>, add a line separator too.
+     * @param newLine if {@code true}, add a line separator too.
      */
     private void appendSeparator(final boolean newLine) {
         int length = buffer.length();
@@ -220,7 +222,7 @@ public class Formatter {
     }
 
     /**
-     * Append the specified <code>Formattable</code> object. This method will automatically append
+     * Append the specified {@code Formattable} object. This method will automatically append
      * the keyword (e.g. <code>"GEOCS"</code>), the name and the authority code, and will invokes
      * <code>formattable.{@linkplain Formattable#formatWKT formatWKT}(this)</code> for completing
      * the inner part of the WKT.
@@ -317,7 +319,7 @@ public class Formatter {
     }
 
     /**
-     * Append the specified OpenGIS's <code>IdentifiedObject</code> object.
+     * Append the specified OpenGIS's {@code IdentifiedObject} object.
      *
      * @param info The info object to append to the WKT.
      */
@@ -447,7 +449,7 @@ public class Formatter {
     }
 
     /**
-     * Appends a unit in WKT form. For example, <code>append(SI.KILOMETER)</code>
+     * Appends a unit in WKT form. For example, {@code append(SI.KILOMETER)}
      * can append "<code>UNIT["km", 1000]</code>" to the WKT.
      */
     public void append(final Unit unit) {
@@ -522,9 +524,9 @@ public class Formatter {
     }
 
     /**
-     * Increase or reduce the indentation. A value of <code>+1</code> increase
+     * Increase or reduce the indentation. A value of {@code +1} increase
      * the indentation by the amount of spaces specified at construction time,
-     * and a value of <code>+1</code> reduce it.
+     * and a value of {@code +1} reduce it.
      */
     private void indent(final int amount) {
         margin = Math.max(0, margin + indentation*amount);
@@ -538,7 +540,7 @@ public class Formatter {
      * object contains no identifier, then this method returns {@code null}.
      *
      * @param  info The object to looks for a preferred identifier.
-     * @return The preferred identifier, or <code>null</code> if none.
+     * @return The preferred identifier, or {@code null} if none.
      */
     private Identifier getIdentifier(final IdentifiedObject info) {
         Identifier first = null;
@@ -617,10 +619,10 @@ public class Formatter {
     }
 
     /**
-     * The linear unit for formatting measures, or <code>null</code> for the "natural" unit of each
+     * The linear unit for formatting measures, or {@code null} for the "natural" unit of each
      * WKT element.
      *
-     * @return The unit for measure. Default value is <code>null</code>.
+     * @return The unit for measure. Default value is {@code null}.
      */
     public Unit getLinearUnit() {
         return linearUnit;
@@ -629,7 +631,7 @@ public class Formatter {
     /**
      * Set the unit for formatting linear measures.
      *
-     * @param unit The new unit, or <code>null</code>.
+     * @param unit The new unit, or {@code null}.
      */
     public void setLinearUnit(final Unit unit) {
         if (unit!=null && !SI.METER.isCompatible(unit)) {
@@ -640,11 +642,11 @@ public class Formatter {
     }
 
     /**
-     * The angular unit for formatting measures, or <code>null</code> for the "natural" unit of
+     * The angular unit for formatting measures, or {@code null} for the "natural" unit of
      * each WKT element. This value is set for example by "GEOGCS", which force its enclosing
      * "PRIMEM" to take the same units than itself.
      *
-     * @return The unit for measure. Default value is <code>null</code>.
+     * @return The unit for measure. Default value is {@code null}.
      */
     public Unit getAngularUnit() {
         return angularUnit;
@@ -653,7 +655,7 @@ public class Formatter {
     /**
      * Set the angular unit for formatting measures.
      *
-     * @param unit The new unit, or <code>null</code>.
+     * @param unit The new unit, or {@code null}.
      */
     public void setAngularUnit(final Unit unit) {
         if (unit!=null && (!SI.RADIAN.isCompatible(unit) || Unit.ONE.equals(unit))) {
@@ -664,9 +666,9 @@ public class Formatter {
     }
 
     /**
-     * Returns <code>true</code> if the WKT in this formatter is not strictly compliant to the
+     * Returns {@code true} if the WKT in this formatter is not strictly compliant to the
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT
-     * specification</A>. This method returns <code>true</code> if {@link #setInvalidWKT} has
+     * specification</A>. This method returns {@code true} if {@link #setInvalidWKT} has
      * been invoked at least once. The action to take regarding invalid WKT is caller-dependant.
      * For example {@link Formattable#toString} will accepts loose WKT formatting and ignore this
      * flag, while {@link Formattable#toWKT} requires strict WKT formatting and will thrown an
@@ -699,7 +701,7 @@ public class Formatter {
     /**
      * Clear this formatter. All properties (including {@linkplain #getLinearUnit unit}
      * and {@linkplain #isInvalidWKT WKT validity flag} are reset to their default value.
-     * After this method call, this <code>Formatter</code> object is ready for formatting
+     * After this method call, this {@code Formatter} object is ready for formatting
      * a new object.
      */
     public void clear() {
@@ -719,7 +721,7 @@ public class Formatter {
      * method can be invoked from the command line using the following syntax:
      *
      * <blockquote>
-     * <code>java org.geotools.referencing.wkt.Formatter -indentation=</code><var>&lt;preferred
+     * {@code java org.geotools.referencing.wkt.Formatter -indentation=}<var>&lt;preferred
      * indentation&gt;</var>
      * </blockquote>
      */

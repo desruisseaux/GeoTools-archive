@@ -32,6 +32,8 @@ import org.opengis.metadata.quality.AccuracyOfATimeMeasurement;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class AccuracyOfATimeMeasurementImpl extends TemporalAccuracyImpl
         implements AccuracyOfATimeMeasurement

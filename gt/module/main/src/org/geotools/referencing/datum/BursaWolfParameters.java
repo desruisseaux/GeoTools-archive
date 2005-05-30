@@ -46,6 +46,8 @@ import org.opengis.util.Cloneable;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class BursaWolfParameters extends Formattable implements Cloneable, Serializable {
     /**
@@ -87,7 +89,7 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
     }
 
     /**
-     * Returns <code>true</code> if this Bursa Wolf parameters performs no operation.
+     * Returns {@code true} if this Bursa Wolf parameters performs no operation.
      * This is true when all parameters are set to zero.
      */
     public boolean isIdentity() {
@@ -95,7 +97,7 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
     }
 
     /**
-     * Returns <code>true</code> if this Bursa Wolf parameters contains only translation terms.
+     * Returns {@code true} if this Bursa Wolf parameters contains only translation terms.
      */
     public boolean isTranslation() {
         return ex==0 && ey==0 && ez==0 && ppm==0;

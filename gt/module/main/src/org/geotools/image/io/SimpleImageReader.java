@@ -56,7 +56,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * <br><br>
  * This base class makes it easier to construct images from floating point values.
  * It provides default implementations for most {@link ImageReader} methods. Since
- * <code>SimpleImageReader</code> does not expect to know anything about image's
+ * {@code SimpleImageReader} does not expect to know anything about image's
  * color, it uses a grayscale color space scaled to fit the range of values.
  * Displaying such an image may be very slow. Consequently, users who want
  * to display image are encouraged to change data type and color space with
@@ -65,6 +65,8 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see RawBinaryImageReader
  * @see TextRecordImageReader
@@ -86,8 +88,8 @@ public abstract class SimpleImageReader extends ImageReader {
      *       They require JAI's DataBuffer instead.</li>
      * </ul>
      *
-     * This flag is set to <code>true</code> for J2SE 1.4.
-     * It may be turned to <code>false</code> with future
+     * This flag is set to {@code true} for J2SE 1.4.
+     * It may be turned to {@code false} with future
      * J2SE and JAI versions.
      */
     static final boolean USE_JAI_MODEL = true;
@@ -108,7 +110,7 @@ public abstract class SimpleImageReader extends ImageReader {
     }
     
     /**
-     * Sets the input source to use. If <code>input</code> is <code>null</code>,
+     * Sets the input source to use. If {@code input} is {@code null},
      * any currently set input source will be removed.
      *
      * @param input           The input object to use for future decoding.
@@ -171,7 +173,7 @@ public abstract class SimpleImageReader extends ImageReader {
      *
      * @param  allowSearch If true, the number of images will be returned
      *         even if a search is required.
-     * @return The number of images, or -1 if <code>allowSearch</code>
+     * @return The number of images, or -1 if {@code allowSearch}
      *         is false and a search would be required.
      *
      * @throws IllegalStateException if the input source has not been set.
@@ -198,7 +200,7 @@ public abstract class SimpleImageReader extends ImageReader {
     
     /**
      * Returns metadata associated with the given image. Since many raw images
-     * can't store metadata, the default implementation returns <code>null</code>.
+     * can't store metadata, the default implementation returns {@code null}.
      *
      * @throws IOException if an error occurs during reading.
      */
@@ -209,7 +211,7 @@ public abstract class SimpleImageReader extends ImageReader {
     
     /**
      * Returns metadata associated with the input source as a whole. Since many raw images
-     * can't store metadata, the default implementation returns <code>null</code>.
+     * can't store metadata, the default implementation returns {@code null}.
      *
      * @throws IOException if an error occurs during reading.
      */
@@ -237,7 +239,7 @@ public abstract class SimpleImageReader extends ImageReader {
      * data type {@link #getRawDataType}.
      *
      * @param  imageIndex The index of the image to be queried.
-     * @return The image type (never <code>null</code>).
+     * @return The image type (never {@code null}).
      * @throws IOException If an error occurs reading the format information from the input source.
      */
     public ImageTypeSpecifier getRawImageType(final int imageIndex) throws IOException {
@@ -251,7 +253,7 @@ public abstract class SimpleImageReader extends ImageReader {
      *
      * @param  imageIndex The index of the image to be queried.
      * @param  numBands   The number of bands.
-     * @return The image type (never <code>null</code>).
+     * @return The image type (never {@code null}).
      * @throws IOException If an error occurs reading the format information from the input source.
      */
     final ImageTypeSpecifier getRawImageType(final int imageIndex, final int numBands)
@@ -279,10 +281,10 @@ public abstract class SimpleImageReader extends ImageReader {
      * internal data of the image. It should be a constant from
      * {@link DataBuffer}. Common types are {@link DataBuffer#TYPE_INT},
      * {@link DataBuffer#TYPE_FLOAT} and {@link DataBuffer#TYPE_DOUBLE}.
-     * The default implementation returns <code>TYPE_FLOAT</code>.
+     * The default implementation returns {@code TYPE_FLOAT}.
      *
      * @param  imageIndex The index of the image to be queried.
-     * @return The data type (<code>TYPE_FLOAT</code> by default).
+     * @return The data type ({@code TYPE_FLOAT} by default).
      * @throws IOException If an error occurs reading the format information
      *         from the input source.
      */
@@ -296,10 +298,10 @@ public abstract class SimpleImageReader extends ImageReader {
      * may read image data, or just returns some raisonable range.
      *
      * @param  imageIndex The image index.
-     * @param  bandIndex The band index. Valid index goes from <code>0</code> inclusive
-     *         to <code>getNumBands(imageIndex)</code> exclusive. Index are independent
+     * @param  bandIndex The band index. Valid index goes from {@code 0} inclusive
+     *         to {@code getNumBands(imageIndex)} exclusive. Index are independent
      *         of any {@link ImageReadParam#setSourceBands} setting.
-     * @return The expected range of values, or <code>null</code> if unknow.
+     * @return The expected range of values, or {@code null} if unknow.
      * @throws IOException If an error occurs reading the data information from
      *         the input source.
      */
@@ -381,7 +383,7 @@ public abstract class SimpleImageReader extends ImageReader {
     }
     
     /**
-     * Retourne la longueur (en nombre d'octets) des données à lire, ou <code>-1</code> si cette longueur
+     * Retourne la longueur (en nombre d'octets) des données à lire, ou {@code -1} si cette longueur
      * n'est pas connue.  Cette méthode examine le type d'entré (@link #getInput}) et appelle une méthode
      * {@link File#length()}, {@link ImageInputStream#length()} ou {@link URLConnection#getContentLength()}
      * en fonction du type d'entré.
@@ -411,7 +413,7 @@ public abstract class SimpleImageReader extends ImageReader {
     
     /**
      * Retourne une approximation du nombre d'octets du flot occupés par les
-     * images <code>fromImage</code> inclusivement jusqu'à <code>toImage</code>
+     * images {@code fromImage} inclusivement jusqu'à {@code toImage}
      * exclusivement. L'implémentation par défaut calcule cette longueur en
      * supposant que toutes les images se divisent la longueur totale du flot
      * en parts égales.

@@ -43,6 +43,8 @@ import org.geotools.resources.rsc.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
+ * @since 2.1
+ *
  * @see AbstractParameter
  */
 public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObject
@@ -87,7 +89,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      * Creates a new instance of {@linkplain AbstractParameter parameter value or group} initialized
      * with the {@linkplain DefaultParameterDescriptor#getDefaultValue default value(s)}.
      * The {@linkplain AbstractParameter#getDescriptor parameter value descriptor} for the
-     * created parameter value(s) will be <code>this</code> object.
+     * created parameter value(s) will be {@code this} object.
      * <p>
      * Example implementation:
      * <pre>
@@ -120,10 +122,10 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
     /**
      * Compares the specified object with this parameter for equality.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {

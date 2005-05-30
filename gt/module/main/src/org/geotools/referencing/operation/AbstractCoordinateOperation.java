@@ -75,6 +75,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                                       implements CoordinateOperation
@@ -376,13 +378,13 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
 
     /**
      * Compare this coordinate operation with the specified object for equality.
-     * If <code>compareMetadata</code> is <code>true</code>, then all available properties are
+     * If {@code compareMetadata} is {@code true}, then all available properties are
      * compared including {@linkplain #getValidArea valid area} and {@linkplain #getScope scope}.
      *
-     * @param  object The object to compare to <code>this</code>.
-     * @param  compareMetadata <code>true</code> for performing a strict comparaison, or
-     *         <code>false</code> for comparing only properties relevant to transformations.
-     * @return <code>true</code> if both objects are equal.
+     * @param  object The object to compare to {@code this}.
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (object == this) {

@@ -33,7 +33,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 /**
  * A two- or three-dimensional coordinate system with straight axes that are not necessarily
- * orthogonal. An <code>AffineCS</code> shall have two or three {@linkplain #getAxis axis}.
+ * orthogonal. An {@code AffineCS} shall have two or three {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
  * <TR BGCOLOR="#EEEEFF"><TH NOWRAP>Used with CRS type(s)</TH></TR>
@@ -44,6 +44,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  *
  * @see DefaultCartesianCS
  */
@@ -117,7 +119,7 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */

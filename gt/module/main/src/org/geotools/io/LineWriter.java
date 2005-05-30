@@ -24,6 +24,7 @@ import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+// Geotools dependencies
 import org.geotools.resources.XArray;
 
 
@@ -37,6 +38,8 @@ import org.geotools.resources.XArray;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class LineWriter extends FilterWriter {
     /**
@@ -66,24 +69,24 @@ public class LineWriter extends FilterWriter {
     private int count = 0;
 
     /**
-     * Construct a <code>LineWriter</code> object that
+     * Construct a {@code LineWriter} object that
      * will use the platform dependent line separator.
      *
      * @param  out a Writer object to provide the underlying stream.
-     * @throws IllegalArgumentException if <code>out</code> is <code>null</code>.
+     * @throws IllegalArgumentException if {@code out} is {@code null}.
      */
     public LineWriter(final Writer out) {
         this(out, System.getProperty("line.separator", "\n"));
     }
 
     /**
-     * Construct a <code>LineWriter</code> object
+     * Construct a {@code LineWriter} object
      * that will use the specified line separator.
      *
      * @param  out a Writer object to provide the underlying stream.
      * @param  lineSeparator String to use as line separator.
-     * @throws IllegalArgumentException if <code>out</code> or
-     *         <code>lineSeparator</code> is <code>null</code>.
+     * @throws IllegalArgumentException if {@code out} or
+     *         {@code lineSeparator} is {@code null}.
      */
     public LineWriter(final Writer out, final String lineSeparator) {
         super(out);
@@ -107,7 +110,7 @@ public class LineWriter extends FilterWriter {
      * every occurences of "\r", "\n" or "\r\n".
      *
      * @param lineSeparator The new line separator.
-     * @throws IllegalArgumentException if <code>lineSeparator</code> is <code>null</code>.
+     * @throws IllegalArgumentException if {@code lineSeparator} is {@code null}.
      */
     public void setLineSeparator(final String lineSeparator) {
         if (lineSeparator == null) {
@@ -130,7 +133,7 @@ public class LineWriter extends FilterWriter {
     }
 
     /**
-     * Returns <code>true</code> if {@link #buffer} contains only
+     * Returns {@code true} if {@link #buffer} contains only
      * white spaces. It should always be the case. This method is
      * used for assertions only.
      */

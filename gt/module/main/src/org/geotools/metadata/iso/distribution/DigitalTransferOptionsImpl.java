@@ -42,6 +42,8 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
+ *
+ * @since 2.1
  */
 public class DigitalTransferOptionsImpl extends MetadataEntity implements DigitalTransferOptions {
     /**
@@ -57,7 +59,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     /**
      * Estimated size of a unit in the specified transfer format, expressed in megabytes.
      * The transfer size is &gt; 0.0.
-     * Returns <code>null</code> if the transfer size is unknown.
+     * Returns {@code null} if the transfer size is unknown.
      */
     private Number transferSize;
 
@@ -95,7 +97,7 @@ public class DigitalTransferOptionsImpl extends MetadataEntity implements Digita
     /**
      * Returns an estimated size of a unit in the specified transfer format, expressed in megabytes.
      * The transfer size is &gt; 0.0.
-     * Returns <code>null</code> if the transfer size is unknown.
+     * Returns {@code null} if the transfer size is unknown.
      */
     public Number getTransferSize() {
         return transferSize;

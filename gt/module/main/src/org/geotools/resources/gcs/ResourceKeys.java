@@ -10,7 +10,7 @@ package org.geotools.resources.gcs;
 
 /**
  * Resource keys. This interface is used when compiling sources, but
- * no dependencies to <code>ResourceKeys</code> should appear in any
+ * no dependencies to {@code ResourceKeys} should appear in any
  * resulting class files.  Since Java compiler inlines final integer
  * values, using long identifiers will not bloat constant pools of
  * classes compiled against the interface, provided that no class

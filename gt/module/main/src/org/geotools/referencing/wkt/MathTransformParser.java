@@ -54,6 +54,8 @@ import org.geotools.util.Singleton;
  * @author Remi Eve
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.0
  */
 public class MathTransformParser extends AbstractParser {
     /**
@@ -63,7 +65,7 @@ public class MathTransformParser extends AbstractParser {
 
     /**
      * The classification of the last math transform or projection parsed,
-     * or <code>null</code> if none.
+     * or {@code null} if none.
      */
     private String classification;
 

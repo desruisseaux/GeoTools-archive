@@ -63,6 +63,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author André Gosselin
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public class StereographicPolar extends Stereographic {
     /**
@@ -77,7 +79,7 @@ public class StereographicPolar extends Stereographic {
     protected double latitudeTrueScale;
 
     /**
-     * <code>true</code> if this projection is for the south pole, or <code>false</code>
+     * {@code true} if this projection is for the south pole, or {@code false}
      * if it is for the north pole.
      */
     protected final boolean southPole;
@@ -128,7 +130,7 @@ public class StereographicPolar extends Stereographic {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -155,7 +157,7 @@ public class StereographicPolar extends Stereographic {
         
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -245,9 +247,9 @@ public class StereographicPolar extends Stereographic {
      */
     static final class Spherical extends StereographicPolar {
         /**
-         * A constant used in the transformations. This constant hides the <code>k0</code>
-         * constant from the ellipsoidal case. The spherical and ellipsoidal <code>k0</code>
-         * are not computed in the same way, and we preserve the ellipsoidal <code>k0</code>
+         * A constant used in the transformations. This constant hides the {@code k0}
+         * constant from the ellipsoidal case. The spherical and ellipsoidal {@code k0}
+         * are not computed in the same way, and we preserve the ellipsoidal {@code k0}
          * in {@link Stereographic} in order to allow assertions to work.
          */
         private final double k0;
@@ -283,7 +285,7 @@ public class StereographicPolar extends Stereographic {
         
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-         * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+         * and stores the result in {@code ptDst} (linear distance on a unit sphere).
          */
         protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
                 throws ProjectionException 
@@ -327,7 +329,7 @@ public class StereographicPolar extends Stereographic {
 
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-         * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+         * and stores the result in {@code ptDst} (linear distance on a unit sphere).
          */
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
                 throws ProjectionException 
@@ -389,9 +391,9 @@ public class StereographicPolar extends Stereographic {
         private double C, D;
 
         /**
-         * A constant used in the transformations. This constant hides the <code>k0</code>
-         * constant from the USGS case. The EPSG and USGS <code>k0</code> are not computed
-         * in the same way, and we preserve the USGS <code>k0</code> in order to allow
+         * A constant used in the transformations. This constant hides the {@code k0}
+         * constant from the USGS case. The EPSG and USGS {@code k0} are not computed
+         * in the same way, and we preserve the USGS {@code k0} in order to allow
          * assertions to work.
          */
         private final double k0;
@@ -438,7 +440,7 @@ public class StereographicPolar extends Stereographic {
         
         /**
          * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-         * and stores the result in <code>ptDst</code>.
+         * and stores the result in {@code ptDst}.
          */
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
                 throws ProjectionException 

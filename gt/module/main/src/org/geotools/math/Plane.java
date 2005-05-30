@@ -22,10 +22,10 @@ package org.geotools.math;
 
 // J2SE and vecmath dependencies
 import java.io.Serializable;
-
 import javax.vecmath.MismatchedSizeException;
 import javax.vecmath.Point3d;
 
+// OpenGIS dependencies
 import org.opengis.util.Cloneable;
 
 
@@ -45,12 +45,14 @@ import org.opengis.util.Cloneable;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Howard Freeland
+ *
+ * @since 2.0
  */
 public class Plane implements Cloneable, Serializable {
     /**
      * Serial number for compatibility with different versions.
      */
-//    private static final long serialVersionUID = 2185952238314399110L;
+    private static final long serialVersionUID = 2956201711131316723L;
 
     /**
      * The <var>c</var> coefficient for this plane. This coefficient appears in the place equation

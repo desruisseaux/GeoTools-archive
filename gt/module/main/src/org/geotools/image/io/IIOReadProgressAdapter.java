@@ -31,6 +31,8 @@ import javax.imageio.event.IIOReadProgressListener;
  *
  * @author Martin Desruisseaux
  * @version $Id$
+ *
+ * @since 2.1
  */
 public class IIOReadProgressAdapter implements IIOReadProgressListener {
     /**
@@ -53,7 +55,7 @@ public class IIOReadProgressAdapter implements IIOReadProgressListener {
     
     /**
      * Reports the approximate degree of completion of the current
-     * <code>read</code> call of the associated <code>ImageReader</code>.
+     * {@code read} call of the associated {@code ImageReader}.
      */
     public void imageProgress(ImageReader source, float percentageDone) {
     }
@@ -71,8 +73,8 @@ public class IIOReadProgressAdapter implements IIOReadProgressListener {
     }
     
     /**
-     * Reports the approximate degree of completion of the current <code>getThumbnail</code>
-     * call within the associated <code>ImageReader</code>.
+     * Reports the approximate degree of completion of the current {@code getThumbnail}
+     * call within the associated {@code ImageReader}.
      */
     public void thumbnailProgress(ImageReader source, float percentageDone) {
     }
@@ -84,7 +86,7 @@ public class IIOReadProgressAdapter implements IIOReadProgressListener {
     }
     
     /**
-     * Reports that a read has been aborted via the reader's <code>abort</code> method.
+     * Reports that a read has been aborted via the reader's {@code abort} method.
      */
     public void readAborted(ImageReader source) {
     }

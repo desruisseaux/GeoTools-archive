@@ -28,6 +28,7 @@ import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.Locale;
 
+// Geotools dependencies
 import org.geotools.resources.ClassChanger;
 import org.geotools.resources.XArray;
 import org.geotools.resources.rsc.ResourceKeys;
@@ -47,12 +48,12 @@ import org.geotools.resources.rsc.Resources;
  * });
  * </pre></blockquote>
  *
- * <code>LineFormat</code> may be used for reading a matrix with an unknow number of columns,
+ * {@code LineFormat} may be used for reading a matrix with an unknow number of columns,
  * while requiring that all lines have the same number of columns. The example below gets the
  * number of columns while reading the first line, and ensure that all subsequent lines have
  * the same number of columns. If one line violate this condition, then a {@link ParseException}
- * will be thrown. The check if performed by the <code>getValues(double[])</code> method when
- * the <code>data</code> array is non-nul.
+ * will be thrown. The check if performed by the {@code getValues(double[])} method when
+ * the {@code data} array is non-nul.
  *
  * <blockquote><pre>
  * &nbsp;double[] data=null;
@@ -76,6 +77,8 @@ import org.geotools.resources.rsc.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class LineFormat {
     /**
@@ -93,8 +96,8 @@ public class LineFormat {
 
     /**
      * Tableau de formats à utiliser. Chaque format de ce tableau correspond à une
-     * colonne. Par exemple la donnée <code>data[4]</code> aura été lu avec le format
-     * <code>format[4]</code>. Il n'est toutefois pas obligatoire qu'il y ait autant
+     * colonne. Par exemple la donnée {@code data[4]} aura été lu avec le format
+     * {@code format[4]}. Il n'est toutefois pas obligatoire qu'il y ait autant
      * de format que de colonnes. Si {@link #data} et plus long que {@link #format},
      * alors le dernier format sera réutilisé pour toutes les colonnes restantes.
      */
@@ -108,8 +111,8 @@ public class LineFormat {
 
     /**
      * Index du caractère auquel commençaient les éléments qui ont été lus. Par exemple
-     * <code>index[0]</code> contient l'index du premier caractère qui a été lu pour la
-     * donnée <code>data[0]</code>, et ainsi de suite. Ce tableau doit <u>toujours</u>
+     * {@code index[0]} contient l'index du premier caractère qui a été lu pour la
+     * donnée {@code data[0]}, et ainsi de suite. Ce tableau doit <u>toujours</u>
      * avoir une longueur de <code>{@link #data}.length + 1</code>. Le dernier élément
      * de ce tableau sera la longueur de la ligne.
      */
@@ -141,7 +144,7 @@ public class LineFormat {
      * tous autres objets écrits selon le format spécifié.
      *
      * @param format Format à utiliser.
-     * @throws NullPointerException si <code>format</code> est nul.
+     * @throws NullPointerException si {@code format} est nul.
      */
     public LineFormat(final Format format) throws NullPointerException {
         this.data   = new Object[16];
@@ -156,13 +159,13 @@ public class LineFormat {
     /**
      * Construit un objet qui lira des dates, des nombres ou tous autres objets écrits selon
      * les formats spécifiés. Le tableau de format spécifié en argument donne les formats
-     * attendus des premières colonnes. Par exemple <code>formats[0]</code> donne le format
-     * de la première colonne, <code>formats[1]</code> donne le format de la deuxième colonne,
+     * attendus des premières colonnes. Par exemple {@code formats[0]} donne le format
+     * de la première colonne, {@code formats[1]} donne le format de la deuxième colonne,
      * etc. S'il y a plus de colonnes que de formats spécifiés, le dernier format sera réutilisé
      * pour toutes les colonnes restantes.
      *
      * @param formats Tableau de formats à utiliser.
-     * @throws NullPointerException si <code>formats</code> est nul ou si si un des formats est nul.
+     * @throws NullPointerException si {@code formats} est nul ou si si un des formats est nul.
      */
     public LineFormat(final Format[] formats) throws NullPointerException {
         this.data   = new Object[formats.length];
@@ -202,8 +205,8 @@ public class LineFormat {
      * Défini la prochaine ligne qui sera à interpréter.
      *
      * @param  line  Ligne à interpréter.
-     * @param  lower Index du premier caractère de <code>line</code> à prendre en compte.
-     * @param  upper Index suivant celui du dernier caractère de <code>line</code> à prendre en compte.
+     * @param  lower Index du premier caractère de {@code line} à prendre en compte.
+     * @param  upper Index suivant celui du dernier caractère de {@code line} à prendre en compte.
      * @return Nombre d'éléments trouvés dans la ligne. Cette information peut
      *         aussi être obtenue par un appel à {@link #getValueCount}.
      * @throws ParseException si des éléments n'ont pas pu être interprétés.
@@ -220,7 +223,7 @@ public class LineFormat {
         count=0;
         /*
          * Procède au balayage de toutes les valeurs qui se trouvent sur la ligne spécifiée.
-         * Le balayage s'arrêtera lorsque <code>lower</code> aura atteint <code>upper</code>.
+         * Le balayage s'arrêtera lorsque {@code lower} aura atteint {@code upper}.
          */
   load: while (true) {
             while (true) {
@@ -270,7 +273,7 @@ public class LineFormat {
     /**
      * Modifie ou ajoute une valeur. L'index de la valeur doit être compris de
      * 0 à {@link #getValueCount} inclusivement. Si l'index est égal au nombre
-     * de données retourné par {@link #getValueCount}, alors <code>value</code>
+     * de données retourné par {@link #getValueCount}, alors {@code value}
      * sera ajouté à la fin des données existante et une colonne sera ajoutée.
      *
      * @param  index Index de la donnée à modifier ou ajouter.
@@ -312,7 +315,7 @@ public class LineFormat {
     }
 
     /**
-     * Retourne sous forme de nombre la valeur à l'index <code>index</code>.
+     * Retourne sous forme de nombre la valeur à l'index {@code index}.
      *
      * @param  index Index de la valeur demandée.
      * @return La valeur demandée sous forme d'objet {@link Number}.
@@ -339,16 +342,16 @@ public class LineFormat {
 
     /**
      * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers <code>array</code> les valeurs
-     * qui ont été lues. Si <code>array</code> est nul, cette méthode créera et retournera un
+     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
+     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
      * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si <code>array</code> est non-nul, alors cette méthode exigera que la longueur du
+     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
      * tableau soit égale au nombre de données.
      *
      * @param  array Tableau dans lequel copier les valeurs.
-     * @return <code>array</code> s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si <code>array</code> était nul.
-     * @throws ParseException si <code>array</code> était non-nul et que sa longueur
+     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
+     *         créé avec la bonne longueur si {@code array} était nul.
+     * @throws ParseException si {@code array} était non-nul et que sa longueur
      *         ne correspond pas au nombre de données lues, ou si une des données lues
      *         n'est pas convertible en nombre.
      */
@@ -366,16 +369,16 @@ public class LineFormat {
 
     /**
      * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers <code>array</code> les valeurs
-     * qui ont été lues. Si <code>array</code> est nul, cette méthode créera et retournera un
+     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
+     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
      * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si <code>array</code> est non-nul, alors cette méthode exigera que la longueur du
+     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
      * tableau soit égale au nombre de données.
      *
      * @param  array Tableau dans lequel copier les valeurs.
-     * @return <code>array</code> s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si <code>array</code> était nul.
-     * @throws ParseException si <code>array</code> était non-nul et que sa longueur
+     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
+     *         créé avec la bonne longueur si {@code array} était nul.
+     * @throws ParseException si {@code array} était non-nul et que sa longueur
      *         ne correspond pas au nombre de données lues, ou si une des données lues
      *         n'est pas convertible en nombre.
      */
@@ -393,18 +396,18 @@ public class LineFormat {
 
     /**
      * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers <code>array</code> les valeurs
-     * qui ont été lues. Si <code>array</code> est nul, cette méthode créera et retournera un
+     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
+     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
      * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si <code>array</code> est non-nul, alors cette méthode exigera que la longueur du
+     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
      * tableau soit égale au nombre de données.
      *
      * @param  array Tableau dans lequel copier les valeurs.
-     * @return <code>array</code> s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si <code>array</code> était nul.
-     * @throws ParseException si <code>array</code> était non-nul et que sa longueur
+     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
+     *         créé avec la bonne longueur si {@code array} était nul.
+     * @throws ParseException si {@code array} était non-nul et que sa longueur
      *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type <code>long</code>.
+     *         n'est pas convertible en nombre entier de type {@code long}.
      */
     public synchronized long[] getValues(long[] array) throws ParseException {
         if (array!=null) {
@@ -423,18 +426,18 @@ public class LineFormat {
 
     /**
      * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers <code>array</code> les valeurs
-     * qui ont été lues. Si <code>array</code> est nul, cette méthode créera et retournera un
+     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
+     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
      * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si <code>array</code> est non-nul, alors cette méthode exigera que la longueur du
+     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
      * tableau soit égale au nombre de données.
      *
      * @param  array Tableau dans lequel copier les valeurs.
-     * @return <code>array</code> s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si <code>array</code> était nul.
-     * @throws ParseException si <code>array</code> était non-nul et que sa longueur
+     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
+     *         créé avec la bonne longueur si {@code array} était nul.
+     * @throws ParseException si {@code array} était non-nul et que sa longueur
      *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type <code>int</code>.
+     *         n'est pas convertible en nombre entier de type {@code int}.
      */
     public synchronized int[] getValues(int[] array) throws ParseException {
         if (array!=null) {
@@ -453,18 +456,18 @@ public class LineFormat {
 
     /**
      * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers <code>array</code> les valeurs
-     * qui ont été lues. Si <code>array</code> est nul, cette méthode créera et retournera un
+     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
+     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
      * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si <code>array</code> est non-nul, alors cette méthode exigera que la longueur du
+     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
      * tableau soit égale au nombre de données.
      *
      * @param  array Tableau dans lequel copier les valeurs.
-     * @return <code>array</code> s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si <code>array</code> était nul.
-     * @throws ParseException si <code>array</code> était non-nul et que sa longueur
+     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
+     *         créé avec la bonne longueur si {@code array} était nul.
+     * @throws ParseException si {@code array} était non-nul et que sa longueur
      *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type <code>short</code>.
+     *         n'est pas convertible en nombre entier de type {@code short}.
      */
     public synchronized short[] getValues(short[] array) throws ParseException {
         if (array!=null) {
@@ -483,18 +486,18 @@ public class LineFormat {
 
     /**
      * Copie vers le tableau spécifié les valeurs lues dans la ligne. Cette méthode peut être
-     * appelée après {@link #setLine(String)} pour copier vers <code>array</code> les valeurs
-     * qui ont été lues. Si <code>array</code> est nul, cette méthode créera et retournera un
+     * appelée après {@link #setLine(String)} pour copier vers {@code array} les valeurs
+     * qui ont été lues. Si {@code array} est nul, cette méthode créera et retournera un
      * tableau qui aura la longueur tout juste suffisante pour contenir toutes les données.
-     * Mais si <code>array</code> est non-nul, alors cette méthode exigera que la longueur du
+     * Mais si {@code array} est non-nul, alors cette méthode exigera que la longueur du
      * tableau soit égale au nombre de données.
      *
      * @param  array Tableau dans lequel copier les valeurs.
-     * @return <code>array</code> s'il était non-nul, ou un tableau nouvellement
-     *         créé avec la bonne longueur si <code>array</code> était nul.
-     * @throws ParseException si <code>array</code> était non-nul et que sa longueur
+     * @return {@code array} s'il était non-nul, ou un tableau nouvellement
+     *         créé avec la bonne longueur si {@code array} était nul.
+     * @throws ParseException si {@code array} était non-nul et que sa longueur
      *         ne correspond pas au nombre de données lues, ou si une des données lues
-     *         n'est pas convertible en nombre entier de type <code>byte</code>.
+     *         n'est pas convertible en nombre entier de type {@code byte}.
      */
     public synchronized byte[] getValues(byte[] array) throws ParseException {
         if (array!=null) {

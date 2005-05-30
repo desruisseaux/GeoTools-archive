@@ -83,15 +83,17 @@ import org.geotools.resources.gcs.Resources;
  * {@link #getTransform} method provides a convenient {@link AffineTransform} for
  * performing coordinate transformations between pixel and logical spaces.
  * <br><br>
- * By default, <code>TextRecordImageReader</code> assume that <var>x</var> and
+ * By default, {@code TextRecordImageReader} assume that <var>x</var> and
  * <var>y</var> coordinates appear in column #0 and 1 respectively. It also assumes
  * that numeric values are encoded using current defaults {@link java.nio.charset.Charset}
  * and {@link java.util.Locale}, and that there is no pad value. The easiest way to change
  * the default setting is to create a {@link Spi} subclass. There is no need to subclass
- * <code>TextRecordImageReader</code>, unless you want more control on the decoding process.
+ * {@code TextRecordImageReader}, unless you want more control on the decoding process.
  *
- * @version 1.0
+ * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class TextRecordImageReader extends TextImageReader {
     /**
@@ -108,7 +110,7 @@ public class TextRecordImageReader extends TextImageReader {
     /**
      * Lorsque la lecture se fait par-dessus une image {@link BufferedReader} existante,
      * indique s'il faut effacer la région dans laquelle sera placée l'image avant de la
-     * lire. La valeur <code>false</code> permettra de conserver les anciens pixels dans
+     * lire. La valeur {@code false} permettra de conserver les anciens pixels dans
      * les régions ou le fichier ne définit pas de nouvelles valeurs.
      */
     private static final boolean CLEAR = true;
@@ -148,10 +150,10 @@ public class TextRecordImageReader extends TextImageReader {
     private transient LineFormat lineFormat;
     
     /**
-     * Données des images, ou <code>null</code> si aucune lecture n'a encore été
+     * Données des images, ou {@code null} si aucune lecture n'a encore été
      * faite. Chaque élément contient les données de l'image à l'index correspondant
-     * (i.e. l'élément <code>data[0]</code> contient les données de l'image #0,
-     * <code>data[1]</code> contient les données de l'image #1, etc.). Des éléments
+     * (i.e. l'élément {@code data[0]} contient les données de l'image #0,
+     * {@code data[1]} contient les données de l'image #1, etc.). Des éléments
      * de ce tableau peuvent être nuls si les données des images correspondantes
      * ne sont pas retenues après chaque lecture (c'est-à-dire si
      * <code>{@link #seekForwardOnly}==true</code>).
@@ -193,7 +195,7 @@ public class TextRecordImageReader extends TextImageReader {
      *        constantes de {@link DataBuffer}, notamment {@link DataBuffer#TYPE_INT}
      *        ou {@link DataBuffer#TYPE_FLOAT}. Le type {@link DataBuffer#TYPE_DOUBLE}
      *        est accepté mais déconseillé, étant donné que l'implémentation actuelle
-     *        ne lira les données qu'avec la précision des types <code>float</code>.
+     *        ne lira les données qu'avec la précision des types {@code float}.
      */
     public TextRecordImageReader(final ImageReaderSpi provider, final int rawImageType) {
         super(provider, rawImageType);
@@ -242,7 +244,7 @@ public class TextRecordImageReader extends TextImageReader {
     
     /**
      * Retourne le numéro de colonne dans laquelle se trouvent les données de la
-     * bande spécifiée. L'implémentation par défaut retourne <code>band</code>+1
+     * bande spécifiée. L'implémentation par défaut retourne {@code band}+1
      * ou 2 si la bande est plus grand ou égal à {@link #getColumnX} et/ou
      * {@link #getColumnY}. Cette implémentation devrait convenir pour des données
      * se trouvant aussi bien avant qu'après les colonnes <var>x</var>
@@ -394,20 +396,20 @@ public class TextRecordImageReader extends TextImageReader {
     
     /**
      * Convertit une ligne en valeurs numériques. Cette méthode est appelée automatiquement
-     * lors de la lecture de chaque ligne, avec en argument la ligne lue (<code>line</code>)
-     * et le buffer dans lequel placer les valeurs numériques (<code>values</code>).
+     * lors de la lecture de chaque ligne, avec en argument la ligne lue ({@code line})
+     * et le buffer dans lequel placer les valeurs numériques ({@code values}).
      *
      * L'implémentation par défaut décode la ligne en exigeant qu'il y ait autant de nombres
-     * que la longueur du tableau <code>values</code>.  Elle remplace ensuite les occurences
-     * de <code>padValue</code> par {@link Double#NaN}  dans toutes les colonnes sauf celles
+     * que la longueur du tableau {@code values}.  Elle remplace ensuite les occurences
+     * de {@code padValue} par {@link Double#NaN}  dans toutes les colonnes sauf celles
      * des coordonnées <var>x</var> et <var>y</var>.
      *
      * @param line   Ligne à décoder.
-     * @param values Dernières valeurs à avoir été lues, ou <code>null</code> si cette ligne
+     * @param values Dernières valeurs à avoir été lues, ou {@code null} si cette ligne
      *               est la première à être décodée. Ce buffer peut être réutilisé en écrasant
-     *               les anciennes valeurs par les nouvelles valeurs de la ligne <code>line</code>.
-     * @return Les valeurs lues, ou <code>null</code> si la fin de l'image a été atteinte. Le
-     *         tableau retourné sera habituellement le même que <code>values</code>, mais pas
+     *               les anciennes valeurs par les nouvelles valeurs de la ligne {@code line}.
+     * @return Les valeurs lues, ou {@code null} si la fin de l'image a été atteinte. Le
+     *         tableau retourné sera habituellement le même que {@code values}, mais pas
      *         obligatoirement. Par convention, un tableau de longueur 0 signifie que la ligne
      *         ne contient aucune donnée et doit être ignorée.
      * @throws ParseException si une erreur est survenue lors du décodage de la ligne.
@@ -429,11 +431,11 @@ public class TextRecordImageReader extends TextImageReader {
     /**
      * Retourne les données de l'image à l'index spécifié. Si cette image avait déjà été lue, ses
      * données seront retournées immédiatement.  Sinon, cette image sera lue ainsi que toutes les
-     * images qui précèdent <code>imageIndex</code> et qui n'avaient pas encore été lues. Que ces
+     * images qui précèdent {@code imageIndex} et qui n'avaient pas encore été lues. Que ces
      * images précédentes soient mémorisées ou oubliées dépend de {@link #seekForwardOnly}.
      *
      * @param  imageIndex Index de l'image à lire.
-     * @return Les données de l'image. Cette méthode ne retourne jamais <code>null</code>.
+     * @return Les données de l'image. Cette méthode ne retourne jamais {@code null}.
      * @throws IOException si une erreur est survenue lors de la lecture du flot,
      *         ou si des nombres n'étaient pas correctement formatés dans le flot.
      * @throws IndexOutOfBoundsException si l'index spécifié est en dehors des
@@ -543,10 +545,10 @@ public class TextRecordImageReader extends TextImageReader {
     }
     
     /**
-     * Reads the image indexed by <code>imageIndex</code> and returns it as a complete buffered image.
+     * Reads the image indexed by {@code imageIndex} and returns it as a complete buffered image.
      *
      * @param  imageIndex the index of the image to be retrieved.
-     * @param  param Parameters used to control the reading process, or <code>null</code>.
+     * @param  param Parameters used to control the reading process, or {@code null}.
      * @return the desired portion of the image.
      * @throws IOException if an error occurs during reading.
      */
@@ -681,7 +683,7 @@ public class TextRecordImageReader extends TextImageReader {
      * @param  imageIndex Index de l'image dont on veut les types.
      * @param  numBanfd Nombre de bandes.
      * @return Itérateur balayant les types de l'image.
-     * @throws IndexOutOfBoundsException si <code>imageIndex</code> est invalide.
+     * @throws IndexOutOfBoundsException si {@code imageIndex} est invalide.
      * @throws IllegalStateException si aucune source n'a été spécifiée avec {@link #setInput}.
      * @throws IIOException si l'opération a échoué pour une autre raison.
      */
@@ -757,10 +759,10 @@ public class TextRecordImageReader extends TextImageReader {
      * }
      * </pre></blockquote>
      *
-     * (Note: fields <code>vendorName</code> and <code>version</code> are only informatives).
+     * (Note: fields {@code vendorName} and {@code version} are only informatives).
      * There is no need to override any method in this example. However, developers
      * can gain more control by creating subclasses of {@link TextRecordImageReader}
-     * <strong>and</strong> <code>Spi</code> and overriding some of their methods.
+     * <strong>and</strong> {@code Spi} and overriding some of their methods.
      *
      * @version 1.0
      * @author Martin Desruisseaux
@@ -795,8 +797,8 @@ public class TextRecordImageReader extends TextImageReader {
          * a point depart from more than <code>gridTolerance<code> percent of
          * cell's width or height, an exception is thrown.
          * <br><br>
-         * <code>gridTolerance</code> should be a small number like <code>1E-5f</code>
-         * or <code>1E-3f</code>. The later is more tolerant than the former.
+         * {@code gridTolerance} should be a small number like {@code 1E-5f}
+         * or {@code 1E-3f}. The later is more tolerant than the former.
          */
         protected float gridTolerance = EPS;
         
@@ -812,8 +814,8 @@ public class TextRecordImageReader extends TextImageReader {
          * <var>y</var> columns are assumed to be in column #0 and 1 respectively.
          * Others parameters are initialized as in superclass constructor.
          *
-         * @param name Format name, or <code>null</code> to let {@link #names} unset.
-         * @param mime MIME type, or <code>null</code> to let {@link #MIMETypes} unset.
+         * @param name Format name, or {@code null} to let {@link #names} unset.
+         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
          */
         public Spi(final String name, final String mime) {
             this(name, mime, 0, 1);
@@ -822,8 +824,8 @@ public class TextRecordImageReader extends TextImageReader {
         /**
          * Construct a new SPI for {@link TextRecordImageReader}.
          *
-         * @param name Format name, or <code>null</code> to let {@link #names} unset.
-         * @param mime MIME type, or <code>null</code> to let {@link #MIMETypes} unset.
+         * @param name Format name, or {@code null} to let {@link #names} unset.
+         * @param mime MIME type, or {@code null} to let {@link #MIMETypes} unset.
          * @param xColumn 0-based column number for <var>x</var> values.
          * @param yColumn 0-based column number for <var>y</var> values.
          */
@@ -859,7 +861,7 @@ public class TextRecordImageReader extends TextImageReader {
          *
          * @param  line Une des premières lignes du flot à lire.
          * @return {@link Boolean#TRUE} si la ligne peut être décodée, {@link Boolean#FALSE}
-         *         si elle ne peut pas être décodée ou <code>null</code> si on ne sait pas.
+         *         si elle ne peut pas être décodée ou {@code null} si on ne sait pas.
          *         Dans ce dernier cas, cette méthode sera appelée une nouvelle fois avec la
          *         ligne suivante.
          */

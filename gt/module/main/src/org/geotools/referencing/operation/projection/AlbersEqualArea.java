@@ -98,6 +98,8 @@ import org.geotools.resources.cts.Resources;
  *
  * @version $Id$
  * @author Rueben Schulz
+ *
+ * @since 2.1
  */
 public class AlbersEqualArea extends MapProjection {       
     /**
@@ -281,7 +283,7 @@ public class AlbersEqualArea extends MapProjection {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -315,7 +317,7 @@ public class AlbersEqualArea extends MapProjection {
     
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-     * and stores the result in <code>ptDst</code>.
+     * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 

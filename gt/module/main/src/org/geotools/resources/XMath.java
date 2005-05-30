@@ -38,6 +38,8 @@ import org.geotools.resources.rsc.Resources;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class XMath {
     /**
@@ -141,7 +143,7 @@ public final class XMath {
     /**
      * Returns the sign of <var>x</var>. This method returns
      *    -1 if <var>x</var> is negative,
-     *     0 if <var>x</var> is null or <code>NaN</code> and
+     *     0 if <var>x</var> is null or {@code NaN} and
      *    +1 if <var>x</var> is positive.
      *
      * @todo Remove this method when we will be allowed to use J2SE 1.5.
@@ -155,7 +157,7 @@ public final class XMath {
     /**
      * Returns the sign of <var>x</var>. This method returns
      *    -1 if <var>x</var> is negative,
-     *     0 if <var>x</var> is null or <code>NaN</code> and
+     *     0 if <var>x</var> is null or {@code NaN} and
      *    +1 if <var>x</var> is positive.
      *
      * @todo Remove this method when we will be allowed to use J2SE 1.5.
@@ -229,7 +231,7 @@ public final class XMath {
      *
      * @param  value The value to round.
      * @param  flu The amount of floating point units.
-     * @return The rounded value, of <code>value</code> if it was not close enough to an integer.
+     * @return The rounded value, of {@code value} if it was not close enough to an integer.
      */
     public static double round(final double value, int flu) {
         final double target = Math.rint(value);
@@ -247,19 +249,19 @@ public final class XMath {
     }
 
     /**
-     * Try to remove at least <code>n</code> fraction digits in the string representation of
-     * the specified value. This method try small changes to <code>value</code>, by adding or
+     * Try to remove at least {@code n} fraction digits in the string representation of
+     * the specified value. This method try small changes to {@code value}, by adding or
      * substracting a maximum of 4 ulps. If there is no small change that remove at least
-     * <code>n</code> fraction digits, then the value is returned unchanged. This method is
+     * {@code n} fraction digits, then the value is returned unchanged. This method is
      * used for hiding rounding errors, like in conversions from radians to degrees.
      *
-     * <P>Example: <code>XMath.fixRoundingError(-61.500000000000014, 12)</code> returns
-     * <code>-61.5</code>.
+     * <P>Example: {@code XMath.fixRoundingError(-61.500000000000014, 12)} returns
+     * {@code -61.5}.
      *
      * @param  value The value to fix.
      * @param  n0 The minimum amount of fraction digits.
-     * @return The fixed value, or the unchanged <code>value</code> if there is no small change
-     *         that remove at least <code>n</code> fraction digits.
+     * @return The fixed value, or the unchanged {@code value} if there is no small change
+     *         that remove at least {@code n} fraction digits.
      */
     public static double fixRoundingError(final double value, int n) {
         double lower = value;
@@ -342,7 +344,7 @@ public final class XMath {
 
     /**
      * Finds the least float greater than <var>f</var>.
-     * If <code>NaN</code>, returns same value.
+     * If {@code NaN}, returns same value.
      *
      * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
@@ -352,7 +354,7 @@ public final class XMath {
 
     /**
      * Finds the greatest float less than <var>f</var>.
-     * If <code>NaN</code>, returns same value.
+     * If {@code NaN}, returns same value.
      *
      * @todo Remove this method when we will be allowed to use J2SE 1.5.
      */
@@ -362,7 +364,7 @@ public final class XMath {
 
     /**
      * Finds the least double greater than <var>f</var>.
-     * If <code>NaN</code>, returns same value.
+     * If {@code NaN}, returns same value.
      *
      * @see java.text.ChoiceFormat#nextDouble
      *
@@ -374,7 +376,7 @@ public final class XMath {
 
     /**
      * Finds the greatest double less than <var>f</var>.
-     * If <code>NaN</code>, returns same value.
+     * If {@code NaN}, returns same value.
      *
      * @see java.text.ChoiceFormat#previousDouble
      *
@@ -385,26 +387,26 @@ public final class XMath {
     }
 
     /**
-     * Returns the next or previous representable number. If <code>amount</code> is equals to
-     * <code>0</code>, then this method returns the <code>value</code> unchanged. Otherwise,
-     * The operation performed depends on the specified <code>type</code>:
+     * Returns the next or previous representable number. If {@code amount} is equals to
+     * {@code 0}, then this method returns the {@code value} unchanged. Otherwise,
+     * The operation performed depends on the specified {@code type}:
      * <ul>
-     *   <li><p>If the <code>type</code> is {@link Double}, then this method is
-     *       equivalent to invoking   {@link #previous(double)} if <code>amount</code> is equals to
-     *       <code>-1</code>, or invoking {@link #next(double)} if <code>amount</code> is equals to
-     *       <code>+1</code>. If <code>amount</code> is smaller than <code>-1</code> or greater
-     *       than <code>+1</code>, then this method invokes {@link #previous(double)} or
-     *       {@link #next(double)} in a loop for <code>abs(amount)</code> times.</p></li>
+     *   <li><p>If the {@code type} is {@link Double}, then this method is
+     *       equivalent to invoking   {@link #previous(double)} if {@code amount} is equals to
+     *       {@code -1}, or invoking {@link #next(double)} if {@code amount} is equals to
+     *       {@code +1}. If {@code amount} is smaller than {@code -1} or greater
+     *       than {@code +1}, then this method invokes {@link #previous(double)} or
+     *       {@link #next(double)} in a loop for {@code abs(amount)} times.</p></li>
      *
-     *   <li><p>If the <code>type</code> is {@link Float}, then this method is
-     *       equivalent to invoking   {@link #previous(float)} if <code>amount</code> is equals to
-     *       <code>-1</code>, or invoking {@link #next(float)} if <code>amount</code> is equals to
-     *       <code>+1</code>. If <code>amount</code> is smaller than <code>-1</code> or greater
-     *       than <code>+1</code>, then this method invokes {@link #previous(float)} or
-     *       {@link #next(float)} in a loop for <code>abs(amount)</code> times.</p></li>
+     *   <li><p>If the {@code type} is {@link Float}, then this method is
+     *       equivalent to invoking   {@link #previous(float)} if {@code amount} is equals to
+     *       {@code -1}, or invoking {@link #next(float)} if {@code amount} is equals to
+     *       {@code +1}. If {@code amount} is smaller than {@code -1} or greater
+     *       than {@code +1}, then this method invokes {@link #previous(float)} or
+     *       {@link #next(float)} in a loop for {@code abs(amount)} times.</p></li>
      *
-     *   <li><p>If the <code>type</code> is an {@linkplain #isInteger integer}, then invoking
-     *       this method is equivalent to computing <code>value + amount</code>.</p></li>
+     *   <li><p>If the {@code type} is an {@linkplain #isInteger integer}, then invoking
+     *       this method is equivalent to computing {@code value + amount}.</p></li>
      * </ul>
      *
      * @param type    The type. Should be the class of {@link Double}, {@link Float},
@@ -413,8 +415,8 @@ public final class XMath {
      * @param amount  -1 to return the previous representable number,
      *                +1 to return the next representable number, or
      *                 0 to return the number with no change.
-     * @return One of previous or next representable number as a <code>double</code>.
-     * @throws IllegalArgumentException if <code>type</code> is not one of supported types.
+     * @return One of previous or next representable number as a {@code double}.
+     * @throws IllegalArgumentException if {@code type} is not one of supported types.
      */
     public static double rool(final Class type, double value, int amount)
             throws IllegalArgumentException
@@ -453,11 +455,11 @@ public final class XMath {
     }
 
     /**
-     * Returns <code>true</code> if the specified <code>type</code> is one of real
+     * Returns {@code true} if the specified {@code type} is one of real
      * number types. Real number types includes {@link Float} and {@link Double}.
      *
-     * @param  type The type to test (may be <code>null</code>).
-     * @return <code>true</code> if <code>type</code> is the class {@link Float} or {@link Double}.
+     * @param  type The type to test (may be {@code null}).
+     * @return {@code true} if {@code type} is the class {@link Float} or {@link Double}.
      */
     public static boolean isReal(final Class type) {
         return type!=null &&
@@ -466,11 +468,11 @@ public final class XMath {
     }
 
     /**
-     * Returns <code>true</code> if the specified <code>type</code> is one of integer types.
+     * Returns {@code true} if the specified {@code type} is one of integer types.
      * Integer types includes {@link Long}, {@link Integer}, {@link Short} and {@link Byte}.
      *
-     * @param  type The type to test (may be <code>null</code>).
-     * @return <code>true</code> if <code>type</code> is the class {@link Long}, {@link Integer},
+     * @param  type The type to test (may be {@code null}).
+     * @return {@code true} if {@code type} is the class {@link Long}, {@link Integer},
      *         {@link Short} or {@link Byte}.
      */
     public static boolean isInteger(final Class type) {
@@ -484,7 +486,7 @@ public final class XMath {
     /**
      * Returns the number of bits used by number of the specified type.
      *
-     * @param  type The type (may be <code>null</code>).
+     * @param  type The type (may be {@code null}).
      * @return The number of bits, or 0 if unknow.
      *
      * @todo Use the predefined constants when we will be allowed to use J2SE 1.5.
@@ -502,10 +504,10 @@ public final class XMath {
     }
 
     /**
-     * Change a primitive class to its wrapper (e.g. <code>double</code> to {@link Double}).
+     * Change a primitive class to its wrapper (e.g. {@code double} to {@link Double}).
      * If the specified class is not a primitive type, then it is returned unchanged.
      *
-     * @param  type The primitive type (may be <code>null</code>).
+     * @param  type The primitive type (may be {@code null}).
      * @return The type as a wrapper.
      */
     public static Class primitiveToWrapper(final Class type) {

@@ -41,6 +41,8 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class ResourceInternationalString extends AbstractInternationalString implements Serializable {
     /**
@@ -73,10 +75,10 @@ public class ResourceInternationalString extends AbstractInternationalString imp
 
     /**
      * Returns a string in the specified locale. If there is no string for the specified
-     * <code>locale</code>, then this method search for a string in an other locale as
+     * {@code locale}, then this method search for a string in an other locale as
      * specified in the {@link ResourceBundle} class description.
      *
-     * @param  locale The locale to look for, or <code>null</code> for an unlocalized version.
+     * @param  locale The locale to look for, or {@code null} for an unlocalized version.
      * @return The string in the specified locale, or in a default locale.
      * @throws MissingResourceException is the key given to the constructor is invalid.
      */

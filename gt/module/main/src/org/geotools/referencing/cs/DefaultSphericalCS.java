@@ -34,7 +34,7 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 /**
  * A three-dimensional coordinate system with one distance measured from the origin and two angular
  * coordinates. Not to be confused with an {@linkplain DefaultEllipsoidalCS ellipsoidal coordinate
- * system} based on an ellipsoid "degenerated" into a sphere. A <code>SphericalCS</code> shall have
+ * system} based on an ellipsoid "degenerated" into a sphere. A {@code SphericalCS} shall have
  * three {@linkplain #getAxis axis}.
  *
  * <TABLE CELLPADDING='6' BORDER='1'>
@@ -46,6 +46,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class DefaultSphericalCS extends AbstractCS implements SphericalCS {
     /**
@@ -104,7 +106,7 @@ public class DefaultSphericalCS extends AbstractCS implements SphericalCS {
     }
 
     /**
-     * Returns <code>true</code> if the specified axis direction is allowed for this coordinate
+     * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
      */

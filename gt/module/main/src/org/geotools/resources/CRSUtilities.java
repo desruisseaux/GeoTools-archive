@@ -77,6 +77,8 @@ import org.geotools.util.UnsupportedImplementationException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class CRSUtilities {
     /**
@@ -92,7 +94,7 @@ public final class CRSUtilities {
      *
      * @param  object1 The first object to compare (may be null).
      * @param  object2 The second object to compare (may be null).
-     * @return <code>true</code> if both objects are equals.
+     * @return {@code true} if both objects are equals.
      *
      * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
@@ -113,7 +115,7 @@ public final class CRSUtilities {
      * Returns the dimension within the coordinate system of the first occurrence of an axis
      * colinear with the specified axis. If an axis with the same
      * {@linkplain CoordinateSystemAxis#getDirection direction} or an
-     * {@linkplain AxisDirection#inverse opposite} direction than <code>axis</code>
+     * {@linkplain AxisDirection#inverse opposite} direction than {@code axis}
      * ocurs in the coordinate system, then the dimension of the first such occurrence
      * is returned. That is, the a value <i>k</i> such that:
      *
@@ -121,15 +123,15 @@ public final class CRSUtilities {
      * cs.getAxis(<i>k</i>).getDirection().absolute() == axis.getDirection().absolute()
      * </pre></blockquote>
      *
-     * is <code>true</code>. If no such axis occurs in this coordinate system,
-     * then <code>-1</code> is returned.
+     * is {@code true}. If no such axis occurs in this coordinate system,
+     * then {@code -1} is returned.
      * <br><br>
-     * For example, <code>dimensionColinearWith(CoordinateSystemAxis.TIME)</code>
+     * For example, {@code dimensionColinearWith(CoordinateSystemAxis.TIME)}
      * returns the dimension number of time axis.
      *
      * @param  cs   The coordinate system to examine.
      * @param  axis The axis to look for.
-     * @return The dimension number of the specified axis, or <code>-1</code> if none.
+     * @return The dimension number of the specified axis, or {@code -1} if none.
      */
     public static int dimensionColinearWith(final CoordinateSystem     cs,
                                             final CoordinateSystemAxis axis)
@@ -151,14 +153,14 @@ public final class CRSUtilities {
     
     /**
      * Returns the dimension of the first coordinate reference system of the given type. The
-     * <code>type</code> argument must be a subinterface of {@link CoordinateReferenceSystem}.
-     * If no such dimension is found, then this method returns <code>-1</code>.
+     * {@code type} argument must be a subinterface of {@link CoordinateReferenceSystem}.
+     * If no such dimension is found, then this method returns {@code -1}.
      *
      * @param  crs  The coordinate reference system (CRS) to examine.
      * @param  type The CRS type to look for.
      *         Must be a subclass of {@link CoordinateReferenceSystem}.
-     * @return The dimension range of the specified CRS type, or <code>-1</code> if none.
-     * @throws IllegalArgumentException if the <code>type</code> is not legal.
+     * @return The dimension range of the specified CRS type, or {@code -1} if none.
+     * @throws IllegalArgumentException if the {@code type} is not legal.
      */
     public static int getDimensionOf(final CoordinateReferenceSystem crs, final Class type)
             throws IllegalArgumentException
@@ -190,7 +192,7 @@ public final class CRSUtilities {
      * @param  lower The first dimension to keep, inclusive.
      * @param  upper The last  dimension to keep, exclusive.
      * @return The sub-coordinate system, or {@code null} if {@code crs} can't
-     *         be decomposed for dimensions in the range <code>[lower..upper]</code>.
+     *         be decomposed for dimensions in the range {@code [lower..upper]}.
      */
     public static CoordinateReferenceSystem getSubCRS(CoordinateReferenceSystem crs,
                                                       int lower, int upper)

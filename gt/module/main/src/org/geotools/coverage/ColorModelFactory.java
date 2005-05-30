@@ -52,6 +52,8 @@ import org.geotools.util.WeakValueHashMap;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 final class ColorModelFactory {
     /**
@@ -88,9 +90,9 @@ final class ColorModelFactory {
     private final int type;
 
     /**
-     * Construct a new <code>ColorModelFactory</code>. This object will actually be used
-     * as a key in a {@link Map}, so this is not really a <code>ColorModelFactory</code>
-     * but a kind of "<code>ColorModelKey</code>" instead. However, since this constructor
+     * Construct a new {@code ColorModelFactory}. This object will actually be used
+     * as a key in a {@link Map}, so this is not really a {@code ColorModelFactory}
+     * but a kind of "{@code ColorModelKey}" instead. However, since this constructor
      * is private, user doesn't need to know that.
      */
     private ColorModelFactory(final Category[] categories, final int type,
@@ -117,8 +119,8 @@ final class ColorModelFactory {
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
      * @param  numBands The number of bands for the color model (usually 1). The returned color
-     *         model will renderer only the <code>visibleBand</code> and ignore the others, but
-     *         the existence of all <code>numBands</code> will be at least tolerated. Supplemental
+     *         model will renderer only the {@code visibleBand} and ignore the others, but
+     *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
      *         in the <code>{@link CategoryList#getRange}</code> range.

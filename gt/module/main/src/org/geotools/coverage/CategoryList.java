@@ -63,7 +63,7 @@ import org.geotools.util.NumberRange;
 
 /**
  * An immutable list of categories. Categories are sorted by their sample values.
- * Overlapping ranges of sample values are not allowed. A <code>CategoryList</code> can
+ * Overlapping ranges of sample values are not allowed. A {@code CategoryList} can
  * contains a mix of qualitative and quantitative categories.  The {@link #getCategory}
  * method is responsible for finding the right category for an arbitrary sample value.
  *
@@ -71,6 +71,8 @@ import org.geotools.util.NumberRange;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 class CategoryList extends AbstractList implements MathTransform1D, Comparator, Serializable {
     /**
@@ -83,17 +85,17 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * The following rule must hold:
      *
      * <ul>
-     *   <li>If <code>this</code> is an instance of {@link CategoryList}, then
-     *       <code>inverse</code> must be an instance of {@link GeophysicsCategoryList}.</li>
-     *   <li>If <code>this</code> is an instance of {@link GeophysicsCategoryList}, then
-     *       <code>inverse</code> must be an instance of {@link CategoryList}.</li>
+     *   <li>If {@code this} is an instance of {@link CategoryList}, then
+     *       {@code inverse} must be an instance of {@link GeophysicsCategoryList}.</li>
+     *   <li>If {@code this} is an instance of {@link GeophysicsCategoryList}, then
+     *       {@code inverse} must be an instance of {@link CategoryList}.</li>
      * </ul>
      */
     final CategoryList inverse;
 
     /**
      * The range of values in this category list. This is the union of the range of values
-     * of every categories, excluding <code>NaN</code> values. This field will be computed
+     * of every categories, excluding {@code NaN} values. This field will be computed
      * only when first requested.
      */
     private transient NumberRange range;
@@ -140,12 +142,12 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
 
     /**
      * The last used category. We assume that this category is the most likely
-     * to be requested in the next <code>transform(...)</code> invocation.
+     * to be requested in the next {@code transform(...)} invocation.
      */
     private transient Category last;
 
     /**
-     * <code>true</code> if there is gaps between categories, or <code>false</code> otherwise.
+     * {@code true} if there is gaps between categories, or {@code false} otherwise.
      * A gap is found if for example the range of value is [-9999 .. -9999] for the first
      * category and [0 .. 1000] for the second one.
      */
@@ -183,8 +185,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * @param  categories The list of categories.
      * @param  units The geophysics unit, or {@code null} if none.
      * @param  searchNearest The policy when {@link #getCategory} doesn't find an exact match
-     *         for a sample value. <code>true</code> means that it should search for the nearest
-     *         category, while <code>false</code> means that it should returns {@code null}.
+     *         for a sample value. {@code true} means that it should search for the nearest
+     *         category, while {@code false} means that it should returns {@code null}.
      * @param  inverse The inverse transform, or {@code null} to build it automatically.
      *         <STRONG>This argument can be non-null only if invoked from
      *         {@link GeophysicsCategoryList} constructor</STRONG>.
@@ -325,7 +327,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Compare deux valeurs de type <code>double</code>. Cette méthode
+     * Compare deux valeurs de type {@code double}. Cette méthode
      * est similaire à {@link Double#compare(double,double)}, excepté
      * qu'elle ordonne aussi les différentes valeurs NaN.
      */
@@ -341,8 +343,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     
     /**
      * Vérifie si le tableau de catégories spécifié est bien en ordre croissant.
-     * La comparaison ne tient pas compte des valeurs <code>NaN</code>. Cette
-     * méthode n'est utilisée que pour les <code>assert</code>.
+     * La comparaison ne tient pas compte des valeurs {@code NaN}. Cette
+     * méthode n'est utilisée que pour les {@code assert}.
      */
     static boolean isSorted(final Category[] categories) {
         for (int i=1; i<categories.length; i++) {
@@ -417,7 +419,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * If <code>toGeophysics</code> is <code>true</code>, returns a list of categories scaled
+     * If {@code toGeophysics} is {@code true}, returns a list of categories scaled
      * to geophysics values. This method always returns a list of categories in which
      * <code>{@link Category#geophysics(boolean) Category.geophysics}(toGeophysics)</code>
      * has been invoked for each category.
@@ -433,7 +435,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * This is used mostly in assertion statements.
      *
      * @param  toGeophysics The state to test.
-     * @return <code>true</code> if all categories are in the specified state.
+     * @return {@code true} if all categories are in the specified state.
      */
     final boolean isScaled(final boolean toGeophysics) {
         return isScaled(categories, toGeophysics);
@@ -444,7 +446,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      *
      * @param  categories The categories to test.
      * @param  toGeophysics The state to test.
-     * @return <code>true</code> if all categories are in the specified state.
+     * @return {@code true} if all categories are in the specified state.
      */
     static boolean isScaled(final Category[] categories, final boolean toGeophysics) {
         for (int i=0; i<categories.length; i++) {
@@ -508,7 +510,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     
     /**
      * Returns the range of values in this category list. This is the union of the range
-     * of values of every categories, excluding <code>NaN</code> values. A {@link NumberRange}
+     * of values of every categories, excluding {@code NaN} values. A {@link NumberRange}
      * object give more informations than {@link org.opengis.CV_SampleDimension#getMinimum}
      * and {@link org.opengis.CV_SampleDimension#getMaximum} since it contains also the
      * type (integer, float, etc.) and inclusion/exclusion informations.
@@ -541,7 +543,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      *
      * @param  buffer The buffer where to write the range of geophysics values.
      * @param  locale The locale to use for formatting numbers.
-     * @return The <code>buffer</code> for convenience.
+     * @return The {@code buffer} for convenience.
      */
     private StringBuffer formatRange(StringBuffer buffer, final Locale locale) {
         final NumberRange range = getRange();
@@ -564,15 +566,15 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * Format the specified value using the specified locale convention.
      * This method is to be overriden by {@link GeophysicsCategoryList}.
      * The default implementation do not format the value very properly,
-     * since most invocation will be done on <code>geophysics(true).format(...)</code>
+     * since most invocation will be done on {@code geophysics(true).format(...)}
      * anyway.
      *
      * @param  value The value to format.
-     * @param  writeUnit <code>true</code> if unit symbol should be formatted after the number.
+     * @param  writeUnit {@code true} if unit symbol should be formatted after the number.
      *         Ignored if this category list has no unit.
      * @param  locale The locale, or {@code null} for a default one.
      * @param  buffer The buffer where to format.
-     * @return The buffer <code>buffer</code> for convenience.
+     * @return The buffer {@code buffer} for convenience.
      */
     StringBuffer format(final double value, final boolean writeUnits,
                         final Locale locale, StringBuffer buffer)
@@ -587,8 +589,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
      * @param  numBands The number of bands for the color model (usually 1). The returned color
-     *         model will renderer only the <code>visibleBand</code> and ignore the others, but
-     *         the existence of all <code>numBands</code> will be at least tolerated. Supplemental
+     *         model will renderer only the {@code visibleBand} and ignore the others, but
+     *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
      *         in the <code>{@link #getRange}</code> range.
@@ -624,8 +626,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * @param  visibleBand The band to be made visible (usually 0). All other bands, if any
      *         will be ignored.
      * @param  numBands The number of bands for the color model (usually 1). The returned color
-     *         model will renderer only the <code>visibleBand</code> and ignore the others, but
-     *         the existence of all <code>numBands</code> will be at least tolerated. Supplemental
+     *         model will renderer only the {@code visibleBand} and ignore the others, but
+     *         the existence of all {@code numBands} will be at least tolerated. Supplemental
      *         bands, even invisible, are useful for processing with Java Advanced Imaging.
      * @param  type The transfer type used in the sample model
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
@@ -698,11 +700,11 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Format a sample value. If <code>value</code> is a real number, then the value may
+     * Format a sample value. If {@code value} is a real number, then the value may
      * be formatted with the appropriate number of digits and the units symbol. Otherwise,
-     * if <code>value</code> is <code>NaN</code>, then the category name is returned.
+     * if {@code value} is {@code NaN}, then the category name is returned.
      *
-     * @param  value  The sample value (may be <code>NaN</code>).
+     * @param  value  The sample value (may be {@code NaN}).
      * @param  locale Locale to use for formatting, or {@code null} for the default locale.
      * @return A string representation of the sample value.
      */
@@ -746,7 +748,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Returns all categories in this <code>CategoryList</code>.
+     * Returns all categories in this {@code CategoryList}.
      */
     public final Object[] toArray() {
         return (Category[]) categories.clone();
@@ -763,7 +765,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     
     /**
      * Returns a string representation of this category list.
-     * The <code>owner</code> argument allow for a different
+     * The {@code owner} argument allow for a different
      * class name to be formatted.
      */
     final String toString(final Object owner) {
@@ -812,14 +814,14 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Returns the object to use after deserialization. This is usually <code>this</code>.
+     * Returns the object to use after deserialization. This is usually {@code this}.
      * However, if an identical object was previously deserialized, then this method replace
-     * <code>this</code> by the previously deserialized object in order to reduce memory usage.
+     * {@code this} by the previously deserialized object in order to reduce memory usage.
      * This is correct only for immutable objects.
      * <br><br>
      * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
      *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
-     *       in a <code>CategoryList</code>. Concequently, if <code>CategoryList</code> has been
+     *       in a {@code CategoryList}. Concequently, if {@code CategoryList} has been
      *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
      *
      * @return A canonical instance of this object.
@@ -830,17 +832,17 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
 
     /**
-     * Returns the object to write during serialization. This is usually <code>this</code>.
+     * Returns the object to write during serialization. This is usually {@code this}.
      * However, if identical objects are found in the same graph during serialization, then
      * they will be replaced by a single instance in order to reduce the amount of data sent
      * to the output stream. This is correct only for immutable objects.
      * <br><br>
      * NOTE: this method is private because {@link GeophysicsCategoryList} should not inherit it.
      *       {@link GeophysicsCategoryList} is never serialized alone; it is always encapsulated
-     *       in a <code>CategoryList</code>. Concequently, if <code>CategoryList</code> has been
+     *       in a {@code CategoryList}. Concequently, if {@code CategoryList} has been
      *       canonicalized, then {@link GeophysicsCategoryList} has been canonicalized too.
      *
-     * @return The object to serialize (usually <code>this</code>).
+     * @return The object to serialize (usually {@code this}).
      * @throws ObjectStreamException if this object can't be replaced.
      */
     private Object writeReplace() throws ObjectStreamException {
@@ -914,7 +916,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Transforms the specified <code>ptSrc</code> and stores the result in <code>ptDst</code>.
+     * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      */
     public final DirectPosition transform(final DirectPosition ptSrc, DirectPosition ptDst)
             throws TransformException
@@ -992,7 +994,7 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     /**
      * Transforms a list of coordinate point ordinal values. This implementation can work on
      * either float or double arrays, since the quasi-totality of the implementation is the
-     * same. Locale variables still <code>double</code> because this is the type used in
+     * same. Locale variables still {@code double} because this is the type used in
      * {@link Category} objects.
      *
      * @todo We could add an optimisation after the loops checking for category change:
@@ -1147,8 +1149,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     }
     
     /**
-     * Transform a raster. Only the current band in <code>iterator</code> will be transformed.
-     * The transformed value are write back in the <code>iterator</code>. If a different
+     * Transform a raster. Only the current band in {@code iterator} will be transformed.
+     * The transformed value are write back in the {@code iterator}. If a different
      * destination raster is wanted, a {@link org.geotools.resources.image.DualRectIter}
      * may be used.
      *

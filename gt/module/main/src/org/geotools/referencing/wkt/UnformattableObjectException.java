@@ -29,6 +29,8 @@ package org.geotools.referencing.wkt;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class UnformattableObjectException extends UnsupportedOperationException {
     /**

@@ -97,7 +97,7 @@ import org.geotools.util.NumberRange;
  * <strong>Resampling</strong><br>
  * The grid coverage can be resampled at a different cell resolution. Some implementations
  * may be able to do resampling efficiently at any resolution. This can be determined from
- * the {@link GridCoverageProcessor} metadata <code>HasArbitraryResolutions</code> keyword.
+ * the {@link GridCoverageProcessor} metadata {@code HasArbitraryResolutions} keyword.
  * Also a non-rectilinear grid coverage can be accessed as rectilinear grid coverage with
  * this operation.<br>
  * <br>
@@ -113,6 +113,8 @@ import org.geotools.util.NumberRange;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public final class Resampler2D extends GridCoverage2D {
     /**
@@ -172,7 +174,7 @@ public final class Resampler2D extends GridCoverage2D {
      * @param  hints The rendering hints. This is usually provided by {@link GridCoverageProcessor2D}.
      *         This method will looks for {@link Hints#COORDINATE_OPERATION_FACTORY}
      *         and {@link Hints#JAI_INSTANCE} keys.
-     * @return The new grid coverage, or <code>sourceCoverage</code> if no resampling was needed.
+     * @return The new grid coverage, or {@code sourceCoverage} if no resampling was needed.
      * @throws FactoryException is a transformation step can't be created.
      * @throws TransformException if a transformation failed.
      */
@@ -618,8 +620,8 @@ public final class Resampler2D extends GridCoverage2D {
      *
      * @param  transform The transform.
      * @param  mtFactory The factory to use for extracting the sub-transform.
-     * @return The {@link MathTransform2D} part of <code>transform</code>.
-     * @throws FactoryException if <code>transform</code> is not separable.
+     * @return The {@link MathTransform2D} part of {@code transform}.
+     * @throws FactoryException if {@code transform} is not separable.
      */
     private static MathTransform2D getMathTransform2D(final MathTransform        transform,
                                                       final MathTransformFactory mtFactory,
@@ -650,7 +652,7 @@ public final class Resampler2D extends GridCoverage2D {
      *
      * @param  range1 The first range.
      * @param  range2 The second range.
-     * @return <code>true</code> if the two geometries are equal, ignoring unspecified fields.
+     * @return {@code true} if the two geometries are equal, ignoring unspecified fields.
      */
     private static boolean equivalent(final GridGeometry2D geom1, final GridGeometry2D geom2) {
         if (geom1.equals(geom2)) {

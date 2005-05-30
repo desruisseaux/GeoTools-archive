@@ -43,6 +43,8 @@ import org.geotools.referencing.operation.LinearTransform;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public class IdentityTransform extends AbstractMathTransform
                             implements LinearTransform, Serializable

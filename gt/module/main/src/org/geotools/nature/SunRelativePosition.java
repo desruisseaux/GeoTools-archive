@@ -71,6 +71,8 @@ import java.util.TimeZone;
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class SunRelativePosition {
     /**
@@ -149,8 +151,8 @@ public class SunRelativePosition {
     private long time = System.currentTimeMillis();
 
     /**
-     * <code>true</code> is the elevation and azimuth are computed, or <code>false</code>
-     * if they need to be computed.  This flag is set to <code>false</code> when the date
+     * {@code true} is the elevation and azimuth are computed, or {@code false}
+     * if they need to be computed.  This flag is set to {@code false} when the date
      * and/or the coordinate change.
      */
     private boolean updated;
@@ -231,7 +233,7 @@ public class SunRelativePosition {
 
     /**
      * Calculate the eccentricity of earth's orbit. This is the ratio
-     * <code>(a-b)/a</code> where <var>a</var> is the semi-major axis
+     * {@code (a-b)/a} where <var>a</var> is the semi-major axis
      * length and <var>b</var> is the semi-minor axis length.   Value
      * is 0 for a circular orbit.
      *

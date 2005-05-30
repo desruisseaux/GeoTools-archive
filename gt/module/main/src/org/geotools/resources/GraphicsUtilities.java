@@ -43,6 +43,8 @@ import org.geotools.io.ExpandedTabWriter;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.0
  */
 public final class GraphicsUtilities {
     /**
@@ -51,7 +53,7 @@ public final class GraphicsUtilities {
     private static final int TAB_WIDTH = 4;
 
     /**
-     * The creation of <code>GraphicsUtilities</code> class objects is forbidden.
+     * The creation of {@code GraphicsUtilities} class objects is forbidden.
      */
     private GraphicsUtilities() {
     }
