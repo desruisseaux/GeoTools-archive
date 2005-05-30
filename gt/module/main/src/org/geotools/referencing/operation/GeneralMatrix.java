@@ -21,8 +21,14 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
+import java.text.ParseException;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
+import java.util.Locale;
+import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 import javax.vecmath.GMatrix;
 
 // OpenGIS dependencies
@@ -32,6 +38,9 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.io.LineFormat;
+import org.geotools.io.ContentFormatException;
+import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -80,7 +89,7 @@ public class GeneralMatrix extends GMatrix implements Matrix {
      * initialized to the values in the {@code matrix} array. The array values
      * are copied in one row at a time in row major fashion. The array should be
      * exactly <code>numRow*numCol</code> in length. Note that because row and column
-     * numbering begins with zero, {@code row} and {@code numCol} will be
+     * numbering begins with zero, {@code numRow} and {@code numCol} will be
      * one larger than the maximum possible matrix index values.
      */
     public GeneralMatrix(final int numRow, final int numCol, final double[] matrix) {
@@ -423,6 +432,74 @@ public class GeneralMatrix extends GMatrix implements Matrix {
         }
         throw new IllegalStateException(Resources.format(
                     ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM));
+    }
+    
+    /**
+     * Loads data from the specified file until the first blank line or end of file.
+     *
+     * @param  file The file to read.
+     * @return The matrix parsed from the file.
+     * @throws IOException if an error occured while reading the file.
+     *
+     * @since 2.2
+     */
+    public static GeneralMatrix load(final File file) throws IOException {
+        final BufferedReader in = new BufferedReader(new FileReader(file));
+        try {
+            return load(in, Locale.US);
+        } finally {
+            in.close();
+        }
+    }
+
+    /**
+     * Loads data from the specified streal until the first blank line or end of stream.
+     *
+     * @param  in The stream to read.
+     * @param  locale The locale for the numbers to be parsed.
+     * @return The matrix parsed from the stream.
+     * @throws IOException if an error occured while reading the stream.
+     *
+     * @since 2.2
+     */
+    public static GeneralMatrix load(final BufferedReader in, final Locale locale)
+            throws IOException
+    {
+        final LineFormat parser = new LineFormat(locale);
+        double[] data = null;
+        double[] row  = null;
+        int   numRow  = 0;
+        int   numData = 0;
+        String line;
+        while ((line=in.readLine()) != null) {
+            if ((line=line.trim()).length() == 0) {
+                if (numRow == 0) {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            try {
+                parser.setLine(line);
+                row = parser.getValues(row);
+            } catch (ParseException exception) {
+                throw new ContentFormatException(exception.getLocalizedMessage(), exception);
+            }
+            final int upper = numData + row.length;
+            if (data == null) {
+                // Assumes a square matrix.
+                data = new double[numData * numData];
+            }
+            if (upper > data.length) {
+                data = XArray.resize(data, upper*2);
+            }
+            System.arraycopy(row, 0, data, numData, row.length);
+            numData = upper;
+            numRow++;
+            assert numData % numRow == 0 : numData;
+        }
+        data = (data!=null) ? XArray.resize(data, numData) : new double[0];
+        return new GeneralMatrix(numRow, numData/numRow, data);
     }
     
     /**

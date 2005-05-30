@@ -301,10 +301,10 @@ public final class Interpolator2D extends GridCoverage2D {
     }
 
     /**
-     * Returns the name of the primary interpolation used by this {@code Interpolator2D}.
+     * Returns the primary interpolation used by this {@code Interpolator2D}.
      */
-    public String getInterpolationName() {
-        return ImageUtilities.getInterpolationName(interpolation);
+    public Interpolation getInterpolation() {
+        return interpolation;
     }
 
     /**

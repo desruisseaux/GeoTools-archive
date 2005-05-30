@@ -38,6 +38,8 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  *
  * @since 2.1
+ *
+ * @todo Consider extending {@link javax.media.jai.ColorSpaceJAI}.
  */
 final class ScaledColorSpace extends ColorSpace {
     /**

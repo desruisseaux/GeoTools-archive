@@ -54,6 +54,7 @@ import org.geotools.coverage.operation.Interpolator2D;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.util.WeakValueHashMap;
@@ -329,7 +330,8 @@ public class GridCoverageProcessor2D extends AbstractGridCoverageProcessor {
         if (source != result) {
             String interp = "Nearest";
             if (result instanceof Interpolator2D) {
-                interp = ((Interpolator2D)result).getInterpolationName();
+                interp = ImageUtilities.getInterpolationName(
+                            ((Interpolator2D)result).getInterpolation());
             }
             final Locale locale = null; // Set locale here (if any).
             final LogRecord record = Resources.getResources(locale).getLogRecord(
