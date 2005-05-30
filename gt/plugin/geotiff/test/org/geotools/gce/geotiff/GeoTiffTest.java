@@ -24,6 +24,7 @@ import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.resources.TestData;
 import org.geotools.factory.FactoryRegistryException ; 
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -94,9 +95,7 @@ public class GeoTiffTest extends TestCase {
         String []dummy = new String[1] ; 
         dummy[0] = "-projections" ; 
 
-        // this is a long name, but import would conflict with GeoAPI
-        // MathTransformFactory
-        org.geotools.referencing.operation.MathTransformFactory.main(dummy);
+        DefaultMathTransformFactory.main(dummy);
     }
 
     /**

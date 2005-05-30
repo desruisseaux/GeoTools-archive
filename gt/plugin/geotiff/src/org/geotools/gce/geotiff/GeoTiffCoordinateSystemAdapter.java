@@ -23,7 +23,8 @@ import org.geotools.factory.Hints;
 
 // geotools dependencies
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.MathTransformFactory ; 
+import org.geotools.referencing.operation.DefaultOperationMethod;
+import org.geotools.referencing.operation.DefaultMathTransformFactory;
 
 // GeoAPI dependencies
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -43,12 +44,13 @@ import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.operation.OperationMethod;
-import org.opengis.referencing.operation.MathTransform ; 
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.FactoryException;
-import org.opengis.parameter.InvalidParameterValueException ; 
-import org.opengis.parameter.ParameterNotFoundException ; 
-import org.opengis.parameter.ParameterValueGroup ; 
-import org.opengis.parameter.ParameterValue ; 
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterValue;
 
 // J2SE dependencies
 import java.io.IOException;
@@ -131,7 +133,7 @@ public class GeoTiffCoordinateSystemAdapter {
     private static final HashMap mapCoordTrans = new HashMap();
 
     // Create one MathTransformFactory for all Geotiff instances.
-    private static final MathTransformFactory mtf = new MathTransformFactory();
+    private static final MathTransformFactory mtf = new DefaultMathTransformFactory();
 
     static {
         // initialize the Coordinate Transform map with coordinate transforms 
@@ -399,9 +401,7 @@ public class GeoTiffCoordinateSystemAdapter {
             try {
                 CartesianCS cart = createCartesianCS() ; 
                 MathTransform base2derived = createUserDefinedProjection(gcs) ;
-                OperationMethod proj = new 
-                    org.geotools.referencing.operation.OperationMethod(
-                        base2derived) ; 
+                OperationMethod proj = new DefaultOperationMethod(base2derived) ; 
 
                 Map props = new HashMap() ; 
                 props.put("name", "[GeoTiff] Projected CRS") ; 

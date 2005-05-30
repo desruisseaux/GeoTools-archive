@@ -57,9 +57,9 @@ public class DefaultSphericalCS extends AbstractCS implements SphericalCS {
 
     /**
      * A three-dimensional spherical CS with
-     * <var>{@linkplain CoordinateSystemAxis#SPHERICAL_LONGITUDE longitude}</var>,
-     * <var>{@linkplain CoordinateSystemAxis#SPHERICAL_LATITUDE latitude}</var>,
-     * <var>{@linkplain CoordinateSystemAxis#GEOCENTRIC_RADIUS radius}</var>
+     * <var>{@linkplain DefaultCoordinateSystemAxis#SPHERICAL_LONGITUDE longitude}</var>,
+     * <var>{@linkplain DefaultCoordinateSystemAxis#SPHERICAL_LATITUDE latitude}</var>,
+     * <var>{@linkplain DefaultCoordinateSystemAxis#GEOCENTRIC_RADIUS radius}</var>
      * axis.
      *
      * @see DefaultCartesianCS#GEOCENTRIC

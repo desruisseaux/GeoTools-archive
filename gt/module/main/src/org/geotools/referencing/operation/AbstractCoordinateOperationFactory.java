@@ -41,6 +41,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.ConcatenatedOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.Matrix;

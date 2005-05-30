@@ -29,7 +29,7 @@ import org.geotools.data.wms.SimpleLayer;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.referencing.IdentifiedObject;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 
@@ -50,8 +50,8 @@ public class WMSParameterMaker {
     private Map fillProperties(String name, String remarks) {
         Map properties = new HashMap();
 
-        properties.put(IdentifiedObject.NAME_PROPERTY, name);
-        properties.put(IdentifiedObject.REMARKS_PROPERTY, remarks);
+        properties.put(AbstractIdentifiedObject.NAME_PROPERTY, name);
+        properties.put(AbstractIdentifiedObject.REMARKS_PROPERTY, remarks);
 
         return properties;
     }

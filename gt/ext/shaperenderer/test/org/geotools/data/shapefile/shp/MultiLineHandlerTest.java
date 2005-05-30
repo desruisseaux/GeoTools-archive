@@ -31,7 +31,6 @@ import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.crs.GeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiLineHandler;
@@ -63,7 +62,7 @@ public class MultiLineHandlerTest extends TestCase {
 		Envelope env=ds.getFeatureSource().getBounds();
 //		Envelope env=new Envelope(-180,180,-90,90);
 		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
-//		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
+//		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
@@ -89,8 +88,8 @@ public class MultiLineHandlerTest extends TestCase {
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
 		Envelope env=new Envelope(-7.105552354197932,8.20555235419793,-3.239388966356115,4.191388966388683);
-		CoordinateReferenceSystem crs=GeographicCRS.WGS84;
-		MathTransform mt=CRS.transform(crs, GeographicCRS.WGS84);
+		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
+		MathTransform mt=CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		ShapeRenderer renderer=new ShapeRenderer(null);
 		AffineTransform at=renderer.worldToScreenTransform(env,new Rectangle(300,300));
 		MathTransform worldToScreen=FactoryFinder.getMathTransformFactory(null)

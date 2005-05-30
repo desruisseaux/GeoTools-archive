@@ -89,7 +89,7 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Tests {@link Identifier} attributes. Useful for making sure that the
+     * Tests {@link NamedIdentifier} attributes. Useful for making sure that the
      * hash code enumerated in the switch statement in the constructor have
      * the correct value.
      */
@@ -103,7 +103,7 @@ public class BasicTest extends TestCase {
         assertNull(properties.put("remarks_fr",    "Voici des remarques"));
         assertNull(properties.put("remarks_fr_CA", "Pareil"));
 
-        Identifier identifier = new Identifier(properties);
+        NamedIdentifier identifier = new NamedIdentifier(properties);
         assertEquals("code",          "This is a code",        identifier.getCode());
         assertEquals("authority",     "This is an authority",  identifier.getAuthority().getTitle().toString());
         assertEquals("version",       "This is a version",     identifier.getVersion());
@@ -115,19 +115,19 @@ public class BasicTest extends TestCase {
         if (false) {
             // Disabled in order to avoid logging a warning (it disturb the JUnit output)
             properties.put("remarks", new SimpleInternationalString("Overrides remarks"));
-            identifier = new Identifier(properties);
+            identifier = new NamedIdentifier(properties);
             assertEquals("remarks", "Overrides remarks", identifier.getRemarks().toString(Locale.ENGLISH));
         }
 
         assertNotNull(properties.remove("authority"));
         assertNull   (properties.put("AutHOrITY", new CitationImpl("An other authority")));
-        identifier = new Identifier(properties);
+        identifier = new NamedIdentifier(properties);
         assertEquals("authority", "An other authority", identifier.getAuthority().getTitle().toString(Locale.ENGLISH));
 
         assertNotNull(properties.remove("AutHOrITY"));
         assertNull   (properties.put("authority", Locale.CANADA));
         try {
-            identifier = new Identifier(properties);
+            identifier = new NamedIdentifier(properties);
             fail();
         } catch (InvalidParameterValueException exception) {
             // This is the expected exception
@@ -151,7 +151,8 @@ public class BasicTest extends TestCase {
         assertNull(properties.put("validArea",        "Valid area"));
 
         final Map remaining = new HashMap();
-        final IdentifiedObject reference = new IdentifiedObject(properties, remaining, new String[] {"local"});
+        final AbstractIdentifiedObject reference = new AbstractIdentifiedObject(
+                properties, remaining, new String[] {"local"});
         assertEquals("name",       "This is a name",         reference.getName().getCode());
         assertEquals("remarks",    "There is remarks",       reference.getRemarks().toString(null));
         assertEquals("remarks_fr", "Voici des remarques",    reference.getRemarks().toString(Locale.FRENCH));
@@ -171,7 +172,7 @@ public class BasicTest extends TestCase {
     }
 
     /**
-     * Test {@link ReferenceSystem}.
+     * Test {@link AbstractReferenceSystem}.
      */
     public void testReferenceSystem() {
         final Map properties = new HashMap();
@@ -181,7 +182,7 @@ public class BasicTest extends TestCase {
         assertNull(properties.put("remarks",    "There is remarks"));
         assertNull(properties.put("remarks_fr", "Voici des remarques"));
 
-        final ReferenceSystem reference = new ReferenceSystem(properties);
+        final AbstractReferenceSystem reference = new AbstractReferenceSystem(properties);
         assertEquals("name",          "This is a name",         reference.getName()   .getCode());
         assertEquals("scope",         "This is a scope",        reference.getScope()  .toString(null));
         assertEquals("scope_fr",      "Valide dans ce domaine", reference.getScope()  .toString(Locale.FRENCH));
