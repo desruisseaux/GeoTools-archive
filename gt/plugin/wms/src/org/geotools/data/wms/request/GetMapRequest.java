@@ -102,6 +102,7 @@ public interface GetMapRequest extends Request{
     public static final String STYLES = "STYLES"; //$NON-NLS-1$
     
     
+    public static final String EXCEPTION_XML = "application/vnd.ogc.se_xml";
     /** Represents the EXCEPTION_INIMAGE value */
     public static final String EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage"; //$NON-NLS-1$
     /** Represents the EXCEPTION_BLANK value */

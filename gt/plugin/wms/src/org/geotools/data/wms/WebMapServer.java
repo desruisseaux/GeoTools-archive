@@ -50,7 +50,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
 
@@ -557,7 +556,7 @@ public class WebMapServer implements Discovery {
      * @param crs
      * @return an Envelope containing a valid bounding box, or null if none are found
      */
-    public Envelope getEnvelope(Layer layer, CoordinateReferenceSystem crs) {
+    public GeneralEnvelope getEnvelope(Layer layer, CoordinateReferenceSystem crs) {
         
         for (int i = 0; i < crs.getIdentifiers().length; i++) {
             String epsgCode = crs.getIdentifiers()[i].toString();
@@ -612,9 +611,13 @@ public class WebMapServer implements Discovery {
                     epsg = "EPSG:4326";
                 }
                 
-                if (layer.getBoundingBoxes() != null && layer.getBoundingBoxes().size() > 0) {
+                if (tempBBox == null && layer.getBoundingBoxes() != null && layer.getBoundingBoxes().size() > 0) {
                     tempBBox = (BoundingBox) layer.getBoundingBoxes().values().iterator().next();
                     epsg = tempBBox.getCrs();
+                }
+                
+                if (tempBBox == null) {
+                    continue;
                 }
                 
                 GeneralEnvelope env = new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
@@ -649,8 +652,10 @@ public class WebMapServer implements Discovery {
             //TODO Attempt to figure out the valid area of teh CRS and use that.
             
             if (tempBBox != null) {
-                return new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
+                GeneralEnvelope env = new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
                         new double[] { tempBBox.getMaxX(), tempBBox.getMaxY() });
+                env.setCoordinateReferenceSystem(crs);
+                return env;
             }
     
         }

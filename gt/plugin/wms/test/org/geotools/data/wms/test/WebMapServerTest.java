@@ -45,6 +45,7 @@ import org.geotools.data.wms.request.GetFeatureInfoRequest;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.response.GetFeatureInfoResponse;
 import org.geotools.data.wms.response.GetMapResponse;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.ows.ServiceException;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -238,7 +239,7 @@ public class WebMapServerTest extends TestCase {
         Layer layer = (Layer) caps.getLayerList().get(1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326");
         
-        Envelope envelope = wms.getEnvelope(layer, crs);
+        GeneralEnvelope envelope = wms.getEnvelope(layer, crs);
         
 //        minx="-172.367" miny="35.6673" maxx="-11.5624" maxy="83.8293" />
         assertEquals(envelope.getMinimum(0), -172.367, 0.0);
