@@ -72,13 +72,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 
-// User interface
+// User interface (AWT)
 import java.awt.Toolkit;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
+// User interface (Swing)
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JMenu;
@@ -1169,6 +1170,38 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
             fireZoomChanged(change);
             repaint(getZoomableBounds());
             zoomIsReset = false;
+        }
+    }
+
+    /**
+     * Changes the {@linkplain #zoom} by applying an affine transform. The
+     * <code>change</code> transform must express a change in pixel units,
+     * for example, a scrolling of 6 pixels toward right. This method is
+     * conceptually similar to the following code:
+     *
+     * <pre>
+     * {@link #zoom}.{@link AffineTransform#preConcatenate(AffineTransform) preConcatenate}(change);
+     * {@link #fireZoomChanged(AffineTransform) fireZoomChanged}(<cite>change translated in logical units</cite>);
+     * {@link #repaint() repaint}({@link #getZoomableBounds getZoomableBounds}(null));
+     * </pre>
+     *
+     * @param  change The zoom change, as an affine transform in pixel
+     *         coordinates. If <code>change</code> is the identity transform,
+     *         then this method does nothing and listeners are not notified.
+     */
+    public void transformPixels(final AffineTransform change) {
+        if (!change.isIdentity()) {
+            final AffineTransform logical;
+            try {
+                logical = zoom.createInverse();
+            } catch (NoninvertibleTransformException exception) {
+                // TODO: uncomment the argument when we will allowed to compile for J2SE 1.5
+                throw new IllegalStateException(/*exception*/);
+            }
+            logical.concatenate(change);
+            logical.concatenate(zoom);
+            XAffineTransform.round(logical);
+            transform(logical);
         }
     }
 
