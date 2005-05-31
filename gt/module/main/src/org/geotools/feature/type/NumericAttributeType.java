@@ -225,4 +225,6 @@ public class NumericAttributeType extends DefaultAttributeType implements Primat
 	public Filter getRestriction() {
 		return filter;
 	}
+
+
 }
