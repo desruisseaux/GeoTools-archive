@@ -16,41 +16,29 @@
  */
 package org.geotools.renderer.shape;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import junit.framework.TestCase;
 
-import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
-import org.geotools.data.Query;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.CompareFilter;
+import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.IllegalFilterException;
 import org.geotools.map.DefaultMapContext;
-import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
-import org.geotools.map.MapLayer;
-import org.geotools.renderer.lite.LiteRenderer;
 import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.Symbolizer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -67,7 +55,7 @@ public class ShapeRendererTest extends TestCase {
 	public void testCreateFeature() throws Exception {
 		ShapeRenderer renderer = new ShapeRenderer(null);
 		Style style = LabelingTest.loadStyle("LineStyle.sld");
-		ShapefileDataStore ds = Rendering2DTest.getLines("theme1.shp");
+		ShapefileDataStore ds = TestUtilites.getDataStore("theme1.shp");
 		renderer.dbfheader = ShapefileRendererUtil.getDBFReader(ds).getHeader();
 		FeatureType type = renderer.createFeatureType(style, ds.getSchema());
 		assertEquals("NAME", type.getAttributeType(0).getName());
@@ -152,10 +140,127 @@ public class ShapeRendererTest extends TestCase {
 				coordinates[5]);
 	}
 
+	private static final boolean INTERACTIVE = false;
+
 	double[] manyCoords = new double[] { 90.8307300832239, 243.83302237886664,
 			85.959938002934, 238.46064227626084, 94.3885659571406,
 			236.11317091199317, 99.23509261303661, 242.5690788218758,
 			98.31961497838347, 245.82484960695865, 90.8307300832239,
 			243.83302237886664 };
-	   
+
+	public void testRemoveTransaction() throws Exception{
+		ShapefileDataStore ds=TestUtilites.getDataStore("theme1.shp");
+		Style st=TestUtilites.createTestStyle(null, "theme1");
+		FeatureStore store=(FeatureStore) ds.getFeatureSource();
+		Transaction t=new DefaultTransaction();
+		store.setTransaction(t);
+		FeatureCollection collection=store.getFeatures().collection();
+		FeatureIterator iter=collection.features();
+		store.removeFeatures(TestUtilites.filterFactory.createFidFilter(iter.next().getID()));		
+		collection.close(iter);
+		
+		MapContext context=new DefaultMapContext();
+		context.addLayer(store,st);
+		ShapeRenderer renderer=new ShapeRenderer(context);
+		TestUtilites.CountingRenderListener listener=new TestUtilites.CountingRenderListener();
+		renderer.addRenderListener(listener);
+		Envelope env = context.getLayerBounds();
+        int boundary=7;
+        TestUtilites.INTERACTIVE=INTERACTIVE;
+        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+        		env.getMinY() - boundary, env.getMaxY() + boundary);
+		TestUtilites.showRender("testTransaction", renderer, 2000, env);
+		
+		assertEquals(2,listener.count);
+	}
+
+	public void testAddTransaction() throws Exception{
+		final ShapefileDataStore ds=TestUtilites.getDataStore("theme1.shp");
+		Style st=TestUtilites.createTestStyle(null, "theme1");
+		FeatureStore store=(FeatureStore) ds.getFeatureSource();
+		Transaction t=new DefaultTransaction();
+		store.setTransaction(t);
+		FeatureCollection collection=store.getFeatures().collection();
+		FeatureIterator iter=collection.features();
+		final Feature feature=iter.next();		
+		collection.close(iter);
+
+		store.addFeatures(new FeatureReader(){
+
+			private boolean more=true;
+
+			public FeatureType getFeatureType() {
+				try {
+					return ds.getSchema();
+				} catch (IOException e) {
+					return null;
+				}
+			}
+
+			public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
+				more=false;
+				return ds.getSchema().create(feature.getAttributes(new Object[feature.getNumberOfAttributes()]), "newFeature");
+			}
+
+			public boolean hasNext() throws IOException {
+				return more;
+			}
+
+			public void close() throws IOException {
+				//do nothing
+			}
+			
+		});
+		
+		MapContext context=new DefaultMapContext();
+		context.addLayer(store,st);
+		ShapeRenderer renderer=new ShapeRenderer(context);
+		TestUtilites.CountingRenderListener listener=new TestUtilites.CountingRenderListener();
+		renderer.addRenderListener(listener);
+		Envelope env = context.getLayerBounds();
+        int boundary=7;
+        TestUtilites.INTERACTIVE=INTERACTIVE;
+        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+        		env.getMinY() - boundary, env.getMaxY() + boundary);
+		TestUtilites.showRender("testTransaction", renderer, 2000, env);
+		
+		assertEquals(4,listener.count);
+	}
+
+	public void testModifyTransaction() throws Exception{
+		ShapefileDataStore ds=TestUtilites.getDataStore("theme1.shp");
+		Style st=TestUtilites.createTestStyle(null, "theme1");
+		FeatureStore store=(FeatureStore) ds.getFeatureSource();
+		Transaction t=new DefaultTransaction();
+		store.setTransaction(t);
+		FeatureCollection collection=store.getFeatures().collection();
+		FeatureIterator iter=collection.features();
+		store.modifyFeatures(ds.getSchema().getAttributeType("NAME"), "bleep", Filter.NONE);
+		collection.close(iter);
+		
+		MapContext context=new DefaultMapContext();
+		context.addLayer(store,st);
+		ShapeRenderer renderer=new ShapeRenderer(context);
+		TestUtilites.CountingRenderListener listener=new TestUtilites.CountingRenderListener();
+		renderer.addRenderListener(listener);
+		renderer.addRenderListener(new RenderListener(){
+
+			public void featureRenderer(Feature feature) {
+				assertEquals("bleep", feature.getAttribute("NAME"));
+			}
+
+			public void errorOccurred(Exception e) {
+				assertFalse(true);
+			}
+			
+		});
+		Envelope env = context.getLayerBounds();
+        int boundary=7;
+        TestUtilites.INTERACTIVE=INTERACTIVE;
+        env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
+        		env.getMinY() - boundary, env.getMaxY() + boundary);
+		TestUtilites.showRender("testTransaction", renderer, 2000, env);
+		
+		assertEquals(3,listener.count);
+	}
 }

@@ -34,9 +34,9 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiLineHandler;
-import org.geotools.renderer.shape.Rendering2DTest;
 import org.geotools.renderer.shape.ShapeRenderer;
 import org.geotools.renderer.shape.SimpleGeometry;
+import org.geotools.renderer.shape.TestUtilites;
 import org.geotools.resources.TestData;
 import org.geotools.styling.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -112,15 +112,15 @@ public class MultiLineHandlerTest extends TestCase {
 	}
 
 	public void testFeatureNearBoundry() throws Exception{		
-        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getLines("theme1.shp");
-		Style style=Rendering2DTest.createTestStyle(null,"theme1");
+        ShapefileDataStore ds=(ShapefileDataStore) TestUtilites.getDataStore("theme1.shp");
+		Style style=TestUtilites.createTestStyle(null,"theme1");
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(ds.getFeatureSource(), style);
         ShapeRenderer renderer = new ShapeRenderer(map);
         Envelope env = new Envelope(-5,6,-1.4,0);
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-        Rendering2DTest.showRender("testLineLabeling", renderer, 2000, env);
+        TestUtilites.INTERACTIVE=INTERACTIVE;
+        TestUtilites.showRender("testLineLabeling", renderer, 2000, env);
 	}
 
 	public void testBBoxIntersectSegment() throws Exception{

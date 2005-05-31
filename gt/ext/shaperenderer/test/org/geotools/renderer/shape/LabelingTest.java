@@ -56,7 +56,7 @@ public class LabelingTest extends TestCase {
 	}
 
 	public void testLineLabeling() throws Exception{		
-        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getLines("theme1.shp");
+        ShapefileDataStore ds=(ShapefileDataStore) TestUtilites.getDataStore("theme1.shp");
 		Style style=loadStyle("LineStyle.sld");
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
@@ -64,14 +64,14 @@ public class LabelingTest extends TestCase {
         ShapeRenderer renderer = new ShapeRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
+        TestUtilites.INTERACTIVE=INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.showRender("testLineLabeling", renderer, timout, env);
+        TestUtilites.showRender("testLineLabeling", renderer, timout, env);
 	}
 
 	public void testPolyLabeling() throws Exception{		
-        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getPolygons("smallMultiPoly.shp");
+        ShapefileDataStore ds=(ShapefileDataStore) TestUtilites.getDataStore("smallMultiPoly.shp");
         FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
 
 		Style style=loadStyle("PolyStyle.sld");
@@ -83,12 +83,12 @@ public class LabelingTest extends TestCase {
         int boundary=1;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
+        TestUtilites.INTERACTIVE=INTERACTIVE;
+        TestUtilites.showRender("testPolyLabeling", renderer, timout, env);
 	}
 
 	public void testPolyLabelingZoomedOut() throws Exception{		
-        ShapefileDataStore ds=(ShapefileDataStore) Rendering2DTest.getPolygons("smallMultiPoly.shp");
+        ShapefileDataStore ds=(ShapefileDataStore) TestUtilites.getDataStore("smallMultiPoly.shp");
         FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
 
 		Style style=loadStyle("PolyStyle.sld");
@@ -100,8 +100,8 @@ public class LabelingTest extends TestCase {
         int boundary=30;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
-        Rendering2DTest.INTERACTIVE=INTERACTIVE;
-        Rendering2DTest.showRender("testPolyLabeling", renderer, timout, env);
+        TestUtilites.INTERACTIVE=INTERACTIVE;
+        TestUtilites.showRender("testPolyLabeling", renderer, timout, env);
 	}
 
 }

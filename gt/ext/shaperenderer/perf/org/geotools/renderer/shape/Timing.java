@@ -31,6 +31,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 
+import org.geotools.data.shape.ShapeFileIndexer;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.filter.AttributeExpression;
@@ -66,7 +67,7 @@ public class Timing {
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = true;
+	private static boolean ALL_DATA = false;
 
 	private static boolean DISPLAY = true;
 
@@ -74,7 +75,7 @@ public class Timing {
 
 	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = false;
+	private static boolean RUN_LITE = true;
 
 	private static boolean RUN_TINY = false;
 
@@ -82,7 +83,7 @@ public class Timing {
 
 	private static boolean CACHING = false;
 
-	private static boolean NO_REPROJECTION = false;
+	private static boolean NO_REPROJECTION = true;
 
 	private static boolean FILTER = false;
 
@@ -91,6 +92,10 @@ public class Timing {
 	private static boolean LINES = false;
 	
 	private static boolean LABELING=false;
+	
+	private static boolean RTREE=false;
+	
+	private static final boolean QUADTREE = false;
 
 	private String testName;
 	{
@@ -126,9 +131,16 @@ public class Timing {
 		if (CPU_PROFILE) {
 			testName += "_PROFILE";
 		}
+		if( QUADTREE ){
+			testName += "_QUADTREE";
+		}
+		if( RTREE ){
+			testName += "_RTREE";
+		}
 	}
 
 	public final static FileWriter out;
+
     
 	static {
 		FileWriter tmp;
@@ -314,9 +326,57 @@ public class Timing {
 	}
 
 	private MapContext getMapContext() throws Exception {
+		URL url=new URL(LINES ? LINES_FILE : POLY_FILE);
 		ShapefileDataStoreFactory fac = new ShapefileDataStoreFactory();
 		ShapefileDataStore store = (ShapefileDataStore) fac
-				.createDataStore(new URL(LINES ? LINES_FILE : POLY_FILE));
+				.createDataStore(url);
+		
+		if( QUADTREE && RTREE ){
+			throw new Exception( "QUADTREE and RTREE are both true");
+		}
+		if( !QUADTREE ){			
+			String s=url.getPath();
+			s=s.substring(0, s.lastIndexOf( "."));
+			File file = new File( s+".gix");
+			if( file.exists() ){
+				file.delete();
+			}
+		}		
+		if( !RTREE ){
+			String s=url.getPath();
+			s=s.substring(0, s.lastIndexOf("."));
+			File file = new File( s+".grx");
+			if( file.exists() ){
+				file.delete();
+			}
+		}
+		if( RTREE ){
+			String s=url.getPath();
+			s=s.substring(0, s.lastIndexOf("."));
+			File file=new File(s+".shx");
+			if( !file.exists() )
+				throw new IOException( "No shx file" );
+
+			
+			ShapeFileIndexer indexer=new ShapeFileIndexer();
+			indexer.setIdxType(ShapeFileIndexer.RTREE);
+			indexer.setShapeFileName(url.getPath());
+			indexer.index(true);
+		}		
+		if( QUADTREE ){
+			String s=url.getPath();
+			s=s.substring(0, s.lastIndexOf("."));
+			File file=new File(s+".shx");
+			if( !file.exists() )
+				throw new IOException( "No shx file" );
+
+			
+			ShapeFileIndexer indexer=new ShapeFileIndexer();
+			indexer.setIdxType(ShapeFileIndexer.QUADTREE);
+			indexer.setShapeFileName(url.getPath());
+			indexer.index(true);
+		}
+		
 		DefaultMapContext context = new DefaultMapContext();
 		context.addLayer(store.getFeatureSource(), LINES ? createLineStyle()
 				: createPolyStyle());
@@ -467,6 +527,9 @@ public class Timing {
 	private static String BC_FILE="file:///home/jones/aData/lwsg_prov.shp";
 	private static String BC_NAME="lwsg_prov";
 	
+	private static String CIRCLES_FILE="file:///home/jones/aData/pt_circles2.shp";
+	private static String CIRCLES_NAME="pt_circles2";
+	
 	private static String LINES_WORK_FILE = "file:///home/jones/aData/bc_roads.shp";
 	private static String LINES_WORK_TYPE_NAME = "bc_roads";
 	private static String LINES_WORK_LABEL = "STREET";	
@@ -479,8 +542,8 @@ public class Timing {
 	private static String LINES_TYPE_NAME = LINES_WORK_TYPE_NAME;
 	private static String LINES_LABEL = LINES_HOME_LABEL;	
 	
-	private static String POLY_FILE = BC_FILE;
-	private static String POLY_TYPE_NAME = BC_NAME;
+	private static String POLY_FILE = CIRCLES_FILE;
+	private static String POLY_TYPE_NAME = CIRCLES_NAME;
 	private static String POLY_LABEL = NEW_YORK_WORK_LABEL;
 
 	int w = 512, h = 512;

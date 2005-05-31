@@ -90,9 +90,9 @@ public class PolygonHandler implements ShapeHandler {
 		Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1],
 				tmpbbox[3]);
 
-		if (!bbox.intersects(geomBBox)) {
-			return null;
-		}
+//		if (!bbox.intersects(geomBBox)) {
+//			return null;
+//		}
 
 		boolean bboxdecimate = geomBBox.getWidth() <= spanx
 				&& geomBBox.getHeight() <= spany;

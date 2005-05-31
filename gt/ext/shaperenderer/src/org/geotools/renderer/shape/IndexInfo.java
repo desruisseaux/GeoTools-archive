@@ -34,8 +34,8 @@ import com.vividsolutions.jts.geom.Envelope;
 public class IndexInfo {
 
     static final byte TREE_NONE = 0;
-    static final byte TREE_GRX = 1;
-    static final byte TREE_QIX = 2;
+    static final byte R_TREE = 1;
+    static final byte QUAD_TREE = 2;
 	final byte treeType;
 	final URL treeURL;
 	final URL shxURL;
@@ -224,9 +224,9 @@ public class IndexInfo {
 //	}
 
 	private List queryTree(Envelope bbox) throws IOException, TreeException {
-        if (treeType == IndexInfo.TREE_GRX) {
+        if (treeType == IndexInfo.R_TREE) {
             return queryRTree(bbox);
-        } else if (treeType == IndexInfo.TREE_QIX) {
+        } else if (treeType == IndexInfo.QUAD_TREE) {
             return queryQuadTree(bbox);
         }
         // should not happen
@@ -236,20 +236,20 @@ public class IndexInfo {
     
 	static class Reader {
 		private ShapefileReader shp;
-		private List goodRecs;
+		List goodRecs;
 		private int cnt;
 
 		public Reader(IndexInfo info, ShapefileReader reader, Envelope bbox) {
 			shp=reader;
             try {
-                goodRecs = info.queryTree(bbox);
+                if( info.treeType==R_TREE )
+    				info.rtree=info.openRTree();
+    			else if( info.treeType==QUAD_TREE)
+    				info.qtree=info.openQuadTree();
                 info.indexFile=info.openIndexFile();
-            if( info.treeType==TREE_GRX )
-				info.rtree=info.openRTree();
-			else if( info.treeType==TREE_QIX)
-				info.qtree=info.openQuadTree();
+                goodRecs = info.queryTree(bbox);
             } catch (Exception e) {
-            	ShapeRenderer.LOGGER.severe("Exception occured attempting to use indexing:"+e.toString());
+            	ShapeRenderer.LOGGER.fine("Exception occured attempting to use indexing:"+e.toString());
             	goodRecs=null;
             }
             
