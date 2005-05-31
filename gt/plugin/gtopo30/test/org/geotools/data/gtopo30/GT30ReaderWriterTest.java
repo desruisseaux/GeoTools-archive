@@ -16,16 +16,27 @@
  */
 package org.geotools.data.gtopo30;
 
+import org.geotools.coverage.grid.GridCoverage2D;
+
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import java.net.URL;
+
 import java.util.zip.ZipOutputStream;
 
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.coverage.grid.GridCoverageWriter;
+import javax.media.jai.PlanarImage;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 
 
 /**
@@ -51,19 +62,25 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
     protected void setUp() throws Exception {
         super.setUp();
 
-     //   File file = this.getFile(this.fileName + ".zip");
-      //  assertTrue(file.exists());
-
-      //  String outPath = getFile(".").getAbsolutePath();
-     //   this.unzipFile(file.getAbsolutePath(),
-        //    outPath.substring(0, outPath.length() - 1));
+        
     }
+
+	/**
+	 * @throws Exception
+	 */
+	private void unpackGTOPO() throws Exception {
+		File file = this.getFile(this.fileName + ".zip");
+		assertTrue(file.exists());
+		String outPath = getFile(".").getAbsolutePath();
+		this.unzipFile(file.getAbsolutePath(),
+            outPath.substring(0, outPath.length() - 1));
+	}
 
     /*
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
-        //deleteAll();
+        deleteAll();
         super.tearDown();
     }
 
@@ -76,44 +93,42 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
         File[] fileList = testDir.listFiles();
 
         for (int i = 0; i < fileList.length; i++)
-            if (!fileList[i].getName().endsWith("zip")
-                    && !fileList[i].getName().endsWith("ZIP")
-                    && !fileList[i].isDirectory()) {
+            if (!fileList[i].getName().endsWith("zip") &&
+                    !fileList[i].getName().endsWith("ZIP") &&
+                    !fileList[i].isDirectory()) {
                 fileList[i].delete();
             }
     }
 
     /**
      * Testing reader and writer for gtopo.
-     *
-     * @throws IllegalArgumentException
-     * @throws IOException
+     * @throws Exception 
      */
- /*   public void testReaderWriter() throws IllegalArgumentException, IOException {
+    public void testReaderWriter() throws Exception {
         //getting a resource to test
+		unpackGTOPO();
         URL statURL = getTestResource(this.fileName + ".DEM");
-        AbstractGridFormat format = (AbstractGridFormat) new GTopo30FormatFactory()
-            .createFormat();
+        AbstractGridFormat format = (AbstractGridFormat) new GTopo30FormatFactory().createFormat();
 
         if (format.accepts(statURL)) {
             //get a reader
             GridCoverageReader reader = format.getReader(statURL);
 
             //get a grid coverage
-            GridCoverage2D gc = ((GridCoverage2D) reader.read(null)); //.geophysics(false);
+            GridCoverage2D gc = ((GridCoverage2D) reader.read(null)); 
 
             //show the coverage
             ImageIcon icon = new ImageIcon(((PlanarImage) gc.geophysics(false)
-                                                            .getRenderedImage())
-                    .getAsBufferedImage());
-            JLabel label = null; // new JLabel(icon);
-            JFrame frame = null; //new JFrame();
+                                                            .getRenderedImage()).getAsBufferedImage());
+            JLabel label =  new JLabel(icon);
+            JFrame frame = new JFrame();
 
-            //  frame.setTitle(statURL.toString());
-            // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            // frame.getContentPane().add(new JScrollPane(label));
-            //frame.pack();
-            // frame.show();
+            frame.setTitle(statURL.toString());
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().add(new JScrollPane(label));
+            frame.pack();
+            frame.show();
+
             //delete all files and write them again to test
             deleteAll();
 
@@ -129,8 +144,7 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
             gc = ((GridCoverage2D) reader.read(null)).geophysics(false);
 
             //show the coverage again
-            icon = new ImageIcon(((PlanarImage) gc.getRenderedImage())
-                    .getAsBufferedImage());
+            icon = new ImageIcon(((PlanarImage) gc.getRenderedImage()).getAsBufferedImage());
             label = new JLabel(icon);
             frame = new JFrame();
             frame.setTitle(statURL.toString());
@@ -138,14 +152,15 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
             frame.getContentPane().add(new JScrollPane(label));
             frame.pack();
             frame.show();
+			 deleteAll();
         }
-    }*/
-
+    }
+/*
     public void testReaderWriterZip()
-        throws IllegalArgumentException, IOException {
-        URL statURL =getTestResource(this.fileName + ".DEM");
-        AbstractGridFormat format = (AbstractGridFormat) new GTopo30FormatFactory()
-            .createFormat();
+        throws Exception {
+		this.unpackGTOPO();
+        URL statURL = getTestResource(this.fileName + ".DEM");
+        AbstractGridFormat format = (AbstractGridFormat) new GTopo30FormatFactory().createFormat();
 
         if (format.accepts(statURL)) {
             //    	get a reader
@@ -153,13 +168,7 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
 
             //get a grid coverage
             GridCoverage2D gc = ((GridCoverage2D) reader.read(null));
-			
-//			BufferedOutputStream out1=new BufferedOutputStream(new FileOutputStream(new File("c:\\temp\\gtopo.png")));
-//			WorldImageWriter writer1 = new WorldImageWriter(out1);
-//			writer1.getFormat().getWriteParameters().parameter("format").setValue("png");
-//			
-//			writer1.write(gc,null);
-			
+
             File zipFile = getFile("test.zip");
             ZipOutputStream out = new ZipOutputStream(new FileOutputStream(
                         zipFile));
@@ -168,7 +177,7 @@ public class GT30ReaderWriterTest extends TestCaseSupport {
             writer.write(gc, null);
             out.flush();
             out.close();
-
         }
-    }
+		deleteAll();
+    }*/
 }
