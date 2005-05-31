@@ -548,7 +548,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         List goodRecs = null;
         RTree rtree = this.openRTree();
         try {
-            if (rtree != null && !bbox.contains(rtree.getBounds())) {
+            if (rtree != null && rtree.getBounds()!=null && !bbox.contains(rtree.getBounds())) {
                 goodRecs = rtree.search(bbox);
             }
         } catch (LockTimeoutException le) {
