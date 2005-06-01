@@ -751,12 +751,14 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         double scaleX = screenSize.getWidth() / mapExtent.getWidth();
         double scaleY = screenSize.getHeight() / mapExtent.getHeight();
 
-        double tx = -mapExtent.getMinX() * scaleX;
+        double tx = -mapExtent.getMinX() * scaleX ;
         double ty = (mapExtent.getMinY() * scaleY) + screenSize.getHeight();
-
+        
         AffineTransform at = new AffineTransform(scaleX, 0.0d, 0.0d, -scaleY, tx, ty);
+        AffineTransform originTranslation=AffineTransform.getTranslateInstance(screenSize.x, screenSize.y);
+        originTranslation.concatenate(at);
 
-        return at;
+        return originTranslation;
     }
 
     /**
