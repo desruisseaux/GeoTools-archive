@@ -98,7 +98,7 @@ public class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {
      * Returns the implementation hints. The default implementation returns en
      * empty map.
      *
-     * @return DOCUMENT ME!
+     * @return Empty Map.
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;

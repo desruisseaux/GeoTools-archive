@@ -63,7 +63,7 @@ public class GeoTiffException extends IOException {
      * Creates a new instance of <code>GeoTiffException</code> without detail
      * message.
      *
-     * @param metadata DOCUMENT ME!
+     * @param metadata The metadata from the GeoTIFF image causing the error.
      */
     public GeoTiffException(GeoTiffIIOMetadataAdapter metadata) {
         this(metadata, "");
@@ -73,7 +73,7 @@ public class GeoTiffException extends IOException {
      * Constructs an instance of <code>GeoTiffException</code> with the
      * specified detail message.
      *
-     * @param metadata DOCUMENT ME!
+     * @param metadata The metadata from the GeoTIFF image causing the error.
      * @param msg the detail message.
      */
     public GeoTiffException(GeoTiffIIOMetadataAdapter metadata, String msg) {

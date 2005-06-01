@@ -24,9 +24,11 @@ import org.geotools.factory.Hints;
 // geotools dependencies
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.DefaultOperationMethod;
-import org.geotools.referencing.operation.DefaultMathTransformFactory;
-
-// GeoAPI dependencies
+import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -35,38 +37,32 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.cs.EllipsoidalCS;
-import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
-import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.MathTransform;
+
+// GeoAPI dependencies
 import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.FactoryException;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.operation.OperationMethod;
 
 // J2SE dependencies
 import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.units.ConversionException;
 
 // JSR-108 (units) dependencies
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-
-// Technically, this is mapped to OperationMethod, but it's complicated,
-// and it's only relevant when I re-enable user defined projections.
-//import org.geotools.cs.Projection;
 
 /**
  * The <code>GeoTiffCoordinateSystemAdapter</code> is responsible for
@@ -133,7 +129,8 @@ public class GeoTiffCoordinateSystemAdapter {
     private static final HashMap mapCoordTrans = new HashMap();
 
     // Create one MathTransformFactory for all Geotiff instances.
-    private static final MathTransformFactory mtf = new DefaultMathTransformFactory();
+    private static final MathTransformFactory mtf = FactoryFinder
+        .getMathTransformFactory(null);
 
     static {
         // initialize the Coordinate Transform map with coordinate transforms 
@@ -208,14 +205,13 @@ public class GeoTiffCoordinateSystemAdapter {
     }
 
     /**
-     * Returns a copy of the internal coordinate transformation map.
-     * This is used for testing purposes only and should remain package 
-     * private.
-     * @return clone of the coordinate transformation map used by this 
-     * class.
+     * Returns a copy of the internal coordinate transformation map. This is
+     * used for testing purposes only and should remain package  private.
+     *
+     * @return clone of the coordinate transformation map used by this  class.
      */
-    static Map getCoordTransMap() { 
-        return (Map)(mapCoordTrans.clone())  ; 
+    static Map getCoordTransMap() {
+        return (Map) (mapCoordTrans.clone());
     }
 
     /**
@@ -386,32 +382,32 @@ public class GeoTiffCoordinateSystemAdapter {
 
         // if it's user defined, there's a lot of work to do
         if (projCode.equals(USER_DEFINED)) {
-
             // the order of the following calls is important!!
             // 1] Build the GCS and define the angular units.
             // 2] Determine the linear units specified in the GEOTIFF file.
             // 3] Build the CartesianCS.
             // 4] Build the MathTransform & OperationMethod.
             // 5] Build the Projected Coordinate System from the components
-            GeographicCRS gcs = createGeographicCoordinateSystem() ;
-            linearUnit = createUnit(
-                GeoTiffIIOMetadataAdapter.ProjLinearUnitsGeoKey,
-                GeoTiffIIOMetadataAdapter.ProjLinearUnitSizeGeoKey, 
-                SI.METER, SI.METER) ;
+            GeographicCRS gcs = createGeographicCoordinateSystem();
+            linearUnit = createUnit(GeoTiffIIOMetadataAdapter.ProjLinearUnitsGeoKey,
+                    GeoTiffIIOMetadataAdapter.ProjLinearUnitSizeGeoKey,
+                    SI.METER, SI.METER);
+
             try {
-                CartesianCS cart = createCartesianCS() ; 
-                MathTransform base2derived = createUserDefinedProjection(gcs) ;
-                OperationMethod proj = new DefaultOperationMethod(base2derived) ; 
+                CartesianCS cart = createCartesianCS();
+                MathTransform base2derived = createUserDefinedProjection(gcs);
+                OperationMethod proj = new DefaultOperationMethod(base2derived);
 
-                Map props = new HashMap() ; 
-                props.put("name", "[GeoTiff] Projected CRS") ; 
+                Map props = new HashMap();
+                props.put("name", "[GeoTiff] Projected CRS");
 
-                pcs = crsObjFactory.createProjectedCRS(props, 
-                   proj, gcs, base2derived, cart) ; 
+                pcs = crsObjFactory.createProjectedCRS(props, proj, gcs,
+                        base2derived, cart);
             } catch (FactoryException fe) {
-                IOException io = new GeoTiffException(metadata, "Error constructing user defined PCS.") ;
-                io.initCause(fe) ;
-                throw io ;
+                IOException io = new GeoTiffException(metadata,
+                        "Error constructing user defined PCS.");
+                io.initCause(fe);
+                throw io;
             }
 
             // if it's not user defined, just use the EPSG factory to create the
@@ -430,24 +426,35 @@ public class GeoTiffCoordinateSystemAdapter {
 
     /**
      * Creates a cartesian CS with units specified in the GeoTiff file.
+     * The first axis is always Easting and the second axis is always 
+     * northing.  The linear units are specified by the GeoTIFF file.
+     *
+     * @return CartesianCS with easting and northing axes and the 
+     *    correct linear units.
+     *
+     * @throws FactoryException if it can't create either of the coordinate
+     *     system axes or the Cartesian coordinate system.
      */
-    private CartesianCS createCartesianCS() throws FactoryException { 
+    private CartesianCS createCartesianCS() throws FactoryException {
         // Create the easting axis
-        Map props = new HashMap() ; 
-        props.put("name", "[GeoTIFF] Easting") ; 
-        CoordinateSystemAxis easting = csObjFactory.createCoordinateSystemAxis(
-            props, "Easting", AxisDirection.EAST, linearUnit) ; 
+        Map props = new HashMap();
+        props.put("name", "[GeoTIFF] Easting");
+
+        CoordinateSystemAxis easting = csObjFactory.createCoordinateSystemAxis(props,
+                "Easting", AxisDirection.EAST, linearUnit);
 
         // Create the Northing axis
-        props = new HashMap() ; 
-        props.put("name", "[GeoTIFF] Northing") ; 
-        CoordinateSystemAxis northing=csObjFactory.createCoordinateSystemAxis(
-            props, "Northing", AxisDirection.NORTH, linearUnit) ; 
+        props = new HashMap();
+        props.put("name", "[GeoTIFF] Northing");
+
+        CoordinateSystemAxis northing = csObjFactory.createCoordinateSystemAxis(props,
+                "Northing", AxisDirection.NORTH, linearUnit);
 
         // Create the cartesian coordinate system
-        props = new HashMap() ; 
-        props.put("name", "[GeoTIFF] Cartesian Coordinate System") ; 
-        return csObjFactory.createCartesianCS(props, easting, northing) ; 
+        props = new HashMap();
+        props.put("name", "[GeoTIFF] Cartesian Coordinate System");
+
+        return csObjFactory.createCartesianCS(props, easting, northing);
     }
 
     private PrimeMeridian createPrimeMeridian() throws IOException {
@@ -507,10 +514,9 @@ public class GeoTiffCoordinateSystemAdapter {
      * the prime meridian, as it is specified  separately.  This code
      * currently does not support user defined datum.
      *
-     * @return DOCUMENT ME!
+     * @return GeodeticDatum as described in the geotiff file.
      *
-     * @throws IOException DOCUMENT ME!
-     * @throws GeoTiffException DOCUMENT ME!
+     * @throws GeoTiffException for any error.
      */
     private GeodeticDatum createGeodeticDatum() throws IOException {
         // lookup the datum (w/o PrimeMeridian), error if "user defined"
@@ -562,9 +568,9 @@ public class GeoTiffCoordinateSystemAdapter {
      * </ul>
      * 
      *
-     * @return DOCUMENT ME!
+     * @return User defined GCS.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws GeoTiffException wrapped around a FactoryException
      */
     private GeographicCRS createUserDefinedGCS() throws IOException {
         // lookup the angular units used in this file
@@ -617,67 +623,65 @@ public class GeoTiffCoordinateSystemAdapter {
 
     private MathTransform createUserDefinedProjection(GeographicCRS gcs)
         throws IOException {
+        String coordTrans = metadata.getGeoKey(GeoTiffIIOMetadataAdapter.ProjCoordTransGeoKey);
 
-        String coordTrans = metadata.getGeoKey(
-            GeoTiffIIOMetadataAdapter.ProjCoordTransGeoKey) ;
-        
         // throw descriptive exception if ProjCoordTransGeoKey not defined
         if (coordTrans == null) {
             throw new GeoTiffException(metadata,
-              "User defined projections must specify"+
-              " coordinate transformation code in ProjCoordTransGeoKey") ;
+                "User defined projections must specify"
+                + " coordinate transformation code in ProjCoordTransGeoKey");
         }
-        
+
         // the coordinate transformations specified by this GeoKey are
         // NOT EPSG standards.  The codes in the static map are from
         // section 6.3.3.3 of the GeoTIFF standard.
-        MathTransform projXform = null ;
+        MathTransform projXform = null;
+
         try {
-            Short codeCT = Short.valueOf(coordTrans) ;
-            String classification = (String)(mapCoordTrans.get(codeCT));
-     
+            Short codeCT = Short.valueOf(coordTrans);
+            String classification = (String) (mapCoordTrans.get(codeCT));
+
             // was the code valid?
             if (classification == null) {
-                throw new GeoTiffException(metadata, 
-                  "The coordinate transformation code " +
-                  "specified in the ProjCoordTransGeoKey (" + 
-                  coordTrans +") is not currently supported") ;
+                throw new GeoTiffException(metadata,
+                    "The coordinate transformation code "
+                    + "specified in the ProjCoordTransGeoKey (" + coordTrans
+                    + ") is not currently supported");
             }
-        
+
             // read in the parameters specific to this projection
-            ParameterValueGroup params = 
-                createCoordTransformParameterList(codeCT, classification, gcs) ;
-        
+            ParameterValueGroup params = createCoordTransformParameterList(codeCT,
+                    classification, gcs);
+
             // Create the "base to derived" math transform, parameterized 
             // by "param".
             try {
-                projXform = mtf.createParameterizedTransform(params) ; 
+                projXform = mtf.createParameterizedTransform(params);
             } catch (FactoryException fe) {
-                IOException ioe = new GeoTiffException(metadata, 
-                    "Math Transform creation error.") ;
-                ioe.initCause(fe) ;
+                IOException ioe = new GeoTiffException(metadata,
+                        "Math Transform creation error.");
+                ioe.initCause(fe);
             }
-
         } catch (NumberFormatException nfe) {
-            IOException ioe = new GeoTiffException(metadata, 
-                "Bad data in ProjCoordTransGeoKey") ;
-            ioe.initCause(nfe) ;
-            throw ioe ;
+            IOException ioe = new GeoTiffException(metadata,
+                    "Bad data in ProjCoordTransGeoKey");
+            ioe.initCause(nfe);
+            throw ioe;
         }
-     
-        return projXform ;
+
+        return projXform;
     }
 
     /**
-     * This code creates a <code>Unit</code> object out of
-     * the <code>ProjLinearUnitsGeoKey</code> and the
+     * This code creates a <code>Unit</code> object out of the
+     * <code>ProjLinearUnitsGeoKey</code> and the
      * <code>ProjLinearUnitSizeGeoKey</code>.  The unit may either be
      * specified as a standard EPSG recognized unit, or may be user defined.
      *
-     * @param key DOCUMENT ME!
-     * @param userDefinedKey DOCUMENT ME!
-     * @param base DOCUMENT ME!
-     * @param def DOCUMENT ME!
+     * @param key GeoKey value
+     * @param userDefinedKey user defined geokey value
+     * @param base &quot;System Unit&quot; (radians or meter)
+     * @param def default value
      *
      * @return <code>Unit</code> object representative of the tags in the file.
      *
@@ -738,121 +742,150 @@ public class GeoTiffCoordinateSystemAdapter {
     }
 
     private ParameterValueGroup createCoordTransformParameterList(Short code,
-           String xformName, GeographicCRS gcs) throws IOException {
+        String xformName, GeographicCRS gcs) throws IOException {
         // initialize the parameter list
-        ParameterValueGroup params = null ;
-        try { 
-            params = mtf.getDefaultParameters(xformName);
-            // get the semimajor and semiminor axes from the gcs
+        ParameterValueGroup params = null;
 
+        try {
+            params = mtf.getDefaultParameters(xformName);
+
+            // get the semimajor and semiminor axes from the gcs
             // The following cast is VERY WIERD.  A gcs should return a 
             // GeodeticDatum, according to the javadocs.  However, the 
             // cast is required because it's returning a Datum instead.
-            Ellipsoid e = ((GeodeticDatum)(gcs.getDatum())).getEllipsoid() ;
-            params.parameter("semi_minor").setValue(e.getSemiMinorAxis()) ;
-            params.parameter("semi_major").setValue(e.getSemiMajorAxis()) ;
- 
+            Ellipsoid e = ((GeodeticDatum) (gcs.getDatum())).getEllipsoid();
+            params.parameter("semi_minor").setValue(e.getSemiMinorAxis());
+            params.parameter("semi_major").setValue(e.getSemiMajorAxis());
+
             // if latitude of origin is specified, use it.
             addGeoKeyToParameterList("latitude_of_origin", params,
                 GeoTiffIIOMetadataAdapter.ProjNatOriginLatGeoKey, false,
-                SI.RADIAN, angularUnit) ;
+                SI.RADIAN, angularUnit);
+
             // if false easting is specified, use it.
             addGeoKeyToParameterList("false_easting", params,
                 GeoTiffIIOMetadataAdapter.ProjFalseEastingGeoKey, false,
-                SI.METER, linearUnit) ;
+                SI.METER, linearUnit);
+
             // if false northing is specified, use it.
             addGeoKeyToParameterList("false_northing", params,
                 GeoTiffIIOMetadataAdapter.ProjFalseNorthingGeoKey, false,
-                SI.METER, linearUnit) ;
+                SI.METER, linearUnit);
+
             // if central meridian is specified, use it.
             addGeoKeyToParameterList("central_meridian", params,
                 GeoTiffIIOMetadataAdapter.ProjCenterLongGeoKey, false,
-                SI.RADIAN, angularUnit) ;
+                SI.RADIAN, angularUnit);
+
             // if scale factor is specified, use it.
             addGeoKeyToParameterList("scale_factor", params,
-                GeoTiffIIOMetadataAdapter.ProjScaleAtNatOriginGeoKey, false, null, null) ;
+                GeoTiffIIOMetadataAdapter.ProjScaleAtNatOriginGeoKey, false,
+                null, null);
+
             // if 1st standard parallel is specified, use it
             addGeoKeyToParameterList("standard_parallel_1", params,
                 GeoTiffIIOMetadataAdapter.ProjStdParallel1GeoKey, false,
-                SI.RADIAN, angularUnit) ;
-    
+                SI.RADIAN, angularUnit);
+
             // if 2nd standard parallel is specified, use it.
             addGeoKeyToParameterList("standard_parallel_2", params,
                 GeoTiffIIOMetadataAdapter.ProjStdParallel2GeoKey, false,
-                SI.RADIAN, angularUnit) ;
+                SI.RADIAN, angularUnit);
 
             // verify that the required parameters have been read in...
-            ParameterValue test ;
+            ParameterValue test;
+
             switch (code.shortValue()) {
-                case CT_AlbersEqualArea:
-                    // Albers equal area requires two standard parallels
-                    test = params.parameter("standard_parallel_1") ;
-                    test = params.parameter("standard_parallel_2") ;
-                    break  ;
-                case CT_TransverseMercator:
-                    // requires scale factor and false easting, read in above
-                    test = params.parameter("scale_factor") ;
-                    test = params.parameter("false_easting") ;
-                    break ;
-                case CT_Orthographic:
-                    // requires latitude of origin, read in above
-                    test = params.parameter("latitude_of_origin") ;
-                    break ;
-                case CT_PolarStereographic:
-                case CT_ObliqueStereographic:
-                    // both require only scale_factor, read in above
-                    test = params.parameter("scale_factor") ;
-                    break ;
-                default:
-                    throw new GeoTiffException(metadata, 
-                        "Unrecognized coordinate system code.") ;
+            case CT_AlbersEqualArea:
+
+                // Albers equal area requires two standard parallels
+                test = params.parameter("standard_parallel_1");
+                test = params.parameter("standard_parallel_2");
+
+                break;
+
+            case CT_TransverseMercator:
+
+                // requires scale factor and false easting, read in above
+                test = params.parameter("scale_factor");
+                test = params.parameter("false_easting");
+
+                break;
+
+            case CT_Orthographic:
+
+                // requires latitude of origin, read in above
+                test = params.parameter("latitude_of_origin");
+
+                break;
+
+            case CT_PolarStereographic:
+            case CT_ObliqueStereographic:
+
+                // both require only scale_factor, read in above
+                test = params.parameter("scale_factor");
+
+                break;
+
+            default:
+                throw new GeoTiffException(metadata,
+                    "Unrecognized coordinate system code.");
             }
         } catch (ParameterNotFoundException pnf) {
-            IOException io = new GeoTiffException(metadata, 
-                "Required parameter not specified for "+xformName) ;
-            io.initCause(pnf);
-            throw io ;
-        } catch (FactoryException fe) { 
             IOException io = new GeoTiffException(metadata,
-                "Cannot find default parameters for: " +xformName) ; 
-            io.initCause(fe) ; 
-            throw io ; 
+                    "Required parameter not specified for " + xformName);
+            io.initCause(pnf);
+            throw io;
+        } catch (FactoryException fe) {
+            IOException io = new GeoTiffException(metadata,
+                    "Cannot find default parameters for: " + xformName);
+            io.initCause(fe);
+            throw io;
         }
-        return params ;
+
+        return params;
     }
 
+    private void addGeoKeyToParameterList(String name,
+        ParameterValueGroup params, int key, boolean mandatory, Unit base,
+        Unit from) throws IOException {
+        double numeric = 0.; // carries data from "try" to "catch" blocks
 
-    private void addGeoKeyToParameterList(String name, 
-        ParameterValueGroup params, int key, boolean mandatory, 
-        Unit base, Unit from) throws IOException {
-
-	double numeric=0. ; // carries data from "try" to "catch" blocks
         try {
-            String value = metadata.getGeoKey(key) ;
+            String value = metadata.getGeoKey(key);
+
             if (value != null) {
-                numeric = Double.parseDouble(value) ;
- 
+                numeric = Double.parseDouble(value);
+
                 // take care of units conversion if needed.
-                if ( (base != null) && (from != null)) {
-                    numeric = from.getConverterTo(base).convert(numeric) ;
+                // will throw a ConversionException if no conversion
+                // can be found.
+                if ((base != null) && (from != null) && !from.equals(base)) {
+                    numeric = from.getConverterTo(base).convert(numeric);
                 }
-                params.parameter(name).setValue(numeric) ;
+
+                params.parameter(name).setValue(numeric);
             } else if (mandatory) {
-                throw new GeoTiffException(metadata, 
-                    "Mandatory GeoKey is missing") ;
+                throw new GeoTiffException(metadata,
+                    "Mandatory GeoKey is missing");
             }
         } catch (NumberFormatException nfe) {
-            IOException ioe = new GeoTiffException(metadata, 
-                  "Bad data in numeric field.") ;
-            ioe.initCause(nfe) ;
-            throw ioe ;
-        } catch (InvalidParameterValueException ipv) { 
-            IOException ioe = new GeoTiffException(metadata, 
-                  "Bad parameter value " + name + " = " + 
-		  Double.toString(numeric)+".") ;
-            ioe.initCause(ipv) ;
-	    throw ioe ; 
-	}
+            IOException ioe = new GeoTiffException(metadata,
+                    "Bad data in numeric field.");
+            ioe.initCause(nfe);
+            throw ioe;
+        } catch (InvalidParameterValueException ipv) {
+            IOException ioe = new GeoTiffException(metadata,
+                    "Bad parameter value " + name + " = "
+                    + Double.toString(numeric) + ".");
+            ioe.initCause(ipv);
+            throw ioe;
+        } catch (ConversionException ce) {
+            IOException ioe = new GeoTiffException(metadata,
+                    "Cannot convert from " + from.toString() + " to "
+                    + base.toString() + ".");
+            ioe.initCause(ce);
+            throw ioe;
+        }
     }
-
 }

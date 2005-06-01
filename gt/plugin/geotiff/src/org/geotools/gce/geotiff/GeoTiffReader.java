@@ -80,9 +80,9 @@ public class GeoTiffReader implements GridCoverageReader {
     /**
      * Creates a new instance of GeoTiffReader
      *
-     * @param creater DOCUMENT ME!
-     * @param source DOCUMENT ME!
-     * @param hints DOCUMENT ME!
+     * @param creater format object creating this reader
+     * @param source the GeoTiff file
+     * @param hints user-supplied hints
      */
     public GeoTiffReader(Format creater, Object source, Hints hints) {
         this.creater = (GeoTiffFormat) creater;
@@ -106,24 +106,26 @@ public class GeoTiffReader implements GridCoverageReader {
      * </li>
      * </ul>
      * 
-     * \return TRUE if the file is a GeoTiff file.
+     * @return TRUE if the file is a GeoTiff file.
      *
-     * @param file DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * @param file The file to check
      */
     public static boolean isGeoTiffFile(File file) {
         RenderedOp img = JAI.create("ImageRead", file);
-        if( img == null ){
+
+        if (img == null) {
             return false;
         }
+
         // Get the metadata object.
         Object metadataImage = img.getProperty(ImageReadDescriptor.PROPERTY_NAME_METADATA_IMAGE);
-        if( !(metadataImage instanceof IIOMetadata)){
+
+        if (!(metadataImage instanceof IIOMetadata)) {
             return false;
         }
+
         IIOMetadata check = (IIOMetadata) metadataImage;
-        
+
         GeoTiffIIOMetadataAdapter metadata = new GeoTiffIIOMetadataAdapter(check);
 
         // does the GeoKey Directory exist? 
@@ -146,7 +148,7 @@ public class GeoTiffReader implements GridCoverageReader {
     /**
      * No subnames.  Always returns null.
      *
-     * @return DOCUMENT ME!
+     * @return null
      */
     public String getCurrentSubname() {
         return null;
@@ -185,7 +187,7 @@ public class GeoTiffReader implements GridCoverageReader {
     /**
      * Always returns null.  No subnames.
      *
-     * @return DOCUMENT ME!
+     * @return null
      */
     public String[] listSubNames() {
         return null;
@@ -196,15 +198,14 @@ public class GeoTiffReader implements GridCoverageReader {
      * determines the math transform from raster to the CRS model, and
      * constructs a GridCoverage.
      *
-     * @param params DOCUMENT ME!
+     * @param params currently ignored, potentially may be used for hints.
      *
-     * @return DOCUMENT ME!
+     * @return grid coverage represented by the image
      *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException on any IO related troubles
      */
     public GridCoverage read(GeneralParameterValue[] params)
-        throws IllegalArgumentException, IOException {
+        throws IOException {
         // get the raster -> model transformation
         MathTransform r2m = getRasterToModel();
 
@@ -222,11 +223,12 @@ public class GeoTiffReader implements GridCoverageReader {
     }
 
     /**
-     * DOCUMENT ME!
+     * If the dynamic range of the image data is not large, rescale it so
+     * that it can be seen.
      *
-     * @param image2
+     * @param image2 the image to rescale
      *
-     * @return DOCUMENT ME!
+     * @return the image with an &quot;expanded&quot; dynamic range.
      */
     private RenderedOp rescaleIfNeeded(RenderedOp image2) {
         //do not rescale
@@ -252,7 +254,7 @@ public class GeoTiffReader implements GridCoverageReader {
         double[][] extrema = (double[][]) JAI.create("extrema", pb).getProperty("extrema");
 
         /**
-         * RESCSALE
+         * RESCALE
          */
         pb.removeSources();
         pb.removeParameters();
@@ -312,7 +314,7 @@ public class GeoTiffReader implements GridCoverageReader {
      * There are no guts to this function.  Only single-image TIFF files are
      * supported.
      *
-     * @throws UnsupportedOperationException DOCUMENT ME!
+     * @throws UnsupportedOperationException always
      */
     public void skip() {
         // add support for multi image TIFF files later.

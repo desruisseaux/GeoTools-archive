@@ -69,13 +69,15 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * Currently, we only accept files, and we do not open the file to  verify
-     * the correct format.  If the file format is wrong, we deal with that
-     * when we try to read it.
+     * Currently, we only accept files, and we open the file to  verify that it
+     * has a GeoKeyDirectory tag.  If anything more subtle is  wrong with the
+     * file, we deal with that when we try and read it.
      *
      * @param o the source object to test for compatibility with this  format.
+     *        Must be a CatalogEntry.
      *
-     * @return true if "o" is a file.
+     * @return true if "o" is a CatalogEntry with a GeoTiff file as a
+     *         resource.
      */
     public boolean accepts(Object o) {
         boolean goodfile = false;
@@ -97,9 +99,9 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
      * If <CODE>source</CODE> is a file, this will return a reader object. This
      * file does not use hints in the construction of the geotiff reader.
      *
-     * @param source DOCUMENT ME!
+     * @param source must be a GeoTiff File
      *
-     * @return DOCUMENT ME!
+     * @return a GeoTiffReader object initialized to the specified File.
      */
     public GridCoverageReader getReader(Object source) {
         if (source instanceof CatalogEntry) {
@@ -118,7 +120,7 @@ public class GeoTiffFormat extends AbstractGridFormat implements Format {
     /**
      * Always returns null.
      *
-     * @param source DOCUMENT ME!
+     * @param source ignored
      *
      * @return null, always.
      */

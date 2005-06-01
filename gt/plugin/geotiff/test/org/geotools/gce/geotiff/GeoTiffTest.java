@@ -21,28 +21,26 @@ package org.geotools.gce.geotiff;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 import org.geotools.data.coverage.grid.file.FileSystemGridCoverageExchange;
+import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.resources.TestData;
-import org.geotools.factory.FactoryRegistryException ; 
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
-
+import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.IdentifiedObject ; 
-import org.opengis.referencing.operation.MathTransformFactory ; 
-import org.opengis.referencing.operation.Projection ; 
-import org.opengis.parameter.ParameterValueGroup ; 
-
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.Projection;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map ; 
-import java.util.Set ; 
-import java.util.HashSet ; 
+import java.util.Map;
+import java.util.Set;
 
 
 public class GeoTiffTest extends TestCase {
@@ -68,103 +66,109 @@ public class GeoTiffTest extends TestCase {
         assertNotNull(gcs);
     }
 
-    public boolean isAuthorityFactoryAvailable() { 
-        boolean available = false ; 
-        try { 
-            FactoryFinder.getCSAuthorityFactory("EPSG", null) ; 
-            available = true ; 
+    public boolean isAuthorityFactoryAvailable() {
+        boolean available = false;
+
+        try {
+            FactoryFinder.getCSAuthorityFactory("EPSG", null);
+            available = true;
         } catch (FactoryRegistryException fe) {
             // state captured by "available = false"
         }
 
-        return available ; 
+        return available;
     }
 
-
     /**
-     * Prints out the list of available math transforms.  Succeeds if 
-     * a mathtransformfactory can be found and used.
+     * Prints out the list of available math transforms.  Succeeds if  a
+     * mathtransformfactory can be found and used.
      */
-    public void testMathTransformFactory() { 
+    public void testMathTransformFactory() {
         // This checks if FactoryFinder can find a factory
         MathTransformFactory mtf = FactoryFinder.getMathTransformFactory(null);
-        assertNotNull("No Math Transform Factory found!", mtf) ; 
+        assertNotNull("No Math Transform Factory found!", mtf);
 
         //////////////////////////////////////////////////////////////
         // Geotools specific code to print out list of transforms.
-        String []dummy = new String[1] ; 
-        dummy[0] = "-projections" ; 
+        String[] dummy = new String[1];
+        dummy[0] = "-projections";
 
         DefaultMathTransformFactory.main(dummy);
     }
 
     /**
-     * Checks each of the items in the "mapCoordTrans" map to ensure that 
-     * the key is contained in the MathTransformFactory's "available methods".
+     * Checks each of the items in the "mapCoordTrans" map to ensure that  the
+     * key is contained in the MathTransformFactory's "available methods".
      */
-    public void testCoordinateTransformationMap() { 
+    public void testCoordinateTransformationMap() {
         MathTransformFactory mtf = FactoryFinder.getMathTransformFactory(null);
         Map map = GeoTiffCoordinateSystemAdapter.getCoordTransMap();
 
-        Set validXforms = mtf.getAvailableMethods(Projection.class) ; 
-        assertNotNull("No methods returned!", validXforms) ; 
-        assertFalse("Empty set returned!", validXforms.isEmpty()) ; 
+        Set validXforms = mtf.getAvailableMethods(Projection.class);
+        assertNotNull("No methods returned!", validXforms);
+        assertFalse("Empty set returned!", validXforms.isEmpty());
 
         // find out which ones aren't legal, as well as what's allowed
-        StringBuffer msg = new StringBuffer() ; 
-        StringBuffer goodXformNames = new StringBuffer() ; 
+        StringBuffer msg = new StringBuffer();
+        StringBuffer goodXformNames = new StringBuffer();
 
         // assemble a list of what's allowed.
-        Iterator goodXforms = validXforms.iterator() ; 
-        Set goodNameSet = new HashSet() ; 
-        while (goodXforms.hasNext() ) { 
-            IdentifiedObject io = (IdentifiedObject)(goodXforms.next()) ; 
-            String curName = (String)(io.getName().getCode()) ; 
+        Iterator goodXforms = validXforms.iterator();
+        Set goodNameSet = new HashSet();
+
+        while (goodXforms.hasNext()) {
+            IdentifiedObject io = (IdentifiedObject) (goodXforms.next());
+            String curName = (String) (io.getName().getCode());
 
             // assemble a list of good transform names
-            goodNameSet.add(curName) ; 
-            goodXformNames.append(curName) ; 
-            if (goodXforms.hasNext())  {
-                goodXformNames.append(", ") ; 
+            goodNameSet.add(curName);
+            goodXformNames.append(curName);
+
+            if (goodXforms.hasNext()) {
+                goodXformNames.append(", ");
             }
         }
-        goodXformNames.append(".\n") ; 
+
+        goodXformNames.append(".\n");
 
         // assemble a list of what I have listed.
-        Iterator myXforms = map.values().iterator() ; 
-        while (myXforms.hasNext()){  
-            String curName = (String)(myXforms.next());  
+        Iterator myXforms = map.values().iterator();
+
+        while (myXforms.hasNext()) {
+            String curName = (String) (myXforms.next());
 
             // is the current name valid?
-            if (!goodNameSet.contains(curName)) { 
-                msg.append(curName +" not a valid transform!\n") ; 
+            if (!goodNameSet.contains(curName)) {
+                msg.append(curName + " not a valid transform!\n");
             }
         }
 
         // Check that all of MY names are contained in the reference
         // Set returned by the  MathTransformFactory
-        boolean allGood = goodNameSet.containsAll(map.values()) ; 
+        boolean allGood = goodNameSet.containsAll(map.values());
 
-        assertTrue(goodXformNames.append(msg).toString(), allGood) ; 
+        assertTrue(goodXformNames.append(msg).toString(), allGood);
     }
 
     /**
-     * Checks that default parameters are available for each of the 
+     * Checks that default parameters are available for each of the
      * MathTransforms I have registered.
      */
-    public void testDefaultParametersAvailable() { 
-        Iterator it = GeoTiffCoordinateSystemAdapter.getCoordTransMap().
-                      values().iterator() ; 
+    public void testDefaultParametersAvailable() {
+        Iterator it = GeoTiffCoordinateSystemAdapter.getCoordTransMap().values()
+                                                    .iterator();
         MathTransformFactory mtf = FactoryFinder.getMathTransformFactory(null);
 
-        while (it.hasNext()) { 
-            String myName = null ; 
-            try { 
-                myName = (String)(it.next()) ; 
-                ParameterValueGroup pvg = mtf.getDefaultParameters(myName) ; 
-                assertNotNull("No params for: " + myName, pvg) ; 
-            } catch (FactoryException nsi) { 
-                fail("Unrecognized parameter: " + myName) ; 
+        while (it.hasNext()) {
+            String myName = null;
+
+            try {
+                myName = (String) (it.next());
+
+                ParameterValueGroup pvg = mtf.getDefaultParameters(myName);
+                assertNotNull("No params for: " + myName, pvg);
+            } catch (FactoryException nsi) {
+                fail("Unrecognized parameter: " + myName);
             }
         }
     }
@@ -289,14 +293,17 @@ public class GeoTiffTest extends TestCase {
     }
 
     /**
-     * Tests that the GeoTiffReader can read one of the ESRI standard 
-     * Albers Equal Area projections.  This is not totally specified by the 
-     * EPSG and so exercises some of the &quot;custom&quot; code.
+     * Tests that the GeoTiffReader can read one of the ESRI standard  Albers
+     * Equal Area projections.  This is not totally specified by the  EPSG and
+     * so exercises some of the &quot;custom&quot; code.
+     *
+     * @throws IOException DOCUMENT ME!
      */
     public void testReadESRIAlbers() throws IOException {
         // skip if authority factories are not available
-        if (!isAuthorityFactoryAvailable()) 
-            return ; 
+        if (!isAuthorityFactoryAvailable()) {
+            return;
+        }
 
         File testFile = TestData.file(GeoTiffTest.class, "non-arc-meghan.tif");
         GridCoverage gc = readFile(testFile);
