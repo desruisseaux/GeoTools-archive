@@ -70,7 +70,7 @@ public class PointHandler implements ShapeHandler {
             try {
                 mt.transform(coords[0], 0, coords[0], 0, coords[0].length/2);
             } catch (Exception e) {
-                ShapeRenderer.LOGGER.severe("could not transform coordinates"
+                ShapefileRenderer.LOGGER.severe("could not transform coordinates"
                         + e.getLocalizedMessage());
             }
         }

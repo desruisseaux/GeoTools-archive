@@ -93,7 +93,7 @@ public class MultiPointHandler implements ShapeHandler {
 	            try {
 	                mt.transform(coords[t], 0, coords[t], 0, coords[t].length/2);
 	            } catch (Exception e) {
-	                ShapeRenderer.LOGGER.severe("could not transform coordinates"
+	                ShapefileRenderer.LOGGER.severe("could not transform coordinates"
 	                        + e.getLocalizedMessage());
 	            }
             }

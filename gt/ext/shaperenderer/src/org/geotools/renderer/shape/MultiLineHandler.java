@@ -91,14 +91,7 @@ public class MultiLineHandler implements ShapeHandler {
 
 		int dimensions = (type == ShapeType.ARCZ) ? 3 : 2;
 		// read bounding box
-		double[] tmpbbox = new double[4];
-		tmpbbox[0] = buffer.getDouble();
-		tmpbbox[1] = buffer.getDouble();
-		tmpbbox[2] = buffer.getDouble();
-		tmpbbox[3] = buffer.getDouble();
-
-		Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1],
-				tmpbbox[3]);
+		Envelope geomBBox = GeometryHandlerUtilities.readBounds(buffer);
 
 //		if (!bbox.intersects(geomBBox)) {
 //			return null;
@@ -137,7 +130,7 @@ public class MultiLineHandler implements ShapeHandler {
 			try {
 				mt.transform(coords[0], 0, transformed[0], 0, 2);
 			} catch (Exception e) {
-				ShapeRenderer.LOGGER
+				ShapefileRenderer.LOGGER
 						.severe("could not transform coordinates "
 								+ e.getLocalizedMessage());
 				transformed[0]=coords[0];
@@ -176,6 +169,10 @@ public class MultiLineHandler implements ShapeHandler {
 								&& Math.abs(coords[part][readDoubles - 3]
 										- coords[part][readDoubles - 1]) <= spany) {
 							readDoubles -= 2;
+						}else{
+							if( !mt.isIdentity() ){
+								
+							}
 						}
 					}
 				}
@@ -185,15 +182,17 @@ public class MultiLineHandler implements ShapeHandler {
 				if (!mt.isIdentity()) {
 					try {
 						transformed[partsInBBox] = new double[readDoubles];
-						mt.transform(coords[part], 0, transformed[partsInBBox], 0,
-								readDoubles / 2);
+						GeometryHandlerUtilities.transform(type, mt, coords[part], transformed[partsInBBox]);
+//						mt.transform(coords[part], 0, transformed[partsInBBox], 0,
+//								readDoubles / 2);
 					} catch (Exception e) {
-						ShapeRenderer.LOGGER
+						ShapefileRenderer.LOGGER
 								.severe("could not transform coordinates "
 										+ e.getLocalizedMessage());
 						transformed[partsInBBox]=coords[part];
 					}
-				} else{
+				} else
+				{
 					transformed[partsInBBox] = new double[readDoubles];
 					System.arraycopy(coords[part], 0, transformed[partsInBBox], 0,
 							readDoubles / 2);
@@ -211,7 +210,7 @@ public class MultiLineHandler implements ShapeHandler {
 		return new SimpleGeometry(type, transformed, geomBBox);
 	}
 
-   public boolean bboxIntersectSegment(boolean intersection, double[] coords, int currentDoubles) {
+	public boolean bboxIntersectSegment(boolean intersection, double[] coords, int currentDoubles) {
 		if( intersection )
 			return true;
 		if( bbox.contains(coords[currentDoubles-2], coords[currentDoubles-1]) )
@@ -297,7 +296,7 @@ public class MultiLineHandler implements ShapeHandler {
 			try {
 				mt.transform(coords[0], 0, transformed[0], 0, 1);
 			} catch (Exception e) {
-				ShapeRenderer.LOGGER.severe("could not transform coordinates "
+				ShapefileRenderer.LOGGER.severe("could not transform coordinates "
 						+ e.getLocalizedMessage());
 				transformed = coords;
 			}

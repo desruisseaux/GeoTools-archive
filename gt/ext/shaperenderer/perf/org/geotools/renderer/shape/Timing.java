@@ -67,19 +67,19 @@ public class Timing {
 	private static final FilterFactory filterFactory = FilterFactory
 			.createFilterFactory();
 
-	private static boolean ALL_DATA = false;
+	private static boolean ALL_DATA = true;
 
-	private static boolean DISPLAY = true;
+	private static boolean DISPLAY = false;
 
 	private static boolean ANTI_ALIASING = true;
 
 	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = true;
+	private static boolean RUN_LITE = false;
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = false;
+	private static boolean ACCURATE = true;
 
 	private static boolean CACHING = false;
 
@@ -89,7 +89,7 @@ public class Timing {
 
 	private static boolean CPU_PROFILE = false;
 
-	private static boolean LINES = false;
+	private static boolean LINES = true;
 	
 	private static boolean LABELING=false;
 	
@@ -276,7 +276,7 @@ public class Timing {
 
 	private void runShapeRendererTest() throws Exception {
 		MapContext context = getMapContext();
-		ShapeRenderer renderer = new ShapeRenderer(context);
+		ShapefileRenderer renderer = new ShapefileRenderer(context);
 
 		if (ANTI_ALIASING)
 			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -396,7 +396,7 @@ public class Timing {
 		if (NO_REPROJECTION)
 			context.setAreaOfInterest(new Envelope(), store.getSchema()
 					.getDefaultGeometry().getCoordinateSystem());
-		ShapeRenderer renderer = new ShapeRenderer(context);
+		ShapefileRenderer renderer = new ShapefileRenderer(context);
 		if (ANTI_ALIASING)
 			renderer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
@@ -538,12 +538,15 @@ public class Timing {
 	private static String LINES_HOME_TYPE_NAME = "tcn-roads";
 	private static String LINES_HOME_LABEL = "STREET";
 
+	private static String LAKES_FILE="file:/home/jones/dev/geotools/ext/shaperenderer/test/org/geotools/renderer/shape/test-data/lakes.shp";
+	private static String LAKES_NAME = "lakes";
+	
 	private static String LINES_FILE = LINES_WORK_FILE;
 	private static String LINES_TYPE_NAME = LINES_WORK_TYPE_NAME;
 	private static String LINES_LABEL = LINES_HOME_LABEL;	
 	
-	private static String POLY_FILE = CIRCLES_FILE;
-	private static String POLY_TYPE_NAME = CIRCLES_NAME;
+	private static String POLY_FILE = BC_FILE;
+	private static String POLY_TYPE_NAME = BC_NAME;
 	private static String POLY_LABEL = NEW_YORK_WORK_LABEL;
 
 	int w = 512, h = 512;

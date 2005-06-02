@@ -61,7 +61,7 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(ds.getFeatureSource(), style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=10;
         TestUtilites.INTERACTIVE=INTERACTIVE;
@@ -78,7 +78,7 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(ds.getFeatureSource(), style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=1;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
@@ -95,7 +95,7 @@ public class LabelingTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(ds.getFeatureSource(), style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary=30;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 

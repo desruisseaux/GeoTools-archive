@@ -249,7 +249,7 @@ public class IndexInfo {
                 info.indexFile=info.openIndexFile();
                 goodRecs = info.queryTree(bbox);
             } catch (Exception e) {
-            	ShapeRenderer.LOGGER.fine("Exception occured attempting to use indexing:"+e.toString());
+            	ShapefileRenderer.LOGGER.fine("Exception occured attempting to use indexing:"+e.toString());
             	goodRecs=null;
             }
             

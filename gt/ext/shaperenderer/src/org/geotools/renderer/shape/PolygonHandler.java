@@ -80,15 +80,7 @@ public class PolygonHandler implements ShapeHandler {
 		}
 
 		int dimensions = (type == ShapeType.ARCZ) ? 3 : 2;
-		// read bounding box
-		double[] tmpbbox = new double[4];
-		tmpbbox[0] = buffer.getDouble();
-		tmpbbox[1] = buffer.getDouble();
-		tmpbbox[2] = buffer.getDouble();
-		tmpbbox[3] = buffer.getDouble();
-
-		Envelope geomBBox = new Envelope(tmpbbox[0], tmpbbox[2], tmpbbox[1],
-				tmpbbox[3]);
+		Envelope geomBBox = GeometryHandlerUtilities.readBounds(buffer);
 
 //		if (!bbox.intersects(geomBBox)) {
 //			return null;
@@ -124,7 +116,7 @@ public class PolygonHandler implements ShapeHandler {
 			try {
 				mt.transform(coords[0], 0, transformed[0], 0, 1);
 			} catch (Exception e) {
-				ShapeRenderer.LOGGER.severe("could not transform coordinates "
+				ShapefileRenderer.LOGGER.severe("could not transform coordinates "
 						+ e.getLocalizedMessage());
 				transformed[0] = coords[0];
 			}
@@ -184,10 +176,11 @@ public class PolygonHandler implements ShapeHandler {
 
 				if (!mt.isIdentity()) {
 					try {
-						mt.transform(coords[part], 0, transformed[partsInBBox],
-								0, readDoubles / 2);
+						GeometryHandlerUtilities.transform(type, mt, coords[part], transformed[partsInBBox]);
+//						mt.transform(coords[part], 0, transformed[partsInBBox],
+//								0, readDoubles / 2);
 					} catch (Exception e) {
-						ShapeRenderer.LOGGER
+						ShapefileRenderer.LOGGER
 								.severe("could not transform coordinates "
 										+ e.getLocalizedMessage());
 						transformed[partsInBBox] = coords[part];

@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ShapeRendererTest extends TestCase {
 
 	public void testCreateFeature() throws Exception {
-		ShapeRenderer renderer = new ShapeRenderer(null);
+		ShapefileRenderer renderer = new ShapefileRenderer(null);
 		Style style = LabelingTest.loadStyle("LineStyle.sld");
 		ShapefileDataStore ds = TestUtilites.getDataStore("theme1.shp");
 		renderer.dbfheader = ShapefileRendererUtil.getDBFReader(ds).getHeader();
@@ -75,7 +75,7 @@ public class ShapeRendererTest extends TestCase {
 				0.0, 0.0 };
 		Envelope env = new Envelope(0, 400, 0, 400);
 
-		ShapeRenderer renderer = new ShapeRenderer(null);
+		ShapefileRenderer renderer = new ShapefileRenderer(null);
 
 		LiteShape2 shape = renderer.getLiteShape2(new SimpleGeometry(
 				ShapeType.POLYGON, coords, env));
@@ -121,7 +121,7 @@ public class ShapeRendererTest extends TestCase {
 		assertEquals(new Coordinate(100, 100), coordinates[2]);
 		assertEquals(new Coordinate(100, 0), coordinates[3]);
 		assertEquals(new Coordinate(10, 0), coordinates[4]);
-		ShapeRenderer.NUM_SAMPLES=12;
+		ShapefileRenderer.NUM_SAMPLES=12;
 		shape = renderer.getLiteShape2(new SimpleGeometry(ShapeType.POLYGON,
 				new double[][] { manyCoords }, env));
 		jtsGeom = shape.getGeometry();
@@ -161,7 +161,7 @@ public class ShapeRendererTest extends TestCase {
 		
 		MapContext context=new DefaultMapContext();
 		context.addLayer(store,st);
-		ShapeRenderer renderer=new ShapeRenderer(context);
+		ShapefileRenderer renderer=new ShapefileRenderer(context);
 		TestUtilites.CountingRenderListener listener=new TestUtilites.CountingRenderListener();
 		renderer.addRenderListener(listener);
 		Envelope env = context.getLayerBounds();
@@ -214,7 +214,7 @@ public class ShapeRendererTest extends TestCase {
 		
 		MapContext context=new DefaultMapContext();
 		context.addLayer(store,st);
-		ShapeRenderer renderer=new ShapeRenderer(context);
+		ShapefileRenderer renderer=new ShapefileRenderer(context);
 		TestUtilites.CountingRenderListener listener=new TestUtilites.CountingRenderListener();
 		renderer.addRenderListener(listener);
 		Envelope env = context.getLayerBounds();
@@ -240,7 +240,7 @@ public class ShapeRendererTest extends TestCase {
 		
 		MapContext context=new DefaultMapContext();
 		context.addLayer(store,st);
-		ShapeRenderer renderer=new ShapeRenderer(context);
+		ShapefileRenderer renderer=new ShapefileRenderer(context);
 		TestUtilites.CountingRenderListener listener=new TestUtilites.CountingRenderListener();
 		renderer.addRenderListener(listener);
 		renderer.addRenderListener(new RenderListener(){

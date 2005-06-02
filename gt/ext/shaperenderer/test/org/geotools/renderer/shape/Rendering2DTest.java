@@ -102,7 +102,7 @@ public class Rendering2DTest extends TestCase {
 
         MapContext map = new DefaultMapContext();
         map.addLayer(source, style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env
                 .getMaxY());
@@ -115,7 +115,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer(TestUtilites.getLines());
+        ShapefileRenderer renderer=createLineRenderer(TestUtilites.getLines());
         MapContext map=renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
@@ -132,7 +132,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer(TestUtilites.getPolygons());
+        ShapefileRenderer renderer=createLineRenderer(TestUtilites.getPolygons());
         MapContext map=renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
@@ -148,7 +148,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer(TestUtilites.getPolygons());
+        ShapefileRenderer renderer=createLineRenderer(TestUtilites.getPolygons());
         MapContext map=renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
@@ -165,7 +165,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer(TestUtilites.getLines());
+        ShapefileRenderer renderer=createLineRenderer(TestUtilites.getLines());
         MapContext map=renderer.getContext();
 
         map.setAreaOfInterest(map.getLayer(0).getFeatureSource().getBounds(), map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry().getCoordinateSystem());
@@ -188,7 +188,7 @@ public class Rendering2DTest extends TestCase {
 
         MapContext map = new DefaultMapContext();
         map.addLayer(source, style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20, env.getMinY() - 20, env
                 .getMaxY() + 20);
@@ -209,7 +209,7 @@ public class Rendering2DTest extends TestCase {
         map.addLayer(source, style);
         
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -236,7 +236,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer(TestUtilites.getLines());
+        ShapefileRenderer renderer=createLineRenderer(TestUtilites.getLines());
         Envelope env=renderer.getContext().getAreaOfInterest();
 //        INTERACTIVE=true;
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
@@ -256,7 +256,7 @@ public class Rendering2DTest extends TestCase {
         map.addLayer(source, style);
         
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
 
         Rectangle rect = new Rectangle(400, 400);
@@ -274,7 +274,7 @@ public class Rendering2DTest extends TestCase {
         // same as the datasource test, load in some features into a table
         System.err.println("starting rendering2DTest");
         
-        ShapeRenderer renderer=createLineRenderer(TestUtilites.getDataStore("lineNoCRS.shp"));
+        ShapefileRenderer renderer=createLineRenderer(TestUtilites.getDataStore("lineNoCRS.shp"));
         Envelope env=renderer.getContext().getAreaOfInterest();
 //        INTERACTIVE=true;
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
@@ -294,7 +294,7 @@ public class Rendering2DTest extends TestCase {
         map.addLayer(source, style);
         
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_4BYTE_ABGR);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(
                         "PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
@@ -364,7 +364,7 @@ public class Rendering2DTest extends TestCase {
         return style;
     }
     public void testEnvelopePerformance() throws Exception{
-    	ShapeRenderer renderer=createLineRenderer(TestUtilites.getLines());
+    	ShapefileRenderer renderer=createLineRenderer(TestUtilites.getLines());
     	MapContext context=renderer.getContext();
     	
     	context.setAreaOfInterest(context.getLayerBounds());
@@ -389,14 +389,14 @@ public class Rendering2DTest extends TestCase {
 	 * @return
 	 * @throws Exception
 	 */
-	private ShapeRenderer createLineRenderer(ShapefileDataStore ds) throws Exception {
+	private ShapefileRenderer createLineRenderer(ShapefileDataStore ds) throws Exception {
 
         FeatureSource source=ds.getFeatureSource(ds.getTypeNames()[0]);
         Style style = TestUtilites.createTestStyle(null, ds.getTypeNames()[0]);
 
         MapContext map = new DefaultMapContext();
         map.addLayer(source, style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env
                 .getMaxY());

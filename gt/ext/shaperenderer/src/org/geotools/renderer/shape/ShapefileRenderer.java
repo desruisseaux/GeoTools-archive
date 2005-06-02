@@ -74,7 +74,6 @@ import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
@@ -86,7 +85,6 @@ import org.geotools.util.NumberRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -108,7 +106,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author jeichar
  * @since 2.1.x
  */
-public class ShapeRenderer {
+public class ShapefileRenderer {
 	public static final Logger LOGGER = Logger
 			.getLogger("org.geotools.renderer.shape");
 
@@ -183,7 +181,7 @@ public class ShapeRenderer {
 
 	IndexInfo[] layerIndexInfo;
 
-	public ShapeRenderer(MapContext context) {
+	public ShapefileRenderer(MapContext context) {
 		if (context == null)
 			context = new DefaultMapContext();
 
@@ -607,139 +605,6 @@ public class ShapeRenderer {
 					}
 
 					fireFeatureRenderedEvent(feature);
-				} catch (Exception e) {
-					fireErrorEvent(e);
-				}
-			}
-		} finally {
-			dbfreader.close();
-			shpreader.close();
-		}
-	}
-
-	/**
-	 * @param graphics
-	 * @param type
-	 * @param shpreader
-	 * @param dbfreader
-	 * @param typeName
-	 * @param ruleList
-	 * @param elseRuleList
-	 * @param scaleRange
-	 * @throws IOException
-	 */
-	private void processShapefile(Graphics2D graphics, FeatureType type,
-			IndexInfo.Reader shpreader, DbaseFileReader dbfreader,
-			String typeName, List ruleList, List elseRuleList,
-			NumberRange scaleRange) throws IOException {
-		int index = 1;
-		try {
-			while (true) {
-				try {
-
-					if (renderingStopRequested) {
-						break;
-					}
-
-					if (!shpreader.hasNext()) {
-						break;
-					}
-
-					boolean doElse = true;
-
-					if (LOGGER.isLoggable(Level.FINER)) {
-						LOGGER.fine("trying to read geometry ...");
-					}
-
-					ShapefileReader.Record record = shpreader.next();
-
-					SimpleGeometry geom = (SimpleGeometry) record.shape();
-					if (geom == null) {
-						dbfreader.skip();
-						continue;
-					}
-					Feature feature = createFeature(type, record, dbfreader,
-							typeName + index);
-					index++;
-
-					if (renderingStopRequested) {
-						break;
-					}
-
-					if (caching) {
-						geometryCache.add(geom);
-						featureCache.add(feature);
-					}
-
-					if (LOGGER.isLoggable(Level.FINEST)) {
-						LOGGER.finest("... done: " + geom.toString());
-					}
-
-					if (LOGGER.isLoggable(Level.FINER)) {
-						LOGGER.fine("... done: " + typeName);
-					}
-
-					// applicable rules
-					for (Iterator it = ruleList.iterator(); it.hasNext();) {
-
-						Rule r = (Rule) it.next();
-
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.finer("applying rule: " + r.toString());
-						}
-
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.finer("this rule applies ...");
-						}
-
-						Filter filter = r.getFilter();
-
-						if ((filter == null) || filter.contains(feature)) {
-							doElse = false;
-
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("processing Symobolizer ...");
-							}
-
-							Symbolizer[] symbolizers = r.getSymbolizers();
-
-							processSymbolizers(graphics, feature, geom,
-									symbolizers, scaleRange);
-
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("... done!");
-							}
-						}
-					}
-
-					if (doElse) {
-						// rules with an else filter
-						if (LOGGER.isLoggable(Level.FINER)) {
-							LOGGER.finer("rules with an else filter");
-						}
-
-						for (Iterator it = elseRuleList.iterator(); it
-								.hasNext();) {
-							Rule r = (Rule) it.next();
-							Symbolizer[] symbolizers = r.getSymbolizers();
-
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("processing Symobolizer ...");
-							}
-
-							processSymbolizers(graphics, feature, geom,
-									symbolizers, scaleRange);
-
-							if (LOGGER.isLoggable(Level.FINER)) {
-								LOGGER.finer("... done!");
-							}
-						}
-					}
-					if (LOGGER.isLoggable(Level.FINER)) {
-						LOGGER.finer("feature rendered event ...");
-					}
-
-					fireFeatureRenderedEvent(null);
 				} catch (Exception e) {
 					fireErrorEvent(e);
 				}
@@ -1455,6 +1320,7 @@ public class ShapeRenderer {
 		} else {
 			info = new IndexInfo(IndexInfo.TREE_NONE, null, null);
 		}
+		
 		return info;
 
 	}

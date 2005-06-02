@@ -154,9 +154,21 @@ public class TestUtilites {
 	/**
 	 * bounds may be null
 	 */
-	public static void showRender( String testName, Object renderer, long timeOut, Envelope bounds )
+	public static void showRender( String testName, ShapefileRenderer renderer, long timeOut, Envelope bounds )
+	        throws Exception {
+		showRender(testName, renderer, timeOut, bounds, -1);
+	}
+
+	/**
+	 * bounds may be null
+	 */
+	public static void showRender( String testName, ShapefileRenderer renderer, long timeOut, Envelope bounds, int expectedFeatureCount )
 	        throws Exception {
 	
+		CountingRenderListener listener=new CountingRenderListener();
+		if( expectedFeatureCount>-1 ){
+			renderer.addRenderListener(listener);
+		}
 	    int w = 300, h = 300;
 	    final BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 	    Graphics g = image.getGraphics();
@@ -199,7 +211,11 @@ public class TestUtilites {
 	        }
 	    }
 	    TestCase.assertTrue("image is blank and should not be", hasData);
-	
+		if( expectedFeatureCount>-1 ){
+			renderer.removeRenderListener(listener);
+			TestCase.assertEquals(expectedFeatureCount, listener.count);
+		}
+
 	}
 
 	/**
@@ -209,8 +225,8 @@ public class TestUtilites {
 	 * @param bounds
 	 */
 	static void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
-	    if (obj instanceof ShapeRenderer) {
-	        ShapeRenderer renderer = (ShapeRenderer) obj;
+	    if (obj instanceof ShapefileRenderer) {
+	        ShapefileRenderer renderer = (ShapefileRenderer) obj;
 	        renderer.paint((Graphics2D) g, rect, bounds);
 	    }
 	}

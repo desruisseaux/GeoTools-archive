@@ -34,7 +34,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.shape.LabelingTest;
 import org.geotools.renderer.shape.MultiLineHandler;
-import org.geotools.renderer.shape.ShapeRenderer;
+import org.geotools.renderer.shape.ShapefileRenderer;
 import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.TestUtilites;
 import org.geotools.resources.TestData;
@@ -90,7 +90,7 @@ public class MultiLineHandlerTest extends TestCase {
 		Envelope env=new Envelope(-7.105552354197932,8.20555235419793,-3.239388966356115,4.191388966388683);
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform mt=CRS.transform(crs, DefaultGeographicCRS.WGS84);
-		ShapeRenderer renderer=new ShapeRenderer(null);
+		ShapefileRenderer renderer=new ShapefileRenderer(null);
 		AffineTransform at=renderer.worldToScreenTransform(env,new Rectangle(300,300));
 		MathTransform worldToScreen=FactoryFinder.getMathTransformFactory(null)
 		.createAffineTransform(new GeneralMatrix(at));
@@ -117,7 +117,7 @@ public class MultiLineHandlerTest extends TestCase {
 		assertNotNull(style);
 		MapContext map = new DefaultMapContext();
         map.addLayer(ds.getFeatureSource(), style);
-        ShapeRenderer renderer = new ShapeRenderer(map);
+        ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = new Envelope(-5,6,-1.4,0);
         TestUtilites.INTERACTIVE=INTERACTIVE;
         TestUtilites.showRender("testLineLabeling", renderer, 2000, env);
