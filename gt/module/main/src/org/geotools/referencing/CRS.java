@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 // OpenGIS dependencies
 import org.geotools.factory.Hints;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.Factory;
 import org.opengis.referencing.FactoryException;
@@ -36,6 +37,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.CoordinateOperation;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**
@@ -229,4 +232,44 @@ public class CRS {
         if( trouble != null ) notFound.initCause( trouble );        
         throw notFound; 
     }
+    
+    /**
+     * ESTIMATE the distance between the two points.
+     *    1. transforms both points to lat/lon
+     *    2. find the distance between the two points
+     * 
+     *  NOTE: we're using ellipsoid calculations.
+     * 
+     * @param p1   first point
+     * @param p2   second point
+     * @param crs  reference system the two points are in
+     * @return approximate distance between the two points, in meters
+     */
+    public static double distance(Coordinate p1, Coordinate p2, CoordinateReferenceSystem crs) throws Exception
+	{
+    	GeodeticCalculator gc = new GeodeticCalculator() ;  // WGS84
+    	
+    	double[] cs        = new double[4];
+    	double[] csLatLong = new double[4];
+    	cs[0] = p1.x;
+    	cs[1] = p1.y;
+    	cs[2] = p2.x;
+    	cs[3] = p2.y;    	 
+         
+    	MathTransform transform = distanceOperationFactory.createOperation(crs,DefaultGeographicCRS.WGS84).getMathTransform();
+    	transform.transform(cs, 0, csLatLong, 0, 2);
+    	   //these could be backwards depending on what WSG84 you use
+    	gc.setAnchorPoint(csLatLong[0],csLatLong[1]);
+    	gc.setDestinationPoint(csLatLong[2],csLatLong[3]);
+    
+    	return gc.getOrthodromicDistance();
+   }
+    
+    private final static CoordinateOperationFactory distanceOperationFactory;
+    static {
+        Hints hints=new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+        distanceOperationFactory=FactoryFinder.getCoordinateOperationFactory(hints);
+    }
+    
+    
 }
