@@ -22,12 +22,14 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.GeometryDistanceFilter;
 import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
@@ -61,8 +63,16 @@ public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
 
 	// Class to convert geometry value into a Well-known Text string	
 	private static WKTWriter wktWriter = new WKTWriter();
+    //The standard SQL multicharacter wild card. 
+    private static char SQL_WILD_MULTI = '%';
+    //The standard SQL single character wild card.
+    private static char SQL_WILD_SINGLE = '_';
+    // The escaped version of the single wildcard for the REGEXP pattern. 
+    private static String escapedWildcardSingle = "\\.\\?";
+    // The escaped version of the multiple wildcard for the REGEXP pattern. 
+    private static String escapedWildcardMulti = "\\.\\*";
 
-	// The SELECTIVITY clause to be used with spatial predicates.	
+    // The SELECTIVITY clause to be used with spatial predicates.	
 	private String selectivityClause = null;
 	
 	// We need the srid to create an ST_Geometry - default to NAD83 for now
@@ -105,7 +115,50 @@ public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
 	static private HashMap getPredicateTable() {
 			return DB2_SPATIAL_PREDICATES;
 	}
-	
+	/**
+     * Writes the SQL for the Like Filter.  Assumes the current java
+     * implemented wildcards for the Like Filter: . for multi and .? for
+     * single. And replaces them with the SQL % and _, respectively. Currently
+     * does nothing, and should not be called, not included in the
+     * capabilities.
+     *
+     * @param filter the Like Filter to be visited.
+     *
+     * @throws UnsupportedOperationException always, as likes aren't
+     *         implemented yet.
+     *
+     * @task REVISIT: Need to think through the escape char, so it works  right
+     *       when Java uses one, and escapes correctly with an '_'.
+     */
+    public void visit(LikeFilter filter) throws UnsupportedOperationException {
+
+
+try {
+           String pattern = filter.getPattern();
+           LOGGER.fine("input pattern: '" + pattern + "'");
+           String wcm = filter.getWildcardMulti();
+           String wcs = filter.getWildcardSingle();
+           LOGGER.fine("wcm is: '" + wcm + "'; wcs is: '" + wcs + "'");
+
+           pattern = pattern.replace(wcm.charAt(0), SQL_WILD_MULTI);
+           LOGGER.fine("pattern: '" + pattern + "' after replace of '" + wcm + "'");
+           pattern = pattern.replace(wcs.charAt(0), SQL_WILD_SINGLE);
+           LOGGER.fine("pattern: '" + pattern + "' after replace of '" + wcs + "'");
+            //pattern = pattern.replace('\\', ''); //get rid of java escapes.
+            //TODO escape the '_' char, as it could be in our string and will
+                     //mess up the SQL wildcard matching
+                 ((AttributeExpression)filter.getValue()).accept(this);
+                 this.out.write(" LIKE ");
+                 this.out.write("'" + pattern + "'");
+              //if (pattern.indexOf(esc) != -1) { //if it uses the escape char
+              //out.write(" ESCAPE " + "'" + esc + "'");  //this needs testing
+              //} TODO figure out when to add ESCAPE clause,
+              //probably just for the '_' char.
+             } catch (java.io.IOException ioe){
+                 throw new RuntimeException(ioe);
+                 }
+    }
+
 	/**
 	 * Generate a WHERE clause for the input GeometryFilter.
 	 * <p>
@@ -308,6 +361,7 @@ protected FilterCapabilities createFilterCapabilities() {
 	this.capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
 	this.capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
 	this.capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
+	this.capabilities.addType(AbstractFilter.LIKE);
 	this.capabilities.addType(AbstractFilter.NULL);
 	this.capabilities.addType(AbstractFilter.BETWEEN);
 	this.capabilities.addType(AbstractFilter.FID);
