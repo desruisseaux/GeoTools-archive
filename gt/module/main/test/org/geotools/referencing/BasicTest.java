@@ -44,6 +44,7 @@ import org.opengis.util.InternationalString;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
@@ -55,7 +56,10 @@ import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.datum.DefaultVerticalDatum;
+import org.geotools.referencing.wkt.Parser;
 import org.geotools.util.SimpleInternationalString;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 /**
@@ -302,6 +306,19 @@ public class BasicTest extends TestCase {
         serialize(DefaultGeodeticDatum.WGS84);
         serialize(DefaultPrimeMeridian.GREENWICH);
     }
+    
+    //test the distance between points function
+    public void testDistance() throws Exception
+    {
+    	final Parser parser = new Parser();
+    	
+    	String wkt = "PROJCS[\"NAD83 / BC Albers\",GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],TOWGS84[0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]],PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"standard_parallel_1\",50],PARAMETER[\"standard_parallel_2\",58.5],PARAMETER[\"latitude_of_center\",45],PARAMETER[\"longitude_of_center\",-126],PARAMETER[\"false_easting\",1000000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"3005\"]]";
+    	DefaultProjectedCRS crs  = (DefaultProjectedCRS) parser.parseObject(wkt);
+    	double d = CRS.distance(new Coordinate(1402848.193853467,651571.1729878788)
+    			     , new Coordinate(1389481.3104009738,641990.9430108378),crs);
+    	double realValue = 16451.33114;
+    	assertTrue( Math.abs(d-realValue) < 0.1 );
+    } 
 
     /**
      * Test the serialization of the given object.
