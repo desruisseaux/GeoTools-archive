@@ -110,7 +110,7 @@ public class AccessDataSourceTest extends TestCase {
             factory = (DefaultFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
                         new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
             isReady = factory.isReady();
-        } catch (Exception error) {
+        } catch (Throwable error) {
             factory = null;
             noConnection = true;
             final LogRecord record = new LogRecord(Level.WARNING,
