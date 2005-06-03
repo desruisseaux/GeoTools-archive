@@ -235,6 +235,13 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     ////////    expressions.                                               ////////
     ///////////////////////////////////////////////////////////////////////////////
     /**
+     * The name of the thread to execute at JVM shutdown. This thread will be created
+     * by {@link DefaultFactory} on registration. It will be checked by {@link #dispose}
+     * in order to determine if we are in the process for shutting down the database engine.
+     */
+    static final String SHUTDOWN_THREAD = "EPSG factory shutdown";
+
+    /**
      * The authority for this database. Will be created only when first needed.
      * This authority will contains the database version in the {@linkplain Citation#getEdition
      * edition} attribute, together with the {@linkplain Citation#getEditionDate edition date}.
@@ -1708,17 +1715,52 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @throws FactoryException if an error occured while closing the connection.
      */
     public synchronized void dispose() throws FactoryException {
+        final boolean shutdown = SHUTDOWN_THREAD.equals(Thread.currentThread().getName());
         try {
             for (final Iterator it=statements.values().iterator(); it.hasNext();) {
                 ((PreparedStatement) it.next()).close();
                 it.remove();
+            }
+            if (shutdown) {
+                shutdown(true);
             }
             connection.close();
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }
         super.dispose();
+        if (shutdown) try {
+            shutdown(false);
+        } catch (SQLException exception) {
+            throw new FactoryException(exception);
+        }
         LOGGER.fine("EPSG connection closed."); // TODO: localize
+    }
+
+    /**
+     * Shutdown the database engine. This method is invoked twice by {@link DefaultFactory}
+     * at JVM shutdown: one time before the {@linkplain #connection} is closed, and a second
+     * time after. This shutdown hook is usefull for <cite>embedded</cite> database engine
+     * starting a server process in addition to the client process. Just closing the connection
+     * is not enough for them. Example:
+     * <P>
+     * <UL>
+     *   <LI>HSQL database engine needs to execute a {@code "SHUTDOWN"} statement using the
+     *      {@linkplain #connection} before it is closed.</LI>
+     *   <LI>Derby database engine needs to instruct the {@linkplain java.sql.DriverManager driver
+     *       manager} after all connections have been closed.</LI>
+     * </UL>
+     * <P>
+     * The default implementation does nothing, which is suffisient for implementations
+     * connecting to a distant server (i.e. non-embedded database engine), for example
+     * {@linkplain AccessDataSource MS-Access} or {@linkplain PostgreDataSource PostgreSQL}.
+     *
+     * @param active {@code true} if the {@linkplain #connection} is alive, or {@code false}
+     *        otherwise. This method is invoked first with {@code active} set to {@code true},
+     *        then a second time with {@code active} set to {@code false}.
+     * @throws SQLException if this method failed to shutdown the database engine.
+     */
+    protected void shutdown(final boolean active) throws SQLException {
     }
 
     /**
@@ -1740,6 +1782,6 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                                     final SQLException cause)
     {
         return new FactoryException("Database failure will constructing a " +
-                Utilities.getShortName(type) + "for code \""+code+"\".", cause);
+                Utilities.getShortName(type) + " for code \""+code+"\".", cause);
     }
 }

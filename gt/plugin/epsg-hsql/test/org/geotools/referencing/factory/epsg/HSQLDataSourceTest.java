@@ -1,7 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2003, Geotools Project Management Committee (PMC)
- * (C) 2002, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,17 +16,15 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.referencing.operation.transform;
+package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.LogRecord;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.SQLException;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -52,24 +49,18 @@ import org.geotools.referencing.factory.epsg.DefaultFactory;
 
 
 /**
- * Tests transformations from CRS and/or operations created from the EPSG factory.
+ * Tests transformations from CRS and/or operations created from the EPSG factory,
+ * using HSQL plugin.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Vadim Semenov
  */
-public class EPSGTest extends TestCase {
+public class HSQLDataSourceTest extends TestCase {
     /**
      * The EPSG factory.
      */
     private DefaultFactory factory;
-
-    /**
-     * {@code true} if {@link #setUp} has been invoked at least once and failed to make a
-     * connection. This flag is used in order to log a warning only once and avoid any new
-     * useless tentative to get a connection.
-     */
-    private static boolean noConnection;
     
     /**
      * Run the suite from the command line.
@@ -83,72 +74,52 @@ public class EPSGTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(EPSGTest.class);
+        return new TestSuite(HSQLDataSourceTest.class);
     }
     
     /**
      * Constructs a test case with the given name.
      */
-    public EPSGTest(final String name) {
+    public HSQLDataSourceTest(final String name) {
         super(name);
     }
 
     /**
-     * Sets up the authority factory, or lets it to null if the initialisation failed.
-     * In the last case, a warning will be logged but no test will be performed. We will
-     * not throws an exception for peoples who don't have an EPSG database on their machine.
+     * Sets up the authority factory.
      */
-    protected void setUp() {
-        if (noConnection) {
-            // This method was already invoked before and failed.
-            // Do not try again.
-            return;
-        }
-        boolean isReady = false;
-        try {
-            // Do not rely on FactoryFinder: we rely want to test this implementation,
-            // not an arbitrary implementation. The WKT-based factory for instance doesn't
-            // have suffisient capabilities for this test.
-            factory = new DefaultFactory();
-            isReady = factory.isReady();
-        } catch (RuntimeException error) {
-            factory = null;
-            noConnection = true;
-            final LogRecord record = new LogRecord(Level.WARNING,
-                    "An error occured while setting up the date source for the EPSG database.\n" +
-                    "Maybe there is no JDBC-ODBC bridge for the current platform.\n" +
-                    "No test will be performed for this class.");
-            record.setSourceClassName(EPSGTest.class.getName());
-            record.setSourceMethodName("setUp");
-            record.setThrown(error);
-            Logger.getLogger("org.geotools.referencing").log(record);
-            return;
-        }
-        if (!isReady) {
-            factory = null;
-            noConnection = true;
-            Logger.getLogger("org.geotools.referencing").warning(
-                "Failed to connect to the EPSG authority factory.\n" +
-                "This is a normal failure when no EPSG database is available on the current machine.\n" +
-                "No test will be performed for this class.");
-        }
+    protected void setUp() throws SQLException {
+        // Do not rely on FactoryFinder: we rely want to test this implementation,
+        // not an arbitrary implementation. The WKT-based factory for instance doesn't
+        // have suffisient capabilities for this test.
+        factory = new DefaultFactory();
+        factory.setDataSource(new HSQLDataSource());
     }
 
     /**
-     * Release any resources holds by the EPSG factory.
+     * Releases any resources holds by the EPSG factory.
+     * Note: the shutdown is performed in a separated thread because the thread
+     * name is used by HSQL as a flag meaning to stop the database process.
      */
-    protected void tearDown() throws FactoryException {
-        if (factory != null) {
-            factory.dispose();
-            factory = null;
-        }
+    protected void tearDown() throws InterruptedException {
+        final DefaultFactory f = factory;
+        final Thread shutdown = new Thread(FactoryUsingSQL.SHUTDOWN_THREAD) {
+            public void run() {
+                try {
+                    f.dispose();
+                } catch (FactoryException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        };
+        shutdown.start();
+        factory = null;
+        shutdown.join();
     }
 
     /**
      * Tests creations.
      */
     public void testCreation() throws FactoryException {
-        if (factory == null) return;
         final CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);
         CoordinateReferenceSystem sourceCRS, targetCRS;
         CoordinateOperation operation;
@@ -234,7 +205,6 @@ public class EPSGTest extends TestCase {
      * Tests the serialization of many {@link CoordinateOperation} objects.
      */
     public void testSerialization() throws FactoryException, IOException, ClassNotFoundException {
-        if (factory == null) return;
         CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem("4326");
         CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem("4322");
         CoordinateOperationFactory opf = FactoryFinder.getCoordinateOperationFactory(null);

@@ -8,27 +8,31 @@
   {@linkplain org.opengis.referencing.AuthorityFactory Authority factories} for
   the <A HREF="http://www.epsg.org">EPSG</A> database.
 
-  <H2>Windows installation with MS-Access database</H2>
-  <P ALIGN="justify">The EPSG database is available in MS-Access format. Installing this database
-  is the easiest way to get the EPSG factory running, since the MS-Access database can be copied
-  on yours local machine. You don't need the MS-Access software; only the ODBC driver for MS-Access
-  is required, and this driver is usually bundled with all Windows installation. Steps to follow:</P>
-  
-  <ul>
-    <li>Download the MS-Access EPSG database from <A HREF="http://www.epsg.org">http://www.epsg.org</A>
-        and copy the <code>EPSG_v6.mdb</code> anywhere in yours file system. You can rename it at yours
-        convenience.</li>
-    <li>Open the <cite>ODBC data sources</cite> dialog box from the Windows's Control Panel.</li>
-    <li>Click the <cite>Add...</cite> button and select <cite>Microsoft Access Driver (*.mdb)</cite>.</li>
-    <li>In the <cite>Data source</cite> field, enter <code>EPSG</code>.</li>
-    <li>Click on the <cite>Select...</cite> button and select yours (potentially renamed)
-        <code>EPSG_v6.mdb</code> file.</li>
-    <li>Make sure that the JAR file from {@code plugin/epsg-access} (which contains only the
-        {@link org.geotools.referencing.factory.epsg.AccessDataSource} class and its
-        {@code META-INF/services/} registration) is in yours classpath.</LI>
-  </ul>
+  <H2>Available plugins</H2>
+  <P ALIGN="justify">The following plugins are available:</P>
+  <TABLE ALIGN="center" BORDER="1" CELLPADDING="3">
+    <TR>
+      <TH>Required software</TH>
+      <TH>Data source</TH>
+      <TH>Plugin / JAR file</TH>
+      <TH>Additional notes</TH>
+    </TR>
+    <TR>
+      <TD>MS-Access ODBC driver</TD>
+      <TD>{@link org.geotools.referencing.factory.epsg.AccessDataSource}</TD>
+      <TD>{@code epsg-access}</TD>
+      <TD>See <A HREF="doc-files/Access.html">installation instructions</A></TD>
+    </TR>
+    <TR>
+      <TD>HSQL embedded database</TD>
+      <TD>{@link org.geotools.referencing.factory.epsg.HSQLDataSource}</TD>
+      <TD>{@code epsg-hsql}</TD>
+      <TD><A HREF="doc-files/HSQL.html">Note for module mainteners</A></TD>
+    </TR>
+  </TABLE>
 
-  <h2>Any platform installation</h2>
+  <P>&nbsp;</P>
+  <H2>How to create a custom data source</H2>
   <P ALIGN="justify">For getting the EPSG factory to uses a custom connection, create some subclass
   that implements Geotools's {@link org.geotools.referencing.factory.epsg.DataSource} interface. For
   example:</P>
@@ -60,7 +64,7 @@
   the specified server (providing that the relevant JDBC driver is present, of course).</P></LI>
 
 
-  <h2>Any platform installation with JNDI (usually J2EE)</h2>
+  <h3>Registration with JNDI (usually J2EE)</h3>
   <P ALIGN="justify">Installation on Unix systems typically has a database software running on some
   server rather than the local machine. The administrator will probably have to download the SQL
   scripts from <A HREF="http://www.epsg.org">http://www.epsg.org</A> and executes it in whatever database

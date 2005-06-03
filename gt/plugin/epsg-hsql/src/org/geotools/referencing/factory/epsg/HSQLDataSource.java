@@ -19,10 +19,15 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
+import java.io.File;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.logging.Logger;
 
 // Geotools dependencies
 import org.geotools.referencing.factory.FactoryGroup;
@@ -35,107 +40,172 @@ import org.hsqldb.jdbc.jdbcDataSource;
 /**
  * Connection to the EPSG database in HSQL database engine format using JDBC. The EPSG
  * database can be downloaded from <A HREF="http://www.epsg.org">http://www.epsg.org</A>.
- * It has been transformed into {@code HSQL.properties} and {@code HSQL.data} files in the
- * {@code epsg} directory. The database version is given in the
+ * The SQL scripts (modified for the HSQL syntax as <A HREF="doc-files/HSQL.html">explained
+ * here</A>) are bundled into this plugin. The database version is given in the
  * {@linkplain org.opengis.metadata.citation.Citation#getEdition edition attribute}
  * of the {@linkplain org.opengis.referencing.AuthorityFactory#getAuthority authority}.
  * The HSQL database is read only.
  * <P>
- * Just having this class accessible in the classpath, together with the registration in
- * the {@code META-INF/services/} directory, is suffisient to get a working EPSG authority
- * factory backed by this database. Vendors can create a copy of this class, modify it and
- * bundle it with their own distribution if they want to connect their users to an other
- * database.
+ * <H3>Implementation note</H3>
+ * The SQL scripts are executed the first time a connection is required. The database
+ * is then created as cached tables ({@code HSQL.properties} and {@code HSQL.data} files)
+ * in a temporary directory. Future connections to the EPSG database while reuse the cached
+ * tables, if available. Otherwise, the scripts will be executed again in order to recreate
+ * them.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Didier Richard
+ *
+ * @since 2.2
  */
 public class HSQLDataSource extends jdbcDataSource implements DataSource {
     /**
      * Creates a new instance of this data source
      */
     public HSQLDataSource() {
-        setDatabase("jdbc:hsqldb:res:org/geotools/referencing/factory/epsg/HSQL");
-        setUser    ("Geotools");
-        setPassword("Geotools");
+        File directory = new File(System.getProperty("java.io.tmpdir", "."), "Geotools");
+        if (directory.isDirectory() || directory.mkdir()) {
+            directory = new File(directory, "Cached databases");
+            if (directory.isDirectory() || directory.mkdir()) {
+                /*
+                 * Constructs the full path to the HSQL database. Note: we do not use
+                 * File.toURI() because HSQL doesn't seem to expect an encoded URL
+                 * (e.g. "%20" instead of spaces).
+                 */
+                final StringBuffer url = new StringBuffer("jdbc:hsqldb:file:");
+                final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
+                if (path.length()==0 || path.charAt(0)!='/') {
+                    url.append('/');
+                }
+                url.append(path);
+                if (url.charAt(url.length()-1) != '/') {
+                    url.append('/');
+                }
+                url.append("EPSG");
+                setDatabase(url.toString());
+            }
+            /*
+             * If the temporary directory do not exists or can't be created,
+             * lets the 'database' attribute unset. If the user do not set it
+             * explicitly (for example through JNDI), an exception will be thrown
+             * when 'getConnection()' will be invoked.
+             */
+        }
+        setUser("SA"); // System administrator. No password.
     }
 
     /**
      * Returns the priority for this data source. This priority is set to a lower value than
      * the {@linkplain AccessDataSource}'s one in order to give the priority to the Access-backed
-     * database, if presents.
+     * database, if presents. Priorities are set that way because:
+     * <ul>
+     *   <li>The MS-Access format is the primary EPSG database format.</li>
+     *   <li>If a user downloads the MS-Access database himself, he probably wants to use it.</li>
+     * </ul>
      */
     public int getPriority() {
         return NORMAL_PRIORITY-10;
     }
 
     /**
-     * Open a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
+     * Returns {@code true} if the database contains data. This method returns {@code false}
+     * if an empty EPSG database has been automatically created by HSQL and not yet populated.
+     */
+    private static boolean dataExists(final Connection connection) throws SQLException {
+        final ResultSet tables = connection.getMetaData().getTables(
+                null, null, "EPSG_%", new String[] {"TABLE"});
+        final boolean exists = tables.next();
+        tables.close();
+        return exists;
+    }
+
+    /**
+     * Opens a connection to the database. If the cached tables are not available,
+     * they will be created now from the SQL scripts bundled in this plugin.
+     */
+    public Connection getConnection() throws SQLException {
+        final String database = getDatabase();
+        if (database==null || database.trim().length()==0) {
+            /*
+             * The 'database' attribute is unset if the constructor has been unable
+             * to locate the temporary directory, or to create the subdirectory.
+             */
+            // TODO: localize
+            throw new SQLException("Can't write to the temporary directory.");
+        }
+        Connection connection = super.getConnection();
+        if (!dataExists(connection)) {
+            /*
+             * HSQL has created automatically an empty database. We need to populate it.
+             * Executes the SQL scripts bundled in the JAR. In theory, each line contains
+             * a full SQL statement. For this plugin however, we have compressed "INSERT
+             * INTO" statements using Compactor class in this package.
+             */
+            Logger.getLogger("org.geotools.referencing.factory").config("Creating cached EPSG database."); // TODO: localize
+            final Statement statement = connection.createStatement();
+            try {
+                final BufferedReader in = new BufferedReader(new InputStreamReader(
+                        HSQLDataSource.class.getResourceAsStream("EPSG.sql"), "ISO-8859-1"));
+                StringBuffer insertStatement = null;
+                String line;
+                while ((line=in.readLine()) != null) {
+                    line = line.trim();
+                    final int length = line.length();
+                    if (length != 0) {
+                        if (line.startsWith("INSERT INTO")) {
+                            /*
+                             * We are about to insert many rows into a single table.
+                             * The row values appear in next lines; the current line
+                             * should stop right after the VALUES keyword.
+                             */
+                            insertStatement = new StringBuffer(line);
+                            continue;
+                        }
+                        if (insertStatement != null) {
+                            /*
+                             * We are about to insert a row. Prepend the "INSERT INTO"
+                             * statement and check if we will have more rows to insert
+                             * after this one.
+                             */
+                            final int values = insertStatement.length();
+                            insertStatement.append(line);
+                            final boolean hasMore = (line.charAt(length-1) == ',');
+                            if (hasMore) {
+                                insertStatement.setLength(insertStatement.length()-1);
+                            }
+                            line = insertStatement.toString();
+                            insertStatement.setLength(values);
+                            if (!hasMore) {
+                                insertStatement = null;
+                            }
+                        }
+                        statement.execute(line);
+                    }
+                }
+                in.close();
+            } catch (IOException exception) {
+                statement.close();
+                SQLException e = new SQLException("Can't read the SQL script."); // TODO: localize
+                e.initCause(exception);
+                throw e;
+            }
+            statement.close();
+            connection.close();
+            connection = super.getConnection();
+            assert dataExists(connection);
+        }
+        return connection;
+    }
+
+    /**
+     * Opens a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
      *
      * @param  factories The low-level factories to use for CRS creation.
      * @return The EPSG factory using HSQLDB SQL syntax.
      * @throws SQLException if connection to the database failed.
      */
     public AbstractAuthorityFactory createFactory(final FactoryGroup factories) throws SQLException {
-        return new Factory(factories, getConnection());
-    }
-
-    /**
-     * Adapts SQL statements for HSQL. The HSQL database engine doesn't understand
-     * the parenthesis in (INNER JOIN ... ON) statements for the "BursaWolfParameters"
-     * query. Unfortunatly, those parenthesis are required by MS-Access. We need to
-     * removes them programmatically here.
-     *
-     * @todo Verify if we can get ride of this hack in a future HSQL version.
-     */
-    private static final class Factory extends FactoryUsingAnsiSQL {
-        /**
-         * The regular expression pattern for searching the "FROM (" clause.
-         * This is the pattern for the opening parenthesis.
-         */
-        private static final Pattern OPENING_PATTERN =
-                Pattern.compile("\\s+FROM\\s*\\(",
-                Pattern.CASE_INSENSITIVE);
-
-        /**
-         * Constructs the factory for the given connection to the HSQL database.
-         */
-        public Factory(final FactoryGroup factories, final Connection connection) {
-            super(factories, connection);
-        }
-
-        /**
-         * If the query contains a "FROM (" expression, remove the parenthesis.
-         */
-        public String adaptSQL(String query) {
-            query = super.adaptSQL(query);
-            final Matcher matcher = OPENING_PATTERN.matcher(query);
-            if (matcher.find()) {
-                final int opening = matcher.end()-1;
-                final int length  = query.length();
-                int closing = opening;
-                for (int count=0; ; closing++) {
-                    if (closing >= length) {
-                        // Should never happen with well formed SQL statement.
-                        // If it happen anyway, don't change anything and let
-                        // the HSQL driver produces a "syntax error" message.
-                        return query;
-                    }
-                    switch (query.charAt(closing)) {
-                        case '(': count++; break;
-                        case ')': count--; break;
-                        default : continue;
-                    }
-                    if (count == 0) {
-                        break;
-                    }
-                }
-                query = query.substring(0,         opening) +
-                        query.substring(opening+1, closing) +
-                        query.substring(closing+1);
-            }
-            return query;
-        }
+        return new FactoryUsingHSQL(factories, getConnection());
     }
 }

@@ -191,8 +191,8 @@ public class DefaultFactory extends DeferredAuthorityFactory {
             datasources.scanForPlugins();
             datasources.setOrdering(category, new Comparator() {
                 public int compare(final Object f1, final Object f2) {
-                    return ((DataSource) f2).getPriority() -
-                           ((DataSource) f1).getPriority();
+                    return ((DataSource) f1).getPriority() -
+                           ((DataSource) f2).getPriority();
                 }
             });
         }
@@ -327,7 +327,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
 
     /**
      * Called when this factory is added to the given {@code category} of the given
-     * {@code registry}  The object may already be registered under another category.
+     * {@code registry}. The object may already be registered under another category.
      */
     public synchronized void onRegistration(final ServiceRegistry registry, final Class category) {
         super.onRegistration(registry, category);
@@ -340,13 +340,15 @@ public class DefaultFactory extends DeferredAuthorityFactory {
          * deregistered.
          */
         if (shutdown == null) {
-            shutdown = new Thread("EPSG factory shutdown") {
+            shutdown = new Thread(FactoryUsingSQL.SHUTDOWN_THREAD) {
                 public void run() {
-                    try {
-                        dispose();
-                    } catch (FactoryException exception) {
-                        // To late for logging, since the JVM is
-                        // in process of shutting down. Ignore...
+                    synchronized (DefaultFactory.this) {
+                        try {
+                            dispose();
+                        } catch (FactoryException exception) {
+                            // To late for logging, since the JVM is
+                            // in process of shutting down. Ignore...
+                        }
                     }
                 }
             };

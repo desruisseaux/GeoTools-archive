@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>Creating EPSG database for HSQL</TITLE>
+  </HEAD>
+  <BODY>
+    <H1>Creating EPSG database for HSQL</H1>
+    <P ALIGN="justify">The following gives some hints for creating a HSQL database
+    and populate it with EPSG data from the SQL scripts.</P>
+    <UL>
+      <LI><P>Copy the <CODE><A HREF="sqltool.rc">sqltool.rc</A></CODE> file in the developper's
+      home directory and edit it URL path provided in this file.</P></LI>
+
+      <LI><P>Prepare a copy of EPSG's SQL scripts and modify them for HSQL syntax. The
+      following <A HREF="PrepareForHSQL.xml">Ant file</A> can be used for this purpose.</P></LI>
+
+      <LI><P>Creates the database using the following commands:</P>
+<BLOCKQUOTE><PRE>java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_v66.hsql_Tables.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_v66.hsql_Data.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_v66.hsql_FKeys.sql</PRE></BLOCKQUOTE></LI>
+
+      <LI><P>Launch the following application:</P></LI>
+<BLOCKQUOTE><PRE>java org.hsqldb.util.DatabaseManagerSwing</PRE></BLOCKQUOTE></LI>
+
+      <P>Make sure the database is okay, and invoke the following commands:</P>
+<BLOCKQUOTE><PRE>SCRIPT 'EPSG.sql';
+SHUTDOWN COMPACT;</PRE></BLOCKQUOTE></LI>
+
+      <LI><P>Quit the application. Edit the <CODE>EPSG.sql</CODE> script as below:</P>
+      <UL>
+        <LI>Remove the <CODE>SET DELAY 60</CODE> statement; 60 is already the default.</LI>
+
+        <LI>Remove the <CODE>CREATE USER "SA"</CODE> statement; this user will exists
+            before the script is run.</LI>
+
+        <LI>In the table <CODE>EPSG_DATUM</CODE>, change the type of column <CODE>REALIZATION_EPOCH</CODE>
+            to <CODE>INTEGER</CODE>.</LI>
+
+        <LI>Copy all <CODE>ALTER TABLE ... FOREIGN KEY</CODE> statements to the end of the script.</LI>
+
+        <LI>Remove all <CODE>CONSTRAINT ... FOREIGN KEY</CODE> from the <CODE>CREATE TABLE</CODE>
+            statements at the begining of the script, and move them as <CODE>ALTER TABLE ... FOREIGN KEY</CODE>
+            statements at the end of the script.</LI>
+
+        <LI>Add <CODE>SHUTDOWN COMPACT</CODE> statement at the end of file.</LI>
+
+      </UL></LI>
+
+      <LI><P>Run the following commands:</P>
+<BLOCKQUOTE><PRE>java org.geotools.referencing.factory.epsg.Compactor</PRE></BLOCKQUOTE></LI>
+
+      <LI><P>Copy the file created in the above step into the
+          <CODE>org.geotools.referencing.factory.epsg</CODE> package directory
+          using "<CODE>EPSG.sql</CODE>" filename. Finally, create the JAR file
+          as usual, which should includes the <CODE>EPSG.sql</CODE> script.<P></LI>
+    </UL>
+  </BODY>
+</HTML>

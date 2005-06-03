@@ -133,6 +133,36 @@ public class BursaWolfParameters extends Formattable implements Cloneable, Seria
                  0,       0,       0,   1
         });
     }
+
+    /**
+     * Sets <strong>approximatively</strong> the Bursa-Wolf parameters from an affine transform.
+     * This method is approximative because not all affine transforms can be retrofitted in a set
+     * of Bursa-Wolf parameters. The matrix must be symetric except for the last column (which
+     * contains the translation terms). This method accepts matrix that doesn't meet this symetry
+     * condition, but the result for such matrix is not garanteed.
+     *
+     * @todo Current algorithm for non-symetric matrix is somewhat simplist. We need to revisit
+     *       it for a more rigorous approach, maybe using some fitting in the least square sense.
+     *
+     * @since 2.2
+     */
+    public void setAffineTransform(final Matrix matrix) {
+        if (matrix.getNumRow()!=4 || matrix.getNumCol()!=4) {
+            // TODO: provides a localized message. Also checks for affine transform.
+            throw new IllegalArgumentException();
+        }
+        final double S = (matrix.getElement(0, 0) +
+                          matrix.getElement(1, 1) +
+                          matrix.getElement(2, 2)) / 3;
+        final double RS = 0.5 / ((Math.PI/(180*3600)) * S);
+        ppm = (S-1) * 1E+6;
+        ex = (matrix.getElement(2, 1) - matrix.getElement(1, 2)) * RS;
+        ey = (matrix.getElement(0, 2) - matrix.getElement(2, 0)) * RS;
+        ez = (matrix.getElement(1, 0) - matrix.getElement(0, 1)) * RS;
+        dx =  matrix.getElement(0, 3);
+        dy =  matrix.getElement(1, 3);
+        dz =  matrix.getElement(2, 3);
+    }
     
     /**
      * Returns a hash value for this object.

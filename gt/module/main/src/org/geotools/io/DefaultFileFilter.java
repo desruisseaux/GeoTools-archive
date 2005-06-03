@@ -21,9 +21,9 @@ package org.geotools.io;
 
 // J2SE dependencies
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.regex.Pattern;
-import javax.swing.filechooser.FileFilter;
 
 
 /**
@@ -34,10 +34,11 @@ import javax.swing.filechooser.FileFilter;
  *
  * @since 2.0
  */
-public class DefaultFileFilter extends FileFilter implements java.io.FileFilter, FilenameFilter {
+public class DefaultFileFilter extends javax.swing.filechooser.FileFilter
+                            implements FileFilter, FilenameFilter
+{
     /**
-     * The description of this filter, usually
-     * for graphical user interfaces.
+     * The description of this filter, usually for graphical user interfaces.
      */
     private final String description;
 
@@ -73,8 +74,8 @@ public class DefaultFileFilter extends FileFilter implements java.io.FileFilter,
             final char c = pattern.charAt(i);
             if (!Character.isLetterOrDigit(c)) {
                 switch (c) {
-                    case '?': // Fall through
-                    case '*': buffer.append('.');  break;
+                    case '?': buffer.append('.' ); continue;
+                    case '*': buffer.append(".*"); continue;
                     default : buffer.append('\\'); break;
                 }
             }
@@ -95,20 +96,18 @@ public class DefaultFileFilter extends FileFilter implements java.io.FileFilter,
      * Tests if a specified file matches the pattern.
      *
      * @param  file The file to be tested.
-     * @return {@code true} if and only if
-     *         the name matches the pattern.
+     * @return {@code true} if and only if the name matches the pattern.
      */
     public boolean accept(final File file) {
         return (file!=null) && pattern.matcher(file.getName()).matches();
     }
-    
+
     /**
      * Tests if a specified file matches the pattern.
      *
      * @param  dir    the directory in which the file was found.
      * @param  name   the name of the file.
-     * @return {@code true} if and only if
-     *         the name matches the pattern.
+     * @return {@code true} if and only if the name matches the pattern.
      */
     public boolean accept(File dir, String name) {
         return (name!=null) && pattern.matcher(name).matches();

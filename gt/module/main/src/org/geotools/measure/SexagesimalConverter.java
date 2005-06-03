@@ -40,6 +40,16 @@ import javax.units.ConversionException;
  */
 class SexagesimalConverter extends Converter {
     /**
+     * Serial number for compatibility with different versions.
+     */
+    private static final long serialVersionUID = 3873494343412121773L;
+
+    /**
+     * Small tolerance factor for rounding errors.
+     */
+    private static final double EPS = 1E-8;
+
+    /**
      * The value to divide DMS unit by.
      * For "degree minute second" (EPSG code 9107), this is 1.
      * For "sexagesimal degree" (EPSG code 9110), this is 10000.
@@ -86,6 +96,7 @@ class SexagesimalConverter extends Converter {
         final int deg,min,sec;  deg = (int) value; // Round toward 0
         value = (value-deg)*60; min = (int) value; // Round toward 0
         value = (value-min)*60; sec = (int) value; // Round toward 0
+        value -= sec;          // The remainer (fraction of seconds)
         return (((deg*100 + min)*100 + sec) + value)/divider;
     }
 
@@ -115,13 +126,18 @@ class SexagesimalConverter extends Converter {
      * Returns a hash value for this converter.
      */
     public int hashCode() {
-        return 568378689 + divider;
+        return (int)serialVersionUID + divider;
     }
 
     /**
      * The inverse of {@link SexagesimalConverter}.
      */
     private static final class Inverse extends SexagesimalConverter {
+        /**
+         * Serial number for compatibility with different versions.
+         */
+        private static final long serialVersionUID = -7171869900634417819L;
+
         /**
          * Constructs a converter.
          */
@@ -134,14 +150,24 @@ class SexagesimalConverter extends Converter {
          */
         public double convert(double value) throws ConversionException {
             value *= this.divider;
-            final int deg,min;
+            int deg,min;
             deg = (int) (value/10000); value -= 10000*deg;
             min = (int) (value/  100); value -=   100*min;
             if (min<=-60 || min>=60) {  // Accepts NaN
-                throw new ConversionException("Invalid minutes: "+min);
+                if (Math.abs(Math.abs(min) - 100) <= EPS) {
+                    if (min >= 0) deg++; else deg--;
+                    min = 0;
+                } else {
+                    throw new ConversionException("Invalid minutes: "+min);
+                }
             }
             if (value<=-60 || value>=60) { // Accepts NaN
-                throw new ConversionException("Invalid secondes: "+value);
+                if (Math.abs(Math.abs(value) - 100) <= EPS) {
+                    if (value >= 0) min++; else min--;
+                    value = 0;
+                } else {
+                    throw new ConversionException("Invalid secondes: "+value);
+                }
             }
             value = ((value/60) + min)/60 + deg;
             return value;
@@ -151,7 +177,7 @@ class SexagesimalConverter extends Converter {
          * Returns a hash value for this converter.
          */
         public int hashCode() {
-            return 457829627 + divider;
+            return (int)serialVersionUID + divider;
         }
     }
 }

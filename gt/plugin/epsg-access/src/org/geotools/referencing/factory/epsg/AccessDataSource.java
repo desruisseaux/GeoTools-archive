@@ -45,6 +45,8 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @since 2.1
  */
 public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements DataSource {
     /**

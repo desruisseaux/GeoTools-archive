@@ -6,14 +6,11 @@
   <id>epsg-hsql</id>
   <currentVersion>2.1.x</currentVersion>
   <package>org.geotools.referencing</package>
-  <shortDescription>EPSG Authoriy Service</shortDescription>
+  <shortDescription>EPSG Authoriy Service using HSQL database</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>
     Connection to an embedded EPSG database in HSQL format.
     This is database is built from the SQL scripts delivered by EPSG.
-    This plugin is very short and the code contains nothing else than
-    connection parameters through the use of a jar embedding the HSQL
-    files.
   </description>
   <developers>
     <developer>
@@ -53,9 +50,8 @@
       <resource>
         <directory>${basedir}/src</directory>
         <includes>
-          <!-- The following seems to fail, not sure why -->
           <include>META-INF/services/**</include>
-          <include>org/geotools/referencing/factory/epsg/HSQL.*</include>
+          <include>**/*.sql</include>
         </includes>
       </resource>
     </resources>
