@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.Set;
 
+import javax.sql.PooledConnection;
+
 
 /**
  * Provide common functionality for DB2 plug-in testcases.
@@ -115,9 +117,9 @@ public class DB2TestCase extends TestCase {
         poolDataSource.setServerName(host);
         poolDataSource.setDriverType(4);
 
-        DB2PooledConnection pc = (DB2PooledConnection) poolDataSource
+        PooledConnection pc = (PooledConnection) poolDataSource
             .getPooledConnection();
-        pc.setDatabaseName(dbname);
+//        pc.setDatabaseName(dbname);
 
         Connection conn = pc.getConnection();
 

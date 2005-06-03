@@ -52,7 +52,7 @@ public class DB2CoordinateSystemTest extends DB2TestCase {
     public void testCreate() {
         // Should succeed for srid 1		
         try {
-            DB2CoordinateSystem cs = new DB2CoordinateSystem(conn, 1);
+            DB2CoordinateSystem cs = new DB2CoordinateSystem(this.conn, 1);
             assertEquals("GCS_NORTH_AMERICAN_1983=EPSG:4269", cs.toString());
         } catch (SQLException e) {
             // Shouldn't get here

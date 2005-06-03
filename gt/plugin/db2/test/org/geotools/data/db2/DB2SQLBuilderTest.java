@@ -16,10 +16,26 @@
  */
 package org.geotools.data.db2;
 
+import java.io.IOException;
+
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
+
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.LikeFilter;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.SQLEncoderException;
 
 
 /**
@@ -29,7 +45,7 @@ import org.geotools.feature.AttributeTypeFactory;
  */
 public class DB2SQLBuilderTest extends DB2TestCase {
     private DB2SQLBuilder sqlBuilder = null;
-
+    private DB2DataStore dataStore = null;
     /**
      * Setup creates an encoder and SQLBuilder
      *
@@ -37,12 +53,38 @@ public class DB2SQLBuilderTest extends DB2TestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
-
+        this.dataStore = getDataStore();
         SQLEncoderDB2 encoder = new SQLEncoderDB2();
         encoder.setSqlNameEscape("\"");
-        sqlBuilder = new DB2SQLBuilder(encoder, tabSchema, "Test");
+        sqlBuilder = (DB2SQLBuilder) dataStore.getSqlBuilder("Places");
     }
-    
+    public void testPredicates() throws IllegalFilterException, SQLEncoderException, IOException {
+    	String typeName = "Places";
+		FeatureSource fs = dataStore.getFeatureSource("Places");
+		FeatureType ft = fs.getSchema();
+		FilterFactory ff = FilterFactory.createFilterFactory();
+		LikeFilter lf = ff.createLikeFilter();
+		AttributeExpression nameColumn = ff.createAttributeExpression(ft,"Name");
+		LiteralExpression likeExpression = ff.createLiteralExpression("Woo*");
+		lf.setPattern("s.met*s","*", ".","\\");
+		String pattern = "s.met*s";
+		lf.setValue(nameColumn);
+		DefaultQuery query = new DefaultQuery("Places", lf);
+		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+        Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
+        String[] attrNames = new String[ft.getAttributeCount()];
+        AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
+
+        for (int i = 0; i < ft.getAttributeCount(); i++) {
+            attrNames[i] = ft.getAttributeType(i).getName();
+            attrTypes[i] = ft.getAttributeType(i);
+        }
+
+
+		String likeQuery = this.sqlBuilder.buildSQLQuery("Places", 
+				this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
+		assertEquals("LIKE encoding failed", "SELECT \"Id\", \"Name\", \"Geom\"..ST_AsText() FROM \"Test\".\"Places\" WHERE \"Name\" LIKE 's_met%s'", likeQuery);
+    }
     public void testSqlFrom() {
         
         StringBuffer sb;

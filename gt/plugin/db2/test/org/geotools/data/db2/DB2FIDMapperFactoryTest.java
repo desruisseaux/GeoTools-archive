@@ -32,7 +32,7 @@ import java.sql.SQLException;
  * @author David Adler - IBM Corporation
  */
 public class DB2FIDMapperFactoryTest extends DB2TestCase {
-    public void testIsAutoIncrement() throws Exception {
+    public void testMappers() throws Exception {
         String catalog = null;
         String schema = null;
         String tableName = null;
@@ -63,7 +63,7 @@ public class DB2FIDMapperFactoryTest extends DB2TestCase {
        	tableName = "FIDINTPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);   
         wrapperDesc = toString(fm);
-        assertEquals(tableName, wrapperDesc, "class org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper:1:IDCOL:12:255:255:false:false:");
+        assertEquals(tableName, wrapperDesc, "class org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper:1:IDCOL:12:255:255:true:false:");
         
         conn = getLocalConnection();
        	tableName = "FIDVCHARPRIKEY";
@@ -75,7 +75,7 @@ public class DB2FIDMapperFactoryTest extends DB2TestCase {
        	tableName = "FIDMCOLPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);   
         wrapperDesc = toString(fm);
-        assertEquals(tableName, wrapperDesc, "class org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper:2:IDCOL1:1:32:32:false:false:");
+        assertEquals(tableName, wrapperDesc, "class org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper:2:IDCOL1:1:32:32:true:false:");
 
         
         // Don't know why, but DefaultFIDFactory.getPkColumnInfo closes the connection
