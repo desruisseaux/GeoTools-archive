@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -75,6 +76,7 @@ import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.xml.sax.SAXException;
@@ -703,13 +705,14 @@ public class WFSDataStore extends AbstractDataStore {
         // TODO modify bbox requests here
         FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities,query.getTypeName());
         
-        Envelope maxbbox = fsd.getLatLongBoundingBox();
-        CoordinateReferenceSystem crs = null;
+        Envelope maxbbox = null;
+        CoordinateReferenceSystem dataCRS = null;
         if(fsd.getSRS()!=null){
             // reproject this
             try {
-                crs = CRS.decode(fsd.getSRS());
-                maxbbox = JTS.toGeographic(maxbbox,crs);
+                dataCRS = CRS.decode(fsd.getSRS());
+                MathTransform toDataCRS = CRS.transform( DefaultGeographicCRS.WGS84, dataCRS );
+                maxbbox = JTS.transform( fsd.getLatLongBoundingBox(), toDataCRS, 10 );                
             } catch (FactoryException e) {
                 WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
             } catch (MismatchedDimensionException e) {
@@ -718,12 +721,18 @@ public class WFSDataStore extends AbstractDataStore {
                 WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
             }
         }
-        if(maxbbox!=null){
-            WFSBBoxFilterVisitor bfv = new WFSBBoxFilterVisitor(maxbbox);
-            filters[0].accept(bfv);
-        }else{
-            filters[0] = Filter.ALL;
+        else {
+            maxbbox = fsd.getLatLongBoundingBox();
         }
+        // Rewrite request if we have a mxxbox
+        if(maxbbox!=null){
+            WFSBBoxFilterVisitor clipVistor = new WFSBBoxFilterVisitor(maxbbox);
+            filters[0].accept(clipVistor);
+        } else { // give up an request everything
+            LOGGER.log( Level.FINE, "Unable to clip your query against the latlongboundingbox element" );
+            // filters[0] = Filter.ALL; // uncoment this line to just give up
+        }
+        
         ((DefaultQuery)query).setFilter(filters[0]);
         if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
             try {
@@ -769,7 +778,8 @@ public class WFSDataStore extends AbstractDataStore {
                     t = new FilteringFeatureReader(t, filters[1]);
                 }
                 FeatureReader tmp = t;
-                if (query.getCoordinateSystem()!=null){
+                if (query.getCoordinateSystem() !=null &&
+                    !query.getCoordinateSystem().equals( t.getFeatureType().getDefaultGeometry().getCoordinateSystem())){
                     try {
                         t = new ForceCoordinateSystemFeatureReader(t,query.getCoordinateSystem());
                     } catch (SchemaException e) {
@@ -777,11 +787,11 @@ public class WFSDataStore extends AbstractDataStore {
                         t = tmp;
                     }
                 }else{
-                    if(t.getFeatureType().getDefaultGeometry()!= null && crs!=null &&
+                    if(t.getFeatureType().getDefaultGeometry()!= null && dataCRS!=null &&
                             t.getFeatureType().getDefaultGeometry().getCoordinateSystem()== null){
                         // set up crs
                         try {
-                            t = new ForceCoordinateSystemFeatureReader(t,crs);
+                            t = new ForceCoordinateSystemFeatureReader(t,dataCRS);
                         } catch (SchemaException e) {
                             WFSDataStoreFactory.logger.warning(e.toString());
                             t = tmp;
@@ -920,3 +930,4 @@ public class WFSDataStore extends AbstractDataStore {
         }
     }
 }
+
