@@ -546,6 +546,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 }else{
                     LOGGER.fine("Got a tranform exception while trying to de-project the current "
                             + "envelope, falling back on full data loading (no bbox query)");
+                    q.setFilter( Filter.NONE );
                 }
                 query = q;
             }
@@ -582,7 +583,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             results = indexedFeatureResults;
         } 
         else 
-        {
+        {   // insert a debug point here to check your query
             results = featureSource.getFeatures(query);
         }
 

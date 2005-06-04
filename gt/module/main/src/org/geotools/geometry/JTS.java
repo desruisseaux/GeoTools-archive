@@ -19,6 +19,12 @@
 package org.geotools.geometry;
 
 // OpenGIS dependencies
+import java.util.NoSuchElementException;
+
+import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -26,17 +32,9 @@ import org.opengis.referencing.operation.OperationNotFoundException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
-import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
-import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-
-// JTS dependencies
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -126,8 +124,8 @@ public class JTS {
         	offset+=4;
         }
         
-        
-        transform.transform(coordsEnvPoly, 0, newCoords, 0, npoints*4);
+        xform(transform, coordsEnvPoly, newCoords, 2);
+//        transform.transform(coordsEnvPoly, 0, newCoords, 0, npoints*4);
         
         // now find the min/max of the result
         Envelope result = new Envelope();
@@ -140,6 +138,65 @@ public class JTS {
         return result;
     }
 
+    /**
+     * Like a transform but eXtreme!
+     * 
+     * Transforms an array of coordinate using the provided math transform.  
+     * Each Coordinate is transformed seperately. In case of a transform exception then the new value
+     * of the coordinate is the last coordinate correctly transformed.
+     *
+     * @param mt
+     * @param src
+     * @param dest
+     * @throws TransformException
+     */
+    public static void xform(MathTransform mt, double[] src, double[] dest, int dimensions) throws TransformException{
+        xform(mt, src, dest, dimensions, .1f);
+    }
+    /**
+     * Like a transform but eXtreme!
+     * 
+     * Transforms an array of coordinate using the provided math transform.  
+     * Each Coordinate is transformed seperately. In case of a transform exception then the new value
+     * of the coordinate is the last coordinate correctly transformed.
+     *
+     * @param mt
+     * @param src
+     * @param dest
+     * @throws TransformException
+     */
+    public static void xform(MathTransform mt, double[] src, double[] dest, int dimensions, 
+            float failureThreshold ) throws TransformException{
+        int numCoords=dest.length/2;
+        int failures=0;
+        int threshold=(int) ((float)numCoords*failureThreshold);
+        boolean startPointTransformed=true;
+        for( int i=0; i<dest.length; i+=dimensions){
+            try{
+                mt.transform(src, i, dest, i, 1);
+                if ( !startPointTransformed ){
+                    startPointTransformed=true;
+                    for (int j = 0; j < i; j++) {
+                        dest[j]=src[i-dimensions];
+                    }
+                }
+            }catch (TransformException e) {
+                failures++;
+                if( i==0 ){
+                    startPointTransformed=false;
+                } else
+                if( startPointTransformed ){
+                    for( int j = i-dimensions; j < dimensions; j++ ) {
+                        dest[j]=src[i-dimensions];                        
+                    }
+                }
+            }
+        }
+        if( !startPointTransformed ){
+            throw new TransformException("Unable to transform any of the points in the shape");
+        }
+    }
+    
     
     /**
      * Transforms the Envelope using the MathTransform.

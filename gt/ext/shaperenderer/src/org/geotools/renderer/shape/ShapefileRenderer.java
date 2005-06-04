@@ -262,7 +262,7 @@ public class ShapefileRenderer {
 				MathTransform mt;
 				try {
 					mt = CRS.transform(dataCRS, destinationCrs, true);
-					bbox = JTS.transform(bbox, mt.inverse());
+					bbox = JTS.transform(bbox, mt.inverse(), 10);
 				} catch (Exception e) {
 					mt = null;
 				}
