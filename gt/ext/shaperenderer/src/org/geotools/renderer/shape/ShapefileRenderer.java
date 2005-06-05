@@ -226,7 +226,7 @@ public class ShapefileRenderer {
 		 */
 		if (concatTransforms) {
 			AffineTransform atg = graphics.getTransform();
-			graphics.setTransform(new AffineTransform());
+//			graphics.setTransform(new AffineTransform());
 			atg.concatenate(transform);
 			transform = atg;
 		}
