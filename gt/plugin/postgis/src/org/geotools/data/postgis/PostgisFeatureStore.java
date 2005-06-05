@@ -85,13 +85,13 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
     /** Well Known Text writer (from JTS). */
-    private static WKTWriter geometryWriter = new WKTWriter();
+    protected static WKTWriter geometryWriter = new WKTWriter();
 
     /** Factory for producing geometries (from JTS). */
-    private static GeometryFactory geometryFactory = new GeometryFactory();
+    protected static GeometryFactory geometryFactory = new GeometryFactory();
 
     /** Well Known Text reader (from JTS). */
-    private static WKTReader geometryReader = new WKTReader(geometryFactory);
+    protected static WKTReader geometryReader = new WKTReader(geometryFactory);
 
     /** Error message prefix for sql connection errors */
     protected static final String CONN_ERROR = "Some sort of database connection error: ";

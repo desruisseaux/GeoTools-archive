@@ -110,7 +110,7 @@ import java.util.logging.Logger;
  */
 public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** The logger for the postgis module. */
-    private static final Logger LOGGER = Logger.getLogger(
+    protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.postgis");
 
     /** Map of postgis geometries to jts geometries */
@@ -1183,7 +1183,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             if (OPTIMIZE_MODE == OPTIMIZE_SQL) {
                 LOGGER.fine("returning pg feature locking");
 
-                return new PostgisFeatureLocking(this, getSchema(typeName));
+                return createFeatureLockingInternal(this, getSchema(typeName));
             }
 
             // default
@@ -1206,6 +1206,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
+    public PostgisFeatureLocking createFeatureLockingInternal(
+		PostgisDataStore ds, FeatureType type
+	) throws IOException {
+    	
+    	return new PostgisFeatureLocking(ds,type);
+    }
+    
     /**
      * DOCUMENT ME!
      *

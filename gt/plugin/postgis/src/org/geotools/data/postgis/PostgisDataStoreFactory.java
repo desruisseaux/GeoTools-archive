@@ -190,9 +190,9 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         PostgisDataStore dataStore;
 
         if (namespace != null) {
-            dataStore = new PostgisDataStore(pool, namespace);
+        	dataStore = createDataStoreInternal(pool,namespace);
         } else {
-            dataStore = new PostgisDataStore(pool);
+        	dataStore = createDataStoreInternal(pool);
         }
 
         if (wkb_enabled != null) {
@@ -204,6 +204,19 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         }
         
         return dataStore;
+    }
+    
+    protected PostgisDataStore createDataStoreInternal(ConnectionPool pool)
+    	throws IOException {
+    	
+    	return new PostgisDataStore(pool);
+    }
+    
+    protected PostgisDataStore createDataStoreInternal(
+		ConnectionPool pool, String namespace
+	) throws IOException {
+    	
+    	return new PostgisDataStore(pool, namespace);
     }
 
     /**
