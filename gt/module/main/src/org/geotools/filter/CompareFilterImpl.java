@@ -159,50 +159,90 @@ public class CompareFilterImpl extends AbstractFilterImpl
             // Non-math comparison
 
 	if (!(leftValue.getValue(feature) instanceof Number && 
-	      rightValue.getValue(feature) instanceof Number)){
-            if (filterType == COMPARE_EQUALS) {
-                if (LOGGER.isLoggable(Level.FINEST)) {
-                    LOGGER.finest("is equals thingy");
-                    LOGGER.finest("left value class: "
-                        + leftValue.getValue(feature).getClass().toString());
-                    LOGGER.finest("right value class: "
-                        + rightValue.getValue(feature).getClass().toString());
-                }
-
-		return leftValue.getValue(feature).equals(rightValue.getValue(
-                        feature));
+	      rightValue.getValue(feature) instanceof Number))
+	{
+		
+		if (LOGGER.isLoggable(Level.FINEST)) 
+        {
+            LOGGER.finest("is equals thingy");
+            LOGGER.finest("left value class: "
+                + leftValue.getValue(feature).getClass().toString());
+            LOGGER.finest("right value class: "
+                + rightValue.getValue(feature).getClass().toString());
+        }
+		
+		    Object leftObj = leftValue.getValue(feature);
+		    Object rightObj = rightValue.getValue(feature);
+		    
+		    if (!(leftObj.getClass() == rightObj.getClass()))  //both Number case handled above
+		    {
+		    	if ( (Number.class.isAssignableFrom( leftObj.getClass() )) && (rightObj.getClass() == String.class) )
+		    	{
+		    		try{
+		    			rightObj = new Double( Double.parseDouble( (String) rightObj ));
+		    			leftObj  = new Double(  ((Number) leftObj).doubleValue() );
+		    		}
+		    		catch(Exception e)
+					{
+				    	leftObj = leftObj.toString();
+				    	rightObj = rightObj.toString();
+					}
+		    	}
+		    	else if ( (leftObj.getClass() == String.class) && (Number.class.isAssignableFrom( rightObj.getClass() )) )
+		    	{
+		    		try{
+		    			leftObj = new Double( Double.parseDouble( (String) leftObj ) );
+		    			rightObj  = new Double(  ((Number) rightObj).doubleValue() );
+		    		}
+		    		catch(Exception e)
+					{
+				    	leftObj = leftObj.toString();
+				    	rightObj = rightObj.toString();
+					}
+		    	}
+		    	else
+		    	{
+		    		leftObj = leftObj.toString();
+		    		rightObj = rightObj.toString();
+		    	}
+		    }
+		
+            if (filterType == COMPARE_EQUALS)    // non number-number 
+            {
+            		return leftObj.equals(rightObj);   	
             }
 
-            if (filterType == COMPARE_NOT_EQUALS) {
-                return !leftValue.getValue(feature).equals(rightValue.getValue(
-                        feature));
+            if (filterType == COMPARE_NOT_EQUALS) 
+            {
+            	return (!(leftObj.equals(rightObj)));
             }
-	    Object leftObj = leftValue.getValue(feature);
-	    Object rightObj = rightValue.getValue(feature);
-	    if (leftObj.getClass() == rightObj.getClass() &&
-		leftObj instanceof Comparable) {
-		Comparable leftComp = (Comparable)leftObj;
-		Comparable rightComp = (Comparable)rightObj;
-		int comparison = leftComp.compareTo(rightComp);
-		if (filterType == COMPARE_LESS_THAN) {
-		    return (comparison < 0);
-		}
-		
-		if (filterType == COMPARE_GREATER_THAN) {
-		    return (comparison > 0);
-		}
-		
-		if (filterType == COMPARE_LESS_THAN_EQUAL) {
-		    return (comparison <= 0);
-		}
-		
-		if (filterType == COMPARE_GREATER_THAN_EQUAL) {
-		    return (comparison >= 0);
-		} else {
-		    throw new IllegalArgumentException();
-		}
-
-            }
+		   
+		    if (leftObj.getClass() == rightObj.getClass() &&
+		    		leftObj instanceof Comparable) 
+		    {
+				Comparable leftComp = (Comparable)leftObj;
+				Comparable rightComp = (Comparable)rightObj;
+				int comparison = leftComp.compareTo(rightComp);
+				if (filterType == COMPARE_LESS_THAN) {
+				    return (comparison < 0);
+				}
+				
+				if (filterType == COMPARE_GREATER_THAN) {
+				    return (comparison > 0);
+				}
+				
+				if (filterType == COMPARE_LESS_THAN_EQUAL) {
+				    return (comparison <= 0);
+				}
+				
+				if (filterType == COMPARE_GREATER_THAN_EQUAL) {
+				    return (comparison >= 0);
+				} 
+		    }
+			else 
+			{
+			    throw new IllegalArgumentException();
+			}   
 	}
             // Math comparisons
             double leftResult = ((Number) leftValue.getValue(feature))
@@ -333,4 +373,6 @@ public class CompareFilterImpl extends AbstractFilterImpl
     public void accept(FilterVisitor visitor) {
         visitor.visit(this);
     }
+    
+   
 }
