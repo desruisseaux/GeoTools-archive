@@ -4,7 +4,7 @@
  <extend>${basedir}/../../project.xml</extend>
  <name>geotools-image</name>
  <id>image</id>
- <currentVersion>2.1.x</currentVersion>
+ <currentVersion>2.2.x</currentVersion>
  <package>org.geotools</package>
  <shortDescription>WorldImage datasource module</shortDescription>
  <description>Datasource created to read images georeferenced by a world file</description>
@@ -30,7 +30,7 @@
   <dependency>
    <artifactId>main</artifactId>
    <groupId>gt2</groupId>
-   <version>2.1.x</version>
+   <version>2.2.x</version>
   </dependency>
   <dependency>
    <groupId>JTS</groupId>
@@ -59,7 +59,7 @@
   <dependency>
    <groupId>gt2</groupId>
    <artifactId>epsg-wkt</artifactId>
-   <version>2.1.x</version>
+   <version>2.2.x</version>
    <type>jar</type>
   </dependency>
  </dependencies>

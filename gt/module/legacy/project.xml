@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-legacy</name>
   <id>legacy</id>
-  <currentVersion>2.1.x</currentVersion>
+  <currentVersion>2.2.x</currentVersion>
   <shortDescription>Geotools</shortDescription>
   <description>This module contains code which has been depricated.  It exists to help users whilst updating their code and to support the 'migrate' module which contains 
   core geotools code which needs to be updated before it can move back into main.
@@ -26,7 +26,7 @@
      <dependency>
       <id>main</id>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
 
     <dependency>

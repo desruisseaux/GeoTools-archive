@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-property</name>
   <id>property</id>
-  <currentVersion>2.1.x</currentVersion>
+  <currentVersion>2.2.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>property datastore demo</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>gt2</groupId>
       <artifactId>main</artifactId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
     <dependency>
       <groupId>JTS</groupId>

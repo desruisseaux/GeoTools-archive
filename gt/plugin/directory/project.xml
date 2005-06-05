@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-dir</name>
   <id>dir_ds</id>
-  <currentVersion>2.1.x</currentVersion>
+  <currentVersion>2.2.x</currentVersion>
   <package>org.geotools</package>
   <shortDescription>directory module</shortDescription>
   <description>Used to represent a directory and propagates to the 
@@ -35,18 +35,18 @@
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
 
     <dependency>
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
     <dependency>
       <artifactId>gml</artifactId>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
 
     

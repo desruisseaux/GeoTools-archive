@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-main</name>
   <id>main</id>
-  <currentVersion>2.1.x</currentVersion>
+  <currentVersion>2.2.x</currentVersion>
   <issueTrackingUrl>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10270</issueTrackingUrl>
   <shortDescription>Geotools</shortDescription>
   <description>The main module contains the key interfaces and default

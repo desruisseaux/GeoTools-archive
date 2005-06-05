@@ -132,19 +132,19 @@
                <groupId>gt2</groupId>
                <artifactId>shapefile</artifactId>
                <type>jar</type>
-               <version>2.1.x</version>
+               <version>2.2.x</version>
              </dependency>
             <dependency>
                <groupId>gt2</groupId>
                <artifactId>main</artifactId>
                <type>jar</type>
-               <version>2.1.x</version>
+               <version>2.2.x</version>
              </dependency>
               <dependency>
                <groupId>gt2</groupId>
                <artifactId>legacy</artifactId>
                <type>jar</type>
-               <version>2.1.x</version>
+               <version>2.2.x</version>
              </dependency>
     <dependency>
       <id>JTS</id>

@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-epsg-access</name>
   <id>epsg-access</id>
-  <currentVersion>2.1.x</currentVersion>
+  <currentVersion>2.2.x</currentVersion>
   <package>org.geotools.referencing</package>
   <shortDescription>EPSG Authoriy Service using MS-Access database</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
@@ -30,7 +30,7 @@
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
   </dependencies>
 </project>

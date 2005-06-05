@@ -4,7 +4,7 @@
   <extend>${basedir}/../../project.xml</extend>
   <name>geotools-shapefile-renderer</name>
   <id>shapefile-renderer</id>
-  <currentVersion>2.1.x</currentVersion>
+  <currentVersion>2.2.x</currentVersion>
   <shortDescription>renderer optimized for shapefiles</shortDescription>
   <description>renderer optimized for shapefiles</description>
   <developers>
@@ -23,17 +23,17 @@
     <dependency>
       <artifactId>main</artifactId>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
     <dependency>
       <artifactId>indexed-shapefile</artifactId>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
     <dependency>
       <artifactId>shapefile</artifactId>
       <groupId>gt2</groupId>
-      <version>2.1.x</version>
+      <version>2.2.x</version>
     </dependency>
     <dependency>
       <id>JTS</id>

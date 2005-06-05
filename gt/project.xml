@@ -5,7 +5,7 @@
   <id>gtbuild</id>
   <groupId>gt2</groupId>
   <logo>/images/${pom.artifactId}.gif</logo>
-  <currentVersion>2.1.x</currentVersion>
+  <currentVersion>2.2.x</currentVersion>
   <organization>
     <name>GeoTools</name>
     <url>http://www.geotools.org</url>
