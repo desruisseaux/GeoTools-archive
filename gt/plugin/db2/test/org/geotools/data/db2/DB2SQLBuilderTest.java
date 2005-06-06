@@ -16,7 +16,6 @@
  */
 package org.geotools.data.db2;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
@@ -24,11 +23,9 @@ import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
@@ -59,7 +56,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
         sqlBuilder = (DB2SQLBuilder) dataStore.getSqlBuilder("Places");
     }
 
-    public void testPredicates()
+       public void testLikeFilter()
         throws IllegalFilterException, SQLEncoderException, IOException {
         String typeName = "Places";
         FeatureSource fs = dataStore.getFeatureSource("Places");
@@ -67,10 +64,8 @@ public class DB2SQLBuilderTest extends DB2TestCase {
         FilterFactory ff = FilterFactory.createFilterFactory();
         LikeFilter lf = ff.createLikeFilter();
         AttributeExpression nameColumn = ff.createAttributeExpression(ft, "Name");
-        LiteralExpression likeExpression = ff.createLiteralExpression("Woo*");
-        lf.setPattern("s.met*s", "*", ".", "\\");
-
-        String pattern = "s.met*s";
+        String pattern = "s.met*s";       
+        lf.setPattern(pattern, "*", ".", "\\");
         lf.setValue(nameColumn);
 
         DefaultQuery query = new DefaultQuery("Places", lf);
