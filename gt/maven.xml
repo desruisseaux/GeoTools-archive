@@ -129,7 +129,7 @@
 		
 		<attainGoal name="moveBuildFiles"/>
 		<j:set var="ignoreFailures" value="false"/>
-              <!--  <j:set var="goal" value="clean,jar:install,moveBin,moveLib,moveSrc,updateList"/> -->
+                <j:set var="goal" value="clean,jar:install,moveBin,moveLib,moveSrc,updateList"/>
                 <attainGoal name="multiproject:goal"/>
                 
                 <loadfile property="pluginList" srcFile="${release.version}-plugin-list.txt"/>
