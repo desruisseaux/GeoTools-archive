@@ -52,7 +52,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
             //			fs.setTransaction(trans);
             FeatureWriter fw = this.dataStore.getFeatureWriter("Roads", trans);
 
-           if (fw.hasNext()) {
+            if (fw.hasNext()) {
                 Feature f = fw.next();
                 System.out.println(f);
                 fw.remove();
