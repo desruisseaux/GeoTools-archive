@@ -16,10 +16,9 @@
  */
 package org.geotools.data.db2;
 
-import java.rmi.server.UID;
+import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
 import java.util.logging.Logger;
 
-import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
 
 /**
  * Overrides NullFIDMapper methods for DB2-specific handling.
@@ -28,21 +27,22 @@ import org.geotools.data.jdbc.fidmapper.NullFIDMapper;
  */
 public class DB2NullFIDMapper extends NullFIDMapper {
     private static final Logger LOGGER = Logger.getLogger(
-    "org.geotools.data.db2");
+            "org.geotools.data.db2");
     private int currentFID = 1;
 
-/**
-* Default constructor. 
-*/
-public DB2NullFIDMapper() {
-super();
-}
-/**
- * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getID(java.lang.Object[])
- */
-public String getID(Object[] attributes) {
-	currentFID++;
-    return String.valueOf(currentFID);
-}
+    /**
+     * Default constructor.
+     */
+    public DB2NullFIDMapper() {
+        super();
+    }
 
+    /**
+     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getID(java.lang.Object[])
+     */
+    public String getID(Object[] attributes) {
+        currentFID++;
+
+        return String.valueOf(currentFID);
+    }
 }

@@ -408,8 +408,8 @@ public class DB2SpatialCatalog {
      * @throws FactoryException
      * @throws IOException
      */
-    CoordinateReferenceSystem getCRS(String tableSchema,
-        String tableName, String columnName)
+    CoordinateReferenceSystem getCRS(String tableSchema, String tableName,
+        String columnName)
         throws FactoryRegistryException, FactoryException, IOException {
         return getGeometryColumn(tableSchema, tableName, columnName).getCRS();
     }

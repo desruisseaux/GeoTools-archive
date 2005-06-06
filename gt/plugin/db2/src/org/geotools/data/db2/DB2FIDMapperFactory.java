@@ -22,7 +22,6 @@ import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -41,21 +40,24 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
             "org.geotools.data.db2");
 
     /**
-     * Default constructor will cause FID columns to be returned as business attributes.
+     * Default constructor will cause FID columns to be returned as business
+     * attributes.
      */
     public DB2FIDMapperFactory() {
-      super(true);
+        super(true);
     }
 
     /**
      * Constructs a DB2FIDMapperFactory with user specification of whether to
      * return FID columns as business attributes.
-     * @param returnFIDColumnsAsAttributes true if FID columns should be returned as business
-     * attributes.
+     *
+     * @param returnFIDColumnsAsAttributes true if FID columns should be
+     *        returned as business attributes.
      */
     public DB2FIDMapperFactory(boolean returnFIDColumnsAsAttributes) {
-    	super(returnFIDColumnsAsAttributes);
+        super(returnFIDColumnsAsAttributes);
     }
+
     /**
      * Gets the appropriate FIDMapper for the specified table.
      *
@@ -71,9 +73,10 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
      */
     public FIDMapper getMapper(String catalog, String schema, String tableName,
         Connection connection) throws IOException {
-    	FIDMapper fm = super.getMapper(catalog, schema, tableName, connection);
-    	LOGGER.fine(toString(fm));
-    	return fm;
+        FIDMapper fm = super.getMapper(catalog, schema, tableName, connection);
+        LOGGER.fine(toString(fm));
+
+        return fm;
     }
 
     /**
@@ -107,16 +110,18 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
 
         try {
             statement = conn.createStatement();
+
             String stmtString = "SELECT IDENTITY, GENERATED FROM SYSCAT.COLUMNS "
-                + "WHERE TABSCHEMA = '" + tableInfo.getString("TABLE_SCHEM") + "' "
-				+ "AND TABNAME = '" + tableName + "' "
-				+ "AND COLNAME = '" + columnName + "'"; 
+                + "WHERE TABSCHEMA = '" + tableInfo.getString("TABLE_SCHEM")
+                + "' " + "AND TABNAME = '" + tableName + "' "
+                + "AND COLNAME = '" + columnName + "'";
 
             rs = statement.executeQuery(stmtString);
+
             if (rs.next()) {
-            	if (rs.getString(1).equals("Y") && rs.getString(2).equals("A")) {
-            		autoIncrement = true;
-            	}
+                if (rs.getString(1).equals("Y") && rs.getString(2).equals("A")) {
+                    autoIncrement = true;
+                }
             }
         } finally {
             JDBCUtils.close(statement);
@@ -125,6 +130,7 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
 
         return autoIncrement;
     }
+
     /**
      * Returns a DB2NullFIDMapper when there is no primary key.
      *
@@ -141,6 +147,7 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
 
         return mapper;
     }
+
     /**
      * Builds a FID mapper based on a single column primary key. Default
      * version tries the auto-increment way, then a mapping on an {@link
@@ -156,39 +163,37 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
      */
     protected FIDMapper buildSingleColumnFidMapper0(String schema,
         String tableName, Connection connection, ColumnInfo ci) {
-//      if (ci.isAutoIncrement()) {
-//          return new AutoIncrementFIDMapper(ci.getColName(), ci.getDataType());
-//      } else if (isIntegralType(ci.getDataType())) {
-//          return new MaxIncFIDMapper(tableName, ci.getColName(), ci.getDataType(), true);
-//      } else {
-//          return new BasicFIDMapper(ci.getColName(), ci.getSize(), true);
-//      }
-    return null;
+        //      if (ci.isAutoIncrement()) {
+        //          return new AutoIncrementFIDMapper(ci.getColName(), ci.getDataType());
+        //      } else if (isIntegralType(ci.getDataType())) {
+        //          return new MaxIncFIDMapper(tableName, ci.getColName(), ci.getDataType(), true);
+        //      } else {
+        //          return new BasicFIDMapper(ci.getColName(), ci.getSize(), true);
+        //      }
+        return null;
     }
-    
-    /** 
+
+    /**
      * Create a nice string representation of a FID Mapper
+     *
      * @param fm the FID Mapper
+     *
      * @return the String representation
      */
     String toString(FIDMapper fm) {
-    	String mapperName = ((TypedFIDMapper) fm).getWrappedMapper().getClass().toString(); 
-    	String colInfo = "";
-    	if (fm.getColumnCount() > 0) {
-    		colInfo = 
-    			fm.getColumnName(0) + ":" +
-				fm.getColumnType(0) + ":" +
-				fm.getColumnSize(0) + ":" +
-				fm.getColumnDecimalDigits(0)
-    			;
-    	}
-    	String s = mapperName + ":" +
-    		fm.getColumnCount() + ":" +
-			colInfo + ":" +
-			fm.returnFIDColumnsAsAttributes() + ":" +
-			fm.hasAutoIncrementColumns() + ":" +
-			""
-			;
-    	return s;
+        String mapperName = ((TypedFIDMapper) fm).getWrappedMapper().getClass()
+                             .toString();
+        String colInfo = "";
+
+        if (fm.getColumnCount() > 0) {
+            colInfo = fm.getColumnName(0) + ":" + fm.getColumnType(0) + ":"
+                + fm.getColumnSize(0) + ":" + fm.getColumnDecimalDigits(0);
+        }
+
+        String s = mapperName + ":" + fm.getColumnCount() + ":" + colInfo + ":"
+            + fm.returnFIDColumnsAsAttributes() + ":"
+            + fm.hasAutoIncrementColumns() + ":" + "";
+
+        return s;
     }
 }

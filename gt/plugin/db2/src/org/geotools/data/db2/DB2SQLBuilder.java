@@ -36,7 +36,7 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
             "org.geotools.data.db2");
     private String tableSchema = null;
     private String tableName = null;
-    
+
     /**
      * Creates a DB2SQLBuilder that will provide a table schema to qualify
      * table names. The table schema is provided by the DB2DataStore which
@@ -52,7 +52,8 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * @param tableSchema table schema to qualify table names
      * @param tableName the table name to be used by this SQL builder
      */
-    public DB2SQLBuilder(SQLEncoder encoder, String tableSchema, String tableName) {
+    public DB2SQLBuilder(SQLEncoder encoder, String tableSchema,
+        String tableName) {
         super(encoder);
         this.tableSchema = tableSchema;
         this.tableName = tableName;
@@ -148,42 +149,47 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
 
         return sqlStmt;
     }
-    /** 
+
+    /**
      * Gets the SQL encoder associated with this SQL builder.
-     * 
+     *
      * @return the associated encoder
      */
     SQLEncoderDB2 getEncoder() {
-    	return (SQLEncoderDB2) this.encoder;
+        return (SQLEncoderDB2) this.encoder;
     }
-    
-/** 
- * Gets the concatenated schema name and table name needed by DB2.
- * @param tableName
- * @return concatenated schema and table name
- */
-    String getSchemaTableName(String tableName) {
-    	return escapeName(this.tableSchema) + "." + escapeName(tableName);
-    }
-  
-    /** 
+
+    /**
      * Gets the concatenated schema name and table name needed by DB2.
+     *
+     * @param tableName
+     *
      * @return concatenated schema and table name
      */
-        String getSchemaTableName() {
-        	return escapeName(this.tableSchema) + "." + escapeName(this.tableName);
-        }
-        
+    String getSchemaTableName(String tableName) {
+        return escapeName(this.tableSchema) + "." + escapeName(tableName);
+    }
 
-    /** 
-     * "escape" the specified name.
-     * This is currently delegated to the encoder object and for DB2 this means that
-     * the specified name will be surrounded by double-quote characters in order to
-     * ensure case sensitivity.
+    /**
+     * Gets the concatenated schema name and table name needed by DB2.
+     *
+     * @return concatenated schema and table name
+     */
+    String getSchemaTableName() {
+        return escapeName(this.tableSchema) + "." + escapeName(this.tableName);
+    }
+
+    /**
+     * "escape" the specified name. This is currently delegated to the encoder
+     * object and for DB2 this means that the specified name will be
+     * surrounded by double-quote characters in order to ensure case
+     * sensitivity.
+     *
      * @param name
+     *
      * @return escaped name
      */
     String escapeName(String name) {
-    	return this.encoder.escapeName(name);
+        return this.encoder.escapeName(name);
     }
 }

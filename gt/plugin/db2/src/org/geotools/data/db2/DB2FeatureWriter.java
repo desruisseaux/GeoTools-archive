@@ -17,13 +17,13 @@
 package org.geotools.data.db2;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCFeatureWriter;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import java.io.IOException;
@@ -36,17 +36,19 @@ import java.sql.Types;
  * @author David Adler - IBM Corporation
  */
 public class DB2FeatureWriter extends JDBCTextFeatureWriter {
-	private DB2SQLBuilder sqlBuilder;
+    private DB2SQLBuilder sqlBuilder;
+
     /**
      * DOCUMENT ME!
      *
      * @param reader
      * @param queryData
+     * @param sqlBuilder DOCUMENT ME!
      *
      * @throws IOException
      */
-    public DB2FeatureWriter(FeatureReader reader, QueryData queryData, DB2SQLBuilder sqlBuilder)
-        throws IOException {
+    public DB2FeatureWriter(FeatureReader reader, QueryData queryData,
+        DB2SQLBuilder sqlBuilder) throws IOException {
         super(reader, queryData);
         this.sqlBuilder = sqlBuilder;
     }
@@ -68,29 +70,28 @@ public class DB2FeatureWriter extends JDBCTextFeatureWriter {
      * @return
      *
      * @throws IOException
+     * @throws UnsupportedOperationException DOCUMENT ME!
      */
     protected String makeDeleteSql(Feature feature) throws IOException {
-
         FIDMapper mapper = this.queryData.getMapper();
 
         StringBuffer statementSQL = new StringBuffer("DELETE FROM "
-                + this.sqlBuilder.getSchemaTableName()
-                + " WHERE ");
+                + this.sqlBuilder.getSchemaTableName() + " WHERE ");
         Object[] pkValues = mapper.getPKAttributes(feature.getID());
 
         if (mapper.getColumnCount() == 0) {
-          // can't delete without a primary key
-          throw new UnsupportedOperationException();
+            // can't delete without a primary key
+            throw new UnsupportedOperationException();
         }
 
         for (int i = 0; i < mapper.getColumnCount(); i++) {
+            statementSQL.append(this.sqlBuilder.escapeName(mapper.getColumnName(
+                        i))).append(" = ");
 
-        	statementSQL.append(this.sqlBuilder.escapeName(mapper.getColumnName(i))).append(" = ");
             // don't put quotes around numeric values 
-        	if (isTypeNumeric(mapper.getColumnType(i))) {
+            if (isTypeNumeric(mapper.getColumnType(i))) {
                 statementSQL.append(pkValues[i]);
-            }
-            else {
+            } else {
                 statementSQL.append(addQuotes(pkValues[i]));
             }
 
@@ -112,16 +113,13 @@ public class DB2FeatureWriter extends JDBCTextFeatureWriter {
     protected boolean isTypeNumeric(int columnType) {
         boolean numeric = false;
 
-        if (columnType == Types.BIT      ||
-            columnType == Types.TINYINT  ||
-            columnType == Types.SMALLINT ||
-            columnType == Types.INTEGER  ||
-            columnType == Types.BIGINT   ||
-            columnType == Types.FLOAT    ||
-            columnType == Types.REAL     ||
-            columnType == Types.DOUBLE   ||
-            columnType == Types.NUMERIC  ||
-            columnType == Types.DECIMAL) {
+        if ((columnType == Types.BIT) || (columnType == Types.TINYINT)
+                || (columnType == Types.SMALLINT)
+                || (columnType == Types.INTEGER)
+                || (columnType == Types.BIGINT) || (columnType == Types.FLOAT)
+                || (columnType == Types.REAL) || (columnType == Types.DOUBLE)
+                || (columnType == Types.NUMERIC)
+                || (columnType == Types.DECIMAL)) {
             numeric = true;
         }
 

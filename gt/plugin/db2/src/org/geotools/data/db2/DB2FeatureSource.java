@@ -36,10 +36,9 @@ import java.util.logging.Logger;
 
 
 /**
- * DB2 Feature Source implementation.
- * 
- * Overrides functionality in JDBCFeatureSource to provide more efficient or
- * more appropriate DB2-specific implementation.
+ * DB2 Feature Source implementation.  Overrides functionality in
+ * JDBCFeatureSource to provide more efficient or more appropriate
+ * DB2-specific implementation.
  *
  * @author David Adler - IBM Corporation
  */

@@ -57,7 +57,7 @@ import java.util.logging.Logger;
 
 /**
  * DB2 DataStore implementation.
- *
+ * 
  * <p>
  * Instances of this class should only be obtained via
  * DB2DataStoreFactory.createDataStore or DataStoreFinder.getDataStore.
@@ -197,7 +197,7 @@ public class DB2DataStore extends JDBCDataStore {
 
     /**
      * Get the SRID associated with a geometry column.
-     *
+     * 
      * <p>
      * The value returned is the EPSG coordinate system identifier, not the DB2
      * srs_id.
@@ -314,7 +314,7 @@ public class DB2DataStore extends JDBCDataStore {
 
     /**
      * Gets the table schema associated with this data store.
-     *
+     * 
      * <p>
      * At some point this may change if multiple schemas are supported by a
      * data store.
@@ -355,7 +355,6 @@ public class DB2DataStore extends JDBCDataStore {
             return new DB2FeatureSource(this, getSchema(typeName));
         }
     }
-
 
     /**
      * Overrides the method in JDBCDataStore because it includes
@@ -413,7 +412,6 @@ public class DB2DataStore extends JDBCDataStore {
         }
     }
 
-
     /**
      * Overrides the method in JDBCDataStore so that a DB2FeatureWriter is
      * created.
@@ -425,11 +423,15 @@ public class DB2DataStore extends JDBCDataStore {
      *
      * @throws IOException
      *
-     * @see org.geotools.data.jdbc.JDBCDataStore#createFeatureWriter(org.geotools.data.FeatureReader, org.geotools.data.jdbc.QueryData)
+     * @see org.geotools.data.jdbc.JDBCDataStore#createFeatureWriter(org.geotools.data.FeatureReader,
+     *      org.geotools.data.jdbc.QueryData)
      */
-    protected JDBCFeatureWriter createFeatureWriter(FeatureReader featureReader,
-        QueryData queryData) throws IOException {
-    	String featureName = queryData.getFeatureType().getTypeName();
-        return new DB2FeatureWriter(featureReader, queryData, (DB2SQLBuilder) getSqlBuilder(featureName));
+    protected JDBCFeatureWriter createFeatureWriter(
+        FeatureReader featureReader, QueryData queryData)
+        throws IOException {
+        String featureName = queryData.getFeatureType().getTypeName();
+
+        return new DB2FeatureWriter(featureReader, queryData,
+            (DB2SQLBuilder) getSqlBuilder(featureName));
     }
 }
