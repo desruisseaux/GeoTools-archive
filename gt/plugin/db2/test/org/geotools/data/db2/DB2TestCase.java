@@ -17,7 +17,6 @@
 package org.geotools.data.db2;
 
 import com.ibm.db2.jcc.DB2ConnectionPoolDataSource;
-import com.ibm.db2.jcc.DB2PooledConnection;
 import junit.framework.TestCase;
 import org.geotools.data.db2.DB2ConnectionFactory;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -117,10 +116,7 @@ public class DB2TestCase extends TestCase {
         poolDataSource.setServerName(host);
         poolDataSource.setDriverType(4);
 
-        PooledConnection pc = (PooledConnection) poolDataSource
-            .getPooledConnection();
-//        pc.setDatabaseName(dbname);
-
+        PooledConnection pc = poolDataSource.getPooledConnection();
         Connection conn = pc.getConnection();
 
         return conn;

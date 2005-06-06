@@ -46,7 +46,7 @@ http://www.software.ibm.com/data/spatial.
     <dependency>
       <id>db2</id>
       <version>8.2</version>
-      <jar>db2jcc_dummy-8.2.jar</jar>
+      <jar>db2jcc_dummy-8.2.1.jar</jar>
       <url>http://www.software.ibm.com/data/db2</url>
        <properties>
         <relese.bundle>true</relese.bundle>
@@ -59,7 +59,7 @@ http://www.software.ibm.com/data/spatial.
  db2jcc.jar should be copied to %HOMEPATH%\.maven\db2\jars and
  db2jcc_license_cu.jar should be copied to HOMEPATH%\.maven\db2license\jars
     (on Windows) -->
-<!-- 
+<!--
     <dependency>
       <id>db2</id>
       <version>8.2</version>
