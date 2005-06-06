@@ -15,6 +15,7 @@ For this release the following modules comprise the geotools library:
 The following modules comprise the plug-ins and extentions:
 @PLUGIN@
 @EXTENTION@
+@DEMO@
 
 These optional jars typicaly provide support for specific data formats or
 sources, or provide specific additional functionality.
