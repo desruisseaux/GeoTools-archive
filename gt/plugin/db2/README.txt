@@ -2,21 +2,21 @@ DB2 Spatial Data Source Implementation for Geotools
 
 **  Build Issues  **
 
-The DB2 spatial data source requires jars that are non-distributable by 
-the Geotools team.  These jars are the db2jcc.jar and db2jcc_license.jar.  
-We do provide a db2jcc_dummy-8.2.jar that contains stub classes
+The DB2 spatial data plug-in requires jars that are non-distributable by
+the Geotools team.  These jars are the db2jcc.jar and db2jcc_license.jar.
+We do provide a db2jcc_dummy-8.2.1.jar that contains stub classes
 to allow the DB2 data source to build, however the real jars will be required
-to run anything that uses the data source.  
+to run anything that uses the data source.
 
-You can either just include these jars in your runtime or copy the jars to you 
-Maven repository under the db2/jars directory.  If you choose the second 
+You can either just include these jars in your runtime or copy the jars to you
+Maven repository under the db2/jars directory.  If you choose the second
 option, you can make maven use the real jars over the stub jar by commenting out this:
 
 <!-- Use this when you dont have db2jcc.jar and db2jcc_license.jar -->
     <dependency>
       <id>db2</id>
       <version>8.2</version>
-      <jar>db2jcc_dummy-8.2.jar</jar>
+      <jar>db2jcc_dummy-8.2.1.jar</jar>
       <url>http://www.software.ibm.com/data/db2</url>
        <properties>
         <relese.bundle>true</relese.bundle>
@@ -26,7 +26,7 @@ option, you can make maven use the real jars over the stub jar by commenting out
 
 in the project.xml file and uncommenting this:
 
- <!-- Commented out so we can build using the dummy spatial jar 
+ <!-- Commented out so we can build using the dummy spatial jar
     <dependency>
       <id>db2</id>
       <version>8.2</version>
@@ -61,7 +61,7 @@ db2 -tvf import-places.db2
 Modify \db2\test\org\geotools\data\db2\db2test.properties to use
 the appropriate connection information for your geotools database.
 
-Edit \db2\project.xml and comment out the test exclude section.
+Copy projectlocaldb.xml over project.xml.  Use maven to run tests.
 
 
 **  Further Help **
