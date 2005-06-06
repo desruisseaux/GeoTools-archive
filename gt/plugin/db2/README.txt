@@ -56,6 +56,7 @@ Setup the geotools database using the scripts in the
 the following commands:
 db2 -tvf setupdb.db2
 db2 -tvf import-roads.db2
+db2 -tvf FIDTestSetup.db2
 db2 -tvf import-places.db2
 
 Modify \db2\test\org\geotools\data\db2\db2test.properties to use
