@@ -1155,16 +1155,17 @@ public class ShapefileRenderer {
 	 */
 	public AffineTransform worldToScreenTransform(Envelope mapExtent,
 			Rectangle screenSize) {
-		double scaleX = screenSize.getWidth() / mapExtent.getWidth();
-		double scaleY = screenSize.getHeight() / mapExtent.getHeight();
+        double scaleX = screenSize.getWidth() / mapExtent.getWidth();
+        double scaleY = screenSize.getHeight() / mapExtent.getHeight();
 
-		double tx = -mapExtent.getMinX() * scaleX;
-		double ty = (mapExtent.getMinY() * scaleY) + screenSize.getHeight();
+        double tx = -mapExtent.getMinX() * scaleX ;
+        double ty = (mapExtent.getMinY() * scaleY) + screenSize.getHeight();
+        
+        AffineTransform at = new AffineTransform(scaleX, 0.0d, 0.0d, -scaleY, tx, ty);
+        AffineTransform originTranslation=AffineTransform.getTranslateInstance(screenSize.x, screenSize.y);
+        originTranslation.concatenate(at);
 
-		AffineTransform at = new AffineTransform(scaleX, 0.0d, 0.0d, -scaleY,
-				tx, ty);
-
-		return at;
+        return originTranslation;
 	}
 
 	/**
