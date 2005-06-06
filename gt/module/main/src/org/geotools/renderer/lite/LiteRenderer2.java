@@ -52,6 +52,7 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.JTS;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.renderer.Renderer;
@@ -402,7 +403,17 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             at = atg;
         }
         // graphics.setTransform(at);
-        setScaleDenominator(1 / at.getScaleX());
+        
+        //setScaleDenominator(1 / at.getScaleX()); //DJB old method
+        
+        try{
+        	setScaleDenominator(  calculateScale(envelope,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
+        }
+        catch (Exception e) // probably either (1) no CRS (2) error xforming
+		{
+        	setScaleDenominator(1 / at.getScaleX()); //DJB old method - the best we can do
+		}
+        
         MapLayer[] layers = context.getLayers();
         // get detstination CRS
         CoordinateReferenceSystem destinationCrs = context.getCoordinateReferenceSystem();
@@ -443,7 +454,51 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
         }
     }
 
-    /**
+	 /**
+	  * Find the scale denominator of the map.
+	  *   Method:
+	  *    1. find the diagonal distance (meters)
+	  *    2. find the diagonal distance (pixels)
+	  *    3. find the diagonal distance (meters) -- use DPI
+	  *    4. calculate scale (#1/#2)
+	  * 
+	  *   NOTE: return the scale denominator not the actual scale (1/scale = denominator)
+	  * 
+	  * TODO:  (SLD spec page 28):
+	  * Since it is common to integrate the output of multiple servers into a single displayed result in the 
+	  * web-mapping environment, it is important that different map servers have consistent behaviour with respect to 
+	  * processing scales, so that all of the independent servers will select or deselect rules at the same scales.
+	  * To insure consistent behaviour, scales relative to coordinate spaces must be handled consistently between map 
+	  * servers. For geographic coordinate systems, which use angular units, the angular coverage of a map should be 
+	  * converted to linear units for computation of scale by using the circumference of the Earth at the equator and 
+	  * by assuming perfectly square linear units. For linear coordinate systems, the size of the coordinate space 
+	  * should be used directly without compensating for distortions in it with respect to the shape of the real Earth.
+	  * 
+	  * NOTE: we are actually doing a a much more exact calculation, and accounting for non-square pixels (which are allowed in WMS)
+	  * 
+	  * @param envelope
+	  * @param coordinateReferenceSystem
+	  * @param imageWidth
+	  * @param imageHeight
+	  * @param DPI screen dots per inch (OGC standard is 90)
+	  * @return
+	  */
+	public static double calculateScale(Envelope envelope, CoordinateReferenceSystem coordinateReferenceSystem,int imageWidth,int imageHeight,double DPI) throws Exception 
+	{
+		double diagonalGroundDistance = CRS.distance(
+				            new Coordinate(envelope.getMinX(),envelope.getMinY()),
+				            new Coordinate(envelope.getMaxX(),envelope.getMaxY()),
+							coordinateReferenceSystem
+						);
+		     // pythagorus theorm
+		double diagonalPixelDistancePixels = Math.sqrt( imageWidth*imageWidth+imageHeight*imageHeight);
+		double diagonalPixelDistanceMeters = diagonalPixelDistancePixels / DPI * 2.54 / 100; // 2.54 = cm/inch, 100= cm/m
+		
+
+		return diagonalGroundDistance/diagonalPixelDistanceMeters; // remember, this is the denominator, not the actual scale;
+	}
+
+	/**
      * Queries a given layer's features to be rendered based on the target rendering bounding box.
      * <p>
      * If <code>optimizedDataLoadingEnabled</code> attribute has been set to <code>true</code>,

@@ -49,8 +49,11 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
+import org.geotools.referencing.wkt.Parser;
 import org.geotools.resources.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
@@ -862,4 +865,23 @@ public class Rendering2DTest extends TestCase {
         return clone;
     }
 
+    public void testScaleCalc() throws Exception 
+	{
+    	//1388422.8746916912, 639551.3924667436
+    	//1407342.5139777814, 650162.7155794351
+    	//655,368
+                  //some location in bc albers
+    	Envelope envelope = new Envelope(1388422.8746916912,1407342.5139777814,639551.3924667438,650162.715579435);
+    	
+    	final Parser parser = new Parser();
+    	
+    	String wkt = "PROJCS[\"NAD83 / BC Albers\",GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],TOWGS84[0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]],PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"standard_parallel_1\",50],PARAMETER[\"standard_parallel_2\",58.5],PARAMETER[\"latitude_of_center\",45],PARAMETER[\"longitude_of_center\",-126],PARAMETER[\"false_easting\",1000000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"3005\"]]";
+    	DefaultProjectedCRS crs  = (DefaultProjectedCRS) parser.parseObject(wkt);
+
+    	
+    	double s = LiteRenderer2.calculateScale( envelope, crs,
+    			       655, 368, 90.0) ;
+    	
+    	assertTrue( Math.abs(102355-s) < 10 ); //102355.1639202933
+	}
 }
