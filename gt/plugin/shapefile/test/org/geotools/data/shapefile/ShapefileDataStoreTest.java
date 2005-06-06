@@ -331,7 +331,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             String testName = wktResources[i];
             try {
                 
-                runWriteReadTest(geom,false);
+                 runWriteReadTest(geom,false);
                 make3D(geom);
                 testName += "3d";
                 runWriteReadTest(geom,true);

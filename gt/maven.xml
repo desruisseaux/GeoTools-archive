@@ -251,7 +251,7 @@ Please report bugs and feature requests using ${pom.issueTrackingUrl}.
 				<ant:include name="README.txt"/>
                                 <ant:include name="README.html"/>
                                 <ant:include name="LICENSE.txt"/>
-                                <ant:include name="**/type.txt"/>
+                                <ant:include name="**/release.properties"/>
 			</ant:fileset>
 		</ant:copy>
 	</goal>
