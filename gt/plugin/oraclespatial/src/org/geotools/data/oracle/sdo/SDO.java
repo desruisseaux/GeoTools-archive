@@ -1537,7 +1537,7 @@ public final class SDO {
      *
      * @return coords in a CCW order
      */
-    private static CoordinateSequence counterClockWise(
+    public static CoordinateSequence counterClockWise(
         CoordinateSequenceFactory factory, CoordinateSequence ring) {
         if (clock.isCCW(ring.toCoordinateArray())) {
             return ring;

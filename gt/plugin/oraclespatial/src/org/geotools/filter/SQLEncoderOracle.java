@@ -30,6 +30,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 
 /**
  * Encodes Geometry filters into valid oracle SDO statements.
@@ -440,8 +442,25 @@ public class SQLEncoderOracle extends SQLEncoder {
             buffer.append(",NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,1),");
             buffer.append("MDSYS.SDO_ORDINATE_ARRAY(");
 
-            Coordinate[] coordinates = polygon.getExteriorRing().getCoordinates();
+	    CoordinateSequenceFactory fact = polygon.getFactory().getCoordinateSequenceFactory();
+	    CoordinateSequence exterior = polygon.getExteriorRing().getCoordinateSequence();
+	    CoordinateSequence coordSeq = SDO.counterClockWise(fact, exterior);
 
+            for (int i = 0, size = coordSeq.size(); i < size; i++) {
+		Coordinate cur = coordSeq.getCoordinate(i);
+                buffer.append(cur.x);
+                buffer.append(",");
+                buffer.append(cur.y);
+
+                if (i != (size - 1)) {
+                    buffer.append(",");
+                }
+	    }
+
+	    /* This could be expensive if coordSeq implementation is not an
+	       an array.  Leaving in for now as I can't test, and this is
+	       more likely to work right.
+            Coordinate[] coordinates = coordSeq.toCoordinateArray();
             for (int i = 0; i < coordinates.length; i++) {
                 buffer.append(coordinates[i].x);
                 buffer.append(",");
@@ -450,7 +469,7 @@ public class SQLEncoderOracle extends SQLEncoder {
                 if (i != (coordinates.length - 1)) {
                     buffer.append(",");
                 }
-            }
+		}*/
 
             buffer.append("))");
         } else {
