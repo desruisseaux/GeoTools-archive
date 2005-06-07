@@ -932,10 +932,12 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
             List ruleList = new ArrayList();
             List elseRuleList = new ArrayList();
 
-            for( int j = 0; j < rules.length; j++ ) {
-				        if (LOGGER.isLoggable(Level.FINE)) {
-				            LOGGER.fine("processing rule " + j);
-				        }
+            for( int j = 0; j < rules.length; j++ ) 
+            {
+		        if (LOGGER.isLoggable(Level.FINE)) 
+		        {
+		            LOGGER.fine("processing rule " + j);
+		        }
 
                 Rule r = rules[j];
 
@@ -948,6 +950,9 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
                 }
             }
 
+            if ( (ruleList.size() == 0) && (elseRuleList.size()==0) )
+            	return;  //DJB: optimization - nothing to render, dont query layer!!
+            
             // process the features according to the rules
             // TODO: find a better way to declare the scale ranges so that we
             // get style caching also between multiple rendering runs
