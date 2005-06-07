@@ -266,6 +266,16 @@
         <role>Documentation</role>
       </roles>
     </developer>    
+    <developer>
+      <name>Luca Sigfrido Percich</name>
+      <id>lpercich</id>
+      <email>luca.percich@ama-mi.it</email>
+      <organization>AMA-MI</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Mantainer</role>
+      </roles>
+    </developer>    
   </developers>
 
   <dependencies>
