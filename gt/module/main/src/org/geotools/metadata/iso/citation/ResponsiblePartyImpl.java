@@ -79,13 +79,11 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
                                        final OnLineFunction function,
                                        final URI onlineResource)
     {
-        final OnLineResourceImpl resource = new OnLineResourceImpl();
-        resource.setLinkage(onlineResource);
+        final OnLineResourceImpl resource = new OnLineResourceImpl(onlineResource);
         resource.setFunction(function);
         resource.freeze();
         
-        final ContactImpl contact = new ContactImpl();
-        contact.setOnLineResource(resource);
+        final ContactImpl contact = new ContactImpl(resource);
         contact.freeze();
         
         final ResponsiblePartyImpl ogc = new ResponsiblePartyImpl(role);

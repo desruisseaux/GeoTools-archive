@@ -23,12 +23,17 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
+import java.io.Writer;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.Iterator;
 
 // OpenGIS dependencies
-import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 // Geotools dependencies
 import org.geotools.io.TableWriter;
@@ -172,10 +177,8 @@ public abstract class AbstractParameter extends Formattable
     }
     
     /**
-     * Returns a hash value for this parameter.
-     *
-     * @return The hash code value. This value doesn't need to be the same
-     *         in past or future versions of this class.
+     * Returns a hash value for this parameter. This value doesn't need
+     * to be the same in past or future versions of this class.
      */
     public int hashCode() {
         return descriptor.hashCode() ^ (int)serialVersionUID;
@@ -207,7 +210,8 @@ public abstract class AbstractParameter extends Formattable
      *   <li>The parameter value</li>
      * </ol>
      *
-     * <P>Subclasses should override this method with the following idiom:</P>
+     * <P>The default implementation is suitable for most cases. However, subclasses are free to
+     * override this method with the following idiom:</P>
      *
      * <blockquote><pre>
      * table.{@linkplain TableWriter#write(String) write}("<var>parameter name</var>");
@@ -222,9 +226,85 @@ public abstract class AbstractParameter extends Formattable
      * @throws IOException if an error occurs during output operation.
      */
     protected void write(final TableWriter table) throws IOException {
-        table.write(descriptor.getName().getCode());
-        // No know parameter value for this default implementation.
+        table.write(getName(descriptor));
+        table.nextColumn();
+        if (this instanceof ParameterValue) {
+            /*
+             * Provides a default implementation for parameter value. This implementation doesn't
+             * need to be a Geotools's one. Putting a default implementation here avoid to copy it
+             * in all subclasses implementing the same interface.
+             */
+            table.write('=');
+            table.nextColumn();
+            append(table, ((ParameterValue) this).getValue());
+        } else if (this instanceof ParameterValueGroup) {
+            /*
+             * Provides a default implementation for parameter value group,
+             * for the same reasons then the previous block.
+             */
+            table.write(':');
+            table.nextColumn();
+            TableWriter inner = null;
+            for (final Iterator it=((ParameterValueGroup) this).values().iterator(); it.hasNext();) {
+                final GeneralParameterValue value = (GeneralParameterValue) it.next();
+                if (value instanceof AbstractParameter) {
+                    if (inner == null) {
+                        inner = new TableWriter(table, 1);
+                    }
+                    ((AbstractParameter) value).write(inner);
+                } else {
+                    // Unknow implementation. It will break the formatting. Too bad...
+                    if (inner != null) {
+                        inner.flush();
+                        inner = null;
+                    }
+                    table.write(value.toString());
+                    table.write(System.getProperty("line.separator", "\r"));
+                }
+            }
+            if (inner != null) {
+                inner.flush();
+            }
+        } else {
+            /*
+             * No know parameter value for this default implementation.
+             */
+        }
         table.nextLine();
+    }
+
+    /**
+     * Append the specified value to a stream. If the value is an array, then
+     * the array element are appended recursively (i.e. the array may contains
+     * sub-array).
+     */
+    private static void append(final Writer buffer, final Object value) throws IOException {
+        if (value == null) {
+            buffer.write("null");
+        } else if (value.getClass().isArray()) {
+            buffer.write('{');
+            final int length = Array.getLength(value);
+            final int limit = Math.min(5, length);
+            for (int i=0; i<limit; i++) {
+                if (i != 0) {
+                    buffer.write(", ");
+                }
+                append(buffer, Array.get(value, i));
+            }
+            if (length > limit) {
+                buffer.write(", ...");
+            }
+            buffer.write('}');
+        } else {
+            final boolean isNumeric = (value instanceof Number);
+            if (!isNumeric) {
+                buffer.write('"');
+            }
+            buffer.write(value.toString());
+            if (!isNumeric) {
+                buffer.write('"');
+            }
+        }
     }
 
     /**

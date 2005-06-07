@@ -34,6 +34,7 @@ import javax.units.Unit;
 import org.opengis.util.CodeList;
 import org.opengis.util.InternationalString;
 import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
 
 // Geotools dependencies
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -445,7 +446,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * use less storage space and be more flexible during conversions, but this flexibility is
      * not always wanted.</P>
      */
-    public org.opengis.parameter.GeneralParameterValue createValue() {
+    public GeneralParameterValue createValue() {
         if (Double.TYPE.equals(primitiveClass)) {
             return new FloatParameter(this);
         }

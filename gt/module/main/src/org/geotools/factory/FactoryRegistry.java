@@ -83,6 +83,11 @@ public class FactoryRegistry extends ServiceRegistry {
     };
 
     /**
+     * The logger for all events related to factory registry.
+     */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
+
+    /**
      * Constructs a new registry for the specified categories.
      *
      * @param categories The categories.
@@ -374,7 +379,7 @@ public class FactoryRegistry extends ServiceRegistry {
             }
         }
         if (loaders.isEmpty()) {
-            Logger.getLogger("org.geotools.factory").warning("No class loaders available");
+            LOGGER.warning("No class loaders available");
         }
         return loaders;
     }
@@ -417,7 +422,25 @@ public class FactoryRegistry extends ServiceRegistry {
         message.append("' implementations:");
         boolean newServices = false;
         while (factories.hasNext()) {
-            Object factory = factories.next();
+            Object factory;
+            try {
+                factory = factories.next();
+            } catch (NoClassDefFoundError error) {
+                /*
+                 * A provider can't be registered because of some missing dependencies.
+                 * This occurs for example when trying to register the WarpTransform2D
+                 * math transform on a machine without JAI installation. Since the service
+                 * may not be essential (this is the case of WarpTransform2D), just skip it.
+                 */
+                // TODO: localize
+                final LogRecord record = new LogRecord(Level.WARNING,
+                        "Can't load a service for category "+Utilities.getShortName(category));
+                record.setSourceClassName("FactoryRegistry");
+                record.setSourceMethodName("scanForPlugins");
+                record.setThrown(error);
+                LOGGER.log(record);
+                continue;
+            }
             final Class factoryClass = factory.getClass();
             /*
              * If the factory implements more than one interface and an instance were
@@ -497,7 +520,7 @@ public class FactoryRegistry extends ServiceRegistry {
             final LogRecord record = new LogRecord(Level.CONFIG, message.toString());
             record.setSourceClassName(FactoryRegistry.class.getName());
             record.setSourceMethodName("scanForPlugins");
-            Logger.getLogger("org.opengis.factory").log(record);
+            LOGGER.log(record);
         }
     }
 

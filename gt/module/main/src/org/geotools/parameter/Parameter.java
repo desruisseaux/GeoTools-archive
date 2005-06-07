@@ -24,9 +24,6 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,10 +44,9 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.util.CodeList;
 
 // Geotools dependencies
-import org.geotools.io.TableWriter;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -395,7 +391,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
     }
 
     /**
-     * Returns the boolean value of an operation parameter
+     * Returns the boolean value of an operation parameter.
      * A boolean value does not have an associated unit of measure.
      *
      * @return The boolean value represented by this parameter.
@@ -712,6 +708,10 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      * @return {@code true} if both objects are equal.
      */
     public boolean equals(final Object object) {
+        if (object == this) {
+            // Slight optimization
+            return true;
+        }
         if (super.equals(object)) {
             final Parameter that = (Parameter) object;
             return Utilities.equals(this.value, that.value) &&
@@ -730,55 +730,6 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         int code = super.hashCode()*37;
         if (value != null) code +=   value.hashCode();
         if (unit  != null) code += 37*unit.hashCode();
-        return code;
-    }
-
-    /**
-     * Write the content of this parameter to the specified table.
-     *
-     * @param  table The table where to format the parameter value.
-     * @throws IOException if an error occurs during output operation.
-     */
-    protected void write(final TableWriter table) throws IOException {
-        table.write(getName(descriptor));
-        table.nextColumn();
-        table.write('=');
-        table.nextColumn();
-        append(table, value);
-        table.nextLine();
-    }
-
-    /**
-     * Append the specified value to a stream. If the value is an array, then
-     * the array element are appended recursively (i.e. the array may contains
-     * sub-array).
-     */
-    private static void append(final Writer buffer, final Object value) throws IOException {
-        if (value == null) {
-            buffer.write("null");
-        } else if (value.getClass().isArray()) {
-            buffer.write('{');
-            final int length = Array.getLength(value);
-            final int limit = Math.min(5, length);
-            for (int i=0; i<limit; i++) {
-                if (i != 0) {
-                    buffer.write(", ");
-                }
-                append(buffer, Array.get(value, i));
-            }
-            if (length > limit) {
-                buffer.write(", ...");
-            }
-            buffer.write('}');
-        } else {
-            final boolean isNumeric = (value instanceof Number);
-            if (!isNumeric) {
-                buffer.write('"');
-            }
-            buffer.write(value.toString());
-            if (!isNumeric) {
-                buffer.write('"');
-            }
-        }
+        return code ^ (int)serialVersionUID;
     }
 }

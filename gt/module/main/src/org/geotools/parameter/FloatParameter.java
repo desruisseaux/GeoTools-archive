@@ -23,7 +23,6 @@
 package org.geotools.parameter;
 
 // J2SE dependencies and extensions
-import java.io.IOException;
 import java.net.URI;
 import javax.units.Unit;
 
@@ -34,7 +33,6 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 
 // Geotools dependencies
-import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
@@ -332,20 +330,5 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
     public int hashCode() {
         final long code = Double.doubleToLongBits(value);
         return (int)code ^ (int)(code >>> 32) + super.hashCode()*37;
-    }
-
-    /**
-     * Write the content of this parameter to the specified table.
-     *
-     * @param  table The table where to format the parameter value.
-     * @throws IOException if an error occurs during output operation.
-     */
-    protected void write(final TableWriter table) throws IOException {
-        table.write(getName(descriptor));
-        table.nextColumn();
-        table.write('=');
-        table.nextColumn();
-        table.write(String.valueOf(value));
-        table.nextLine();
     }
 }

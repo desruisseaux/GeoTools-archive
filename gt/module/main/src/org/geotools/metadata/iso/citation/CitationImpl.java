@@ -87,8 +87,8 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
-     * The <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A>
-     * (01-068r3) "Automatic Projections" Authority.
+     * The WMS 1.1.1 "Automatic Projections" Authority.
+     * Source: <A HREF="http://www.opengis.org/docs/01-068r3.pdf">WMS 1.1.1</A> (01-068r3)
      * <p>
      * Here is the assumptions used by the {@code CRSAuthorityFactory} to locate an
      * authority on AUTO data:
@@ -125,8 +125,8 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
     
     /**
-     * The <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A>
-     * (01-068r3) "Automatic Projections" Authority.
+     * The WMS 1.3.0 "Automatic Projections" Authority.
+     * Source: <A HREF="http://portal.opengis.org/files/?artifact_id=5316">WMS 1.3.0</A> (01-068r3)
      * <p>
      * Here is the assumptions used by the CRSAuthorityFactory to locate an
      * authority on AUTO2 data:

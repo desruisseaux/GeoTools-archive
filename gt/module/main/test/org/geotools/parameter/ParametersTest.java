@@ -17,7 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.referencing;
+package org.geotools.parameter;
 
 // J2SE dependencies and extensions
 import java.awt.geom.AffineTransform;
@@ -55,13 +55,8 @@ import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
-import org.geotools.parameter.MatrixParameterDescriptors;
-import org.geotools.parameter.MatrixParameters;
-import org.geotools.parameter.Parameter;
-import org.geotools.parameter.DefaultParameterDescriptor;
-import org.geotools.parameter.ParameterGroup;
-import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.GeneralMatrix;
 import org.geotools.referencing.wkt.Formatter;
 
 
@@ -71,7 +66,7 @@ import org.geotools.referencing.wkt.Formatter;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ParameterTest extends TestCase {
+public class ParametersTest extends TestCase {
     /**
      * Run the suite from the command line.
      */
@@ -84,13 +79,13 @@ public class ParameterTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(ParameterTest.class);
+        return new TestSuite(ParametersTest.class);
     }
 
     /**
-     * Construct a test case.
+     * Constructs a test case.
      */
-    public ParameterTest(String testName) {
+    public ParametersTest(String testName) {
         super(testName);
     }
 

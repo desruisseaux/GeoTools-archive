@@ -57,8 +57,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      */
     public static final Contact OGC;
     static {
-        final ContactImpl c = new ContactImpl();
-        c.setOnLineResource(OnLineResourceImpl.OGC);
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.OGC);
         c.freeze();
         OGC = c;
     }    
@@ -70,8 +69,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      */
     public static final Contact OPEN_GIS;
     static {
-        final ContactImpl c = new ContactImpl();
-        c.setOnLineResource(OnLineResourceImpl.OPEN_GIS);
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.OPEN_GIS);
         c.freeze();
         OPEN_GIS = c;
     }
@@ -84,8 +82,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      */
     public static final Contact EPSG;
     static {
-        final ContactImpl c = new ContactImpl();
-        c.setOnLineResource(OnLineResourceImpl.EPSG);
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.EPSG);
         c.freeze();
         EPSG = c;
     }
@@ -98,8 +95,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      */
     public static final Contact GEOTIFF;
     static {
-        final ContactImpl c = new ContactImpl();
-        c.setOnLineResource(OnLineResourceImpl.GEOTIFF);
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.GEOTIFF);
         c.freeze();
         GEOTIFF = c;
     }
@@ -111,8 +107,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      */
     public static final Contact ESRI;
     static {
-        final ContactImpl c = new ContactImpl();
-        c.setOnLineResource(OnLineResourceImpl.ESRI);
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.ESRI);
         c.freeze();
         ESRI = c;
     }
@@ -124,8 +119,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      */
     public static final Contact ORACLE;
     static {
-        final ContactImpl c = new ContactImpl();
-        c.setOnLineResource(OnLineResourceImpl.ORACLE);
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.ORACLE);
         c.freeze();
         ORACLE = c;
     }
@@ -137,8 +131,7 @@ public class ContactImpl extends MetadataEntity implements Contact {
      */
     public static final Contact GEOTOOLS;
     static {
-        final ContactImpl c = new ContactImpl();
-        c.setOnLineResource(OnLineResourceImpl.GEOTOOLS);
+        final ContactImpl c = new ContactImpl(OnLineResourceImpl.GEOTOOLS);
         c.freeze();
         GEOTOOLS = c;
     }
@@ -175,6 +168,13 @@ public class ContactImpl extends MetadataEntity implements Contact {
     public ContactImpl() {
         // empty constructor, please use set methods and call
         // freeze before returning this instance to client code
+    }
+
+    /**
+     * Constructs a contact initialized to the specified online resource.
+     */
+    public ContactImpl(final OnLineResource resource) {
+        setOnLineResource(resource);
     }
 
     /**

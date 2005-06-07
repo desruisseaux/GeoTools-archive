@@ -23,7 +23,6 @@
 package org.geotools.parameter;
 
 // J2SE dependencies
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -44,11 +43,10 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
-import org.geotools.io.TableWriter;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.resources.cts.Resources;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -449,40 +447,5 @@ public class ParameterGroup extends AbstractParameter implements ParameterValueG
         }
         copy.asList = null;
         return copy;
-    }
-
-    /**
-     * Writes the content of this parameter to the specified table.
-     *
-     * @param  table The table where to format the parameter value.
-     * @throws IOException if an error occurs during output operation.
-     */
-    protected void write(final TableWriter table) throws IOException {
-        table.write(getName(descriptor));
-        table.nextColumn();
-        table.write(':');
-        table.nextColumn();
-        TableWriter inner = null;
-        for (final Iterator it=values.iterator(); it.hasNext();) {
-            final GeneralParameterValue value = (GeneralParameterValue) it.next();
-            if (value instanceof AbstractParameter) {
-                if (inner == null) {
-                    inner = new TableWriter(table, 1);
-                }
-                ((AbstractParameter) value).write(inner);
-            } else {
-                // Unknow implementation. It will break the formatting. Too bad...
-                if (inner != null) {
-                    inner.flush();
-                    inner = null;
-                }
-                table.write(value.toString());
-                table.write(System.getProperty("line.separator", "\r"));
-            }
-        }
-        if (inner != null) {
-            inner.flush();
-        }
-        table.nextLine();
     }
 }

@@ -67,7 +67,7 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -4613190550542423839L;
-    
+
     /**
      * The maximum number of times that values for this parameter group or
      * parameter are required.
@@ -157,10 +157,9 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
     }
 
     /**
-     * The maximum number of times that values for this parameter group or
-     * parameter are required.
+     * The maximum number of times that values for this parameter group are required.
      *
-     * @see #getMaximumOccurs
+     * @see #getMinimumOccurs
      */
     public int getMaximumOccurs() {
         return maximumOccurs;
@@ -282,6 +281,10 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
      * @return {@code true} if both objects are equal.
      */
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
+        if (object == this) {
+            // Slight optimization
+            return true;
+        }
         if (super.equals(object, compareMetadata)) {
             final DefaultParameterDescriptorGroup that = (DefaultParameterDescriptorGroup) object;
             return Arrays.equals(this.parameters, that.parameters);
