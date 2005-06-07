@@ -126,6 +126,12 @@ public final class FilterDOMParser {
         if(childName==null){
             childName= child.getNodeName();//HACK ?
         }
+        if (childName.indexOf(':') != -1)
+        {
+        	//the DOM parser wasnt properly set to handle namespaces...
+        	childName = childName.substring(childName.indexOf(':')+1);
+        }
+        
         LOGGER.finest("looking up " + childName);
 
         if (comparisions.containsKey(childName)) {
@@ -154,6 +160,11 @@ public final class FilterDOMParser {
                             String fidElementName = fidElement.getLocalName();
                             if(fidElementName==null){
                                 fidElementName= fidElement.getNodeName();//HACK ?
+                            }
+                            if (fidElementName.indexOf(':') != -1)
+                            {
+                            	//the DOM parser wasnt properly set to handle namespaces...
+                            	fidElementName = fidElementName.substring(fidElementName.indexOf(':')+1);
                             }
                             if ("FeatureId".equals(fidElementName)) {
                                 fidFilter.addFid(fidElement.getAttribute("fid"));
@@ -193,6 +204,11 @@ public final class FilterDOMParser {
                         Node kid = kids.item(i);
 
                         String kidName = (kid.getLocalName()!=null)?kid.getLocalName():kid.getNodeName(); 
+                        if (kidName.indexOf(':') != -1)
+                        {
+                        	//the DOM parser wasnt properly set to handle namespaces...
+                        	kidName = kidName.substring(kidName.indexOf(':')+1);
+                        }
                         if (kidName.equalsIgnoreCase("LowerBoundary")) {
                             value = kid.getFirstChild();
 
@@ -236,6 +252,11 @@ public final class FilterDOMParser {
                         }
 
                         String res = (kid.getLocalName()!=null)?kid.getLocalName():kid.getNodeName(); 
+                        if (res.indexOf(':') != -1)
+                        {
+                        	//the DOM parser wasnt properly set to handle namespaces...
+                        	res = res.substring(res.indexOf(':')+1);
+                        }
 
                         if (res.equalsIgnoreCase("PropertyName")) {
                             value = ExpressionDOMParser.parseExpression(kid);
@@ -254,7 +275,11 @@ public final class FilterDOMParser {
 
                         //if(kid == null || kid.getNodeType() != Node.ELEMENT_NODE) continue;
                         String res = (kid.getLocalName()!=null)?kid.getLocalName():kid.getNodeName(); 
-
+                        if (res.indexOf(':') != -1)
+                        {
+                        	//the DOM parser wasnt properly set to handle namespaces...
+                        	res = res.substring(res.indexOf(':')+1);
+                        }
                         if (res.equalsIgnoreCase("wildCard")) {
                             wildcard = kid.getNodeValue();
                         }
@@ -338,6 +363,12 @@ public final class FilterDOMParser {
                 LOGGER.finest("add right value -> " + value + "<-");
 
                 String valueName = (value.getLocalName()!=null)?value.getLocalName():value.getNodeName(); 
+                if (valueName.indexOf(':') != -1)
+                {
+                	//the DOM parser wasnt properly set to handle namespaces...
+                	valueName = valueName.substring(valueName.indexOf(':')+1);
+                }
+                
                 if (!(valueName.equalsIgnoreCase("Literal")
                         || valueName.equalsIgnoreCase("propertyname"))) {
                     Element literal = value.getOwnerDocument().createElement("literal");

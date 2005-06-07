@@ -101,6 +101,12 @@ public final class ExpressionDOMParser {
 
         String childName = (child.getLocalName() != null)
             ? child.getLocalName() : child.getNodeName();
+        
+        if (childName.indexOf(':') != -1)
+        {
+        	//the DOM parser wasnt properly set to handle namespaces...
+        	childName = childName.substring(childName.indexOf(':')+1);
+        }
 
         if (childName.equalsIgnoreCase("Literal")) {
             LOGGER.finer("processing literal " + child);
@@ -364,6 +370,11 @@ public final class ExpressionDOMParser {
 
                 if (name == null) {
                     name = map.item(k).getNodeName();
+                }
+                if (name.indexOf(':') != -1)
+                {
+                	//the DOM parser wasnt properly set to handle namespaces...
+                	name = name.substring(name.indexOf(':')+1);
                 }
 
                 LOGGER.fine("attribute " + name + " with value of " + res);
