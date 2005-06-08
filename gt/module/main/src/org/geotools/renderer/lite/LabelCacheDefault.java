@@ -116,16 +116,23 @@ public class LabelCacheDefault implements LabelCache {
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#put(org.geotools.renderer.style.TextStyle2D, org.geotools.renderer.lite.LiteShape)
 	 */
-	public void put(TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) {
-		TextStyle2D textStyle=(TextStyle2D) styleFactory.createStyle(feature, symbolizer, scaleRange);
-    	//equals and hashcode of LabelCacheItem is the hashcode of label and the
-    	// equals of the 2 labels so label can be used to find the entry.  
-    	if( !labelCache.containsKey(textStyle.getLabel())){
-    		labelCache.put(textStyle.getLabel(), new LabelCacheItem(textStyle, shape));
-    	}else{
-    		LabelCacheItem item=(LabelCacheItem) labelCache.get(textStyle.getLabel());
-    		item.getGeoms().add(shape.getGeometry());
-    	}
+	public void put(TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) 
+	{
+		try{
+			TextStyle2D textStyle=(TextStyle2D) styleFactory.createStyle(feature, symbolizer, scaleRange);
+	    	//equals and hashcode of LabelCacheItem is the hashcode of label and the
+	    	// equals of the 2 labels so label can be used to find the entry.  
+	    	if( !labelCache.containsKey(textStyle.getLabel())){
+	    		labelCache.put(textStyle.getLabel(), new LabelCacheItem(textStyle, shape));
+	    	}else{
+	    		LabelCacheItem item=(LabelCacheItem) labelCache.get(textStyle.getLabel());
+	    		item.getGeoms().add(shape.getGeometry());
+	    	}
+		}
+		catch(Exception e)  //DJB: protection if there's a problem with the decimation (getGeometry() can be null)
+		{
+			//do nothing
+		}
 	}
 
 	/**
@@ -139,77 +146,84 @@ public class LabelCacheDefault implements LabelCache {
 	 */
 	public void end(Graphics2D graphics, Rectangle displayArea) {
 		List glyphs=new ArrayList();
-    	for (Iterator labelIter = labelCache.keySet().iterator(); labelIter.hasNext();) {
-			LabelCacheItem labelItem = (LabelCacheItem) labelCache.get(labelIter.next());
-
-			
-			GeometryFactory factory=new GeometryFactory();
-			Geometry displayGeom=factory.toGeometry(new Envelope(displayArea.getMinX(), displayArea.getMaxX(),
-					displayArea.getMinY(), displayArea.getMaxY()));
-
-			AffineTransform oldTransform = graphics.getTransform();
-			AffineTransform tempTransform = new AffineTransform(oldTransform);			
-
-			GlyphVector glyphVector = labelItem.getTextStyle().getTextGlyphVector(graphics);
-			
-			//DJB: simplified this.  Just send off to the point,line,or polygon routine
-			//    NOTE: labelItem.getGeometry() returns the FIRST geometry, so we're assuming that lines & points arent mixed
-			//          If they are, then the FIRST geometry determines how its rendered (which is probably bad since it should be in area,line,point order
-			//TOD: as in NOTE above
-			
-			if ( ( labelItem.getGeometry() instanceof Point ) || ( labelItem.getGeometry() instanceof MultiPoint ) )
-				paintPointLabel(glyphVector, labelItem, tempTransform, displayGeom);
-			
-			
-			
-			if( ( (labelItem.getGeometry() instanceof LineString )
-					&& !(labelItem.getGeometry() instanceof LinearRing))
-					 ||( labelItem.getGeometry() instanceof MultiLineString ))
-				paintLineLabel(glyphVector, labelItem, tempTransform, displayGeom);
-			
-			
-			if( labelItem.getGeometry() instanceof Polygon ||
-					labelItem.getGeometry() instanceof MultiPolygon ||
-					labelItem.getGeometry() instanceof LinearRing )
-				paintPolygonLabel(glyphVector, labelItem, tempTransform, displayGeom);
-			
-			if( overlappingItems(glyphVector, tempTransform, glyphs)  )
-				continue;
-			try {
-			    graphics.setTransform(tempTransform);
-			    
-			    if (labelItem.getTextStyle().getHaloFill() != null) {
-			        // float radious = ts2d.getHaloRadius();
-
-			        // graphics.translate(radious, -radious);
-			        graphics.setPaint(labelItem.getTextStyle().getHaloFill());
-			        graphics.setComposite(labelItem.getTextStyle().getHaloComposite());
-			        graphics.fill(labelItem.getTextStyle().getHaloShape(graphics));
-
-			        // graphics.translate(radious, radious);
-			    }
-			    //DJB: added this because several people were using
-			    //     "font-color" instead of fill
-			    //     It legal to have a label w/o fill (which means dont render it)
-			    //     This causes people no end of trouble.
-			    //     If they dont want to colour it, then they should use a filter
-			    //     DEFAULT (no <Fill>) --> BLACK
-			    //NOTE: re-reading the spec says this is the correct assumption.
-                Paint fill = labelItem.getTextStyle().getFill();
-                Composite comp = labelItem.getTextStyle().getComposite();
-                if (fill == null)
-                {
-                	fill = Color.BLACK;
-                	comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f); //100% opaque
-                }
-			    if (fill != null) {
-			        graphics.setPaint(fill);
-			        graphics.setComposite(comp);
-			        graphics.drawGlyphVector(glyphVector, 0, 0);
-			        glyphs.add(glyphVector.getPixelBounds(new FontRenderContext(tempTransform, true, false), 0,0));
-			    }
-			} finally {
-			    graphics.setTransform(oldTransform);
+    	for (Iterator labelIter = labelCache.keySet().iterator(); labelIter.hasNext();) 
+    	{
+    		try{
+				LabelCacheItem labelItem = (LabelCacheItem) labelCache.get(labelIter.next());
+	
+				
+				GeometryFactory factory=new GeometryFactory();
+				Geometry displayGeom=factory.toGeometry(new Envelope(displayArea.getMinX(), displayArea.getMaxX(),
+						displayArea.getMinY(), displayArea.getMaxY()));
+	
+				AffineTransform oldTransform = graphics.getTransform();
+				AffineTransform tempTransform = new AffineTransform(oldTransform);			
+	
+				GlyphVector glyphVector = labelItem.getTextStyle().getTextGlyphVector(graphics);
+				
+				//DJB: simplified this.  Just send off to the point,line,or polygon routine
+				//    NOTE: labelItem.getGeometry() returns the FIRST geometry, so we're assuming that lines & points arent mixed
+				//          If they are, then the FIRST geometry determines how its rendered (which is probably bad since it should be in area,line,point order
+				//TOD: as in NOTE above
+				
+				if ( ( labelItem.getGeometry() instanceof Point ) || ( labelItem.getGeometry() instanceof MultiPoint ) )
+					paintPointLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				
+				
+				
+				if( ( (labelItem.getGeometry() instanceof LineString )
+						&& !(labelItem.getGeometry() instanceof LinearRing))
+						 ||( labelItem.getGeometry() instanceof MultiLineString ))
+					paintLineLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				
+				
+				if( labelItem.getGeometry() instanceof Polygon ||
+						labelItem.getGeometry() instanceof MultiPolygon ||
+						labelItem.getGeometry() instanceof LinearRing )
+					paintPolygonLabel(glyphVector, labelItem, tempTransform, displayGeom);
+				
+				if( overlappingItems(glyphVector, tempTransform, glyphs)  )
+					continue;
+				try {
+				    graphics.setTransform(tempTransform);
+				    
+				    if (labelItem.getTextStyle().getHaloFill() != null) {
+				        // float radious = ts2d.getHaloRadius();
+	
+				        // graphics.translate(radious, -radious);
+				        graphics.setPaint(labelItem.getTextStyle().getHaloFill());
+				        graphics.setComposite(labelItem.getTextStyle().getHaloComposite());
+				        graphics.fill(labelItem.getTextStyle().getHaloShape(graphics));
+	
+				        // graphics.translate(radious, radious);
+				    }
+				    //DJB: added this because several people were using
+				    //     "font-color" instead of fill
+				    //     It legal to have a label w/o fill (which means dont render it)
+				    //     This causes people no end of trouble.
+				    //     If they dont want to colour it, then they should use a filter
+				    //     DEFAULT (no <Fill>) --> BLACK
+				    //NOTE: re-reading the spec says this is the correct assumption.
+	                Paint fill = labelItem.getTextStyle().getFill();
+	                Composite comp = labelItem.getTextStyle().getComposite();
+	                if (fill == null)
+	                {
+	                	fill = Color.BLACK;
+	                	comp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f); //100% opaque
+	                }
+				    if (fill != null) {
+				        graphics.setPaint(fill);
+				        graphics.setComposite(comp);
+				        graphics.drawGlyphVector(glyphVector, 0, 0);
+				        glyphs.add(glyphVector.getPixelBounds(new FontRenderContext(tempTransform, true, false), 0,0));
+				    }
+				} finally {
+				    graphics.setTransform(oldTransform);
+				}
+    		}
+    		catch(Exception e) //the decimation can cause problems - we try to minimize it
+			{
+    			//do nothing
 			}
     	}
     	labelCache.clear();
