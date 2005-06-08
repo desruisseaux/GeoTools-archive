@@ -335,7 +335,25 @@ public class LabelCacheDefault implements LabelCache {
 	
 		Point centroid;
 		
-      	centroid = geom.getCentroid(); // this where you would do the north/south/west/east stuff
+		try{
+			centroid = geom.getCentroid(); // this where you would do the north/south/west/east stuff
+		}
+		catch(Exception e)  // generalized polygons causes problems - this tries to hid them.
+		{
+			try{
+				centroid = geom.getExteriorRing().getCentroid();
+			}
+			catch(Exception ee)
+			{
+				try {
+					centroid = geom.getFactory().createPoint( geom.getCoordinate() );
+				}
+				catch(Exception eee)
+				{
+					return; //we're hooped
+				}
+			}
+		}
         
 		
 		TextStyle2D textStyle = labelItem.getTextStyle();
