@@ -124,8 +124,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         ensureNonNull("unit", unit);
         final Unit thisUnit = getUnit();
         if (thisUnit == null) {
-            throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, Parameter.getName(descriptor)));
+            throw unitlessParameter(descriptor);
         }
         final int expectedID = Parameter.getUnitMessageID(thisUnit);
         if (Parameter.getUnitMessageID(unit) != expectedID) {
@@ -240,8 +239,7 @@ public class FloatParameter extends AbstractParameter implements ParameterValue 
         ensureNonNull("unit", unit);
         final Unit thisUnit = ((ParameterDescriptor) descriptor).getUnit();
         if (thisUnit == null) {
-            throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, Parameter.getName(descriptor)));
+            throw unitlessParameter(descriptor);
         }
         final int expectedID = Parameter.getUnitMessageID(thisUnit);
         if (Parameter.getUnitMessageID(unit) != expectedID) {

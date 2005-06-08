@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 // JAI dependencies
 import javax.media.jai.ParameterList;
 import javax.media.jai.ParameterListImpl;
+import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.OperationDescriptor;
 
 // OpenGIS dependencies
@@ -68,8 +69,16 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
 
     /**
      * The JAI's parameter list. This is also the backing store for this
-     * {@linkplain ParameterValueGroup parameter value group}: all parameters
+     * {@linkplain ParameterValueGroup parameter value group}: all "ordinary" parameters
+     * (i.e. <strong>not</strong> including {@linkplain ParameterBlockJAI#getSources sources})
      * are actually stored in this list.
+     * <P>
+     * If the {@linkplain ImagingParameterDescriptors#descriptor JAI descriptor} is an instance
+     * of {@link OperationDescriptor}, then this parameter list is also an instance of
+     * {@link ParameterBlockJAI}. The {@linkplain ParameterBlockJAI#getSources sources}
+     * must be handled separatly, because the source type for a JAI operator (typically
+     * {@link java.awt.image.RenderedImage}) is not the same than the source type for a
+     * coverage operation (typically {@link org.opengis.coverage.GridCoverage}).
      */
     protected final ParameterList parameters;
 
@@ -89,7 +98,14 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      */
     public ImagingParameters(final ImagingParameterDescriptors descriptor) {
         super(descriptor);
-        parameters = new ParameterListImpl(descriptor.descriptor);
+        if (descriptor.operation instanceof OperationDescriptor) {
+            // Parameters with sources
+            parameters = new ParameterBlockJAI((OperationDescriptor) descriptor.operation,
+                                                                     descriptor.registryMode);
+        } else {
+            // Parameters without sources
+            parameters = new ParameterListImpl(descriptor.descriptor);
+        }
     }
 
     /**
@@ -118,8 +134,18 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
             final String name = d.getName().getCode().trim().toLowerCase();
             final ParameterValue value;
             if (parameterNames.contains(name)) {
+                /*
+                 * Uses 'parameters' as the backing store.
+                 */
                 value = new ImagingParameter(d, parameters);
             } else {
+                /*
+                 * In theory, we should uses ParameterBlock sources. However, we can't because
+                 * the type is not the same: JAI operations typically expect a RenderedImage
+                 * source, while coverage operations typically expect a GridCoverage source.
+                 * The value will be stored separatly, and the coverage framework will need
+                 * to handle it itself.
+                 */
                 value = new Parameter(d);
             }
             elements.put(name, value);

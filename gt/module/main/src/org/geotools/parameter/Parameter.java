@@ -334,8 +334,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     public double doubleValue(final Unit unit) throws InvalidParameterTypeException {
         if (this.unit == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+            throw unitlessParameter(descriptor);
         }
         ensureNonNull("unit", unit);
         final int expectedID = getUnitMessageID(this.unit);
@@ -449,8 +448,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
      */
     public double[] doubleValueList(final Unit unit) throws InvalidParameterTypeException {
         if (this.unit == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+            throw unitlessParameter(descriptor);
         }
         ensureNonNull("unit", unit);
         final int expectedID = getUnitMessageID(this.unit);
@@ -587,8 +585,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         ensureNonNull("unit", unit);
         final Unit targetUnit = ((ParameterDescriptor) descriptor).getUnit();
         if (targetUnit == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+            throw unitlessParameter(descriptor);
         }
         final int expectedID = getUnitMessageID(targetUnit);
         if (getUnitMessageID(unit) != expectedID) {
@@ -684,8 +681,7 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         ensureNonNull("unit", unit);
         final Unit targetUnit = ((ParameterDescriptor) descriptor).getUnit();
         if (targetUnit == null) {
-            throw new IllegalStateException(Resources.format(
-                      ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+            throw unitlessParameter(descriptor);
         }
         final int expectedID = getUnitMessageID(targetUnit);
         if (getUnitMessageID(unit) != expectedID) {

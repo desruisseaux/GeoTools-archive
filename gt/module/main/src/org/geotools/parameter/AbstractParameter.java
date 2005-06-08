@@ -142,6 +142,15 @@ public abstract class AbstractParameter extends Formattable
     }
 
     /**
+     * Returns an exception initialized with a "Unitless parameter" error message for the
+     * specified descriptor.
+     */
+    static IllegalStateException unitlessParameter(final GeneralParameterDescriptor descriptor) {
+        return new IllegalStateException(Resources.format(ResourceKeys.ERROR_UNITLESS_PARAMETER_$1,
+                                                          getName(descriptor)));
+    }
+
+    /**
      * Convenience method returning the name of the specified descriptor. This method is used
      * mostly for output to be read by human, not for processing. Concequently, we may consider
      * to returns a localized name in a future version.
@@ -231,7 +240,7 @@ public abstract class AbstractParameter extends Formattable
         if (this instanceof ParameterValue) {
             /*
              * Provides a default implementation for parameter value. This implementation doesn't
-             * need to be a Geotools's one. Putting a default implementation here avoid to copy it
+             * need to be a Geotools's one. Putting a default implementation here avoid duplication
              * in all subclasses implementing the same interface.
              */
             table.write('=');
@@ -239,8 +248,9 @@ public abstract class AbstractParameter extends Formattable
             append(table, ((ParameterValue) this).getValue());
         } else if (this instanceof ParameterValueGroup) {
             /*
-             * Provides a default implementation for parameter value group,
-             * for the same reasons then the previous block.
+             * Provides a default implementation for parameter value group, for the same reasons
+             * then the previous block. Reminder: the above 'instanceof' check for interface, not
+             * for subclass. This explain why we use it instead of method overriding.
              */
             table.write(':');
             table.nextColumn();

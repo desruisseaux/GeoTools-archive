@@ -73,6 +73,12 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
     private static final long serialVersionUID = 2127050865911951239L;
 
     /**
+     * The registry mode. Usually {@value RenderedRegistryMode#MODE_NAME}.
+     * This field is {@code null} if {@link #operation} is null.
+     */
+    final String registryMode;
+
+    /**
      * The JAI's operation descriptor, or {@code null} if none. This is usually an
      * instance of {@link OperationDescriptor}, but this is not strictly required.
      */
@@ -134,8 +140,9 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
     {
         super(properties(name, operation), 1, 1,
               asDescriptors(descriptor, operation, sourceTypeMap, registryMode));
-        this.descriptor = descriptor;
-        this.operation  = operation;
+        this.descriptor   = descriptor;
+        this.operation    = operation;
+        this.registryMode = registryMode;
     }
 
     /**
@@ -186,6 +193,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
                                                        final String registryMode)
     {
         ensureNonNull("descriptor", descriptor);
+        final Map properties = new HashMap();
         /*
          * JAI considers sources as a special kind of parameters, while GridCoverageProcessor makes
          * no distinction. If the registry element "operation" is really a JAI's OperationDescriptor
@@ -207,20 +215,30 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
                     type = types[i];
                 }
                 String name = names[i];
+                properties.clear();
                 if (numSources == 1) {
                     /*
                      * If there is only one source argument, rename for example "Source0"
-                     * as "Source" for better compliance with OpenGIS usage.
+                     * as "Source" for better compliance with OpenGIS usage. However, we
+                     * will keep the original name as an alias.
                      */
                     final int length = name.length();
                     if (length != 0) {
                         final char c = name.charAt(length-1);
                         if (c=='0' || c=='1') {
+                            properties.put(ALIAS_PROPERTY, name);
                             name = name.substring(0, length-1);
                         }
                     }
                 }
-                desc[i] = new DefaultParameterDescriptor(name, type, null, null);
+                properties.put(NAME_PROPERTY, name);
+                desc[i] = new DefaultParameterDescriptor(properties, type,
+                                                         null,   // validValues
+                                                         null,   // defaultValue
+                                                         null,   // minimum
+                                                         null,   // maximum
+                                                         null,   // unit
+                                                         true);  // required
             }
         } else {
             numSources = 0;
@@ -229,7 +247,6 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
         /*
          * Source parameters completed. Now get the ordinary parameters.
          */
-        final Map    properties = new HashMap();
         final String[]    names = descriptor.getParamNames();
         final Class[]   classes = descriptor.getParamClasses();
         final Object[] defaults = descriptor.getParamDefaults();

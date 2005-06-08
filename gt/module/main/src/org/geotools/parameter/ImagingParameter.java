@@ -53,7 +53,7 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
     private static final long serialVersionUID = -170895429717041733L;
 
     /**
-     * The JAI's parameter list.
+     * The JAI's parameter list used as the backing store for parameter values.
      */
     private final ParameterList parameters;
 
@@ -71,13 +71,14 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
     private InvalidParameterTypeException invalidType(final ClassCastException cause) {
         final InvalidParameterTypeException exception = new InvalidParameterTypeException(
                 Resources.format(ResourceKeys.ERROR_ILLEGAL_OPERATION_FOR_VALUE_CLASS_$1,
-                Utilities.getShortName(getType())), getName());
+                Utilities.getShortName(getType())), getName(descriptor));
         exception.initCause(cause);
         return exception;
     }
 
     /**
-     * Returns the unlocalized operation name.
+     * Returns the unlocalized operation name. This is different from
+     * {@link AbstractParameter#getName}, which may returns a localized name.
      */
     private String getName() {
         return descriptor.getName().getCode();
@@ -101,8 +102,7 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
      * Always throws an exception, since this parameter has no unit.
      */
     public double doubleValue(final Unit unit) throws InvalidParameterTypeException {
-        throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+        throw unitlessParameter(descriptor);
     }
 
     /**
@@ -168,8 +168,7 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
      * Always throws an exception, since this parameter has no unit.
      */
     public double[] doubleValueList(Unit unit) throws InvalidParameterTypeException {
-        throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+        throw unitlessParameter(descriptor);
     }
 
     /**
@@ -228,8 +227,7 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
      * Always throws an exception, since this parameter has no unit.
      */
     public void setValue(final double value, Unit unit) throws InvalidParameterValueException {
-        throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+        throw unitlessParameter(descriptor);
     }
 
     /**
@@ -295,8 +293,7 @@ final class ImagingParameter extends AbstractParameter implements ParameterValue
      * Always throws an exception, since this parameter has no unit.
      */
     public void setValue(double[] values, Unit unit) throws InvalidParameterValueException {
-        throw new IllegalStateException(Resources.format(
-                  ResourceKeys.ERROR_UNITLESS_PARAMETER_$1, getName(descriptor)));
+        throw unitlessParameter(descriptor);
     }
     
     /**
