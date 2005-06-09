@@ -23,6 +23,7 @@ package org.geotools.referencing.factory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.units.ConversionException;
@@ -483,11 +484,12 @@ public class FactoryGroup {
          */
         if (crs instanceof CompoundCRS) {
             int count=0, lowerDimension=0, lowerIndex=0;
-            final CoordinateReferenceSystem[] sources, targets;
+            final List/*<CoordinateReferenceSystem>*/ sources;
+            final CoordinateReferenceSystem[] targets;
             sources = ((CompoundCRS) crs).getCoordinateReferenceSystems();
-            targets = new CoordinateReferenceSystem[sources.length];
-search:     for (int i=0; i<sources.length; i++) {
-                final CoordinateReferenceSystem source = sources[i];
+            targets = new CoordinateReferenceSystem[sources.size()];
+search:     for (final Iterator it=sources.iterator(); it.hasNext();) {
+                final CoordinateReferenceSystem source = (CoordinateReferenceSystem) it.next();
                 final int upperDimension = lowerDimension + source.getCoordinateSystem().getDimension();
                 /*
                  * 'source' CRS applies to dimension 'lowerDimension' inclusive to 'upperDimension'

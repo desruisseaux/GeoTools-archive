@@ -24,7 +24,8 @@
 package org.geotools.referencing.operation;
 
 // J2SE dependencies
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,9 +88,13 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     private static final long serialVersionUID = 1237358357729193885L;
 
     /**
-     * An empty array of positional accuracy.
+     * An empty array of positional accuracy. This is usefull for fetching accuracies as an array,
+     * using the following idiom:
+     * <blockquote><pre>
+     * {@linkplain #getPositionalAccuracies()}.toArray(EMPTY_ACCURACY_ARRAY);
+     * </pre></blockquote>
      */
-    private static final PositionalAccuracy[] EMPTY_ACCURACY = new PositionalAccuracy[0];
+    public static final PositionalAccuracy[] EMPTY_ACCURACY_ARRAY = new PositionalAccuracy[0];
 
     /**
      * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
@@ -150,7 +155,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * Estimate(s) of the impact of this operation on point accuracy, or {@code null}
      * if none.
      */
-    private final PositionalAccuracy[] positionalAccuracy;
+    private final Collection/*<PositionalAccuracy>*/ positionalAccuracy;
 
     /**
      * Area in which this operation is valid, or {@code null} if not available.
@@ -259,7 +264,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                 ensureNonNull(POSITIONAL_ACCURACY_PROPERTY, positionalAccuracy, i);
             }
         }
-        this.positionalAccuracy = positionalAccuracy;
+        this.positionalAccuracy = asSet(positionalAccuracy);
         this.sourceCRS = sourceCRS;
         this.targetCRS = targetCRS;
         this.transform = transform;
@@ -324,11 +329,10 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * position error estimates for target coordinates of this coordinate
      * operation, assuming no errors in source coordinates.
      *
-     * @return The position error estimates, or an empty array if not available.
+     * @return The position error estimates, or an empty collection if not available.
      */
-    public PositionalAccuracy[] getPositionalAccuracy() {
-        return (positionalAccuracy!=null) ? (PositionalAccuracy[]) positionalAccuracy.clone()
-                                          : EMPTY_ACCURACY;
+    public Collection/*<PositionalAccuracy>*/ getPositionalAccuracy() {
+        return (positionalAccuracy!=null) ? positionalAccuracy : Collections.EMPTY_SET;
     }
 
     /**
@@ -398,8 +402,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
                 if (compareMetadata) {
                     if (!Utilities.equals(this.validArea,          that.validArea) ||
                         !Utilities.equals(this.scope,              that.scope    ) ||
-                        !Arrays   .equals(this.positionalAccuracy, that.positionalAccuracy))
-                        // TODO: Uses Arrays.deepEquals(...) when J2SE 1.5 will be available.
+                        !Utilities.equals(this.positionalAccuracy, that.positionalAccuracy))
                     {
                         return false;
                     }

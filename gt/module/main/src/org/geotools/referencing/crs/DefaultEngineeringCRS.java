@@ -24,6 +24,7 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies and extensions
 import java.util.Collections;
+import java.util.Collection;
 import java.util.Map;
 import javax.units.SI;
 
@@ -87,8 +88,9 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
         private static final long serialVersionUID = -1773381554353809683L;
 
         /** The alias to use for all Cartesian CS. */
-        private static GenericName ALIAS = NameFactory.create(new InternationalString[] {
-                       Resources.formatInternational(ResourceKeys.CARTESIAN)});
+        private static Collection/*<GenericName>*/ ALIAS = Collections.singleton(
+                        NameFactory.create(new InternationalString[] {
+                        Resources.formatInternational(ResourceKeys.CARTESIAN)}));
 
         /** Constructs a coordinate system with the given name. */
         public Cartesian(final String name, final CoordinateSystem cs) {
@@ -96,8 +98,8 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
         }
 
         /** Returns the localized name for "Cartesian". */
-        public GenericName[] getAlias() {
-            return new GenericName[] {ALIAS};
+        public Collection/*<GenericName>*/ getAlias() {
+            return ALIAS;
         }
 
         /**

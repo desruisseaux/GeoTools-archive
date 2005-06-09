@@ -173,9 +173,9 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
     }
 
     /** For compatibility with GeoAPI interfaces. */
-    public org.opengis.util.GenericName[] getAlias() {
-        return new org.opengis.util.GenericName[0];
-    }    
+    public java.util.Collection getAlias() {
+        return java.util.Collections.EMPTY_SET;
+    }
     
     /**
      * Returns a hash value for this axis.
@@ -232,8 +232,8 @@ public class AxisInfo implements CoordinateSystemAxis, Serializable {
     }
     
     /** For compatibility with GeoAPI interfaces. */
-    public Identifier[] getIdentifiers() {
-        return Info.EMPTY_IDENTIFIERS;
+    public java.util.Set/*<Identifier>*/ getIdentifiers() {
+        return java.util.Collections.EMPTY_SET;
     }
     
     /** For compatibility with GeoAPI interfaces. */

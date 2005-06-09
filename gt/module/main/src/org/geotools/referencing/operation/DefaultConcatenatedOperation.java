@@ -25,8 +25,10 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     /**
      * The sequence of operations.
      */
-    protected final SingleOperation[] operations;
+    private final List/*<SingleOperation>*/ operations;
 
     /**
      * Constructs a concatenated operation from the specified name.
@@ -128,11 +130,10 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private DefaultConcatenatedOperation(final Map  properties,
-                                         final List list,
+                                         final ArrayList list,
                                          final CoordinateOperation[] operations)
     {
-        this(properties, expand(operations, list),
-             (SingleOperation[]) list.toArray(new SingleOperation[list.size()]));
+        this(properties, expand(operations, list), list);
     }
 
     /**
@@ -140,13 +141,12 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private DefaultConcatenatedOperation(final Map  properties,
-                                         final List list,
+                                         final ArrayList list,
                                          final CoordinateOperation[] operations,
                                          final MathTransformFactory factory)
             throws FactoryException
     {
-        this(properties, expand(operations, list, factory, true),
-             (SingleOperation[]) list.toArray(new SingleOperation[list.size()]));
+        this(properties, expand(operations, list, factory, true), list);
     }
 
     /**
@@ -155,13 +155,14 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      */
     private DefaultConcatenatedOperation(final Map  properties,
                                          final MathTransform transform,
-                                         final SingleOperation[] operations) // MUST be last argument
+                                         final ArrayList/*<SingleOperation>*/ operations)
     {
         super(mergeAccuracy(properties, operations),
-              operations[0].getSourceCRS(),
-              operations[operations.length-1].getTargetCRS(),
+              ((SingleOperation) operations.get(0)).getSourceCRS(),
+              ((SingleOperation) operations.get(operations.size()-1)).getTargetCRS(),
               transform);
-        this.operations = operations; // No need to clone.
+        operations.trimToSize();
+        this.operations = Collections.unmodifiableList(operations); // No need to clone.
     }
 
     /**
@@ -180,7 +181,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     }
 
     /**
-     * Transform the list of operations into a list of single operations. This method
+     * Transforms the list of operations into a list of single operations. This method
      * also check against null value and make sure that all CRS dimension matches.
      *
      * @param  operations The array of operations to expand.
@@ -205,7 +206,9 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
                 list.add(op);
             } else if (op instanceof ConcatenatedOperation) {
                 final ConcatenatedOperation cop = (ConcatenatedOperation) op;
-                expand(cop.getOperations(), list, factory, false);
+                final List cops = cop.getOperations();
+                expand((CoordinateOperation[]) cops.toArray(new CoordinateOperation[cops.size()]),
+                       list, factory, false);
             } else {
                 throw new IllegalArgumentException(Resources.format(
                                                    ResourceKeys.ERROR_ILLEGAL_CLASS_$2,
@@ -254,25 +257,24 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
 
     /**
      * If no accuracy were specified in the given properties map, add all accuracy founds in
-     * the operation to concatenate.
+     * the operation to concatenate. This method is a work around for RFE #4093999 in Sun's bug
+     * database ("Relax constraint on placement of this()/super() call in constructors").
      *
      * @todo We should use a Map and merge only one accuracy for each specification.
      */
-    private static Map mergeAccuracy(final Map properties, final CoordinateOperation[] operations) {
+    private static Map mergeAccuracy(final Map properties,
+                                     final List/*<CoordinateOperation>*/ operations)
+    {
         if (!properties.containsKey(POSITIONAL_ACCURACY_PROPERTY)) {
             Set accuracy = null;
-            for (int i=0; i<operations.length; i++) {
-                final PositionalAccuracy[] array = operations[i].getPositionalAccuracy();
-                if (array != null) {
-                    for (int j=0; j<array.length; j++) {
-                        final PositionalAccuracy candidate = array[j];
-                        if (candidate != null) {
-                            if (accuracy == null) {
-                                accuracy = new LinkedHashSet();
-                            }
-                            accuracy.add(candidate);
-                        }
+            for (final Iterator it=operations.iterator(); it.hasNext();) {
+                final Collection/*<PositionalAccuracy>*/ candidates =
+                        ((CoordinateOperation)it.next()).getPositionalAccuracy();
+                if (candidates != null) {
+                    if (accuracy == null) {
+                        accuracy = new LinkedHashSet();
                     }
+                    accuracy.addAll(candidates);
                 }
             }
             if (accuracy != null) {
@@ -288,8 +290,8 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     /**
      * Returns the sequence of operations.
      */
-    public SingleOperation[] getOperations() {
-        return (SingleOperation[]) operations.clone();
+    public List/*<SingleOperation>*/ getOperations() {
+        return operations;
     }
 
     /**
@@ -317,11 +319,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * Returns a hash code value for this concatenated operation.
      */
     public int hashCode() {
-        int code = (int)serialVersionUID;
-        for (int i=operations.length; --i>=0;) {
-            code = code*37 + operations[i].hashCode();
-        }
-        return code;
+        return operations.hashCode() ^ (int)serialVersionUID;
     }
     
     /**
@@ -333,8 +331,8 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
      * @return The WKT element name.
      */
     protected String formatWKT(final Formatter formatter) {
-        for (int i=0; i<operations.length; i++) {
-            formatter.append(operations[i]);
+        for (final Iterator it=operations.iterator(); it.hasNext();) {
+            formatter.append((SingleOperation) it.next());
         }
         formatter.setInvalidWKT();
         return Utilities.getShortClassName(this);

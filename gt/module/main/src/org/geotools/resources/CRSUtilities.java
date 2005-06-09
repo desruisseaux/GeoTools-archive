@@ -20,6 +20,7 @@
 package org.geotools.resources;
 
 // J2SE dependencies
+import java.util.List;
 import java.util.Iterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -172,9 +173,11 @@ public final class CRSUtilities {
             return 0;
         }
         if (crs instanceof CompoundCRS) {
-            final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (int offset=0,i=0; i<c.length; i++) {
-                final CoordinateReferenceSystem ci = c[i];
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            int offset = 0;
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final CoordinateReferenceSystem ci = (CoordinateReferenceSystem) it.next();
                 final int index = getDimensionOf(ci, type);
                 if (index >= 0) {
                     return index + offset;
@@ -207,12 +210,13 @@ public final class CRSUtilities {
             if (!(crs instanceof CompoundCRS)) {
                 return null;
             }
-            final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            if (c.length == 0) {
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            if (c==null || c.isEmpty()) {
                 return null;
             }
-            for (int i=0; i<c.length; i++) {
-                crs = c[i];
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                crs = (CoordinateReferenceSystem) it.next();
                 dimension = crs.getCoordinateSystem().getDimension();
                 if (lower < dimension) {
                     break;
@@ -248,11 +252,12 @@ public final class CRSUtilities {
                             ResourceKeys.ERROR_CANT_REDUCE_TO_TWO_DIMENSIONS_$1,
                             crs.getName().toString()));
                 }
-                final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-                if (c.length == 0) {
+                final List/*<CoordinateReferenceSystem>*/ c =
+                        ((CompoundCRS)crs).getCoordinateReferenceSystems();
+                if (c==null || c.isEmpty()) {
                     return null;
                 }
-                crs = c[0];
+                crs = (CoordinateReferenceSystem) c.get(0);
             }
         }
         return crs;
@@ -276,9 +281,10 @@ public final class CRSUtilities {
             }
         }
         if (crs instanceof CompoundCRS) {
-            final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (int i=0; i<c.length; i++) {
-                final SingleCRS candidate = getHorizontalCRS(c[i]);
+            final List/*<CoordinateReferenceSystem>*/ c=
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final SingleCRS candidate = getHorizontalCRS((CoordinateReferenceSystem) it.next());
                 if (candidate != null) {
                     return candidate;
                 }
@@ -298,9 +304,10 @@ public final class CRSUtilities {
             return (ProjectedCRS) crs;
         }
         if (crs instanceof CompoundCRS) {
-            final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (int i=0; i<c.length; i++) {
-                final ProjectedCRS candidate = getProjectedCRS(c[i]);
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final ProjectedCRS candidate = getProjectedCRS((CoordinateReferenceSystem) it.next());
                 if (candidate != null) {
                     return candidate;
                 }
@@ -320,9 +327,10 @@ public final class CRSUtilities {
             return (VerticalCRS) crs;
         }
         if (crs instanceof CompoundCRS) {
-            final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (int i=0; i<c.length; i++) {
-                final VerticalCRS candidate = getVerticalCRS(c[i]);
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final VerticalCRS candidate = getVerticalCRS((CoordinateReferenceSystem) it.next());
                 if (candidate != null) {
                     return candidate;
                 }
@@ -342,9 +350,10 @@ public final class CRSUtilities {
             return (TemporalCRS) crs;
         }
         if (crs instanceof CompoundCRS) {
-            final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (int i=0; i<c.length; i++) {
-                final TemporalCRS candidate = getTemporalCRS(c[i]);
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final TemporalCRS candidate = getTemporalCRS((CoordinateReferenceSystem) it.next());
                 if (candidate != null) {
                     return candidate;
                 }
@@ -374,9 +383,10 @@ public final class CRSUtilities {
             return ((GeodeticDatum) datum).getEllipsoid();
         }
         if (crs instanceof CompoundCRS) {
-            final CoordinateReferenceSystem[] c= ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (int i=0; i<c.length; i++) {
-                final Ellipsoid candidate = getEllipsoid(c[i]);
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final Ellipsoid candidate = getEllipsoid((CoordinateReferenceSystem) it.next());
                 if (candidate != null) {
                     return candidate;
                 }
@@ -393,9 +403,10 @@ public final class CRSUtilities {
     public static Ellipsoid getHeadGeoEllipsoid(CoordinateReferenceSystem crs) {
         while (!(crs instanceof GeographicCRS)) {
             if (crs instanceof CompoundCRS) {
-                CoordinateReferenceSystem[] c = ((CompoundCRS)crs).getCoordinateReferenceSystems();
-                if (c.length != 0) {
-                    crs = c[0];
+                final List/*<CoordinateReferenceSystem>*/ c =
+                        ((CompoundCRS)crs).getCoordinateReferenceSystems();
+                if (c!=null && !c.isEmpty()) {
+                    crs = (CoordinateReferenceSystem) c.get(0);
                     continue;
                 }
             }

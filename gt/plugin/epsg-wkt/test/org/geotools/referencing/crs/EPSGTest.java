@@ -97,9 +97,9 @@ public class EPSGTest extends TestCase {
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem) factory.createObject("EPSG:42102");
         assertNotNull( crs );
         assertNotNull(crs.getIdentifiers());
-        assertTrue(crs.getIdentifiers().length>0);
+        assertTrue(crs.getIdentifiers().size()>0);
         NamedIdentifier expected = new NamedIdentifier(CitationImpl.EPSG, "42102");
-        assertTrue( Arrays.asList( crs.getIdentifiers() ).contains( expected ));
+        assertTrue( crs.getIdentifiers() .contains( expected ));
     }
     public void testSuccess() throws Exception {
         Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
@@ -162,8 +162,8 @@ public class EPSGTest extends TestCase {
         CoordinateReferenceSystem crs = CRS.decode("epsg:42102");
         assertNotNull( crs );
         assertNotNull(crs.getIdentifiers());
-        assertTrue(crs.getIdentifiers().length>0);
+        assertTrue(crs.getIdentifiers().size()>0);
         NamedIdentifier expected = new NamedIdentifier(CitationImpl.EPSG, "42102");
-        assertTrue( Arrays.asList( crs.getIdentifiers() ).contains( expected ));
+        assertTrue( crs.getIdentifiers() .contains( expected ));
     }
 }

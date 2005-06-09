@@ -24,6 +24,7 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ import org.opengis.referencing.operation.CoordinateOperation;
 // Geotools dependencies
 import org.geotools.util.MapEntry;
 import org.geotools.referencing.operation.DefaultOperation;
+import org.geotools.referencing.operation.AbstractCoordinateOperation;
 
 
 /**
@@ -95,13 +97,14 @@ final class Properties extends AbstractMap {
     private Object get(final int key) {
         switch (key) {
             case  0: return info.getName();
-            case  1: return info.getIdentifiers();
-            case  2: return info.getAlias();
+            case  1: return info.getIdentifiers().toArray(AbstractIdentifiedObject.EMPTY_IDENTIFIER_ARRAY);
+            case  2: return info.getAlias()      .toArray(AbstractIdentifiedObject.EMPTY_ALIAS_ARRAY);
             case  3: return info.getRemarks();
             case  4: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getScope()              : null;
             case  5: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getValidArea()          : null;
             case  6: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getOperationVersion()   : null;
-            case  7: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getPositionalAccuracy() : null;
+            case  7: return (info instanceof CoordinateOperation) ? ((CoordinateOperation) info).getPositionalAccuracy()
+                                .toArray(AbstractCoordinateOperation.EMPTY_ACCURACY_ARRAY): null;
             default: return null;
         }
     }
@@ -135,6 +138,7 @@ final class Properties extends AbstractMap {
                     entries.add(new MapEntry(KEYS[i], value));
                 }
             }
+            entries = Collections.unmodifiableSet(entries);
         }
         return entries;
     }

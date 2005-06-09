@@ -127,8 +127,8 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         ensureNonNull("parameters", parameters);
         final Map properties = new HashMap(4);
         properties.put(NAME_PROPERTY,        parameters.getName());
-        properties.put(IDENTIFIERS_PROPERTY, parameters.getIdentifiers());
-        properties.put(ALIAS_PROPERTY,       parameters.getAlias());
+        properties.put(IDENTIFIERS_PROPERTY, parameters.getIdentifiers().toArray(EMPTY_IDENTIFIER_ARRAY));
+        properties.put(ALIAS_PROPERTY,       parameters.getAlias()      .toArray(EMPTY_ALIAS_ARRAY));
         return properties;
     }
 
@@ -367,12 +367,12 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         String name = param.getName().getCode();
         final Citation authority = group.getDescriptor().getName().getAuthority();
         if (authority != null) {
-            final GenericName[] alias = param.getAlias();
-            for (int i=0; i<alias.length; i++) {
-                final GenericName scope = alias[i].getScope();
+            for (final Iterator it=param.getAlias().iterator(); it.hasNext();) {
+                final GenericName alias = (GenericName) it.next();
+                final GenericName scope = alias.getScope();
                 if (scope != null) {
                     if (CitationImpl.titleMatches(authority, scope.toString())) {
-                        name = alias[i].asLocalName().toString();
+                        name = alias.asLocalName().toString();
                         break;
                     }
                 }

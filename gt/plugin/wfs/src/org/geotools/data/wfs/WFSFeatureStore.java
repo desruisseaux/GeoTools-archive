@@ -92,7 +92,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             		if(atrs[i].isGeometry()){
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
-                		g.setUserData(cs.getIdentifiers()[0].toString());
+                		g.setUserData(cs.getIdentifiers().iterator().next().toString());
             		}
             	}
                 ts.addAction(new InsertAction(f));
@@ -157,7 +157,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         	if(type[i].isGeometry()){
         		Geometry g = (Geometry)value[i];
         		CoordinateReferenceSystem cs = ((GeometryAttributeType)type[i]).getCoordinateSystem();
-        		g.setUserData(cs.getIdentifiers()[0].toString());
+        		g.setUserData(cs.getIdentifiers().iterator().next().toString());
         	}
             props.put(type[i].getName(), value[i]);
         }
@@ -203,7 +203,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             		if(atrs[i].isGeometry()){
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
-                		g.setUserData(cs.getIdentifiers()[0].toString());
+                		g.setUserData(cs.getIdentifiers().iterator().next().toString());
             		}
             	}
                 ts.addAction(new InsertAction(f));

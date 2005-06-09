@@ -26,6 +26,7 @@ package org.geotools.referencing.wkt;
 import java.lang.reflect.Array;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
 import javax.units.NonSI;
@@ -545,10 +546,10 @@ public class Formatter {
     private Identifier getIdentifier(final IdentifiedObject info) {
         Identifier first = null;
         if (info != null) {
-            final Identifier[] identifiers = info.getIdentifiers();
+            final Collection/*<Identifier>*/ identifiers = info.getIdentifiers();
             if (identifiers != null) {
-                for (int i=0; i<identifiers.length; i++) {
-                    final Identifier id = identifiers[i];
+                for (final Iterator it=identifiers.iterator(); it.hasNext();) {
+                    final Identifier id = (Identifier) it.next();
                     if (authorityMatches(id.getAuthority())) {
                         return id;
                     }
@@ -586,7 +587,7 @@ public class Formatter {
     public String getName(final IdentifiedObject info) {
         final Identifier name = info.getName();
         if (!authorityMatches(name.getAuthority())) {
-            final GenericName[] aliases = info.getAlias();
+            final Collection/*<GenericName>*/ aliases = info.getAlias();
             if (aliases != null) {
                 /*
                  * The main name doesn't matches. Search in alias. We will first
@@ -594,8 +595,8 @@ public class Formatter {
                  * Geotools implementation). Otherwise, we will look at the
                  * scope in generic name.
                  */
-                for (int i=0; i<aliases.length; i++) {
-                    final GenericName alias = aliases[i];
+                for (final Iterator it=aliases.iterator(); it.hasNext();) {
+                    final GenericName alias = (GenericName) it.next();
                     if (alias instanceof Identifier) {
                         final Identifier candidate = (Identifier) alias;
                         if (authorityMatches(candidate.getAuthority())) {
@@ -604,8 +605,8 @@ public class Formatter {
                     }
                 }
                 final String title = authority.getTitle().toString(Locale.US);
-                for (int i=0; i<aliases.length; i++) {
-                    final GenericName alias = aliases[i];
+                for (final Iterator it=aliases.iterator(); it.hasNext();) {
+                    final GenericName alias = (GenericName) it.next();
                     final GenericName scope = alias.getScope();
                     if (scope != null) {
                         if (title.equalsIgnoreCase(scope.toString())) {

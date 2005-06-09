@@ -26,9 +26,14 @@ package org.geotools.referencing;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.units.SI;
 import javax.units.Unit;
@@ -82,6 +87,24 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     private static final long serialVersionUID = -5173281694258483264L;
 
     /**
+     * An empty array of identifiers. This is usefull for fetching identifiers as an array,
+     * using the following idiom:
+     * <blockquote><pre>
+     * {@linkplain #getIdentifiers()}.toArray(EMPTY_IDENTIFIER_ARRAY);
+     * </pre></blockquote>
+     */
+    public static final Identifier[] EMPTY_IDENTIFIER_ARRAY = new Identifier[0];
+
+    /**
+     * An empty array of alias. This is usefull for fetching alias as an array,
+     * using the following idiom:
+     * <blockquote><pre>
+     * {@linkplain #getAlias()}.toArray(EMPTY_ALIAS_ARRAY);
+     * </pre></blockquote>
+     */
+    public static final GenericName[] EMPTY_ALIAS_ARRAY = new GenericName[0];
+
+    /**
      * Key for the <code>{@value #NAME_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getName}.
@@ -129,10 +152,11 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     public static final Comparator IDENTIFIER_COMPARATOR = new IdentifierComparator();
     private static final class IdentifierComparator implements Comparator, Serializable {
         public int compare(final Object o1, final Object o2) {
-            final Identifier[] a1 = ((IdentifiedObject)o1).getIdentifiers();
-            final Identifier[] a2 = ((IdentifiedObject)o2).getIdentifiers();
-            return doCompare((a1!=null && a1.length!=0) ? a1[0].getCode() : null,
-                             (a2!=null && a2.length!=0) ? a2[0].getCode() : null);
+            final Collection/*<Identifier>*/ a1 = ((IdentifiedObject)o1).getIdentifiers();
+            final Collection/*<Identifier>*/ a2 = ((IdentifiedObject)o2).getIdentifiers();
+            return doCompare((a1!=null && !a1.isEmpty()) ? ((Identifier) a1.iterator().next()).getCode() : null,
+                             (a2!=null && !a2.isEmpty()) ? ((Identifier) a2.iterator().next()).getCode() : null);
+            // TODO: remove (Identifier) cast once we will be allowed to compile for J2SE 1.5.
         }
         protected Object readResolve() throws ObjectStreamException {
             return IDENTIFIER_COMPARATOR;
@@ -152,16 +176,6 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
             return REMARKS_COMPARATOR;
         }
     }
-    
-    /**
-     * An empty array of alias.
-     */
-    private static final GenericName[] NO_ALIAS = new GenericName[0];
-    
-    /**
-     * An empty array of identifiers.
-     */
-    private static final Identifier[] NO_IDENTIFIER = new Identifier[0];
 
     /**
      * The name for this object or code. Should never be {@code null}.
@@ -171,13 +185,13 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     /**
      * An alternative name by which this object is identified.
      */
-    private final GenericName[] alias;
+    private final Collection/*<GenericName>*/ alias;
 
     /**
      * An identifier which references elsewhere the object's defining information.
      * Alternatively an identifier by which this object can be referenced.
      */
-    private final Identifier[] identifiers;
+    private final Set/*<Identifier>*/ identifiers;
 
     /**
      * Comments on or information about this object, or {@code null} if none.
@@ -453,9 +467,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
          */
         String key=null; Object value=null;
         try {
-            key=        NAME_PROPERTY; this.name        = (Identifier)          (value=name);
-            key=       ALIAS_PROPERTY; this.alias       = (GenericName[])  clone(value=alias);
-            key= IDENTIFIERS_PROPERTY; this.identifiers = (Identifier[])   clone(value=identifiers);
+            key=        NAME_PROPERTY; this.name        =          (Identifier) (value=name);
+            key=       ALIAS_PROPERTY; this.alias       = asSet((GenericName[]) (value=alias));
+            key= IDENTIFIERS_PROPERTY; this.identifiers = asSet( (Identifier[]) (value=identifiers));
             key=     REMARKS_PROPERTY; this.remarks     = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
             InvalidParameterValueException e = new InvalidParameterValueException(Resources.format(
@@ -465,17 +479,6 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         }
         ensureNonNull(NAME_PROPERTY, name);
         ensureNonNull(NAME_PROPERTY, name.toString());
-    }
-
-    /**
-     * If the specified object is an array, clone it.
-     */
-    private static Object clone(Object object) {
-        if (object instanceof Object[]) {
-            final Object[] array = (Object[]) object;
-            object = (array.length!=0) ? array.clone() : null;
-        }
-        return object;
     }
 
     /**
@@ -490,11 +493,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *         
      * @return The aliases, or an empty array if there is none.
      */
-    public GenericName[] getAlias() {
-        if (alias != null) {
-            return (GenericName[]) alias.clone();
-        }
-        return NO_ALIAS;
+    public Collection/*<GenericName>*/ getAlias() {
+        return (alias!=null) ? alias : Collections.EMPTY_SET;
     }
 
     /**
@@ -503,11 +503,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *
      * @return This object identifiers, or an empty array if there is none.
      */
-    public Identifier[] getIdentifiers() {
-        if (identifiers != null) {
-            return (Identifier[]) identifiers.clone();
-        }
-        return NO_IDENTIFIER;
+    public Set/*<Identifier>*/ getIdentifiers() {
+        return (identifiers!=null) ? identifiers : Collections.EMPTY_SET;
     }
 
     /**
@@ -596,19 +593,20 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      *         matches the specified {@code name}.
      */
     private static boolean nameMatches(final IdentifiedObject object,
-                                       final GenericName[] alias, String name)
+                                       final Collection/*<GenericName>*/ alias, String name)
     {
         name = name.trim();
         if (name.equalsIgnoreCase(object.getName().getCode().trim())) {
             return true;
         }
         if (alias != null) {
-            for (int i=0; i<alias.length; i++) {
-                final ScopedName asScoped = alias[i].asScopedName();
+            for (final Iterator it=alias.iterator(); it.hasNext();) {
+                final GenericName asName = (GenericName) it.next();
+                final ScopedName asScoped = asName.asScopedName();
                 if (asScoped!=null && name.equalsIgnoreCase(asScoped.toString().trim())) {
                     return true;
                 }
-                if (name.equalsIgnoreCase(alias[i].asLocalName().toString().trim())) {
+                if (name.equalsIgnoreCase(asName.asLocalName().toString().trim())) {
                     return true;
                 }
             }
@@ -628,7 +626,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare this object with the specified object for equality.
+     * Compares this object with the specified object for equality.
      *
      * If {@code compareMetadata} is {@code true}, then all available properties
      * are compared including {@linkplain #getName name}, {@linkplain #getRemarks remarks},
@@ -659,15 +657,15 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 return true;
             }
             return Utilities.equals(name,        object.name       ) &&
-                      Arrays.equals(alias,       object.alias      ) &&
-                      Arrays.equals(identifiers, object.identifiers) &&
+                   Utilities.equals(alias,       object.alias      ) &&
+                   Utilities.equals(identifiers, object.identifiers) &&
                    Utilities.equals(remarks,     object.remarks    );
         }
         return false;
     }
 
     /**
-     * Compare two Geotools's {@code AbstractIdentifiedObject} objects for equality. This
+     * Compares two Geotools's {@code AbstractIdentifiedObject} objects for equality. This
      * method is equivalent to {@code object1.<b>equals</b>(object2, <var>compareMetadata</var>)}
      * except that one or both arguments may be null. This convenience method is provided for
      * implementation of {@code equals} in subclasses.
@@ -686,7 +684,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare two OpenGIS's {@code IdentifiedObject} objects for equality. This convenience
+     * Compares two OpenGIS's {@code IdentifiedObject} objects for equality. This convenience
      * method is provided for implementation of {@code equals} in subclasses.
      *
      * @param  object1 The first object to compare (may be {@code null}).
@@ -705,8 +703,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare two array of OpenGIS's {@code IdentifiedObject} objects for equality. This
-     * convenience method is provided for implementation of {@code equals} in subclasses.
+     * Compares two arrays of OpenGIS's {@code IdentifiedObject} objects for equality. This
+     * convenience method is provided for implementation of {@code equals} method in subclasses.
      *
      * @param  array1 The first array to compare (may be {@code null}).
      * @param  array2 The second array to compare (may be {@code null}).
@@ -732,7 +730,42 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Compare two objects for order. Any object may be null. This method is
+     * Compares two collectionss of OpenGIS's {@code IdentifiedObject} objects for equality.
+     * The comparaison take order in account, which make it more appropriate for {@link List}
+     * or {@link LinkedHashSet} comparaisons. This convenience method is provided for
+     * implementation of {@code equals} method in subclasses.
+     *
+     * @param  array1 The first collection to compare (may be {@code null}).
+     * @param  array2 The second collection to compare (may be {@code null}).
+     * @param  compareMetadata {@code true} for performing a strict comparaison, or
+     *         {@code false} for comparing only properties relevant to transformations.
+     * @return {@code true} if both collections are equal.
+     */
+    protected static boolean equals(final Collection/*<? extends IdentifiedObject>*/ collection1,
+                                    final Collection/*<? extends IdentifiedObject>*/ collection2,
+                                    final boolean compareMetadata)
+    {
+        if (collection1 == collection2) {
+            return true;
+        }
+        if (collection1==null || collection2==null) {
+            return false;
+        }
+        final Iterator it1 = collection1.iterator();
+        final Iterator it2 = collection2.iterator();
+        while (it1.hasNext()) {
+            if (!it2.hasNext() ||
+                !equals((IdentifiedObject) it1.next(),
+                        (IdentifiedObject) it2.next(), compareMetadata))
+            {
+                return false;
+            }
+        }
+        return !it2.hasNext();
+    }
+
+    /**
+     * Compares two objects for order. Any object may be null. This method is
      * used for implementation of {@link #NAME_COMPARATOR} and its friends.
      */
     private static int doCompare(final Comparable c1, final Comparable c2) {
@@ -743,6 +776,26 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             return +1;
         }
         return c1.compareTo(c2);
+    }
+
+    /**
+     * Returns the specified array as an immutable set, or {@code null} if the
+     * array is empty or null. This is a convenience method for sub-classes
+     * constructors.
+     *
+     * @param  array The array to copy in a set. May be {@code null}.
+     * @return A set containing the array elements, or {@code null} if none or empty.
+     */
+    protected static Set asSet(final Object[] array) {
+        if (array == null) {
+            return null;
+        }
+        switch (array.length) {
+            case 0:  return null;
+            case 1:  return Collections.singleton(array[0]);
+            default: return Collections.unmodifiableSet(new LinkedHashSet(Arrays.asList(array)));
+        }
+        
     }
     
     /**

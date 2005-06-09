@@ -220,8 +220,8 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
     }
 
     /** For compatibility with GeoAPI interfaces. */
-    public org.opengis.util.GenericName[] getAlias() {
-        return new org.opengis.util.GenericName[0];
+    public java.util.Collection getAlias() {
+        return java.util.Collections.EMPTY_SET;
     }    
     
     /**
@@ -571,8 +571,8 @@ public class Info implements org.opengis.referencing.IdentifiedObject, Serializa
     }
 
     /** For compatibility with GeoAPI interfaces. */
-    public Identifier[] getIdentifiers() {
-        return EMPTY_IDENTIFIERS;
+    public java.util.Set/*<Identifier>*/ getIdentifiers() {
+        return java.util.Collections.EMPTY_SET;
     }    
 
     /** For compatibility with GeoAPI interfaces. */

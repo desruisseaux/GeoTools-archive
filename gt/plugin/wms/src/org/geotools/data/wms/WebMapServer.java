@@ -558,8 +558,8 @@ public class WebMapServer implements Discovery {
      */
     public GeneralEnvelope getEnvelope(Layer layer, CoordinateReferenceSystem crs) {
         
-        for (int i = 0; i < crs.getIdentifiers().length; i++) {
-            String epsgCode = crs.getIdentifiers()[i].toString();
+        for (final Iterator i=crs.getIdentifiers().iterator(); i.hasNext();) {
+            String epsgCode = i.next().toString();
 
             BoundingBox tempBBox = null;
             Layer parentLayer = layer;

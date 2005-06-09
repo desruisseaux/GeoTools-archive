@@ -365,8 +365,8 @@ public class GridCoverageImpl extends AbstractGridCoverage
 	public InternationalString[] getDimensionNames() {
 		List results = new ArrayList();
 		
-		results.addAll(Arrays.asList(crs.getCoordinateSystem().getAxis(0).getIdentifiers()));
-		results.addAll(Arrays.asList(crs.getCoordinateSystem().getAxis(1).getIdentifiers()));
+		results.addAll(crs.getCoordinateSystem().getAxis(0).getIdentifiers());
+		results.addAll(crs.getCoordinateSystem().getAxis(1).getIdentifiers());
 		
 		InternationalString[] strings = new InternationalString[results.size()];
 		

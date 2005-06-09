@@ -34,6 +34,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.EngineeringCRS;
@@ -157,6 +159,13 @@ public class AccessDataSourceTest extends TestCase {
     }
 
     /**
+     * Returns the first identifier for the specified object.
+     */
+    private static String getIdentifier(final IdentifiedObject object) {
+        return ((Identifier) object.getIdentifiers().iterator().next()).getCode();
+    }
+
+    /**
      * Tests creations.
      */
     public void testCreation() throws FactoryException {
@@ -166,47 +175,47 @@ public class AccessDataSourceTest extends TestCase {
         CoordinateOperation operation;
         
         sourceCRS = factory.createCoordinateReferenceSystem("4274");
-        assertEquals("4274", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("4274", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeographicCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:4140");
-        assertEquals("4140", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("4140", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeographicCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem("2027");
-        assertEquals("2027", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("2027", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof ProjectedCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem(" EPSG : 2442 ");
-        assertEquals("2442", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("2442", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof ProjectedCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:4915");
-        assertEquals("4915", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("4915", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeocentricCRS);
         assertEquals(3, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:4993");
-        assertEquals("4993", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("4993", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof GeographicCRS);
         assertEquals(3, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:5735");
-        assertEquals("5735", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("5735", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof VerticalCRS);
         assertEquals(1, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:5801");
-        assertEquals("5801", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("5801", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof EngineeringCRS);
         assertEquals(2, sourceCRS.getCoordinateSystem().getDimension());
         
         sourceCRS = factory.createCoordinateReferenceSystem("EPSG:7400");
-        assertEquals("7400", sourceCRS.getIdentifiers()[0].getCode());
+        assertEquals("7400", getIdentifier(sourceCRS));
         assertTrue(sourceCRS instanceof CompoundCRS);
         assertEquals(3, sourceCRS.getCoordinateSystem().getDimension());
 
@@ -235,10 +244,10 @@ public class AccessDataSourceTest extends TestCase {
         }
         assertFalse(factory.isConnected());
         // Should be in the cache.
-        assertEquals("4273", factory.createCoordinateReferenceSystem("4273").getIdentifiers()[0].getCode());
+        assertEquals("4273", getIdentifier(factory.createCoordinateReferenceSystem("4273")));
         assertFalse(factory.isConnected());
         // Was not in the cache
-        assertEquals("4275", factory.createCoordinateReferenceSystem("4275").getIdentifiers()[0].getCode());
+        assertEquals("4275", getIdentifier(factory.createCoordinateReferenceSystem("4275")));
         assertTrue(factory.isConnected());
     }
 

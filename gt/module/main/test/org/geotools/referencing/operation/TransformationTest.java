@@ -267,8 +267,8 @@ public class TransformationTest extends TestTransform {
         final CoordinateOperation operation = opFactory.createOperation(sourceCRS, targetCRS);
         assertSame(sourceCRS, operation.getSourceCRS());
         assertSame(targetCRS, operation.getTargetCRS());
-        assertTrue (contains(operation.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
-        assertFalse(contains(operation.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
+        assertTrue (operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+        assertFalse(operation.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
 
         final MathTransform transform = operation.getMathTransform();
         assertInterfaced(transform);
@@ -311,8 +311,8 @@ public class TransformationTest extends TestTransform {
         final CoordinateOperation lenient = lenientFactory.createOperation(amputedCRS, targetCRS);
         assertSame(amputedCRS, lenient.getSourceCRS());
         assertSame( targetCRS, lenient.getTargetCRS());
-        assertFalse(contains(lenient.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
-        assertTrue (contains(lenient.getPositionalAccuracy(), PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
+        assertFalse(lenient.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_APPLIED));
+        assertTrue (lenient.getPositionalAccuracy().contains(PositionalAccuracyImpl.DATUM_SHIFT_OMITTED));
 
         final MathTransform lenientTr = lenient.getMathTransform();
         assertInterfaced(lenientTr);
@@ -322,21 +322,6 @@ public class TransformationTest extends TestTransform {
         // Note 1: Expected values above were computed with Geotools (not an external library).
         // Note 2: The commented-out test is the one we get with "Abridged_Molodenski" method
         //         instead of "Molodenski".
-    }
-
-    /**
-     * Returns {@code true} if the specified array contains the specified element.
-     */
-    private static boolean contains(final PositionalAccuracy[] array,
-                                    final PositionalAccuracy searchFor)
-    {
-        assertNotNull(searchFor);
-        for (int i=0; i<array.length; i++) {
-            if (array[i].equals(searchFor)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

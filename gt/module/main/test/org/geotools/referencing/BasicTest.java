@@ -39,6 +39,7 @@ import junit.framework.TestSuite;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.util.InternationalString;
+import org.opengis.util.GenericName;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
@@ -213,8 +214,10 @@ public class BasicTest extends TestCase {
         assertEquals("Latitude",  "AXIS[\"Spherical latitude\", NORTH]", DefaultCoordinateSystemAxis.SPHERICAL_LATITUDE .toWKT(0));
 
         // Test localization
-        assertEquals("English", "Time",  DefaultCoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.ENGLISH));
-        assertEquals("French",  "Temps", DefaultCoordinateSystemAxis.TIME.getAlias()[0].toInternationalString().toString(Locale.FRENCH ));
+        assertEquals("English", "Time",  ((GenericName) DefaultCoordinateSystemAxis.TIME.getAlias().iterator().next()).toInternationalString().toString(Locale.ENGLISH));
+        assertEquals("French",  "Temps", ((GenericName) DefaultCoordinateSystemAxis.TIME.getAlias().iterator().next()).toInternationalString().toString(Locale.FRENCH ));
+        // TODO: remove cast and use static import once we are allowed to compile for J2SE 1.5.
+        //       It will make the line much shorter!!
 
         // Test geocentric
         assertFalse("X",         DefaultCoordinateSystemAxis.X        .equals(DefaultCoordinateSystemAxis.GEOCENTRIC_X,        false));

@@ -215,12 +215,15 @@ public class ParameterWriter extends FilterWriter {
         out.write(' ');
         out.write(name);
         out.write(lineSeparator);
-        GenericName[] alias = group.getAlias();
+        Collection/*<GenericName>*/ alias = group.getAlias();
         if (alias != null) {
-            for (int i=0; i<alias.length; i++) {
-                out.write(i!=0 ? "       " : " alias ");
-                out.write(alias[i].toInternationalString().toString(locale));
+            boolean first = true;
+            for (final Iterator i=alias.iterator(); i.hasNext();) {
+                final GenericName a = (GenericName) i.next();
+                out.write(first ? " alias " : "       ");
+                out.write(a.toInternationalString().toString(locale));
                 out.write(lineSeparator);
+                first = false;
             }
         }
         /*
@@ -283,8 +286,8 @@ public class ParameterWriter extends FilterWriter {
             table.write(identifier.getCode());
             alias = generalDescriptor.getAlias();
             if (alias != null) {
-                for (int i=0; i<alias.length; i++) {
-                    final GenericName a = alias[i];
+                for (final Iterator i=alias.iterator(); i.hasNext();) {
+                    final GenericName a = (GenericName) i.next();
                     if (!identifier.equals(a)) {
                         table.write(lineSeparator);
                         table.write(a.asLocalName().toInternationalString().toString(locale));
@@ -396,12 +399,13 @@ public class ParameterWriter extends FilterWriter {
         titles.put(null, new Integer(0)); // Special value for the identifier column.
         for (final Iterator it=parameters.iterator(); it.hasNext();) {
             final IdentifiedObject element = (IdentifiedObject) it.next();
-            final GenericName[] aliases = element.getAlias();
+            final Collection/*<GenericName>*/ aliases = element.getAlias();
             String[] elementNames = new String[titles.size()];
             elementNames[0] = element.getName().getCode();
             if (aliases != null) {
-                for (int i=0; i<aliases.length; i++) {
-                    final GenericName alias = aliases[i];
+                int count = 0;
+                for (final Iterator i=aliases.iterator(); it.hasNext();) {
+                    final GenericName alias = (GenericName) i.next();
                     final GenericName scope = alias.getScope();
                     final GenericName name  = alias.asLocalName();
                     final Object title;
@@ -411,7 +415,7 @@ public class ParameterWriter extends FilterWriter {
                         }
                         title = scope.toInternationalString().toString(locale);
                     } else {
-                        title = new Integer(i);
+                        title = new Integer(count++);
                     }
                     Integer position = (Integer) titles.get(title);
                     if (position == null) {

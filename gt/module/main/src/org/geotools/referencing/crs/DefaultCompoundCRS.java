@@ -24,7 +24,9 @@ package org.geotools.referencing.crs;
 
 // J2SE dependencies
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +67,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     /**
      * The coordinate reference systems in this compound CRS.
      */
-    private final CoordinateReferenceSystem[] crs;
+    private final List/*<CoordinateReferenceSystem>*/ crs;
 
     /**
      * Constructs a coordinate reference system from a name and two CRS.
@@ -118,7 +120,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     public DefaultCompoundCRS(final Map properties, CoordinateReferenceSystem[] crs) {
         super(properties, createCoordinateSystem(crs));
         ensureNonNull("crs", crs);
-        this.crs = crs = (CoordinateReferenceSystem[]) crs.clone();
+        crs = (CoordinateReferenceSystem[]) crs.clone();
         for (int i=0; i<crs.length; i++) {
             ensureNonNull("crs", crs, i);
         }
@@ -126,6 +128,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
             throw new IllegalArgumentException(Resources.format(
                         ResourceKeys.ERROR_MISSING_PARAMETER_$1, "crs["+crs.length+']'));
         }
+        this.crs = Collections.unmodifiableList(Arrays.asList(crs));
     }
 
     /**
@@ -149,8 +152,8 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      *
      * @return The coordinate reference systems.
      */
-    public CoordinateReferenceSystem[] getCoordinateReferenceSystems() {
-        return (CoordinateReferenceSystem[]) crs.clone();
+    public List/*<CoordinateReferenceSystem>*/ getCoordinateReferenceSystems() {
+        return crs;
     }
 
     /**
@@ -159,11 +162,10 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * them are expanded in an array of {@code SingleCRS} objects.
      *
      * @return The single coordinate reference systems.
-     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
-     *         {@link CompoundCRS}.
+     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a {@link CompoundCRS}.
      */
     public SingleCRS[] getSingleCRS() {
-        final List singles = new ArrayList(crs.length);
+        final List singles = new ArrayList(crs.size());
         getSingleCRS(crs, singles);
         return (SingleCRS[]) singles.toArray(new SingleCRS[singles.size()]);
     }
@@ -175,17 +177,16 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      *
      * @param  crs The coordinate reference system.
      * @return The single coordinate reference systems.
-     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
-     *         {@link CompoundCRS}.
+     * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a {@link CompoundCRS}.
      */
     public static SingleCRS[] getSingleCRS(final CoordinateReferenceSystem crs) {
         if (crs instanceof DefaultCompoundCRS) {
             return ((DefaultCompoundCRS) crs).getSingleCRS();
         }
         if (crs instanceof CompoundCRS) {
-            final CoordinateReferenceSystem[] elements =
+            final List/*<CoordinateReferenceSystem>*/ elements =
                 ((CompoundCRS) crs).getCoordinateReferenceSystems();
-            final List singles = new ArrayList(elements.length);
+            final List singles = new ArrayList(elements.size());
             getSingleCRS(elements, singles);
             return (SingleCRS[]) singles.toArray(new SingleCRS[singles.size()]);
         }
@@ -198,9 +199,11 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @throws ClassCastException if a CRS is neither a {@link SingleCRS} or a
      *         {@link CompoundCRS}.
      */
-    private static void getSingleCRS(final CoordinateReferenceSystem[] crs, final List singles) {
-        for (int i=0; i<crs.length; i++) {
-            final CoordinateReferenceSystem candidate = crs[i];
+    private static void getSingleCRS(final List/*<CoordinateReferenceSystem>*/ crs,
+                                     final List/*<SingleCRS>*/ singles)
+    {
+        for (final Iterator it=crs.iterator(); it.hasNext();) {
+            final CoordinateReferenceSystem candidate = (CoordinateReferenceSystem) it.next();
             if (candidate instanceof CompoundCRS) {
                 getSingleCRS(((CompoundCRS) candidate).getCoordinateReferenceSystems(), singles);
             } else {
@@ -210,7 +213,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     }
 
     /**
-     * Compare this coordinate reference system with the specified object for equality.
+     * Compares this coordinate reference system with the specified object for equality.
      *
      * @param  object The object to compare to {@code this}.
      * @param  compareMetadata {@code true} for performing a strict comparaison, or
@@ -236,11 +239,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      */
     public int hashCode() {
         // Don't call superclass method since 'coordinateSystem' and 'datum' may be null.
-        int code = (int)serialVersionUID;
-        for (int i=0; i<crs.length; i++) {
-            code = code*37 + crs[i].hashCode();
-        }
-        return code;
+        return crs.hashCode() ^ (int)serialVersionUID;
     }
     
     /**
@@ -252,8 +251,8 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @return The WKT element name, which is "COMPD_CS"
      */
     protected String formatWKT(final Formatter formatter) {
-        for (int i=0; i<crs.length; i++) {
-            formatter.append(crs[i]);
+        for (final Iterator it=crs.iterator(); it.hasNext();) {
+            formatter.append((CoordinateReferenceSystem) it.next());
         }
         return "COMPD_CS";
     }

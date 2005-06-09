@@ -21,7 +21,9 @@ package org.geotools.parameter;
 
 // J2SE dependencies
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 // OpenGIS dependencies
 import org.opengis.metadata.Identifier;
@@ -111,7 +113,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
-    public GenericName[] getAlias() {
+    public Collection/*<GenericName>*/ getAlias() {
         return descriptor.getAlias();
     }
 
@@ -119,7 +121,7 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
      * Forward the call to the {@linkplain MatrixParameterDescriptors matrix parameter descriptors}
      * specified at construction time.
      */
-    public Identifier[] getIdentifiers() {
+    public Set/*<Identifier>*/ getIdentifiers() {
         return descriptor.getIdentifiers();
     }
 
