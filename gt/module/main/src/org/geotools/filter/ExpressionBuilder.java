@@ -385,7 +385,22 @@ public class ExpressionBuilder {
             if (geometryFilterType >= 0)
                 return buildGeometryFilter(geometryFilterType);
             
-            throw new ExpressionException("Could not build function : " + function,getToken(0));
+            FunctionExpression func = factory.createFunctionExpression(function);
+            if (func == null) throw new ExpressionException("Could not build function : " + function,getToken(0));
+
+            int nArgs = func.getArgCount();
+            if (n.jjtGetNumChildren() != nArgs) {
+                throw new ExpressionException(function + " function requires " + nArgs + " arguments",getToken(0));
+            }
+
+            Expression[] args = new Expression[func.getArgCount()];
+            for (int i = 0; i < args.length; i++) {
+                args[i] = expression();
+            }
+            
+            func.setArgs(args);
+            return func; 
+            
         }
         
         /**
