@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.geometry.jts.PreciseCoordinateSequenceTransformer;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
@@ -212,11 +213,11 @@ public class JTS {
         return new Envelope(newcoords[0],newcoords[2],newcoords[1],newcoords[3]);
     }
 
-    public static ReferencedEnvelope transform(ReferencedEnvelope envelope, CoordinateReferenceSystem crs) throws TransformException, OperationNotFoundException, NoSuchElementException, FactoryException {
+    public static ReferencedEnvelope transform(ReferencedEnvelope envelope, CoordinateReferenceSystem crs, boolean lenient) throws TransformException, OperationNotFoundException, NoSuchElementException, FactoryException {
         double[] coords=new double[]{envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
         double[] newcoords=new double[4];
-        MathTransform transform = FactoryFinder.getCoordinateOperationFactory(null)
-        .createOperation(envelope.getCRS(),crs).getMathTransform();
+        
+        MathTransform transform = CRS.transform(envelope.getCRS(),crs,lenient);
         transform.transform(coords, 0, newcoords, 0, 2);
         return new ReferencedEnvelope(new Envelope(newcoords[0],newcoords[2],newcoords[1],newcoords[3]),crs);
     }
