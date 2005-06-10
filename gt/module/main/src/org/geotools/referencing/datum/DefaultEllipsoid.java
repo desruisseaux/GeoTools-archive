@@ -154,7 +154,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
                                                    final double semiMinorAxis,
                                                    final Unit   unit)
     {
-        return createEllipsoid(Collections.singletonMap(NAME_PROPERTY, name),
+        return createEllipsoid(Collections.singletonMap(NAME_KEY, name),
                                semiMajorAxis, semiMinorAxis, unit);
     }
 
@@ -195,7 +195,7 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
                                                          final double inverseFlattening,
                                                          final Unit   unit)
     {
-        return createFlattenedSphere(Collections.singletonMap(NAME_PROPERTY, name),
+        return createFlattenedSphere(Collections.singletonMap(NAME_KEY, name),
                                      semiMajorAxis, inverseFlattening, unit);
     }
     

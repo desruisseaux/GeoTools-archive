@@ -39,6 +39,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -69,7 +70,6 @@ import org.opengis.referencing.operation.OperationMethod;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
@@ -326,15 +326,15 @@ public class Parser extends MathTransformParser {
     {
         final Element element = parent.pullOptionalElement("AUTHORITY");
         if (element == null) {
-            return Collections.singletonMap(AbstractIdentifiedObject.NAME_PROPERTY, name);
+            return Collections.singletonMap(IdentifiedObject.NAME_KEY, name);
         }
         final String auth = element.pullString("name");
         final String code = element.pullString("code");
         element.close();
         final Map     properties = new HashMap(4);
         final Citation authority = CitationImpl.createCitation(auth);
-        properties.put(AbstractIdentifiedObject.       NAME_PROPERTY, new NamedIdentifier(authority, name));
-        properties.put(AbstractIdentifiedObject.IDENTIFIERS_PROPERTY, new NamedIdentifier(authority, code));
+        properties.put(IdentifiedObject.       NAME_KEY, new NamedIdentifier(authority, name));
+        properties.put(IdentifiedObject.IDENTIFIERS_KEY, new NamedIdentifier(authority, code));
         return properties;
     }
 
@@ -352,7 +352,7 @@ public class Parser extends MathTransformParser {
      * @throws ParseException if the "UNIT" can't be parsed.
      *
      * @todo Authority code is currently ignored. We may consider to create a subclass of
-     *       {@link Unit} which implements {@link AbstractIdentifiedObject} in a future version.
+     *       {@link Unit} which implements {@link IdentifiedObject} in a future version.
      */
     private static Unit parseUnit(final Element parent, final Unit unit)
             throws ParseException
@@ -438,7 +438,7 @@ public class Parser extends MathTransformParser {
             }
         }
         return csFactory.createCoordinateSystemAxis(Collections.singletonMap(
-               AbstractIdentifiedObject.NAME_PROPERTY, name), name, direction, unit);
+               IdentifiedObject.NAME_KEY, name), name, direction, unit);
     }
 
     /**
@@ -629,7 +629,7 @@ public class Parser extends MathTransformParser {
             if (properties.size() == 1) {
                 properties = new HashMap(properties);
             }
-            properties.put(DefaultGeodeticDatum.BURSA_WOLF_PROPERTY, toWGS84);
+            properties.put(DefaultGeodeticDatum.BURSA_WOLF_KEY, toWGS84);
         }
         try {
             return datumFactory.createGeodeticDatum(properties, ellipsoid, meridian);
@@ -949,7 +949,7 @@ public class Parser extends MathTransformParser {
                 buffer.setLength(start);
                 buffer.append(number);
                 axis[i] = csFactory.createCoordinateSystemAxis(
-                    Collections.singletonMap(AbstractIdentifiedObject.NAME_PROPERTY, buffer.toString()),
+                    Collections.singletonMap(IdentifiedObject.NAME_KEY, buffer.toString()),
                     number, AxisDirection.OTHER, Unit.ONE);
             }
             return crsFactory.createDerivedCRS(properties, method, base, toBase.inverse(),

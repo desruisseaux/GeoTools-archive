@@ -89,7 +89,7 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
      * @param angularUnit         The angular unit of the longitude.
      */
     public DefaultPrimeMeridian(final String name, final double greenwichLongitude, final Unit angularUnit) {
-        this(Collections.singletonMap(NAME_PROPERTY, name), greenwichLongitude, angularUnit);
+        this(Collections.singletonMap(NAME_KEY, name), greenwichLongitude, angularUnit);
     }
 
     /**

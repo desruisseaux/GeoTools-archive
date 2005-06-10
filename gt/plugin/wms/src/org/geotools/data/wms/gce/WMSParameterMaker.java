@@ -50,8 +50,8 @@ public class WMSParameterMaker {
     private Map fillProperties(String name, String remarks) {
         Map properties = new HashMap();
 
-        properties.put(AbstractIdentifiedObject.NAME_PROPERTY, name);
-        properties.put(AbstractIdentifiedObject.REMARKS_PROPERTY, remarks);
+        properties.put(AbstractIdentifiedObject.NAME_KEY, name);
+        properties.put(AbstractIdentifiedObject.REMARKS_KEY, remarks);
 
         return properties;
     }

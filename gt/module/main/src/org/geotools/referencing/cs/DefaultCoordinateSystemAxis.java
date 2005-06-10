@@ -440,7 +440,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
                                        final AxisDirection direction,
                                        final Unit          unit)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, abbreviation), abbreviation, direction, unit);
+        this(Collections.singletonMap(NAME_KEY, abbreviation), abbreviation, direction, unit);
     }
 
     /**
@@ -473,8 +473,8 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     private static Map toMap(final InternationalString name) {
         final Map properties = new HashMap(4);
         if (name != null) {
-            properties.put(NAME_PROPERTY,  name.toString(Locale.US));
-            properties.put(ALIAS_PROPERTY, NameFactory.create(new InternationalString[] {name}));
+            properties.put(NAME_KEY,  name.toString(Locale.US));
+            properties.put(ALIAS_KEY, NameFactory.create(new InternationalString[] {name}));
         }
         return properties;
     }

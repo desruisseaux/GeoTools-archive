@@ -66,7 +66,7 @@ public class DefaultTemporalDatum extends AbstractDatum implements TemporalDatum
      * @param origin The date and time origin of this temporal datum.
      */
     public DefaultTemporalDatum(final String name, final Date origin) {
-        this(Collections.singletonMap(NAME_PROPERTY, name), origin);
+        this(Collections.singletonMap(NAME_KEY, name), origin);
     }
 
     /**

@@ -43,6 +43,7 @@ import javax.units.Unit;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.AuthorityFactory; // For javadoc
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.IdentifiedObject; // For javadoc
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.GeodeticDatum;
@@ -83,7 +84,7 @@ import org.geotools.resources.XArray;
  * class provides a way to handle that.
  * <br><br>
  * {@code DatumAliases} is a class that determines if a datum name is in our list of aliases and
- * constructs a value for the {@linkplain AbstractIdentifiedObject#ALIAS_PROPERTY aliases property} (as
+ * constructs a value for the {@linkplain IdentifiedObject#ALIAS_KEY aliases property} (as
  * {@linkplain GenericName generic names}) for a name. The default implementation is backed by
  * the text file "{@code DatumAliasesTable.txt}". The first line in this text file must be the
  * authority names. All other lines are the aliases.
@@ -400,8 +401,8 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
     /**
      * Completes the given map of properties. This method expects a map of properties to
      * be given to {@link AbstractDatum#AbstractDatum(Map)} constructor. The name is fetch
-     * from the {@link AbstractIdentifiedObject#NAME_PROPERTY NAME_PROPERTY}.
-     * The {@link AbstractIdentifiedObject#ALIAS_PROPERTY ALIAS_PROPERTY} is
+     * from the {@link IdentifiedObject#NAME_KEY NAME_KEY}.
+     * The {@link AbstractIdentifiedObject#ALIAS_KEY ALIAS_KEY} is
      * completed with the aliases know to this factory.
      *
      * @param  properties The set of properties to complete.
@@ -411,7 +412,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
      */
     private Map addAliases(Map properties) {
         ensureNonNull("properties", properties);
-        Object value = properties.get(AbstractIdentifiedObject.NAME_PROPERTY);
+        Object value = properties.get(IdentifiedObject.NAME_KEY);
         ensureNonNull("name", value);
         final String name;
         if (value instanceof Identifier) {
@@ -429,7 +430,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
              * acts as a FIFO queue).
              */
             int count = aliases.length;
-            value = properties.get(AbstractIdentifiedObject.ALIAS_PROPERTY);
+            value = properties.get(IdentifiedObject.ALIAS_KEY);
             if (value != null) {
                 final Map merged/*<String,GenericName>*/ = new LinkedHashMap();
                 putAll(NameFactory.toArray(value), merged);
@@ -443,7 +444,7 @@ public class DatumAliases extends AbstractFactory implements DatumFactory {
              */
             if (count > 0) {
                 properties = new HashMap(properties);
-                properties.put(AbstractIdentifiedObject.ALIAS_PROPERTY, aliases);
+                properties.put(IdentifiedObject.ALIAS_KEY, aliases);
             }
         }
         return properties;

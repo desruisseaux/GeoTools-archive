@@ -85,7 +85,7 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
                               final VerticalDatum datum,
                               final VerticalCS       cs)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
+        this(Collections.singletonMap(NAME_KEY, name), datum, cs);
     }
 
     /**

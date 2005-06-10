@@ -58,20 +58,24 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      * Key for the <code>{@value #VALID_AREA_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractReferenceSystem(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getValidArea()}.
+     *
+     * @deprecated Replaced by {@link #VALID_AREA_KEY}.
      */
-    public static final String VALID_AREA_PROPERTY = "validArea";
+    public static final String VALID_AREA_PROPERTY = VALID_AREA_KEY;
 
     /**
      * Key for the <code>{@value #SCOPE_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractReferenceSystem(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getScope()}.
+     *
+     * @deprecated Replaced by {@link #SCOPE_KEY}.
      */
-    public static final String SCOPE_PROPERTY = "scope";
+    public static final String SCOPE_PROPERTY = SCOPE_KEY;
 
     /**
      * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
      */
-    private static final String[] LOCALIZABLES = {SCOPE_PROPERTY};
+    private static final String[] LOCALIZABLES = {SCOPE_KEY};
 
     /**
      * Area for which the (coordinate) reference system is valid.
@@ -97,12 +101,12 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #VALID_AREA_PROPERTY "validArea"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VALID_AREA_KEY "validArea"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getValidArea}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #SCOPE_PROPERTY "scope"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #SCOPE_KEY "scope"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
@@ -118,8 +122,8 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      */
     private AbstractReferenceSystem(final Map properties, final Map subProperties) {
         super(properties, subProperties, LOCALIZABLES);
-        validArea = (Extent)              subProperties.get(VALID_AREA_PROPERTY);
-        scope     = (InternationalString) subProperties.get(SCOPE_PROPERTY);
+        validArea = (Extent)              subProperties.get(VALID_AREA_KEY);
+        scope     = (InternationalString) subProperties.get(SCOPE_KEY);
     }
 
     /**

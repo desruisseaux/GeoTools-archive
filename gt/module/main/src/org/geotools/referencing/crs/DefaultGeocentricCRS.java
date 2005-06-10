@@ -94,7 +94,7 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
                                 final GeodeticDatum datum,
                                 final CartesianCS      cs)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
+        this(Collections.singletonMap(NAME_KEY, name), datum, cs);
     }
 
     /**
@@ -108,7 +108,7 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
                                 final GeodeticDatum datum,
                                 final SphericalCS      cs)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
+        this(Collections.singletonMap(NAME_KEY, name), datum, cs);
     }
 
     /**

@@ -108,29 +108,37 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * Key for the <code>{@value #NAME_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getName}.
+     *
+     * @deprecated Replaced by {@link #NAME_KEY}.
      */
-    public static final String NAME_PROPERTY = "name";
+    public static final String NAME_PROPERTY = NAME_KEY;
 
     /**
      * Key for the <code>{@value #ALIAS_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getAlias()}.
+     *
+     * @deprecated Replaced by {@link #ALIAS_KEY}.
      */
-    public static final String ALIAS_PROPERTY = "alias";
+    public static final String ALIAS_PROPERTY = ALIAS_KEY;
 
     /**
      * Key for the <code>{@value #IDENTIFIERS_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getIdentifiers()}.
+     *
+     * @deprecated Replaced by {@link #IDENTIFIERS_KEY}.
      */
-    public static final String IDENTIFIERS_PROPERTY = "identifiers";
+    public static final String IDENTIFIERS_PROPERTY = IDENTIFIERS_KEY;
     
     /**
      * Key for the <code>{@value #REMARKS_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getRemarks()}.
+     *
+     * @deprecated Replaced by {@link #REMARKS_KEY}.
      */
-    public static final String REMARKS_PROPERTY = "remarks";
+    public static final String REMARKS_PROPERTY = REMARKS_KEY;
    
     /**
      * A comparator for sorting identified objects by {@linkplain #getName name}.
@@ -221,33 +229,33 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #NAME_PROPERTY "name"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #NAME_KEY "name"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link Identifier}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getName}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #ALIAS_PROPERTY "alias"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #ALIAS_KEY "alias"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}, <code>{@linkplain String}[]</code>,
      *     {@link GenericName} or <code>{@linkplain GenericName}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getAlias}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link NamedIdentifier#AUTHORITY_PROPERTY "authority"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link Identifier#AUTHORITY_KEY "authority"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the {@linkplain #getName name}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link NamedIdentifier#VERSION_PROPERTY "version"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link Identifier#VERSION_KEY "version"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the {@linkplain #getName name}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #IDENTIFIERS_PROPERTY "identifiers"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #IDENTIFIERS_KEY "identifiers"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Identifier} or <code>{@linkplain Identifier}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getIdentifiers}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #REMARKS_PROPERTY "remarks"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #REMARKS_KEY "remarks"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getRemarks}</td>
      *   </tr>
@@ -332,7 +340,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 // "name": String or Identifier
                 // ----------------------------
                 case 3373707: {
-                    if (key.equals(NAME_PROPERTY)) {
+                    if (key.equals(NAME_KEY)) {
                         if (value instanceof String) {
                             name = new NamedIdentifier(properties, false);
                             assert value.equals(((Identifier) name).getCode()) : name;
@@ -347,7 +355,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 // "alias": String, String[], GenericName or GenericName[]
                 // -------------------------------------------------------
                 case 92902992: {
-                    if (key.equals(ALIAS_PROPERTY)) {
+                    if (key.equals(ALIAS_KEY)) {
                         alias = NameFactory.toArray(value);
                         continue NEXT_KEY;
                     }
@@ -357,7 +365,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 // "identifiers": Identifier or Identifier[]
                 // -----------------------------------------
                 case 1368189162: {
-                    if (key.equals(IDENTIFIERS_PROPERTY)) {
+                    if (key.equals(IDENTIFIERS_KEY)) {
                         if (value != null) {
                             if (value instanceof Identifier) {
                                 identifiers = new Identifier[] {(Identifier) value};
@@ -373,7 +381,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                 // "remarks": String or InternationalString
                 // ----------------------------------------
                 case 1091415283: {
-                    if (key.equals(REMARKS_PROPERTY)) {
+                    if (key.equals(REMARKS_KEY)) {
                         if (value instanceof InternationalString) {
                             remarks = value;
                             continue NEXT_KEY;
@@ -395,7 +403,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
                         growable = new GrowableInternationalString();
                     }
                 }
-                if (growable.add(REMARKS_PROPERTY, key, value.toString())) {
+                if (growable.add(REMARKS_KEY, key, value.toString())) {
                     continue NEXT_KEY;
                 }
             }
@@ -467,18 +475,18 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
          */
         String key=null; Object value=null;
         try {
-            key=        NAME_PROPERTY; this.name        =          (Identifier) (value=name);
-            key=       ALIAS_PROPERTY; this.alias       = asSet((GenericName[]) (value=alias));
-            key= IDENTIFIERS_PROPERTY; this.identifiers = asSet( (Identifier[]) (value=identifiers));
-            key=     REMARKS_PROPERTY; this.remarks     = (InternationalString) (value=remarks);
+            key=        NAME_KEY; this.name        =          (Identifier) (value=name);
+            key=       ALIAS_KEY; this.alias       = asSet((GenericName[]) (value=alias));
+            key= IDENTIFIERS_KEY; this.identifiers = asSet( (Identifier[]) (value=identifiers));
+            key=     REMARKS_KEY; this.remarks     = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
             InvalidParameterValueException e = new InvalidParameterValueException(Resources.format(
                                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, value), key, value);
             e.initCause(exception);
             throw e;
         }
-        ensureNonNull(NAME_PROPERTY, name);
-        ensureNonNull(NAME_PROPERTY, name.toString());
+        ensureNonNull(NAME_KEY, name);
+        ensureNonNull(NAME_KEY, name.toString());
     }
 
     /**
@@ -516,7 +524,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
 
     /**
      * Returns the informations provided in the specified indentified object as a map of
-     * properties. The returned map contains key such as {@link #NAME_PROPERTY}, and values
+     * properties. The returned map contains key such as {@link #NAME_KEY}, and values
      * from methods such as {@link IdentifiedObject#getName}.
      *
      * @param  info The identified object to view as a properties map.
@@ -735,8 +743,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * or {@link LinkedHashSet} comparaisons. This convenience method is provided for
      * implementation of {@code equals} method in subclasses.
      *
-     * @param  array1 The first collection to compare (may be {@code null}).
-     * @param  array2 The second collection to compare (may be {@code null}).
+     * @param  collection1 The first collection to compare (may be {@code null}).
+     * @param  collection2 The second collection to compare (may be {@code null}).
      * @param  compareMetadata {@code true} for performing a strict comparaison, or
      *         {@code false} for comparing only properties relevant to transformations.
      * @return {@code true} if both collections are equal.

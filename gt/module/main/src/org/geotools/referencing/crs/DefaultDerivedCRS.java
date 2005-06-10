@@ -79,7 +79,7 @@ public class DefaultDerivedCRS extends AbstractDerivedCRS implements DerivedCRS 
                              final CoordinateSystem     derivedCS)
             throws MismatchedDimensionException
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), method, base, baseToDerived, derivedCS);
+        this(Collections.singletonMap(NAME_KEY, name), method, base, baseToDerived, derivedCS);
     }
 
     /**

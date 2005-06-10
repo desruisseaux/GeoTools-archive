@@ -72,35 +72,43 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      * Key for the <code>"anchorPoint"</code> property to be given to the
      * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getAnchorPoint()}.
+     *
+     * @deprecated Replaced by {@link #ANCHOR_POINT_KEY}.
      */
-    public static final String ANCHOR_POINT_PROPERTY = "anchorPoint";
+    public static final String ANCHOR_POINT_PROPERTY = ANCHOR_POINT_KEY;
 
     /**
      * Key for the <code>"realizationEpoch"</code> property to be given to the
      * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getRealizationEpoch()}.
+     *
+     * @deprecated Replaced by {@link #REALIZATION_EPOCH_KEY}.
      */
-    public static final String REALIZATION_EPOCH_PROPERTY = "realizationEpoch";
+    public static final String REALIZATION_EPOCH_PROPERTY = REALIZATION_EPOCH_KEY;
 
     /**
      * Key for the <code>"validArea"</code> property to be given to the
      * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getValidArea()}.
+     *
+     * @deprecated Replaced by {@link #VALID_AREA_KEY}.
      */
-    public static final String VALID_AREA_PROPERTY = "validArea";
+    public static final String VALID_AREA_PROPERTY = VALID_AREA_KEY;
 
     /**
      * Key for the <code>"scope"</code> property to be given to the
      * {@linkplain #AbstractDatum(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getScope()}.
+     *
+     * @deprecated Replaced by {@link #SCOPE_KEY}.
      */
-    public static final String SCOPE_PROPERTY = "scope";
+    public static final String SCOPE_PROPERTY = SCOPE_KEY;
     
     /**
      * List of localizable properties. To be given to
      * {@link AbstractIdentifiedObject} constructor.
      */
-    private static final String[] LOCALIZABLES = {ANCHOR_POINT_PROPERTY, SCOPE_PROPERTY};
+    private static final String[] LOCALIZABLES = {ANCHOR_POINT_KEY, SCOPE_KEY};
 
     /**
      * Description, possibly including coordinates, of the point or points used to anchor the datum
@@ -139,22 +147,22 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #ANCHOR_POINT_PROPERTY "anchorPoint"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #ANCHOR_POINT_KEY "anchorPoint"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link InternationalString} or {@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getAnchorPoint}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #REALIZATION_EPOCH_PROPERTY "realizationEpoch"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #REALIZATION_EPOCH_KEY "realizationEpoch"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Date}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getRealizationEpoch}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #VALID_AREA_PROPERTY "validArea"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VALID_AREA_KEY "validArea"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getValidArea}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #SCOPE_PROPERTY "scope"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #SCOPE_KEY "scope"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link InternationalString} or {@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
@@ -171,10 +179,10 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     private AbstractDatum(final Map properties, final Map subProperties) {
         super(properties, subProperties, LOCALIZABLES);
         final Date realizationEpoch;
-        anchorPoint      = (InternationalString) subProperties.get(ANCHOR_POINT_PROPERTY     );
-        realizationEpoch = (Date)                subProperties.get(REALIZATION_EPOCH_PROPERTY);
-        validArea        = (Extent)              subProperties.get(VALID_AREA_PROPERTY       );
-        scope            = (InternationalString) subProperties.get(SCOPE_PROPERTY            );
+        anchorPoint      = (InternationalString) subProperties.get(ANCHOR_POINT_KEY     );
+        realizationEpoch = (Date)                subProperties.get(REALIZATION_EPOCH_KEY);
+        validArea        = (Extent)              subProperties.get(VALID_AREA_KEY       );
+        scope            = (InternationalString) subProperties.get(SCOPE_KEY            );
         this.realizationEpoch = (realizationEpoch != null) ?
                                  realizationEpoch.getTime() : Long.MIN_VALUE;
     }

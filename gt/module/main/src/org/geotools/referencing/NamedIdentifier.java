@@ -83,29 +83,42 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * Key for the <code>{@value #CODE_PROPERTY}</code> property to be given to the
      * {@linkplain #NamedIdentifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getCode()}.
+     *
+     * @deprecated Replaced by {@link #CODE_KEY}.
      */
-    public static final String CODE_PROPERTY = "code";
+    public static final String CODE_PROPERTY = CODE_KEY;
 
     /**
      * Key for the <code>{@value #AUTHORITY_PROPERTY}</code> property to be given to the
      * {@linkplain #NamedIdentifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getAuthority()}.
+     *
+     * @deprecated Replaced by {@link #AUTHORITY_KEY}.
      */
-    public static final String AUTHORITY_PROPERTY = "authority";
+    public static final String AUTHORITY_PROPERTY = AUTHORITY_KEY;
 
     /**
      * Key for the <code>{@value #VERSION_PROPERTY}</code> property to be given to the
      * {@linkplain #NamedIdentifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getVersion()}.
+     *
+     * @deprecated Replaced by {@link #VERSION_KEY}.
      */
-    public static final String VERSION_PROPERTY = "version";
+    public static final String VERSION_PROPERTY = VERSION_KEY;
+
+    /**
+     * @todo Replace by static import once we are allowed to compile for J2SE 1.5.
+     */
+    private static final String REMARKS_KEY = org.opengis.referencing.IdentifiedObject.REMARKS_KEY;
     
     /**
      * Key for the <code>{@value #REMARKS_PROPERTY}</code> property to be given to the
      * {@linkplain #NamedIdentifier(Map) constructor}. This is used
      * for setting the value to be returned by {@link #getRemarks()}.
+     *
+     * @deprecated Replaced by {@link org.opengis.referencing.IdentifiedObject#REMARKS_KEY}.
      */
-    public static final String REMARKS_PROPERTY = "remarks";
+    public static final String REMARKS_PROPERTY = REMARKS_KEY;
 
     /**
      * A pool of {@link LocalName} values for given {@link InternationalString}.
@@ -159,22 +172,22 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #CODE_PROPERTY "code"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #CODE_KEY "code"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getCode}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #AUTHORITY_PROPERTY "authority"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #AUTHORITY_KEY "authority"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getAuthority}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #VERSION_PROPERTY "version"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VERSION_KEY "version"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getVersion}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #REMARKS_PROPERTY "remarks"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #REMARKS_KEY "remarks"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getRemarks}</td>
      *   </tr>
@@ -244,9 +257,9 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
                              final String   version)
     {
         final Map properties = new HashMap(4);
-        if (authority != null) properties.put(AUTHORITY_PROPERTY, authority);
-        if (code      != null) properties.put(     CODE_PROPERTY, code     );
-        if (version   != null) properties.put(  VERSION_PROPERTY, version  );
+        if (authority != null) properties.put(AUTHORITY_KEY, authority);
+        if (code      != null) properties.put(     CODE_KEY, code     );
+        if (version   != null) properties.put(  VERSION_KEY, version  );
         return properties;
     }
 
@@ -298,21 +311,21 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
                     break;
                 }
                 case 3059181: {
-                    if (key.equals(CODE_PROPERTY)) {
+                    if (key.equals(CODE_KEY)) {
                         code = value;
                         continue;
                     }
                     break;
                 }
                 case 351608024: {
-                    if (key.equals(VERSION_PROPERTY)) {
+                    if (key.equals(VERSION_KEY)) {
                         version = value;
                         continue;
                     }
                     break;
                 }
                 case 1475610435: {
-                    if (key.equals(AUTHORITY_PROPERTY)) {
+                    if (key.equals(AUTHORITY_KEY)) {
                         if (value instanceof String) {
                             value = new CitationImpl(value.toString());
                         }
@@ -322,7 +335,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
                     break;
                 }
                 case 1091415283: {
-                    if (standalone && key.equals(REMARKS_PROPERTY)) {
+                    if (standalone && key.equals(REMARKS_KEY)) {
                         if (value instanceof InternationalString) {
                             remarks = value;
                             continue;
@@ -342,7 +355,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
                         growable = new GrowableInternationalString();
                     }
                 }
-                growable.add(REMARKS_PROPERTY, key, value.toString());
+                growable.add(REMARKS_KEY, key, value.toString());
             }
         }
         /*
@@ -364,17 +377,17 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
          * are rethrown them as more informative exceptions.
          */
         try {
-            key=      CODE_PROPERTY; this.code      = (String)              (value=code);
-            key=   VERSION_PROPERTY; this.version   = (String)              (value=version);
-            key= AUTHORITY_PROPERTY; this.authority = (Citation)            (value=authority);
-            key=   REMARKS_PROPERTY; this.remarks   = (InternationalString) (value=remarks);
+            key=      CODE_KEY; this.code      = (String)              (value=code);
+            key=   VERSION_KEY; this.version   = (String)              (value=version);
+            key= AUTHORITY_KEY; this.authority = (Citation)            (value=authority);
+            key=   REMARKS_KEY; this.remarks   = (InternationalString) (value=remarks);
         } catch (ClassCastException exception) {
             InvalidParameterValueException e = new InvalidParameterValueException(Resources.format(
                                    ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, key, value), key, value);
             e.initCause(exception);
             throw e;
         }
-        ensureNonNull(CODE_PROPERTY, code);
+        ensureNonNull(CODE_KEY, code);
     }
     
     /**

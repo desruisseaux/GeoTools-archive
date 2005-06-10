@@ -587,7 +587,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * The default value is 3, which is the value implied in OGC's WKT.
          */
         private static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
-                    Collections.singletonMap(NAME_PROPERTY,
+                    Collections.singletonMap(NAME_KEY,
                                              new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
                     3, 2, 3, false);
 

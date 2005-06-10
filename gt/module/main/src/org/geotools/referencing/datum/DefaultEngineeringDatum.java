@@ -65,8 +65,8 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
     public static final DefaultEngineeringDatum UNKNOW;
     static {
         final Map properties = new HashMap(4);
-        properties.put( NAME_PROPERTY, "Unknow");
-        properties.put(ALIAS_PROPERTY,
+        properties.put( NAME_KEY, "Unknow");
+        properties.put(ALIAS_KEY,
                        new LocalName(Resources.formatInternational(ResourceKeys.UNKNOW)));
         UNKNOW = new DefaultEngineeringDatum(properties);
     }
@@ -77,7 +77,7 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
      * @param name The datum name.
      */
     public DefaultEngineeringDatum(final String name) {
-        this(Collections.singletonMap(NAME_PROPERTY, name));
+        this(Collections.singletonMap(NAME_KEY, name));
     }
 
     /**

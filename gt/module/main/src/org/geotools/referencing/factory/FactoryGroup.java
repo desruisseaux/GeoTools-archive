@@ -538,7 +538,7 @@ search:     for (final Iterator it=sources.iterator(); it.hasNext();) {
      * Returns a temporary name for object derived from the specified one.
      */
     private static Map getTemporaryName(final IdentifiedObject source) {
-        return Collections.singletonMap(AbstractIdentifiedObject.NAME_PROPERTY,
+        return Collections.singletonMap(IdentifiedObject.NAME_KEY,
                                         source.getName().getCode() + " (3D)");
     }
 }

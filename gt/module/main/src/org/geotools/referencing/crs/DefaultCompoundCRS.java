@@ -106,7 +106,7 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * @param crs The array of coordinate reference system making this compound CRS.
      */
     public DefaultCompoundCRS(final String name, final CoordinateReferenceSystem[] crs) {
-        this(Collections.singletonMap(NAME_PROPERTY, name), crs);
+        this(Collections.singletonMap(NAME_KEY, name), crs);
     }
 
     /**

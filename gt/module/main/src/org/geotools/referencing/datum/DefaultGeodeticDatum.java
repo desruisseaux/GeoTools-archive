@@ -80,17 +80,25 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
             new NamedIdentifier(CitationImpl.EPSG,   "World Geodetic System 1984")
         };
         final Map properties = new HashMap(4);
-        properties.put(NAME_PROPERTY,  identifiers[0]);
-        properties.put(ALIAS_PROPERTY, identifiers);
+        properties.put(NAME_KEY,  identifiers[0]);
+        properties.put(ALIAS_KEY, identifiers);
         WGS84 = new DefaultGeodeticDatum(properties, DefaultEllipsoid.WGS84,
                                          DefaultPrimeMeridian.GREENWICH);
     }
 
     /**
-     * The <code>{@value #BURSA_WOLF_PROPERTY}</code> property for
+     * The <code>{@value #BURSA_WOLF_KEY}</code> property for
      * {@linkplain #getAffineTransform datum shifts}.
      */
-    public static final String BURSA_WOLF_PROPERTY = "bursaWolf";
+    public static final String BURSA_WOLF_KEY = "bursaWolf";
+
+    /**
+     * The <code>{@value #BURSA_WOLF_PROPERTY}</code> property for
+     * {@linkplain #getAffineTransform datum shifts}.
+     *
+     * @deprecated Renamed as {@link #BURSA_WOLF_KEY}.
+     */
+    public static final String BURSA_WOLF_PROPERTY = BURSA_WOLF_KEY;
 
     /**
      * The ellipsoid.
@@ -118,7 +126,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
                                 final Ellipsoid     ellipsoid,
                                 final PrimeMeridian primeMeridian)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), ellipsoid, primeMeridian);
+        this(Collections.singletonMap(NAME_KEY, name), ellipsoid, primeMeridian);
     }
 
     /**
@@ -133,7 +141,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #BURSA_WOLF_PROPERTY "bursaWolf"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #BURSA_WOLF_KEY "bursaWolf"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link BursaWolfParameters} or an array of those&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getBursaWolfParameters}</td>
      *   </tr>
@@ -153,7 +161,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
         ensureNonNull("ellipsoid",     ellipsoid);
         ensureNonNull("primeMeridian", primeMeridian);
         BursaWolfParameters[] bursaWolf;
-        final Object object = properties.get(BURSA_WOLF_PROPERTY);
+        final Object object = properties.get(BURSA_WOLF_KEY);
         if (object instanceof BursaWolfParameters) {
             bursaWolf = new BursaWolfParameters[] {
                 (BursaWolfParameters) ((BursaWolfParameters) object).clone()

@@ -88,7 +88,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     public DefaultConcatenatedOperation(final String name,
                                         final CoordinateOperation[] operations)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), operations);
+        this(Collections.singletonMap(NAME_KEY, name), operations);
     }
 
     /**
@@ -265,7 +265,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
     private static Map mergeAccuracy(final Map properties,
                                      final List/*<CoordinateOperation>*/ operations)
     {
-        if (!properties.containsKey(POSITIONAL_ACCURACY_PROPERTY)) {
+        if (!properties.containsKey(POSITIONAL_ACCURACY_KEY)) {
             Set accuracy = null;
             for (final Iterator it=operations.iterator(); it.hasNext();) {
                 final Collection/*<PositionalAccuracy>*/ candidates =
@@ -279,7 +279,7 @@ public class DefaultConcatenatedOperation extends AbstractCoordinateOperation
             }
             if (accuracy != null) {
                 final Map merged = new HashMap(properties);
-                merged.put(POSITIONAL_ACCURACY_PROPERTY,
+                merged.put(POSITIONAL_ACCURACY_KEY,
                            accuracy.toArray(new PositionalAccuracy[accuracy.size()]));
                 return merged;
             }

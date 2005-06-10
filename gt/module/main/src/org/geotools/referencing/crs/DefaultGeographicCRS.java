@@ -100,7 +100,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
                                 final GeodeticDatum datum,
                                 final EllipsoidalCS    cs)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
+        this(Collections.singletonMap(NAME_KEY, name), datum, cs);
     }
 
     /**

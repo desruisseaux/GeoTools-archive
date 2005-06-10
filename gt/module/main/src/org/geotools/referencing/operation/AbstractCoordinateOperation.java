@@ -91,49 +91,55 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      * An empty array of positional accuracy. This is usefull for fetching accuracies as an array,
      * using the following idiom:
      * <blockquote><pre>
-     * {@linkplain #getPositionalAccuracies()}.toArray(EMPTY_ACCURACY_ARRAY);
+     * {@linkplain #getPositionalAccuracy()}.toArray(EMPTY_ACCURACY_ARRAY);
      * </pre></blockquote>
      */
     public static final PositionalAccuracy[] EMPTY_ACCURACY_ARRAY = new PositionalAccuracy[0];
-
-    /**
-     * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
-     *
-     * @todo Declare constants
-     */
-    private static final String[] LOCALIZABLES = {"scope"};
 
     /**
      * Key for the <code>{@value #OPERATION_VERSION_PROPERTY}</code> property to be given
      * to the {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
      * CoordinateReferenceSystem, MathTransform) constructor}. This is used
      * for setting the value to be returned by {@link #getOperationVersion}.
+     *
+     * @deprecated Replaced by {@link #OPERATION_VERSION_KEY}.
      */
-    public static final String OPERATION_VERSION_PROPERTY = "operationVersion";
+    public static final String OPERATION_VERSION_PROPERTY = OPERATION_VERSION_KEY;
 
     /**
      * Key for the <code>{@value #POSITIONAL_ACCURACY_PROPERTY}</code> property to be given
      * to the {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
      * CoordinateReferenceSystem, MathTransform) constructor}. This is used
      * for setting the value to be returned by {@link #getPositionalAccuracy}.
+     *
+     * @deprecated Replaced by {@link #POSITIONAL_ACCURACY_KEY}.
      */
-    public static final String POSITIONAL_ACCURACY_PROPERTY = "positionalAccuracy";
+    public static final String POSITIONAL_ACCURACY_PROPERTY = POSITIONAL_ACCURACY_KEY;
 
     /**
      * Key for the <code>{@value #VALID_AREA_PROPERTY}</code> property to be given
      * to the {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
      * CoordinateReferenceSystem, MathTransform) constructor}. This is used
      * for setting the value to be returned by {@link #getValidArea}.
+     *
+     * @deprecated Replaced by {@link #VALID_AREA_KEY}.
      */
-    public static final String VALID_AREA_PROPERTY = "validArea";
+    public static final String VALID_AREA_PROPERTY = VALID_AREA_KEY;
 
     /**
      * Key for the <code>{@value #SCOPE_PROPERTY}</code> property to be given to the
      * {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
      * CoordinateReferenceSystem, MathTransform) constructor}. This is used
      * for setting the value to be returned by {@link #getScope}.
+     *
+     * @deprecated Replaced by {@link #SCOPE_KEY}.
      */
-    public static final String SCOPE_PROPERTY = "scope";
+    public static final String SCOPE_PROPERTY = SCOPE_KEY;
+
+    /**
+     * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
+     */
+    private static final String[] LOCALIZABLES = {SCOPE_KEY};
 
     /**
      * The source CRS, or {@code null} if not available.
@@ -206,22 +212,22 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      *     <th nowrap>Value given to</th>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #OPERATION_VERSION_PROPERTY "operationVersion"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #OPERATION_VERSION_KEY "operationVersion"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getOperationVersion}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #POSITIONAL_ACCURACY_PROPERTY "positionalAccuracy"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #POSITIONAL_ACCURACY_KEY "positionalAccuracy"}&nbsp;</td>
      *     <td nowrap>&nbsp;<code>{@linkplain PositionalAccuracy}[]</code>&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getPositionalAccuracy}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #VALID_AREA_PROPERTY "validArea"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #VALID_AREA_KEY "validArea"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link Extent}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getValidArea}</td>
      *   </tr>
      *   <tr>
-     *     <td nowrap>&nbsp;{@link #SCOPE_PROPERTY "scope"}&nbsp;</td>
+     *     <td nowrap>&nbsp;{@link #SCOPE_KEY "scope"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link InternationalString}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link #getScope}</td>
      *   </tr>
@@ -252,16 +258,16 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     {
         super(properties, subProperties, LOCALIZABLES);
         PositionalAccuracy[] positionalAccuracy;
-        validArea          = (Extent)               subProperties.get(VALID_AREA_PROPERTY         );
-        scope              = (InternationalString)  subProperties.get(SCOPE_PROPERTY              );
-        operationVersion   = (String)               subProperties.get(OPERATION_VERSION_PROPERTY  );
-        positionalAccuracy = (PositionalAccuracy[]) subProperties.get(POSITIONAL_ACCURACY_PROPERTY);
+        validArea          = (Extent)               subProperties.get(VALID_AREA_KEY         );
+        scope              = (InternationalString)  subProperties.get(SCOPE_KEY              );
+        operationVersion   = (String)               subProperties.get(OPERATION_VERSION_KEY  );
+        positionalAccuracy = (PositionalAccuracy[]) subProperties.get(POSITIONAL_ACCURACY_KEY);
         if (positionalAccuracy==null || positionalAccuracy.length==0) {
             positionalAccuracy = null;
         } else {
             positionalAccuracy = (PositionalAccuracy[]) positionalAccuracy.clone();
             for (int i=0; i<positionalAccuracy.length; i++) {
-                ensureNonNull(POSITIONAL_ACCURACY_PROPERTY, positionalAccuracy, i);
+                ensureNonNull(POSITIONAL_ACCURACY_KEY, positionalAccuracy, i);
             }
         }
         this.positionalAccuracy = asSet(positionalAccuracy);

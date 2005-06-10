@@ -101,7 +101,7 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
                                final CartesianCS       derivedCS)
             throws MismatchedDimensionException
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), method, base, baseToDerived, derivedCS);
+        this(Collections.singletonMap(NAME_KEY, name), method, base, baseToDerived, derivedCS);
     }
 
     /**

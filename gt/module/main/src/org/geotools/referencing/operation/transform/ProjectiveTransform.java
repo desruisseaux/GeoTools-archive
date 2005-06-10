@@ -481,9 +481,9 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         static {
             final NamedIdentifier name = new NamedIdentifier(CitationImpl.OGC, "Affine");
             final Map  properties = new HashMap(4, 0.8f);
-            properties.put(NAME_PROPERTY,        name);
-            properties.put(IDENTIFIERS_PROPERTY, name);
-            properties.put(ALIAS_PROPERTY, new NamedIdentifier[] {name,
+            properties.put(NAME_KEY,        name);
+            properties.put(IDENTIFIERS_KEY, name);
+            properties.put(ALIAS_KEY, new NamedIdentifier[] {name,
                 new NamedIdentifier(CitationImpl.EPSG, "Affine general parametric transformation"),
                 new NamedIdentifier(CitationImpl.EPSG, "9624"),
                 new NamedIdentifier(CitationImpl.GEOTOOLS,

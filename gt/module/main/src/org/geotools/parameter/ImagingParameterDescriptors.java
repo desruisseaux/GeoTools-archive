@@ -39,6 +39,7 @@ import javax.media.jai.RegistryElementDescriptor;
 import javax.media.jai.registry.RenderedRegistryMode;
 
 // OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Role;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
@@ -46,7 +47,6 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.metadata.iso.citation.ContactImpl;
 import org.geotools.metadata.iso.citation.CitationImpl;
@@ -106,7 +106,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
      *        singleton with the (<code>{@linkplain java.awt.image.RenderedImage}.class</code>,
      *        <code>{@linkplain org.opengis.coverage.grid.GridCoverage}.class</code>) key-value
      *        pair.
-     * @param mode The JAI's registry mode (usually {@value RenderedRegistryMode#MODE_NAME}).
+     * @param registryMode The JAI's registry mode (usually {@value RenderedRegistryMode#MODE_NAME}).
      */
     public ImagingParameterDescriptors(final RegistryElementDescriptor operation,
                                        final Map/*<Class,Class>*/ sourceTypeMap,
@@ -157,10 +157,10 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
             final OperationDescriptor op = (OperationDescriptor) operation;
             final ResourceBundle  bundle = op.getResourceBundle(Locale.getDefault());
             final Map properties = new HashMap();
-            properties.put(NAME_PROPERTY, name);
-            properties.put(ALIAS_PROPERTY,   new ImagingParameterDescription(op, "LocalName"));
-            properties.put(REMARKS_PROPERTY, new ImagingParameterDescription(op, "Description"));
-            properties.put(NamedIdentifier.VERSION_PROPERTY, bundle.getString("Version"));
+            properties.put(NAME_KEY, name);
+            properties.put(ALIAS_KEY,   new ImagingParameterDescription(op, "LocalName"));
+            properties.put(REMARKS_KEY, new ImagingParameterDescription(op, "Description"));
+            properties.put(Identifier.VERSION_KEY, bundle.getString("Version"));
             try {
                 final URI                     uri = new URI(bundle.getString("DocURL"));
                 final OnLineResourceImpl resource = new OnLineResourceImpl(uri);
@@ -171,14 +171,14 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
                 party.setOrganisationName(vendor);
                 party.setContactInfo(contact);
                 citation.setCitedResponsibleParties(Collections.singleton(party));
-                properties.put(NamedIdentifier.AUTHORITY_PROPERTY, citation.unmodifiable());
+                properties.put(Identifier.AUTHORITY_KEY, citation.unmodifiable());
             } catch (URISyntaxException exception) {
                 // Invalid URI syntax. Ignore, since this property
                 // was really just for information purpose.
             }
             return properties;
         } else {
-            return Collections.singletonMap(NAME_PROPERTY, name);
+            return Collections.singletonMap(NAME_KEY, name);
         }
     }
 
@@ -226,12 +226,12 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
                     if (length != 0) {
                         final char c = name.charAt(length-1);
                         if (c=='0' || c=='1') {
-                            properties.put(ALIAS_PROPERTY, name);
+                            properties.put(ALIAS_KEY, name);
                             name = name.substring(0, length-1);
                         }
                     }
                 }
-                properties.put(NAME_PROPERTY, name);
+                properties.put(NAME_KEY, name);
                 desc[i] = new DefaultParameterDescriptor(properties, type,
                                                          null,   // validValues
                                                          null,   // defaultValue
@@ -275,12 +275,12 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
                 defaultValue = null;
             }
             properties.clear();
-            properties.put(NAME_PROPERTY, name);
+            properties.put(NAME_KEY, name);
             if (operation instanceof OperationDescriptor) {
                 final ImagingParameterDescription remark =
                         new ImagingParameterDescription((OperationDescriptor) operation, i);
                 if (remark.exists()) {
-                    properties.put(REMARKS_PROPERTY, remark);
+                    properties.put(REMARKS_KEY, remark);
                 }
             }
             desc[i + numSources] = new DefaultParameterDescriptor(properties,

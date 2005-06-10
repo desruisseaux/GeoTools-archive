@@ -90,8 +90,6 @@ import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.datum.AbstractDatum;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
@@ -589,15 +587,15 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             properties.clear();
         }
         if (name != null) {
-            properties.put(prepend(AbstractIdentifiedObject.NAME_PROPERTY),
+            properties.put(prepend(IdentifiedObject.NAME_KEY),
                            new NamedIdentifier(authority, name.trim()));
         }
         if (code != null) {
-            properties.put(prepend(AbstractIdentifiedObject.IDENTIFIERS_PROPERTY),
+            properties.put(prepend(IdentifiedObject.IDENTIFIERS_KEY),
                            new NamedIdentifier(authority, code.trim()));
         }
         if (remarks!=null && (remarks=remarks.trim()).length()!=0) {
-            properties.put(prepend(AbstractIdentifiedObject.REMARKS_PROPERTY), remarks);
+            properties.put(prepend(IdentifiedObject.REMARKS_KEY), remarks);
         }
         /*
          * Search for alias.
@@ -632,7 +630,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         }
         result.close();
         if (alias != null) {
-            properties.put(prepend(AbstractIdentifiedObject.ALIAS_PROPERTY),
+            properties.put(prepend(IdentifiedObject.ALIAS_KEY),
                            (GenericName[]) alias.toArray(new GenericName[alias.size()]));
         }
         return properties;
@@ -656,10 +654,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         final Map properties = createProperties(name, code, remarks);
         if (area != null  &&  (area=area.trim()).length() != 0) {
             final Extent extent = buffered.createExtent(area);
-            properties.put(prepend(AbstractDatum.VALID_AREA_PROPERTY), extent);
+            properties.put(prepend(Datum.VALID_AREA_KEY), extent);
         }
         if (scope != null &&  (scope=scope.trim()).length() != 0) {
-            properties.put(prepend(AbstractDatum.SCOPE_PROPERTY), scope);
+            properties.put(prepend(Datum.SCOPE_KEY), scope);
         }
         return properties;
     }
@@ -1143,12 +1141,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 final String remarks = result.getString( 8);
                 Map properties = createProperties(name, epsg, area, scope, remarks);
                 if (anchor != null) {
-                    properties.put(AbstractDatum.ANCHOR_POINT_PROPERTY, anchor);
+                    properties.put(Datum.ANCHOR_POINT_KEY, anchor);
                 }
                 if (epoch != 0) {
                     calendar.clear();
                     calendar.set(epoch, 0, 1);
-                    properties.put(AbstractDatum.REALIZATION_EPOCH_PROPERTY, calendar.getTime());
+                    properties.put(Datum.REALIZATION_EPOCH_KEY, calendar.getTime());
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;
@@ -1171,7 +1169,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     final BursaWolfParameters[] param = createBursaWolfParameters(code, result);
                     if (param != null) {
                         result = null; // Already closed by createBursaWolfParameters
-                        properties.put(DefaultGeodeticDatum.BURSA_WOLF_PROPERTY, param);
+                        properties.put(DefaultGeodeticDatum.BURSA_WOLF_KEY, param);
                     }
                     datum = factory.createGeodeticDatum(properties, ellipsoid, meridian);
                 } else if (type.equalsIgnoreCase("vertical")) {
@@ -1680,7 +1678,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             }
             final Map properties = createProperties(name, code, remarks);
             if (formula != null) {
-                properties.put(DefaultOperationMethod.FORMULA_PROPERTY, formula);
+                properties.put(OperationMethod.FORMULA_KEY, formula);
             }
             method = new DefaultOperationMethod(properties, sourceDimensions, targetDimensions,
                      new DefaultParameterDescriptorGroup(properties, descriptors));

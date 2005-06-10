@@ -23,8 +23,10 @@ package org.geotools.referencing.crs;
 import java.util.Iterator;
 import java.util.Map;
 
+// OpenGIS dependencies
+import org.opengis.referencing.IdentifiedObject;
+
 // Geotools dependencies
-import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.util.DerivedMap;
 
 
@@ -61,8 +63,8 @@ final class UnprefixedMap extends DerivedMap {
     public UnprefixedMap(final Map base, final String prefix) {
         super(base);
         this.prefix = prefix.trim();
-        final String  nameKey = this.prefix + AbstractIdentifiedObject. NAME_PROPERTY;
-        final String aliasKey = this.prefix + AbstractIdentifiedObject.ALIAS_PROPERTY;
+        final String  nameKey = this.prefix + IdentifiedObject. NAME_KEY;
+        final String aliasKey = this.prefix + IdentifiedObject.ALIAS_KEY;
         boolean hasName  = false;
         boolean hasAlias = false;
         for (final Iterator it=base.keySet().iterator(); it.hasNext();) {
@@ -120,8 +122,8 @@ final class UnprefixedMap extends DerivedMap {
      * or <code>"alias_"</code> are accepted as well.
      */
     private boolean isPlainKey(final String key) {
-        return (!hasName  && keyMatches(AbstractIdentifiedObject.NAME_PROPERTY,  key)) ||
-               (!hasAlias && keyMatches(AbstractIdentifiedObject.ALIAS_PROPERTY, key));
+        return (!hasName  && keyMatches(IdentifiedObject.NAME_KEY,  key)) ||
+               (!hasAlias && keyMatches(IdentifiedObject.ALIAS_KEY, key));
     }
 
     /**

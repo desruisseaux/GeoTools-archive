@@ -295,7 +295,7 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
          * constructed twice.
          */
         param = new DefaultParameterDescriptor(
-                Collections.singletonMap(NAME_PROPERTY, prefix + row + separator + column),
+                Collections.singletonMap(NAME_KEY, prefix + row + separator + column),
                 Double.TYPE, null, org.geotools.parameter.Parameter.wrap(row==column ? 1.0 : 0.0),
                 null, null, Unit.ONE, true);
         if (index >= 0) {

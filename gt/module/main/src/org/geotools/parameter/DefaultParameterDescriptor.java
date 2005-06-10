@@ -124,7 +124,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
                                       final int minimum,
                                       final int maximum)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name),
+        this(Collections.singletonMap(NAME_KEY, name),
              defaultValue, minimum, maximum, true);
     }
 
@@ -163,7 +163,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
                                       final double maximum,
                                final Unit   unit)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name),
+        this(Collections.singletonMap(NAME_KEY, name),
              defaultValue, minimum, maximum, unit, true);
     }
 
@@ -211,7 +211,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
                                       final Comparable maximum,
                                       final Unit       unit)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name),
+        this(Collections.singletonMap(NAME_KEY, name),
              valueClass, null, defaultValue, minimum, maximum, unit, true);
     }
 
@@ -246,11 +246,11 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      */
     private static final Map toMap(final String name, final CharSequence remarks) {
         if (remarks == null ){
-            return Collections.singletonMap(NAME_PROPERTY, name);
+            return Collections.singletonMap(NAME_KEY, name);
         }
         final Map properties = new HashMap(4);
-        properties.put(NAME_PROPERTY,    name);
-        properties.put(REMARKS_PROPERTY, remarks);
+        properties.put(NAME_KEY,    name);
+        properties.put(REMARKS_KEY, remarks);
         return properties;        
     }
 
@@ -312,7 +312,7 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
                                       final Object[] validValues,
                                       final Object   defaultValue)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name),
+        this(Collections.singletonMap(NAME_KEY, name),
              valueClass, validValues, defaultValue, null, null, null, true);
     }
 

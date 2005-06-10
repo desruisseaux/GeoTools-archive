@@ -88,7 +88,7 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
                               final TemporalDatum datum,
                               final TimeCS           cs)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
+        this(Collections.singletonMap(NAME_KEY, name), datum, cs);
     }
 
     /**

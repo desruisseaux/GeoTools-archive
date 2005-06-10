@@ -102,7 +102,7 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
      * @param type   The type of this vertical datum.
      */
     public DefaultVerticalDatum(final String name, final VerticalDatumType type) {
-        this(Collections.singletonMap(NAME_PROPERTY, name), type);
+        this(Collections.singletonMap(NAME_KEY, name), type);
     }
 
     /**

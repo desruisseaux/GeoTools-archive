@@ -146,7 +146,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      *
      * @todo Replace by a static import when we will be allowed to compile with J2SE 1.5.
      */
-    private static final String NAME_PROPERTY = AbstractIdentifiedObject.NAME_PROPERTY;
+    private static final String NAME_KEY = IdentifiedObject.NAME_KEY;
 
     /**
      * The set of helper methods on factories.
@@ -280,14 +280,14 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
         final Map properties;
         if (name==DATUM_SHIFT || name==ELLIPSOID_SHIFT) {
             properties = new HashMap(4);
-            properties.put(NAME_PROPERTY, name);
-            properties.put(AbstractCoordinateOperation.OPERATION_VERSION_PROPERTY, "(unknow)");
-            properties.put(AbstractCoordinateOperation.POSITIONAL_ACCURACY_PROPERTY,
+            properties.put(NAME_KEY, name);
+            properties.put(CoordinateOperation.OPERATION_VERSION_KEY, "(unknow)");
+            properties.put(CoordinateOperation.POSITIONAL_ACCURACY_KEY,
                   new org.opengis.metadata.quality.PositionalAccuracy[] {
                       name==DATUM_SHIFT ? PositionalAccuracyImpl.DATUM_SHIFT_APPLIED
                                         : PositionalAccuracyImpl.DATUM_SHIFT_OMITTED});
         } else {
-            properties = Collections.singletonMap(NAME_PROPERTY, name);
+            properties = Collections.singletonMap(NAME_KEY, name);
         }
         return properties;
     }
@@ -315,7 +315,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     {
         final MathTransform transform = mtFactory.createAffineTransform(matrix);
         final Map properties = getProperties(name);
-        final Class type = properties.containsKey(AbstractCoordinateOperation.POSITIONAL_ACCURACY_PROPERTY)
+        final Class type = properties.containsKey(CoordinateOperation.POSITIONAL_ACCURACY_KEY)
                            ? Transformation.class : Conversion.class;
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
                 ProjectiveTransform.Provider.getMethod(transform.getSourceDimensions(),
@@ -366,7 +366,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                                   final MathTransform             transform)
             throws FactoryException
     {
-        return createFromMathTransform(Collections.singletonMap(NAME_PROPERTY, name),
+        return createFromMathTransform(Collections.singletonMap(NAME_KEY, name),
                                        sourceCRS, targetCRS, transform, null,
                                        CoordinateOperation.class);
     }
@@ -604,8 +604,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      */
     static Map getTemporaryName(final IdentifiedObject source) {
         final Map properties = new HashMap(4);
-        properties.put(NAME_PROPERTY, new TemporaryIdentifier(source.getName()));
-        properties.put(AbstractIdentifiedObject.REMARKS_PROPERTY,
+        properties.put(NAME_KEY, new TemporaryIdentifier(source.getName()));
+        properties.put(IdentifiedObject.REMARKS_KEY,
                        "Derived from " + getClassName(source));
         return properties;
     }
@@ -619,7 +619,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
                                 final CoordinateReferenceSystem target)
     {
         final String name = getClassName(source) + " \u21E8 " + getClassName(target);
-        return Collections.singletonMap(NAME_PROPERTY, name);
+        return Collections.singletonMap(NAME_KEY, name);
     }
 
     /**

@@ -70,7 +70,7 @@ public class DefaultImageCRS extends AbstractSingleCRS implements ImageCRS {
                            final ImageDatum datum,
                            final AffineCS   cs)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
+        this(Collections.singletonMap(NAME_KEY, name), datum, cs);
     }
 
     /**

@@ -185,7 +185,7 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
                                  final EngineeringDatum datum,
                                  final CoordinateSystem    cs)
     {
-        this(Collections.singletonMap(NAME_PROPERTY, name), datum, cs);
+        this(Collections.singletonMap(NAME_KEY, name), datum, cs);
     }
 
     /**

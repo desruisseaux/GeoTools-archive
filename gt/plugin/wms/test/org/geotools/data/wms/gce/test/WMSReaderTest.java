@@ -180,7 +180,7 @@ public class WMSReaderTest extends TestCase {
         }
 //
 //        Map properties = new HashMap();
-//        properties.put(AbstractIdentifiedObject.NAME_PROPERTY, "WMS");
+//        properties.put(AbstractIdentifiedObject.NAME_KEY, "WMS");
 
         GridCoverage coverage = reader.read(generalParameterValues);
     }

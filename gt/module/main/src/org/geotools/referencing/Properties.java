@@ -34,7 +34,6 @@ import org.opengis.referencing.operation.CoordinateOperation;
 
 // Geotools dependencies
 import org.geotools.util.MapEntry;
-import org.geotools.referencing.operation.DefaultOperation;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 
 
@@ -116,14 +115,14 @@ final class Properties extends AbstractMap {
      * @todo Add properties for {@link IdentifiedObject} sub-interfaces.
      */
     private static final String[] KEYS = {
-        /*[0]*/AbstractIdentifiedObject.NAME_PROPERTY,
-        /*[1]*/AbstractIdentifiedObject.IDENTIFIERS_PROPERTY,
-        /*[2]*/AbstractIdentifiedObject.ALIAS_PROPERTY,
-        /*[3]*/AbstractIdentifiedObject.REMARKS_PROPERTY,
-        /*[4]*/DefaultOperation.        SCOPE_PROPERTY,
-        /*[5]*/DefaultOperation.        VALID_AREA_PROPERTY,
-        /*[6]*/DefaultOperation.        OPERATION_VERSION_PROPERTY,
-        /*[7]*/DefaultOperation.        POSITIONAL_ACCURACY_PROPERTY
+        /*[0]*/IdentifiedObject    .NAME_KEY,
+        /*[1]*/IdentifiedObject    .IDENTIFIERS_KEY,
+        /*[2]*/IdentifiedObject    .ALIAS_KEY,
+        /*[3]*/IdentifiedObject    .REMARKS_KEY,
+        /*[4]*/CoordinateOperation .SCOPE_KEY,
+        /*[5]*/CoordinateOperation .VALID_AREA_KEY,
+        /*[6]*/CoordinateOperation .OPERATION_VERSION_KEY,
+        /*[7]*/CoordinateOperation .POSITIONAL_ACCURACY_KEY
     };
 
     /**

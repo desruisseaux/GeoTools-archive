@@ -64,7 +64,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
      * @param pixelInCell the way the image grid is associated with the image data attributes.
      */
     public DefaultImageDatum(final String name, final PixelInCell pixelInCell) {
-        this(Collections.singletonMap(NAME_PROPERTY, name), pixelInCell);
+        this(Collections.singletonMap(NAME_KEY, name), pixelInCell);
     }
 
     /**

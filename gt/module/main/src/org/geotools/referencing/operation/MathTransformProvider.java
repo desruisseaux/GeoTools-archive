@@ -126,9 +126,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
     private static Map toMap(final IdentifiedObject parameters) {
         ensureNonNull("parameters", parameters);
         final Map properties = new HashMap(4);
-        properties.put(NAME_PROPERTY,        parameters.getName());
-        properties.put(IDENTIFIERS_PROPERTY, parameters.getIdentifiers().toArray(EMPTY_IDENTIFIER_ARRAY));
-        properties.put(ALIAS_PROPERTY,       parameters.getAlias()      .toArray(EMPTY_ALIAS_ARRAY));
+        properties.put(NAME_KEY,        parameters.getName());
+        properties.put(IDENTIFIERS_KEY, parameters.getIdentifiers().toArray(EMPTY_IDENTIFIER_ARRAY));
+        properties.put(ALIAS_KEY,       parameters.getAlias()      .toArray(EMPTY_ALIAS_ARRAY));
         return properties;
     }
 
@@ -228,9 +228,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         }
         alias = (GenericName[]) XArray.resize(alias, count);
         final Map properties = new HashMap(4, 0.8f);
-        properties.put(NAME_PROPERTY,        identifiers[0]);
-        properties.put(IDENTIFIERS_PROPERTY, identifiers[0]);
-        properties.put(ALIAS_PROPERTY,       alias);
+        properties.put(NAME_KEY,        identifiers[0]);
+        properties.put(IDENTIFIERS_KEY, identifiers[0]);
+        properties.put(ALIAS_KEY,       alias);
         return properties;
     }
 

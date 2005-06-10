@@ -72,6 +72,6 @@ public class DefaultTransformation extends DefaultOperation implements Transform
                                  final OperationMethod           method)
     {
         super(properties, sourceCRS, targetCRS, transform, method);
-        ensureNonNull(OPERATION_VERSION_PROPERTY, operationVersion);
+        ensureNonNull(OPERATION_VERSION_KEY, operationVersion);
     }
 }
