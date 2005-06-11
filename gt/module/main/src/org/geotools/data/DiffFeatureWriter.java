@@ -60,7 +60,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * @param diff
      */
     public DiffFeatureWriter(FeatureReader reader, Map diff) {
-        this.reader = reader;
+        this.reader = new DiffFeatureReader(reader, diff);
         this.diff = diff;
         if( !diff.isEmpty() ){
             for( Iterator iter = diff.keySet().iterator(); iter.hasNext(); ) {
@@ -117,6 +117,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
                 next = null;
                 current = type.create(new Object[type.getAttributeCount()],
                         "new"+nextfidIndex);
+                nextfidIndex++;
                 return current;
             } catch (IllegalAttributeException e) {
                 throw new IOException("Could not create new content");
@@ -176,33 +177,33 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
     }
 
     /**
-     * Query for more content.
-     *
-     * @see org.geotools.data.FeatureWriter#hasNext()
-     */
-    public boolean hasNext() throws IOException {
-        if (next != null) {
-            // we found next already
-            return true;
-        }
-
-        live = null;
-        current = null;
-
-        if (reader.hasNext()) {
-            try {
-                next = reader.next();
-            } catch (NoSuchElementException e) {
-                throw new DataSourceException("No more content", e);
-            } catch (IllegalAttributeException e) {
-                throw new DataSourceException("No more content", e);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
+	 * Query for more content.
+	 *
+	 * @see org.geotools.data.FeatureWriter#hasNext()
+	 */
+	public boolean hasNext() throws IOException {
+	    if (next != null) {
+	        // we found next already
+	        return true;
+	    }
+	
+	    live = null;
+	    current = null;
+	
+	    if (reader.hasNext()) {
+	        try {
+	            next = reader.next();
+	        } catch (NoSuchElementException e) {
+	            throw new DataSourceException("No more content", e);
+	        } catch (IllegalAttributeException e) {
+	            throw new DataSourceException("No more content", e);
+	        }
+	
+	        return true;
+	    }
+	
+	    return false;
+	}
 
     /**
      * Clean up resources associated with this writer.

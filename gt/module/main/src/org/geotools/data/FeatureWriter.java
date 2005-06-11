@@ -89,7 +89,7 @@ public interface FeatureWriter {
      * <p>
      * If this FeatureWriter is opperating against a Transaction
      * FEATURES_REMOVED events should only be sent to FeatureSources
-     * opperating on the same Transaction. When Transaction commit() is called
+     * operating on the same Transaction. When Transaction commit() is called
      * other FeatureSources will be informed of the modifications.
      * </p>
      * 

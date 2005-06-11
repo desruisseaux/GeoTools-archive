@@ -127,8 +127,10 @@ public class DiffFeatureReader implements FeatureReader {
             Iterator i = diff.values().iterator();
             next = (Feature) i.next();
             i.remove();
-
-            return true;
+            if( next==null )
+            	return hasNext();
+            else
+            	return true;
         }
 
         return false;

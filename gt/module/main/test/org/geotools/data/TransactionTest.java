@@ -18,12 +18,14 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -55,42 +57,35 @@ public class TransactionTest extends TestCase {
         
         FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
         store.setTransaction(new DefaultTransaction());
-        store.addFeatures(new Reader(f1));
-        store.addFeatures(new Reader(f2));
+        store.addFeatures(new TestReader(type, f1));
+        store.addFeatures(new TestReader(type, f2));
         
-        int i=0;
-        for( FeatureReader reader=store.getFeatures().reader();reader.hasNext();){
+        count( store, 3);
+//        assertEquals("Number of known feature as obtained from getCount",3, store.getCount(Query.ALL));
+    }
+
+    public void testRemoveFeature() throws Exception{
+        Feature f1=type.create(new Object[]{ "one",geom });
+        
+        FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
+        store.setTransaction(new DefaultTransaction());
+        Set fid=store.addFeatures(new TestReader(type, f1));
+
+        count(store, 2);
+        Filter f=FilterFactory.createFilterFactory().createFidFilter((String) fid.iterator().next());
+        store.removeFeatures(f);
+        
+        count(store, 1);
+//        assertEquals("Number of known feature as obtained from getCount",3, store.getCount(Query.ALL));
+    }
+
+	private void count(FeatureStore store, int expected) throws IOException, IllegalAttributeException {
+		int i=0;
+        for( FeatureReader reader=store.getFeatures().reader();
+        reader.hasNext();){
             reader.next();
             i++;
         }
-        assertEquals("Number of known feature as obtained from reader",3, i);
-//        assertEquals("Number of known feature as obtained from getCount",3, store.getCount(Query.ALL));
-    }
-    
-    class Reader implements FeatureReader{
-
-        private Feature feature;
-
-        public Reader(Feature f) {
-            this.feature=f;
-        }
-        
-        public FeatureType getFeatureType() {
-            return type;
-        }
-
-        public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
-            next=false;
-            return feature;
-        }
-
-        boolean next=true;
-        public boolean hasNext() throws IOException {
-            return next;
-        }
-
-        public void close() throws IOException {
-        }
-        
-    }
+        assertEquals("Number of known feature as obtained from reader",expected, i);
+	}
 }

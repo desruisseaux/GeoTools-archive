@@ -1079,7 +1079,6 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 						            LOGGER.finer("feature rendered event ...");
 						        }
 
-                    fireFeatureRenderedEvent(feature);
                 } catch (Exception e) {
                     fireErrorEvent(e);
                 }
@@ -1160,6 +1159,8 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 
             }
         }
+
+                    fireFeatureRenderedEvent(feature);
     }
 
     /**
