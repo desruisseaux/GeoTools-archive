@@ -51,6 +51,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -134,6 +135,12 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
      * this caching sacrifies {@code SpatioTemporalCoverage3D} thread safety.
      */
     private final GeneralDirectPosition coordinate;
+
+    /**
+     * The grid coverage factory for {@link #getCoverage2D} method.
+     * Will be created only when first needed.
+     */
+    private transient GridCoverageFactory factory;
 
     /**
      * Constructs a new coverage. The coordinate reference system will be the same than the
@@ -491,6 +498,8 @@ control:    for (int p=0; p<=1; p++) {
      *
      * @see #getRenderableImage(Date)
      * @see RenderableImage#createDefaultRendering()
+     *
+     * @todo Find some way to avoid the cast in the {@code return} statement.
      */
     public GridCoverage2D getGridCoverage2D(final Date time) throws CannotEvaluateException {
         final InternationalString      name = getName();
@@ -502,7 +511,10 @@ control:    for (int p=0; p<=1; p++) {
         }
         final MathTransform gridToCRS = ProjectiveTransform.create((AffineTransform)
                                         image.getProperty("gridToCoordinateSystem"));
-        return new GridCoverage2D(name, image, crs, gridToCRS, bands, null, null);
+        if (factory == null) {
+            factory = org.geotools.coverage.FactoryFinder.getGridCoverageFactory(HINTS);
+        }
+        return (GridCoverage2D) factory.create(name, image, crs, gridToCRS, bands, null, null);
     }
 
     /**

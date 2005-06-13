@@ -116,8 +116,9 @@ import org.geotools.coverage.grid.GridCoverage2D;                 // For javadoc
  *         raster.setSample(x, y, 0, <cite>some_value</cite>);
  *     }
  * }
- * {@linkplain GridCoverage2D} coverage = new GridCoverage2D("My grayscale coverage", raster, gridCRS,
- *                               IdentityTransform.create(2), null, null, null, null, null);
+ * GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+ * GridCoverage coverage = factory.create("My grayscale coverage", raster, gridCRS,
+ *                          IdentityTransform.create(2), null, null, null, null, null);
  * coverage.show();
  * <FONT color='#008000'>//
  * // Projects the coverage from its current 'gridCS' to the 'realCS'. If the grid of

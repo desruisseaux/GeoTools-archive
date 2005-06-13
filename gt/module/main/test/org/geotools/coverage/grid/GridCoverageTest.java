@@ -49,8 +49,10 @@ import org.opengis.spatialschema.geometry.Envelope;
 // Geotools dependencies
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.operation.Resampler2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.TestData;
 import org.geotools.util.NumberRange;
@@ -209,8 +211,9 @@ public class GridCoverageTest extends TestCase {
         for (int i=envelope.getDimension(); --i>=2;) {
             envelope.setRange(i, 10*i, 10*i+5);
         }
-        coverage = transform(new GridCoverage2D("Test", image, crs, envelope,
-                                                new GridSampleDimension[]{band}, null, null));
+        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        coverage = transform((GridCoverage2D) factory.create("Test", image, crs, envelope,
+                                            new GridSampleDimension[]{band}, null, null));
 
         /* ----------------------------------------------------------------------------------------
          *
@@ -333,6 +336,7 @@ public class GridCoverageTest extends TestCase {
         final Envelope   envelope = new GeneralEnvelope(bounds);
         final RenderedImage image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
         final String     filename = new File(path).getName();
-        return new GridCoverage2D(filename, image, crs, envelope, bands, null, null);
+        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
+        return (GridCoverage2D) factory.create(filename, image, crs, envelope, bands, null, null);
     }
 }

@@ -53,6 +53,7 @@ import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.coverage.processing.GridCoverageProcessor2D;
+import org.geotools.coverage.FactoryFinder;
 
 
 /**
@@ -261,7 +262,8 @@ public final class ResampleTest extends GridCoverageTest {
          * amount, with the opposite sign.
          */
         AffineTransform expected = getAffineTransform(grid);
-        grid = new GridCoverage2D("Translated", img,  grid.getCoordinateReferenceSystem(),
+        grid = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create("Translated",
+                                  img,  grid.getCoordinateReferenceSystem(),
                                   grid.getEnvelope(), grid.getSampleDimensions(),
                                   new GridCoverage2D[]{grid}, grid.getProperties());
         expected.translate(-transX, -transY);

@@ -19,12 +19,17 @@
 package org.geotools.coverage.grid;
 
 // J2SE and JAI dependencies
+import java.util.Map;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.image.Raster;
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import java.util.Map;
+import java.awt.image.renderable.ParameterBlock;
+import java.awt.geom.AffineTransform;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.ImageFunction;
 import javax.media.jai.util.CaselessStringKey;
 import javax.units.Unit;
@@ -34,6 +39,7 @@ import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.SampleDimensionType;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridGeometry;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -41,6 +47,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
@@ -90,7 +97,33 @@ public class GridCoverageFactory {
              final GridSampleDimension[]   bands, final Map            properties)
             throws MismatchedDimensionException
     {
-        return new GridCoverage2D(name, function, crs, gridGeometry, bands, properties);
+        final MathTransform transform = gridGeometry.getGridToCoordinateSystem2D();
+        if (!(transform instanceof AffineTransform)) {
+            throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
+                    org.geotools.resources.cts.ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM));
+        }
+        final AffineTransform at = (AffineTransform) transform;
+        if (at.getShearX()!=0 || at.getShearY()!=0) {
+            // TODO: We may support that in a future version.
+            //       1) Create a copy with shear[X/Y] set to 0. Use the copy.
+            //       2) Compute the residu with createInverse() and concatenate().
+            //       3) Apply the residu with JAI.create("Affine").
+            throw new IllegalArgumentException("Shear and rotation not supported");
+        }
+        final double xScale =  at.getScaleX();
+        final double yScale =  at.getScaleY();
+        final double xTrans = -at.getTranslateX()/xScale;
+        final double yTrans = -at.getTranslateY()/yScale;
+        final GridRange      range = gridGeometry.getGridRange();
+        final ParameterBlock param = new ParameterBlock().add(function)
+                                                         .add(range.getLength(0)) // width
+                                                         .add(range.getLength(1)) // height
+                                                         .add((float) xScale)
+                                                         .add((float) yScale)
+                                                         .add((float) xTrans)
+                                                         .add((float) yTrans);
+        return new GridCoverage2D(name, JAI.create("ImageFunction", param),
+                                  crs, gridGeometry, null, bands, null, properties);
     }
 
     /**
@@ -113,7 +146,7 @@ public class GridCoverageFactory {
              final Envelope       envelope)
             throws MismatchedDimensionException
     {
-        return new GridCoverage2D(name, raster, envelope);
+        return create(name, raster, DefaultGeographicCRS.WGS84, envelope, null, null, null, null, null);
     }
 
     /**
@@ -164,8 +197,8 @@ public class GridCoverageFactory {
              final RenderingHints          hints)
             throws MismatchedDimensionException, IllegalArgumentException
     {
-        return new GridCoverage2D(name, raster, crs, envelope,
-                    minValues, maxValues, units, colors, hints);
+        return create(name, raster, crs, null, new GeneralEnvelope(envelope),
+             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
     }
 
     /**
@@ -211,8 +244,24 @@ public class GridCoverageFactory {
              final RenderingHints          hints)
             throws MismatchedDimensionException, IllegalArgumentException
     {
-        return new GridCoverage2D(name, raster, crs, gridToCRS,
-                    minValues, maxValues, units, colors, hints);
+        return create(name, raster, crs, new GridGeometry2D(null, gridToCRS), null,
+             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
+    }
+
+    /**
+     * Helper method for public methods expecting a {@link Raster} argument.
+     */
+    private GridCoverage create(final CharSequence             name,
+                                final WritableRaster         raster,
+                                final CoordinateReferenceSystem crs,
+                                final GridGeometry2D   gridGeometry, // ONE and only one of those two
+                                final GeneralEnvelope      envelope, // arguments should be non-null.
+                                final GridSampleDimension[]   bands)
+            throws MismatchedDimensionException, IllegalArgumentException
+    {
+        return new GridCoverage2D(name, PlanarImage.wrapRenderedImage(
+                   new BufferedImage(bands[0].getColorModel(0, bands.length), raster, false, null)),
+             crs, gridGeometry, envelope, bands, null, null);
     }
 
     /**
@@ -239,7 +288,7 @@ public class GridCoverageFactory {
              final CoordinateReferenceSystem crs, final Envelope    envelope)
             throws MismatchedDimensionException
     {
-        return new GridCoverage2D(name, image, crs, envelope);
+        return create(name, image, crs, envelope, null, null, null);
     }
 
     /**

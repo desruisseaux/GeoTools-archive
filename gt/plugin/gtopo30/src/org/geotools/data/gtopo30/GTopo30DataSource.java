@@ -19,6 +19,7 @@ package org.geotools.data.gtopo30;
 import com.sun.media.imageio.stream.FileChannelImageInputStream;
 import com.sun.media.imageio.stream.RawImageInputStream;
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DataSourceException;
@@ -419,8 +420,8 @@ class GTopo30DataSource {
             }
         }
 		
-		GridCoverage2D gc=new GridCoverage2D(coverageName, img, crs, env,
-	            new GridSampleDimension[] { band }, null, metadata);
+		GridCoverage2D gc = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create(
+                coverageName, img, crs, env, new GridSampleDimension[] { band }, null, metadata);
 		
 		/**
 		 * Freeing everything to be sure we do not leave any dead reference.

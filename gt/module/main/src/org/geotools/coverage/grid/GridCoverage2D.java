@@ -27,10 +27,8 @@ package org.geotools.coverage.grid;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentSampleModel;
 import java.awt.image.DataBuffer;
@@ -40,7 +38,6 @@ import java.awt.image.Raster;
 import java.awt.image.RasterFormatException;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
-import java.awt.image.WritableRaster;
 import java.awt.image.WritableRenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderableImage;
@@ -104,7 +101,6 @@ import org.geotools.coverage.processing.AbstractGridCoverageProcessor;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.XArray;
@@ -226,7 +222,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * {@code true} is all sample in the image are geophysics values.
      */
     private final boolean isGeophysics;
-    
+
     /**
      * Construct a new grid coverage with the same parameter than the specified
      * coverage. This constructor is useful when creating a coverage with
@@ -246,256 +242,6 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         envelope         = coverage.envelope;
         sampleDimensions = coverage.sampleDimensions;
         isGeophysics     = coverage.isGeophysics;
-    }
-
-    /**
-     * Constructs a grid coverage from an image function.
-     *
-     * @param name         The grid coverage name.
-     * @param function     The image function.
-     * @param crs          The coordinate reference system. This specifies the CRS used when
-     *                     accessing a grid coverage with the {@code evaluate} methods. The
-     *                     number of dimensions must matches the number of dimensions of
-     *                     the grid range in {@code gridGeometry}.
-     * @param gridGeometry The grid geometry. The grid range must contains the expected
-     *                     image size (width and height).
-     * @param bands        Sample dimensions for each image band, or {@code null} for
-     *                     default sample dimensions. If non-null, then this array's length
-     *                     must matches the number of bands in {@code image}.
-     * @param properties The set of properties for this coverage, or {@code null} if there is none.
-     *        "Properties" in <cite>Java Advanced Imaging</cite> is what OpenGIS calls "Metadata".
-     *        Keys are {@link String} objects ({@link CaselessStringKey} are accepted as well),
-     *        while values may be any {@link Object}.
-     *
-     * @throws MismatchedDimensionException If the grid range's dimension
-     *         is not the same than the coordinate system's dimension.
-     *
-     * @deprecated Replaced by a {@code create} method with the same signature in
-     *             {@link GridCoverageFactory}.
-     */
-    public GridCoverage2D(final CharSequence             name, final ImageFunction  function,
-                          final CoordinateReferenceSystem crs, final GridGeometry2D gridGeometry,
-                          final GridSampleDimension[]   bands, final Map            properties)
-            throws MismatchedDimensionException
-    {
-        this(name, getImage(function, gridGeometry),
-             crs, gridGeometry, null, bands, null, properties);
-    }
-
-    /**
-     * Creates an image from an image function. Translation and scale
-     * factors are fetched from the grid geometry, which must have an
-     * affine transform.
-     *
-     * @todo We could support shear in affine transform.
-     * @todo Should be inlined in the above constructor if only Sun was to fix RFE #4093999
-     *       ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private static PlanarImage getImage(final ImageFunction  function,
-                                        final GridGeometry2D gridGeometry)
-    {
-        final MathTransform transform = gridGeometry.getGridToCoordinateSystem2D();
-        if (!(transform instanceof AffineTransform)) {
-            throw new IllegalArgumentException(org.geotools.resources.cts.Resources.format(
-                    org.geotools.resources.cts.ResourceKeys.ERROR_NOT_AN_AFFINE_TRANSFORM));
-        }
-        final AffineTransform at = (AffineTransform) transform;
-        if (at.getShearX()!=0 || at.getShearY()!=0) {
-            // TODO: We may support that in a future version.
-            //       1) Create a copy with shear[X/Y] set to 0. Use the copy.
-            //       2) Compute the residu with createInverse() and concatenate().
-            //       3) Apply the residu with JAI.create("Affine").
-            throw new IllegalArgumentException("Shear and rotation not supported");
-        }
-        final double xScale =  at.getScaleX();
-        final double yScale =  at.getScaleY();
-        final double xTrans = -at.getTranslateX()/xScale;
-        final double yTrans = -at.getTranslateY()/yScale;
-        final GridRange      range = gridGeometry.getGridRange();
-        final ParameterBlock param = new ParameterBlock().add(function)
-                                                         .add(range.getLength(0)) // width
-                                                         .add(range.getLength(1)) // height
-                                                         .add((float) xScale)
-                                                         .add((float) yScale)
-                                                         .add((float) xTrans)
-                                                         .add((float) yTrans);
-        return JAI.create("ImageFunction", param);
-    }
-
-    /**
-     * Constructs a grid coverage from a raster and an envelope in
-     * <var>longitude</var>,<var>latitude</var> coordinates. The coordinate system is assumed to
-     * be based on {@linkplain DefaultGeographicCRS#WGS84 WGS84}. A default color palette
-     * is built from the minimal and maximal values found in the raster.
-     *
-     * @param name     The grid coverage name.
-     * @param raster   The data (may be floating point numbers). {@linkplain Float#NaN NaN}
-     *                 values are mapped to a transparent color.
-     * @param envelope The envelope in geographic (<var>longitude</var>,<var>latitude</var>)
-     *                 coordinates.
-     *
-     * @throws MismatchedDimensionException If the envelope's dimension is not 2.
-     *
-     * @deprecated Replaced by a {@code create} method with the same signature in
-     *             {@link GridCoverageFactory}.
-     */
-    public GridCoverage2D(final CharSequence   name,
-                          final WritableRaster raster,
-                          final Envelope       envelope)
-            throws MismatchedDimensionException
-    {
-        this(name, raster, DefaultGeographicCRS.WGS84, envelope, null, null, null, null, null);
-    }
-
-    /**
-     * Constructs a grid coverage from a {@linkplain Raster raster} with the specified
-     * {@linkplain Envelope envelope}.
-     *
-     * @param name        The grid coverage name.
-     * @param raster      The data (may be floating point numbers). {@linkplain Float#NaN NaN}
-     *                    values are mapped to a transparent color.
-     * @param crs         The coordinate reference system. This specifies the CRS used when
-     *                    accessing a grid coverage with the {@code evaluate} methods. The
-     *                    number of dimensions must matches the number of dimensions
-     *                    of {@code envelope}.
-     * @param envelope    The grid coverage cordinates. This envelope must have at least two
-     *                    dimensions.   The two first dimensions describe the image location
-     *                    along <var>x</var> and <var>y</var> axis. The other dimensions are
-     *                    optional and may be used to locate the image on a vertical axis or
-     *                    on the time axis.
-     * @param minValues   The minimal value for each bands in the raster, or {@code null}
-     *                    for computing it automatically.
-     * @param maxValues   The maximal value for each bands in the raster, or {@code null}
-     *                    for computing it automatically.
-     * @param units       The units of sample values, or {@code null} if unknow.
-     * @param colors      The colors to use for values from {@code minValues} to
-     *                    {@code maxValues} for each bands, or {@code null} for a
-     *                    default color palette. If non-null, each arrays {@code colors[b]}
-     *                    may have any length; colors will be interpolated as needed.
-     * @param hints       An optional set of rendering hints, or {@code null} if none.
-     *                    Those hints will not affect the grid coverage to be created.
-     *                    However, they may affect the grid coverage to be returned by
-     *                    <code>{@link #geophysics geophysics}(false)</code>, i.e.
-     *                    the view to be used at rendering time. The optional hint
-     *                    {@link Hints#SAMPLE_DIMENSION_TYPE} specifies the
-     *                    {@link SampleDimensionType} to be used at rendering time, which can be
-     *                    one of {@link SampleDimensionType#UNSIGNED_8BITS UNSIGNED_8BITS} or
-     *                    {@link SampleDimensionType#UNSIGNED_16BITS UNSIGNED_16BITS}.
-     *
-     * @throws MismatchedDimensionException If the envelope's dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
-     *
-     * @deprecated Replaced by a {@code create} method with the same signature in
-     *             {@link GridCoverageFactory}.
-     */
-    public GridCoverage2D(final CharSequence             name, final WritableRaster raster,
-                          final CoordinateReferenceSystem crs, final Envelope       envelope,
-                          final double[]            minValues, final double[]       maxValues,
-                          final Unit                    units, final Color[][]      colors,
-                          final RenderingHints          hints)
-            throws MismatchedDimensionException, IllegalArgumentException
-    {
-        this(name, raster, crs, null, new GeneralEnvelope(envelope),
-             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
-    }
-
-    /**
-     * Constructs a grid coverage from a {@linkplain Raster raster} with the specified
-     * "{@linkplain GridGeometry#getGridToCoordinateSystem grid to coordinate system}"
-     * transform.
-     *
-     * @param name        The grid coverage name.
-     * @param raster      The data (may be floating point numbers). {@linkplain Float#NaN NaN}
-     *                    values are mapped to a transparent color.
-     * @param crs         The coordinate reference system. This specifies the CRS used when
-     *                    accessing a grid coverage with the {@code evaluate} methods.
-     * @param gridToCRS   The math transform from grid to coordinate reference system.
-     * @param minValues   The minimal value for each bands in the raster, or {@code null}
-     *                    for computing it automatically.
-     * @param maxValues   The maximal value for each bands in the raster, or {@code null}
-     *                    for computing it automatically.
-     * @param units       The units of sample values, or {@code null} if unknow.
-     * @param colors      The colors to use for values from {@code minValues} to
-     *                    {@code maxValues} for each bands, or {@code null} for a
-     *                    default color palette. If non-null, each arrays {@code colors[b]}
-     *                    may have any length; colors will be interpolated as needed.
-     * @param hints       An optional set of rendering hints, or {@code null} if none.
-     *                    Those hints will not affect the grid coverage to be created.
-     *                    However, they may affect the grid coverage to be returned by
-     *                    <code>{@link #geophysics geophysics}(false)</code>, i.e.
-     *                    the view to be used at rendering time. The optional hint
-     *                    {@link Hints#SAMPLE_DIMENSION_TYPE} specifies the
-     *                    {@link SampleDimensionType} to be used at rendering time, which can be
-     *                    one of {@link SampleDimensionType#UNSIGNED_8BITS UNSIGNED_8BITS} or
-     *                    {@link SampleDimensionType#UNSIGNED_16BITS UNSIGNED_16BITS}.
-     *
-     * @throws MismatchedDimensionException If the {@code gridToCRS} dimension
-     *         is not the same than the coordinate system's dimension.
-     * @throws IllegalArgumentException if the number of bands differs
-     *         from the number of sample dimensions.
-     *
-     * @deprecated Replaced by a {@code create} method with the same signature in
-     *             {@link GridCoverageFactory}.
-     */
-    public GridCoverage2D(final CharSequence             name, final WritableRaster raster,
-                          final CoordinateReferenceSystem crs, final MathTransform  gridToCRS,
-                          final double[]            minValues, final double[]       maxValues,
-                          final Unit                    units, final Color[][]      colors,
-                          final RenderingHints          hints)
-            throws MismatchedDimensionException, IllegalArgumentException
-    {
-        this(name, raster, crs, new GridGeometry2D(null, gridToCRS), null,
-             Grid2DSampleDimension.create(name, raster, minValues, maxValues, units, colors, hints));
-    }
-
-    /**
-     * Helper constructor for public constructors expecting a {@link Raster} argument.
-     *
-     * @todo Should be inlined in the above constructor if only Sun was to fix RFE #4093999
-     *       ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private GridCoverage2D(final CharSequence             name,
-                           final WritableRaster         raster,
-                           final CoordinateReferenceSystem crs,
-                           final GridGeometry2D   gridGeometry, // ONE and only one of those two
-                           final GeneralEnvelope      envelope, // arguments should be non-null.
-                           final GridSampleDimension[]   bands)
-            throws MismatchedDimensionException, IllegalArgumentException
-    {
-        this(name, PlanarImage.wrapRenderedImage(
-                   new BufferedImage(bands[0].getColorModel(0, bands.length), raster, false, null)),
-             crs, gridGeometry, envelope, bands, null, null);
-    }
-
-    /**
-     * Constructs a grid coverage with the specified envelope. A default set of
-     * {@linkplain SampleDimension sample dimensions} is used.
-     *
-     * @param name         The grid coverage name.
-     * @param image        The image.
-     * @param crs          The coordinate reference system. This specifies the CRS used when
-     *                     accessing a grid coverage with the {@code evaluate} methods. The
-     *                     number of dimensions must matches the number of dimensions
-     *                     of {@code envelope}.
-     * @param envelope     The grid coverage cordinates. This envelope must have at least two
-     *                     dimensions.   The two first dimensions describe the image location
-     *                     along <var>x</var> and <var>y</var> axis. The other dimensions are
-     *                     optional and may be used to locate the image on a vertical axis or
-     *                     on the time axis.
-     *
-     * @throws MismatchedDimensionException If the envelope's dimension
-     *         is not the same than the coordinate system's dimension.
-     *
-     * @deprecated Replaced by a {@code create} method with the same signature in
-     *             {@link GridCoverageFactory}.
-     */
-    public GridCoverage2D(final CharSequence             name, final RenderedImage  image,
-                          final CoordinateReferenceSystem crs, final Envelope    envelope)
-            throws MismatchedDimensionException
-    {
-        this(name, image, crs, envelope, null, null, null);
     }
 
     /**
@@ -578,14 +324,14 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
      * <strong>One and only one of those argument</strong> should be non-null.
      * The null arguments will be computed from the non-null argument.
      */
-    private GridCoverage2D(final CharSequence             name,
-                           final PlanarImage             image,
-                           final CoordinateReferenceSystem crs,
-                                 GridGeometry2D   gridGeometry, // ONE and only one of those two
-                                 GeneralEnvelope      envelope, // arguments should be non-null.
-                           final GridSampleDimension[] sdBands,
-                           final GridCoverage[]        sources,
-                           final Map                properties)
+    GridCoverage2D(final CharSequence             name,
+                   final PlanarImage             image,
+                   final CoordinateReferenceSystem crs,
+                         GridGeometry2D   gridGeometry, // ONE and only one of those two
+                         GeneralEnvelope      envelope, // arguments should be non-null.
+                   final GridSampleDimension[] sdBands,
+                   final GridCoverage[]        sources,
+                   final Map                properties)
             throws MismatchedDimensionException, IllegalArgumentException
     {
         super(name, crs, sources, image, properties);

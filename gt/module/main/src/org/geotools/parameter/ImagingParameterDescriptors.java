@@ -112,9 +112,28 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
                                        final Map/*<Class,Class>*/ sourceTypeMap,
                                        final String registryMode)
     {
-        this(operation.getName(),
+        this(getName(operation),
              operation.getParameterListDescriptor(registryMode),
              operation, sourceTypeMap, registryMode);
+    }
+
+    /**
+     * Returns a name from the specified operation descriptor. If the name begins
+     * with the {@code "org.geotools"} prefix, then the prefix will be ignored.
+     *
+     * @todo Should be inlined in the constructor if only Sun was to fix RFE #4093999
+     *       ("Relax constraint on placement of this()/super() call in constructors").
+     *
+     * @todo We could do a more general work and ommit the vendor prefix instead of the
+     *       hard-coded "org.geotools." prefix.
+     */
+    private static String getName(final RegistryElementDescriptor operation) {
+        final String prefix = "org.geotools.";
+        String name = operation.getName();
+        if (name.startsWith(prefix)) {
+            name = name.substring(prefix.length());
+        }
+        return name;
     }
 
     /**

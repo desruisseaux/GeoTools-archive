@@ -422,16 +422,17 @@ public class CoverageStack extends AbstractCoverage {
      * different times:
      *
      * <blockquote><pre>
+     * GridCoverageFactory     factory = ...;
      * CoordinateReferenceSystem crs2D = ...;  // Yours horizontal CRS.
      * TemporalCRS             timeCRS = ...;  // Yours CRS for time measurement.
      * CoordinateReferenceSystem crs3D = new CompoundCRS(crs3D, timeCRS);
      *
-     * List           coverages = new ArrayList();
+     * List&lt;Coverage&gt; coverages = new ArrayList&lt;Coverage&gt;();
      * GeneralEnvelope envelope = new GeneralEnvelope(3); // A <strong>3-dimensional</strong> envelope.
      * envelope.setRange(...);                            // Set the horizontal part.
      * for (int i=0; i<...; i++) {
      *     envelope.setRange(2, startTime, endTime);
-     *     coverages.add(new GridCoverage2D(..., crs, envelope, ...);
+     *     coverages.add(factory.create(..., crs, envelope, ...);
      * }
      * </pre></blockquote>
      * 

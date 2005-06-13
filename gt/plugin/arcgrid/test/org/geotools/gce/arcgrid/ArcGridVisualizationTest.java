@@ -17,6 +17,7 @@
 package org.geotools.gce.arcgrid;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gce.image.WorldImageWriter;
@@ -232,7 +233,7 @@ public class ArcGridVisualizationTest extends TestCaseSupport {
 		RenderedImage destOverlayed=JAI.create("overlay", pb, null);
 
 		//creating a copy of the given grid coverage2D
-		GridCoverage2D subCoverage = new GridCoverage2D(
+		GridCoverage2D subCoverage = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).create(
 				"s",
 				destOverlayed,
 				gc.getCoordinateReferenceSystem(),
@@ -292,7 +293,8 @@ public class ArcGridVisualizationTest extends TestCaseSupport {
 	    			bands[i]=new GridSampleDimension(new Category[] {values}, null).geophysics(true);
 	    		
 	    		//creating coverage
-	    		coverage = new GridCoverage2D(coverageName, image, crs, envelope,bands,null,null);
+	    		coverage = FactoryFinder.getGridCoverageFactory(null).create(
+                        coverageName, image, crs, envelope,bands,null,null);
 	    	} catch (NoSuchElementException e1) {
 	    		throw new IOException("Error when creating the coverage in world image"+e1.getMessage());
 	    	}

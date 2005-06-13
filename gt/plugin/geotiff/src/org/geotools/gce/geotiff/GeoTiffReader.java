@@ -23,6 +23,7 @@ package org.geotools.gce.geotiff;
 import com.sun.media.jai.operator.ImageReadDescriptor;
 
 // Geotools dependencies 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.operation.GeneralMatrix;
@@ -218,8 +219,8 @@ public class GeoTiffReader implements GridCoverageReader {
         //rescale image if needed to enhane the dynamic
         image = rescaleIfNeeded(image);
 
-        return new GridCoverage2D(((File) source).getName(), image, crs, r2m,
-            null, null, null);
+        return FactoryFinder.getGridCoverageFactory(null).create(((File) source).getName(),
+                image, crs, r2m, null, null, null);
     }
 
     /**

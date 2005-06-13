@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 
 import junit.framework.TestCase;
 
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.map.DefaultMapContext;
@@ -47,7 +48,8 @@ public class GridCoverageRendererTest extends TestCase {
 
         BufferedImage imageTest = ImageIO.read(inTest);
 
-        GridCoverage2D coverage=new GridCoverage2D("GridCoverage",imageTest, DefaultGeographicCRS.WGS84,
+        GridCoverage2D coverage = (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null).
+                create("GridCoverage", imageTest, DefaultGeographicCRS.WGS84,
                 new Envelope2D(DefaultGeographicCRS.WGS84, 0,0, imageTest.getWidth(), imageTest.getHeight()));  
         
         MapContext context=new DefaultMapContext();

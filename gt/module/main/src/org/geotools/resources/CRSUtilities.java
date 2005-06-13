@@ -191,7 +191,7 @@ public final class CRSUtilities {
     /**
      * Returns a sub-coordinate reference system for the specified dimension range.
      *
-     * @param  crs   The coordinate system to decompose.
+     * @param  crs   The coordinate reference system to decompose.
      * @param  lower The first dimension to keep, inclusive.
      * @param  upper The last  dimension to keep, exclusive.
      * @return The sub-coordinate system, or {@code null} if {@code crs} can't

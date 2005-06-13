@@ -17,6 +17,7 @@
 package org.geotools.gce.arcgrid;
 
 import org.geotools.coverage.Category;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.*;
 import org.geotools.data.*;
@@ -395,7 +396,7 @@ public class ArcGridReader implements GridCoverageReader {
             BufferedImage image = new BufferedImage(band.getColorModel(),
                     raster, false, null); //TODO properties????
 
-            return new GridCoverage2D("ArcGrid", //TODO SET THE NAME!!!
+            return FactoryFinder.getGridCoverageFactory(null).create("ArcGrid", //TODO SET THE NAME!!!
                 image, coordinateSystem, envelope,
                 new GridSampleDimension[] { band }, null, null); //TODO SET THE METADATA AS SOON AS POSSIBLE!!!!
 

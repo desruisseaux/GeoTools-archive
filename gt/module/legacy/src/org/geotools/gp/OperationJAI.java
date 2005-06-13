@@ -20,6 +20,8 @@
  *
  *    This package contains documentation from OpenGIS specifications.
  *    OpenGIS consortium's work is fully acknowledged here.
+ *
+ * @deprecated Replaced by {@link org.geotools.coverage.processing.OperationJAI}.
  */
 package org.geotools.gp;
 

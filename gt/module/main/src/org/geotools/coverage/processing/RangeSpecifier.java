@@ -1,6 +1,6 @@
 /*
  * Geotools - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Management Committee (PMC)
+ * (C) 2005, Geotools Project Management Committee (PMC)
  * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -17,44 +17,41 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.gp;
+package org.geotools.coverage.processing;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Arrays;
+import javax.units.Unit;
 
-import org.geotools.ct.MathTransform1D;
-import org.geotools.cv.Category;
-import org.geotools.gc.GridCoverage;
-import org.geotools.resources.Utilities;
-import org.geotools.units.Unit;
-import org.geotools.util.NumberRange;
+// OpenGIS dependencies
 import org.opengis.util.Cloneable;
+import org.opengis.referencing.operation.MathTransform1D;
+
+// Geotools dependencies
+import org.geotools.util.NumberRange;
+import org.geotools.coverage.Category;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.resources.Utilities;
 
 
 /**
- * Argument type for {@link GridCoverageProcessor} operations for specifying the range,
- * colors and units of a computation result. <code>RangeSpecifier</code> are used for
- * tuning the {@link Category} object to be constructed. For example the "GradientMagnitude"
- * operation will produces new {@link GridCoverage} with sample values ranging from 0 to some
- * maximal value which may be very different from the source {@link GridCoverage} range. By
- * default, most {@linkplain Operation operations} try to guess a raisonable range for output
- * values. This default behavior can be overriden with an explicit <code>RangeSpecifier</code>
+ * Argument type for {@link GridCoverageProcessor2D} operations for specifying the range,
+ * colors and units of a computation result. {@code RangeSpecifier} are used for tuning the
+ * {@link Category} object to be constructed. For example the {@code "GradientMagnitude"}
+ * operation will produces new {@link GridCoverage2D} with sample values ranging from 0 to some
+ * maximal value which may be very different from the source {@link GridCoverage2D} range. By
+ * default, most {@linkplain Operation2D operations} try to guess a raisonable range for output
+ * values. This default behavior can be overriden with an explicit {@code RangeSpecifier}
  * argument.
- * <br><br>
- * All <code>RangeSpecifier</code>'s properties are optional; it is up to processor's
- * {@linkplain Operation operation} to replace <code>null</code> values by a default
- * one. <code>RangeSpecifier</code> argument is used by the
- *
- * "GradientMagnitude"
- *
- * operation.
+ * <p>
+ * All {@code RangeSpecifier}'s properties are optional; it is up to processor's
+ * {@linkplain Operation2D operation} to replace {@code null} values by a default
+ * one.
  *
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link org.geotools.referencing.processing.RangeSpecifier}.
  */
 public class RangeSpecifier implements Serializable, Cloneable {
     /**
@@ -63,40 +60,40 @@ public class RangeSpecifier implements Serializable, Cloneable {
     private static final long serialVersionUID = 8436500582161136302L;
 
     /**
-     * The target range, or <code>null</code> if none.
+     * The target range, or {@code null} if none.
      */
     private NumberRange range;
 
     /**
-     * The target "sample to geophysics" transform, or <code>null</code> if none.
+     * The target "sample to geophysics" transform, or {@code null} if none.
      */
     private MathTransform1D transform;
 
     /**
-     * The target range units, or <code>null</code> if none.
+     * The target range units, or {@code null} if none.
      */
     private Unit unit;
 
     /**
-     * The target colors, or <code>null</code> if none.
+     * The target colors, or {@code null} if none.
      */
     private Color[] colors;
 
     /**
-     * Construct a default <code>RangeSpecifier</code> with no value set.
+     * Constructs a default {@code RangeSpecifier} with no value set.
      */
     public RangeSpecifier() {
     }
 
     /**
-     * Construct a <code>RangeSpecifier</code> initialised to the spécified range.
+     * Constructs a {@code RangeSpecifier} initialised to the spécified range.
      */
     public RangeSpecifier(final NumberRange range) {
         this.range = range;
     }
 
     /**
-     * Construct a <code>RangeSpecifier</code> initialised to the specified
+     * Constructs a {@code RangeSpecifier} initialised to the specified
      * "sample to geophysics" transform.
      */
     public RangeSpecifier(final MathTransform1D transform) {
@@ -104,7 +101,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     }
 
     /**
-     * Returns the target range, or <code>null</code> if none.
+     * Returns the target range, or {@code null} if none.
      */
     public NumberRange getRange() {
         return range;
@@ -123,7 +120,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     }
 
     /**
-     * Returns the target "sample to geophysics" transform, or <code>null</code> if none.
+     * Returns the target "sample to geophysics" transform, or {@code null} if none.
      */
     public MathTransform1D getSampleToGeophysics() {
         return transform;
@@ -140,7 +137,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     }
 
     /**
-     * Returns the target range units, or <code>null</code> if none.
+     * Returns the target range units, or {@code null} if none.
      */
     public Unit getUnit() {
         return unit;
@@ -154,7 +151,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     }
 
     /**
-     * Returns the target colors, or <code>null</code> if none.
+     * Returns the target colors, or {@code null} if none.
      */
     public Color[] getColors() {
         return (colors!=null) ? (Color[])colors.clone() : null;
@@ -194,7 +191,7 @@ public class RangeSpecifier implements Serializable, Cloneable {
     }
 
     /**
-     * Compare this range specifier with the specified object for equality.
+     * Compares this range specifier with the specified object for equality.
      */
     public boolean equals(final Object object) {
         if (object!=null && object.getClass().equals(getClass())) {

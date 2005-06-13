@@ -43,7 +43,9 @@ import org.opengis.referencing.operation.TransformException;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.CategoryListTest;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.IdentityTransform;
 
@@ -150,9 +152,10 @@ public class SampleTranscoderTest extends TestCase {
             array[i] = (byte) random.nextInt(161);
         }
         final MathTransform identity = IdentityTransform.create(2);
+        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
         GridCoverage2D coverage;
-        coverage = new GridCoverage2D("Test", source, DefaultGeographicCRS.WGS84, identity,
-                                      new GridSampleDimension[]{band}, null, null);
+        coverage = (GridCoverage2D) factory.create("Test", source, DefaultGeographicCRS.WGS84,
+                                        identity, new GridSampleDimension[]{band}, null, null);
         /*
          * Apply the operation. The SampleTranscoder class is suppose to transform our
          * integers into real-world values. Check if the result use floating-points.
@@ -175,8 +178,8 @@ public class SampleTranscoderTest extends TestCase {
          * Compare the resulting values with the original data.
          */
         RenderedImage back = PlanarImage.wrapRenderedImage(target).getAsBufferedImage();
-        coverage = new GridCoverage2D("Test", back, DefaultGeographicCRS.WGS84, identity,
-                                    new GridSampleDimension[]{band.geophysics(true)}, null, null);
+        coverage = (GridCoverage2D) factory.create("Test", back, DefaultGeographicCRS.WGS84,
+                    identity, new GridSampleDimension[]{band.geophysics(true)}, null, null);
 
         back = coverage.geophysics(false).getRenderedImage();
         assertEquals(DataBuffer.TYPE_BYTE, back.getSampleModel().getDataType());
