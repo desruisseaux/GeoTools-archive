@@ -1,0 +1,228 @@
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.data.mif;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * DOCUMENT ME!
+ *
+ * Builds a MIFDataStore. Required parameters are:
+ *         <ul><li>PARAM_DBTYPE = "mif"  <li>PARAM_PATH = full path of the
+ *         directory containing MIF files, or path of a single mif file  </ul>
+ *         Optional parameters: <ul><li>[PARAM_FIELDCASE] = "upper" | "lower"
+ *         <li>[PARAM_GEOMNAME] defaults to "the_geom"
+ *         <li>[PARAM_GEOMFACTORY]  <li>[PARAM_GEOMTYPE]  </ul>
+ * @author Luca S. Percich, AMA-MI 
+ */
+public class MIFDataStoreFactory implements DataStoreFactorySpi {
+    // DataStore - specific parameters
+    public static final Param PARAM_DBTYPE = new Param("dbtype", String.class,
+            "Must be \"mif\"", true, "mif");
+    public static final Param PARAM_PATH = new Param("path", String.class,
+            "Full path of directory containing mifs or single mif file", true,
+            "c:/data/mifpath/");
+
+    // Options
+    public static final Param PARAM_FIELDCASE = new Param(MIFDataStore.PARAM_FIELDCASE,
+            String.class,
+            "Field name case transformation, can be \"\" (no transform), \"upper\" (to uppercase) or \"lower\" (to lowercase).",
+            false, "upper");
+    public static final Param PARAM_GEOMNAME = new Param(MIFDataStore.PARAM_GEOMNAME,
+            String.class,
+            "Name of the geometry field, if not specified defaults to \"the_geom\".",
+            false, "the_geom");
+    public static final Param PARAM_GEOMFACTORY = new Param(MIFDataStore.PARAM_GEOMFACTORY,
+            GeometryFactory.class,
+            "GeometryFactory object used for building geometries", false,
+            "new GeometryFactory()");
+    public static final Param PARAM_GEOMTYPE = new Param(MIFDataStore.PARAM_GEOMTYPE,
+            String.class, "Can be typed, untyped or multi (implies typed).",
+            false, "untyped");
+
+    // Header clauses
+    public static final Param PARAM_COORDSYS = new Param(MIFDataStore.HCLAUSE_COORDSYS,
+            String.class, "CoordSys clause for new files", false,
+            "CoordSys Earth Projection 8, 87, \"m\", 9, 0, 0.9996, 1500000, 0 Bounds (-6746230.6469, -9998287.38389) (9746230.6469, 9998287.38389)");
+    public static final Param PARAM_CHARSET = new Param(MIFDataStore.HCLAUSE_CHARSET,
+            String.class, "Charset clause", false, "WindowsLatin1");
+    public static final Param PARAM_DELIMITER = new Param(MIFDataStore.HCLAUSE_DELIMITER,
+            String.class, "Delimiter to be used in output MID files", false, ";");
+    public static final Param PARAM_INDEX = new Param(MIFDataStore.HCLAUSE_INDEX,
+            String.class,
+            "Index clasue (comma separated list of indexed field numbers",
+            false, "1,2,4");
+    public static final Param PARAM_TRANSFORM = new Param(MIFDataStore.HCLAUSE_TRANSFORM,
+            String.class, "Transform clause to be uised for output", false,
+            "0.5,0.5,0,0");
+    public static final Param PARAM_UNIQUE = new Param(MIFDataStore.HCLAUSE_UNIQUE,
+            String.class,
+            "Unique clause - comma separated list of field numbers forming unique values.",
+            false, "1,2");
+    public static final Param PARAM_VERSION = new Param(MIFDataStore.HCLAUSE_VERSION,
+            String.class, "Version ID", false, "410");
+
+    /**
+     * Creates a new MIFDataStoreFactory object.
+     */
+    public MIFDataStoreFactory() {
+        super();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     */
+    public String getDisplayName() {
+        return "MIFDataStore";
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
+     */
+    public DataStore createDataStore(Map params) throws IOException {
+        if (!processParams(params)) {
+            throw new IOException("The parameters map isn't correct.");
+        }
+
+        MIFDataStore mif = null;
+
+        try {
+            HashMap parameters = new HashMap();
+
+            String path = (String) PARAM_PATH.lookUp(params);
+
+            // Options
+            addParamToMap(PARAM_FIELDCASE, params, parameters, null);
+            addParamToMap(PARAM_GEOMNAME, params, parameters, null);
+            addParamToMap(PARAM_GEOMTYPE, params, parameters, null);
+            addParamToMap(PARAM_GEOMFACTORY, params, parameters, null);
+
+            // Header
+            addParamToMap(PARAM_COORDSYS, params, parameters, null);
+            addParamToMap(PARAM_CHARSET, params, parameters, null);
+            addParamToMap(PARAM_DELIMITER, params, parameters, null);
+            addParamToMap(PARAM_INDEX, params, parameters, null);
+            addParamToMap(PARAM_TRANSFORM, params, parameters, null);
+            addParamToMap(PARAM_UNIQUE, params, parameters, null);
+            addParamToMap(PARAM_VERSION, params, parameters, null);
+
+            mif = new MIFDataStore(path, parameters);
+
+            return mif;
+        } catch (IOException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new IOException(ex.toString());
+        }
+    }
+
+    private void addParamToMap(Param param, Map params, HashMap map, Object defa) {
+        Object val = null;
+
+        try {
+            val = param.lookUp(params);
+        } catch (Exception e) {
+        }
+
+        if (val != null) {
+            map.put(param.key, val);
+        } else if (defa != null) {
+            map.put(param.key, defa);
+        }
+    }
+
+    /*
+     * What is this method supposed to do????
+     */
+    public DataStore createNewDataStore(Map params) throws IOException {
+        return createDataStore(params); // return null????
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStoreFactorySpi#getDescription()
+     */
+    public String getDescription() {
+        return "MapInfo MIF/MID format datastore";
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
+     */
+    public Param[] getParametersInfo() {
+        Param[] params = {
+                PARAM_DBTYPE, PARAM_PATH, PARAM_FIELDCASE, PARAM_COORDSYS,
+                PARAM_GEOMNAME, PARAM_GEOMTYPE, PARAM_COORDSYS, PARAM_CHARSET,
+                PARAM_DELIMITER, PARAM_INDEX, PARAM_TRANSFORM, PARAM_UNIQUE,
+                PARAM_VERSION
+            };
+
+        return params;
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStoreFactorySpi#canProcess(java.util.Map)
+     */
+    public boolean canProcess(Map params) {
+        try {
+            return processParams(params);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /*
+     * Utility function for processing params
+     */
+    private boolean processParams(Map params) throws IOException {
+        if (!String.valueOf(PARAM_DBTYPE.lookUp(params)).equalsIgnoreCase("mif")) {
+            throw new IOException("mif dbtype expected");
+        }
+
+        String path = String.valueOf(PARAM_PATH.lookUp(params));
+        File file = new File(path);
+
+        if (!file.exists()) {
+            throw new IOException("Specified path does not exist");
+        }
+
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.data.DataStoreFactorySpi#isAvailable()
+     */
+    public boolean isAvailable() {
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.geotools.factory.Factory#getImplementationHints()
+     */
+    public Map getImplementationHints() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+}

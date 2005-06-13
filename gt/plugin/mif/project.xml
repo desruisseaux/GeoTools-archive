@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <name>geotools-mif</name>
+  <extend>${basedir}/../../project.xml</extend>
+  <id>mif</id>
+  <currentVersion>2.2.x</currentVersion>
+  <package>org.geotools</package>
+  <shortDescription>MapInfo MIF format module</shortDescription>
+  <description>MIF module</description>
+  <developers>
+    <developer>
+      <name>Luca Sigfrido Percich</name>
+      <id>lpercich</id>
+      <email>luca.percich@ama-mi.it</email>
+      <organization>AMA-MI</organization>
+      <roles>
+        <role>Module Mantainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>    
+    <developer>
+      <name>Ray Gallagher</name>
+      <id>omyar</id>
+      <email>omyar@users.sourceforge.net</email>
+      <organization>none</organization>
+      <roles>
+        <role>Former Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jianhui Jin</name>
+      <id></id>
+      <email></email>
+      <organization>CCG</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <artifactId>main</artifactId>
+      <groupId>gt2</groupId>
+      <version>2.2.x</version>
+    </dependency>
+    <dependency>
+      <id>JTS</id>
+      <version>1.6</version>
+      <url>http://www.vividsolutions.com/JTS/jts_frame.htm</url>
+    </dependency>
+  </dependencies>
+  <build>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test</directory>
+          <includes>
+	    <include>META-INF/</include>
+	    <include>**/test-data/</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+</project>
