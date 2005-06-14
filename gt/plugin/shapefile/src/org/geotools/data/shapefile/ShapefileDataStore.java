@@ -111,10 +111,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     protected final URL shxURL;
     protected final URL prjURL;
     protected final URL xmlURL;
-    
+    Lock readWriteLock=new Lock();
     protected URI namespace =null; //namespace provided by the constructor's map
     protected FeatureType schema; // read only
-    
     /**
      * Creates a new instance of ShapefileDataStore.
      *
@@ -446,14 +445,14 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         if (rbc == null) {
             return null;
         }
-        
+    	readWriteLock.startRead();        
         try {
-            return new ShapefileReader(rbc, true);
+            return new ShapefileReader(rbc, true, readWriteLock);
         } catch (ShapefileException se) {
             throw new DataSourceException("Error creating ShapefileReader", se);
         }
     }
-    
+   
     /**
      * Convenience method for opening a DbaseFileReader.
      *
@@ -825,7 +824,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      */
     protected int getCount( Query query ) throws IOException {
         if( query.getFilter()==Filter.NONE ){
-            ShapefileReader reader=new ShapefileReader(getReadChannel(shpURL));
+            ShapefileReader reader=new ShapefileReader(getReadChannel(shpURL), readWriteLock);
             int count=-1;
             try{
                 count = reader.getCount(count);
@@ -1018,7 +1017,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             // open underlying writers
             shpWriter = new ShapefileWriter((FileChannel) getWriteChannel(
             getStorageURL(shpURL)),
-            (FileChannel) getWriteChannel(getStorageURL(shxURL)));
+            (FileChannel) getWriteChannel(getStorageURL(shxURL)), readWriteLock);
             
             dbfChannel = (FileChannel) getWriteChannel(getStorageURL(dbfURL));
             dbfHeader = createDbaseHeader();
@@ -1191,13 +1190,18 @@ public class ShapefileDataStore extends AbstractFileDataStore {
          * @throws IOException DOCUMENT ME!
          */
         protected void copyAndDelete(URL src) throws IOException {
+
             File storage = getStorageFile(src);
             File dest = new File(src.getFile());
             FileChannel in = null;
             FileChannel out = null;
             try {
-                in = new FileInputStream(storage).getChannel();
+
+                readWriteLock.startWrite();
+            	in = new FileInputStream(storage).getChannel();
                 out = new FileOutputStream(dest).getChannel();
+
+
                 long len = in.size();
                 long copied = out.transferFrom(in, 0, in.size());
                 
@@ -1207,6 +1211,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 
                 storage.delete();
             } finally {
+                readWriteLock.endWrite();
                 if( in != null ) in.close();
                 if( out != null ) out.close();
             }
@@ -1397,4 +1402,5 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             currentFeature = null;
         }
     }
+    
 }

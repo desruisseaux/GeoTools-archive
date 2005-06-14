@@ -29,6 +29,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.shapefile.Lock;
 import org.geotools.resources.NIOUtilities;
 
 /**
@@ -97,6 +98,7 @@ public class ShapefileReader {
   private ByteBuffer headerTransfer;
   private final Record record = new Record();
   private final boolean randomAccessEnabled;
+private Lock lock;
   
   /** Creates a new instance of ShapeFile.
    * @param channel The ReadableByteChannel this reader will use.
@@ -105,9 +107,10 @@ public class ShapefileReader {
    * @throws IOException If problems arise.
    * @throws ShapefileException If for some reason the file contains invalid records.
    */
-  public ShapefileReader(ReadableByteChannel channel, boolean strict) throws IOException, ShapefileException {
+  public ShapefileReader(ReadableByteChannel channel, boolean strict, Lock lock) throws IOException, ShapefileException {
     this.channel = channel;
     randomAccessEnabled = channel instanceof FileChannel;
+    this.lock=lock;
     init(strict);
   }
   
@@ -116,8 +119,8 @@ public class ShapefileReader {
    * @throws IOException
    * @throws ShapefileException
    */  
-  public ShapefileReader(ReadableByteChannel channel) throws IOException, ShapefileException {
-    this(channel,true);
+  public ShapefileReader(ReadableByteChannel channel, Lock lock) throws IOException, ShapefileException {
+    this(channel,true, lock);
   }
   
   // convenience to peak at a header
@@ -221,6 +224,7 @@ public class ShapefileReader {
    * @throws IOException If errors occur while closing the channel.
    */  
   public void close() throws IOException {
+    lock.endRead();
     if (channel.isOpen()) {
       channel.close();
     }
@@ -507,7 +511,7 @@ public class ShapefileReader {
   
   public static void main(String[] args) throws Exception {
     FileChannel channel = new FileInputStream(args[0]).getChannel();
-    ShapefileReader reader = new ShapefileReader(channel);
+    ShapefileReader reader = new ShapefileReader(channel, new Lock());
     System.out.println(reader.getHeader());
     while (reader.hasNext()) {
       System.out.println(reader.nextRecord().shape());

@@ -90,8 +90,8 @@ public class ShapefileTest extends TestCaseSupport {
   }
   
   public void testIndexFile() throws Exception {
-    ShapefileReader reader1 = new ShapefileReader(getTestResourceChannel(STATEPOP));
-    ShapefileReader reader2 = new ShapefileReader(getReadableFileChannel(STATEPOP));
+    ShapefileReader reader1 = new ShapefileReader(getTestResourceChannel(STATEPOP), new Lock());
+    ShapefileReader reader2 = new ShapefileReader(getReadableFileChannel(STATEPOP), new Lock());
     IndexFile index = new IndexFile(getTestResourceChannel(STATEPOP_IDX));
     for (int i = 0; i < index.getRecordCount(); i++) {
       if (reader1.hasNext()) {
@@ -137,7 +137,7 @@ public class ShapefileTest extends TestCaseSupport {
   }
   
   public void testSkippingRecords() throws Exception {
-    ShapefileReader r = new ShapefileReader(getTestResourceChannel(STATEPOP));
+    ShapefileReader r = new ShapefileReader(getTestResourceChannel(STATEPOP), new Lock());
     int idx = 0;
     while (r.hasNext()) {
         idx++;
@@ -147,7 +147,7 @@ public class ShapefileTest extends TestCaseSupport {
   }
   
   public void testShapefileReaderRecord() throws Exception {
-    ShapefileReader reader = new ShapefileReader(getTestResourceChannel(STATEPOP));
+    ShapefileReader reader = new ShapefileReader(getTestResourceChannel(STATEPOP), new Lock());
     ArrayList offsets = new ArrayList();
     while (reader.hasNext()) {
       ShapefileReader.Record record = reader.nextRecord();
@@ -156,14 +156,14 @@ public class ShapefileTest extends TestCaseSupport {
       assertEquals(new Envelope(record.minX,record.maxX,record.minY,record.maxY), geom.getEnvelopeInternal());
       record.toString();
     }
-    reader = new ShapefileReader(getReadableFileChannel(STATEPOP));
+    reader = new ShapefileReader(getReadableFileChannel(STATEPOP), new Lock());
     for (int i = 0, ii = offsets.size(); i < ii; i++) {
       reader.shapeAt( ((Integer)offsets.get(i)).intValue() ); 
     }
   }
   
   private void loadShapes(String resource,int expected) throws Exception {
-    ShapefileReader reader = new ShapefileReader(getTestResourceChannel(resource));
+    ShapefileReader reader = new ShapefileReader(getTestResourceChannel(resource), new Lock());
     int cnt = 0;
     while (reader.hasNext()) {
       reader.nextRecord().shape();
@@ -173,7 +173,7 @@ public class ShapefileTest extends TestCaseSupport {
   }
   
   private void loadMemoryMapped(String resource,int expected) throws Exception {
-    ShapefileReader reader = new ShapefileReader(getReadableFileChannel(resource));
+    ShapefileReader reader = new ShapefileReader(getReadableFileChannel(resource), new Lock());
     int cnt = 0;
     while (reader.hasNext()) {
       reader.nextRecord().shape();

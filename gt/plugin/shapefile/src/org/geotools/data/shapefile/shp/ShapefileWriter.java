@@ -25,6 +25,7 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.geotools.data.shapefile.Lock;
 import org.geotools.resources.NIOUtilities;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -63,11 +64,14 @@ public class ShapefileWriter {
   int offset;
   int lp;
   int cnt;
+private Lock lock;
   
-  /** Creates a new instance of ShapeFileWriter */
-  public ShapefileWriter(FileChannel shpChannel, FileChannel shxChannel) {
+  /** Creates a new instance of ShapeFileWriter 
+ * @throws IOException */
+  public ShapefileWriter(FileChannel shpChannel, FileChannel shxChannel, Lock lock) throws IOException {
     this.shpChannel = shpChannel;
     this.shxChannel = shxChannel;
+    this.lock=lock;
   }
   
 //  private void allocateBuffers(int geomCnt, int fileLength) throws IOException {
