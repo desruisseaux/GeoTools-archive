@@ -378,7 +378,7 @@ public class MIFFile {
      * 
      * <ul>
      * <li>
-     * MIFDataStore.HCLAUSE_VERSION = Version number ("310"
+     * MIFDataStore.HCLAUSE_VERSION = Version number ("310")
      * </li>
      * <li>
      * MIFDataStore.HCLAUSE_CHARSET = Charset name ("WindowsLatin1")

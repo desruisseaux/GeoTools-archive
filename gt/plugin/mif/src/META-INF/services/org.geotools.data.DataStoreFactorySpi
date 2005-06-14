@@ -1,1 +1,1 @@
-it.ama_mi.sis.module.mif.MIFDataStoreFactory
+org.geotools.data.mif.MIFDataStoreFactory
