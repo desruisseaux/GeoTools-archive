@@ -98,13 +98,18 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
 public class LabelCacheDefault implements LabelCache {
 
     /** Map<label, LabelCacheItem> the label cache */
-	Map labelCache=new HashMap();
-	private SLDStyleFactory styleFactory=new SLDStyleFactory();
+	protected Map labelCache=new HashMap();
+	protected SLDStyleFactory styleFactory=new SLDStyleFactory();
+	boolean stop=false;
 	
+	public void stop() {
+		stop=true;
+	}
 	/**
 	 * @see org.geotools.renderer.lite.LabelCache#start()
 	 */
 	public void start() {
+		stop=false;
 	}
 
 	/**
@@ -148,6 +153,8 @@ public class LabelCacheDefault implements LabelCache {
 		List glyphs=new ArrayList();
     	for (Iterator labelIter = labelCache.keySet().iterator(); labelIter.hasNext();) 
     	{
+    		if(stop)
+    			return;
     		try{
 				LabelCacheItem labelItem = (LabelCacheItem) labelCache.get(labelIter.next());
 	

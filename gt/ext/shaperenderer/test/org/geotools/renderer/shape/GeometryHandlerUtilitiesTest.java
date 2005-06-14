@@ -21,12 +21,8 @@ import java.awt.geom.AffineTransform;
 import junit.framework.TestCase;
 
 import org.geotools.data.shapefile.shp.ShapeType;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.GeneralMatrix;
-import org.geotools.referencing.wkt.Parser;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.NoninvertibleTransformException;

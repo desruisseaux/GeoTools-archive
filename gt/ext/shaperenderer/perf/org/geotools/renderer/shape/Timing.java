@@ -50,6 +50,7 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
@@ -69,21 +70,21 @@ public class Timing {
 
 	private static boolean ALL_DATA = true;
 
-	private static boolean DISPLAY = false;
+	private static boolean DISPLAY = true;
 
 	private static boolean ANTI_ALIASING = true;
 
 	private static boolean RUN_SHAPE = true;
 
-	private static boolean RUN_LITE = false;
+	private static boolean RUN_LITE = true;
 
 	private static boolean RUN_TINY = false;
 
-	private static boolean ACCURATE = true;
+	private static boolean ACCURATE = false;
 
 	private static boolean CACHING = false;
 
-	private static boolean NO_REPROJECTION = true;
+	private static boolean NO_REPROJECTION = false;
 
 	private static boolean FILTER = false;
 
@@ -91,7 +92,7 @@ public class Timing {
 
 	private static boolean LINES = true;
 	
-	private static boolean LABELING=false;
+	private static boolean LABELING=true;
 	
 	private static boolean RTREE=false;
 	
@@ -188,11 +189,12 @@ public class Timing {
 			rule2.setFilter(filter);
 		}
 		if (LABELING) {
+			StyleBuilder builder=new StyleBuilder();
 			TextSymbolizer textsym=sFac.createTextSymbolizer();
 			textsym.setFill(sFac.getDefaultFill());
 			textsym.setGeometryPropertyName("the_geom");
 			textsym.setLabel(filterFactory.createLiteralExpression(LINES_LABEL));
-			textsym.setFonts(new Font[]{sFac.getDefaultFont()});
+			textsym.setFonts(new Font[]{builder.createFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 10))});
 			rule2.setSymbolizers(new Symbolizer[] { linesym, textsym });
 		}		
 		FeatureTypeStyle fts2 = sFac.createFeatureTypeStyle();
@@ -236,6 +238,8 @@ public class Timing {
 			rule2.setFilter(filter);
 		}
 		if (LABELING) {
+			StyleBuilder builder=new StyleBuilder();
+			
 			TextSymbolizer textsym=sFac.createTextSymbolizer();
 			textsym.setFill(sFac.createFill(filterFactory.createLiteralExpression("#000000")));
 			textsym.setGeometryPropertyName("the_geom");
@@ -244,7 +248,7 @@ public class Timing {
 					.createDataStore(new URL(POLY_FILE));
 			textsym.setLabel(filterFactory.createAttributeExpression(
 					store.getSchema(), POLY_LABEL));
-			textsym.setFonts(new Font[]{sFac.getDefaultFont()});
+			textsym.setFonts(new Font[]{builder.createFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 10))});
 			rule2.setSymbolizers(new Symbolizer[] { lineSym, textsym });
 		}		
 
@@ -526,6 +530,10 @@ public class Timing {
 
 	private static String BC_FILE="file:///home/jones/aData/lwsg_prov.shp";
 	private static String BC_NAME="lwsg_prov";
+
+	private static String BC_WIN_FILE="file:/L:\\uDigData\\countries.shp";
+	private static String BC_WIN_NAME="countries";
+	private static String BC_WIN_LABEL="CNTRY_NAME";
 	
 	private static String CIRCLES_FILE="file:///home/jones/aData/pt_circles2.shp";
 	private static String CIRCLES_NAME="pt_circles2";
@@ -534,6 +542,8 @@ public class Timing {
 	private static String LINES_WORK_TYPE_NAME = "bc_roads";
 	private static String LINES_WORK_LABEL = "STREET";	
 	
+	private static String LINES_WIN_FILE = "file:/c:\\java\\uDigData\\bc_roads.shp";
+	
 	private static String LINES_HOME_FILE = "file:///home/jones/allShapefiles/tcn-roads.shp";
 	private static String LINES_HOME_TYPE_NAME = "tcn-roads";
 	private static String LINES_HOME_LABEL = "STREET";
@@ -541,13 +551,13 @@ public class Timing {
 	private static String LAKES_FILE="file:/home/jones/dev/geotools/ext/shaperenderer/test/org/geotools/renderer/shape/test-data/lakes.shp";
 	private static String LAKES_NAME = "lakes";
 	
-	private static String LINES_FILE = LINES_WORK_FILE;
+	private static String LINES_FILE = LINES_WIN_FILE;
 	private static String LINES_TYPE_NAME = LINES_WORK_TYPE_NAME;
-	private static String LINES_LABEL = LINES_HOME_LABEL;	
+	private static String LINES_LABEL = LINES_WORK_LABEL;	
 	
-	private static String POLY_FILE = BC_FILE;
-	private static String POLY_TYPE_NAME = BC_NAME;
-	private static String POLY_LABEL = NEW_YORK_WORK_LABEL;
+	private static String POLY_FILE = BC_WIN_FILE;
+	private static String POLY_TYPE_NAME = BC_WIN_NAME;
+	private static String POLY_LABEL = BC_WIN_LABEL;
 
 	int w = 512, h = 512;
 }

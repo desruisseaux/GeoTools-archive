@@ -63,4 +63,9 @@ public interface LabelCache {
 	 * @param displayArea The size of the display area.
 	 */
 	void end(Graphics2D graphics, Rectangle displayArea);
+	
+	/**
+	 * Tells the cache to stop labelling.
+	 */
+	void stop();
 }

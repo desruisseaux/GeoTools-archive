@@ -20,6 +20,7 @@ import java.net.URL;
 
 import junit.framework.TestCase;
 
+import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -51,7 +52,7 @@ public class MultiPointHandlerTest extends TestCase {
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
+		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
 		reader.setHandler(new MultiPointHandler(reader.getHeader().getShapeType(), env, mt));
 //		Object shape=reader.nextRecord().shape();
 //		assertNotNull( shape );

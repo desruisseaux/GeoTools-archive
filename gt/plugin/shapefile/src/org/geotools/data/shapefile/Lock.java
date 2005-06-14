@@ -24,12 +24,17 @@ public class Lock{
 				throw (IOException) new IOException().initCause(e);
 			}    				
 		}
-		assert level>-1;
+		assertTrue( level>-1 ); 
 		level++;
 		logger.fine("Start Read Lock:"+level);
 	}
+	
+	private void assertTrue(boolean b) {
+		if (!b)
+			throw new AssertionError();
+	}
 	public synchronized void endRead() {
-		assert level>0;
+		assertTrue( level>0 );
 		level--;
 		logger.fine("End Read Lock:"+level);
 		notifyAll();
@@ -42,12 +47,12 @@ public class Lock{
 				throw (IOException) new IOException().initCause(e);
 			}    		 				
 		}
-		assert level==0;
+		assertTrue( level==0 );
 		level=-1;
 		logger.fine("Start Write Lock:"+level);
 	}
 	public synchronized void endWrite() {
-		assert level==-1;
+		assertTrue( level==-1 );
 		level=0;
 		logger.fine("End Write Lock:"+level);
 		notifyAll();

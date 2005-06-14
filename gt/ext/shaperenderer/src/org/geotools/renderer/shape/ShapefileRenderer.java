@@ -32,6 +32,7 @@ import javax.media.jai.util.Range;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.TransactionStateDiff;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -68,6 +69,7 @@ import org.geotools.renderer.lite.LabelCacheDefault;
 import org.geotools.renderer.lite.ListenerList;
 import org.geotools.renderer.lite.LiteCoordinateSequence;
 import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
+import org.geotools.renderer.lite.LiteRenderer2;
 import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
 import org.geotools.renderer.style.SLDStyleFactory;
@@ -190,7 +192,7 @@ public class ShapefileRenderer {
 		layerIndexInfo = new IndexInfo[layers.length];
 		for (int i = 0; i < layers.length; i++) {
 			DataStore ds = layers[i].getFeatureSource().getDataStore();
-			assert ds instanceof ShapefileDataStore;
+			assert (ds instanceof ShapefileDataStore);
 			ShapefileDataStore sds = (ShapefileDataStore) ds;
 			try {
 				layerIndexInfo[i] = useIndex(sds);
@@ -231,8 +233,14 @@ public class ShapefileRenderer {
 			transform = atg;
 		}
 
-		// graphics.setTransform(at);
-		setScaleDenominator(1 / transform.getScaleX());
+        try{
+        	setScaleDenominator(  LiteRenderer2.calculateScale(envelope,context.getCoordinateReferenceSystem(),paintArea.width,paintArea.height,90));// 90 = OGC standard DPI (see SLD spec page 37)
+        }
+        catch (Exception e) // probably either (1) no CRS (2) error xforming
+		{
+        	setScaleDenominator(1 / transform.getScaleX()); //DJB old method - the best we can do
+		}
+
 		MapLayer[] layers = context.getLayers();
 		// get detstination CRS
 		CoordinateReferenceSystem destinationCrs = context
@@ -256,7 +264,6 @@ public class ShapefileRenderer {
 			try {
 				ShapefileDataStore ds = (ShapefileDataStore) currLayer
 						.getFeatureSource().getDataStore();
-				dbfheader = ShapefileRendererUtil.getDBFReader(ds).getHeader();
 				CoordinateReferenceSystem dataCRS = ds.getSchema()
 						.getDefaultGeometry().getCoordinateSystem();
 				MathTransform mt;
@@ -276,12 +283,15 @@ public class ShapefileRenderer {
 							.createConcatenatedTransform(mt, at);
 				}
 
+				//dbfheader must be set so that the attributes required for theming can be read in.
+				dbfheader=getDBFHeader(ds);
+				
 				// graphics.setTransform(transform);
 
 				// extract the feature type stylers from the style object
 				// and process them
 				if (isCaching() && geometryCache.size() > 0)
-					processStylersCaching(graphics, ds, bbox, mt, currLayer
+					processStylersCaching(graphics, ds, currLayer.getQuery(), bbox, mt, currLayer
 							.getStyle());
 				else {
 					Transaction transaction = null;
@@ -289,7 +299,7 @@ public class ShapefileRenderer {
 						transaction = ((FeatureStore) currLayer
 								.getFeatureSource()).getTransaction();
 
-					processStylersNoCaching(graphics, ds, bbox, mt, currLayer
+					processStylersNoCaching(graphics, ds, currLayer.getQuery(), bbox, mt, currLayer
 							.getStyle(), layerIndexInfo[i], transaction);
 
 				}
@@ -306,8 +316,29 @@ public class ShapefileRenderer {
 				+ styleFactory.getRequests());
 	}
 
+	private DbaseFileHeader getDBFHeader(ShapefileDataStore ds) {
+		
+		DbaseFileReader reader=null;
+		try {
+			reader=ShapefileRendererUtil.getDBFReader(ds);
+			return reader.getHeader();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if( reader!=null )
+				try {
+					reader.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		return null;
+	}
+
+
 	private void processStylersNoCaching(Graphics2D graphics,
-			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
+			ShapefileDataStore datastore, Query query, Envelope bbox, MathTransform mt,
 			Style style, IndexInfo info, Transaction transaction) throws IOException {
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("processing " + style.getFeatureTypeStyles().length
@@ -316,7 +347,7 @@ public class ShapefileRenderer {
 		FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
 		FeatureType type;
 		try {
-			type = createFeatureType(style, datastore.getSchema());
+			type = createFeatureType(query, style, datastore.getSchema());
 		} catch (Exception e) {
 			fireErrorEvent(e);
 			return;
@@ -466,7 +497,6 @@ public class ShapefileRenderer {
 						LOGGER.finer("feature rendered event ...");
 					}
 
-					fireFeatureRenderedEvent(feature);
 				}
 			}
 		}
@@ -604,7 +634,6 @@ public class ShapefileRenderer {
 						LOGGER.finer("feature rendered event ...");
 					}
 
-					fireFeatureRenderedEvent(feature);
 				} catch (Exception e) {
 					fireErrorEvent(e);
 				}
@@ -616,7 +645,7 @@ public class ShapefileRenderer {
 	}
 
 	private void processStylersCaching(Graphics2D graphics,
-			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
+			ShapefileDataStore datastore,Query query, Envelope bbox, MathTransform mt,
 			Style style) throws IOException {
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("processing " + style.getFeatureTypeStyles().length
@@ -625,7 +654,7 @@ public class ShapefileRenderer {
 		FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
 		FeatureType type;
 		try {
-			type = createFeatureType(style, datastore.getSchema());
+			type = createFeatureType(query, style, datastore.getSchema());
 		} catch (Exception e) {
 			fireErrorEvent(e);
 			return;
@@ -831,17 +860,19 @@ public class ShapefileRenderer {
 	private Map decimators=new HashMap();
 
 	/**
+	 * @param query 
 	 * @param style
 	 * @return
 	 * @throws SchemaException
 	 * @throws FactoryConfigurationError
 	 */
-	FeatureType createFeatureType(Style style, FeatureType schema)
+	FeatureType createFeatureType(Query query, Style style, FeatureType schema)
 			throws FactoryConfigurationError, SchemaException {
-		String[] attributes = findStyleAttributes(style, schema);
+		
+		String[] attributes = findStyleAttributes(query==null?Query.ALL:query , style, schema);
 		AttributeType[] types = new AttributeType[attributes.length];
 		attributeIndexing = new int[attributes.length];
-
+		
 		for (int i = 0; i < types.length; i++) {
 			types[i] = schema.getAttributeType(attributes[i]);
 			for (int j = 0; j < dbfheader.getNumFields(); j++) {
@@ -870,8 +901,18 @@ public class ShapefileRenderer {
 	 * @return the minimun set of attribute names needed to render
 	 *         <code>layer</code>
 	 */
-	private String[] findStyleAttributes(Style style, FeatureType schema) {
-		StyleAttributeExtractor sae = new StyleAttributeExtractor();
+	private String[] findStyleAttributes(final Query query, Style style, FeatureType schema) {
+		StyleAttributeExtractor sae = new StyleAttributeExtractor(){
+			public void visit(Rule rule) {
+				if( query!=Query.ALL || !query.getFilter().equals(Filter.NONE)){
+					if( rule.getFilter()==null )
+						rule.setFilter(query.getFilter());
+					else
+						rule.setFilter(rule.getFilter().and(query.getFilter()));
+				}
+				super.visit(rule);
+			}
+		};
 		sae.visit(style);
 
 		String[] ftsAttributes = sae.getAttributeNames();
@@ -911,15 +952,17 @@ public class ShapefileRenderer {
 						.paint(graphics, getShape(geom), style,
 								scaleDenominator);
 
-				// try {
-				// style = styleFactory.createStyle(feature, getTestStyle(),
-				// scaleRange);
-				// painter.paint(graphics, getLiteShape2(geom), style,
-				// scaleDenominator);
-				// } catch (Exception e) {
-				// fireErrorEvent(e);
-				// }
+//				 try {
+//				 style = styleFactory.createStyle(feature, getTestStyle(),
+//				 scaleRange);
+//				 painter.paint(graphics, getLiteShape2(geom), style,
+//				 scaleDenominator);
+//				 } catch (Exception e) {
+//				 fireErrorEvent(e);
+//				 }
 			}
+
+			fireFeatureRenderedEvent(feature);
 
 		}
 
@@ -960,6 +1003,8 @@ public class ShapefileRenderer {
                 }
 
         }
+
+		fireFeatureRenderedEvent(feature);
     }
     /**
 	 * @return
@@ -1059,25 +1104,7 @@ public class ShapefileRenderer {
 				largestPart = i;
 			}
 		}
-		int step = geom.coords[largestPart].length < NUM_SAMPLES ? 2
-				: (int) (geom.coords[largestPart].length / NUM_SAMPLES);
-		if (step % 2 != 0)
-			step++;
-		int size = Math.min(geom.coords[largestPart].length, NUM_SAMPLES);
-		double[] coords = new double[size];
-		int location = 0;
-		for (int i = 0; i < coords.length; i += 2, location += step) {
-			coords[i] = geom.coords[largestPart][location];
-			coords[i + 1] = geom.coords[largestPart][location + 1];
-		}
-		if (isPolygon) {
-			coords[size - 2] = coords[0];
-			coords[size - 1] = coords[1];
-		} else {
-			coords[size - 2] = geom.coords[largestPart][geom.coords[largestPart].length - 2];
-			coords[size - 1] = geom.coords[largestPart][geom.coords[largestPart].length - 1];
-		}
-		return coords;
+		return geom.coords[largestPart];
 	}
 
 	/**
@@ -1185,6 +1212,7 @@ public class ShapefileRenderer {
 	 */
 	public void stopRendering() {
 		renderingStopRequested = true;
+		labelCache.stop();
 	}
 
 	/**

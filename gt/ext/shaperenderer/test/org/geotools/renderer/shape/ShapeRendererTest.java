@@ -27,7 +27,6 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
-import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -36,13 +35,10 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RenderListener;
 import org.geotools.styling.Style;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @TODO class description
@@ -51,13 +47,14 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 2.1.x
  */
 public class ShapeRendererTest extends TestCase {
+	private static final boolean INTERACTIVE = false;
 
 	public void testCreateFeature() throws Exception {
 		ShapefileRenderer renderer = new ShapefileRenderer(null);
 		Style style = LabelingTest.loadStyle("LineStyle.sld");
 		ShapefileDataStore ds = TestUtilites.getDataStore("theme1.shp");
 		renderer.dbfheader = ShapefileRendererUtil.getDBFReader(ds).getHeader();
-		FeatureType type = renderer.createFeatureType(style, ds.getSchema());
+		FeatureType type = renderer.createFeatureType(null, style, ds.getSchema());
 		assertEquals("NAME", type.getAttributeType(0).getName());
 		assertEquals(2, type.getAttributeCount());
 		Feature feature = renderer.createFeature(type, ShapefileRendererUtil
@@ -66,87 +63,6 @@ public class ShapeRendererTest extends TestCase {
 		assertEquals("id", feature.getID());
 		assertEquals("dave street", feature.getAttribute(0));
 	}
-
-	public void testGetLiteShape() throws Exception {
-		double[][] coords = new double[2][];
-		coords[0] = new double[] { 0.0, 0.0, 0.0, 100.0, 100.0, 100.0, 100.0,
-				0.0, 10.0, 0.0 };
-		coords[1] = new double[] { 300.0, 300.0, 300.0, 400.0, 400.0, 400.0,
-				0.0, 0.0 };
-		Envelope env = new Envelope(0, 400, 0, 400);
-
-		ShapefileRenderer renderer = new ShapefileRenderer(null);
-
-		LiteShape2 shape = renderer.getLiteShape2(new SimpleGeometry(
-				ShapeType.POLYGON, coords, env));
-
-		Geometry jtsGeom = shape.getGeometry();
-		assertEquals(5, jtsGeom.getNumPoints());
-		Coordinate[] coordinates = jtsGeom.getCoordinates();
-		assertEquals(new Coordinate(0, 0), coordinates[0]);
-		assertEquals(new Coordinate(0, 100), coordinates[1]);
-		assertEquals(new Coordinate(100, 100), coordinates[2]);
-		assertEquals(new Coordinate(100, 0), coordinates[3]);
-		assertEquals(new Coordinate(0, 0), coordinates[4]);
-
-		shape = renderer.getLiteShape2(new SimpleGeometry(ShapeType.ARC,
-				coords, env));
-		jtsGeom = shape.getGeometry();
-		assertTrue(jtsGeom.getNumPoints() == 5);
-		coordinates = jtsGeom.getCoordinates();
-		assertEquals(new Coordinate(0, 0), coordinates[0]);
-		assertEquals(new Coordinate(0, 100), coordinates[1]);
-		assertEquals(new Coordinate(100, 100), coordinates[2]);
-		assertEquals(new Coordinate(100, 0), coordinates[3]);
-		assertEquals(new Coordinate(10, 0), coordinates[4]);
-
-		shape = renderer.getLiteShape2(new SimpleGeometry(ShapeType.POLYGONZ,
-				coords, env));
-		jtsGeom = shape.getGeometry();
-		assertTrue(jtsGeom.getNumPoints() == 5);
-		coordinates = jtsGeom.getCoordinates();
-		assertEquals(new Coordinate(0, 0), coordinates[0]);
-		assertEquals(new Coordinate(0, 100), coordinates[1]);
-		assertEquals(new Coordinate(100, 100), coordinates[2]);
-		assertEquals(new Coordinate(100, 0), coordinates[3]);
-		assertEquals(new Coordinate(0, 0), coordinates[4]);
-
-		shape = renderer.getLiteShape2(new SimpleGeometry(ShapeType.MULTIPOINT,
-				coords, env));
-		jtsGeom = shape.getGeometry();
-		assertTrue(jtsGeom.getNumPoints() == 5);
-		coordinates = jtsGeom.getCoordinates();
-		assertEquals(new Coordinate(0, 0), coordinates[0]);
-		assertEquals(new Coordinate(0, 100), coordinates[1]);
-		assertEquals(new Coordinate(100, 100), coordinates[2]);
-		assertEquals(new Coordinate(100, 0), coordinates[3]);
-		assertEquals(new Coordinate(10, 0), coordinates[4]);
-		ShapefileRenderer.NUM_SAMPLES=12;
-		shape = renderer.getLiteShape2(new SimpleGeometry(ShapeType.POLYGON,
-				new double[][] { manyCoords }, env));
-		jtsGeom = shape.getGeometry();
-		coordinates = jtsGeom.getCoordinates();
-		assertEquals(new Coordinate(manyCoords[0], manyCoords[1]),
-				coordinates[0]);
-		assertEquals(new Coordinate(manyCoords[2], manyCoords[3]),
-				coordinates[1]);
-		assertEquals(new Coordinate(manyCoords[4], manyCoords[5]),
-				coordinates[2]);
-		assertEquals(new Coordinate(manyCoords[6], manyCoords[7]),
-				coordinates[3]);
-		assertEquals(new Coordinate(manyCoords[8], manyCoords[9]),
-				coordinates[4]);
-		assertEquals(new Coordinate(manyCoords[10], manyCoords[11]),
-				coordinates[5]);
-	}
-
-	private static final boolean INTERACTIVE = false;
-
-	double[] manyCoords = new double[] { 90.8307300832239, 243.83302237886664,
-			85.959938002934, 238.46064227626084, 94.3885659571406,
-			236.11317091199317, 99.23509261303661, 242.5690788218758,
-			98.31961497838347, 245.82484960695865, 90.8307300832239,
-			243.83302237886664 };
 
 	public void testRemoveTransaction() throws Exception{
 		ShapefileDataStore ds=TestUtilites.getDataStore("theme1.shp");

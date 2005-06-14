@@ -49,7 +49,7 @@ public class ShapefileRendererUtil {
 	 * @throws TransformException
 	 */
 	public static ShapefileReader getShpReader(ShapefileDataStore ds, Envelope bbox, MathTransform mt) throws IOException, TransformException{
-		ShapefileReader reader=new ShapefileReader(ds.getReadChannel(ds.shpURL));
+		ShapefileReader reader=ds.openShapeReader();
 		ShapeType type=reader.getHeader().getShapeType();
 		
 		if( type==ShapeType.ARC || type==ShapeType.ARCM || type==ShapeType.ARCZ )

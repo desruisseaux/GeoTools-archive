@@ -444,8 +444,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         
         if (rbc == null) {
             return null;
-        }
-    	readWriteLock.startRead();        
+        } 
         try {
             return new ShapefileReader(rbc, true, readWriteLock);
         } catch (ShapefileException se) {

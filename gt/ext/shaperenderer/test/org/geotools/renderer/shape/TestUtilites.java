@@ -223,10 +223,13 @@ public class TestUtilites {
 	 * 
 	 * @param g
 	 * @param bounds
+	 * @throws IOException 
 	 */
-	static void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) {
+	static void render( Object obj, Graphics g, Rectangle rect, Envelope bounds ) throws IOException {
 	    if (obj instanceof ShapefileRenderer) {
 	        ShapefileRenderer renderer = (ShapefileRenderer) obj;
+	        if( bounds==null )
+	        	bounds=renderer.getContext().getLayerBounds();
 	        renderer.paint((Graphics2D) g, rect, bounds);
 	    }
 	}

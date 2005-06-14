@@ -111,6 +111,7 @@ private Lock lock;
     this.channel = channel;
     randomAccessEnabled = channel instanceof FileChannel;
     this.lock=lock;
+    lock.startRead();
     init(strict);
   }
   

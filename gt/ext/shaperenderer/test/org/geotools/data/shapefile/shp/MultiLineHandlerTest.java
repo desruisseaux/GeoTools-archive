@@ -23,6 +23,7 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 import org.geotools.data.Query;
+import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
@@ -65,7 +66,7 @@ public class MultiLineHandlerTest extends TestCase {
 //		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
 		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
 		
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
+		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
 		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
@@ -96,7 +97,7 @@ public class MultiLineHandlerTest extends TestCase {
 		.createAffineTransform(new GeneralMatrix(at));
 		mt = FactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt,worldToScreen);
-		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds));
+		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
 		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt));
 		SimpleGeometry shape=(SimpleGeometry) reader.nextRecord().shape();
 		assertEquals( 6, shape.coords[0].length );

@@ -8,6 +8,7 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -327,6 +328,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     public void stopRendering() {
         renderingStopRequested = true;
+		labelCache.stop();
     }
 
     /**
@@ -904,7 +906,7 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
     								throws IOException,  IllegalAttributeException 
 	{
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("processing " + featureStylers.length + " stylers");
+            LOGGER.fine("processing " + featureStylers.length + " stylers for "+features.getSchema().getTypeName());
         }
 
 //        LiteShape2 shape = createPath(null, at);
@@ -1244,10 +1246,25 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
      */
     private void renderRaster( Graphics2D graphics, Feature feature, RasterSymbolizer symbolizer ) {
         LOGGER.fine("rendering Raster for feature " + feature.toString() + " - " + feature.getAttribute("grid") );
+        float alpha = getOpacity(symbolizer);
+        graphics.setComposite(AlphaComposite.getInstance(
+        			AlphaComposite.SRC_OVER, alpha));
         GridCoverage grid = (GridCoverage) feature.getAttribute("grid");
         GridCoverageRenderer gcr = new GridCoverageRenderer(grid);
         gcr.paint(graphics);
         LOGGER.fine("Raster rendered");
+    }
+    
+    private float getOpacity(RasterSymbolizer sym) {
+    	float alpha = 1.0f;
+    	Expression exp = sym.getOpacity();
+    	if(exp == null) return alpha;
+    	Object obj = exp.getValue(null);
+    	if(obj == null) return alpha;
+    	Number num = null;
+    	if(obj instanceof Number) num = (Number)obj;
+    	if(num == null) return alpha;
+    	return num.floatValue();
     }
 
     /**
