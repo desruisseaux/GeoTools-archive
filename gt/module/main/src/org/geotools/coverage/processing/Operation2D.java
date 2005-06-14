@@ -46,6 +46,8 @@ import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.cts.Resources;
+import org.geotools.resources.cts.ResourceKeys;
 
 
 
@@ -97,6 +99,7 @@ public abstract class Operation2D implements Operation, Serializable {
      */
     public Operation2D(final ParameterDescriptorGroup descriptor) {
         this.descriptor = descriptor;
+        ensureNonNull("descriptor", descriptor);
     }
 
     /**
@@ -205,6 +208,23 @@ public abstract class Operation2D implements Operation, Serializable {
             }
         }
         return GridCoverageProcessor2D.getDefault();
+    }
+    
+    /**
+     * Makes sure that an argument is non-null. This is a
+     * convenience method for subclass constructors.
+     *
+     * @param  name   Argument name.
+     * @param  object User argument.
+     * @throws InvalidParameterValueException if {@code object} is null.
+     */
+    protected static void ensureNonNull(final String name, final Object object)
+            throws IllegalArgumentException
+    {
+        if (object == null) {
+            throw new IllegalArgumentException(Resources.format(
+                        ResourceKeys.ERROR_NULL_ARGUMENT_$1, name));
+        }
     }
 
     /**

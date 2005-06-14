@@ -20,32 +20,24 @@
 package org.geotools.coverage.processing;
 
 // J2SE dependencies and extensions
+import java.awt.RenderingHints;
+import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
-import java.io.Serializable;
-import java.awt.RenderingHints;
-import java.awt.image.ColorModel;
-import java.awt.image.RenderedImage;
 import javax.units.Unit;
 
 // JAI dependencies
 import javax.media.jai.ImageLayout;
-import javax.media.jai.IntegerSequence;
 import javax.media.jai.JAI;
 import javax.media.jai.OperationDescriptor;
 import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.ParameterList;
-import javax.media.jai.ParameterListDescriptor;
-import javax.media.jai.ParameterListDescriptorImpl;
 import javax.media.jai.registry.RenderedRegistryMode;
-import javax.media.jai.util.Range;
 
 // OpenGIS dependencies
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -53,22 +45,22 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.util.AbstractInternationalString;
-import org.geotools.parameter.ImagingParameterDescriptors;
-import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.factory.Hints;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
+import org.geotools.factory.Hints;
+import org.geotools.parameter.ImagingParameters;
+import org.geotools.parameter.ImagingParameterDescriptors;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
@@ -76,6 +68,7 @@ import org.geotools.resources.GCSUtilities;
 import org.geotools.resources.gcs.Resources;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.util.AbstractInternationalString;
 
 
 /**
@@ -105,7 +98,7 @@ import org.geotools.resources.image.ImageUtilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class OperationJAI extends Operation2D {
+public class OperationJAI extends Operation2D {
     /**
      * Serial number for interoperability with different versions.
      */
@@ -143,11 +136,11 @@ public abstract class OperationJAI extends Operation2D {
      * constructor fetch the {@link OperationDescriptor} from the specified operation
      * name using the default {@link JAI} instance.
      *
-     * @param operationName JAI operation name (e.g. {@code "GradientMagnitude"}).
+     * @param operation JAI operation name (e.g. {@code "GradientMagnitude"}).
      * @throws OperationNotFoundException if no JAI descriptor was found for the given name.
      */
-    public OperationJAI(final String operationName) throws OperationNotFoundException {
-        this(getOperationDescriptor(operationName));
+    public OperationJAI(final String operation) throws OperationNotFoundException {
+        this(getOperationDescriptor(operation));
     }
 
     /**
@@ -173,6 +166,7 @@ public abstract class OperationJAI extends Operation2D {
     {
         super(parameters);
         this.operation = operation;
+        ensureNonNull("operation", operation);
         /*
          * Check argument validity.
          */
@@ -229,105 +223,95 @@ public abstract class OperationJAI extends Operation2D {
         return true;
     }
 
-//    /**
-//     * Apply a process operation to a grid coverage.
-//     * The default implementation performs the following steps:
-//     *
-//     * <ul>
-//     *   <li>Convert source grid coverages to their <cite>geophysics</cite> view, using
-//     *       <code>{@link GridCoverage2D#geophysics GridCoverage2D.geophysics}(true)</code>.
-//     *       This allow to performs all computation on geophysics values instead of encoded
-//     *       samples.</li>
-//     *   <li>Ensure that every source <code>GridCoverage2D</code>s use the same coordinate
-//     *       system and have the same envelope.</li>
-//     *   <li>Invoke {@link #deriveGridCoverage}.
-//     *       The sources in the <code>ParameterBlock</code> are {@link RenderedImage} objects
-//     *       obtained from {@link GridCoverage2D#getRenderedImage()}.</li>
-//     *   <li>If the source <code>GridCoverage2D</code>s was not a geophysics view, convert the
-//     *       result back to the same type with
-//     *       <code>{@link GridCoverage2D#geophysics GridCoverage2D.geophysics}(false)</code>.</li>
-//     * </ul>
-//     *
-//     * @param  parameters List of name value pairs for the parameters required for the operation.
-//     * @param  hints A set of rendering hints, or {@code null} if none.
-//     * @return The result as a grid coverage.
-//     *
-//     * @see #deriveGridCoverage
-//     */
-//    protected GridCoverage2D doOperation(final ParameterList  parameters,
-//                                       final RenderingHints hints)
-//    {
-//        /*
-//         * Copy parameter values from the ParameterList to the ParameterBlockJAI.
-//         * The sources GridCoverages are extracted in the process and the source
-//         * RenderedImage are set in the ParameterBlockJAI. The first array of
-//         * range specifiers, if any, is treated especialy.
-//         */
-//        RangeSpecifier[]        ranges = null;
-//        Boolean  requireGeophysicsType = null;
-//        final ParameterBlockJAI  block = new ParameterBlockJAI(operation, RENDERED_MODE);
-//        final String[]      paramNames = parameters.getParameterListDescriptor().getParamNames();
-//        final String[] blockParamNames = block.getParameterListDescriptor().getParamNames();
-//        final String[]     sourceNames = getSourceNames(parameters);
-//        final GridCoverage2D[]   sources = new GridCoverage2D[length(sourceNames)];
-//        for (int srcCount=0,i=0; i<paramNames.length; i++) {
-//            final String name  = paramNames[i];
-//            final Object value = parameters.getObjectParameter(name);
-//            if (contains(sourceNames, name)) {
-//                GridCoverage2D source = (GridCoverage2D) value;
-//                if (computeOnGeophysicsValues()) {
-//                    final GridCoverage2D old = source;
-//                    source = source.geophysics(true);
-//                    if (srcCount == PRIMARY_SOURCE_INDEX) {
-//                        requireGeophysicsType = Boolean.valueOf(old==source);
-//                    }
-//                }
-//                sources[srcCount++] = source;
-//                continue;
-//            }
-//            if (!contains(blockParamNames, name)) {
-//                if (value == null) {
-//                    continue;
-//                }
-//                if (value instanceof RangeSpecifier) {
-//                    ranges = new RangeSpecifier[] {(RangeSpecifier)value};
-//                    continue;
-//                }
-//                if (value instanceof RangeSpecifier[]) {
-//                    ranges = (RangeSpecifier[]) value;
-//                    continue;
-//                }
-//            }
-//            setParameter(block, name, value);
-//        }
-//        /*
-//         * Ensures that all coverages use the same coordinate system and has the same envelope.
-//         * After the projection, the method still checks all CS in case the user overrided the
-//         * {@link #resampleToCommonGeometry} method.
-//         */
-//        resampleToCommonGeometry(sources, null, null, hints);
-//        GridCoverage2D          coverage = sources[PRIMARY_SOURCE_INDEX];
-//        final CoordinateReferenceSystem cs = coverage.getCoordinateReferenceSystem2D();
-//        final MathTransform2D gridToCS = coverage.getGridGeometry().getGridToCoordinateSystem2D();
-//        for (int i=0; i<sources.length; i++) {
-//            final GridCoverage2D source = sources[i];
-//            if (!cs.equals(getCoordinateSystem(source), false) ||
-//                !gridToCS.equals(source.getGridGeometry().getGridToCoordinateSystem2D()))
-//            {
-//                throw new IllegalArgumentException(Resources.format(
-//                        ResourceKeys.ERROR_INCOMPATIBLE_GRID_GEOMETRY));
-//            }
-//            block.addSource(source.getRenderedImage());
-//        }
-//        /*
-//         * Apply the operation. This delegates the work to the chain of 'deriveXXX' methods.
-//         */
-//        coverage = deriveGridCoverage(sources, new Parameters(cs, gridToCS, block, hints, ranges));
-//        if (requireGeophysicsType != null) {
-//            coverage = coverage.geophysics(requireGeophysicsType.booleanValue());
-//        }
-//        return coverage;
-//    }
+    /**
+     * Applies a process operation to a grid coverage.
+     * The default implementation performs the following steps:
+     *
+     * <ul>
+     *   <li>Converts source grid coverages to their <cite>geophysics</cite> view using
+     *       <code>{@linkplain GridCoverage2D#geophysics GridCoverage2D.geophysics}(true)</code>.
+     *       This allow to performs all computation on geophysics values instead of encoded
+     *       samples.</li>
+     *   <li>Ensures that every sources {@code GridCoverage2D}s use the same coordinate reference
+     *       system (at least for the two-dimensional part) with the same
+     *       {@link GridGeometry2D#getGridToCoordinateSystem2D gridToCRS} relationship.</li>
+     *   <li>Invokes {@link #deriveGridCoverage}.
+     *       The sources in the {@code ParameterBlock} are {@link RenderedImage} objects
+     *       obtained from {@link GridCoverage2D#getRenderedImage()}.</li>
+     *   <li>If the source {@code GridCoverage2D}s was not a geophysics view, converts the
+     *       result back to the same type with
+     *       <code>{@linkplain GridCoverage2D#geophysics GridCoverage2D.geophysics}(false)</code>.</li>
+     * </ul>
+     *
+     * @param  parameters List of name value pairs for the parameters required for the operation.
+     * @param  hints A set of rendering hints, or {@code null} if none.
+     * @return The result as a grid coverage.
+     *
+     * @see #deriveGridCoverage
+     */
+    protected GridCoverage2D doOperation(final ParameterValueGroup  parameters,
+                                         final RenderingHints       hints)
+    {
+        /*
+         * Copies parameter values from the 'ParameterValues' object to the 'ParameterBlockJAI',
+         * except the sources. The sources GridCoverages are extracted now but will be set in the
+         * ParameterBlockJAI (as RenderedImages) later.
+         */
+        final ParameterBlockJAI block;
+        if (parameters instanceof ParameterBlockJAI) {
+            block = (ParameterBlockJAI) parameters;
+        } else {
+            final ImagingParameters copy = (ImagingParameters) descriptor.createValue();
+            block = (ParameterBlockJAI) copy.parameters;
+            org.geotools.parameter.Parameters.copy(parameters, copy);
+        }
+        Boolean  requireGeophysicsType = null;
+        final String[]     sourceNames = operation.getSourceNames();
+        final GridCoverage2D[] sources = new GridCoverage2D[sourceNames.length];
+        for (int i=0; i<sourceNames.length; i++) {
+            GridCoverage2D source = (GridCoverage2D) parameters.parameter(sourceNames[i]).getValue();
+            if (computeOnGeophysicsValues()) {
+                final GridCoverage2D old = source;
+                source = source.geophysics(true);
+                if (i == PRIMARY_SOURCE_INDEX) {
+                    requireGeophysicsType = Boolean.valueOf(old == source);
+                }
+            }
+            sources[i] = source;
+        }
+        /*
+         * Ensures that all coverages use the same CRS and has the same 'gridToCRS' relationship.
+         * After the reprojection, the method still checks all CRS in case the user overrided the
+         * {@link #resampleToCommonGeometry} method.
+         */
+        final Hints cHints = (hints instanceof Hints) ? (Hints) hints : new Hints(hints);
+        resampleToCommonGeometry(sources, null, null, cHints);
+        GridCoverage2D coverage = sources[PRIMARY_SOURCE_INDEX];
+        final CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem2D();
+        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
+        final MathTransform2D gridToCRS = ((GridGeometry2D) coverage.getGridGeometry()).getGridToCoordinateSystem2D();
+        for (int i=0; i<sources.length; i++) {
+            final GridCoverage2D source = sources[i];
+            if (!CRSUtilities.equalsIgnoreMetadata(crs, source.getCoordinateReferenceSystem2D()) ||
+                !CRSUtilities.equalsIgnoreMetadata(gridToCRS,
+                    ((GridGeometry2D) source.getGridGeometry()).getGridToCoordinateSystem2D()))
+            {
+                throw new IllegalArgumentException(Resources.format(
+                        ResourceKeys.ERROR_INCOMPATIBLE_GRID_GEOMETRY));
+            }
+            block.setSource(sourceNames[i], source.getRenderedImage());
+        }
+        /*
+         * Applies the operation. This delegates the work to the chain of 'deriveXXX' methods.
+         * TODO: get the range specifier.
+         */
+        RangeSpecifier[] ranges = null;
+        coverage = deriveGridCoverage(sources, new Parameters(crs, gridToCRS, block, cHints, ranges));
+        if (requireGeophysicsType != null) {
+            coverage = coverage.geophysics(requireGeophysicsType.booleanValue());
+        }
+        return coverage;
+    }
 
     /**
      * Returns a sub-coordinate reference system for the specified dimension range.
@@ -336,11 +320,12 @@ public abstract class OperationJAI extends Operation2D {
      * @param  crs   The coordinate reference system to decompose.
      * @param  lower The first dimension to keep, inclusive.
      * @param  upper The last  dimension to keep, exclusive.
-     * @return The sub-coordinate system, or {@code null} if {@code lower} is equals to
-     *         {@code upper}.
+     * @return The sub-coordinate system, or {@code null} if {@code lower} is equals to {@code upper}.
+     * @throws InvalidGridGeometryException if the CRS can't be separated.
      */
     private static CoordinateReferenceSystem getSubCRS(final CoordinateReferenceSystem crs,
                                                        final int lower, final int upper)
+            throws InvalidGridGeometryException
     {
         if (lower == upper) {
             return null;
@@ -353,12 +338,43 @@ public abstract class OperationJAI extends Operation2D {
     }
 
     /**
+     * Ensures that the source and target dimensions are the same. This method is for internal
+     * use by {@link #resampleToCommonGeometry}.
+     */
+    private static void ensureStableDimensions(final DimensionFilter filter)
+            throws InvalidGridGeometryException
+    {
+        final int[] source = filter.getSourceDimensions(); Arrays.sort(source);
+        final int[] target = filter.getTargetDimensions(); Arrays.sort(target);
+        if (!Arrays.equals(source, target)) {
+            // TODO: localize
+            throw new InvalidGridGeometryException("Unsupported math transform.");
+        }
+    }
+
+    /**
      * Resamples all sources grid coverages to the same {@linkplain GridGeometry2D two-dimensional
-     * geometry} before to apply the {@linkplain #operation}. Only the two-dimensional part is
-     * reprojected; extra dimension (if any) are left unchanged. Extra dimensions are typically
-     * a time axis or a depth. Subclasses should override this method if they want to specify a
-     * target {@linkplain GridGeometry2D grid geometry} and {@linkplain CoordinateReferenceSystem
-     * coordinate reference system} different than the default one.
+     * geometry} before to apply the {@linkplain #operation}. This method is invoked automatically
+     * by the {@link #doOperation doOperation} method. Only the two-dimensional part is reprojected
+     * (usually the spatial component of a CRS). Extra dimension (if any) are left unchanged. Extra
+     * dimensions are typically time axis or depth. Note that extra dimensions are
+     * <strong>not</strong> forced to a common geometry; only the two dimensions that apply to a
+     * {@link javax.media.jai.PlanarImage} are. This is because the extra dimensions don't need to
+     * be compatible for all operations. For example if a source image is a slice in a time series,
+     * a second source image could be a slice in the frequency representation of this time series.
+     * <p>
+     * Subclasses should override this method if they want to specify target
+     * {@linkplain GridGeometry2D grid geometry} and
+     * {@linkplain CoordinateReferenceSystem coordinate reference system} different than the
+     * default ones. For example if a subclass wants to force all images to be referenced in a
+     * {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS#WGS84 WGS 84} CRS, then
+     * it may overrides this method as below:
+     *
+     * <blockquote><pre>
+     * protected void resampleToCommonGeometry(...) {
+     *    crs2D = DefaultGeographicCRS.WGS84;
+     *    super.resampleToCommonGeometry(sources, crs2D, gridToCrs2D, hints);
+     * }</pre></blockquote>
      *
      * @param  sources     The source grid coverages to resample. This array is updated in-place as
      *                     needed (for example if a grid coverage is replaced by a projected one).
@@ -448,38 +464,57 @@ public abstract class OperationJAI extends Operation2D {
                     throw new CannotReprojectException(exception.getLocalizedMessage(), exception);
                 }
             }
+            /*
+             * Constructs the 'gridToCRS' transform in the same way than the CRS:
+             * leading and trailing dimensions (if any) are preserved.
+             */
             final MathTransform toSource2D = geometry.getGridToCoordinateSystem2D();
             final MathTransform toSource   = geometry.getGridToCoordinateSystem();
-            final MathTransform toTarget;
+            MathTransform toTarget;
             if (CRSUtilities.equalsIgnoreMetadata(gridToCrs2D, toSource2D)) {
                 toTarget  = toSource;
             } else {
                 /*
-                 * Constructs the 'gridToCRS' transform in the same way than the CRS:
-                 * leading and trailing dimensions (if any) are preserved.
+                 * Replaces the 2D part in the source MT, while preserving the leading and
+                 * trailing MT (if any). This is similar to the 'lowerDim' and 'upperDim'
+                 * variables in the CRS case above, except that we operate on "grid" space
+                 * rather than "axis" spaces. The index are usually the same, but not always.
                  */
-                MathTransformFactory factory = FactoryFinder.getMathTransformFactory(hints);
-//                try {
-//                    MathTransform transform = source.getGridGeometry().getGridToCoordinateSystem();
-//                    IntegerSequence headDim = JAIUtilities.createSequence(0, dimension-1);
-//                    IntegerSequence tailDim = JAIUtilities.createSequence(dimension, sourceDim-1);
-//                    MathTransform   headTr  = factory.createSubTransform(transform, headDim, null);
-//                    MathTransform   tailTr  = factory.createSubTransform(transform, tailDim, null);
-//                    if (!headTr.equals(gridToCS)) {
-//                        headTr = factory.createPassThroughTransform(0, headTr, sourceDim-dimension);
-//                        tailTr = factory.createPassThroughTransform(dimension, tailTr, 0);
-//                        transform = factory.createConcatenatedTransform(headTr, tailTr);
-//                    }
-//                    targetGeom = new GridGeometry(null, transform);
-//                } catch (FactoryException exception) {
-//                    throw new CannotReprojectException(Resources.format(
-//                            ResourceKeys.ERROR_CANT_REPROJECT_$1,
-//                            source.getName(null)), exception);
-//                }
+                final int  lowerDim = Math.min(geometry.gridDimensionX, geometry.gridDimensionY);
+                final int  upperDim = Math.max(geometry.gridDimensionX, geometry.gridDimensionY)+1;
+                final int sourceDim = toSource.getSourceDimensions();
+                if (upperDim-lowerDim != toSource2D.getSourceDimensions()) {
+                    // TODO: localize
+                    throw new InvalidGridGeometryException("Unsupported math transform.");
+                }
+                final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(hints);
+                final DimensionFilter       filter = new DimensionFilter(factory);
+                toTarget = gridToCrs2D;
+                try {
+                    if (lowerDim != 0) {
+                        filter.addSourceDimensionRange(0, lowerDim);
+                        MathTransform step = filter.separate(toSource);
+                        ensureStableDimensions(filter);
+                        step = factory.createPassThroughTransform(0, step, sourceDim-lowerDim);
+                        toTarget = factory.createConcatenatedTransform(step, toTarget);
+                    }
+                    if (upperDim != sourceDim) {
+                        filter.clear();
+                        filter.addSourceDimensionRange(upperDim, sourceDim);
+                        MathTransform step = filter.separate(toSource);
+                        ensureStableDimensions(filter);
+                        step = factory.createPassThroughTransform(upperDim, step, 0);
+                        toTarget = factory.createConcatenatedTransform(toTarget, step);
+                    }
+                } catch (FactoryException exception) {
+                    throw new CannotReprojectException(Resources.format(
+                            ResourceKeys.ERROR_CANT_REPROJECT_$1, source.getName()), exception);
+                }
             }
+            final GridGeometry2D targetGeom = new GridGeometry2D(null, toTarget);
             sources[i] = (GridCoverage2D) processor.doOperation(
                             "Resample",                  source,
-//                          "GridGeometry",              targetGeom,
+                            "GridGeometry",              targetGeom,
                             "CoordinateReferenceSystem", targetCRS);
         }
     }
@@ -489,8 +524,8 @@ public abstract class OperationJAI extends Operation2D {
      * {@link #doOperation}. The default implementation performs the following steps:
      *
      * <ul>
-     *   <li>Gets the {@link SampleDimension}s for the target images by invoking the
-     *       {@link #deriveSampleDimension deriveSampleDimension(...)} method.</li>
+     *   <li>Gets the {@linkplain GridSampleDimension sample dimensions} for the target images by
+     *       invoking the {@link #deriveSampleDimension deriveSampleDimension(...)} method.</li>
      *   <li>Applied the JAI operation using {@link #createRenderedImage}.</li>
      *   <li>Wraps the result in a {@link GridCoverage2D} object.</li>
      * </ul>
@@ -602,9 +637,10 @@ public abstract class OperationJAI extends Operation2D {
     }
 
     /**
-     * Returns the {@link SampleDimension}s for the target {@linkplain GridCoverage2D grid coverage}.
-     * This method is invoked automatically by {@link #deriveGridCoverage deriveGridCoverage} with
-     * a {@code bandLists} argument initialized as below:
+     * Returns the {@linkplain GridSampleDimension sample dimensions} for the target
+     * {@linkplain GridCoverage2D grid coverage}. This method is invoked automatically by
+     * {@link #deriveGridCoverage deriveGridCoverage} with a {@code bandLists} argument
+     * initialized as below:
      * <p>
      * <ul>
      *   <li>The {@code bandLists} array length is equals to the number of source coverages.</li>
@@ -623,7 +659,7 @@ public abstract class OperationJAI extends Operation2D {
      * should override this method if they know a more accurate algorithm for determining sample
      * dimensions.
      *
-     * @param  bandLists The set of {@link SampleDimension}s for each source {@link GridCoverage2D}s.
+     * @param  bandLists The set of sample dimensions for each source {@link GridCoverage2D}s.
      * @param  parameters Parameters, rendering hints and coordinate reference system to use.
      * @return The sample dimensions for each band in the destination image, or {@code null}
      *         if unknow.
@@ -700,7 +736,7 @@ public abstract class OperationJAI extends Operation2D {
     }
 
     /**
-     * Returns the quantitative category for a single {@linkplain SampleDimension sample dimension}
+     * Returns the quantitative category for a single {@linkplain GridSampleDimension sample dimension}
      * in the target {@linkplain GridCoverage2D grid coverage}. This method is invoked automatically
      * by the {@link #deriveSampleDimension deriveSampleDimension} method for each band in the
      * target image. Subclasses should override this method in order to compute the target
@@ -728,7 +764,7 @@ public abstract class OperationJAI extends Operation2D {
     }
 
     /**
-     * Returns the unit of data for a single {@linkplain SampleDimension sample dimension} in the
+     * Returns the unit of data for a single {@linkplain GridSampleDimension sample dimension} in the
      * target {@linkplain GridCoverage2D grid coverage}. This method is invoked automatically by
      * the {@link #deriveSampleDimension deriveSampleDimension} method for each band in the target
      * image. Subclasses should override this method in order to compute the target units from the

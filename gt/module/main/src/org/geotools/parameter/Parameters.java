@@ -50,6 +50,32 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 /**
  * Utility class for methods helping implementing, and working with the
  * parameter API from {@link org.opengis.parameter} package.
+ * <p>
+ * <h3>Design note</h3>
+ * This class contains some methods working on a specific parameter in a group (e.g.
+ * {@linkplain #search searching}, {@linkplain #ensureSet setting a value}, <cite>etc.</cite>).
+ * Parameters are identified by their {@linkplain ParameterDescriptor#getName name} instead of
+ * their full {@linkplain ParameterDescriptor descriptor} object, because:
+ * <ul>
+ *   <li>The parameter descriptor may not be always available. For example a user may looks for
+ *       the {@code "semi_major"} axis length (because it is documented in OGC specification under
+ *       that name) but doesn't know and doesn't care about who is providing the implementation. In
+ *       such case, he doesn't have the parameter's descriptor. He only have the parameter's name,
+ *       and creating a descriptor from that name (a descriptor independent of any implementation)
+ *       is tedious.</li>.
+ *   <li>Parameter descriptors are implementation-dependent. For example if a user searchs for
+ *       the above-cited {@code "semi_major"} axis length using the {@linkplain
+ *       org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MAJOR
+ *       Geotools's descriptor} for this parameter, we will fail to find this parameter in any
+ *       alternative {@link ParameterValueGroup} implementations. This is against GeoAPI's
+ *       inter-operability goal.</li>
+ * </ul>
+ * <p>
+ * The above doesn't mean that parameter's descriptor should not be used. They are used for
+ * inspecting meta-data about parameters, not as a key for searching parameters in a group.
+ * Since each parameter's name should be unique in a given parameter group (because
+ * {@linkplain ParameterDescriptor#getMaximumOccurs maximum occurs} is always 1 for single
+ * parameter), the parameter name is a suffisient key.
  *
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
@@ -69,46 +95,9 @@ public class Parameters {
     public static ParameterDescriptorGroup EMPTY_GROUP =
             new DefaultParameterDescriptorGroup("empty", // TODO: localize
             new GeneralParameterDescriptor[0]);
-    
-    /**
-     * Used to handle code that expexted group.getValues().
-     *
-     * @deprecated This method was provided as a bridge between the old API (array-based) to the
-     *             new API (list-based). New code should work directly on the list instead.
-     */
-    private static GeneralParameterValue[] array(ParameterValueGroup group) {
-        List params = group.values(); 
-        return (GeneralParameterValue[]) params.toArray( new GeneralParameterValue[ params.size()] );
-    }
 
     /**
-     * Number of type in group.
-     * 
-     * @param group
-     * @param type
-     * @return count of type in group
-     *
-     * @deprecated Use {@code ParameterValueGroup.groups(type.getName().getCode())}
-     *             instead. It allows to fetch groups by name independently of the actual
-     *             descriptor implementation. The returned list can be used for many operation,
-     *             including fetching the count with {@code size()}.
-     *
-     * @see ParameterValueGroup#groups
-     */ 
-    public static int count(ParameterValueGroup group, GeneralParameterDescriptor type) {
-        final GeneralParameterValue[] params = array( group );
-        int count = 0;
-        for (int i=0; i<params.length; i++) {
-            final GeneralParameterValue param = params[i];
-            if (param.getDescriptor() == type) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * Check a parameter value against its {@linkplain ParameterDescriptor parameter descriptor}.
+     * Checks a parameter value against its {@linkplain ParameterDescriptor parameter descriptor}.
      * This method takes care of handling checking arrays and collections against parameter
      * descriptor.
      * <br><br>
@@ -189,107 +178,11 @@ public class Parameters {
     }
 
     /**
-     * Search for an exact match for the provided GeneralParameterDescriptor.
-     * <p>
-     * This method does not search in subgroups.
-     * </p>
-     * @param type GeneralParameterDescriptor to search for
-     * @return List (possibly empty of GeneralParameter
-     *
-     * @deprecated Use {@link ParameterValueGroup#parameter} or {@link ParameterValueGroup#groups}
-     * instead. We would like to encourage peoples to use parameter name as key instead of parameter
-     * descriptor, because the parameter descriptor may not be always available. For example
-     * if a user know he is looking for the "semi_major" axis length (because it is documented
-     * in OpenGIS specification under that name) but don't know and don't care about who is
-     * providing the implementation, then he doesn't have the parameter descriptor; he only
-     * have the parameter name. Furthermore, parameter descriptor is implementation dependent.
-     * For example if we search for the "semi_major" axis length using the Geotools descriptor
-     * for this parameter, we will fail to find this parameter in a {@link ParameterValueGroup}
-     * provided by an other implementation. This is against GeoAPI goal, which is
-     * inter-operability. This doesn't mean that parameter descriptor should not be used.
-     * They are used for inspecting meta-data about parameters, not for searching parameters.
-     * Since each parameter name should be unique in a given parameter group (because
-     * {@link ParameterDescriptor#getMaximumOccurs} is always 1 for single parameter),
-     * the parameter name is a suffisient key for searching.
-     */
-    public static int indexOf(ParameterValueGroup group, GeneralParameterDescriptor type) {
-        GeneralParameterValue[] params = array( group );
-        if( params == null ){
-            return -1;
-        }        
-        for (int i=0; i<params.length; i++) {
-            final GeneralParameterValue param = params[i];
-            if( param.getDescriptor() == type ){
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Search for an exact match for the provided GeneralParameterDescriptor.
-     * <p>
-     * This method does not search in subgroups.
-     * </p>
-     * @param type GeneralParameterDescriptor to search for
-     * @return List (possibly empty) of GeneralParameter
-     *
-     * @deprecated Use <code>{@linkplain #search(GeneralParameterValue,String,int) search}(group,
-     * type.getName().getCode(), 1)</code> instead. See comments in {@link #indexOf} for a rational
-     * about why name should be used as key instead of parameter descriptor.
-     */
-    public static List list(ParameterValueGroup group, GeneralParameterDescriptor type) {
-        GeneralParameterValue[] params = array( group );
-        if( params == null ){
-            return Collections.EMPTY_LIST;
-        }
-        List list = new ArrayList(1);
-        for (int i=0; i<params.length; i++) {
-            final GeneralParameterValue param = params[i];
-            if( param.getDescriptor() == type ){
-                list.add( param );
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Search for an exact match for the provided GeneralParameterDescriptor.
-     * <p>
-     * This method does search in subgroups.
-     * </p>
-     * @param type GeneralParameterDescriptor to search for
-     * @return List (possibly empty of GeneralParameter
-     *
-     * @deprecated Use <code>{@linkplain #search(GeneralParameterValue,String,int) search}(group,
-     * type.getName().getCode(), 100)</code> instead. See comments in {@link #indexOf} for a
-     * rational about why name should be used as key instead of parameter descriptor.
-     */
-    public static List search(ParameterValueGroup group, GeneralParameterDescriptor type) {
-        GeneralParameterValue[] params = array( group );
-        if( params == null ){
-            return Collections.EMPTY_LIST;
-        }
-        List list = new ArrayList(1);
-        for (int i=0; i<params.length; i++) {
-            final GeneralParameterValue param = params[i];
-            if( param.getDescriptor() == type ){
-                list.add( param );
-            }
-            if( param instanceof ParameterValueGroup ){
-                List found = search( (ParameterValueGroup) param, type );
-                list.addAll( found );
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Search all parameters with the specified name. The given {@code name} is compared against
+     * Searchs all parameters with the specified name. The given {@code name} is compared against
      * parameter {@link GeneralParameterDescriptor#getName name} and
      * {@link GeneralParameterDescriptor#getAlias alias}. This method search recursively
      * in subgroups up to the specified depth:
-     * <br><br>
+     * <p>
      * <ul>
      *   <li>If {@code maxDepth} is equals to 0, then this method returns {@code param}
      *       if and only if it matches the specified name.</li>
@@ -304,7 +197,9 @@ public class Parameters {
      * </ul>
      *
      * @param  param The parameter to inspect.
-     * @param  name  The name of the parameter to search for.
+     * @param  name  The name of the parameter to search for. See the class javadoc
+     *               for a rational about the usage of name as a key instead of
+     *               {@linkplain ParameterDescriptor descriptor}.
      * @return The set (possibly empty) of parameters with the given name.
      */
     public static List search(final GeneralParameterValue param, final String name, int maxDepth) {
@@ -332,6 +227,26 @@ public class Parameters {
     }
 
     /**
+     * Copies all parameter values from {@code source} to {@code target}. A typical usage of
+     * this method is for transfering values from an arbitrary implementation to some specific
+     * implementation (e.g. a parameter group implementation backed by a
+     * {@link java.awt.image.renderable.ParameterBlock} for image processing operations).
+     *
+     * @since 2.2
+     */
+    public static void copy(final ParameterValueGroup source, final ParameterValueGroup target) {
+        for (final Iterator it=source.values().iterator(); it.hasNext();) {
+            final GeneralParameterValue param = (GeneralParameterValue) source;
+            final String name = param.getDescriptor().getName().getCode();
+            if (param instanceof ParameterValueGroup) {
+                copy((ParameterValueGroup) param, target.addGroup(name));
+            } else {
+                target.parameter(name).setValue(((ParameterValue) param).getValue());
+            }
+        }
+    }
+
+    /**
      * Gets a flat view of
      * {@linkplain ParameterDescriptor#getName name}-{@linkplain ParameterValue#getValue value}
      * pairs. This method copies all parameter values into the supplied {@code destination} map.
@@ -340,7 +255,7 @@ public class Parameters {
      *
      * @param  parameters  The parameters to extract values from.
      * @param  destination The destination map, or {@code null} for a default one.
-     * @return [@code destination}, or a new map if {@code destination} was null.
+     * @return {@code destination}, or a new map if {@code destination} was null.
      */
     public static Map toNameValueMap(final GeneralParameterValue parameters, Map destination) {
         if (destination == null) {

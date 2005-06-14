@@ -80,7 +80,7 @@ public class ImagingParameters extends AbstractParameter implements ParameterVal
      * {@link java.awt.image.RenderedImage}) is not the same than the source type for a
      * coverage operation (typically {@link org.opengis.coverage.GridCoverage}).
      */
-    protected final ParameterList parameters;
+    public final ParameterList parameters;
 
     /**
      * The wrappers around each elements in {@link #parameters}. Keys are parameter name
