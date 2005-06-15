@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * <p>
  * MIFDataStore gives read and write access to MapInfo MIF files.  It can be
- * instantiated either on a single mif file, or in a directory  (thus exposing
+ * instantiated either on a single .mif file, or on a directory (thus exposing
  * all the mif files within).
  * </p>
  * 
@@ -37,10 +37,13 @@ import java.util.Iterator;
  * TODO - Still doesn't work with transactions in write mode apparently due to
  * a bug in DiffFeatureWriter.
  * </p>
+ * 
+ * <p>
+ * MIFDataStore supersedes MapInfoDataStore, which incapsulated MapInfoDataSource.
+ * </p>
  *
  * @author Luca S. Percich, AMA-MI
  *
- * @see MapInfoDataStore
  */
 public class MIFDataStore extends AbstractDataStore {
     // MIF Header clause names
@@ -93,14 +96,10 @@ public class MIFDataStore extends AbstractDataStore {
 
         filePath = new File(String.valueOf(path));
 
-        if (!filePath.exists()) {
-            throw new IOException("Path or file does not exist: "
-                + filePath.toString());
-        }
-
         if (filePath.isDirectory()) {
             scanFiles(filePath);
         } else {
+            // Try to access a single .mif file - might have been specified with no extension
             registerMIF(filePath.getAbsolutePath());
         }
     }

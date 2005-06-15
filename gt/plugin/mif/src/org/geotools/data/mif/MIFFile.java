@@ -75,7 +75,6 @@ import java.util.logging.Logger;
  *
  * @author Luca S. Percich, AMA-MI
  * @author Paolo Rizzi, AMA-MI
- *
  */
 public class MIFFile {
     // Geometry type identifier constants 
@@ -206,10 +205,11 @@ public class MIFFile {
      *   fr.close(); // closes file resources
      * </code></pre>
      *
-     * @param path Full pathName
-     * @param params DOCUMENT ME!
+     * @param path Full pathName of the mif file, can be specified without the
+     *        .mif extension
+     * @param params Parameters map
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException If the specified mif file could not be opened
      */
     public MIFFile(String path, Map params) throws IOException {
         super();
@@ -260,12 +260,15 @@ public class MIFFile {
      *   fw.close();
      * </code></pre>
      *
-     * @param path Full path & file name of the MIF file to create
+     * @param path Full path & file name of the MIF file to create, can be
+     *        specified without the .mif extension
      * @param featureType
      * @param params Parameter map
      *
-     * @throws IOException DOCUMENT ME!
-     * @throws SchemaException DOCUMENT ME!
+     * @throws IOException Couldn't open the specified mif file for writing
+     *         header
+     * @throws SchemaException Error setting the given FeatureType as the MIF
+     *         schema
      */
     public MIFFile(String path, FeatureType featureType, HashMap params)
         throws IOException, SchemaException {
@@ -291,7 +294,7 @@ public class MIFFile {
      *
      * @param params
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException Error getting parameters from the specified map
      */
     private void parseParams(Map params) throws IOException {
         if (params == null) {
@@ -326,6 +329,7 @@ public class MIFFile {
                         PrecisionModel.FLOATING), 0);
         }
 
+        // TODO use null instead???
         nullGeometry = geomFactory.createPoint(new Coordinate(0, 0));
 
         geometryName = (String) getParam(MIFDataStore.PARAM_GEOMNAME,
@@ -343,7 +347,7 @@ public class MIFFile {
      * @param name
      * @param defa
      * @param required
-     * @param params DOCUMENT ME!
+     * @param params
      *
      * @return
      *
@@ -405,7 +409,7 @@ public class MIFFile {
      * @param clause Name of the Header Clause
      * @param value Value for the Header Clause
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException Bad delimiter was specified
      */
     private void setHeaderClause(String clause, String value)
         throws IOException {
@@ -479,7 +483,7 @@ public class MIFFile {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns a FeatureWriter for writing features to the MIF/MID file.
      *
      * @return A featureWriter for this file
      *
@@ -522,7 +526,7 @@ public class MIFFile {
      *
      * @return the Header as a String
      *
-     * @throws SchemaException DOCUMENT ME!
+     * @throws SchemaException A required header clause is missing.
      */
     private String exportHeader() throws SchemaException {
         // Header tags passed in parameters are overridden by the tags read from mif file 
@@ -597,12 +601,12 @@ public class MIFFile {
     }
 
     /**
-     * Sets the location name of the MIFMID file
+     * Sets the path name of the MIF and MID files
      *
-     * @param path The full path of the MIF file
+     * @param path The full path of the .mif file, with or without extension
      * @param mustExist True if opening file for reading
      *
-     * @throws FileNotFoundException DOCUMENT ME!
+     * @throws FileNotFoundException
      */
     private void initFiles(String path, boolean mustExist)
         throws FileNotFoundException {
@@ -612,51 +616,66 @@ public class MIFFile {
             throw new FileNotFoundException(path + " is a directory");
         }
 
-        String fName = file.getName();
+        String fName = getMifName(file.getName());
+        file = file.getParentFile();
+
+        mifFile = getFileHandler(file, fName, ".mif", mustExist);
+        midFile = getFileHandler(file, fName, ".mid", mustExist);
+
+        mifFileOut = getFileHandler(file, fName, ".mif.out", false);
+        midFileOut = getFileHandler(file, fName, ".mid.out", false);
+    }
+
+    /**
+     * Returns the name of a .mif file without extension
+     *
+     * @param fName The file name, possibly with .mif extension
+     *
+     * @return The name with no extension
+     *
+     * @throws FileNotFoundException if extension was other than "mif"
+     */
+    protected static String getMifName(String fName)
+        throws FileNotFoundException {
         int ext = fName.lastIndexOf(".");
 
         if (ext > 0) {
-            String theExt = fName.substring(ext + 1);
+            String theExt = fName.substring(ext + 1).toLowerCase();
 
-            if (!(theExt.equalsIgnoreCase("MIF")
-                    || theExt.equalsIgnoreCase("MID"))) {
+            if (!(theExt.equals("mif"))) {
                 throw new FileNotFoundException(
-                    "Please specify a MIF or MID file extension.");
+                    "Please specify a .mif file extension.");
             }
 
             fName = fName.substring(0, ext);
         }
 
-        file = file.getParentFile();
-
-        mifFile = getFileHandler(file, fName, ".MIF", mustExist);
-        midFile = getFileHandler(file, fName, ".MID", mustExist);
-
-        mifFileOut = getFileHandler(file, fName, ".MIF.out", false);
-        midFileOut = getFileHandler(file, fName, ".MID.out", false);
+        return fName;
     }
 
     /**
-     * Utility function for initFiles
+     * Utility function for initFiles - returns a File given a parent path, the
+     * file name without extension and the extension Tests different extension
+     * case for case-sensitive filesystems
      *
-     * @param path DOCUMENT ME!
-     * @param fileName DOCUMENT ME!
-     * @param ext DOCUMENT ME!
-     * @param mustExist DOCUMENT ME!
+     * @param path Directory containing the file
+     * @param fileName Name of the file with no extension
+     * @param ext extension with trailing "."
+     * @param mustExist If true, raises an excaption if the file does not exist
      *
-     * @return DOCUMENT ME!
+     * @return The File object
      *
-     * @throws FileNotFoundException DOCUMENT ME!
+     * @throws FileNotFoundException
      */
-    private File getFileHandler(File path, String fileName, String ext,
-        boolean mustExist) throws FileNotFoundException {
-        File file = new File(path, fileName + ext.toUpperCase());
+    protected static File getFileHandler(File path, String fileName,
+        String ext, boolean mustExist) throws FileNotFoundException {
+        File file = new File(path, fileName + ext);
 
         if (file.exists() || !mustExist) {
             return file;
         }
 
-        file = new File(path, fileName + ext.toLowerCase());
+        file = new File(path, fileName + ext.toUpperCase());
 
         if (file.exists()) {
             return file;
@@ -666,13 +685,13 @@ public class MIFFile {
     }
 
     /**
-     * Reads the header from the given MIF file stream
+     * Reads the header from the given MIF file stream tokenizer
      *
      * @param skipRead Skip the header, just to get to the data section
-     * @param mif DOCUMENT ME!
+     * @param mif
      *
      * @throws IOException
-     * @throws SchemaException DOCUMENT ME!
+     * @throws SchemaException Error reading header information
      */
     private void readMifHeader(boolean skipRead, MIFFileTokenizer mif)
         throws IOException, SchemaException {
@@ -857,7 +876,7 @@ public class MIFFile {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the MIF schema
      *
      * @return the current FeatureType associated with the MIF file
      */
@@ -871,7 +890,8 @@ public class MIFFile {
      *
      * @param ft
      *
-     * @throws SchemaException DOCUMENT ME!
+     * @throws SchemaException The given FeatureType is not compatible with
+     *         MapInfo format
      */
     private void setSchema(FeatureType ft) throws SchemaException {
         featureType = ft;
@@ -913,7 +933,7 @@ public class MIFFile {
     }
 
     /**
-     * DOCUMENT ME!
+     * Gets the ValueSetters
      *
      * @return An array of valueSetters to be used for IO operations
      */
@@ -1179,7 +1199,7 @@ public class MIFFile {
          *
          * @return The geometry object
          *
-         * @throws IOException
+         * @throws IOException Error retrieving geometry from input MIF stream
          */
         private Geometry readGeometry() throws IOException {
             if (!mif.readLine()) {
@@ -1227,9 +1247,9 @@ public class MIFFile {
         /**
          * Reads Multi-Line (PLine) information from the MIF stream
          *
-         * @return
+         * @return The (MULTI)LINESTRING object read
          *
-         * @throws IOException
+         * @throws IOException Error retrieving geometry from input MIF stream
          */
         private Geometry readPLineObject() throws IOException {
             try {
@@ -1284,9 +1304,9 @@ public class MIFFile {
         /**
          * Reads Region (Polygon) information from the MIF stream
          *
-         * @return
+         * @return The (MULTI)POLYGON object
          *
-         * @throws IOException
+         * @throws IOException Error retrieving geometry from input MIF stream
          */
         private Geometry readRegionObject() throws IOException {
             try {
@@ -1382,9 +1402,9 @@ public class MIFFile {
         /**
          * Reads Point information from the MIF stream
          *
-         * @return DOCUMENT ME!
+         * @return The next POINT object read
          *
-         * @throws IOException DOCUMENT ME!
+         * @throws IOException Error retrieving geometry from input MIF stream
          */
         private Geometry readPointObject() throws IOException {
             return geomFactory.createPoint(readMIFCoordinate());
@@ -1393,9 +1413,9 @@ public class MIFFile {
         /**
          * Reads Line information from the MIF stream
          *
-         * @return DOCUMENT ME!
+         * @return a LINESTRING object
          *
-         * @throws IOException DOCUMENT ME!
+         * @throws IOException Error retrieving geometry from input MIF stream
          */
         private Geometry readLineObject() throws IOException {
             Coordinate[] cPoints = new Coordinate[2];
@@ -1408,10 +1428,8 @@ public class MIFFile {
 
     /**
      * <p>
-     * MIF Feature Writer
+     * MIF FeatureWriter
      * </p>
-     *
-     * @author sigfrido
      */
     private class Writer implements FeatureWriter {
         private PrintStream outMif = null;
@@ -1630,9 +1648,9 @@ public class MIFFile {
         /**
          * Renders a single coordinate
          *
-         * @param coord DOCUMENT ME!
+         * @param coord The Coordinate object
          *
-         * @return DOCUMENT ME!
+         * @return The coordinate as string
          */
         private String exportCoord(Coordinate coord) {
             return coord.x + " " + coord.y;
@@ -1643,10 +1661,10 @@ public class MIFFile {
          * SkipLast is used for Polygons (in Mapinfo the last vertex of a
          * polygon is not the clone of first one)
          *
-         * @param coords DOCUMENT ME!
-         * @param skipLast DOCUMENT ME!
+         * @param coords The coordinates to render
+         * @param skipLast if true, a polygon coordinate list will be rendered
          *
-         * @return DOCUMENT ME!
+         * @return the coordinate list as string
          */
         private String exportCoords(Coordinate[] coords, boolean skipLast) {
             int len = (skipLast) ? (coords.length - 1) : coords.length;

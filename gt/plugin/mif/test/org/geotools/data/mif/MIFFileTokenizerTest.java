@@ -18,6 +18,7 @@ package org.geotools.data.mif;
 
 import com.vividsolutions.jts.io.ParseException;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -30,6 +31,17 @@ import java.io.FileReader;
  */
 public class MIFFileTokenizerTest extends TestCase {
     MIFFileTokenizer tok = null;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param args DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
+     */
+    public static void main(java.lang.String[] args) throws Exception {
+        junit.textui.TestRunner.run(new TestSuite(MIFFileTokenizerTest.class));
+    }
 
     /*
      * @see TestCase#setUp()

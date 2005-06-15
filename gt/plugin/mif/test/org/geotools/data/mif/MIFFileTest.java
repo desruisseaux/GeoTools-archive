@@ -17,6 +17,7 @@
 package org.geotools.data.mif;
 
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.mif.MIFFile;
@@ -38,6 +39,17 @@ public class MIFFileTest extends TestCase {
     private String dataPath = MIFTestUtils.getDataPath();
     private MIFFile mif = null;
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param args DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
+     */
+    public static void main(java.lang.String[] args) throws Exception {
+        junit.textui.TestRunner.run(new TestSuite(MIFFileTest.class));
+    }
+
     /*
      * @see TestCase#setUp()
      */
@@ -57,7 +69,7 @@ public class MIFFileTest extends TestCase {
      */
     public void testMIFFileOpen() {
         try {
-            mif = new MIFFile(MIFTestUtils.getDataPath() + "mixed.mif",
+            mif = new MIFFile(MIFTestUtils.getDataPath() + "mixed", // .mif
                     MIFTestUtils.getParams("mif", ""));
             assertEquals("450",
                 mif.getHeaderClause(MIFDataStore.HCLAUSE_VERSION));
@@ -94,7 +106,7 @@ public class MIFFileTest extends TestCase {
     public void testFileCopy() {
         try {
             // Input file
-            MIFFile in = new MIFFile(dataPath + "grafo.mif", null);
+            MIFFile in = new MIFFile(dataPath + "grafo", null); // .mif
             FeatureType ft = in.getSchema();
 
             int maxAttr = ft.getAttributeCount() - 1;
@@ -116,7 +128,7 @@ public class MIFFileTest extends TestCase {
             params.put(MIFDataStore.HCLAUSE_DELIMITER, ",");
 
             // Output file
-            MIFFile out = new MIFFile(dataPath + "grafo_out.mif", ft, params);
+            MIFFile out = new MIFFile(dataPath + "grafo_out", ft, params); // .mif
 
             FeatureReader inFR = in.getFeatureReader();
             FeatureWriter outFW = out.getFeatureWriter();
@@ -170,9 +182,10 @@ public class MIFFileTest extends TestCase {
      */
     public void testFeatureWriter() {
         try {
+            
             MIFTestUtils.copyMif("mixed", "mixed_wri");
 
-            MIFFile in = new MIFFile(dataPath + "mixed_wri.mif",
+            MIFFile in = new MIFFile(dataPath + "mixed_wri", // .mif
                     MIFTestUtils.getParams("", ""));
             FeatureWriter fw = in.getFeatureWriter();
 

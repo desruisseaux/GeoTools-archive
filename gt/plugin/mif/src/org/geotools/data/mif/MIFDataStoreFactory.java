@@ -26,15 +26,37 @@ import java.util.Map;
 
 
 /**
- * DOCUMENT ME!
- *
  * Builds a MIFDataStore. Required parameters are:
- *         <ul><li>PARAM_DBTYPE = "mif"  <li>PARAM_PATH = full path of the
- *         directory containing MIF files, or path of a single mif file  </ul>
- *         Optional parameters: <ul><li>[PARAM_FIELDCASE] = "upper" | "lower"
- *         <li>[PARAM_GEOMNAME] defaults to "the_geom"
- *         <li>[PARAM_GEOMFACTORY]  <li>[PARAM_GEOMTYPE]  </ul>
- * @author Luca S. Percich, AMA-MI 
+ * 
+ * <ul>
+ * <li>
+ * PARAM_DBTYPE = "mif"
+ * </li>
+ * <li>
+ * PARAM_PATH = full path of the directory containing MIF files, or path of a
+ * single mif file
+ * </li>
+ * </ul>
+ * 
+ * Optional parameters:
+ * 
+ * <ul>
+ * <li>
+ * [PARAM_FIELDCASE] = "upper" | "lower" | "" (or not defined)
+ * </li>
+ * <li>
+ * [PARAM_GEOMNAME] defaults to "the_geom"
+ * </li>
+ * <li>
+ * [PARAM_GEOMFACTORY]
+ * </li>
+ * <li>
+ * [PARAM_GEOMTYPE]
+ * </li>
+ * </ul>
+ * 
+ *
+ * @author Luca S. Percich, AMA-MI
  */
 public class MIFDataStoreFactory implements DataStoreFactorySpi {
     // DataStore - specific parameters
@@ -91,9 +113,6 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
      */
     public String getDisplayName() {
         return "MIFDataStore";
@@ -204,8 +223,11 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
         String path = String.valueOf(PARAM_PATH.lookUp(params));
         File file = new File(path);
 
-        if (!file.exists()) {
-            throw new IOException("Specified path does not exist");
+        if (!file.isDirectory()) {
+            // Try to build a File object pointing to a .mif file
+            // Will throw an exception if the file cannot be found
+            MIFFile.getFileHandler(file.getParentFile(),
+                MIFFile.getMifName(file.getName()), ".mif", true);
         }
 
         return true;

@@ -18,6 +18,7 @@ package org.geotools.data.mif;
 
 import com.vividsolutions.jts.io.ParseException;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 
 /**
@@ -27,6 +28,17 @@ import junit.framework.TestCase;
  */
 public class MIFStringTokenizerTest extends TestCase {
     private MIFStringTokenizer tok = null;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param args DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
+     */
+    public static void main(java.lang.String[] args) throws Exception {
+        junit.textui.TestRunner.run(new TestSuite(MIFStringTokenizerTest.class));
+    }
 
     /**
      * DOCUMENT ME!

@@ -25,6 +25,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.resources.TestData;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -62,24 +63,17 @@ public class MIFTestUtils {
      *
      * @param inMif DOCUMENT ME!
      * @param outMif DOCUMENT ME!
+     *
+     * @throws FileNotFoundException
      */
-    public static void copyMif(String inMif, String outMif) {
-        copyFileUsingChannels(getDataPath() + inMif + ".mif",
-            getDataPath() + outMif + ".mif");
-        copyFileUsingChannels(getDataPath() + inMif + ".mid",
-            getDataPath() + outMif + ".mid");
-    }
+    public static void copyMif(String inMif, String outMif)
+        throws FileNotFoundException {
+        File path = new File(getDataPath());
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param in DOCUMENT ME!
-     * @param out DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public static String copyFileUsingChannels(String in, String out) {
-        return copyFileUsingChannels(new File(in), new File(out));
+        copyFileUsingChannels(MIFFile.getFileHandler(path, inMif, ".mif", true),
+            new File(getDataPath() + outMif + ".mif"));
+        copyFileUsingChannels(MIFFile.getFileHandler(path, inMif, ".mid", true),
+            new File(getDataPath() + outMif + ".mid"));
     }
 
     /**

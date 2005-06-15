@@ -19,6 +19,7 @@ package org.geotools.data.mif;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTReader;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
@@ -48,6 +49,17 @@ public class MIFDataStoreTest extends TestCase {
     private String dataPath = MIFTestUtils.getDataPath();
     private WKTReader reader = new WKTReader(new GeometryFactory());
     private String geomName = "the_geom";
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param args DOCUMENT ME!
+     *
+     * @throws Exception DOCUMENT ME!
+     */
+    public static void main(java.lang.String[] args) throws Exception {
+        junit.textui.TestRunner.run(new TestSuite(MIFDataStoreTest.class));
+    }
 
     /*
      * @see TestCase#setUp()
@@ -103,7 +115,7 @@ public class MIFDataStoreTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testFeatureReaderFilter() {
-        initDS(dataPath + "grafo.mif");
+        initDS(dataPath + "grafo"); // .mif
 
         try {
             FeatureReader fr = getFeatureReader("grafo", "ID = 33755");

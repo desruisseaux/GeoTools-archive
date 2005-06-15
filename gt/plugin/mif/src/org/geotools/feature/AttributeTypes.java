@@ -27,8 +27,9 @@ import java.util.Iterator;
 
 /**
  * <p>
- * AttributeType utilities
+ * Proposal: AttributeType utilities class.
  * </p>
+ * @author Luca S. Percich, AMA-MI
  */
 public class AttributeTypes {
     // Returned by getFieldLength() functions when field length is undefined
@@ -58,7 +59,7 @@ public class AttributeTypes {
      * </p>
      *
      * @param attr The attribute type
-     * @param defaultLength DOCUMENT ME!
+     * @param defaultLength The default field length
      *
      * @return The defined field length, or defaultLength if no maximum length
      *         has been defined.

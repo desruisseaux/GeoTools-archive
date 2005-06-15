@@ -17,6 +17,7 @@
 package org.geotools.data.mif;
 
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi.Param;
 import java.io.IOException;
@@ -30,6 +31,12 @@ import java.util.HashMap;
  */
 public class MIFDataStoreFactoryTest extends TestCase {
     private MIFDataStoreFactory dsFactory = null;
+
+    /**
+     */
+    public static void main(java.lang.String[] args) throws Exception {
+        junit.textui.TestRunner.run(new TestSuite(MIFDataStoreFactoryTest.class));
+    }
 
     /*
      * @see TestCase#setUp()
@@ -83,15 +90,26 @@ public class MIFDataStoreFactoryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testCanProcess() {
+        String dataPath = MIFTestUtils.getDataPath();
+        assertEquals(true,
+            dsFactory.canProcess(MIFTestUtils.getParams("mif", dataPath)));
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    MIFTestUtils.getDataPath())));
-        assertEquals(false,
-            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar",
-                    MIFTestUtils.getDataPath())));
+                    dataPath + "grafo")));
+        assertEquals(true,
+            dsFactory.canProcess(MIFTestUtils.getParams("mif",
+                    dataPath + "grafo.MIF")));
+        assertEquals(true,
+            dsFactory.canProcess(MIFTestUtils.getParams("mif",
+                    dataPath + "grafo.mif")));
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
-                    MIFTestUtils.getDataPath() + "/some/non/existent/path/")));
+                    dataPath + "grafo.zip")));
+        assertEquals(false,
+            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", dataPath)));
+        assertEquals(false,
+            dsFactory.canProcess(MIFTestUtils.getParams("mif",
+                    dataPath + "some/non/existent/path/")));
     }
 
     /**
