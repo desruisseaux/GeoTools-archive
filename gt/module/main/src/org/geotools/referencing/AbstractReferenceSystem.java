@@ -89,6 +89,21 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
     private final InternationalString scope;
 
     /**
+     * Constructs a new reference system with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public AbstractReferenceSystem(final ReferenceSystem object) {
+        super(object);
+        validArea = object.getValidArea();
+        scope     = object.getScope();
+    }
+
+    /**
      * Constructs a reference system from a set of properties.
      * The properties given in argument follow the same rules than for the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.

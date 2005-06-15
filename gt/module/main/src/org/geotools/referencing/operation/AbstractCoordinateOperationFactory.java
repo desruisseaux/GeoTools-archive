@@ -472,8 +472,8 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
              * Also applies only if the transform to hide has identical source and target
              * dimensions in order to avoid mismatch with the method's dimensions.
              */
-            return createFromMathTransform(getProperties(step), sourceCRS, targetCRS,
-                   mtFactory.createConcatenatedTransform(mt1, mt2),
+            return createFromMathTransform(AbstractIdentifiedObject.getProperties(step),
+                   sourceCRS, targetCRS, mtFactory.createConcatenatedTransform(mt1, mt2),
                    ((Operation) step).getMethod(), CoordinateOperation.class);
         }
         return createConcatenatedOperation(getTemporaryName(sourceCRS, targetCRS),
@@ -534,17 +534,6 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
      */
     static int getDimension(final CoordinateReferenceSystem crs) {
         return (crs!=null) ? crs.getCoordinateSystem().getDimension() : 0;
-    }
-
-    /**
-     * Returns the properties of the given object.
-     *
-     * @todo Delete and replace by a static import when we will be allowed to compile against
-     *       J2SE 1.5. Note: there is a bunch of constants in this class that we could
-     *       simplified as well.
-     */
-    static Map getProperties(final IdentifiedObject object) {
-        return AbstractIdentifiedObject.getProperties(object);
     }
 
     /**

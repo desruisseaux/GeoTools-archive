@@ -113,6 +113,26 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     private final Unit unit;
     
     /**
+     * Constructs a new ellipsoid with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     *
+     * @see #wrap
+     */
+    protected DefaultEllipsoid(final Ellipsoid ellipsoid) {
+        super(ellipsoid);
+        semiMajorAxis     = ellipsoid.getSemiMajorAxis();
+        semiMinorAxis     = ellipsoid.getSemiMinorAxis();
+        inverseFlattening = ellipsoid.getInverseFlattening();
+        ivfDefinitive     = ellipsoid.isIvfDefinitive();
+        unit              = ellipsoid.getAxisUnit();
+    }
+
+    /**
      * Constructs a new ellipsoid using the specified axis length. The properties map is
      * given unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
@@ -123,6 +143,9 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
      * @param inverseFlattening The inverse of the flattening value.
      * @param ivfDefinitive     {@code true} if the inverse flattening is definitive.
      * @param unit              The units of the semi-major and semi-minor axis values.
+     *
+     * @see #createEllipsoid
+     * @see #createFlattenedSphere
      */
     protected DefaultEllipsoid(final Map     properties,
                                final double  semiMajorAxis,
@@ -247,14 +270,12 @@ public class DefaultEllipsoid extends AbstractIdentifiedObject implements Ellips
     }
     
     /**
-     * Checks the argument validity. Argument {@code value} should be
-     * greater than zero.
+     * Checks the argument validity. Argument {@code value} should be greater than zero.
      *
      * @param  name  Argument name.
      * @param  value Argument value.
      * @return {@code value}.
-     * @throws IllegalArgumentException if {@code value} is not greater
-     *         than  0.
+     * @throws IllegalArgumentException if {@code value} is not greater than  0.
      */
     static double check(final String name, final double value) throws IllegalArgumentException {
         if (value > 0) {

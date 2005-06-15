@@ -1,6 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Management Committee (PMC)
+ * (C) 2005, Geotools Project Management Committee (PMC)
  * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -17,9 +17,9 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.io.coverage;
+package org.geotools.coverage.io;
 
-// Input/output
+// J2SE dependencies
 import java.awt.Dimension;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
@@ -34,7 +34,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
@@ -44,14 +43,18 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 
-import org.geotools.cs.CoordinateSystem;
-import org.geotools.cv.SampleDimension;
-import org.geotools.gc.GridCoverage;
-import org.geotools.gc.GridRange;
+// OpenGIS dependencoes
+import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.grid.GridRange;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+// Geotools dependencies
+import org.geotools.coverage.grid.GeneralGridRange;
+// import org.geotools.image.io.RawBinaryImageReadParam; // TODO
 import org.geotools.io.LineWriter;
 import org.geotools.io.TableWriter;
-import org.geotools.image.io.RawBinaryImageReadParam;
-import org.geotools.pt.Envelope;
 import org.geotools.resources.gcs.ResourceKeys;
 import org.geotools.resources.gcs.Resources;
 
@@ -87,7 +90,7 @@ public abstract class GridCoverageReader {
     /**
      * The logger for the {@link #getGridCoverage} method.
      */
-    static Logger LOGGER = Logger.getLogger("org.geotools.io.coverage");
+    static Logger LOGGER = Logger.getLogger("org.geotools.coverage.io");
     
     /**
      * Minimum tile size. If tiles are smaller than this size, a format operation
@@ -309,15 +312,15 @@ public abstract class GridCoverageReader {
     }
     
     /**
-     * Returns the coordinate system for the {@link GridCoverage} to be read.
+     * Returns the coordinate reference system for the {@link GridCoverage} to be read.
      *
      * @param  index The index of the image to be queried.
-     * @return The coordinate system for the {@link GridCoverage} at the specified index.
+     * @return The coordinate reference system for the {@link GridCoverage} at the specified index.
      * @throws IllegalStateException if the input source has not been set.
      * @throws IndexOutOfBoundsException if the supplied index is out of bounds.
      * @throws IOException if an error occurs reading the width information from the input source.
      */
-    public abstract CoordinateSystem getCoordinateSystem(int index) throws IOException;
+    public abstract CoordinateReferenceSystem getCoordinateReferenceSystem(int index) throws IOException;
     
     /**
      * Returns the envelope for the {@link GridCoverage} to be read.
@@ -351,13 +354,13 @@ public abstract class GridCoverageReader {
      */
     public synchronized GridRange getGridRange(final int index) throws IOException {
         checkImageIndex(index);
-        final int dimension = getCoordinateSystem(index).getDimension();
+        final int dimension = getCoordinateReferenceSystem(index).getCoordinateSystem().getDimension();
         final int[]   lower = new int[dimension];
         final int[]   upper = new int[dimension];
         Arrays.fill(upper, 1);
         upper[0] = reader.getWidth(index);
         upper[1] = reader.getHeight(index);
-        return new GridRange(lower, upper);
+        return new GeneralGridRange(lower, upper);
     }
     
     /**
@@ -397,23 +400,24 @@ public abstract class GridCoverageReader {
 	public synchronized GridCoverage getGridCoverage(final int index) throws IOException {
 		checkImageIndex(index);
 		final ImageReadParam param = reader.getDefaultReadParam();
-		if (param instanceof RawBinaryImageReadParam) {
-			final RawBinaryImageReadParam rawParam = (RawBinaryImageReadParam) param;
-			final GridRange range = getGridRange(index);
-			final Dimension  size = new Dimension(range.getLength(0), range.getLength(1));
-			rawParam.setStreamImageSize(size);
-		}
-		final String          name = getName(index);
-		final Envelope    envelope = getEnvelope(index);
-		final CoordinateSystem  cs = getCoordinateSystem(index);
-		final SampleDimension[] sd = getSampleDimensions(index);
-		final RenderedImage  image = reader.readAsRenderedImage(index, param);
+// TODO
+//		if (param instanceof RawBinaryImageReadParam) {
+//			final RawBinaryImageReadParam rawParam = (RawBinaryImageReadParam) param;
+//			final GridRange range = getGridRange(index);
+//			final Dimension  size = new Dimension(range.getLength(0), range.getLength(1));
+//			rawParam.setStreamImageSize(size);
+//		}
+		final String                   name = getName(index);
+		final Envelope             envelope = getEnvelope(index);
+		final CoordinateReferenceSystem crs = getCoordinateReferenceSystem(index);
+		final SampleDimension[]          sd = getSampleDimensions(index);
+		final RenderedImage           image = reader.readAsRenderedImage(index, param);
 		if (LOGGER.isLoggable(Level.FINE)) {
 			/*
 			 * Log the arguments used for creating the GridCoverage. This is a costly logging:
 			 * the string representations for some argument are very long   (RenderedImage and
-			 * CoordinateSystem), and string representation for sample dimensions may use many
-			 * lines.
+			 * CoordinateReferenceSystem), and string representation for sample dimensions may
+             * use many lines.
 			 */
 			final StringWriter buffer = new StringWriter(         );
 			final LineWriter   trimer = new LineWriter  (buffer   );
@@ -429,9 +433,9 @@ public abstract class GridCoverageReader {
 				String key = "";
 				Object value;
 				switch (i) {
-					case -3: key="RenderedImage";    value=image;    break;
-					case -2: key="CoordinateSystem"; value=cs;       break;
-					case -1: key="Envelope";         value=envelope; break;
+					case -3: key="RenderedImage";             value=image;    break;
+					case -2: key="CoordinateReferenceSystem"; value=crs;      break;
+					case -1: key="Envelope";                  value=envelope; break;
 					case  0: key="SampleDimensions"; // fall through
 					default: value=sd[i]; break;
 				}
@@ -468,7 +472,8 @@ public abstract class GridCoverageReader {
 		pbj.setParameter("dataType", image.getSampleModel().getDataType());
 		PlanarImage pi = JAI.create("Format", pbj, hints);
 
-		return new GridCoverage(name, pi, cs, envelope, sd, null, null);
+        throw new UnsupportedOperationException("Port from legacy code not yet finished"); // TODO
+//		return new GridCoverage(name, pi, cs, envelope, sd, null, null);
 	}
     
     /**

@@ -91,6 +91,27 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     private transient Unit distanceUnit;
 
     /**
+     * Constructs a new coordinate system with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public AbstractCS(final CoordinateSystem cs) {
+        super(cs);
+        if (cs instanceof AbstractCS) {
+            axis = ((AbstractCS) cs).axis;
+        } else {
+            axis = new CoordinateSystemAxis[cs.getDimension()];
+            for (int i=0; i<axis.length; i++) {
+                axis[i] = cs.getAxis(i);
+            }
+        }
+    }
+
+    /**
      * Constructs a coordinate system from a name.
      *
      * @param name  The coordinate system name.
@@ -345,6 +366,36 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
             throws UnsupportedOperationException, MismatchedDimensionException
     {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Returns all axis in the specified unit. This method is used for implementation of
+     * {@code usingUnit} methods in subclasses.
+     *
+     * @param  unit The unit for the new axis.
+     * @return New axis using the specified unit, or {@code null} if current axis fits.
+     * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
+     *
+     * @since 2.2
+     */
+    final CoordinateSystemAxis[] axisUsingUnit(final Unit unit) throws IllegalArgumentException {
+        final CoordinateSystemAxis[] newAxis = new CoordinateSystemAxis[axis.length];
+        boolean modified = false;
+        for (int i=0; i<newAxis.length; i++) {
+            CoordinateSystemAxis a = axis[i];
+            DefaultCoordinateSystemAxis da;
+            if (a instanceof DefaultCoordinateSystemAxis) {
+                da = (DefaultCoordinateSystemAxis) a;
+            } else {
+                a = da = new DefaultCoordinateSystemAxis(a);
+            }
+            da = da.usingUnit(unit);
+            if (a != da) {
+                modified = true;
+            }
+            newAxis[i] = da;
+        }
+        return modified ? newAxis : null;
     }
 
     /**

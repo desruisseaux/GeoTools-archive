@@ -122,11 +122,9 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     private static Map getProperties(final MathTransform transform) {
         ensureNonNull("transform", transform);
         final Map properties;
-        ParameterDescriptorGroup descriptor;
         if (transform instanceof AbstractMathTransform) {
-            descriptor = ((AbstractMathTransform) transform).getParameterDescriptors();
-            properties = new HashMap(getProperties(descriptor));
-            properties.put(NAME_KEY, descriptor.getName().getCode());
+            final AbstractMathTransform mt = (AbstractMathTransform) transform;
+            properties = getProperties(mt.getParameterDescriptors(), null);
         } else {
             properties = Collections.singletonMap(NAME_KEY, Resources.format(ResourceKeys.UNKNOW));
         }

@@ -78,6 +78,21 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
     private transient long origin;
 
     /**
+     * Constructs a new temporal CRS with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     *
+     * @see #wrap
+     */
+    public DefaultTemporalCRS(final TemporalCRS crs) {
+        super(crs);
+    }
+
+    /**
      * Constructs a temporal CRS from a name.
      *
      * @param name The name.
@@ -114,10 +129,7 @@ public class DefaultTemporalCRS extends AbstractSingleCRS implements TemporalCRS
         if (crs instanceof DefaultTemporalCRS) {
             return (DefaultTemporalCRS) crs;
         }
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        return new DefaultTemporalCRS(getProperties(crs),
-                   (TemporalDatum) crs.getDatum(),
-                   (TimeCS) crs.getCoordinateSystem());
+        return new DefaultTemporalCRS(crs);
     }
 
     /**

@@ -72,6 +72,19 @@ public class DefaultEngineeringDatum extends AbstractDatum implements Engineerin
     }
 
     /**
+     * Constructs a new datum with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultEngineeringDatum(final EngineeringDatum datum) {
+        super(datum);
+    }
+
+    /**
      * Constructs an engineering datum from a name.
      *
      * @param name The datum name.

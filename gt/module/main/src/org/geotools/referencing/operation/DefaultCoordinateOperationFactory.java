@@ -1406,7 +1406,7 @@ search: for (int j=0; j<targets.length; j++) {
         int lower, upper=0;
         for (int i=0; i<targets.length; i++) {
             CoordinateOperation step = steps[i];
-            final Map properties = getProperties(step);
+            final Map properties = AbstractIdentifiedObject.getProperties(step);
             final CoordinateReferenceSystem source = ordered[i];
             final CoordinateReferenceSystem target = targets[i];
             final CoordinateReferenceSystem targetStepCRS;

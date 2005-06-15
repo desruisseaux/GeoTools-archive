@@ -25,8 +25,10 @@ package org.geotools.referencing.operation;
 
 // J2SE dependencies
 import java.util.Map;
+import java.util.Collections;
 
 // OpenGIS dependencies
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.GeneralDerivedCRS;
 import org.opengis.referencing.operation.OperationMethod;
@@ -53,6 +55,32 @@ public class DefiningConversion extends DefaultConversion {
      * The parameter values.
      */
     private final ParameterValueGroup parameters;
+
+    /**
+     * Convenience constructor for creating a defining conversion with a default operation method.
+     * The operation method is assumed two-dimensional.
+     *
+     * @param name       The conversion name.
+     * @param parameters The parameter values.
+     *
+     * @since 2.2
+     */
+    public DefiningConversion(final String              name,
+                              final ParameterValueGroup parameters)
+    {
+        this(Collections.singletonMap(NAME_KEY, name), getOperationMethod(parameters), parameters);
+    }
+
+    /**
+     * Work around for RFE #4093999 in Sun's bug database
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static OperationMethod getOperationMethod(final ParameterValueGroup parameters) {
+        ensureNonNull("parameters", parameters);
+        // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
+        final ParameterDescriptorGroup descriptor = (ParameterDescriptorGroup) parameters.getDescriptor();
+        return new DefaultOperationMethod(getProperties(descriptor, null), 2, 2, descriptor);
+    }
 
     /**
      * Constructs a conversion from a set of properties. The properties given in argument

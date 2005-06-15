@@ -56,6 +56,19 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
     private static final long serialVersionUID = 7977674229369042440L;
 
     /**
+     * Constructs a new coordinate system with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultAffineCS(final AffineCS cs) {
+        super(cs);
+    }
+
+    /**
      * Constructs a two-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.

@@ -1,6 +1,6 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Management Committee (PMC)
+ * (C) 2005, Geotools Project Management Committee (PMC)
  * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -16,21 +16,8 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.io.coverage;
+package org.geotools.coverage.io;
 
 // Resources
 import org.geotools.resources.gcs.ResourceKeys;
@@ -44,6 +31,8 @@ import org.geotools.resources.gcs.Resources;
  *
  * @version $Id: MissingPropertyException.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
+ *
+ * @since 2.2
  */
 public class MissingPropertyException extends PropertyException {
     /**
@@ -52,16 +41,14 @@ public class MissingPropertyException extends PropertyException {
     private static final long serialVersionUID = -5215286265847774754L;
 
     /**
-     * Construct an exception with the specified message. This exception is
-     * usually raised because no value was defined for the key <code>key</code>.
+     * Constructs an exception with the specified message. This exception is
+     * usually raised because no value was defined for the key {@code key}.
      *
-     * @param message The message. If <code>null</code>, a message will
-     *                be constructed from the alias.
-     * @param key     The property key which was the cause for this exception, or
-     *                <code>null</code> if none. This is a format neutral key,
-     *                for example {@link PropertyParser#DATUM}.
-     * @param alias   The alias used for for the key <code>key</code>, or <code>null</code>
-     *                if none. This is usually the name used in the external file parsed.
+     * @param message The message. If {@code null}, a message will be constructed from the alias.
+     * @param key     The property key which was the cause for this exception, or {@code null} if
+     *                none. This is a format neutral key, for example {@link PropertyParser#DATUM}.
+     * @param alias   The alias used for for the key {@code key}, or {@code null} if none. This is
+     *                usually the name used in the external file parsed.
      */
     public MissingPropertyException(final String message,
                                     final PropertyParser.Key key,

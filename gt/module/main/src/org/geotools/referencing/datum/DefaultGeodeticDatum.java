@@ -116,6 +116,23 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
     private final BursaWolfParameters[] bursaWolf;
 
     /**
+     * Constructs a new datum with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultGeodeticDatum(final GeodeticDatum datum) {
+        super(datum);
+        ellipsoid     = datum.getEllipsoid();
+        primeMeridian = datum.getPrimeMeridian();
+        bursaWolf     = (datum instanceof DefaultGeodeticDatum) ?
+                        ((DefaultGeodeticDatum) datum).bursaWolf : null;
+    }
+
+    /**
      * Constructs a geodetic datum from a name.
      *
      * @param name          The datum name.

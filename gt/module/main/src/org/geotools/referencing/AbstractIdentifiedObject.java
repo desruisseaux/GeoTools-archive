@@ -34,6 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import javax.units.SI;
 import javax.units.Unit;
@@ -208,6 +209,10 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
 
     /**
      * Constructs a new identified object with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
      */
     public AbstractIdentifiedObject(final IdentifiedObject object) {
         name        = object.getName();
@@ -532,6 +537,33 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      */
     public static Map getProperties(final IdentifiedObject info) {
         return new Properties(info);
+    }
+
+    /**
+     * Returns the properties to be given to an identified object derived from the specified one.
+     * An example of typical usage is creating a new CRS identical to an existing one except for
+     * axis units. This methods returns the same properties than the supplied argument (as of
+     * <code>{@linkplain #getProperties getProperties}(info)</code>), except for the following:
+     * <p>
+     * <ul>
+     *   <li>The {@linkplain #getName name}'s authority is replaced by the specified one.</li>
+     *   <li>All {@linkplain #getIdentifiers identifiers} are removed, because the new object
+     *       to be created is probably not endorsed by the original authority.</li>
+     * </ul>
+     * <p>
+     * This method returns a mutable map. Concequently, callers can add their own identifiers
+     * directly to this map if they wish.
+     *
+     * @param  info The identified object to view as a properties map.
+     * @param  authority The new authority for the object to be created, or {@code null} if it
+     *         is not going to have any declared authority.
+     * @return An view of the identified object as a mutable map.
+     */
+    public static Map getProperties(final IdentifiedObject info, final Citation authority) {
+        final Map properties = new HashMap(getProperties(info));
+        properties.put(NAME_KEY, new NamedIdentifier(authority, info.getName().getCode()));
+        properties.remove(IDENTIFIERS_KEY);
+        return properties;
     }
     
     /**

@@ -175,6 +175,19 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
             new Cartesian("Generic", DefaultCartesianCS.GENERIC_3D);
 
     /**
+     * Constructs a new enginnering CRS with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultEngineeringCRS(final EngineeringCRS crs) {
+        super(crs);
+    }
+
+    /**
      * Constructs an engineering CRS from a name.
      *
      * @param name The name.

@@ -106,6 +106,20 @@ public class DefaultVerticalDatum extends AbstractDatum implements VerticalDatum
     }
 
     /**
+     * Constructs a new datum with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultVerticalDatum(final VerticalDatum datum) {
+        super(datum);
+        type = datum.getVerticalDatumType();
+    }
+
+    /**
      * Constructs a vertical datum from a set of properties. The properties map is given
      * unchanged to the {@linkplain AbstractDatum#AbstractDatum(Map) super-class constructor}.
      *

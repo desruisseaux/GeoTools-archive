@@ -164,7 +164,6 @@ public class AUTOCRSAuthorityFactory implements CRSAuthorityFactory {
      * the result provided does work with the EPSG assumption maintained by
      * CRSService. The result may provide this prefix in the future. 
      * </p>
-     * @see org.geotools.data.crs.CRSAuthoritySpi#getCodes()
      * @return Set of know codes.
      */
     public Set getAuthorityCodes(Class clazz) throws FactoryException {

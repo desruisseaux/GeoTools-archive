@@ -70,6 +70,20 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
     private final List/*<CoordinateReferenceSystem>*/ crs;
 
     /**
+     * Constructs a new compound CRS with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultCompoundCRS(final CompoundCRS crs) {
+        super(crs);
+        this.crs = crs.getCoordinateReferenceSystems();
+    }
+
+    /**
      * Constructs a coordinate reference system from a name and two CRS.
      *
      * @param name The name.

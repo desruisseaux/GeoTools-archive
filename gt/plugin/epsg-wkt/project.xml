@@ -9,7 +9,7 @@
   <shortDescription>EPSG Authoriy Service</shortDescription>
   <gumpRepositoryId>geotools</gumpRepositoryId>
   <description>
-  EPSG and AUTO CRSAuthoritySpi are defined for data.crs.CRSService.
+  EPSG and AUTO authority factories are defined for data.crs.CRSService.
   These codes are used to provide CoordinateRegerenceSystem for GCE and
   DataStore implementations that do not define their own native definition.
   

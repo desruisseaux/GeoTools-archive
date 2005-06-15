@@ -98,6 +98,19 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
     private transient Converter longitudeConverter, latitudeConverter, heightConverter;
 
     /**
+     * Constructs a new coordinate system with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultEllipsoidalCS(final EllipsoidalCS cs) {
+        super(cs);
+    }
+
+    /**
      * Constructs a two-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.
@@ -263,5 +276,28 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
             }
         }
         return heightConverter.convert(coordinates[heightAxis]);
+    }
+
+    /**
+     * Returns a new coordinate system with the same properties than the current one except for
+     * axis units.
+     *
+     * @param  unit The unit for the new axis.
+     * @return A coordinate system with axis using the specified units.
+     * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
+     *
+     * @since 2.2
+     */
+    public DefaultEllipsoidalCS usingUnit(final Unit unit) throws IllegalArgumentException {
+        final CoordinateSystemAxis[] axis = axisUsingUnit(unit);
+        if (axis == null) {
+            return this;
+        }
+        final Map properties = getProperties(this, null);
+        switch (axis.length) {
+            case 2:  return new DefaultEllipsoidalCS(properties, axis[0], axis[1]);
+            case 3:  return new DefaultEllipsoidalCS(properties, axis[0], axis[1], axis[2]);
+            default: throw new AssertionError(axis.length); // Should never happen.
+        }
     }
 }

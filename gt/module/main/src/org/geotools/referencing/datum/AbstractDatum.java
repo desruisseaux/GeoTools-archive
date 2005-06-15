@@ -135,6 +135,24 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
     private final InternationalString scope;
 
     /**
+     * Constructs a new datum with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public AbstractDatum(final Datum datum) {
+        super(datum);
+        final Date epoch = datum.getRealizationEpoch();
+        realizationEpoch = (epoch!=null) ? epoch.getTime() : Long.MIN_VALUE;
+        validArea        = datum.getValidArea();
+        scope            = datum.getScope();
+        anchorPoint      = datum.getAnchorPoint();
+    }
+
+    /**
      * Constructs a datum from a set of properties. The properties given in argument follow
      * the same rules than for the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}. Additionally, the following properties are understood by this

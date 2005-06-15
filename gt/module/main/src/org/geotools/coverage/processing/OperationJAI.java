@@ -84,16 +84,22 @@ import org.geotools.util.AbstractInternationalString;
  * The default implementation forward the call to other methods for different bits of tasks,
  * resulting in the following chain of calls:
  * <p>
- * <ol>
- *   <li>{@link #doOperation doOperation} (the entry point)</li>
- *   <li>{@link #resampleToCommonGeometry resampleToCommonGeometry}
- *       (reproject all source to the same coordinate reference system)</li>
- *   <li>{@link #deriveGridCoverage deriveGridCoverage} (gets the destination properties)</li>
- *   <li>{@link #deriveSampleDimension} (gets the destination sample dimensions)</li>
- *   <li>{@link #deriveCategory} (gets the destination categories)</li>
- *   <li>{@link #deriveUnit} (gets the destination units)</li>
- *   <li>{@link #createRenderedImage} (the actual call to {@link JAI#createNS JAI.createNS})</li>
- * </ol>
+ * <table>
+ *   <tr><td>{@link #doOperation doOperation}:&nbsp;</td>
+ *       <td>the entry point.</td></tr>
+ *   <tr><td>{@link #resampleToCommonGeometry resampleToCommonGeometry}:&nbsp;</td>
+ *       <td>reprojects all sources to the same coordinate reference system.</td></tr>
+ *   <tr><td>{@link #deriveGridCoverage deriveGridCoverage}:&nbsp;</td>
+ *       <td>gets the destination properties.</td></tr>
+ *   <tr><td>{@link #deriveSampleDimension deriveSampleDimension}:&nbsp;</td>
+ *       <td>gets the destination sample dimensions.</td></tr>
+ *   <tr><td>{@link #deriveCategory deriveCategory}:&nbsp;</td>
+ *       <td>gets the destination categories.</td></tr>
+ *   <tr><td>{@link #deriveUnit deriveUnit}:&nbsp;</td>
+ *       <td>gets the destination units.</td></tr>
+ *   <tr><td>{@link #createRenderedImage createRenderedImage}:&nbsp;</td>
+ *       <td>the actual call to {@link JAI#createNS JAI.createNS}.</td></tr>
+ * </table>
  *
  * @version $Id$
  * @author Martin Desruisseaux

@@ -403,6 +403,22 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     private final Unit unit;
 
     /**
+     * Constructs a new coordinate system axis with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultCoordinateSystemAxis(final CoordinateSystemAxis axis) {
+        super(axis);
+        abbreviation = axis.getAbbreviation();
+        direction    = axis.getDirection();
+        unit         = axis.getUnit();
+    }
+
+    /**
      * Constructs an axis from a set of properties. The properties map is given unchanged to the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      *
@@ -558,6 +574,27 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public Unit getUnit() {
         return unit;
+    }
+
+    /**
+     * Returns a new axis with the same properties than current axis except for the units.
+     *
+     * @param  unit The unit for the new axis.
+     * @return An axis using the specified unit.
+     * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
+     *
+     * @since 2.2
+     */
+    final DefaultCoordinateSystemAxis usingUnit(final Unit unit) throws IllegalArgumentException {
+        if (this.unit.equals(unit)) {
+            return this;
+        }
+        if (this.unit.isCompatible(unit)) {
+            return new DefaultCoordinateSystemAxis(getProperties(this, null),
+                                                   abbreviation, direction, unit);
+        }
+        throw new IllegalArgumentException(
+                Resources.format(ResourceKeys.ERROR_INCOMPATIBLE_UNIT_$1, unit));
     }
     
     /**

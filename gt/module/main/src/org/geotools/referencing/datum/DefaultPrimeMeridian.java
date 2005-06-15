@@ -71,6 +71,21 @@ public class DefaultPrimeMeridian extends AbstractIdentifiedObject implements Pr
     private final Unit angularUnit;
 
     /**
+     * Constructs a new prime meridian with the same values than the specified one.
+     * This copy constructor provides a way to wrap an arbitrary implementation into a
+     * Geotools one or a user-defined one (as a subclass), usually in order to leverage
+     * some implementation-specific API. This constructor performs a shallow copy,
+     * i.e. the properties are not cloned.
+     *
+     * @since 2.2
+     */
+    public DefaultPrimeMeridian(final PrimeMeridian meridian) {
+        super(meridian);
+        greenwichLongitude = meridian.getGreenwichLongitude();
+        angularUnit        = meridian.getAngularUnit();
+    }
+
+    /**
      * Constructs a prime meridian from a name. The {@code greenwichLongitude} value
      * is assumed in {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *

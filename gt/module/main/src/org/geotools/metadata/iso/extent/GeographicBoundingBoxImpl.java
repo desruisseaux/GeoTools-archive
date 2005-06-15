@@ -27,6 +27,22 @@ import java.awt.geom.Rectangle2D;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.Envelope;
+
+// Geotools dependencies
+import org.geotools.measure.Latitude;
+import org.geotools.measure.Longitude;
+import org.geotools.measure.AngleFormat;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.gcs.Resources;
+import org.geotools.resources.gcs.ResourceKeys;
 
 
 /**
@@ -82,7 +98,40 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     }
 
     /**
+     * Constructs a geographic bounding box from the specified envelope. If the envelope contains
+     * a CRS, then the bounding box will be projected to the {@linkplain DefaultGeographicCRS#WGS84
+     * WGS 84} CRS. Otherwise, the envelope is assumed already in WGS 84 CRS.
+     *
+     * @since 2.2
+     */
+    public GeographicBoundingBoxImpl(Envelope envelope) throws TransformException {
+        super(true);
+        // TODO: use a more direct way if we add a 'getCRS()' method straight into Envelope.
+        final CoordinateReferenceSystem crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
+        if (crs != null) {
+            if (!CRSUtilities.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs,0,2), DefaultGeographicCRS.WGS84) &&
+                !CRSUtilities.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs,0,3), DefaultGeographicCRS.WGS84_3D))
+            {
+                final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory(null);
+                final CoordinateOperation operation;
+                try {
+                    operation = factory.createOperation(crs, DefaultGeographicCRS.WGS84);
+                } catch (FactoryException exception) {
+                    throw new TransformException(Resources.format(
+                              ResourceKeys.ERROR_CANT_TRANSFORM_ENVELOPE, exception));
+                }
+                envelope = CRSUtilities.transform(operation.getMathTransform(), envelope);
+            }
+            setWestBoundLongitude(envelope.getMinimum(0));
+            setEastBoundLongitude(envelope.getMaximum(0));
+            setSouthBoundLatitude(envelope.getMinimum(1));
+            setNorthBoundLatitude(envelope.getMaximum(1));
+        }
+    }
+
+    /**
      * Constructs a geographic bounding box from the specified rectangle.
+     * The rectangle is assumed in {@linkplain DefaultGeographicCRS#WGS84 WGS 84} CRS.
      */
     public GeographicBoundingBoxImpl(final Rectangle2D bounds) {
         this(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
@@ -92,9 +141,9 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Creates a geographic bounding box initialized to the specified values.
      */
     public GeographicBoundingBoxImpl(final double westBoundLongitude,
-                                 final double eastBoundLongitude,
-                                 final double southBoundLatitude,
-                                 final double northBoundLatitude)
+                                     final double eastBoundLongitude,
+                                     final double southBoundLatitude,
+                                     final double northBoundLatitude)
     {
         super(true);
         setWestBoundLongitude( westBoundLongitude);
@@ -102,7 +151,7 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         setSouthBoundLatitude(southBoundLatitude );
         setNorthBoundLatitude(northBoundLatitude );
     }
-    
+
     /**
      * Returns the western-most coordinate of the limit of the
      * dataset extent. The value is expressed in longitude in
@@ -228,11 +277,26 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
     }
 
     /**
-     * Returns a string representation of this extent.
-     *
-     * @todo Provides a more elaborated implementation.
+     * Returns a string representation of this extent using a default angle pattern.
      */
     public String toString() {
-        return super.toString();
+        return toString("DD°MM'SS\"");
+    }
+
+    /**
+     * Returns a string representation of this extent using the specified angle pattern.
+     * See {@link AngleFormat} for a description of angle patterns.
+     */
+    public String toString(final String pattern) {
+        final StringBuffer buffer = new StringBuffer();
+        final AngleFormat  format = new AngleFormat(pattern);
+        buffer.append(format.format(new  Latitude(getNorthBoundLatitude())));
+        buffer.append(", ");
+        buffer.append(format.format(new Longitude(getSouthBoundLatitude())));
+        buffer.append(" - ");
+        buffer.append(format.format(new  Latitude(getWestBoundLongitude())));
+        buffer.append(", ");
+        buffer.append(format.format(new Longitude(getEastBoundLongitude())));
+        return buffer.toString();
     }    
 }

@@ -1,6 +1,6 @@
 /*
  * Geotools - OpenSource mapping toolkit
- * (C) 2002, Centre for Computational Geography
+ * (C) 2005, Geotools Project Management Committee (PMC)
  * (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -16,36 +16,26 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- * Contacts:
- *     UNITED KINGDOM: James Macgill
- *             mailto:j.macgill@geog.leeds.ac.uk
- *
- *     FRANCE: Surveillance de l'Environnement Assistée par Satellite
- *             Institut de Recherche pour le Développement / US-Espace
- *             mailto:seasnet@teledetection.fr
- *
- *     CANADA: Observatoire du Saint-Laurent
- *             Institut Maurice-Lamontagne
- *             mailto:osl@osl.gc.ca
  */
-package org.geotools.io.coverage;
-// Image input/output
+package org.geotools.coverage.io;
+
+// J2SE dependencies
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 
-import org.geotools.cv.SampleDimension;
-import org.geotools.gc.GridCoverage;
-import org.geotools.gc.GridRange;
-import org.geotools.pt.Envelope;
+// OpenGIS dependencies
+import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridRange;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+// Geotools dependencies
 import org.geotools.resources.gcs.ResourceKeys;
-import org.geotools.cs.CoordinateSystem;
 
 
 /**
@@ -183,9 +173,11 @@ public class ExoreferencedGridCoverageReader extends GridCoverageReader {
      * @throws IOException if an error occurs reading the width information from
      *         the input source.
      */
-    public synchronized CoordinateSystem getCoordinateSystem(final int index) throws IOException {
+    public synchronized CoordinateReferenceSystem getCoordinateReferenceSystem(final int index)
+            throws IOException
+    {
         checkImageIndex(index);
-        return properties.getCoordinateSystem();
+        return properties.getCoordinateReferenceSystem();
     }
     
     /**
