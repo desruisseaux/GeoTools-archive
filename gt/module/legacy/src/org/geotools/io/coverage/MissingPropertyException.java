@@ -45,7 +45,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id: MissingPropertyException.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.coverage.io.MissingPropertyException}.
+ * @deprecated Replaced by {@link org.geotools.coverage.io.MissingMetadataException}.
  */
 public class MissingPropertyException extends PropertyException {
     /**

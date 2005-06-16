@@ -43,7 +43,7 @@ import javax.imageio.IIOException;
  * @version $Id: PropertyException.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.coverage.io.PropertyException}.
+ * @deprecated Replaced by {@link org.geotools.coverage.io.MetadataException}.
  */
 public class PropertyException extends IIOException {
     /**

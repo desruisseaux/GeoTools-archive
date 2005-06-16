@@ -23,6 +23,7 @@
 package org.geotools.metadata.iso.extent;
 
 // J2SE dependencies
+import java.util.Locale;
 import java.awt.geom.Rectangle2D;
 
 // OpenGIS dependencies
@@ -280,23 +281,33 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Returns a string representation of this extent using a default angle pattern.
      */
     public String toString() {
-        return toString("DD°MM'SS\"");
+        return toString(this, "DD°MM'SS\"", null);
     }
 
     /**
-     * Returns a string representation of this extent using the specified angle pattern.
-     * See {@link AngleFormat} for a description of angle patterns.
+     * Returns a string representation of the specified extent using the specified angle pattern
+     * and locale. See {@link AngleFormat} for a description of angle patterns.
+     *
+     * @param box     The bounding box to format.
+     * @param pattern The angle pattern (e.g. {@code DD°MM'SS"}.
+     * @param locale  The locale, or {@code null} for the default one.
+     *
+     * @since 2.2
      */
-    public String toString(final String pattern) {
+    public static String toString(final GeographicBoundingBox box,
+                                  final String                pattern,
+                                  final Locale                locale)
+    {
         final StringBuffer buffer = new StringBuffer();
-        final AngleFormat  format = new AngleFormat(pattern);
-        buffer.append(format.format(new  Latitude(getNorthBoundLatitude())));
+        final AngleFormat  format = (locale!=null) ? new AngleFormat(pattern, locale) :
+                                                     new AngleFormat(pattern);
+        buffer.append(format.format(new  Latitude(box.getNorthBoundLatitude())));
         buffer.append(", ");
-        buffer.append(format.format(new Longitude(getSouthBoundLatitude())));
+        buffer.append(format.format(new Longitude(box.getSouthBoundLatitude())));
         buffer.append(" - ");
-        buffer.append(format.format(new  Latitude(getWestBoundLongitude())));
+        buffer.append(format.format(new  Latitude(box.getWestBoundLongitude())));
         buffer.append(", ");
-        buffer.append(format.format(new Longitude(getEastBoundLongitude())));
+        buffer.append(format.format(new Longitude(box.getEastBoundLongitude())));
         return buffer.toString();
     }    
 }

@@ -34,7 +34,8 @@ import junit.textui.TestRunner;
  */
 public class AllTests extends TestCase {
     /** No need to construct this class. */
-    private AllTests() {}        
+    private AllTests() {
+    }        
 
     /**
      * Run the suite from the command line.
@@ -48,7 +49,7 @@ public class AllTests extends TestCase {
      * Returns all suites.
      */
     public static Test suite() {
-        final TestSuite suite = new TestSuite("org.geotools.Coverage");
+        final TestSuite suite = new TestSuite("org.geotools.coverage");
         suite.addTest(org.geotools.referencing.  AllTests            .suite());
         suite.addTest(org.geotools.coverage.     CategoryTest        .suite());
         suite.addTest(org.geotools.coverage.     CategoryListTest    .suite());
@@ -59,6 +60,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.coverage.grid.GridCoverageTest    .suite());
         suite.addTest(org.geotools.coverage.grid.InterpolatorTest    .suite());
         suite.addTest(org.geotools.coverage.grid.ResampleTest        .suite());
+        suite.addTest(org.geotools.coverage.io.MetadataBuilderTest   .suite());
         return suite;
     }
 }

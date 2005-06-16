@@ -102,6 +102,17 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
     
     /**
+     * Constructs an empty envelope with the specified coordinate reference system.
+     * All ordinates are initialized to 0.
+     *
+     * @since 2.2
+     */
+    public GeneralEnvelope(final CoordinateReferenceSystem crs) {
+        this(crs.getCoordinateSystem().getDimension());
+        this.crs = crs;
+    }
+
+    /**
      * Constructs an empty envelope of the specified dimension.
      * All ordinates are initialized to 0.
      */

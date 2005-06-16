@@ -45,7 +45,7 @@ import org.geotools.resources.gcs.Resources;
  * @version $Id: AmbiguousPropertyException.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
  *
- * @deprecated Replaced by {@link org.geotools.coverage.io.AmbiguousPropertyException}.
+ * @deprecated Replaced by {@link org.geotools.coverage.io.AmbiguousMetadataException}.
  */
 public class AmbiguousPropertyException extends PropertyException {
     /**

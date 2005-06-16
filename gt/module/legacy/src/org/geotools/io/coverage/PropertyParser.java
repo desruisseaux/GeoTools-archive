@@ -134,7 +134,7 @@ import org.opengis.referencing.operation.TransformException;
  * For example, the {@link #getCoordinateSystem} method constructs a
  * {@link org.geotools.cs.CoordinateSystem} object using available informations.
  *
- * @version $Id: PropertyParser.java 10796 2005-01-28 19:09:18Z dzwiers $
+ * @version $Id: MetadataBuilder.java 10796 2005-01-28 19:09:18Z dzwiers $
  * @author Martin Desruisseaux
  *
  * @deprecated Replaced by {@link org.geotools.coverage.io.PropertyParser}.
