@@ -8,8 +8,21 @@
   {@linkplain org.opengis.referencing.AuthorityFactory Authority factories} for
   the <A HREF="http://www.epsg.org">EPSG</A> database.
 
-  <H2>Available plugins</H2>
-  <P ALIGN="justify">The following plugins are available:</P>
+  <P ALIGN="justify">EPSG codes are numerical identifiers. For example "4326" is the EPSG
+  identifier for the "WGS 84" geographic CRS. However, the default implementation accepts
+  names as well as numeric identifiers. For example "<cite>NTF (Paris) / France I</cite>"
+  and {@code "27581"} both fetchs the same object. Note that names may be ambiguous since
+  the same name may be used for more than one object. This is the case of "WGS 84" for example.
+  If such an ambiguity is found, an exception will be thrown.</P>
+
+  <P ALIGN="justify">An EPSG authority factory is created using the following code:</P>
+  <BLOCKQUOTE><CODE>{@linkplain org.opengis.referencing.crs.CRSAuthorityFactory} factory =
+  {@linkplain org.geotools.referencing.FactoryFinder}.getCRSAuthorityFactory("EPSG", null);</CODE></BLOCKQUOTE>
+
+  <P ALIGN="justify">This package provides the general framework for accessing an EPSG database,
+  but the actual connection to a database requires the existence of an EPSG plugin in the classpath.
+  Otherwise, a {@link org.geotools.factory.FactoryNotFoundException} will be thrown. Available plugins are:</P>
+
   <TABLE ALIGN="center" BORDER="1" CELLPADDING="3">
     <TR>
       <TH>Required software</TH>

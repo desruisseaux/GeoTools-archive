@@ -93,7 +93,7 @@ public class MetadataException extends IIOException {
     /**
      * Constructs an exception from the specified cause.
      *
-     * @param message The cause for this exception.
+     * @param cause   The cause for this exception.
      * @param key     The metadata key which was the cause for this exception, or {@code null} if
      *                none. This is a format neutral key, for example {@link MetadataBuilder#DATUM}.
      * @param alias   The alias used for for the key {@code key}, or {@code null} if none. This is

@@ -74,7 +74,7 @@ import org.geotools.resources.gcs.Resources;
  * Subclasses needs to implements at least the following methods:
  *
  * <ul>
- *   <li>{@link #getCoordinateSystem}</li>
+ *   <li>{@link #getCoordinateReferenceSystem}</li>
  *   <li>{@link #getEnvelope}</li>
  * </ul>
  *
@@ -388,7 +388,7 @@ public abstract class AbstractGridCoverageReader {
 	 * {@link RawBinaryImageReadParam#setStreamImageSize} with informations
 	 * provided by {@link #getGridRange}. Finally, a grid coverage is
 	 * constructed using informations provided by {@link #getName},
-	 * {@link #getCoordinateSystem} and {@link #getEnvelope}.
+	 * {@link #getCoordinateReferenceSystem} and {@link #getEnvelope}.
 	 *
 	 * @param  index The index of the image to be queried.
 	 * @return The {@link GridCoverage} at the specified index.

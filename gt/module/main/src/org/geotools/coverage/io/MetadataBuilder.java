@@ -1462,7 +1462,7 @@ public class MetadataBuilder {
      * @throws MissingMetadataException if no value exists for the {@link #UNITS} key.
      * @throws MetadataException if the operation failed for some other reason.
      *
-     * @see #getCoordinateSystem
+     * @see #getCoordinateReferenceSystem
      */
     public synchronized Unit getUnit() throws MetadataException {
         final Object value = get(UNITS);
@@ -1525,7 +1525,7 @@ public class MetadataBuilder {
      * @throws MissingMetadataException if no value exists for the {@link #ELLIPSOID} key.
      * @throws MetadataException if the operation failed for some other reason.
      *
-     * @see #getCoordinateSystem
+     * @see #getCoordinateReferenceSystem
      * @see #getGeodeticDatum
      */
     public synchronized Ellipsoid getEllipsoid() throws MetadataException {
@@ -1735,7 +1735,7 @@ public class MetadataBuilder {
      * Returns the coordinate reference system. The default implementation constructs a CRS
      * from the information provided by {@link #getUnit}, {@link #getGeodeticDatum} and
      * {@link #getProjection}. The coordinate system name (optional) will be fetch from
-     * metadata {@link #CRS}, if presents as a string.
+     * metadata {@link #COORDINATE_REFERENCE_SYSTEM}, if presents as a string.
      *
      * @throws MissingMetadataException if a required value is missing
      *        (e.g. {@link #PROJECTION}, {@link #DATUM}, {@link #UNITS}, etc.).

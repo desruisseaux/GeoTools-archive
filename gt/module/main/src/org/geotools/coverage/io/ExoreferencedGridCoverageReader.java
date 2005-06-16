@@ -164,7 +164,8 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
     /**
      * Returns the coordinate system for the {@link GridCoverage} to be read.
      * The default implementation invokes
-     * <code>{@link #metadata}.{@link MetadataBuilder#getCoordinateSystem() getCoordinateSystem()}</code>.
+     * <code>{@link #metadata}.{@link MetadataBuilder#getCoordinateReferenceSystem()
+     * getCoordinateReferenceSystem()}</code>.
      *
      * @param  index The index of the image to be queried.
      * @return The coordinate system for the {@link GridCoverage} at the specified index.

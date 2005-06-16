@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.SQLException;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -51,34 +52,44 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.epsg.DefaultFactory;
+import org.geotools.util.MonolineFormatter;
+import org.geotools.resources.Arguments;
 
 
 /**
- * Tests transformations from CRS and/or operations created from the EPSG factory,
- * using MS-Access plugin.
+ * Tests transformations from CRS and/or operations created from the EPSG factory, using
+ * the default plugin. If the MS-Access database is installed and the {@code epsg-access}
+ * plugin is in the classpath, then the default plugin will be the factory backed by the
+ * MS-Access database. Otherwise, the default will probably be the one backed by the HSQL
+ * database.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Vadim Semenov
  */
-public class AccessDataSourceTest extends TestCase {
+public class DefaultDataSourceTest extends TestCase {
     /**
-     * The EPSG factory.
+     * The EPSG factory to test.
      */
-    private DefaultFactory factory;
+    DefaultFactory factory;
 
     /**
      * {@code true} if {@link #setUp} has been invoked at least once and failed to make a
      * connection. This flag is used in order to log a warning only once and avoid any new
      * useless tentative to get a connection.
      */
-    private static boolean noConnection;
+    static boolean noConnection;
 
     /**
-     * Run the suite from the command line.
+     * Run the suite from the command line. If {@code "-log"} flag is specified on the
+     * command-line, then the logger will be set to {@link Level#CONFIG}. This is usefull
+     * for tracking down which data source is actually used.
      */
     public static void main(final String[] args) {
-        org.geotools.util.MonolineFormatter.initGeotools();
+        final Arguments arguments = new Arguments(args);
+        final boolean log = arguments.getFlag("-log");
+        arguments.getRemainingArguments(0);
+        MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
     }
 
@@ -86,13 +97,13 @@ public class AccessDataSourceTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(AccessDataSourceTest.class);
+        return new TestSuite(DefaultDataSourceTest.class);
     }
 
     /**
      * Constructs a test case with the given name.
      */
-    public AccessDataSourceTest(final String name) {
+    public DefaultDataSourceTest(final String name) {
         super(name);
     }
 
@@ -101,7 +112,7 @@ public class AccessDataSourceTest extends TestCase {
      * In the last case, a warning will be logged but no test will be performed. We will
      * not throws an exception for peoples who don't have an EPSG database on their machine.
      */
-    protected void setUp() {
+    protected void setUp() throws SQLException {
         if (noConnection) {
             // This method was already invoked before and failed.
             // Do not try again.
@@ -119,7 +130,7 @@ public class AccessDataSourceTest extends TestCase {
                     "An error occured while setting up the date source for the EPSG database.\n" +
                     "Maybe there is no JDBC-ODBC bridge for the current platform.\n" +
                     "No test will be performed for this class.");
-            record.setSourceClassName(AccessDataSourceTest.class.getName());
+            record.setSourceClassName(DefaultDataSourceTest.class.getName());
             record.setSourceMethodName("setUp");
             record.setThrown(error);
             Logger.getLogger("org.geotools.referencing").log(record);
@@ -163,6 +174,21 @@ public class AccessDataSourceTest extends TestCase {
      */
     private static String getIdentifier(final IdentifiedObject object) {
         return ((Identifier) object.getIdentifiers().iterator().next()).getCode();
+    }
+
+    /**
+     * Tests the creation of CRS using name instead of primary keys.
+     */
+    public void testNameUsage() throws FactoryException {
+        if (factory == null) return;
+        final CoordinateReferenceSystem primary, byName;
+        primary = factory.createCoordinateReferenceSystem("27581");
+        assertEquals("27581", getIdentifier(primary));
+        assertTrue(primary instanceof ProjectedCRS);
+        assertEquals(2, primary.getCoordinateSystem().getDimension());
+
+        byName = factory.createCoordinateReferenceSystem("NTF (Paris) / France I");
+        assertEquals(primary, byName);
     }
 
     /**

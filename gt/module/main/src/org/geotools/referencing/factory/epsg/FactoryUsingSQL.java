@@ -104,13 +104,24 @@ import org.geotools.util.ScopedName;
 
 
 /**
- * Default implementation for a coordinate system factory backed by the EPSG database. The EPSG
- * database is freely available at <A HREF="http://www.epsg.org">http://www.epsg.org</a>. Current
- * version of this class requires EPSG database version 6.6.
- * <br><br>
+ * Default implementation for a coordinate reference system factory backed by the EPSG database.
+ * The EPSG database is freely available at <A HREF="http://www.epsg.org">http://www.epsg.org</a>.
+ * Current version of this class requires EPSG database version 6.6 or above.
+ * <p>
  * This factory doesn't cache any result. Any call to a {@code createFoo} method will send a new
  * query to the EPSG database. For caching, this factory should be wrapped in some buffered factory
  * like {@link DefaultFactory}.
+ * <p>
+ * This factory accepts names as well as numerical identifiers. For example
+ * "<cite>NTF (Paris) / France I</cite>" and {@code "27581"} both fetchs the same object.
+ * However, names may be ambiguous since the same name may be used for more than one object.
+ * This is the case of "WGS 84" for example. If such an ambiguity is found, an exception
+ * will be thrown. If names are not wanted as a legal EPSG code, subclasses can override the
+ * {@link #isPrimaryKey} method.
+ * <p>
+ * This factory uses the MS-Access dialect of SQL, because the primary distribution format for the
+ * EPSG database is MS-Access. For translating this SQL dialect into an other one, subclasses
+ * should override the {@link #adaptSQL} method.
  *
  * @version $Id$
  * @author Yann Cézard
@@ -197,9 +208,13 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * List of tables and columns to test for codes values.
-     * Elements at even index are table name.
-     * Elements at odd index are column name.
+     * List of tables and columns to test for codes values. The table contains tuples made of
+     * the following values:
+     * <ul>
+     *   <li>Table names.</li>
+     *   <li>Column name for the code (usually with the {@code "_CODE"} suffix).</li>
+     *   <li>Column name for the name (usually with the {@code "_NAME"} suffix), or {@code null}.</li>
+     * </ul>
      *
      * This table is used by the {@link #createObject} method in order to detect
      * which of the following methods should be invoked for a given code:
@@ -216,13 +231,21 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @see #lastObjectType
      */
     private static final String[] OBJECT_TABLES = {
-        "[Coordinate Reference System]", "COORD_REF_SYS_CODE",   // [ 0]: createCoordinateReferenceSystem
-        "[Coordinate System]",           "COORD_SYS_CODE",       // [ 2]: createCoordinateSystem
-        "[Coordinate Axis]",             "COORD_AXIS_CODE",      // [ 4]: createCoordinateSystemAxis
-        "[Datum]",                       "DATUM_CODE",           // [ 6]: createDatum
-        "[Ellipsoid]",                   "ELLIPSOID_CODE",       // [ 8]: createEllipsoid
-        "[Prime Meridian]",              "PRIME_MERIDIAN_CODE"   // [10]: createPrimeMeridian
+        "[Coordinate Reference System]", "COORD_REF_SYS_CODE",  "COORD_REF_SYS_NAME",
+        "[Coordinate System]",           "COORD_SYS_CODE",      "COORD_SYS_NAME",
+        "[Coordinate Axis]",             "COORD_AXIS_CODE",     null,
+        "[Datum]",                       "DATUM_CODE",          "DATUM_NAME",
+        "[Ellipsoid]",                   "ELLIPSOID_CODE",      "ELLIPSOID_NAME",
+        "[Prime Meridian]",              "PRIME_MERIDIAN_CODE", "PRIME_MERIDIAN_NAME"
     };
+
+    /**
+     * The tuple length in {@link #OBJECT_TABLES}.
+     */
+    private static final int TUPLE_LENGTH = 3;
+    static {
+        assert (OBJECT_TABLES.length % TUPLE_LENGTH) == 0 : OBJECT_TABLES.length;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     ////////                                                               ////////
@@ -251,7 +274,13 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * This type is an index in the {@link #OBJECT_TABLES} array and is
      * strictly for {@link #createObject} internal use.
      */
-    private int lastObjectType = -2;
+    private int lastObjectType = -TUPLE_LENGTH;
+
+    /**
+     * The last table in which object name were looked for. This is for internal use
+     * by {@link #getNumericalIdentifier} only.
+     */
+    private transient String lastTableForName;
 
     /**
      * The calendar instance for creating {@link java.util.Date} objects from a year
@@ -282,6 +311,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
 
     /**
      * The prefix to prepend to each properties, or an empty buffer if none.
+     * This is used by {@code createProperties} internal methods.
      */
     private final StringBuffer prefix = new StringBuffer();
 
@@ -361,7 +391,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @todo localize
      */
     public synchronized String getBackingStoreDescription() throws FactoryException {
-        final String lineSeparator = System.getProperty("line.separator", "\r");
+        final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuffer  buffer = new StringBuffer();
         final Citation   authority = getAuthority();
         CharSequence s;
@@ -432,7 +462,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns a prepared statement for the specified name.
+     * Returns a prepared statement for the specified name. Most {@link PreparedStatement}
+     * creations are performed through this method, except {@link #getNumericalIdentifier}
+     * and {@link #createObject}.
      *
      * @param  key A key uniquely identifying the caller
      *         (e.g. <code>"Ellipsoid"</code> for {@link #createEllipsoid}).
@@ -530,6 +562,67 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
+     * Converts a code from an arbitrary name to the numerical identifier (the primary key).
+     * If the supplied code is already a numerical value, then it is returned unchanged.
+     * If the code is not found in the name column, it is returned unchanged as well so that
+     * the caller will produces an appropriate "Code not found" error message. If the code
+     * is found more than once, then an exception is thrown.
+     * <p>
+     * Note that this method includes a call to {@link #trimAuthority}, so there is no need to
+     * call it before or after this method.
+     *
+     * @param  code       The code to check.
+     * @param  table      The table where the code should appears.
+     * @param  codeColumn The column name for the code.
+     * @param  nameColumn The column name for the name.
+     * @return The numerical identifier (i.e. the table primary key value).
+     * @throws SQLException if an error occured while reading the database.
+     */
+    private String toPrimaryKey(final String code,
+                                final String table,
+                                final String codeColumn,
+                                final String nameColumn)
+            throws SQLException, FactoryException
+    {
+        assert Thread.holdsLock(this);
+        final String epsg = trimAuthority(code);
+        if (!isPrimaryKey(epsg)) {
+            /*
+             * The character is not the numerical code. Search the value in the database.
+             * If a prepared statement is already available, reuse it providing that it was
+             * created for the current table. Otherwise, we will create a new statement.
+             */
+            final String KEY = "NumericalIdentifier";
+            PreparedStatement statement = (PreparedStatement) statements.get(KEY);
+            if (statement != null) {
+                if (!table.equals(lastTableForName)) {
+                    statements.remove(KEY);
+                    statement.close();
+                    statement        = null;
+                    lastTableForName = null;
+                }
+            }
+            if (statement == null) {
+                final String query = "SELECT " + codeColumn + " FROM " + table +
+                                     " WHERE " + nameColumn + " = ?";
+                statement = connection.prepareStatement(adaptSQL(query));
+                statements.put(KEY, statement);
+            }
+            statement.setString(1, epsg);
+            String identifier = null;
+            final ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                identifier = (String) ensureSingleton(result.getString(1), identifier, code);
+            }
+            result.close();
+            if (identifier != null) {
+                return identifier;
+            }
+        }
+        return epsg;
+    }
+
+    /**
      * Make sure that an object constructed from the database is not incoherent.
      * If the code supplied to a {@code createFoo} method exists in the database,
      * then we should find only one record. However, we will do a paranoiac check and
@@ -557,6 +650,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
 
     /**
      * Prepend the prefix to the specified key, if needed.
+     * This is used by {@code createProperties} internal methods.
      */
     private String prepend(String key) {
         final int base = prefix.length();
@@ -687,9 +781,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
          * costly operation. Only the last successful prepared statement is cached, in order to keep
          * the amount of statements low. Unsuccessful statements are immediately disposed.
          */
-        final String epsg = trimAuthority(code);
-        for (int i=-2; i<OBJECT_TABLES.length; i+=2) {
-            if (i == lastObjectType) {
+        final String  epsg        = trimAuthority(code);
+        final boolean isNumeric   = isPrimaryKey(epsg);
+        final int     tupleToSkip = isNumeric ? lastObjectType : -TUPLE_LENGTH;
+        int index = -TUPLE_LENGTH;
+        for (int i=-TUPLE_LENGTH; i<OBJECT_TABLES.length; i+=TUPLE_LENGTH) {
+            if (i == tupleToSkip) {
                 // Avoid to test the same table twice.  Note that this test also avoid a
                 // NullPointerException if 'stmt' is null, since 'lastObjectType' should
                 // be -2 in this case.
@@ -697,43 +794,70 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             }
             try {
                 if (i >= 0) {
-                    final String table  = OBJECT_TABLES[i  ];
-                    final String column = OBJECT_TABLES[i+1];
+                    final String table  = OBJECT_TABLES[i];
+                    final String column = OBJECT_TABLES[i + (isNumeric ? 1 : 2)];
+                    if (column == null) {
+                        continue;
+                    }
                     if (query == null) {
                         query = new StringBuffer("SELECT ");
                     }
                     query.setLength(7); // 7 is the length of "SELECT " in the line above.
-                    query.append(column);
+                    query.append(OBJECT_TABLES[i + 1]);
                     query.append(" FROM ");
                     query.append(table);
                     query.append(" WHERE ");
                     query.append(column);
                     query.append(" = ?");
-                    assert !statements.containsKey(KEY);
-                    stmt = prepareStatement(KEY, query.toString());
+                    if (isNumeric) {
+                        assert !statements.containsKey(KEY) : table;
+                        stmt = prepareStatement(KEY, query.toString());
+                    } else {
+                        // Do not cache the statement for names.
+                        stmt = connection.prepareStatement(adaptSQL(query.toString()));
+                    }
                 }
+                /*
+                 * Checks if at least one record if found for the code. If the code is the primary
+                 * key, then we will stop at the first table found since a well-formed EPSG database
+                 * should not contains any duplicate identifiers. In the code is a name, then search
+                 * in all tables since duplicate names exist.
+                 */
                 stmt.setString(1, epsg);
                 final ResultSet result = stmt.executeQuery();
                 final boolean  present = result.next();
                 result.close();
                 if (present) {
-                    if (i >= 0) {
-                        lastObjectType = i;
+                    if (index >= 0) {
+                        throw new FactoryException(Resources.format(
+                                ResourceKeys.ERROR_DUPLICATED_VALUES_$1, code));
                     }
-                    switch (lastObjectType) {
-                        case  0:  return buffered.createCoordinateReferenceSystem(code);
-                        case  2:  return buffered.createCoordinateSystem         (code);
-                        case  4:  return buffered.createCoordinateSystemAxis     (code);
-                        case  6:  return buffered.createDatum                    (code);
-                        case  8:  return buffered.createEllipsoid                (code);
-                        case 10:  return buffered.createPrimeMeridian            (code);
-                        default: throw new AssertionError(i); // Should not happen
+                    index = (i < 0) ? lastObjectType : i;
+                    if (isNumeric) {
+                        lastObjectType = index;
+                        break;
                     }
                 }
-                statements.remove(KEY);
+                if (isNumeric) {
+                    statements.remove(KEY);
+                }
                 stmt.close();
             } catch (SQLException exception) {
                 throw databaseFailure(IdentifiedObject.class, code, exception);
+            }
+        }
+        /*
+         * If a record has been found in one table, then delegate to the appripriate method.
+         */
+        if (index >= 0) {
+            switch (index) {
+                case 0*TUPLE_LENGTH:  return buffered.createCoordinateReferenceSystem(code);
+                case 1*TUPLE_LENGTH:  return buffered.createCoordinateSystem         (code);
+                case 2*TUPLE_LENGTH:  return buffered.createCoordinateSystemAxis     (code);
+                case 3*TUPLE_LENGTH:  return buffered.createDatum                    (code);
+                case 4*TUPLE_LENGTH:  return buffered.createEllipsoid                (code);
+                case 5*TUPLE_LENGTH:  return buffered.createPrimeMeridian            (code);
+                default: throw new AssertionError(index); // Should not happen
             }
         }
         return super.createObject(code);
@@ -754,6 +878,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         Unit returnValue = null;
         try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Unit of Measure]", "UOM_CODE", "UNIT_OF_MEAS_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Unit", "SELECT UOM_CODE,"
                                           +       " FACTOR_B,"
@@ -761,7 +887,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                           +       " TARGET_UOM_CODE"
                                           + " FROM [Unit of Measure]"
                                           + " WHERE UOM_CODE = ?");
-            stmt.setString(1, trimAuthority(code));
+            stmt.setString(1, primaryKey);
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final int source = getInt(result,   1, code);
@@ -809,6 +935,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         Ellipsoid returnValue = null;
         try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Ellipsoid]", "ELLIPSOID_CODE", "ELLIPSOID_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Ellipsoid", "SELECT ELLIPSOID_CODE,"
                                                +       " ELLIPSOID_NAME,"
@@ -819,7 +947,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                                +       " REMARKS"
                                                + " FROM [Ellipsoid]"
                                                + " WHERE ELLIPSOID_CODE = ?");
-            stmt.setString(1, trimAuthority(code));
+            stmt.setString(1, primaryKey);
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 /*
@@ -889,6 +1017,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         PrimeMeridian returnValue = null;
         try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Prime Meridian]", "PRIME_MERIDIAN_CODE", "PRIME_MERIDIAN_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("PrimeMeridian", "SELECT PRIME_MERIDIAN_CODE,"
                                                    +       " PRIME_MERIDIAN_NAME,"
@@ -897,7 +1027,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                                    +       " REMARKS"
                                                    + " FROM [Prime Meridian]"
                                                    + " WHERE PRIME_MERIDIAN_CODE = ?");
-            stmt.setString(1, trimAuthority(code));
+            stmt.setString(1, primaryKey);
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg      = getString(result, 1, code);
@@ -936,6 +1066,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         Extent returnValue = null;
         try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Area]", "AREA_CODE", "AREA_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Area", "SELECT AREA_OF_USE,"
                                           +       " AREA_SOUTH_BOUND_LAT,"
@@ -944,7 +1076,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                           +       " AREA_EAST_BOUND_LON"
                                           + " FROM [Area]"
                                           + " WHERE AREA_CODE = ?");
-            stmt.setString(1, trimAuthority(code));
+            stmt.setString(1, primaryKey);
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 ExtentImpl extent = null;
@@ -1115,6 +1247,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         Datum returnValue = null;
         try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Datum]", "DATUM_CODE", "DATUM_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Datum", "SELECT DATUM_CODE,"
                                            +       " DATUM_NAME,"
@@ -1128,7 +1262,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                            +       " PRIME_MERIDIAN_CODE" // Only for geodetic type
                                            + " FROM [Datum]"
                                            + " WHERE DATUM_CODE = ?");
-            stmt.setString(1, trimAuthority(code));
+            stmt.setString(1, primaryKey);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg    = getString(result, 1, code);
@@ -1310,6 +1444,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         CoordinateSystem returnValue = null;
         final PreparedStatement stmt;
         try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Coordinate System]", "COORD_SYS_CODE", "COORD_SYS_NAME");
             stmt = prepareStatement("CoordinateSystem", "SELECT COORD_SYS_CODE,"
                                                       +       " COORD_SYS_NAME,"
                                                       +       " COORD_SYS_TYPE,"
@@ -1317,7 +1453,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                                       +       " REMARKS"
                                                       + " FROM [Coordinate System]"
                                                       + " WHERE COORD_SYS_CODE = ?");
-            stmt.setString(1, trimAuthority(code));
+            stmt.setString(1, primaryKey);
             final ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String    epsg = getString(result, 1, code);
@@ -1401,6 +1537,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         CoordinateReferenceSystem returnValue = null;
         try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Coordinate Reference System]", "COORD_REF_SYS_CODE", "COORD_REF_SYS_NAME");
             PreparedStatement stmt;
             stmt = prepareStatement("CoordinateReferenceSystem",
                                             "SELECT COORD_REF_SYS_CODE,"
@@ -1417,7 +1555,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                           +       " CMPD_VERTCRS_CODE"     // For CompoundCRS only
                                           + " FROM [Coordinate Reference System]"
                                           + " WHERE COORD_REF_SYS_CODE = ?");
-            stmt.setString(1, trimAuthority(code));
+            stmt.setString(1, primaryKey);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 final String epsg    = getString(result, 1, code);
@@ -1705,6 +1843,39 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      */
     protected String adaptSQL(final String statement) {
         return statement;
+    }
+
+    /**
+     * Returns {@code true} if the specified code may be a primary key in some table. This method
+     * do not needs to checks any entry in the database. It should just checks from the syntax if
+     * the code looks like a valid EPSG identifier. The default implementation returns {@code true}
+     * if all non-space characters are {@linkplain Character#isDigit(char) digits}.
+     * <p>
+     * When this method returns {@code false}, some {@code createFoo(...)} methods look for the
+     * code in the name column instead of the primary key column. This allows to accept the
+     * "<cite>NTF (Paris) / France I</cite>" string (for example) in addition to the {@code "27581"}
+     * primary key. Both should fetch the same object.
+     * <p>
+     * If this method returns {@code true} in all cases, then this factory never search for matching
+     * names. In such case, an appropriate exception will be thrown in {@code createFoo(...)}
+     * methods if the code is not found in the primary key column. Subclasses can overrides this
+     * method that way if this is the intended behavior.
+     *
+     * @param  code The code the inspect.
+     * @return {@code true} if the code is probably a primary key.
+     * @throws FactoryException if an unexpected error occured while inspecting the code.
+     *
+     * @since 2.2
+     */
+    protected boolean isPrimaryKey(final String code) throws FactoryException {
+        final int length = code.length();
+        for (int i=0; i<length; i++) {
+            final char c = code.charAt(i);
+            if (!Character.isDigit(c) && !Character.isSpaceChar(c)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
