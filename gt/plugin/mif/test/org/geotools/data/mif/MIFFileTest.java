@@ -16,16 +16,15 @@
  */
 package org.geotools.data.mif;
 
+import java.util.HashMap;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.mif.MIFFile;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.logging.Logger;
 
 
 /**
@@ -34,8 +33,6 @@ import java.util.logging.Logger;
  * @author Luca S. Percich, AMA-MI
  */
 public class MIFFileTest extends TestCase {
-    private static Logger LOGGER = Logger.getLogger(
-            "org.geotools.data.mif.MIFFileTest");
     private String dataPath = MIFTestUtils.getDataPath();
     private MIFFile mif = null;
 
@@ -55,12 +52,14 @@ public class MIFFileTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
+        MIFTestUtils.cleanFiles();
     }
 
     /*
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
+        MIFTestUtils.cleanFiles();
         super.tearDown();
     }
 

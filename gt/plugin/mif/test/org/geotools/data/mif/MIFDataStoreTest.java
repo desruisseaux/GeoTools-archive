@@ -16,25 +16,26 @@
  */
 package org.geotools.data.mif;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.io.WKTReader;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.HashMap;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.Filter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.logging.Logger;
+
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -43,12 +44,8 @@ import java.util.logging.Logger;
  * @author Luca S. Percich, AMA-MI
  */
 public class MIFDataStoreTest extends TestCase {
-    private static Logger LOGGER = Logger.getLogger(
-            "org.geotools.data.mif.MIFDataStoreTest");
     private MIFDataStore ds;
     private String dataPath = MIFTestUtils.getDataPath();
-    private WKTReader reader = new WKTReader(new GeometryFactory());
-    private String geomName = "the_geom";
 
     /**
      * DOCUMENT ME!
@@ -66,17 +63,19 @@ public class MIFDataStoreTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
+        MIFTestUtils.cleanFiles();
     }
 
     /*
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
+        MIFTestUtils.cleanFiles();
         super.tearDown();
     }
 
     /**
-     * Utility method for instantiating a MIFDataStore via MIFDataStoreFactory
+     * Utility method for instantiating a MIFDataStore
      *
      * @param initPath DOCUMENT ME!
      *
@@ -112,7 +111,89 @@ public class MIFDataStoreTest extends TestCase {
     }
 
     /**
-     * DOCUMENT ME!
+     */
+    public void testCreateSchema() {
+        initDS(dataPath);
+
+        try {
+            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("newschema");
+            builder.addType(AttributeTypeFactory.newAttributeType("obj",
+                    LineString.class, true));
+            builder.addType(AttributeTypeFactory.newAttributeType("charfield",
+                    String.class, false, 25, ""));
+            builder.addType(AttributeTypeFactory.newAttributeType("intfield",
+                    Integer.class, false, 0, new Integer(0)));
+
+            builder.addType(AttributeTypeFactory.newAttributeType("datefield",
+                    Date.class, true));
+            builder.addType(AttributeTypeFactory.newAttributeType("doublefield",
+                    Double.class, false, 0, new Double(0)));
+            builder.addType(AttributeTypeFactory.newAttributeType("floatfield",
+                    Float.class, false, 0, new Float(0)));
+            builder.addType(AttributeTypeFactory.newAttributeType("boolfield",
+                    Boolean.class, false, 0, new Boolean(false)));
+            
+
+            FeatureType newFT = builder.getFeatureType();
+
+            ds.createSchema(newFT);
+            
+            FeatureType builtFT = ds.getSchema("newschema");
+            
+            assertEquals(builtFT, newFT);
+            
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     */
+    public void testCreateSchemaBadGeometry() {
+        initDS(dataPath);
+
+        try {
+            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("newschema");
+            builder.addType(AttributeTypeFactory.newAttributeType("charfield",
+                    String.class, false, 25, ""));
+            builder.addType(AttributeTypeFactory.newAttributeType("intfield",
+                    Integer.class, false, 0, new Integer(0)));
+            builder.addType(AttributeTypeFactory.newAttributeType("obj",
+                    LineString.class, true));
+
+            FeatureType newFT = builder.getFeatureType();
+
+            ds.createSchema(newFT);
+            fail("SchemaException expected"); // Geometry must be the first field
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     */
+    public void testCreateSchemaTwoGeometry() {
+        initDS(dataPath);
+
+        try {
+            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("newschema");
+            builder.addType(AttributeTypeFactory.newAttributeType("obj",
+                    LineString.class, true));
+            builder.addType(AttributeTypeFactory.newAttributeType("charfield",
+                    String.class, false, 25, ""));
+            builder.addType(AttributeTypeFactory.newAttributeType("obj2",
+                    LineString.class, true));
+            builder.addType(AttributeTypeFactory.newAttributeType("intfield",
+                    Integer.class, false, 0, new Integer(0)));
+
+            FeatureType newFT = builder.getFeatureType();
+
+            ds.createSchema(newFT);
+            fail("SchemaException expected"); // Only one geometry
+        } catch (Exception e) {
+        }
+    }
+
+    /**
      */
     public void testFeatureReaderFilter() {
         initDS(dataPath + "grafo"); // .mif
@@ -145,18 +226,19 @@ public class MIFDataStoreTest extends TestCase {
             FeatureType ft = ds.getSchema("grafo");
             int maxAttr = ft.getAttributeCount() - 1;
 
-            AttributeType[] ats = new AttributeType[ft.getAttributeCount()];
-
-            for (int i = 0; i < ats.length; i++) {
-                ats[i] = ft.getAttributeType(i);
+            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("grafo_new");
+            
+            for (int i = 0; i < ft.getAttributeCount(); i++) {
+                builder.addType(ft.getAttributeType(i));
             }
 
-            FeatureType newFT = FeatureTypeFactory.newFeatureType(ats,
-                    "grafo_new");
+            FeatureType newFT = builder.getFeatureType();
             ds.createSchema(newFT);
 
+            Transaction transaction = new DefaultTransaction(); // Transaction.AUTO_COMMIT; 
+
             FeatureWriter fw = ds.getFeatureWriterAppend("grafo_new",
-                    Transaction.AUTO_COMMIT);
+                    transaction);
             Feature f;
             FeatureReader fr = getFeatureReader("grafo",
                     "ID == 73690 || ID == 71045");
@@ -176,10 +258,13 @@ public class MIFDataStoreTest extends TestCase {
                 fw.write();
             }
 
+            transaction.commit();
+
             fw.close();
 
             assertEquals(counter, 2);
 
+            transaction = new DefaultTransaction(); // Transaction.AUTO_COMMIT;
             fw = ds.getFeatureWriter("grafo_new",
                     (Filter) ExpressionBuilder.parse("ID == 71045"),
                     Transaction.AUTO_COMMIT);
@@ -198,6 +283,22 @@ public class MIFDataStoreTest extends TestCase {
             assertEquals("F3", f.getAttribute("CLASSE"));
             assertEquals(73690, ((Integer) f.getAttribute("ID")).intValue());
             fr.close();
+
+            fw = ds.getFeatureWriterAppend("grafo_new", transaction);
+
+            f = fw.next();
+            f.setAttribute("ID", "99998");
+            f.setAttribute("NOMECOMUNE", "foo");
+            fw.write();
+
+            f = fw.next();
+            f.setAttribute("ID", "99999");
+            f.setAttribute("NOMECOMUNE", "bar");
+            fw.write();
+
+            transaction.commit();
+
+            fw.close();
         } catch (Exception e) {
             fail(e.getMessage());
         }

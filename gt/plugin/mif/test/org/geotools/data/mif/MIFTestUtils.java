@@ -102,6 +102,32 @@ public class MIFTestUtils {
     }
 
     /**
+     * 
+     * @param mifName MIF file to be deleted (no extension)
+     */
+    public static void safeDeleteMif(String mifName) {
+        File f;
+        try {
+            f = MIFFile.getFileHandler(new File(getDataPath()), mifName, ".mif", false);
+            if (f.exists()) f.delete();
+            f = MIFFile.getFileHandler(new File(getDataPath()), mifName, ".mid", false);
+            if (f.exists()) f.delete();
+        } catch (FileNotFoundException e) {
+        }
+    }
+  
+    /**
+     * Deletes temporary files in test-data
+     *
+     */
+    public static void cleanFiles() {
+        safeDeleteMif("grafo_new");
+        safeDeleteMif("grafo_out");
+        safeDeleteMif("mixed_wri");
+        safeDeleteMif("newschema");
+    }
+    
+    /**
      * DOCUMENT ME!
      *
      * @param f DOCUMENT ME!

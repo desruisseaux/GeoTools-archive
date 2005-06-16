@@ -23,6 +23,7 @@ import com.vividsolutions.jts.io.ParseException;
  * Simple tokenizer class
  *
  * @author Luca S. Percich, AMA-MI
+ * @version $Id: MIFStringTokenizer.java,v 1.5 2005/06/16 14:06:42 lpercich Exp $
  */
 public class MIFStringTokenizer {
     private String line = ""; // Current line buffer

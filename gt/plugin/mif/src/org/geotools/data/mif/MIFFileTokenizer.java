@@ -24,6 +24,7 @@ import java.io.IOException;
  * Simple tokenizer class for BufferedReaders
  *
  * @author Luca S. Percich, AMA-MI
+ * @version $Id: MIFFileTokenizer.java,v 1.4 2005/06/16 14:06:42 lpercich Exp $
  */
 public class MIFFileTokenizer extends MIFStringTokenizer {
     private BufferedReader reader = null;

@@ -17,10 +17,13 @@
 package org.geotools.data.mif;
 
 /**
- * Utility class for setting object values from strings
+ * <p>Utility class for setting object values from strings and vice-versa.</p>
+ * <p>The main use of this class is building a schema-dependent array of "parsers" which speed up the process of reading
+ * text lines and converting them into features.</p>
  *
  * @author Luca S. Percich, AMA-MI
- */
+ * @version $Id: MIFValueSetter.java,v 1.4 2005/06/16 14:06:42 lpercich Exp $
+*/
 public abstract class MIFValueSetter {
     protected String strValue = null; // The object value as string
     protected Object objValue = null; // the object value
@@ -28,7 +31,7 @@ public abstract class MIFValueSetter {
     private String errorMessage = "";
 
     /**
-     * The constructor accepts a default value for the ValueSetter
+     * <p>The constructor accepts a default value for the ValueSetter.</p>
      *
      * @param defa String representation of the default value
      */
@@ -37,8 +40,8 @@ public abstract class MIFValueSetter {
     }
 
     /**
-     * Sets the value as a String. After a setString call, getValue() can be
-     * used to access the converted value.
+     * <p>Sets the value as a String. After a setString call, getValue() can be
+     * used to access the converted value.</p>
      *
      * @param value String representation of the object value
      *
@@ -68,7 +71,7 @@ public abstract class MIFValueSetter {
     }
 
     /**
-     * Returns the string value
+     * <p>Returns the string value.</p>
      *
      * @return
      */
@@ -77,7 +80,7 @@ public abstract class MIFValueSetter {
     }
 
     /**
-     * Sets the object value, and calculates the String value.
+     * <p>Sets the object value, and calculates the String value.</p>
      *
      * @param value The Object value
      */
@@ -87,7 +90,7 @@ public abstract class MIFValueSetter {
     }
 
     /**
-     * Gets the object value
+     * <p>Gets the object value.</p>
      *
      * @return
      */
@@ -96,7 +99,7 @@ public abstract class MIFValueSetter {
     }
 
     /**
-     * Gets and resets the current error message.
+     * <p>Gets and resets the current error message.</p>
      *
      * @return The current error message, "" if none
      */
@@ -108,8 +111,8 @@ public abstract class MIFValueSetter {
     }
 
     /**
-     * Converts an object value to string - the default implementation uses
-     * toString for non-null values
+     * <p>Converts an object value to string - the default implementation uses
+     * toString for non-null values.</p>
      */
     protected void valueToString() {
         // String.valueOf() would yeld "null"
@@ -121,11 +124,11 @@ public abstract class MIFValueSetter {
     }
 
     /**
-     * This method must be overridden by descendants in order to implement the
+     * <p>This method must be overridden by descendants in order to implement the
      * correct conversion between strings and object values. <br>
-     * Must raise an exception if conversion failed
+     * Must throw an exception if conversion failed</p>.
      *
-     * @throws Exception if Value conversion failed
+     * @throws Exception if value conversion failed
      */
     protected abstract void stringToValue() throws Exception;
 }

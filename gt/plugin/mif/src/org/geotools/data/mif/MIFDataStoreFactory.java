@@ -16,13 +16,16 @@
  */
 package org.geotools.data.mif;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFactorySpi;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**
@@ -30,33 +33,22 @@ import java.util.Map;
  * 
  * <ul>
  * <li>
- * PARAM_DBTYPE = "mif"
+ * MIFDataStore.PARAM_DBTYPE: String, must be "mif"
  * </li>
  * <li>
- * PARAM_PATH = full path of the directory containing MIF files, or path of a
- * single mif file
+ * MIFDataStore.PARAM_PATH: String, full path of the directory containing MIF
+ * files, or path of a single mif file (with or without .mif extension)
  * </li>
  * </ul>
  * 
- * Optional parameters:
- * 
- * <ul>
- * <li>
- * [PARAM_FIELDCASE] = "upper" | "lower" | "" (or not defined)
- * </li>
- * <li>
- * [PARAM_GEOMNAME] defaults to "the_geom"
- * </li>
- * <li>
- * [PARAM_GEOMFACTORY]
- * </li>
- * <li>
- * [PARAM_GEOMTYPE]
- * </li>
- * </ul>
- * 
+ * <p>
+ * For a full description of creation parameters, see MIFDataStore().
+ * </p>
  *
  * @author Luca S. Percich, AMA-MI
+ * @version $Id: MIFDataStoreFactory.java,v 1.7 2005/06/16 14:06:42 lpercich Exp $
+ *
+ * @see MIFDataStore#MIFDataStore(String, HashMap);
  */
 public class MIFDataStoreFactory implements DataStoreFactorySpi {
     // DataStore - specific parameters
@@ -173,21 +165,31 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
         }
     }
 
-    /*
-     * What is this method supposed to do????
+    /**
+     * <p>
+     * As the creation of new MIF files is simply achieved by createSchema()
+     * calls, this method simply calls createDataStore().
+     * </p>
+     *
+     * @param params The parameter map
+     *
+     * @return the MIFDataStore instance returned by createDataStore(params)
+     *
+     * @throws IOException
+     * @see createDataStore(Map);
      */
     public DataStore createNewDataStore(Map params) throws IOException {
         return createDataStore(params); // return null????
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.geotools.data.DataStoreFactorySpi#getDescription()
      */
     public String getDescription() {
         return "MapInfo MIF/MID format datastore";
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
@@ -201,7 +203,7 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
         return params;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.geotools.data.DataStoreFactorySpi#canProcess(java.util.Map)
      */
     public boolean canProcess(Map params) {
@@ -233,18 +235,23 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
         return true;
     }
 
-    /* (non-Javadoc)
+    /**
+     * <p>
+     * This method always returns true, because no specific libraries are required by MIFDataStore.
+     * </p>
+     *
      * @see org.geotools.data.DataStoreFactorySpi#isAvailable()
      */
     public boolean isAvailable() {
         return true;
     }
 
-    /* (non-Javadoc)
+    /**
+     * <p>Always return Collections#EMPTY_MAP, because no hints are available for now.</p>
      * @see org.geotools.factory.Factory#getImplementationHints()
      */
     public Map getImplementationHints() {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO Check possible use of hints for GeometryFactory, SRID.
+        return Collections.EMPTY_MAP;
     }
 }

@@ -16,16 +16,18 @@
  */
 package org.geotools.data.mif;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataStoreFactorySpi.Param;
-import java.io.IOException;
-import java.util.HashMap;
 
 
 /**
- * DOCUMENT ME!
+ * TestCase class for MIFDataStoreFactory
  *
  * @author Luca S. Percich, AMA-MI
  */
@@ -50,19 +52,34 @@ public class MIFDataStoreFactoryTest extends TestCase {
      * @see TestCase#tearDown()
      */
     protected void tearDown() throws Exception {
-        super.tearDown();
         dsFactory = null;
+        super.tearDown();
     }
 
     /**
-     * DOCUMENT ME!
      */
     public void testGetDisplayName() {
         assertEquals("MIFDataStore", dsFactory.getDisplayName());
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a MIFDataStore using DataStoreFinder
+     */
+    public void testDataStoreFinder() {
+        DataStore ds = null;
+
+        try {
+            ds = DataStoreFinder.getDataStore(MIFTestUtils.getParams("mif",
+                        MIFTestUtils.getDataPath()));
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        assertNotNull(ds);
+        assertEquals(true, ds.getClass() == MIFDataStore.class);
+    }
+
+    /**
      */
     public void testCreateDataStore() {
         DataStore ds = null;
@@ -79,7 +96,6 @@ public class MIFDataStoreFactoryTest extends TestCase {
     }
 
     /**
-     * DOCUMENT ME!
      */
     public void testGetDescription() {
         assertEquals("MapInfo MIF/MID format datastore",
@@ -87,12 +103,33 @@ public class MIFDataStoreFactoryTest extends TestCase {
     }
 
     /**
-     * DOCUMENT ME!
+     * Test the canProcess() method with different sets of (possibly wrong)
+     * parameters
      */
-    public void testCanProcess() {
+    public void testCanProcessPath() {
         String dataPath = MIFTestUtils.getDataPath();
+
+        // Opens the test-data directory
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif", dataPath)));
+    }
+
+    /**
+     */
+    public void testCanProcessWrongDBType() {
+        String dataPath = MIFTestUtils.getDataPath();
+
+        // fails because dbtype != "mif"
+        assertEquals(false,
+            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", dataPath)));
+    }
+
+    /**
+     */
+    public void testCanProcessMIF() {
+        String dataPath = MIFTestUtils.getDataPath();
+
+        // Opens a single mif file; works with or without extension, and regardless the extension's case.
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
                     dataPath + "grafo")));
@@ -102,25 +139,31 @@ public class MIFDataStoreFactoryTest extends TestCase {
         assertEquals(true,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
                     dataPath + "grafo.mif")));
+    }
+
+    /**
+     */
+    public void testCanProcessWrongPath() {
+        String dataPath = MIFTestUtils.getDataPath();
+
+        // Fails because an extension other than ".mif" was specified
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
                     dataPath + "grafo.zip")));
-        assertEquals(false,
-            dsFactory.canProcess(MIFTestUtils.getParams("miffooobar", dataPath)));
+
+        // fails because the path is non-existent
         assertEquals(false,
             dsFactory.canProcess(MIFTestUtils.getParams("mif",
                     dataPath + "some/non/existent/path/")));
     }
 
     /**
-     * DOCUMENT ME!
      */
     public void testIsAvailable() {
         assertEquals(true, dsFactory.isAvailable());
     }
 
     /**
-     * DOCUMENT ME!
      */
     public void testGetParametersInfo() {
         Param[] pars = dsFactory.getParametersInfo();
@@ -132,6 +175,6 @@ public class MIFDataStoreFactoryTest extends TestCase {
      * DOCUMENT ME!
      */
     public void testGetImplementationHints() {
-        // TODO Hints still missing
+        assertNotNull(dsFactory.getImplementationHints());
     }
 }

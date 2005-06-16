@@ -33,7 +33,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.AttributeTypes;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
 import java.io.BufferedReader;
 import java.io.File;
@@ -75,6 +75,7 @@ import java.util.logging.Logger;
  *
  * @author Luca S. Percich, AMA-MI
  * @author Paolo Rizzi, AMA-MI
+ * @version $Id: MIFFile.java,v 1.11 2005/06/16 15:57:43 lpercich Exp $
  */
 public class MIFFile {
     // Geometry type identifier constants 
@@ -589,7 +590,7 @@ public class MIFFile {
             return "Char(" + l + ")";
         } else if (at.getType() == Integer.class) {
             return "Integer";
-        } else if (at.getType() == Double.class) {
+        } else if (at.getType() == Double.class || at.getType() == Float.class) {
             return "Float";
         } else if (at.getType() == Boolean.class) {
             return "Logical";
@@ -859,9 +860,13 @@ public class MIFFile {
                         String typeName = mifFile.getName();
                         typeName = typeName.substring(0, typeName.indexOf("."));
 
-                        // TODO switch to FeatureTypeBuilder
-                        setSchema(FeatureTypeFactory.newFeatureType(columns,
-                                typeName));
+                        FeatureTypeBuilder builder = FeatureTypeBuilder
+                            .newInstance(typeName);
+
+                        for (int i = 0; i < columns.length; i++)
+                            builder.addType(columns[i]);
+
+                        setSchema(builder.getFeatureType());
                     } catch (SchemaException schexp) {
                         throw new SchemaException(
                             "Exception creating feature type from MIF header: "
@@ -936,8 +941,10 @@ public class MIFFile {
      * Gets the ValueSetters
      *
      * @return An array of valueSetters to be used for IO operations
+     *
+     * @throws SchemaException An attribute of an unsupported type was found.
      */
-    private MIFValueSetter[] getValueSetters() {
+    private MIFValueSetter[] getValueSetters() throws SchemaException {
         MIFValueSetter[] fieldValueSetters = new MIFValueSetter[numAttribs];
 
         for (int i = 0; i < featureType.getAttributeCount(); i++) {
@@ -958,6 +965,18 @@ public class MIFFile {
                             protected void stringToValue()
                                 throws Exception {
                                 objValue = new Double(strValue);
+                            }
+
+                            protected void valueToString() {
+                                // TODO use DecimalFormat class!!!
+                                super.valueToString();
+                            }
+                        };
+            } else if (atc == Float.class) {
+                fieldValueSetters[i] = new MIFValueSetter("0") {
+                            protected void stringToValue()
+                                throws Exception {
+                                objValue = new Float(strValue);
                             }
 
                             protected void valueToString() {
@@ -1011,7 +1030,7 @@ public class MIFFile {
                                 }
                             }
                         };
-            } else {
+            } else if (atc == String.class) {
                 fieldValueSetters[i] = new MIFValueSetter("") {
                             protected void stringToValue()
                                 throws Exception {
@@ -1025,6 +1044,9 @@ public class MIFFile {
                                             "\"\"") + "\"");
                             }
                         };
+            } else {
+                throw new SchemaException("Unsupported attribute type: "
+                    + atc.getName());
             }
         }
 
@@ -1074,7 +1096,13 @@ public class MIFFile {
         private Reader(MIFFileTokenizer mifTokenizer,
             MIFFileTokenizer midTokenizer) throws IOException {
             inputBuffer = new Object[numAttribs];
-            fieldValueSetters = getValueSetters();
+
+            try {
+                fieldValueSetters = getValueSetters();
+            } catch (SchemaException e) {
+                throw new IOException(e.getMessage());
+            }
+
             mif = mifTokenizer;
             mid = midTokenizer;
             inputFeature = readFeature();
@@ -1442,7 +1470,13 @@ public class MIFFile {
         private Writer(PrintStream mif, PrintStream mid, boolean append)
             throws IOException {
             innerReader = getFeatureReader();
-            fieldValueSetters = getValueSetters();
+
+            try {
+                fieldValueSetters = getValueSetters();
+            } catch (SchemaException e) {
+                throw new IOException(e.getMessage());
+            }
+
             outMif = mif;
             outMid = mid;
 
