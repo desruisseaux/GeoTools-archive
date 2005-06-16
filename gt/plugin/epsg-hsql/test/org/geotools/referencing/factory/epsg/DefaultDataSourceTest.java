@@ -144,6 +144,13 @@ public class DefaultDataSourceTest extends TestCase {
                 "This is a normal failure when no EPSG database is available on the current machine.\n" +
                 "No test will be performed for this class.");
         }
+        if (factory.getDataSource() instanceof HSQLDataSource) {
+            factory = null;
+            noConnection = true;
+            Logger.getLogger("org.geotools.referencing").info(
+                "No data source other than HSQL found.\n" +
+                "Skip this suite, since HSQL data source will be tested by an other suite.");
+        }
     }
 
     /**
