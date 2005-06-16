@@ -39,6 +39,16 @@
       <version>2.2.x</version>
     </dependency>
     <dependency>
+      <id>units</id>
+      <version>0.01</version>
+      <url>http://jsr-108.sourceforge.net</url>
+    </dependency>
+    <dependency>
+      <id>vecmath</id>
+      <version>1.3</version>
+      <url>http://java.sun.com/products/java-media/3D/</url>
+    </dependency>
+    <dependency>
       <artifactId>hsqldb</artifactId>
       <groupId>hsql</groupId>
       <version>1.7.3</version>
@@ -60,9 +70,6 @@
       <includes>
         <include>**/*Test.java</include>
       </includes>
-      <excludes>
-        <exclude>**/HSQLDataSourceTest.java</exclude>
-      </excludes>
       <resources>
         <resource>
           <directory>${basedir}/test</directory>
