@@ -55,24 +55,6 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
     private static final long serialVersionUID = 3337659819553899435L;
 
     /**
-     * Key for the <code>{@value #VALID_AREA_PROPERTY}</code> property to be given to the
-     * {@linkplain #AbstractReferenceSystem(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getValidArea()}.
-     *
-     * @deprecated Replaced by {@link #VALID_AREA_KEY}.
-     */
-    public static final String VALID_AREA_PROPERTY = VALID_AREA_KEY;
-
-    /**
-     * Key for the <code>{@value #SCOPE_PROPERTY}</code> property to be given to the
-     * {@linkplain #AbstractReferenceSystem(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getScope()}.
-     *
-     * @deprecated Replaced by {@link #SCOPE_KEY}.
-     */
-    public static final String SCOPE_PROPERTY = SCOPE_KEY;
-
-    /**
      * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {SCOPE_KEY};

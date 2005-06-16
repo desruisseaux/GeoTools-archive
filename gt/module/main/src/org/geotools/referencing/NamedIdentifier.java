@@ -80,45 +80,9 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     private static final long serialVersionUID = 8474731565582774497L;
 
     /**
-     * Key for the <code>{@value #CODE_PROPERTY}</code> property to be given to the
-     * {@linkplain #NamedIdentifier(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getCode()}.
-     *
-     * @deprecated Replaced by {@link #CODE_KEY}.
-     */
-    public static final String CODE_PROPERTY = CODE_KEY;
-
-    /**
-     * Key for the <code>{@value #AUTHORITY_PROPERTY}</code> property to be given to the
-     * {@linkplain #NamedIdentifier(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getAuthority()}.
-     *
-     * @deprecated Replaced by {@link #AUTHORITY_KEY}.
-     */
-    public static final String AUTHORITY_PROPERTY = AUTHORITY_KEY;
-
-    /**
-     * Key for the <code>{@value #VERSION_PROPERTY}</code> property to be given to the
-     * {@linkplain #NamedIdentifier(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getVersion()}.
-     *
-     * @deprecated Replaced by {@link #VERSION_KEY}.
-     */
-    public static final String VERSION_PROPERTY = VERSION_KEY;
-
-    /**
      * @todo Replace by static import once we are allowed to compile for J2SE 1.5.
      */
     private static final String REMARKS_KEY = org.opengis.referencing.IdentifiedObject.REMARKS_KEY;
-    
-    /**
-     * Key for the <code>{@value #REMARKS_PROPERTY}</code> property to be given to the
-     * {@linkplain #NamedIdentifier(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getRemarks()}.
-     *
-     * @deprecated Replaced by {@link org.opengis.referencing.IdentifiedObject#REMARKS_KEY}.
-     */
-    public static final String REMARKS_PROPERTY = REMARKS_KEY;
 
     /**
      * A pool of {@link LocalName} values for given {@link InternationalString}.

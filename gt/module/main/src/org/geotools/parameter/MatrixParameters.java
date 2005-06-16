@@ -169,15 +169,6 @@ public class MatrixParameters extends ParameterGroup implements ParameterDescrip
     }
 
     /**
-     * Returns the parameter for the given name.
-     *
-     * @deprecated Use {@link #descriptor(String)} instead.
-     */
-    public ParameterDescriptor getParameter(final String name) throws ParameterNotFoundException {
-        return (ParameterDescriptor) descriptor(name);
-    }
-
-    /**
      * Returns the value in this group for the specified name. The name can be a matrix element
      * if it uses the following syntax: <code>"elt_<var>row</var>_<var>col</var>"</code> where
      * <code>"elt_"</code> is the {@linkplain MatrixParameterDescriptors#prefix prefix} for all

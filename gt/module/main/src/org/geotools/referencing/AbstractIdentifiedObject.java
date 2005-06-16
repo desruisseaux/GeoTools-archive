@@ -104,42 +104,6 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      * </pre></blockquote>
      */
     public static final GenericName[] EMPTY_ALIAS_ARRAY = new GenericName[0];
-
-    /**
-     * Key for the <code>{@value #NAME_PROPERTY}</code> property to be given to the
-     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getName}.
-     *
-     * @deprecated Replaced by {@link #NAME_KEY}.
-     */
-    public static final String NAME_PROPERTY = NAME_KEY;
-
-    /**
-     * Key for the <code>{@value #ALIAS_PROPERTY}</code> property to be given to the
-     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getAlias()}.
-     *
-     * @deprecated Replaced by {@link #ALIAS_KEY}.
-     */
-    public static final String ALIAS_PROPERTY = ALIAS_KEY;
-
-    /**
-     * Key for the <code>{@value #IDENTIFIERS_PROPERTY}</code> property to be given to the
-     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getIdentifiers()}.
-     *
-     * @deprecated Replaced by {@link #IDENTIFIERS_KEY}.
-     */
-    public static final String IDENTIFIERS_PROPERTY = IDENTIFIERS_KEY;
-    
-    /**
-     * Key for the <code>{@value #REMARKS_PROPERTY}</code> property to be given to the
-     * {@linkplain #AbstractIdentifiedObject(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getRemarks()}.
-     *
-     * @deprecated Replaced by {@link #REMARKS_KEY}.
-     */
-    public static final String REMARKS_PROPERTY = REMARKS_KEY;
    
     /**
      * A comparator for sorting identified objects by {@linkplain #getName name}.

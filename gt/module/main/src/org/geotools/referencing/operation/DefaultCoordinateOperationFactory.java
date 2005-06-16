@@ -169,32 +169,6 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     }
 
     /**
-     * Constructs a coordinate operation factory from the specified math transform factory.
-     *
-     * @param mtFactory The math transform factory to use.
-     *
-     * @deprecated Use {@link #DefaultCoordinateOperationFactory(Hints)} instead.
-     */
-    public DefaultCoordinateOperationFactory(final MathTransformFactory mtFactory) {
-        super(mtFactory);
-        molodenskiMethod  = "Molodenski";
-        lenientDatumShift = false;
-    }
-
-    /**
-     * Constructs a coordinate operation factory from a group of factories.
-     *
-     * @param factories The factories to use.
-     *
-     * @deprecated Use {@link #DefaultCoordinateOperationFactory(Hints)} instead.
-     */
-    public DefaultCoordinateOperationFactory(final FactoryGroup factories) {
-        super(factories);
-        molodenskiMethod  = "Molodenski";
-        lenientDatumShift = false;
-    }
-
-    /**
      * Returns an operation for conversion or transformation between two coordinate reference
      * systems. If an operation exists, it is returned. If more than one operation exists, the
      * default is returned. If no operation exists, then the exception is thrown.

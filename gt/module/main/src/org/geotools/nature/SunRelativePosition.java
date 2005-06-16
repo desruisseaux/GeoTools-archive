@@ -497,21 +497,6 @@ public class SunRelativePosition {
     }
 
     /**
-     * Calculates solar position for the specified date, time and location.
-     * Results are reported in azimuth and elevation in degrees.
-     *
-     * @param longitude Longitude in degrees.
-     * @param latitude  Latitude in degrees.
-     * @param date      Date, GMT timezone.
-     *
-     * @deprecated Use {@link #setCoordinate(double,double)} and {@link #setDate(Date)} instead.
-     */
-    public void compute(double longitude, double latitude, final Date date) {
-        setCoordinate(longitude, latitude);
-        setDate(date);
-    }
-
-    /**
      * Set the geographic coordinate where to compute the {@linkplain #getElevation elevation}
      * and {@linkplain #getAzimuth azimuth}.
      *

@@ -69,19 +69,6 @@ public class DefaultPolarCS extends AbstractCS implements PolarCS {
     }
 
     /**
-     * Constructs a coordinate system from a name.
-     *
-     * @param name  The coordinate system name.
-     * @param axis  The set of axis.
-     *
-     * @deprecated Use the method with a pre-defined number of axis
-     *             (for enforcing compile-time check).
-     */
-    public DefaultPolarCS(final String name, final CoordinateSystemAxis[] axis) {
-        super(name, axis);
-    }
-
-    /**
      * Constructs a two-dimensional coordinate system from a name.
      *
      * @param name  The coordinate system name.

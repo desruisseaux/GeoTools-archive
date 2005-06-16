@@ -66,15 +66,6 @@ public class DefaultOperationMethod extends AbstractIdentifiedObject implements 
     private static final long serialVersionUID = -98032729598205972L;
 
     /**
-     * Key for the <code>{@value #FORMULA_PROPERTY}</code> property to be given to the
-     * {@linkplain #DefaultOperationMethod(Map,int,int,ParameterDescriptorGroup) constructor}.
-     * This is used for setting the value to be returned by {@link #getFormula}.
-     *
-     * @deprecated Replaced by {@link #FORMULA_KEY}.
-     */
-    public static final String FORMULA_PROPERTY = FORMULA_KEY;
-
-    /**
      * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {FORMULA_KEY};

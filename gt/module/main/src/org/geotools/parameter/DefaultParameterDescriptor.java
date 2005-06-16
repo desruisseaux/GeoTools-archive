@@ -191,31 +191,6 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
     }
 
     /**
-     * Constructs a mandatory parameter from a range of comparable objects.
-     *
-     * @param name The parameter name.
-     * @param valueClass The class that describe the type of the parameter.
-     * @param defaultValue The default value for the parameter, or {@code null}.
-     * @param minimum The minimum parameter value, or {@code null}.
-     * @param maximum The maximum parameter value, or {@code null}.
-     * @param unit    The unit for default, minimum and maximum values, or {@code null}.
-     *
-     * @deprecated This constructor add little benefit compared to the full constructor.
-     *             In other words, this "convenience" constructor doesn't save much typing.
-     *             It will be removed in a future version, in order to simplify the API.
-     */
-    public DefaultParameterDescriptor(final String     name,
-                                      final Class      valueClass,
-                                      final Comparable defaultValue,
-                                      final Comparable minimum,
-                                      final Comparable maximum,
-                                      final Unit       unit)
-    {
-        this(Collections.singletonMap(NAME_KEY, name),
-             valueClass, null, defaultValue, minimum, maximum, unit, true);
-    }
-
-    /**
      * Constructs a parameter for a name and a default value. The parameter type will
      * be assumed the same than the default value class.
      * 
@@ -354,6 +329,9 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * Constructs a parameter from a set of properties. The properties map is
      * given unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
      * super-class constructor}.
+     * <p>
+     * This constructor assumes that minimum, maximum and default values are
+     * already replaced by their cached values, if available.
      *
      * @param properties Set of properties. Should contains at least <code>"name"</code>.
      * @param required {@code true} if this parameter is required, or {@code false}
@@ -366,25 +344,15 @@ public class DefaultParameterDescriptor extends AbstractParameterDescriptor
      * @param minimum The minimum parameter value, or {@code null}.
      * @param maximum The maximum parameter value, or {@code null}.
      * @param unit    The unit for default, minimum and maximum values.
-     *
-     * @deprecated Use the constructor with {@code required} as the last argument
-     *             instead. This is just a change in the order of arguments, which was
-     *             performed for consistency with other constructors.
-     *
-     * @todo Do not delete this constructor. Turn it into a private one instead, because
-     *       it is invoked by other constructors in this class.
-     *
-     *       This constructor assumes that minimum, maximum and default values are
-     *       already replaced by their cached values, if available.
      */
-    public DefaultParameterDescriptor(final Map        properties,
-                                      final boolean    required,
-                                            Class      valueClass,
-                                      final Object[]   validValues,
-                                      final Object     defaultValue,
-                                      final Comparable minimum,
-                                      final Comparable maximum,
-                                      final Unit       unit)
+    private DefaultParameterDescriptor(final Map        properties,
+                                       final boolean    required,
+                                             Class      valueClass,
+                                       final Object[]   validValues,
+                                       final Object     defaultValue,
+                                       final Comparable minimum,
+                                       final Comparable maximum,
+                                       final Unit       unit)
     {
         super(properties, required ? 1 : 0, 1);
         this.primitiveClass = valueClass;

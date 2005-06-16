@@ -93,14 +93,6 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
     public static final String BURSA_WOLF_KEY = "bursaWolf";
 
     /**
-     * The <code>{@value #BURSA_WOLF_PROPERTY}</code> property for
-     * {@linkplain #getAffineTransform datum shifts}.
-     *
-     * @deprecated Renamed as {@link #BURSA_WOLF_KEY}.
-     */
-    public static final String BURSA_WOLF_PROPERTY = BURSA_WOLF_KEY;
-
-    /**
      * The ellipsoid.
      */
     private final Ellipsoid ellipsoid;

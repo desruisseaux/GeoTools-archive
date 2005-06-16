@@ -97,46 +97,6 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
     public static final PositionalAccuracy[] EMPTY_ACCURACY_ARRAY = new PositionalAccuracy[0];
 
     /**
-     * Key for the <code>{@value #OPERATION_VERSION_PROPERTY}</code> property to be given
-     * to the {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
-     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
-     * for setting the value to be returned by {@link #getOperationVersion}.
-     *
-     * @deprecated Replaced by {@link #OPERATION_VERSION_KEY}.
-     */
-    public static final String OPERATION_VERSION_PROPERTY = OPERATION_VERSION_KEY;
-
-    /**
-     * Key for the <code>{@value #POSITIONAL_ACCURACY_PROPERTY}</code> property to be given
-     * to the {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
-     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
-     * for setting the value to be returned by {@link #getPositionalAccuracy}.
-     *
-     * @deprecated Replaced by {@link #POSITIONAL_ACCURACY_KEY}.
-     */
-    public static final String POSITIONAL_ACCURACY_PROPERTY = POSITIONAL_ACCURACY_KEY;
-
-    /**
-     * Key for the <code>{@value #VALID_AREA_PROPERTY}</code> property to be given
-     * to the {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
-     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
-     * for setting the value to be returned by {@link #getValidArea}.
-     *
-     * @deprecated Replaced by {@link #VALID_AREA_KEY}.
-     */
-    public static final String VALID_AREA_PROPERTY = VALID_AREA_KEY;
-
-    /**
-     * Key for the <code>{@value #SCOPE_PROPERTY}</code> property to be given to the
-     * {@linkplain #AbstractCoordinateOperation(Map, CoordinateReferenceSystem,
-     * CoordinateReferenceSystem, MathTransform) constructor}. This is used
-     * for setting the value to be returned by {@link #getScope}.
-     *
-     * @deprecated Replaced by {@link #SCOPE_KEY}.
-     */
-    public static final String SCOPE_PROPERTY = SCOPE_KEY;
-
-    /**
      * List of localizable properties. To be given to {@link AbstractIdentifiedObject} constructor.
      */
     private static final String[] LOCALIZABLES = {SCOPE_KEY};

@@ -159,23 +159,6 @@ public class DefaultMathTransformFactory implements MathTransformFactory {
     }
 
     /**
-     * Returns a set of all available methods for {@linkplain MathTransform math transform}. For
-     * each element in this set, the {@linkplain OperationMethod#getName operation method name}
-     * must be known to the {@link #getDefaultParameters} method in this factory.
-     * The set of available methods is implementation dependent.
-     *
-     * @return All {@linkplain MathTransform math transform} methods available in this factory.
-     *
-     * @deprecated Replaced by {@link #getAvailableMethods}. The old name was misleading, since
-     *             a transform is an instantiation of an operation method with a given set of
-     *             parameters. There is usually much less operation method in a system than
-     *             transforms.
-     */
-    public Set getAvailableTransforms() {
-        return getAvailableMethods(Operation.class);
-    }
-
-    /**
      * Returns a set of available methods for {@linkplain MathTransform math transforms}. For
      * each element in this set, the {@linkplain OperationMethod#getName operation method name}
      * must be known to the {@link #getDefaultParameters} method in this factory.

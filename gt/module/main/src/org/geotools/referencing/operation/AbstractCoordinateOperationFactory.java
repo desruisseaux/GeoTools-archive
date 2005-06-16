@@ -196,32 +196,6 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     }
 
     /**
-     * Constructs a coordinate operation factory from a group of factories.
-     *
-     * @param factories The factories to use.
-     *
-     * @deprecated Use {@link #AbstractCoordinateOperationFactory(Hints)} instead.
-     */
-    public AbstractCoordinateOperationFactory(final FactoryGroup factories) {
-        ensureNonNull("factories", factories);
-        this.factories = factories;
-        mtFactory = factories.getMathTransformFactory();
-    }
-
-    /**
-     * Constructs a coordinate operation factory from a math transform.
-     *
-     * @param mtFactory The math transform factory to use.
-     *
-     * @deprecated Use {@link #AbstractCoordinateOperationFactory(Hints)} instead.
-     */
-    public AbstractCoordinateOperationFactory(final MathTransformFactory mtFactory) {
-        this.mtFactory = mtFactory;
-        ensureNonNull("mtFactory", mtFactory);
-        factories = new FactoryGroup(null, null, null, mtFactory);
-    }
-
-    /**
      * Returns the underlying math transform factory. This factory
      * is used for constructing {@link MathTransform} objects for
      * all {@linkplain CoordinateOperation coordinate operations}.

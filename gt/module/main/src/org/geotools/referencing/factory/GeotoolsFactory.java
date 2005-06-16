@@ -1068,10 +1068,10 @@ public class GeotoolsFactory extends AbstractFactory
      *
      * @deprecated Use {@link FactoryGroup#createProjectedCRS} instead.
      */
-    public ProjectedCRS createProjectedCRS(Map                 properties,
-                                           GeographicCRS             base,
-                                           ParameterValueGroup parameters,
-                                           CartesianCS          derivedCS)
+    private ProjectedCRS createProjectedCRS(Map                 properties,
+                                            GeographicCRS             base,
+                                            ParameterValueGroup parameters,
+                                            CartesianCS          derivedCS)
             throws FactoryException
     {
         return new FactoryGroup(this, this, this, null).createProjectedCRS(
@@ -1087,7 +1087,7 @@ public class GeotoolsFactory extends AbstractFactory
      *
      * @deprecated This method will be removed.
      */
-    public ParameterValueGroup getDefaultParameters(final String method)
+    private ParameterValueGroup getDefaultParameters(final String method)
             throws NoSuchIdentifierException
     {
         return FactoryFinder.getMathTransformFactory(null).getDefaultParameters(method);

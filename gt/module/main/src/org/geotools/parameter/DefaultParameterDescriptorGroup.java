@@ -261,16 +261,6 @@ public class DefaultParameterDescriptorGroup extends AbstractParameterDescriptor
         throw new ParameterNotFoundException(Resources.format(
                   ResourceKeys.ERROR_MISSING_PARAMETER_$1, name), name);
     }
-
-    /**
-     * Returns the first parameter in this group for the specified {@linkplain Identifier#getCode
-     * identifier code}.
-     *
-     * @deprecated Use {@link #descriptor} instead.
-     */
-    public ParameterDescriptor getParameter(String name) throws ParameterNotFoundException {
-        return (ParameterDescriptor) descriptor(name);
-    }
     
     /**
      * Compares the specified object with this parameter group for equality.

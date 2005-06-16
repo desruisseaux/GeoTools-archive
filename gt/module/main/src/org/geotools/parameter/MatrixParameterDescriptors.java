@@ -339,15 +339,6 @@ public class MatrixParameterDescriptors extends DefaultParameterDescriptorGroup 
     }
 
     /**
-     * Returns the descriptor for the specified name.
-     *
-     * @deprecated Use {@link #descriptor(String)} instead.
-     */
-    public final ParameterDescriptor getParameter(String name) {
-        return (ParameterDescriptor) descriptor(name);
-    }
-
-    /**
      * Creates a new instance of {@linkplain MatrixParameters parameter values} with
      * elements initialized to the 1 on the diagonal, and 0 everywere else. The returned
      * parameter group is extensible, i.e. the number of elements will depends upon the

@@ -146,16 +146,6 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
-     * Returns the low-level {@linkplain ObjectFactory object factory} used for
-     * {@linkplain #createObject object creation}.
-     *
-     * @deprecated Will be removed.
-     */
-    public final org.opengis.referencing.ObjectFactory getObjectFactory() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * Returns an arbitrary object from a code. The returned object will typically be an instance
      * of {@link Datum}, {@link CoordinateSystem}, {@link CoordinateReferenceSystem} or
      * {@link CoordinateOperation}. The default implementation always throw an exception.
@@ -348,43 +338,6 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
         } catch (ClassCastException exception) {
             throw noSuchAuthorityCode(Extent.class, code, exception);
         }
-    }
-
-    /**
-     * Gets the Geoid code from a WKT name. 
-     * In the OGC definition of WKT horizontal datums, the geoid is
-     * referenced by a quoted string, which is used as a key value.  This
-     * method converts the key value string into a code recognized by this
-     * authority.
-     *
-     * @param wkt Name of geoid defined by OGC (e.g. "European_Datum_1950").
-     *
-     * @see #createGeodeticDatum
-     *
-     * @deprecated We should try to rely on the alias mechanism available in all
-     *             {@link IdentifiedObject} instead. If this method is really
-     *             needed, we can reinsert it later.
-     */
-    public String geoidFromWktName(String wkt) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Gets the WKT name of a Geoid. 
-     * In the OGC definition of WKT horizontal datums, the geoid is
-     * referenced by a quoted string, which is used as a key value.
-     * This method gets the OGC WKT key value from a geoid code.
-     *
-     * @param geoid Code value for geoid allocated by authority.
-     *
-     * @see #createGeodeticDatum
-     *
-     * @deprecated We should try to rely on the alias mechanism available in all
-     *             {@link IdentifiedObject} instead. If this method is really
-     *             needed, we can reinsert it later.
-     */
-    public String wktFromGeoidName(String geoid) {
-        throw new UnsupportedOperationException();
     }
 
     /**

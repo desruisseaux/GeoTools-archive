@@ -67,42 +67,6 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -4894180465652474930L;
-
-    /**
-     * Key for the <code>"anchorPoint"</code> property to be given to the
-     * {@linkplain #AbstractDatum(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getAnchorPoint()}.
-     *
-     * @deprecated Replaced by {@link #ANCHOR_POINT_KEY}.
-     */
-    public static final String ANCHOR_POINT_PROPERTY = ANCHOR_POINT_KEY;
-
-    /**
-     * Key for the <code>"realizationEpoch"</code> property to be given to the
-     * {@linkplain #AbstractDatum(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getRealizationEpoch()}.
-     *
-     * @deprecated Replaced by {@link #REALIZATION_EPOCH_KEY}.
-     */
-    public static final String REALIZATION_EPOCH_PROPERTY = REALIZATION_EPOCH_KEY;
-
-    /**
-     * Key for the <code>"validArea"</code> property to be given to the
-     * {@linkplain #AbstractDatum(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getValidArea()}.
-     *
-     * @deprecated Replaced by {@link #VALID_AREA_KEY}.
-     */
-    public static final String VALID_AREA_PROPERTY = VALID_AREA_KEY;
-
-    /**
-     * Key for the <code>"scope"</code> property to be given to the
-     * {@linkplain #AbstractDatum(Map) constructor}. This is used
-     * for setting the value to be returned by {@link #getScope()}.
-     *
-     * @deprecated Replaced by {@link #SCOPE_KEY}.
-     */
-    public static final String SCOPE_PROPERTY = SCOPE_KEY;
     
     /**
      * List of localizable properties. To be given to
