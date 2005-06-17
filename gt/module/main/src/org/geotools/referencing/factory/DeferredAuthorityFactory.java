@@ -152,9 +152,10 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
     }
 
     /**
-     * Set a timer for dispoding the backing store after the specified amount of milliseconds of
+     * Set a timer for disposing the backing store after the specified amount of milliseconds of
      * inactivity. The {@link #createBackingStore} method will be responsible for creating a new
-     * backing store when needed.
+     * backing store when needed. Note that the backing store disposal can be vetoed if
+     * {@link #canDisposeBackingStore} returns {@code false}.
      *
      * @param delay The minimal delay before to close the backing store. This delay is very
      *        approximative. The backing store will not be closed before, but may take as
@@ -169,7 +170,21 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
     }
 
     /**
-     * Releases resources immediately instead of waiting for the garbage collector.
+     * Returns {@code true} if the backing store can be disposed now. This method is invoked
+     * automatically after the amount of time specified by {@link #setTimeout} if the factory
+     * were not used during that time. The default implementation always returns {@code true}.
+     * Subclasses should override this method and returns {@code false} if they want to prevent
+     * the backing store disposal under some circonstances.
+     *
+     * @param backingStore The backing store in process of being disposed.
+     */
+    protected boolean canDisposeBackingStore(final AbstractAuthorityFactory backingStore) {
+        return true;
+    }
+
+    /**
+     * Releases resources immediately instead of waiting for the garbage collector. This
+     * method disposes the backing store regardeless of {@link #canDisposeBackingStore} value.
      */
     public synchronized void dispose() throws FactoryException {
         if (disposer != null) {
@@ -185,7 +200,7 @@ public abstract class DeferredAuthorityFactory extends BufferedAuthorityFactory
     private final class Disposer extends TimerTask {
         public void run() {
             synchronized (DeferredAuthorityFactory.this) {
-                if (used) {
+                if (used || !canDisposeBackingStore(backingStore)) {
                     used = false;
                     return;
                 }

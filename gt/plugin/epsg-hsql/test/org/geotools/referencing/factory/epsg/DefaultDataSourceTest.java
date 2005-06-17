@@ -19,6 +19,8 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
+import java.util.Set;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -38,6 +40,8 @@ import junit.framework.TestSuite;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.EngineeringCRS;
 import org.opengis.referencing.crs.GeocentricCRS;
@@ -51,6 +55,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.factory.epsg.DefaultFactory;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
@@ -177,6 +182,56 @@ public class DefaultDataSourceTest extends TestCase {
     }
 
     /**
+     * Tests the {@code getAuthorityCodes()} method.
+     */
+    public void testAuthorityCodes() throws FactoryException {
+        if (factory == null) return;
+        final Set crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        assertFalse(crs.isEmpty());
+        assertTrue(crs.size() > 0);
+        assertEquals("Check size() consistency", crs.size(), crs.size());
+
+        final Set geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
+        assertFalse(geographicCRS.isEmpty());
+        assertTrue(geographicCRS.size() > 0);
+        assertTrue(geographicCRS.size() < crs.size());
+        assertTrue(crs.containsAll(geographicCRS));
+        assertFalse(geographicCRS.containsAll(crs));
+
+        final Set projectedCRS = factory.getAuthorityCodes(ProjectedCRS.class);
+        assertFalse(projectedCRS.isEmpty());
+        assertTrue(projectedCRS.size() > 0);
+        assertTrue(projectedCRS.size() < crs.size());
+        assertTrue(crs.containsAll(projectedCRS));
+        assertFalse(projectedCRS.containsAll(crs));
+//        assertTrue(Collections.disjoint(geographicCRS, projectedCRS));
+        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+
+        final Set datum = factory.getAuthorityCodes(Datum.class);
+        assertFalse(datum.isEmpty());
+        assertTrue(datum.size() > 0);
+//        assertTrue(Collections.disjoint(datum, crs));
+        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+
+        final Set geodeticDatum = factory.getAuthorityCodes(GeodeticDatum.class);
+        assertFalse(geodeticDatum.isEmpty());
+        assertTrue(geodeticDatum.size() > 0);
+        assertTrue(datum.containsAll(geodeticDatum));
+        assertFalse(geodeticDatum.containsAll(datum));
+
+        // Ensures that the factory keept the set in its cache.
+        assertSame(crs,           factory.getAuthorityCodes(CoordinateReferenceSystem.class));
+        assertSame(geographicCRS, factory.getAuthorityCodes(            GeographicCRS.class));
+        assertSame(projectedCRS,  factory.getAuthorityCodes(             ProjectedCRS.class));
+        assertSame(datum,         factory.getAuthorityCodes(                    Datum.class));
+        assertSame(geodeticDatum, factory.getAuthorityCodes(            GeodeticDatum.class));
+        assertSame(geodeticDatum, factory.getAuthorityCodes(     DefaultGeodeticDatum.class));
+
+        // Try a dummy type.
+        assertTrue("Dummy type", factory.getAuthorityCodes(String.class).isEmpty());
+    }
+
+    /**
      * Returns the first identifier for the specified object.
      */
     private static String getIdentifier(final IdentifiedObject object) {
@@ -193,9 +248,22 @@ public class DefaultDataSourceTest extends TestCase {
         assertEquals("27581", getIdentifier(primary));
         assertTrue(primary instanceof ProjectedCRS);
         assertEquals(2, primary.getCoordinateSystem().getDimension());
-
+        /*
+         * Gets the CRS by name. It should be the same.
+         */
         byName = factory.createCoordinateReferenceSystem("NTF (Paris) / France I");
         assertEquals(primary, byName);
+        /*
+         * Gets the CRS using 'createObject'. It will requires ony more
+         * SQL statement internally in order to determines the object type.
+         */
+        factory.dispose(); // Clear the cache. This is not a real disposal.
+        assertEquals(primary, factory.createObject("27581"));
+        assertEquals(byName,  factory.createObject("NTF (Paris) / France I"));
+        /*
+         * Tests descriptions.
+         */
+        assertEquals("NTF (Paris) / France I", factory.getDescriptionText("27581").toString());
     }
 
     /**

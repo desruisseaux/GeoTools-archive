@@ -326,6 +326,20 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     }
 
     /**
+     * Returns {@code true} if the backing store can be disposed now. This method is invoked
+     * automatically after the amount of time specified by {@link #setTimeout} if the factory
+     * were not used during that time.
+     *
+     * @param backingStore The backing store in process of being disposed.
+     */
+    protected boolean canDisposeBackingStore(final AbstractAuthorityFactory backingStore) {
+        if (backingStore instanceof FactoryUsingSQL) {
+            return ((FactoryUsingSQL) backingStore).canDispose();
+        }
+        return super.canDisposeBackingStore(backingStore);
+    }
+
+    /**
      * Called when this factory is added to the given {@code category} of the given
      * {@code registry}. The object may already be registered under another category.
      */

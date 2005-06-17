@@ -39,7 +39,7 @@ import org.geotools.resources.Utilities;
  * {@code WeakValueHashMap} will automatically be removed when its value is no longer
  * in ordinary use. This class is similar to the standard {@link WeakHashMap} class provided
  * is J2SE, except that weak references are hold on values instead of keys.
- * <br><br>
+ * <p>
  * The {@code WeakValueHashMap} class is thread-safe.
  *
  * @version $Id$
@@ -84,7 +84,7 @@ public class WeakValueHashMap extends AbstractMap {
         int index;
 
         /**
-         * Construct a new weak reference.
+         * Constructs a new weak reference.
          */
         Entry(final Object key, final Object value, final Entry next, final int index) {
             super(value, WeakCollectionCleaner.DEFAULT.referenceQueue);
@@ -120,7 +120,8 @@ public class WeakValueHashMap extends AbstractMap {
         }
 
         /**
-         * Clear the reference.
+         * Clear the reference. The {@link WeakCollectionCleaner} requires that this method is
+         * overriden in order to remove this entry from the enclosing hash map.
          */
         public void clear() {
             super.clear();

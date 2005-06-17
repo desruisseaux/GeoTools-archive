@@ -33,14 +33,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
@@ -55,6 +58,7 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.GeocentricCRS;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
@@ -75,8 +79,12 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.OperationMethod;
+import org.opengis.referencing.operation.Transformation;
+import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.Projection;
+import org.opengis.metadata.Identifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
@@ -127,6 +135,7 @@ import org.geotools.util.ScopedName;
  * @author Yann Cézard
  * @author Martin Desruisseaux
  * @author Rueben Schulz
+ * @author Matthias Basler
  *
  * @since 2.1
  */
@@ -208,14 +217,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * List of tables and columns to test for codes values. The table contains tuples made of
-     * the following values:
-     * <ul>
-     *   <li>Table names.</li>
-     *   <li>Column name for the code (usually with the {@code "_CODE"} suffix).</li>
-     *   <li>Column name for the name (usually with the {@code "_NAME"} suffix), or {@code null}.</li>
-     * </ul>
-     *
+     * List of tables and columns to test for codes values.
      * This table is used by the {@link #createObject} method in order to detect
      * which of the following methods should be invoked for a given code:
      *
@@ -230,22 +232,61 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @see #createObject
      * @see #lastObjectType
      */
-    private static final String[] OBJECT_TABLES = {
-        "[Coordinate Reference System]", "COORD_REF_SYS_CODE",  "COORD_REF_SYS_NAME",
-        "[Coordinate System]",           "COORD_SYS_CODE",      "COORD_SYS_NAME",
-        "[Coordinate Axis]",             "COORD_AXIS_CODE",     null,
-        "[Datum]",                       "DATUM_CODE",          "DATUM_NAME",
-        "[Ellipsoid]",                   "ELLIPSOID_CODE",      "ELLIPSOID_NAME",
-        "[Prime Meridian]",              "PRIME_MERIDIAN_CODE", "PRIME_MERIDIAN_NAME"
-    };
+    private static final TableInfo[] TABLES_INFO = {
+        new TableInfo(CoordinateReferenceSystem.class,
+                      "[Coordinate Reference System]",
+                      "COORD_REF_SYS_CODE",
+                      "COORD_REF_SYS_NAME",
+                      "COORD_REF_SYS_KIND",
+         new Class[] { ProjectedCRS.class, GeographicCRS.class, GeocentricCRS.class},
+         new String[] {"projected",       "geographic",        "geocentric"}),
 
-    /**
-     * The tuple length in {@link #OBJECT_TABLES}.
-     */
-    private static final int TUPLE_LENGTH = 3;
-    static {
-        assert (OBJECT_TABLES.length % TUPLE_LENGTH) == 0 : OBJECT_TABLES.length;
-    }
+        new TableInfo(CoordinateSystem.class,
+                      "[Coordinate System]",
+                      "COORD_SYS_CODE",
+                      "COORD_SYS_NAME",
+                      "COORD_SYS_TYPE",
+         new Class[]  { CartesianCS.class, EllipsoidalCS.class, SphericalCS.class, VerticalCS.class},
+         new String[] {"Cartesian",       "ellipsoidal",       "spherical",       "gravity-related"}),
+
+        new TableInfo(CoordinateSystemAxis.class,
+                      "[Coordinate Axis]",
+                      "COORD_AXIS_CODE",
+                      null, null, null, null),
+
+        new TableInfo(Datum.class,
+                      "[Datum]",
+                      "DATUM_CODE",
+                      "DATUM_NAME",
+                      "DATUM_TYPE",
+         new Class[] { GeodeticDatum.class, VerticalDatum.class, EngineeringDatum.class},
+         new String[]{"geodetic",          "vertical",          "engineering"}),
+
+        new TableInfo(Ellipsoid.class,
+                      "[Ellipsoid]",
+                      "ELLIPSOID_CODE",
+                      "ELLIPSOID_NAME",
+                      null, null, null),
+        new TableInfo(PrimeMeridian.class,
+                      "[Prime Meridian]",
+                      "PRIME_MERIDIAN_CODE",
+                      "PRIME_MERIDIAN_NAME",
+                      null, null, null),
+
+        new TableInfo(CoordinateOperation.class,
+                      "[Coordinate_Operation]",
+                      "COORD_OP_CODE",
+                      "COORD_OP_NAME",
+                      "COORD_OP_TYPE",
+         new Class[] { Conversion.class, Transformation.class},
+         new String[]{"conversion",     "transformation"}),
+
+        new TableInfo(OperationMethod.class,
+                      "[Coordinate_Operation Method]",
+                      "COORD_OP_METHOD_CODE",
+                      "COORD_OP_METHOD_NAME",
+                      null, null, null)
+    };
 
     ///////////////////////////////////////////////////////////////////////////////
     ////////                                                               ////////
@@ -270,11 +311,11 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     private transient Citation authority;
 
     /**
-     * Last object type returned by {@link #createObject}, or -2 if none.
-     * This type is an index in the {@link #OBJECT_TABLES} array and is
+     * Last object type returned by {@link #createObject}, or -1 if none.
+     * This type is an index in the {@link #TABLES_INFO} array and is
      * strictly for {@link #createObject} internal use.
      */
-    private int lastObjectType = -TUPLE_LENGTH;
+    private int lastObjectType = -1;
 
     /**
      * The last table in which object name were looked for. This is for internal use
@@ -296,6 +337,16 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * while values are {@link PreparedStatement} objects.
      */
     private final Map statements = new IdentityHashMap();
+
+    /**
+     * The set of authority codes for different types. Keys are {@link Class} or
+     * {@link String} objects. This map is used by the {@link #getAuthorityCodes}
+     * method. Note that this factory can't be disposed as long as some cached sets
+     * are in use (i.e. as long as this map is not empty). This is why a weak value
+     * map is mandatory here. The {@link AuthorityCodes#finalize} methods take care
+     * of closing the stamenents used by the sets.
+     */
+    private final Map/*<Object,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
 
     /**
      * Pool of naming systems, used for caching.
@@ -423,33 +474,83 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns the set of authority codes of the given type. The {@code type}
-     * argument specify the base class. For example:
-     * <ul>
-     *   <li><strong><code>{@linkplain CoordinateReferenceSystem}.class&nbsp;</code></strong>
-     *       asks for all authority codes accepted by one of
-     *       {@link #createGeographicCRS createGeographicCRS},
-     *       {@link #createProjectedCRS  createProjectedCRS},
-     *       {@link #createVerticalCRS   createVerticalCRS},
-     *       {@link #createTemporalCRS   createTemporalCRS}
-     *       and their friends.</li>
-     *   <li><strong><code>{@linkplain ProjectedCRS}.class&nbsp;</code></strong>
-     *       asks only for authority codes accepted by
-     *       {@link #createProjectedCRS createProjectedCRS}.</li>
-     * </ul>
+     * Returns the set of authority codes of the given type.
+     * <p>
+     * <strong>NOTE:</strong> This method returns a living connection to the underlying database.
+     * This means that the returned set can executes efficiently idioms like the following one:
+     *
+     * <blockquote>
+     * <pre>getAuthorityCodes(<var>type</var).containsAll(<var>others</var>)</pre>
+     * </blockquote>
+     *
+     * But do not keep the returned reference for a long time. The returned set should stay valid
+     * even if retained for a long time (as long as this factory has not been {@linkplain #dispose
+     * disposed}), but the existence of those long-living connections may prevent this factory to
+     * release some resources. If the set of codes is needed for a long time, copy their values in
+     * an other collection object.
      *
      * @param  type The spatial reference objects type (may be {@code Object.class}).
      * @return The set of authority codes for spatial reference objects of the given type.
      *         If this factory doesn't contains any object of the given type, then this method
      *         returns an {@linkplain java.util.Collections#EMPTY_SET empty set}.
      * @throws FactoryException if access to the underlying database failed.
+     *
+     * @since 2.2
      */
     public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
-        throw new UnsupportedOperationException("Not yet implemented."); // TODO
+        return getAuthorityCodes0(type);
+    }
+
+    /**
+     * Implementation of {@link #getAuthorityCodes0} as a private method, for protecting
+     * {@link #getDescriptionText} for user method overriding.
+     */
+    private synchronized Set/*<String>*/ getAuthorityCodes0(final Class type) throws FactoryException {
+        Reference reference;
+        AuthorityCodes candidate;
+        /*
+         * If the set were already requested previously for the given type, returns it.
+         * Otherwise, a new one will be created (but will not use the database connection yet).
+         */
+        reference = (Reference) authorityCodes.get(type);
+        candidate = (reference!=null) ? (AuthorityCodes) reference.get() : null;
+        if (candidate != null) {
+            return candidate;
+        }
+        for (int i=0; i<TABLES_INFO.length; i++) {
+            final TableInfo table = TABLES_INFO[i];
+            if (table.type.isAssignableFrom(type)) {
+                /*
+                 * Maybe an instance already existed but was not found above because the user
+                 * specified some implementation class instead of an interface class. Before
+                 * to return the newly created set, check again in the cached sets using the
+                 * SQL statement as a key instead of the type. Two sets with identical SQL
+                 * statements are actually identical collections even if the user-specified
+                 * type is different.
+                 */
+                final AuthorityCodes codes;
+                codes = new AuthorityCodes(connection, TABLES_INFO[i], type, this);
+                reference = (Reference) authorityCodes.get(codes.sqlAll);
+                candidate = (reference!=null) ? (AuthorityCodes) reference.get() : null;
+                if (candidate == null) {
+                    candidate = codes;
+                } else if (reference instanceof SoftReference) {
+                    // No need to update the reference.
+                    return candidate;
+                }
+                reference = new SoftReference(candidate);
+                authorityCodes.put(codes.type,   reference);
+                authorityCodes.put(codes.sqlAll, reference);
+                return candidate;
+            }
+        }
+        return Collections.EMPTY_SET;
     }
 
     /**
      * Gets a description of the object corresponding to a code.
+     *
+     * @since 2.2
      *
      * @param  code Value allocated by authority.
      * @return A description of the object, or {@code null} if the object
@@ -457,8 +558,25 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the query failed for some other reason.
      */
-    public InternationalString getDescriptionText(String code) throws FactoryException {
-        throw new UnsupportedOperationException("Not yet implemented."); // TODO
+    public InternationalString getDescriptionText(final String code) throws FactoryException {
+        for (int i=0; i<TABLES_INFO.length; i++) {
+            final Set codes = getAuthorityCodes0(TABLES_INFO[i].type);
+            if (codes instanceof AuthorityCodes) {
+                final String text = (String) ((AuthorityCodes) codes).asMap().get(code);
+                if (text != null) {
+                    return new SimpleInternationalString(text);
+                }
+            }
+        }
+        /*
+         * Maybe the user overrided some object creation
+         * methods with a value for the supplied code.
+         */
+        final Identifier identifier = createObject(code).getName();
+        if (identifier instanceof GenericName) {
+            return ((GenericName) identifier).toInternationalString();
+        }
+        return new SimpleInternationalString(identifier.getCode());
     }
 
     /**
@@ -774,18 +892,18 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         PreparedStatement stmt = (PreparedStatement) statements.get(KEY); // Null allowed.
         StringBuffer     query = null; // Will be created only if the last statement doesn't suit.
         /*
-         * Iterates through all tables listed in OBJECT_TABLES, starting with the table used during
+         * Iterates through all tables listed in TABLES_INFO, starting with the table used during
          * the last call to 'createObject(code)'.  This approach assumes that two consecutive calls
          * will often return the same type of object.  If the object type changed, then this method
          * will have to discard the old prepared statement and prepare a new one, which may be a
          * costly operation. Only the last successful prepared statement is cached, in order to keep
          * the amount of statements low. Unsuccessful statements are immediately disposed.
          */
-        final String  epsg        = trimAuthority(code);
-        final boolean isNumeric   = isPrimaryKey(epsg);
-        final int     tupleToSkip = isNumeric ? lastObjectType : -TUPLE_LENGTH;
-        int index = -TUPLE_LENGTH;
-        for (int i=-TUPLE_LENGTH; i<OBJECT_TABLES.length; i+=TUPLE_LENGTH) {
+        final String  epsg         = trimAuthority(code);
+        final boolean isPrimaryKey = isPrimaryKey(epsg);
+        final int     tupleToSkip  = isPrimaryKey ? lastObjectType : -1;
+        int index = -1;
+        for (int i=-1; i<TABLES_INFO.length; i++) {
             if (i == tupleToSkip) {
                 // Avoid to test the same table twice.  Note that this test also avoid a
                 // NullPointerException if 'stmt' is null, since 'lastObjectType' should
@@ -794,8 +912,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             }
             try {
                 if (i >= 0) {
-                    final String table  = OBJECT_TABLES[i];
-                    final String column = OBJECT_TABLES[i + (isNumeric ? 1 : 2)];
+                    final TableInfo table = TABLES_INFO[i];
+                    final String column = isPrimaryKey ? table.codeColumn : table.nameColumn;
                     if (column == null) {
                         continue;
                     }
@@ -803,13 +921,13 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                         query = new StringBuffer("SELECT ");
                     }
                     query.setLength(7); // 7 is the length of "SELECT " in the line above.
-                    query.append(OBJECT_TABLES[i + 1]);
+                    query.append(table.codeColumn);
                     query.append(" FROM ");
-                    query.append(table);
+                    query.append(table.table);
                     query.append(" WHERE ");
                     query.append(column);
                     query.append(" = ?");
-                    if (isNumeric) {
+                    if (isPrimaryKey) {
                         assert !statements.containsKey(KEY) : table;
                         stmt = prepareStatement(KEY, query.toString());
                     } else {
@@ -833,12 +951,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                 ResourceKeys.ERROR_DUPLICATED_VALUES_$1, code));
                     }
                     index = (i < 0) ? lastObjectType : i;
-                    if (isNumeric) {
+                    if (isPrimaryKey) {
                         lastObjectType = index;
                         break;
                     }
                 }
-                if (isNumeric) {
+                if (isPrimaryKey) {
                     statements.remove(KEY);
                 }
                 stmt.close();
@@ -851,12 +969,14 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
          */
         if (index >= 0) {
             switch (index) {
-                case 0*TUPLE_LENGTH:  return buffered.createCoordinateReferenceSystem(code);
-                case 1*TUPLE_LENGTH:  return buffered.createCoordinateSystem         (code);
-                case 2*TUPLE_LENGTH:  return buffered.createCoordinateSystemAxis     (code);
-                case 3*TUPLE_LENGTH:  return buffered.createDatum                    (code);
-                case 4*TUPLE_LENGTH:  return buffered.createEllipsoid                (code);
-                case 5*TUPLE_LENGTH:  return buffered.createPrimeMeridian            (code);
+                case 0:  return buffered.createCoordinateReferenceSystem(code);
+                case 1:  return buffered.createCoordinateSystem         (code);
+                case 2:  return buffered.createCoordinateSystemAxis     (code);
+                case 3:  return buffered.createDatum                    (code);
+                case 4:  return buffered.createEllipsoid                (code);
+                case 5:  return buffered.createPrimeMeridian            (code);
+                case 6:  break; // TODO return buffered.createCoordinateOperation      (code);
+                case 7:  break; // TODO return buffered.createOperationMethod          (code);
                 default: throw new AssertionError(index); // Should not happen
             }
         }
@@ -1879,13 +1999,62 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
-     * Dispose any resources hold by this object.
+     * Returns {@code true} if it is safe to dispose this factory. This method is invoked indirectly
+     * by {@link DefaultFactory} after some timeout in order to release resources. This method will
+     * block the disposal if some {@linkplain #getAuthorityCodes set of authority codes} are still
+     * in use.
+     */
+    final synchronized boolean canDispose() {
+        boolean can = true;
+        Map pool/*<SoftReference,WeakReference>*/ = null;
+        for (final Iterator it=authorityCodes.entrySet().iterator(); it.hasNext();) {
+            final Map.Entry  entry     = (Map.Entry)      it.next();
+            final Reference  reference = (Reference)      entry.getValue();
+            final AuthorityCodes codes = (AuthorityCodes) reference.get();
+            if (codes == null) {
+                it.remove();
+                continue;
+            }
+            /*
+             * A set of authority codes is still in use. We can't dispose this factory.
+             * But maybe the set was retained only by soft references... So we continue
+             * the iteration anyway and replace all soft references by weak ones, in order
+             * to get more chances to be garbage-collected before the next disposal cycle.
+             */
+            can = false;
+            if (reference instanceof SoftReference) {
+                // Each reference appears twice (once with the type key, and once under the SQL
+                // statement as key). So we need to manage a pool of references for avoiding
+                // duplication.
+                if (pool == null) {
+                    pool = new IdentityHashMap();
+                }
+                WeakReference weak = (WeakReference) pool.get(reference);
+                if (weak == null) {
+                    weak = new WeakReference(codes);
+                    pool.put(reference, weak);
+                }
+                entry.setValue(weak);
+            }
+        }
+        return can;
+    }
+
+    /**
+     * Disposes any resources hold by this object.
      *
      * @throws FactoryException if an error occured while closing the connection.
      */
     public synchronized void dispose() throws FactoryException {
         final boolean shutdown = SHUTDOWN_THREAD.equals(Thread.currentThread().getName());
         try {
+            for (final Iterator it=authorityCodes.values().iterator(); it.hasNext();) {
+                final AuthorityCodes set = (AuthorityCodes) ((Reference) it.next()).get();
+                if (set != null) {
+                    set.finalize();
+                }
+                it.remove();
+            }
             for (final Iterator it=statements.values().iterator(); it.hasNext();) {
                 ((PreparedStatement) it.next()).close();
                 it.remove();
