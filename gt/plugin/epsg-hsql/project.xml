@@ -1,80 +1,85 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
-  <pomVersion>3</pomVersion>
-  <extend>${basedir}/../../project.xml</extend>
-  <name>geotools-epsg-hsql</name>
-  <id>epsg-hsql</id>
-  <currentVersion>2.2.x</currentVersion>
-  <package>org.geotools.referencing</package>
-  <shortDescription>EPSG Authoriy Service using HSQL database</shortDescription>
-  <gumpRepositoryId>geotools</gumpRepositoryId>
-  <description>
-    Connection to an embedded EPSG database in HSQL format.
-    This is database is built from the SQL scripts delivered by EPSG.
-  </description>
-  <developers>
-    <developer>
-      <name>Didier Richard</name>
-      <email>dgr@libertysurf.fr</email>
-      <organization>Institut Géographique National - France</organization>
-      <roles>
-        <role>Contributor</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement</organization>
-      <roles>
-        <role>Java Developer</role>
-        <role>Module Maintainer</role>
-      </roles>
-    </developer>
-  </developers>
-  <dependencies>
-    <dependency>
-      <artifactId>main</artifactId>
-      <groupId>gt2</groupId>
-      <version>2.2.x</version>
-    </dependency>
-    <dependency>
-      <id>units</id>
-      <version>0.01</version>
-      <url>http://jsr-108.sourceforge.net</url>
-    </dependency>
-    <dependency>
-      <id>vecmath</id>
-      <version>1.3</version>
-      <url>http://java.sun.com/products/java-media/3D/</url>
-    </dependency>
-    <dependency>
-      <artifactId>hsqldb</artifactId>
-      <groupId>hsql</groupId>
-      <version>1.7.3</version>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>${basedir}/src</directory>
-        <includes>
-          <include>META-INF/services/**</include>
-          <include>**/*.sql</include>
-        </includes>
-      </resource>
-    </resources>
-
-    <unitTest>
-      <includes>
-        <include>**/*Test.java</include>
-      </includes>
-      <resources>
-        <resource>
-          <directory>${basedir}/test</directory>
-        </resource>
-      </resources>
-    </unitTest>
-  </build>
+ <pomVersion>3</pomVersion>
+ <extend>${basedir}/../../project.xml</extend>
+ <name>geotools-epsg-hsql</name>
+ <id>epsg-hsql</id>
+ <currentVersion>2.2.x</currentVersion>
+ <package>org.geotools.referencing</package>
+ <shortDescription>EPSG Authoriy Service using HSQL database</shortDescription>
+ <gumpRepositoryId>geotools</gumpRepositoryId>
+ <description>Connection to an embedded EPSG database in HSQL format.
+    This is database is built from the SQL scripts delivered by EPSG.</description>
+ <developers>
+  <developer>
+   <name>Didier Richard</name>
+   <email>dgr@libertysurf.fr</email>
+   <organization>Institut G�ographique National - France</organization>
+   <roles>
+    <role>Contributor</role>
+   </roles>
+  </developer>
+  <developer>
+   <name>Martin Desruisseaux</name>
+   <id>desruisseaux</id>
+   <email>desruisseaux@users.sourceforge.net</email>
+   <organization>Institut de Recherche pour le D�veloppement</organization>
+   <roles>
+    <role>Java Developer</role>
+    <role>Module Maintainer</role>
+   </roles>
+  </developer>
+ </developers>
+ <dependencies>
+  <dependency>
+   <artifactId>main</artifactId>
+   <groupId>gt2</groupId>
+   <version>2.2.x</version>
+  </dependency>
+  <dependency>
+   <groupId>units</groupId>
+   <artifactId>units</artifactId>
+   <version>0.01</version>
+   <url>http://jsr-108.sourceforge.net</url>
+  </dependency>
+  <dependency>
+   <groupId>vecmath</groupId>
+   <artifactId>vecmath</artifactId>
+   <version>1.3</version>
+   <url>http://java.sun.com/products/java-media/3D/</url>
+  </dependency>
+  <dependency>
+   <artifactId>hsqldb</artifactId>
+   <groupId>hsql</groupId>
+   <version>1.7.3</version>
+  </dependency>
+  <dependency>
+   <groupId>JTS</groupId>
+   <artifactId>JTS</artifactId>
+   <version>1.6</version>
+   <type>jar</type>
+  </dependency>
+ </dependencies>
+ <build>
+  <resources>
+   <resource>
+    <directory>${basedir}/src</directory>
+    <includes>
+     <include>META-INF/services/**</include>
+     <include>**/*.sql</include>
+    </includes>
+   </resource>
+  </resources>
+  <unitTest>
+   <includes>
+    <include>**/*Test.java</include>
+   </includes>
+   <resources>
+    <resource>
+     <directory>${basedir}/test</directory>
+    </resource>
+   </resources>
+  </unitTest>
+ </build>
 </project>
+
