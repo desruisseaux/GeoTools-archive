@@ -23,9 +23,12 @@
 package org.geotools.referencing.factory;
 
 // J2SE dependencies and extensions
+import java.util.Map;
+import java.util.Set;
 import java.util.Iterator;
-import javax.units.Unit;
+import java.util.Collections;
 import javax.imageio.spi.ServiceRegistry;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
@@ -67,10 +70,14 @@ import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
+import org.geotools.referencing.FactoryFinder;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.resources.Utilities;
 import org.geotools.util.NameFactory;
@@ -96,12 +103,19 @@ import org.geotools.util.NameFactory;
  * @since 2.1
  */
 public abstract class AbstractAuthorityFactory extends AbstractFactory
-        implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory
+        implements DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory,
+                   CoordinateOperationAuthorityFactory
 {
     /**
      * The underlying factories used for objects creation.
      */
     protected final FactoryGroup factories;
+
+    /**
+     * The operation factory to use for {@link #createFromCoordinateReferenceSystemCodes}.
+     * Will be fetch only when first needed.
+     */
+    private transient CoordinateOperationFactory operationFactory;
 
     /**
      * Constructs an instance using the specified set of factories.
@@ -111,10 +125,29 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
      *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
      */
-    protected AbstractAuthorityFactory(final FactoryGroup factories, final int priority) {
+    AbstractAuthorityFactory(final FactoryGroup factories, final int priority) {
         super(priority);
         this.factories = factories;
         ensureNonNull("factories", factories);
+    }
+
+    /**
+     * Constructs an instance using the specified hints. This constructor recognizes the
+     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
+     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints. In addition,
+     * the {@link FactoryGroup#HINT_KEY} hint may be used as a low-level substitute for all the
+     * above.
+     *
+     * @param hints The hints.
+     * @param priority The priority for this factory, as a number between
+     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
+     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
+     *
+     * @since 2.2
+     */
+    protected AbstractAuthorityFactory(final Hints hints, final int priority) {
+        super(priority);
+        factories = FactoryGroup.createInstance(hints);
     }
 
     /**
@@ -702,6 +735,53 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
     }
 
     /**
+     * Creates an operation from a single operation code. 
+     *
+     * @param code Value allocated by authority.
+     * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     *
+     * @since 2.2
+     */
+    public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
+        final IdentifiedObject operation = createObject(code);
+        try {
+            return (CoordinateOperation) operation;
+        } catch (ClassCastException exception) {
+            throw noSuchAuthorityCode(CoordinateOperation.class, code, exception);
+        }
+    }
+
+    /**
+     * Creates an operation from coordinate reference system codes.
+     *
+     * @param sourceCode Coded value of source coordinate reference system.
+     * @param targetCode Coded value of target coordinate reference system.
+     *
+     * @throws NoSuchAuthorityCodeException if a specified code was not found.
+     * @throws FactoryException if the object creation failed for some other reason.
+     *
+     * @since 2.2
+     */
+    public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
+                                        final String sourceCode, final String targetCode)
+            throws FactoryException
+    {
+        ensureNonNull("sourceCode", sourceCode);
+        ensureNonNull("targetCode", targetCode);
+        final CoordinateReferenceSystem sourceCRS = createCoordinateReferenceSystem(sourceCode);
+        final CoordinateReferenceSystem targetCRS = createCoordinateReferenceSystem(targetCode);
+        /*
+         * No need to synchronize. This is not a big deal if FactoryFinder is invoked twice.
+         */
+        if (operationFactory == null) {
+            operationFactory = FactoryFinder.getCoordinateOperationFactory(
+                               new Hints(FactoryGroup.HINT_KEY, factories));
+        }
+        return Collections.singleton(operationFactory.createOperation(sourceCRS, targetCRS));
+    }
+
+    /**
      * Releases resources immediately instead of waiting for the garbage collector.
      * Once a factory has been disposed, further {@code create(...)} invocations
      * may throw a {@link FactoryException}. Disposing a previously-disposed factory,
@@ -711,6 +791,21 @@ public abstract class AbstractAuthorityFactory extends AbstractFactory
      */
     public void dispose() throws FactoryException {
         // To be overriden by subclasses.
+    }
+
+    /**
+     * Returns the implementation hints for this factory. The returned map contains values for
+     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
+     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints. Other values
+     * may be provided as well, at implementation choice.
+     */
+    public Map getImplementationHints() {
+        synchronized (hints) { // Note: avoid lock on public object.
+            if (hints.isEmpty()) {
+                factories.getHints(hints);
+            }
+        }
+        return super.getImplementationHints();
     }
 
     /**

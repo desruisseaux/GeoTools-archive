@@ -90,6 +90,18 @@ import org.geotools.resources.XArray;
  */
 public class FactoryGroup {
     /**
+     * Hint for the {@code FactoryGroup} instance to use. This hint is a somewhat low-level details
+     * of Geotools implementation, which is why this hint is not listed in the {@link Hints} class.
+     * The {@link Hints#CRS_FACTORY CRS_FACTORY} hint and its friend should be suffisient in most
+     * cases.
+     *
+     * @see #createInstance
+     *
+     * @since 2.2
+     */
+    public static final Hints.Key HINT_KEY = new Hints.Key(FactoryGroup.class);
+
+    /**
      * The {@linkplain Datum datum} factory.
      * If null, then a default factory will be created only when first needed.
      */
@@ -128,24 +140,6 @@ public class FactoryGroup {
     }
 
     /**
-     * Constructs an instance using the factories initialized with the specified hints.
-     */
-    public FactoryGroup(final Hints hints) {
-        /*
-         * If hints are provided, we will fetch factory immediately (instead of storing the hints
-         * in an inner field) because most factories will retain few hints, while the Hints map
-         * may contains big objects. If no hints were provided, we will construct factories only
-         * when first needed.
-         */
-        if (hints!=null && !hints.isEmpty()) {
-            datumFactory = FactoryFinder.getDatumFactory        (hints);
-            csFactory    = FactoryFinder.getCSFactory           (hints);
-            crsFactory   = FactoryFinder.getCRSFactory          (hints);
-            mtFactory    = FactoryFinder.getMathTransformFactory(hints);
-        }
-    }
-
-    /**
      * Constructs an instance using the specified factories. If any factory is null,
      * a default instance will be created by {@link FactoryFinder} when first needed.
      *
@@ -164,6 +158,67 @@ public class FactoryGroup {
         this.csFactory    =    csFactory;
         this.crsFactory   =   crsFactory;
         this.mtFactory    =    mtFactory;
+    }
+
+    /**
+     * Constructs an instance using the factories initialized with the specified hints.
+     *
+     * @see #createInstance
+     */
+    public FactoryGroup(final Hints hints) {
+        /*
+         * If hints are provided, we will fetch factory immediately (instead of storing the hints
+         * in an inner field) because most factories will retain few hints, while the Hints map
+         * may contains big objects. If no hints were provided, we will construct factories only
+         * when first needed.
+         */
+        if (hints!=null && !hints.isEmpty()) {
+            datumFactory = FactoryFinder.getDatumFactory        (hints);
+            csFactory    = FactoryFinder.getCSFactory           (hints);
+            crsFactory   = FactoryFinder.getCRSFactory          (hints);
+            mtFactory    = FactoryFinder.getMathTransformFactory(hints);
+        }
+    }
+
+    /**
+     * Creates an instance from the specified hints. If the hints contains a {@link #HINT_KEY}
+     * value, then the specified factory group will be returned. Otherwise, a new one will be
+     * created.
+     *
+     * @param  hints The hints, or {@code null} if none.
+     * @return A factory group created from the specified set of hints.
+     *
+     * @since 2.2
+     */
+    public static FactoryGroup createInstance(final Hints hints) {
+        if (hints != null) {
+            final FactoryGroup candidate = (FactoryGroup) hints.get(HINT_KEY);
+            if (candidate != null) {
+                return candidate;
+            }
+        }
+        return new FactoryGroup(hints);
+    }
+
+    /**
+     * Copies in the specified map all values for the {@link Hints#CRS_FACTORY CRS},
+     * {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM} and
+     * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints.
+     * A {@link #HINT_KEY} is put in addition for this {@code FactoryGroup} instance,
+     * but it should be considered as low-level detail. This method is provided as a helper
+     * for implementation of {@link org.geotools.factory.Factory#getImplementationHints}
+     * methods.
+     *
+     * @param hints The map to put hints into.
+     *
+     * @since 2.2
+     */
+    public void getHints(final Map hints) {
+        hints.put(Hints.           CRS_FACTORY, getCRSFactory());
+        hints.put(Hints.            CS_FACTORY, getCSFactory());
+        hints.put(Hints.         DATUM_FACTORY, getDatumFactory());
+        hints.put(Hints.MATH_TRANSFORM_FACTORY, getMathTransformFactory());
+        hints.put(HINT_KEY, this);
     }
 
     /**

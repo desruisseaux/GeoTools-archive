@@ -26,7 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 // Geotools dependencies
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 
@@ -67,11 +67,11 @@ public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements Dat
     /**
      * Open a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
      *
-     * @param  factories The low-level factories to use for CRS creation.
+     * @param  hints A map of hints, including the low-level factories to use for CRS creation.
      * @return The EPSG factory using MS-Access SQL syntax.
      * @throws SQLException if connection to the database failed.
      */
-    public AbstractAuthorityFactory createFactory(final FactoryGroup factories) throws SQLException {
+    public AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException {
         final Connection connection;
         try {
             connection = getConnection();
@@ -85,6 +85,6 @@ public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements Dat
             e.initCause(exception);
             throw e;
         }
-        return new FactoryUsingSQL(factories, connection);
+        return new FactoryUsingSQL(hints, connection);
     }
 }

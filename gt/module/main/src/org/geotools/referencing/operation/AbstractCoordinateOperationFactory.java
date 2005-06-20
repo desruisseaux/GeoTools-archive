@@ -168,31 +168,50 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
 
     /**
      * Constructs a coordinate operation factory using the specified hints.
+     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
+     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
+     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
+     * a low-level substitute for all the above.
      *
      * @param hints The hints, or {@code null} if none.
-     *
-     * @todo Need a FactoryGroup hint.
      */
     public AbstractCoordinateOperationFactory(final Hints hints) {
-        /*
-         * Examines the hints.
-         */
-        MathTransformFactory mtFactory = null;
-        if (hints != null) {
-            mtFactory = (MathTransformFactory) hints.get(Hints.MATH_TRANSFORM_FACTORY);
+        this(hints, NORMAL_PRIORITY);
+    }
+
+    /**
+     * Constructs a coordinate operation factory using the specified hints and priority.
+     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
+     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
+     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
+     * a low-level substitute for all the above.
+     *
+     * @param hints The hints, or {@code null} if none.
+     * @param priority The priority for this factory, as a number between
+     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
+     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
+     *
+     * @since 2.2
+     */
+    public AbstractCoordinateOperationFactory(final Hints hints, final int priority) {
+        super(priority);
+        factories = FactoryGroup.createInstance(hints);
+        mtFactory = factories.getMathTransformFactory();
+    }
+
+    /**
+     * Returns the implementation hints for this factory. The returned map contains values for
+     * {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS}, {@link Hints#DATUM_FACTORY DATUM}
+     * and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM} {@code FACTORY} hints. Other values
+     * may be provided as well, at implementation choice.
+     */
+    public Map getImplementationHints() {
+        synchronized (hints) { // Note: avoid lock on public object.
+            if (hints.isEmpty()) {
+                factories.getHints(hints);
+            }
         }
-        if (mtFactory == null) {
-            mtFactory = FactoryFinder.getMathTransformFactory(hints);
-        }
-        /*
-         * Stores the hints in inner fields.
-         */
-        this.mtFactory = mtFactory;
-        /*
-         * Declares the hints that we use.
-         */
-        super.hints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
-        factories = new FactoryGroup(null, null, null, mtFactory);
+        return super.getImplementationHints();
     }
 
     /**
@@ -393,7 +412,7 @@ public abstract class AbstractCoordinateOperationFactory extends AbstractFactory
     /**
      * Creates a concatenated operation from a sequence of operations.
      *
-     * @param  properties Set of properties. Should contains at least <code>"name"</code>.
+     * @param  properties Set of properties. Should contains at least {@code "name"}.
      * @param  operations The sequence of operations.
      * @return The concatenated operation.
      * @throws FactoryException if the object creation failed.

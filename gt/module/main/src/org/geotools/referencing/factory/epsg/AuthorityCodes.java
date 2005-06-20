@@ -30,6 +30,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+// OpenGIS dependencies
+import org.opengis.referencing.operation.Projection;
+
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 
@@ -46,13 +49,26 @@ import org.geotools.resources.Utilities;
  */
 final class AuthorityCodes extends AbstractSet {
     /**
+     * The factory which is the owner of this set. One purpose of this field (even if it were not
+     * used directly by this class) is to avoid garbage collection of the factory as long as this
+     * set is in use. This is required because {@link FactoryUsingSQL#finalize} closes the JDBC
+     * connections.
+     */
+    private final FactoryUsingSQL factory;
+
+    /**
      * The type for this code set. This is translated to the most appropriate
      * interface type even if the user supplied an implementation type.
      */
     public final Class type;
 
     /**
-     * A view of this set as a map with object's name as value, or {@code null} if none.
+     * {@code true} if {@link #type} is assignable to {@link Projection}.
+     */
+    private final boolean isProjection;
+
+    /**
+     * A view of this set as a map with object's name as values, or {@code null} if none.
      * Will be created only when first needed.
      */
     private transient java.util.Map asMap;
@@ -86,8 +102,9 @@ final class AuthorityCodes extends AbstractSet {
     private final Connection connection;
 
     /**
-     * The collection's size, or -1 if not yet computed.
-     * Records will be counted only when first needed.
+     * The collection's size, or a negative value if not yet computed. The records will be counted
+     * only when first needed. The special value -2 if set by {@link #isEmpty} if the size has not
+     * yet been computed, but we know that the set is not empty.
      */
     private int size = -1;
 
@@ -104,6 +121,7 @@ final class AuthorityCodes extends AbstractSet {
                           final Class           type,
                           final FactoryUsingSQL factory)
     {
+        this.factory    = factory;
         this.connection = connection;
         final StringBuffer buffer = new StringBuffer("SELECT ");
         buffer.append(table.codeColumn);
@@ -135,6 +153,7 @@ final class AuthorityCodes extends AbstractSet {
             }
         }
         this.type = tableType;
+        isProjection = Projection.class.isAssignableFrom(tableType);
         final int length = buffer.length();
         buffer.append(" ORDER BY ");
         buffer.append(table.codeColumn);
@@ -172,21 +191,54 @@ final class AuthorityCodes extends AbstractSet {
     }
 
     /**
+     * Returns {@code true} if the code in the specified result set is acceptable.
+     * This method handle projections in a special way.
+     */
+    private boolean isAcceptable(final ResultSet results) throws SQLException {
+        if (!isProjection) {
+            return true;
+        }
+        final String code = results.getString(1);
+        synchronized (factory) {
+            return factory.isProjection(code);
+        }
+    }
+
+    /**
+     * Returns {@code true} if the code in the specified code is acceptable.
+     * This method handle projections in a special way.
+     */
+    private boolean isAcceptable(final String code) throws SQLException {
+        if (!isProjection) {
+            return true;
+        }
+        synchronized (factory) {
+            return factory.isProjection(code);
+        }
+    }
+
+    /**
      * Returns {@code true} if this collection contains no elements.
      * This method fetch at most one row instead of counting all rows.
      */
     public boolean isEmpty() {
-        if (size >= 0) { // No need to synchronize
+        if (size != -1) { // No need to synchronize
             return size == 0;
         }
         boolean empty = true;
         try {
             final ResultSet results = getAll();
-            empty = !results.next();
+            while (results.next()) {
+                if (isAcceptable(results)) {
+                    empty = false;
+                    break;
+                }
+            }
             results.close();
         } catch (SQLException exception) {
             unexpectedException("isEmpty", exception);
         }
+        size = empty ? 0 : -2;
         return empty;
     }
 
@@ -201,13 +253,15 @@ final class AuthorityCodes extends AbstractSet {
         try {
             final ResultSet results = getAll();
             while (results.next()) {
-                count++;
+                if (isAcceptable(results)) {
+                    count++;
+                }
             }
             results.close();
-            size = count; // Stores only on success.
         } catch (SQLException exception) {
             unexpectedException("size", exception);
         }
+        size = count; // Stores only on success.
         return count;
     }
 
@@ -218,7 +272,12 @@ final class AuthorityCodes extends AbstractSet {
         boolean exists = false;
         if (code != null) try {
             final ResultSet results = getSingle(code);
-            exists = results.next();
+            while (results.next()) {
+                if (isAcceptable(results)) {
+                    exists = true;
+                    break;
+                }
+            }
             results.close();
         } catch (SQLException exception) {
             unexpectedException("contains", exception);
@@ -295,12 +354,15 @@ final class AuthorityCodes extends AbstractSet {
 
         /** Moves to the next element. */
         private void toNext() throws SQLException {
-            if (results.next()) {
+            while (results.next()) {
                 next = results.getString(1);
-            } else {
-                results.close();
-                results = null;
+                if (isAcceptable(next)) {
+                    return;
+                }
             }
+            results.close();
+            results = null;
+            next    = null;
         }
 
         /** Returns {@code true} if there is more elements. */
@@ -373,8 +435,11 @@ final class AuthorityCodes extends AbstractSet {
             String value = null;
             if (code != null) try {
                 final ResultSet results = getSingle(code);
-                if (results.next()) {
-                    value = results.getString(2);
+                while (results.next()) {
+                    if (isAcceptable(results)) {
+                        value = results.getString(2);
+                        break;
+                    }
                 }
                 results.close();
             } catch (SQLException exception) {

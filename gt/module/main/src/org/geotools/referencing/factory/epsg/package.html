@@ -50,7 +50,7 @@
   that implements Geotools's {@link org.geotools.referencing.factory.epsg.DataSource} interface. For
   example:</P>
   <BLOCKQUOTE><TABLE border="2" width="100%"><TR><TD><PRE><B>import</B> org.postgresql.ds.PGSimpleDataSource;
-<B>import</B> org.geotools.referencing.factory.FactoryGroup;
+<B>import</B> org.geotools.factory.Hints;
 <B>import</B> org.geotools.referencing.factory.AbstractAuthorityFactory;
 <B>import</B> org.geotools.referencing.factory.epsg.DataSource;
 
@@ -63,8 +63,8 @@
     <B>public</B> <B>int</B> getPriority() {
         <B>return</B> MAXIMUM_PRIORITY - 200;
 
-    <B>public</B> AbstractAuthorityFactory createFactory(FactoryGroup factories) <B>throws</B> SQLException {
-        <B>return</B> <B>new</B> FactoryUsingAnsiSQL(factories, getConnection());
+    <B>public</B> AbstractAuthorityFactory createFactory(Hints hints) <B>throws</B> SQLException {
+        <B>return</B> <B>new</B> FactoryUsingAnsiSQL(hints, getConnection());
     }
 }</PRE></TD></TR></TABLE></BLOCKQUOTE>
   <P ALIGN="justify">Then, declare this custom implementation in the following file

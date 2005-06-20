@@ -364,19 +364,9 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
          * EPSG database for example: we need to use the EPSG names instead
          * of the OGC ones.
          */
-        String name = param.getName().getCode();
-        final Citation authority = group.getDescriptor().getName().getAuthority();
-        if (authority != null) {
-            for (final Iterator it=param.getAlias().iterator(); it.hasNext();) {
-                final GenericName alias = (GenericName) it.next();
-                final GenericName scope = alias.getScope();
-                if (scope != null) {
-                    if (CitationImpl.titleMatches(authority, scope.toString())) {
-                        name = alias.asLocalName().toString();
-                        break;
-                    }
-                }
-            }
+        String name = getName(param, group.getDescriptor().getName().getAuthority());
+        if (name == null) {
+            name = param.getName().getCode();
         }
         if (param.getMinimumOccurs() != 0) {
             return group.parameter(name);

@@ -37,6 +37,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.AbstractReferenceSystem;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.wkt.Formatter;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.util.UnsupportedImplementationException;
 
 
@@ -99,22 +100,11 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
 
     /**
      * Returns the unit used for all axis. If not all axis uses the same unit,
-     * then this method returns {@code null}. This method is often used
-     * for Well Know Text (WKT) formatting.
+     * then this method returns {@code null}. This method is often used for
+     * Well Know Text (WKT) formatting.
      */
     final Unit getUnit() {
-        Unit unit = null;
-        for (int i=coordinateSystem.getDimension(); --i>=0;) {
-            final Unit candidate = coordinateSystem.getAxis(i).getUnit();
-            if (candidate != null) {
-                if (unit == null) {
-                    unit = candidate;
-                } else if (!unit.equals(candidate)) {
-                    return null;
-                }
-            }
-        }
-        return unit;
+        return CRSUtilities.getUnit(coordinateSystem);
     }
 
     /**

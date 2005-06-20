@@ -41,6 +41,7 @@ import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.MathTransformFactory;
 
 // Geotools dependencies
@@ -119,7 +120,8 @@ public final class FactoryFinder {
                     CSAuthorityFactory.class,
                     CRSAuthorityFactory.class,
                     MathTransformFactory.class,
-                    CoordinateOperationFactory.class}));
+                    CoordinateOperationFactory.class,
+                    CoordinateOperationAuthorityFactory.class}));
         }
         return registry;
     }
@@ -225,6 +227,38 @@ public final class FactoryFinder {
     }
 
     /**
+     * Returns the first implementation of {@link CoordinateOperationFactory} matching the specified
+     * hints. If no implementation matches, a new one is created if possible or an exception is
+     * thrown otherwise. If more than one implementation is registered and an
+     * {@linkplain #setVendorOrdering ordering is set}, then the preferred
+     * implementation is returned. Otherwise an arbitrary one is selected.
+     * <p>
+     * Hints that may be understood includes
+     * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM_FACTORY},
+     * {@link Hints#DATUM_SHIFT_METHOD     DATUM_SHIFT_METHOD} and
+     * {@link Hints#LENIENT_DATUM_SHIFT    LENIENT_DATUM_SHIFT}.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return The first coordinate operation factory that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         {@link CoordinateOperationFactory} interface.
+     */
+    public static synchronized CoordinateOperationFactory getCoordinateOperationFactory(final Hints hints)
+            throws FactoryRegistryException
+    {
+        return (CoordinateOperationFactory) getServiceRegistry().getServiceProvider(
+                CoordinateOperationFactory.class, null, hints, Hints.COORDINATE_OPERATION_FACTORY);
+    }
+
+    /**
+     * Returns a set of all available implementations for the
+     * {@link CoordinateOperationFactory} interface.
+     */
+    public static synchronized Set getCoordinateOperationFactories() {
+        return new LazySet(getServiceRegistry().getServiceProviders(CoordinateOperationFactory.class));
+    }
+
+    /**
      * Returns the first implementation of {@link DatumAuthorityFactory} matching the specified
      * hints. If no implementation matches, a new one is created if possible or an exception is
      * thrown otherwise. If more than one implementation is registered and an
@@ -294,7 +328,7 @@ public final class FactoryFinder {
      *
      * @param  authority The desired authority (e.g. "EPSG").
      * @param  hints An optional map of hints, or {@code null} if none.
-     * @return The first coordinate system authority factory that matches the supplied hints.
+     * @return The first coordinate reference system authority factory that matches the supplied hints.
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link CRSAuthorityFactory} interface.
      */
@@ -312,9 +346,45 @@ public final class FactoryFinder {
      * In the event that the same code is understood by more then one authority
      * you will need to assume both are close enough, or make use of this set directly
      * rather than use the {@link CRS#decode} convenience method.
+     *
+     * @return Set of available coordinate reference system authority factory implementations.
      */
     public static synchronized Set getCRSAuthorityFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(CRSAuthorityFactory.class));
+    }
+
+    /**
+     * Returns the first implementation of {@link CoordinateOperationAuthorityFactory} matching
+     * the specified hints. If no implementation matches, a new one is created if possible or an
+     * exception is thrown otherwise. If more than one implementation is registered and an
+     * {@linkplain #setVendorOrdering ordering is set}, then the preferred
+     * implementation is returned. Otherwise an arbitrary one is selected.
+     *
+     * @param  authority The desired authority (e.g. "EPSG").
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return The first coordinate operation authority factory that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         {@link CoordinateOperationAuthorityFactory} interface.
+     */
+    public static synchronized CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(
+                                                                        final String authority,
+                                                                        final Hints  hints)
+            throws FactoryRegistryException
+    {
+        return (CoordinateOperationAuthorityFactory) getServiceRegistry().getServiceProvider(
+                CoordinateOperationAuthorityFactory.class,
+                new AuthorityFilter(authority), hints, Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY);
+    }
+    
+    /**
+     * Returns a set of all available implementations for the
+     * {@link CoordinateOperationAuthorityFactory} interface.
+     *
+     * @return Set of available coordinate operation authority factory implementations.
+     */
+    public static synchronized Set getCoordinateOperationAuthorityFactories() {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                    CoordinateOperationAuthorityFactory.class));
     }
 
     /**
@@ -342,38 +412,6 @@ public final class FactoryFinder {
      */
     public static synchronized Set getMathTransformFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(MathTransformFactory.class));
-    }
-
-    /**
-     * Returns the first implementation of {@link CoordinateOperationFactory} matching the specified
-     * hints. If no implementation matches, a new one is created if possible or an exception is
-     * thrown otherwise. If more than one implementation is registered and an
-     * {@linkplain #setVendorOrdering ordering is set}, then the preferred
-     * implementation is returned. Otherwise an arbitrary one is selected.
-     * <p>
-     * Hints that may be understood includes
-     * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM_FACTORY},
-     * {@link Hints#DATUM_SHIFT_METHOD     DATUM_SHIFT_METHOD} and
-     * {@link Hints#LENIENT_DATUM_SHIFT    LENIENT_DATUM_SHIFT}.
-     *
-     * @param  hints An optional map of hints, or {@code null} if none.
-     * @return The first coordinate operation factory that matches the supplied hints.
-     * @throws FactoryRegistryException if no implementation was found or can be created for the
-     *         {@link CoordinateOperationFactory} interface.
-     */
-    public static synchronized CoordinateOperationFactory getCoordinateOperationFactory(final Hints hints)
-            throws FactoryRegistryException
-    {
-        return (CoordinateOperationFactory) getServiceRegistry().getServiceProvider(
-                CoordinateOperationFactory.class, null, hints, Hints.COORDINATE_OPERATION_FACTORY);
-    }
-
-    /**
-     * Returns a set of all available implementations for the
-     * {@link CoordinateOperationFactory} interface.
-     */
-    public static synchronized Set getCoordinateOperationFactories() {
-        return new LazySet(getServiceRegistry().getServiceProviders(CoordinateOperationFactory.class));
     }
 
     /**

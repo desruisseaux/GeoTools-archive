@@ -30,6 +30,9 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -37,24 +40,27 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.lang.ref.SoftReference;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import javax.units.NonSI;
 import javax.units.Unit;
 import javax.units.SI;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.quality.EvaluationMethodType;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CRSFactory;
@@ -79,20 +85,25 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.VerticalDatum;
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.metadata.Identifier;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.measure.Units;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.metadata.iso.quality.QuantitativeResultImpl;
+import org.geotools.metadata.iso.quality.AbsoluteExternalPositionalAccuracyImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
@@ -102,8 +113,12 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.operation.DefaultOperationMethod;
+import org.geotools.referencing.operation.DefaultTransformation;
+import org.geotools.referencing.operation.DefaultConversion;
+import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.referencing.operation.projection.MapProjection;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.cts.Resources;
 import org.geotools.resources.cts.ResourceKeys;
 import org.geotools.util.LocalName;
@@ -278,8 +293,9 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                       "COORD_OP_CODE",
                       "COORD_OP_NAME",
                       "COORD_OP_TYPE",
-         new Class[] { Conversion.class, Transformation.class},
-         new String[]{"conversion",     "transformation"}),
+         new Class[] { Projection.class, Conversion.class, Transformation.class},
+         new String[]{"conversion",     "conversion",     "transformation"}),
+                      // Note: Projection is handle in a special way.
 
         new TableInfo(OperationMethod.class,
                       "[Coordinate_Operation Method]",
@@ -296,6 +312,14 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     ////////    values (others than SQL statements) in 'equalsIgnoreCase'  ////////
     ////////    expressions.                                               ////////
     ///////////////////////////////////////////////////////////////////////////////
+    /**
+     * The name for the transformation accuracy metadata.
+     *
+     * @todo localize.
+     */
+    private static final InternationalString TRANSFORMATION_ACCURACY =
+            new SimpleInternationalString("Transformation accuracy");
+
     /**
      * The name of the thread to execute at JVM shutdown. This thread will be created
      * by {@link DefaultFactory} on registration. It will be checked by {@link #dispose}
@@ -382,6 +406,12 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     AbstractAuthorityFactory buffered = this;
 
     /**
+     * A coordinate operation factory, or {@code null} if none.
+     * Will be created only when first needed.
+     */
+    private transient CoordinateOperationFactory operationFactory;
+
+    /**
      * The connection to the EPSG database.
      */
     protected final Connection connection;
@@ -391,9 +421,23 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      *
      * @param factories  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
+     *
+     * @deprecated Use {@link #FactoryUsingSQL(Hints,Connection)} instead.
      */
     public FactoryUsingSQL(final FactoryGroup factories, final Connection connection) {
-        super(factories, MAXIMUM_PRIORITY-20);
+        this(new Hints(FactoryGroup.HINT_KEY, factories), connection);
+    }
+
+    /**
+     * Constructs an authority factory using the specified connection.
+     *
+     * @param hints The underlying factories used for objects creation.
+     * @param connection The connection to the underlying EPSG database.
+     *
+     * @since 2.2
+     */
+    public FactoryUsingSQL(final Hints hints, final Connection connection) {
+        super(hints, MAXIMUM_PRIORITY-20);
         this.connection = connection;
         ensureNonNull("connection", connection);
     }
@@ -496,6 +540,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * @throws FactoryException if access to the underlying database failed.
      *
      * @since 2.2
+     *
+     * @todo Current implementation do not differentiate {@link Projection} from {@link Conversion}.
+     *       We would need some callback mechanism for invoking the private {@code isProjection}
+     *       method.
      */
     public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
         return getAuthorityCodes0(type);
@@ -1643,6 +1691,16 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     }
 
     /**
+     * Returns the primary key for a coordinate reference system name.
+     * This method is used both by {@link #createCoordinateReferenceSystem}
+     * and {@link #createFromCoordinateReferenceSystemCodes}
+     */
+    private String toPrimaryKey(final String code) throws SQLException, FactoryException {
+        return toPrimaryKey(code, "[Coordinate Reference System]",
+                                  "COORD_REF_SYS_CODE", "COORD_REF_SYS_NAME");
+    }
+
+    /**
      * Returns a coordinate reference system from a code.
      *
      * @param  code Value allocated by authority.
@@ -1657,8 +1715,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
         ensureNonNull("code", code);
         CoordinateReferenceSystem returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code,
-                    "[Coordinate Reference System]", "COORD_REF_SYS_CODE", "COORD_REF_SYS_NAME");
+            final String primaryKey = toPrimaryKey(code);
             PreparedStatement stmt;
             stmt = prepareStatement("CoordinateReferenceSystem",
                                             "SELECT COORD_REF_SYS_CODE,"
@@ -1820,7 +1877,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                  * ---------------------------------------------------------------------- */
                 else {
                     result.close();
-                    throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, code));
+                    throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
                 }
                 returnValue = (CoordinateReferenceSystem) ensureSingleton(crs, returnValue, code);
                 if (result == null) {
@@ -1843,8 +1900,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
      * Returns parameter descriptors from a code. The default value is
      * set to the actual value declared in the parameter value table.
      *
-     * @param  operation The operation code.
-     * @param  method The method code.
+     * @param  method       The EPSG code for the operation method.
+     * @param  operation    The EPSG code for the operation (conversion or transformation).
+     * @param  isProjection {@code true} if we should automatically add "semi_major" and
+     *                      "semi_minor" parameters to the list of parameters to be returned.
      * @return The parameter descriptors.
      */
     private ParameterDescriptor[] createParameters(final String  method,
@@ -1875,7 +1934,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                                 +    " ORDER BY CU.SORT_ORDER");
         stmt.setString(1, method);
         stmt.setString(2, operation);
-        ResultSet result = stmt.executeQuery();
+        final ResultSet result = stmt.executeQuery();
         while (result.next()) {
             final ParameterDescriptor parameter;
             final String name    = getString(result, 1, operation);
@@ -1905,11 +1964,16 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     /**
      * Returns an operation method from a code.
      *
-     * @param  code Value allocated by authority.
-     * @return The operation method code.
+     * @param  code             The operation method code allocated by EPSG authority.
+     * @param  operation        The EPSG code for the operation (conversion or transformation).
+     * @param  sourceDimensions The source dimensions for the coordinate operation to be created.
+     * @param  targetDimensions The target dimensions for the coordinate operation to be created.
+     * @param  isProjection     {@code true} if we should automatically add "semi_major" and
+     *                          "semi_minor" parameters to the list of parameters to be returned.
      * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
      */
-    private OperationMethod createOperationMethod(final String code, final String operation,
+    private OperationMethod createOperationMethod(final String code,
+                                                  final String operation,
                                                   final int sourceDimensions,
                                                   final int targetDimensions,
                                                   final boolean isProjection)
@@ -1917,14 +1981,13 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
     {
         OperationMethod returnValue = null;
         final PreparedStatement stmt;
-        stmt = prepareStatement("OperationMethod",
-                                           "SELECT COORD_OP_METHOD_NAME,"
-                                         +       " FORMULA,"
-                                         +       " REMARKS"
-                                         +  " FROM [Coordinate_Operation Method]"
-                                         + " WHERE COORD_OP_METHOD_CODE = ?");
+        stmt = prepareStatement("OperationMethod", "SELECT COORD_OP_METHOD_NAME,"
+                                                 +       " FORMULA,"
+                                                 +       " REMARKS"
+                                                 +  " FROM [Coordinate_Operation Method]"
+                                                 + " WHERE COORD_OP_METHOD_CODE = ?");
         stmt.setString(1, code);
-        ResultSet result = stmt.executeQuery();
+        final ResultSet result = stmt.executeQuery();
         ParameterDescriptor[] descriptors = null;
         OperationMethod method = null;
         while (result.next()) {
@@ -1946,6 +2009,235 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
              throw noSuchAuthorityCode(OperationMethod.class, code);
         }
         return returnValue;
+    }
+
+    /**
+     * Returns {@code true} if the {@linkplain CoordinateOperation coordinate operation} for the
+     * specified code is a {@linkplain Projection projection}. The caller must have ensured that
+     * the designed operation is a {@linkplain Conversion conversion} before to invoke this method.
+     */
+    final boolean isProjection(final String code) throws SQLException {
+        assert Thread.holdsLock(this);
+        final PreparedStatement stmt = prepareStatement("isProjection",
+                      "SELECT COORD_REF_SYS_CODE"           +
+                      " FROM [Coordinate Reference System]" +
+                     " WHERE PROJECTION_CONV_CODE = ?"      +
+                       " AND COORD_REF_SYS_KIND LIKE 'projected%'");
+        stmt.setString(1, code);
+        final ResultSet result = stmt.executeQuery();
+        boolean found = result.next();
+        result.close();
+        return found;
+    }
+
+    /**
+     * Returns a coordinate operation from a code.
+     * The returned object will either be a {@linkplain Conversion conversion} or a
+     * {@linkplain Transformation transformation}, depending on the code.
+     *
+     * @param  code Value allocated by authority.
+     * @return The coordinate operation object.
+     * @throws NoSuchAuthorityCodeException if this method can't find the requested code.
+     * @throws FactoryException if some other kind of failure occured in the backing
+     *         store. This exception usually have {@link SQLException} as its cause.
+     *
+     * @since 2.2
+     */
+    public synchronized CoordinateOperation createCoordinateOperation(final String code)
+            throws FactoryException
+    {
+        ensureNonNull("code", code);
+        CoordinateOperation returnValue = null;
+        try {
+            final String primaryKey = toPrimaryKey(code,
+                    "[Coordinate_Operation]", "COORD_OP_CODE", "COORD_OP_NAME");
+            final PreparedStatement stmt;
+            stmt = prepareStatement("CoordinateOperation", "SELECT COORD_OP_CODE,"
+                                                         +       " COORD_OP_NAME,"
+                                                         +       " COORD_OP_TYPE,"
+                                                         +       " SOURCE_CRS_CODE,"
+                                                         +       " TARGET_CRS_CODE,"
+                                                         +       " COORD_OP_METHOD_CODE,"
+                                                         +       " COORD_TFM_VERSION,"
+                                                         +       " COORD_OP_ACCURACY,"
+                                                         +       " AREA_OF_USE_CODE,"
+                                                         +       " COORD_OP_SCOPE,"
+                                                         +       " REMARKS"
+                                                         + " FROM [Coordinate_Operation]"
+                                                         + " WHERE COORD_OP_CODE = ?");
+            stmt.setString(1, code);
+            final ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final String epsg  = getString(result, 1, code);
+                final String name  = getString(result, 2, code);
+                final String type  = getString(result, 3, code).trim().toLowerCase();
+                final boolean isTransformation = type.equals("transformation");
+                final boolean isConversion     = type.equals("conversion");
+                final boolean isConcatenated   = type.equals("concatenated operation");
+                final String sourceCode, targetCode, methodCode;
+                if (isConversion) {
+                    // Optional for conversions, mandatory for all others.
+                    sourceCode = result.getString(4);
+                    targetCode = result.getString(5);
+                } else {
+                    sourceCode = getString(result, 4, code);
+                    targetCode = getString(result, 5, code);
+                }
+                if (isConcatenated) {
+                    // Not applicable to concatenated operation, mandatory for all others.
+                    methodCode = result.getString(6);
+                } else {
+                    methodCode = getString(result, 6, code);
+                }
+                String version  = result.getString( 7);
+                double accuracy = result.getDouble( 8); if (result.wasNull()) accuracy=Double.NaN;
+                String area     = result.getString( 9);
+                String scope    = result.getString(10);
+                String remarks  = result.getString(11);
+                /*
+                 * Gets the source and target CRS. They are mandatory for transformations (is was
+                 * checked above in this method) and optional for conversions. Conversions are
+                 * usually "defining conversions" and don't define source and target CRS.
+                 */
+                final CoordinateReferenceSystem sourceCRS, targetCRS;
+                sourceCRS = (sourceCode!=null) ? buffered.createCoordinateReferenceSystem(sourceCode) : null;
+                targetCRS = (targetCode!=null) ? buffered.createCoordinateReferenceSystem(targetCode) : null;
+                /*
+                 * Creates common properties. While 'version' and 'accuracy' should be defined
+                 * for transformations only, we still checks them for all operation just in case.
+                 */
+                final Map properties = createProperties(name, epsg, area, scope, remarks);
+                if (version!=null && (version=version.trim()).length()!=0) {
+                    properties.put(CoordinateOperation.OPERATION_VERSION_KEY, version);
+                }
+                if (!Double.isNaN(accuracy)) {
+                    final QuantitativeResultImpl                 accuracyResult;
+                    final AbsoluteExternalPositionalAccuracyImpl accuracyElement;
+                    accuracyResult = new QuantitativeResultImpl(new double[]{accuracy});
+                    accuracyResult.setValueType(Float.class); // This is the type declared in the MS-Access database.
+                    if (targetCRS != null) {
+                        final Unit unit = CRSUtilities.getUnit(targetCRS.getCoordinateSystem());
+                        if (unit != null) {
+                            accuracyResult.setValueUnit(unit);
+                        }
+                    }
+                    accuracyElement = new AbsoluteExternalPositionalAccuracyImpl(accuracyResult);
+                    accuracyElement.setMeasureDescription(TRANSFORMATION_ACCURACY);
+                    accuracyElement.setEvaluationMethodType(EvaluationMethodType.DIRECT_EXTERNAL);
+                    properties.put(CoordinateOperation.POSITIONAL_ACCURACY_KEY,
+                                   accuracyElement.unmodifiable());
+                }
+                /*
+                 * Gets the operation method. This is mandatory for conversions and transformations
+                 * (it was checked above in this method) but optional for concatenated operations.
+                 *
+                 * TODO: When no CRS is specified, current implementation assumes a 2D CRS.
+                 */
+                final OperationMethod method;
+                final ParameterValueGroup parameters;
+                if (methodCode != null) {
+                    method = createOperationMethod(methodCode, epsg,
+                             (sourceCRS!=null) ? sourceCRS.getCoordinateSystem().getDimension() : 2,
+                             (targetCRS!=null) ? targetCRS.getCoordinateSystem().getDimension() : 2,
+                             isConversion ? isProjection(epsg) : false);
+                    parameters = (ParameterValueGroup) method.getParameters().createValue();
+                    // ParameterDescriptor's default values are actual parameter values.
+                } else {
+                    method     = null;
+                    parameters = null;
+                }
+                /*
+                 * Creates the operation. Conversions are the only operations allowed to have null
+                 * source and target CRS.
+                 */
+                final CoordinateOperation operation;
+                if (isConversion && (sourceCRS==null || targetCRS==null)) {
+                    operation = new DefiningConversion(properties, method, parameters);
+                } else if (isConcatenated) {
+                    if (operationFactory == null) {
+                        operationFactory = new ConcatenatedOperationFactory(factories, this);
+                    }
+                    ((ConcatenatedOperationFactory) operationFactory).init(properties, sourceCode, targetCode);
+                    operation = operationFactory.createOperation(sourceCRS, targetCRS);
+                } else {
+                    final MathTransform mt;
+                    mt = factories.getMathTransformFactory().createParameterizedTransform(parameters);
+                    if (isTransformation) {
+                        // TODO: uses GeoAPI factory method once available.
+                        operation = new DefaultTransformation(properties, sourceCRS, targetCRS, mt, method);
+                    } else if (isConversion) {
+                        // TODO: uses GeoAPI factory method once available.
+                        operation = new DefaultConversion(properties, sourceCRS, targetCRS, mt, method);
+                    } else {
+                        result.close();
+                        throw new FactoryException(Resources.format(ResourceKeys.ERROR_UNKNOW_TYPE_$1, type));
+                    }
+                }
+                returnValue = (CoordinateOperation) ensureSingleton(operation, returnValue, code);
+            }
+            result.close();
+        } catch (SQLException exception) {
+            throw databaseFailure(CoordinateOperation.class, code, exception);
+        }            
+        if (returnValue == null) {
+             throw noSuchAuthorityCode(CoordinateOperation.class, code);
+        }
+        return returnValue;
+    }
+
+    /**
+     * Creates operations from coordinate reference system codes.
+     *
+     * @param sourceCode Coded value of source coordinate reference system.
+     * @param targetCode Coded value of target coordinate reference system.
+     * @throws FactoryException if the object creation failed.
+     *
+     * @since 2.2
+     */
+    public synchronized Set createFromCoordinateReferenceSystemCodes(final String sourceCode,
+                                                                     final String targetCode)
+            throws FactoryException
+    {
+        ensureNonNull("sourceCode", sourceCode);
+        ensureNonNull("targetCode", targetCode);
+        final String pair = sourceCode + " \u21E8 " + targetCode;
+        final Set set = new LinkedHashSet();
+        try {
+            final PreparedStatement stmt;
+            final String sourceKey = toPrimaryKey(sourceCode);
+            final String targetKey = toPrimaryKey(targetCode);
+            stmt = prepareStatement("FromCRS", "SELECT COORD_OP_CODE"
+                                             + " FROM [Coordinate_Operation]"
+                                             + " WHERE SOURCE_CRS_CODE = ? "
+                                             +   " AND TARGET_CRS_CODE = ?");
+            stmt.setString(1, sourceKey);
+            stmt.setString(2, targetKey);
+            final ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final String code = getString(result, 1, pair);
+                final CoordinateOperation operation;
+                try {
+                    operation = buffered.createCoordinateOperation(code);
+                } catch (NoSuchIdentifierException exception) {
+                    /*
+                     * The operation uses an unsupported math transform.
+                     * Log as a warning and search for other operations.
+                     * TODO: localize
+                     */
+                    final LogRecord record = new LogRecord(Level.WARNING,
+                            "Operation \""+code+"\" uses an unsupported method.");
+                    record.setSourceClassName("FactoryUsingSQL");
+                    record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
+                    record.setThrown(exception);
+                    LOGGER.log(record);
+                    continue;
+                }
+                set.add(operation);
+            }
+        } catch (SQLException exception) {
+            throw databaseFailure(CoordinateOperation.class, pair, exception);
+        }
+        return set;
     }
 
     /**

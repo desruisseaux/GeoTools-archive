@@ -130,14 +130,38 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * Constructs a coordinate operation factory using the default factories.
      */
     public DefaultCoordinateOperationFactory() {
-        this((Hints) null);
+        this(null);
     }
 
     /**
      * Constructs a coordinate operation factory using the specified hints.
+     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
+     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
+     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
+     * a low-level substitute for all the above.
+     *
+     * @param hints The hints, or {@code null} if none.
      */
     public DefaultCoordinateOperationFactory(final Hints hints) {
-        super(hints);
+        this(hints, NORMAL_PRIORITY);
+    }
+
+    /**
+     * Constructs a coordinate operation factory using the specified hints and priority.
+     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
+     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
+     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
+     * a low-level substitute for all the above.
+     *
+     * @param hints The hints, or {@code null} if none.
+     * @param priority The priority for this factory, as a number between
+     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
+     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
+     *
+     * @since 2.2
+     */
+    public DefaultCoordinateOperationFactory(final Hints hints, final int priority) {
+        super(hints, priority);
         //
         // Default hints values
         //
@@ -172,10 +196,10 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * Returns an operation for conversion or transformation between two coordinate reference
      * systems. If an operation exists, it is returned. If more than one operation exists, the
      * default is returned. If no operation exists, then the exception is thrown.
-     *
-     * <P>The default implementation inspects the CRS and delegates the work to one or
+     * <P>
+     * The default implementation inspects the CRS and delegates the work to one or
      * many {@code createOperationStep(...)} methods. This method fails if no path
-     * between the CRS is found.</P>
+     * between the CRS is found.
      *
      * @param  sourceCRS Input coordinate reference system.
      * @param  targetCRS Output coordinate reference system.

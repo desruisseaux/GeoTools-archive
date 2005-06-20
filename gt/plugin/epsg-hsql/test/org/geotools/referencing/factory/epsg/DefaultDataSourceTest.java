@@ -49,6 +49,10 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.Operation;
+import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.Projection;
+import org.opengis.referencing.operation.Transformation;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 
@@ -188,36 +192,36 @@ public class DefaultDataSourceTest extends TestCase {
         if (factory == null) return;
         final Set crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertFalse(crs.isEmpty());
-        assertTrue(crs.size() > 0);
+        assertTrue (crs.size() > 0);
         assertEquals("Check size() consistency", crs.size(), crs.size());
 
         final Set geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
         assertFalse(geographicCRS.isEmpty());
-        assertTrue(geographicCRS.size() > 0);
-        assertTrue(geographicCRS.size() < crs.size());
-        assertTrue(crs.containsAll(geographicCRS));
+        assertTrue (geographicCRS.size() > 0);
+        assertTrue (geographicCRS.size() < crs.size());
         assertFalse(geographicCRS.containsAll(crs));
+        assertTrue (crs.containsAll(geographicCRS));
 
         final Set projectedCRS = factory.getAuthorityCodes(ProjectedCRS.class);
         assertFalse(projectedCRS.isEmpty());
-        assertTrue(projectedCRS.size() > 0);
-        assertTrue(projectedCRS.size() < crs.size());
-        assertTrue(crs.containsAll(projectedCRS));
+        assertTrue (projectedCRS.size() > 0);
+        assertTrue (projectedCRS.size() < crs.size());
         assertFalse(projectedCRS.containsAll(crs));
+        assertTrue (crs.containsAll(projectedCRS));
 //        assertTrue(Collections.disjoint(geographicCRS, projectedCRS));
         // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
 
         final Set datum = factory.getAuthorityCodes(Datum.class);
         assertFalse(datum.isEmpty());
-        assertTrue(datum.size() > 0);
+        assertTrue (datum.size() > 0);
 //        assertTrue(Collections.disjoint(datum, crs));
         // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
 
         final Set geodeticDatum = factory.getAuthorityCodes(GeodeticDatum.class);
         assertFalse(geodeticDatum.isEmpty());
-        assertTrue(geodeticDatum.size() > 0);
-        assertTrue(datum.containsAll(geodeticDatum));
+        assertTrue (geodeticDatum.size() > 0);
         assertFalse(geodeticDatum.containsAll(datum));
+        assertTrue (datum.containsAll(geodeticDatum));
 
         // Ensures that the factory keept the set in its cache.
         assertSame(crs,           factory.getAuthorityCodes(CoordinateReferenceSystem.class));
@@ -229,6 +233,35 @@ public class DefaultDataSourceTest extends TestCase {
 
         // Try a dummy type.
         assertTrue("Dummy type", factory.getAuthorityCodes(String.class).isEmpty());
+
+        // Tests projections, which are handle in a special way.
+        final Set operations      = factory.getAuthorityCodes(Operation     .class);
+        final Set conversions     = factory.getAuthorityCodes(Conversion    .class);
+        final Set projections     = factory.getAuthorityCodes(Projection    .class);
+        final Set transformations = factory.getAuthorityCodes(Transformation.class);
+
+        assertTrue (conversions    .size() < operations .size());
+        assertTrue (projections    .size() < operations .size());
+        assertTrue (transformations.size() < operations .size());
+        assertTrue (projections    .size() < conversions.size());
+
+        assertFalse(projections.containsAll(conversions));
+        assertTrue (conversions.containsAll(projections));
+        assertTrue (operations .containsAll(conversions));
+        assertTrue (operations .containsAll(transformations));
+
+        // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+//        assertTrue (Collections.disjoint(conversions, transformations));
+//        assertFalse(Collections.disjoint(conversions, projections));
+
+        assertFalse(operations     .isEmpty());
+        assertFalse(conversions    .isEmpty());
+        assertFalse(projections    .isEmpty());
+        assertFalse(transformations.isEmpty());
+
+        assertTrue (conversions.contains("101"));
+        assertFalse(projections.contains("101"));
+        assertTrue (projections.contains("16001"));
     }
 
     /**

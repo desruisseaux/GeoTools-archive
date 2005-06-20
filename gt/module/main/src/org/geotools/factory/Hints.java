@@ -147,6 +147,15 @@ public final class Hints extends RenderingHints {
             new Key("org.opengis.referencing.operation.CoordinateOperationFactory");
 
     /**
+     * Hint for the {@link org.opengis.referencing.operation.CoordinateOperationAuthorityFactory}
+     * instance to use.
+     *
+     * @see org.geotools.referencing.FactoryFinder#getCoordinateOperationAuthorityFactory
+     */
+    public static final Key COORDINATE_OPERATION_AUTHORITY_FACTORY =
+            new Key("org.opengis.referencing.operation.CoordinateOperationAuthorityFactory");
+
+    /**
      * Hint for the {@link org.opengis.referencing.operation.MathTransformFactory} instance to use.
      *
      * @see org.geotools.referencing.FactoryFinder#getMathTransformFactory
@@ -257,7 +266,7 @@ public final class Hints extends RenderingHints {
          *
          * @param classe The base class for all valid values.
          */
-        Key(final Class classe) {
+        public Key(final Class classe) {
             this(classe.getName());
             valueClass = classe;
         }

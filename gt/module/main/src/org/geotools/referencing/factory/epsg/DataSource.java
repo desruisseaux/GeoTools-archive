@@ -23,9 +23,9 @@ package org.geotools.referencing.factory.epsg;
 import java.sql.SQLException;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 
@@ -86,11 +86,11 @@ public interface DataSource extends javax.sql.DataSource {
      * sub-class of {@link FactoryUsingSQL} if they wants to uses slightly different SQL
      * queries.
      *
-     * @param  factories The low-level factories to use for CRS creation. This argument
-     *         should be given unchanged to {@code FactoryUsingSQL} constructor.
+     * @param  hints A map of hints, including the low-level factories to use for CRS creation.
+     *         This argument should be given unchanged to {@code FactoryUsingSQL} constructor.
      * @return The {@linkplain FactoryUsingSQL EPSG factory} using SQL queries appropriate
      *         for this data source.
      * @throws SQLException if connection to the database failed.
      */
-    AbstractAuthorityFactory createFactory(final FactoryGroup factories) throws SQLException;
+    AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException;
 }

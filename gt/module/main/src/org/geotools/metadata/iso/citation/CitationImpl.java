@@ -422,23 +422,64 @@ public class CitationImpl extends MetadataEntity implements Citation {
     }
 
     /**
+     * Returns {@code true} if at least one {@linkplain #getTitle title} or
+     * {@linkplain #getAlternateTitles alternate title} is found equals in both citations.
+     * The comparaison is case-insensitive and ignores leading and trailing spaces. The
+     * titles ordering is ignored.
+     *
+     * @param  c1 The first citation to compare.
+     * @param  c2 the second citation to compare.
+     * @return {@code true} if at least one title or alternate title matches.
+     *
+     * @since 2.2
+     */
+    public static boolean titleMatches(final Citation c1, final Citation c2) {
+        InternationalString candidate = c2.getTitle();
+        Iterator iterator = null;
+        do {
+            final String asString = candidate.toString(Locale.US);
+            if (titleMatches(c1, asString)) {
+                return true;
+            }
+            final String asLocalized = candidate.toString();
+            if (asLocalized!=asString && titleMatches(c1, asLocalized)) {
+                return true;
+            }
+            if (iterator == null) {
+                final Collection titles = c2.getAlternateTitles();
+                if (titles == null) {
+                    break;
+                }
+                iterator = titles.iterator();
+            }
+            if (!iterator.hasNext()) {
+                break;
+            }
+            candidate = (InternationalString) iterator.next();
+        } while (true);
+        return false;
+    }
+
+    /**
      * Returns {@code true} if the {@linkplain #getTitle title} or any
-     * {@linkplain #getAlternateTitles alternate title} in the given citation
-     * matches the given string.
+     * {@linkplain #getAlternateTitles alternate title} in the given citation matches the given
+     * string. The comparaison is case-insensitive and ignores leading and trailing spaces.
      *
      * @param  citation The citation to check for.
      * @param  title The title or alternate title to compare.
-     * @return {@code true} in the title or alternate title matche the given string.
+     * @return {@code true} if the title or alternate title matches the given string.
      */
     public static boolean titleMatches(final Citation citation, String title) {
         title = title.trim();
         InternationalString candidate = citation.getTitle();
         Iterator iterator = null;
         do {
-            if (candidate.toString(Locale.US).trim().equalsIgnoreCase(title)) {
+            final String asString = candidate.toString(Locale.US);
+            if (asString.trim().equalsIgnoreCase(title)) {
                 return true;
             }
-            if (candidate.toString().trim().equalsIgnoreCase(title)) {
+            final String asLocalized = candidate.toString();
+            if (asLocalized!=asString && asLocalized.trim().equalsIgnoreCase(title)) {
                 return true;
             }
             if (iterator == null) {

@@ -19,12 +19,13 @@
  */
 package org.geotools.resources;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.List;
 import java.util.Iterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.BoundingPolygon;
@@ -150,6 +151,28 @@ public final class CRSUtilities {
             }
         }
         return candidate;
+    }
+
+    /**
+     * Returns the unit used for all axis in the specified coordinate system.
+     * If not all axis uses the same unit, then this method returns {@code null}.
+     * This convenience method is often used for Well Know Text (WKT) formatting.
+     *
+     * @since 2.2
+     */
+    public static Unit getUnit(final CoordinateSystem cs) {
+        Unit unit = null;
+        for (int i=cs.getDimension(); --i>=0;) {
+            final Unit candidate = cs.getAxis(i).getUnit();
+            if (candidate != null) {
+                if (unit == null) {
+                    unit = candidate;
+                } else if (!unit.equals(candidate)) {
+                    return null;
+                }
+            }
+        }
+        return unit;
     }
     
     /**

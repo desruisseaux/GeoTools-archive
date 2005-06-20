@@ -30,7 +30,7 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 
 // Geotools dependencies
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 // HSQL dependencies
@@ -201,11 +201,11 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
     /**
      * Opens a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
      *
-     * @param  factories The low-level factories to use for CRS creation.
+     * @param  hints A map of hints, including the low-level factories to use for CRS creation.
      * @return The EPSG factory using HSQLDB SQL syntax.
      * @throws SQLException if connection to the database failed.
      */
-    public AbstractAuthorityFactory createFactory(final FactoryGroup factories) throws SQLException {
-        return new FactoryUsingHSQL(factories, getConnection());
+    public AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException {
+        return new FactoryUsingHSQL(hints, getConnection());
     }
 }

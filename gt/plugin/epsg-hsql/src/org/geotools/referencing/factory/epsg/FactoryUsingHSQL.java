@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 // Geotools dependencies
-import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.factory.Hints;
 
 
 /**
@@ -52,8 +52,8 @@ final class FactoryUsingHSQL extends FactoryUsingAnsiSQL {
     /**
      * Constructs the factory for the given connection to the HSQL database.
      */
-    public FactoryUsingHSQL(final FactoryGroup factories, final Connection connection) {
-        super(factories, connection);
+    public FactoryUsingHSQL(final Hints hints, final Connection connection) {
+        super(hints, connection);
     }
 
     /**

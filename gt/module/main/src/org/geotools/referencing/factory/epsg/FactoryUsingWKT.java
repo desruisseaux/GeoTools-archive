@@ -28,6 +28,7 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
@@ -63,11 +64,21 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory {
     public static final String FILENAME = "epsg.properties";
 
     /**
-     * Constructs an authority factory using the default set of
-     * {@linkplain org.opengis.referencing.ObjectFactory object factories}.
+     * Constructs an authority factory using the default set of factories.
      */
     public FactoryUsingWKT() {
-        super(new FactoryGroup(), MINIMUM_PRIORITY+20);
+        this(null);
+    }
+
+    /**
+     * Constructs an authority factory using a set of factories created from the specified hints.
+     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
+     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
+     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
+     * a low-level substitute for all the above.
+     */
+    public FactoryUsingWKT(final Hints hints) {
+        super(hints, MINIMUM_PRIORITY+20);
         setTimeout(15*60*1000L); // Closes the connection after at least 15 minutes of inactivity.
     }
 

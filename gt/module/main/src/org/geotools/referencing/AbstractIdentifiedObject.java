@@ -48,9 +48,11 @@ import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.ObjectFactory;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
+import org.opengis.util.LocalName;
 import org.opengis.util.ScopedName;
 
 // Geotools dependencies
+import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.cts.ResourceKeys;
@@ -65,7 +67,7 @@ import org.geotools.util.NameFactory;
  * {@linkplain Identifier#getAuthority authority} and {@linkplain Identifier#getCode
  * authority code} values are set to the authority name of the factory object, and the
  * authority code supplied by the client, respectively. When {@link ObjectFactory} creates an
- * object, the {@linkplain #getName name} is set to the value supplied by the client and
+ * object, the {@linkplain #getName() name} is set to the value supplied by the client and
  * all of the other metadata items are left empty.
  * <p>
  * This class is conceptually <cite>abstract</cite>, even if it is technically possible to
@@ -106,7 +108,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
     public static final GenericName[] EMPTY_ALIAS_ARRAY = new GenericName[0];
    
     /**
-     * A comparator for sorting identified objects by {@linkplain #getName name}.
+     * A comparator for sorting identified objects by {@linkplain #getName() name}.
      */
     public static final Comparator NAME_COMPARATOR = new NameComparator();
     private static final class NameComparator implements Comparator, Serializable {
@@ -200,7 +202,7 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      *   <tr>
      *     <td nowrap>&nbsp;{@link #NAME_KEY "name"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link Identifier}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link #getName}</td>
+     *     <td nowrap>&nbsp;{@link #getName()}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link #ALIAS_KEY "alias"}&nbsp;</td>
@@ -211,12 +213,12 @@ public class AbstractIdentifiedObject extends Formattable implements IdentifiedO
      *   <tr>
      *     <td nowrap>&nbsp;{@link Identifier#AUTHORITY_KEY "authority"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String} or {@link Citation}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the {@linkplain #getName name}</td>
+     *     <td nowrap>&nbsp;{@link Identifier#getAuthority} on the {@linkplain #getName() name}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link Identifier#VERSION_KEY "version"}&nbsp;</td>
      *     <td nowrap>&nbsp;{@link String}&nbsp;</td>
-     *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the {@linkplain #getName name}</td>
+     *     <td nowrap>&nbsp;{@link Identifier#getVersion} on the {@linkplain #getName() name}</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>&nbsp;{@link #IDENTIFIERS_KEY "identifiers"}&nbsp;</td>
@@ -460,6 +462,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
 
     /**
      * The primary name by which this object is identified.
+     *
+     * @see #getName(Citation)
      */
     public Identifier getName() {
         return name;
@@ -469,6 +473,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * An alternative name by which this object is identified.
      *         
      * @return The aliases, or an empty array if there is none.
+     *
+     * @see #getName(Citation)
      */
     public Collection/*<GenericName>*/ getAlias() {
         return (alias!=null) ? alias : Collections.EMPTY_SET;
@@ -479,6 +485,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * Alternatively an identifier by which this object can be referenced.
      *
      * @return This object identifiers, or an empty array if there is none.
+     *
+     * @see #getIdentifier(Citation)
      */
     public Set/*<Identifier>*/ getIdentifiers() {
         return (identifiers!=null) ? identifiers : Collections.EMPTY_SET;
@@ -493,8 +501,8 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
 
     /**
      * Returns the informations provided in the specified indentified object as a map of
-     * properties. The returned map contains key such as {@link #NAME_KEY}, and values
-     * from methods such as {@link IdentifiedObject#getName}.
+     * properties. The returned map contains key such as {@link #NAME_KEY NAME_KEY}, and
+     * values from methods such as {@link #getName}.
      *
      * @param  info The identified object to view as a properties map.
      * @return An view of the identified object as an immutable map.
@@ -510,7 +518,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * <code>{@linkplain #getProperties getProperties}(info)</code>), except for the following:
      * <p>
      * <ul>
-     *   <li>The {@linkplain #getName name}'s authority is replaced by the specified one.</li>
+     *   <li>The {@linkplain #getName() name}'s authority is replaced by the specified one.</li>
      *   <li>All {@linkplain #getIdentifiers identifiers} are removed, because the new object
      *       to be created is probably not endorsed by the original authority.</li>
      * </ul>
@@ -529,31 +537,164 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         properties.remove(IDENTIFIERS_KEY);
         return properties;
     }
-    
+
     /**
-     * Returns a hash value for this identified object. {@linkplain #getName Name},
-     * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
-     * are not taken in account. In other words, two identified objects will return
-     * the same hash value if they are equal in the sense of
-     * <code>{@link #equals(AbstractIdentifiedObject,boolean) equals}(AbstractIdentifiedObject,
-     * <strong>false</strong>)</code>.
+     * Returns an identifier according the given authority. This method checks first all
+     * {@link #getIdentifiers identifiers} in their iteration order. It returns the first
+     * identifier with an {@linkplain Identifier#getAuthority identifier authority} title
+     * {@linkplain CitationImpl#titleMatches(Citation,Citation) matching} at least one title
+     * from the specified authority.
      *
-     * @return The hash code value. This value doesn't need to be the same
-     *         in past or future versions of this class.
+     * @param  authority The authority for the identifier to return.
+     * @return The object's identifier, or {@code null} if no identifier matching the specified
+     *         authority was found.
+     *
+     * @since 2.2
      */
-    public int hashCode() {
-        // Subclasses need to overrides this!!!!
-        return (int)serialVersionUID ^ getClass().hashCode();
+    public Identifier getIdentifier(final Citation authority) {
+        return getIdentifier0(this, authority);
     }
 
     /**
-     * Returns {@code true} if either the {@linkplain #getName primary name} or at least
-     * one {@linkplain #getAlias alias} matches the specified string. This method performs the
-     * search in the following order:
+     * Returns an identifier according the given authority. This method performs the same search
+     * than {@link #getIdentifier(Citation)} on arbitrary implementations of GeoAPI interface.
+     *
+     * @param  info The object to get the identifier from.
+     * @param  authority The authority for the identifier to return.
+     * @return The object's identifier, or {@code null} if no identifier matching the specified
+     *         authority was found.
+     *
+     * @since 2.2
+     */
+    public static Identifier getIdentifier(final IdentifiedObject info, final Citation authority) {
+        if (info instanceof AbstractIdentifiedObject) {
+            // Gives a chances to subclasses to get their overriden method invoked.
+            return ((AbstractIdentifiedObject) info).getIdentifier(authority);
+        }
+        return getIdentifier0(info, authority);
+    }
+
+    /**
+     * Implementation of {@link #getIdentifier(Citation)}.
+     */
+    private static Identifier getIdentifier0(final IdentifiedObject info, final Citation authority) {
+        for (final Iterator it=info.getIdentifiers().iterator(); it.hasNext();) {
+            final Identifier identifier = (Identifier) it.next();
+            if (authority == null) {
+                return identifier;
+            }
+            final Citation infoAuthority = identifier.getAuthority();
+            if (infoAuthority != null) {
+                if (CitationImpl.titleMatches(authority, infoAuthority)) {
+                    return identifier;
+                }
+            }
+        }
+        return (authority==null) ? info.getName() : null;
+    }
+
+    /**
+     * Returns this object's name according the given authority. This method checks first the
+     * {@linkplain #getName() primary name}, then all {@link #getAlias() alias} in their iteration
+     * order. The objects being examined are {@link Identifier}s or {@link GenericName}s. If a
+     * generic name implements the {@code Identifier} interface (e.g. {@link NamedIdentifier}),
+     * then the identifier view has precedence.
+     * <p>
+     * This method returns the {@linkplain Identifier#getCode code} (for identifiers) or the
+     * {@linkplain GenericName#asLocalName local name} (for alias) of the first object that
+     * meets the following conditions:
+     * <p>
      * <ul>
-     *   <li>The {@linkplain #getName primary name} of this object</li>
-     *   <li>The {@linkplain org.geotools.util.ScopedName fully qualified name} of an alias</li>
-     *   <li>The {@linkplain org.geotools.util.LocalName local name} of an alias</li>
+     *   <li>An {@linkplain Identifier#getAuthority identifier authority} title
+     *       {@linkplain CitationImpl#titleMatches(Citation,Citation) matching}
+     *       at least one title from the specified authority.</li>
+     *   <li>A {@linkplain GenericName#getScope name scope}
+     *       {@linkplain CitationImpl#titleMatches(Citation,String) matching}
+     *       at least one title from the specified authority.</li>
+     * </ul>
+     *
+     * @param  authority The authority for the name to return.
+     * @return The object's name (either a {@linkplain Identifier#getCode code} or a
+     *         {@linkplain GenericName#asLocalName local name}), or {@code null} if no
+     *         name matching the specified authority was found.
+     *
+     * @see #getName()
+     * @see #getAlias()
+     *
+     * @since 2.2
+     */
+    public String getName(final Citation authority) {
+        return getName0(this, authority);
+    }
+
+    /**
+     * Returns an object's name according the given authority. This method performs the same search
+     * than {@link #getName(Citation)} on arbitrary implementations of GeoAPI interface.
+     *
+     * @param  info The object to get the name from.
+     * @param  authority The authority for the name to return.
+     * @return The object's name (either a {@linkplain Identifier#getCode code} or a
+     *         {@linkplain GenericName#asLocalName local name}), or {@code null} if no
+     *         name matching the specified authority was found.
+     *
+     * @since 2.2
+     */
+    public static String getName(final IdentifiedObject info, final Citation authority) {
+        if (info instanceof AbstractIdentifiedObject) {
+            // Gives a chances to subclasses to get their overriden method invoked.
+            return ((AbstractIdentifiedObject) info).getName(authority);
+        }
+        return getName0(info, authority);
+    }
+
+    /**
+     * Implementation of {@link #getName(Citation)}.
+     */
+    private static String getName0(final IdentifiedObject info, final Citation authority) {
+        Identifier identifier = info.getName();
+        if (authority == null) {
+            return identifier.getCode();
+        }
+        String name = null;
+        Citation infoAuthority = identifier.getAuthority();
+        if (infoAuthority != null) {
+            if (CitationImpl.titleMatches(authority, infoAuthority)) {
+                name = identifier.getCode();
+            } else {
+                for (final Iterator it=info.getAlias().iterator(); it.hasNext();) {
+                    final GenericName alias = (GenericName) it.next();
+                    if (alias instanceof Identifier) {
+                        identifier = (Identifier) alias;
+                        infoAuthority = identifier.getAuthority();
+                        if (infoAuthority != null) {
+                            if (CitationImpl.titleMatches(authority, infoAuthority)) {
+                                name = identifier.getCode();
+                                break;
+                            }
+                        }
+                    } else {
+                        final GenericName scope = alias.getScope();
+                        if (scope != null) {
+                            if (CitationImpl.titleMatches(authority, scope.toString())) {
+                                name = alias.asLocalName().toString();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return name;
+    }
+
+    /**
+     * Returns {@code true} if either the {@linkplain #getName() primary name} or at least
+     * one {@linkplain #getAlias alias} matches the specified string. This method performs
+     * the search in the following order, regardless of any authority:
+     * <ul>
+     *   <li>The {@linkplain #getName() primary name} of this object</li>
+     *   <li>The {@linkplain ScopedName fully qualified name} of an alias</li>
+     *   <li>The {@linkplain LocalName local name} of an alias</li>
      * </ul>
      *
      * @param  name The name to compare.
@@ -565,10 +706,10 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     }
 
     /**
-     * Returns {@code true} if either the {@linkplain #getName primary name} or at least
+     * Returns {@code true} if either the {@linkplain #getName() primary name} or at least
      * one {@linkplain #getAlias alias} matches the specified string. This method performs the
      * same check than the {@linkplain #nameMatches(String) non-static method} on arbitrary
-     * object implementing the OpenGIS interface.
+     * object implementing the GeoAPI interface.
      *
      * @param  object The object to check.
      * @param  name The name.
@@ -632,19 +773,19 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
     /**
      * Compares this object with the specified object for equality.
      *
-     * If {@code compareMetadata} is {@code true}, then all available properties
-     * are compared including {@linkplain #getName name}, {@linkplain #getRemarks remarks},
+     * If {@code compareMetadata} is {@code true}, then all available properties are
+     * compared including {@linkplain #getName() name}, {@linkplain #getRemarks remarks},
      * {@linkplain #getIdentifiers identifiers code}, etc.
      *
      * If {@code compareMetadata} is {@code false}, then this method compare
      * only the properties needed for computing transformations. In other words,
      * {@code sourceCS.equals(targetCS, false)} returns {@code true} only if
      * the transformation from {@code sourceCS} to {@code targetCS} is
-     * the identity transform, no matter what {@link #getName} saids.
+     * the identity transform, no matter what {@link #getName()} saids.
      * <P>
      * Some subclasses (especially {@link org.geotools.referencing.datum.AbstractDatum}
      * and {@link org.geotools.parameter.AbstractParameterDescriptor}) will test for
-     * the {@linkplain #getName name}, since objects with different name have
+     * the {@linkplain #getName() name}, since objects with different name have
      * completly different meaning. For example nothing differentiate the
      * <code>"semi_major"</code> and <code>"semi_minor"</code> parameters
      * except the name. The name comparaison may be loose however, i.e. we may
@@ -780,6 +921,22 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
             return +1;
         }
         return c1.compareTo(c2);
+    }
+    
+    /**
+     * Returns a hash value for this identified object. {@linkplain #getName() Name},
+     * {@linkplain #getIdentifiers identifiers} and {@linkplain #getRemarks remarks}
+     * are not taken in account. In other words, two identified objects will return
+     * the same hash value if they are equal in the sense of
+     * <code>{@link #equals(AbstractIdentifiedObject,boolean) equals}(AbstractIdentifiedObject,
+     * <strong>false</strong>)</code>.
+     *
+     * @return The hash code value. This value doesn't need to be the same
+     *         in past or future versions of this class.
+     */
+    public int hashCode() {
+        // Subclasses need to overrides this!!!!
+        return (int)serialVersionUID ^ getClass().hashCode();
     }
 
     /**

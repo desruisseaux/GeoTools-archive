@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.FactoryGroup;
 
 
@@ -120,11 +121,27 @@ public class FactoryUsingAnsiSQL extends FactoryUsingSQL {
      *
      * @param factories  The underlying factories used for objects creation.
      * @param connection The connection to the underlying EPSG database.
+     *
+     * @deprecated Use {@link #FactoryUsingAnsiSQL(Hints,Connection)} instead.
      */
     public FactoryUsingAnsiSQL(final FactoryGroup factories,
                                final Connection  connection)
     {
-        super(factories, connection);
+        this(new Hints(FactoryGroup.HINT_KEY, factories), connection);
+    }
+
+    /**
+     * Constructs an authority factory using the specified connection.
+     *
+     * @param hints      The underlying factories used for objects creation.
+     * @param connection The connection to the underlying EPSG database.
+     *
+     * @since 2.2
+     */
+    public FactoryUsingAnsiSQL(final Hints      hints,
+                               final Connection connection)
+    {
+        super(hints, connection);
         for (int i=0; i<ANSI.length; i++) {
             map.put(ANSI[i], ANSI[++i]);
         }

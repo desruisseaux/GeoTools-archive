@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
@@ -66,9 +67,11 @@ import org.opengis.referencing.datum.ImageDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.datum.TemporalDatum;
 import org.opengis.referencing.datum.VerticalDatum;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
 
@@ -156,18 +159,18 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * constructors only. Subclasses are responsible for creating an appropriate backing store
      * when the {@link DeferredAuthorityFactory#createBackingStore} method is invoked.
      *
-     * @param factories The factories to use.
+     * @param hints The hints, usually with a {@link FactoryGroup#HINT_KEY} entry.
      * @param priority The priority for this factory, as a number between
      *        {@link #MIN_PRIORITY MIN_PRIORITY} and {@link #MAX_PRIORITY MAX_PRIORITY} inclusive.
      * @param maxStrongReferences The maximum number of objects to keep by strong reference.
      *
      * @see DeferredAuthorityFactory#createBackingStore
      */
-    BufferedAuthorityFactory(final FactoryGroup factories,
-                             final int          priority,
+    BufferedAuthorityFactory(final Hints hints,
+                             final int priority,
                              final int maxStrongReferences)
     {
-        super(factories, priority);
+        super(hints, priority);
         this.maxStrongReferences = maxStrongReferences;
     }
 
@@ -294,7 +297,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns an arbitrary {@linkplain Datum datum} from a code.
+     * Returns an arbitrary datum from a code.
      */
     public synchronized Datum createDatum(final String code)
             throws FactoryException
@@ -311,7 +314,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a {@linkplain EngineeringDatum engineering datum} from a code.
+     * Returns an engineering datum from a code.
      */
     public synchronized EngineeringDatum createEngineeringDatum(final String code)
             throws FactoryException
@@ -328,7 +331,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a {@linkplain ImageDatum image datum} from a code.
+     * Returns an image datum from a code.
      */
     public synchronized ImageDatum createImageDatum(final String code)
             throws FactoryException
@@ -345,7 +348,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a {@linkplain VerticalDatum vertical datum} from a code.
+     * Returns a vertical datum from a code.
      */
     public synchronized VerticalDatum createVerticalDatum(final String code)
             throws FactoryException
@@ -362,7 +365,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a {@linkplain TemporalDatum temporal datum} from a code.
+     * Returns a temporal datum from a code.
      */
     public synchronized TemporalDatum createTemporalDatum(final String code)
             throws FactoryException
@@ -379,7 +382,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns a {@linkplain GeodeticDatum geodetic datum} from a code.
+     * Returns a geodetic datum from a code.
      */
     public synchronized GeodeticDatum createGeodeticDatum(final String code)
             throws FactoryException
@@ -396,7 +399,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns an {@linkplain Ellipsoid ellipsoid} from a code.
+     * Returns an ellipsoid from a code.
      */
     public synchronized Ellipsoid createEllipsoid(final String code)
             throws FactoryException
@@ -413,7 +416,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns a {@linkplain PrimeMeridian prime meridian} from a code.
+     * Returns a prime meridian from a code.
      */
     public synchronized PrimeMeridian createPrimeMeridian(final String code)
             throws FactoryException
@@ -430,7 +433,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns an {@linkplain Extent extent} (usually an area of validity) from a code.
+     * Returns an extent (usually an area of validity) from a code.
      */
     public synchronized Extent createExtent(final String code)
             throws FactoryException
@@ -447,7 +450,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns an arbitrary {@linkplain CoordinateSystem coordinate system} from a code.
+     * Returns an arbitrary coordinate system from a code.
      */
     public synchronized CoordinateSystem createCoordinateSystem(final String code)
             throws FactoryException
@@ -464,7 +467,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a cartesian coordinate system from a code.
+     * Returns a cartesian coordinate system from a code.
      */
     public synchronized CartesianCS createCartesianCS(final String code)
             throws FactoryException
@@ -481,7 +484,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a polar coordinate system from a code.
+     * Returns a polar coordinate system from a code.
      */
     public synchronized PolarCS createPolarCS(final String code)
             throws FactoryException
@@ -498,7 +501,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a cylindrical coordinate system from a code.
+     * Returns a cylindrical coordinate system from a code.
      */
     public synchronized CylindricalCS createCylindricalCS(final String code)
             throws FactoryException
@@ -515,7 +518,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a spherical coordinate system from a code.
+     * Returns a spherical coordinate system from a code.
      */
     public synchronized SphericalCS createSphericalCS(final String code)
             throws FactoryException
@@ -532,7 +535,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates an ellipsoidal coordinate system from a code.
+     * Returns an ellipsoidal coordinate system from a code.
      */
     public synchronized EllipsoidalCS createEllipsoidalCS(final String code)
             throws FactoryException
@@ -549,7 +552,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a vertical coordinate system from a code.
+     * Returns a vertical coordinate system from a code.
      */
     public synchronized VerticalCS createVerticalCS(final String code)
             throws FactoryException
@@ -566,7 +569,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a temporal coordinate system from a code.
+     * Returns a temporal coordinate system from a code.
      */
     public synchronized TimeCS createTimeCS(final String code)
             throws FactoryException
@@ -583,7 +586,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns a {@linkplain CoordinateSystemAxis coordinate system axis} from a code.
+     * Returns a coordinate system axis from a code.
      */
     public synchronized CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
@@ -600,7 +603,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns an {@linkplain Unit unit} from a code.
+     * Returns an unit from a code.
      */
     public synchronized Unit createUnit(final String code)
             throws FactoryException
@@ -617,7 +620,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system} from a code. If the
+     * Returns an arbitrary coordinate reference system from a code.
      */
     public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
@@ -634,7 +637,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a 3D coordinate reference system from a code.
+     * Returns a 3D coordinate reference system from a code.
      */
     public synchronized CompoundCRS createCompoundCRS(final String code)
             throws FactoryException
@@ -651,7 +654,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Creates a derived coordinate reference system from a code.
+     * Returns a derived coordinate reference system from a code.
      */
     public synchronized DerivedCRS createDerivedCRS(final String code)
             throws FactoryException
@@ -668,7 +671,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
     
     /**
-     * Create a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
+     * Returns an engineering coordinate reference system from a code.
      */
     public synchronized EngineeringCRS createEngineeringCRS(final String code)
             throws FactoryException
@@ -685,7 +688,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns a {@linkplain GeographicCRS geographic coordinate reference system} from a code.
+     * Returns a geographic coordinate reference system from a code.
      */
     public synchronized GeographicCRS createGeographicCRS(final String code)
             throws FactoryException
@@ -702,7 +705,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns a {@linkplain GeocentricCRS geocentric coordinate reference system} from a code.
+     * Returns a geocentric coordinate reference system from a code.
      */
     public synchronized GeocentricCRS createGeocentricCRS(final String code)
             throws FactoryException
@@ -719,7 +722,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Create a {@linkplain ImageCRS image coordinate reference system} from a code.
+     * Returns an image coordinate reference system from a code.
      */
     public synchronized ImageCRS createImageCRS(final String code)
             throws FactoryException
@@ -736,7 +739,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Returns a {@linkplain ProjectedCRS projected coordinate reference system} from a code.
+     * Returns a projected coordinate reference system from a code.
      */
     public synchronized ProjectedCRS createProjectedCRS(final String code)
             throws FactoryException
@@ -753,7 +756,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Create a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
+     * Returns a temporal coordinate reference system from a code.
      */
     public synchronized TemporalCRS createTemporalCRS(final String code)
             throws FactoryException
@@ -770,7 +773,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
     }
 
     /**
-     * Create a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
+     * Returns a vertical coordinate reference system from a code.
      */
     public synchronized VerticalCRS createVerticalCRS(final String code)
             throws FactoryException
@@ -784,6 +787,80 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         }
         put(code, crs);
         return crs;
+    }
+
+    /**
+     * Returns an operation from a single operation code. 
+     *
+     * @since 2.2
+     */
+    public synchronized CoordinateOperation createCoordinateOperation(final String code)
+            throws FactoryException
+    {
+        final CoordinateOperation operation;
+        final Object cached = get(code);
+        if (cached instanceof CoordinateOperation) {
+            operation = (CoordinateOperation) cached;
+        } else {
+            operation = getBackingStore().createCoordinateOperation(code);
+        }
+        put(code, operation);
+        return operation;
+    }
+
+    /**
+     * Returns an operation from coordinate reference system codes.
+     *
+     * @since 2.2
+     */
+    public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
+                                        final String sourceCode, final String targetCode)
+            throws FactoryException
+    {
+        final Set/*<CoordinateOperation>*/ operations;
+        final CodePair key = new CodePair(sourceCode, targetCode);
+        final Object cached = get(key);
+        if (cached instanceof CoordinateOperation) {
+            operations = (Set/*<CoordinateOperation>*/) cached;
+        } else {
+            operations = Collections.unmodifiableSet(getBackingStore()
+                         .createFromCoordinateReferenceSystemCodes(sourceCode, targetCode));
+        }
+        put(key, operations);
+        return operations;
+    }
+
+    /**
+     * A pair of codes for operations to cache with
+     * {@link #createFromCoordinateReferenceSystemCodes}.
+     */
+    private static final class CodePair {
+        private final String source, target;
+
+        public CodePair(final String source, final String target) {
+            this.source = source;
+            this.target = target;
+        }
+
+        public int hashCode() {
+            int code = 0;
+            if (source!=null) code  = source.hashCode();
+            if (target!=null) code += target.hashCode() * 37;
+            return code;
+        }
+
+        public boolean equals(final Object other) {
+            if (other instanceof CodePair) {
+                final CodePair that = (CodePair) other;
+                return Utilities.equals(this.source, that.source) &&
+                       Utilities.equals(this.target, that.target);
+            }
+            return false;
+        }
+
+        public String toString() {
+            return source + " \u21E8 " + target;
+        }
     }
 
     /**
@@ -804,7 +881,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      *
      * @todo Consider logging a message here to the finer or finest level.
      */
-    private Object get(final String code) {
+    private Object get(final Object code) {
         Object object = pool.get(code);
         if (object instanceof Reference) {
             object = ((Reference) object).get();
@@ -819,7 +896,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * and 2) Alters the linked hash set order, so that this object is declared as the last
      * one used.
      */
-    private void put(final String code, final Object object) {
+    private void put(final Object code, final Object object) {
         pool.put(code, object);
         int toReplace = maxStrongReferences - pool.size();
         if (toReplace > 0) {

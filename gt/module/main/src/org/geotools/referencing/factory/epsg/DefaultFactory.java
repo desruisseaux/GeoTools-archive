@@ -109,11 +109,21 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     private Thread shutdown;
 
     /**
-     * Constructs an authority factory using the default set of
-     * {@linkplain org.opengis.referencing.ObjectFactory object factories}.
+     * Constructs an authority factory using the default set of factories.
      */
     public DefaultFactory() {
-        super(new FactoryGroup(), MAXIMUM_PRIORITY-10);
+        this(null);
+    }
+
+    /**
+     * Constructs an authority factory using a set of factories created from the specified hints.
+     * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
+     * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
+     * {@code FACTORY} hints. In addition, the {@link FactoryGroup#HINT_KEY} hint may be used as
+     * a low-level substitute for all the above.
+     */
+    public DefaultFactory(final Hints hints) {
+        super(hints, MAXIMUM_PRIORITY-10);
         setTimeout(30*60*1000L); // Closes the connection after at least 30 minutes of inactivity.
     }
 
@@ -215,7 +225,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
     private AbstractAuthorityFactory createFactory() throws SQLException {
         assert Thread.holdsLock(this);
         if (datasource != null) {
-            return datasource.createFactory(factories);
+            return datasource.createFactory(new Hints(FactoryGroup.HINT_KEY, factories));
         }
         /*
          * Try to gets the DataSource from JNDI. In case of success, it will be tried
@@ -249,7 +259,7 @@ public class DefaultFactory extends DeferredAuthorityFactory {
         SQLException             failure = null;
         while (true) {
             if (source != null) try {
-                factory = source.createFactory(factories);
+                factory = source.createFactory(new Hints(FactoryGroup.HINT_KEY, factories));
                 break; // Found a successfull connection: stop the loop.
             } catch (SQLException exception) {
                 // Keep only the exception from the first data source.
