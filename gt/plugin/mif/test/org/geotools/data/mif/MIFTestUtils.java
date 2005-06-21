@@ -22,6 +22,8 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypes;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.SchemaException;
 import org.geotools.resources.TestData;
 import java.io.File;
 import java.io.FileInputStream;
@@ -102,23 +104,33 @@ public class MIFTestUtils {
     }
 
     /**
-     * 
+     * DOCUMENT ME!
+     *
      * @param mifName MIF file to be deleted (no extension)
      */
     public static void safeDeleteMif(String mifName) {
         File f;
+
         try {
-            f = MIFFile.getFileHandler(new File(getDataPath()), mifName, ".mif", false);
-            if (f.exists()) f.delete();
-            f = MIFFile.getFileHandler(new File(getDataPath()), mifName, ".mid", false);
-            if (f.exists()) f.delete();
+            f = MIFFile.getFileHandler(new File(getDataPath()), mifName,
+                    ".mif", false);
+
+            if (f.exists()) {
+                f.delete();
+            }
+
+            f = MIFFile.getFileHandler(new File(getDataPath()), mifName,
+                    ".mid", false);
+
+            if (f.exists()) {
+                f.delete();
+            }
         } catch (FileNotFoundException e) {
         }
     }
-  
+
     /**
      * Deletes temporary files in test-data
-     *
      */
     public static void cleanFiles() {
         safeDeleteMif("grafo_new");
@@ -126,7 +138,7 @@ public class MIFTestUtils {
         safeDeleteMif("mixed_wri");
         safeDeleteMif("newschema");
     }
-    
+
     /**
      * DOCUMENT ME!
      *
@@ -185,5 +197,26 @@ public class MIFTestUtils {
         params.put(MIFDataStore.HCLAUSE_COORDSYS, MIFTestUtils.coordsysClause);
 
         return params;
+    }
+
+    /**
+     * Duplicates a given feature type
+     *
+     * @param inFeatureType
+     * @param typeName
+     *
+     * @return
+     *
+     * @throws SchemaException
+     */
+    protected static FeatureType duplicateSchema(FeatureType inFeatureType,
+        String typeName) throws SchemaException {
+        FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(typeName);
+
+        for (int i = 0; i < inFeatureType.getAttributeCount(); i++) {
+            builder.addType(inFeatureType.getAttributeType(i));
+        }
+
+        return builder.getFeatureType();
     }
 }

@@ -16,13 +16,9 @@
  */
 package org.geotools.data.mif;
 
-import java.io.IOException;
-import java.sql.Date;
-import java.util.HashMap;
-
+import com.vividsolutions.jts.geom.LineString;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
@@ -34,8 +30,9 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.Filter;
-
-import com.vividsolutions.jts.geom.LineString;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.HashMap;
 
 
 /**
@@ -116,7 +113,8 @@ public class MIFDataStoreTest extends TestCase {
         initDS(dataPath);
 
         try {
-            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("newschema");
+            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
+                    "newschema");
             builder.addType(AttributeTypeFactory.newAttributeType("obj",
                     LineString.class, true));
             builder.addType(AttributeTypeFactory.newAttributeType("charfield",
@@ -126,22 +124,20 @@ public class MIFDataStoreTest extends TestCase {
 
             builder.addType(AttributeTypeFactory.newAttributeType("datefield",
                     Date.class, true));
-            builder.addType(AttributeTypeFactory.newAttributeType("doublefield",
-                    Double.class, false, 0, new Double(0)));
-            builder.addType(AttributeTypeFactory.newAttributeType("floatfield",
-                    Float.class, false, 0, new Float(0)));
+            builder.addType(AttributeTypeFactory.newAttributeType(
+                    "doublefield", Double.class, false, 0, new Double(0)));
+            builder.addType(AttributeTypeFactory.newAttributeType(
+                    "floatfield", Float.class, false, 0, new Float(0)));
             builder.addType(AttributeTypeFactory.newAttributeType("boolfield",
                     Boolean.class, false, 0, new Boolean(false)));
-            
 
             FeatureType newFT = builder.getFeatureType();
 
             ds.createSchema(newFT);
-            
+
             FeatureType builtFT = ds.getSchema("newschema");
-            
+
             assertEquals(builtFT, newFT);
-            
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -153,7 +149,8 @@ public class MIFDataStoreTest extends TestCase {
         initDS(dataPath);
 
         try {
-            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("newschema");
+            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
+                    "newschema");
             builder.addType(AttributeTypeFactory.newAttributeType("charfield",
                     String.class, false, 25, ""));
             builder.addType(AttributeTypeFactory.newAttributeType("intfield",
@@ -175,7 +172,8 @@ public class MIFDataStoreTest extends TestCase {
         initDS(dataPath);
 
         try {
-            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("newschema");
+            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance(
+                    "newschema");
             builder.addType(AttributeTypeFactory.newAttributeType("obj",
                     LineString.class, true));
             builder.addType(AttributeTypeFactory.newAttributeType("charfield",
@@ -223,22 +221,14 @@ public class MIFDataStoreTest extends TestCase {
         initDS(dataPath);
 
         try {
-            FeatureType ft = ds.getSchema("grafo");
-            int maxAttr = ft.getAttributeCount() - 1;
-
-            FeatureTypeBuilder builder = FeatureTypeBuilder.newInstance("grafo_new");
-            
-            for (int i = 0; i < ft.getAttributeCount(); i++) {
-                builder.addType(ft.getAttributeType(i));
-            }
-
-            FeatureType newFT = builder.getFeatureType();
+            FeatureType newFT = MIFTestUtils.duplicateSchema(ds.getSchema(
+                        "grafo"), "grafo_new");
             ds.createSchema(newFT);
 
-            Transaction transaction = new DefaultTransaction(); // Transaction.AUTO_COMMIT; 
+            int maxAttr = newFT.getAttributeCount() - 1;
 
             FeatureWriter fw = ds.getFeatureWriterAppend("grafo_new",
-                    transaction);
+                    Transaction.AUTO_COMMIT);
             Feature f;
             FeatureReader fr = getFeatureReader("grafo",
                     "ID == 73690 || ID == 71045");
@@ -258,47 +248,84 @@ public class MIFDataStoreTest extends TestCase {
                 fw.write();
             }
 
-            transaction.commit();
-
             fw.close();
 
             assertEquals(counter, 2);
 
-            transaction = new DefaultTransaction(); // Transaction.AUTO_COMMIT;
             fw = ds.getFeatureWriter("grafo_new",
                     (Filter) ExpressionBuilder.parse("ID == 71045"),
                     Transaction.AUTO_COMMIT);
 
             assertEquals(true, fw.hasNext());
             f = fw.next();
-            assertEquals("Via NOVARA", f.getAttribute("NOMECOMUNE"));
             fw.remove();
+
+            fw.close();
+
+            fw = ds.getFeatureWriterAppend("grafo_new", Transaction.AUTO_COMMIT);
+
+            f = fw.next();
+            f.setAttribute("ID", "99998");
+            f.setAttribute("NOMECOMUNE", "foobar");
+            fw.write();
 
             fw.close();
 
             fr = getFeatureReader("grafo_new");
 
-            assertEquals(true, fr.hasNext());
-            f = fr.next();
-            assertEquals("F3", f.getAttribute("CLASSE"));
-            assertEquals(73690, ((Integer) f.getAttribute("ID")).intValue());
-            fr.close();
+            counter = 0;
 
-            fw = ds.getFeatureWriterAppend("grafo_new", transaction);
+            while (fr.hasNext()) {
+                f = fr.next();
+                counter++;
+            }
+
+            assertEquals(counter, 2);
+            fr.close();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Tests createSchema & FeatureWriter
+     */
+    public void testFeatureWriterAppendTransaction() {
+        try {
+            MIFTestUtils.copyMif("grafo", "grafo_new");
+            initDS(dataPath);
+
+            Feature f;
+            Transaction transaction = new DefaultTransaction();
+
+            FeatureWriter fw = ds.getFeatureWriterAppend("grafo_new",
+                    transaction);
 
             f = fw.next();
-            f.setAttribute("ID", "99998");
+            f = fw.next();
+            f.setAttribute("ID", "80001");
             f.setAttribute("NOMECOMUNE", "foo");
             fw.write();
 
             f = fw.next();
-            f.setAttribute("ID", "99999");
+            f.setAttribute("ID", "80002");
             f.setAttribute("NOMECOMUNE", "bar");
             fw.write();
 
+            fw.close();
             transaction.commit();
 
-            fw.close();
+            FeatureReader fr = getFeatureReader("grafo_new",
+                    "ID > 80000 && ID <80003");
+
+            int counter = 0;
+
+            while (fr.hasNext()) {
+                f = fr.next();
+                counter++;
+            }
+
+            assertEquals(counter, 2);
         } catch (Exception e) {
             fail(e.getMessage());
         }
