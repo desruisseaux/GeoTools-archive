@@ -146,6 +146,17 @@
       </roles>
     </developer>
     <developer>
+      <name>Richard Gould</name>
+      <id>rgould</id>
+      <email>rgould@refractions.net</email>
+      <organization>Refractions Research, Inc.</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>				
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Christiaan ten Klooster</name>
       <id>ckl</id>
       <email>ckl@dacelo.nl</email>
