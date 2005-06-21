@@ -132,8 +132,8 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      * {@linkplain DefaultCoordinateOperationFactory#createOperation(CoordinateReferenceSystem,
      * CoordinateReferenceSystem) generic implementation} provided by the super-class.
      * <p>
-     * Note that this method may be invoked recursively by the super-class implementation.
-     * For example no operation may be available from the underlying {@link #getAuthorityFactory
+     * Note that this method may be invoked recursively by the super-class implementation. For
+     * example no operation may be available from the underlying {@linkplain #getAuthorityFactory
      * authority factory} between two {@linkplain org.opengis.referencing.crs.CompoundCRS compound
      * CRS}, but an operation may be available between two components of those compound CRS.
      *

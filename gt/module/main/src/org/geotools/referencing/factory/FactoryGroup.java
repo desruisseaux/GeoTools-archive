@@ -71,8 +71,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.cs.DefaultEllipsoidalCS;
-import org.geotools.referencing.cs.DefaultCartesianCS;
+import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.Singleton;
 import org.geotools.resources.XArray;
@@ -335,21 +334,22 @@ public class FactoryGroup {
          * parameters (because they duplicate datum information).
          */
         final Ellipsoid ellipsoid = CRSUtilities.getHeadGeoEllipsoid(baseCRS);
-        final Unit axisUnit = ellipsoid.getAxisUnit();
-        Parameters.ensureSet(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit, false);
-        Parameters.ensureSet(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit, false);
+        if (ellipsoid != null) {
+            final Unit axisUnit = ellipsoid.getAxisUnit();
+            Parameters.ensureSet(parameters, "semi_major", ellipsoid.getSemiMajorAxis(), axisUnit, false);
+            Parameters.ensureSet(parameters, "semi_minor", ellipsoid.getSemiMinorAxis(), axisUnit, false);
+        }
         /*
          * Computes matrix for swapping axis and performing units conversion.
          * There is one matrix to apply before projection on (longitude,latitude)
          * coordinates, and one matrix to apply after projection on (easting,northing)
          * coordinates.
          */
-        // TODO: remove cast once we will be allowed to compile for J2SE 1.5.
-        final EllipsoidalCS geoCS = (EllipsoidalCS) baseCRS.getCoordinateSystem();
+        final CoordinateSystem sourceCS = baseCRS.getCoordinateSystem();
         final Matrix swap1, swap3;
         try {
-            swap1 = DefaultEllipsoidalCS.swapAndScaleAxis(geoCS, DefaultEllipsoidalCS.GEODETIC_2D);
-            swap3 = DefaultCartesianCS.swapAndScaleAxis(DefaultCartesianCS.PROJECTED, derivedCS);
+            swap1 = AbstractCS.swapAndScaleAxis(sourceCS, AbstractCS.standard(sourceCS));
+            swap3 = AbstractCS.swapAndScaleAxis(AbstractCS.standard(derivedCS), derivedCS);
         } catch (IllegalArgumentException cause) {
             // User-specified axis don't match.
             throw new FactoryException(cause);

@@ -404,7 +404,7 @@ public class ParameterWriter extends FilterWriter {
             elementNames[0] = element.getName().getCode();
             if (aliases != null) {
                 int count = 0;
-                for (final Iterator i=aliases.iterator(); it.hasNext();) {
+                for (final Iterator i=aliases.iterator(); i.hasNext();) {
                     final GenericName alias = (GenericName) i.next();
                     final GenericName scope = alias.getScope();
                     final GenericName name  = alias.asLocalName();

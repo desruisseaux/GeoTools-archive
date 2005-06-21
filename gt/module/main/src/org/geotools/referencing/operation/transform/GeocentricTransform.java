@@ -546,7 +546,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
     }
     
     /**
-     * The provider for {@link GeocentricTransform}. This provider will construct transforms
+     * The provider for {@link GeocentricTransform}. This provider will constructs transforms
      * from {@linkplain org.geotools.referencing.crs.DefaultGeographicCRS geographic} to
      * {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric} coordinate
      * reference systems.
@@ -583,22 +583,22 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
-         * The number of geographic dimension (2 or 3). This is a Geotools-specif argument.
+         * The number of geographic dimension (2 or 3). This is a Geotools-specific argument.
          * The default value is 3, which is the value implied in OGC's WKT.
          */
         private static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
-                                             new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
+                        new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
                     3, 2, 3, false);
 
         /**
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
-                        "Ellipsoid_To_Geocentric",
-                        "Geographic/geocentric conversions", 
-                        "9602",
-                        ResourceKeys.GEOCENTRIC_TRANSFORM);
+                        "Ellipsoid_To_Geocentric",              // OGC name
+                        "Geographic/geocentric conversions",    // EPSG name
+                        "9602",                                 // EPSG identifier
+                        ResourceKeys.GEOCENTRIC_TRANSFORM);     // Geotools name
 
         /**
          * Constructs the parameters group.
@@ -666,6 +666,8 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             final double  semiMajor = doubleValue(SEMI_MAJOR, values);
             final double  semiMinor = doubleValue(SEMI_MINOR, values);
             return new GeocentricTransform(semiMajor, semiMinor, SI.METER, dimGeographic!=2);
+            // Note: 'dimGeographic' may be 0 if no value were user-specified.
+            //       0 value shall be treated as 3.
         }
 
         /**
@@ -686,7 +688,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
             }
         }
     }
-    
+
     /**
      * The provider for inverse of {@link GeocentricTransform}. This provider will construct
      * transforms from {@linkplain org.geotools.referencing.crs.DefaultGeocentricCRS geocentric}
@@ -708,13 +710,13 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * @todo The EPSG code seems to be the same than for the direct transform.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(
-                        "Geocentric_To_Ellipsoid",
-                        "Geographic/geocentric conversions", 
-                        "9602",
-                        ResourceKeys.GEOCENTRIC_TRANSFORM);
+                        "Geocentric_To_Ellipsoid",              // OGC name
+                        "Geographic/geocentric conversions",    // EPSG name
+                        "9602",                                 // EPSG identifier
+                        ResourceKeys.GEOCENTRIC_TRANSFORM);     // Geotools name
 
         /**
-         * Create a provider.
+         * Creates a provider.
          */
         public ProviderInverse() {
             super(3, 3, PARAMETERS);

@@ -35,6 +35,10 @@ import javax.units.Unit;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.CartesianCS;
+import org.opengis.referencing.cs.EllipsoidalCS;
+import org.opengis.referencing.cs.SphericalCS;
+import org.opengis.referencing.cs.VerticalCS;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
@@ -292,6 +296,88 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
             }
         }
         return matrix;
+    }
+
+    /**
+     * Returns a coordinate system with standard axis order and units. This method returns one
+     * of the predefined constants with axis in (<var>longitude</var>,<var>latitude</var>) or
+     * (<var>X</var>,<var>Y</var>) order, and units in degree or metres. This method is typically
+     * used together with {@link #swapAndScaleAxis swapAndScaleAxis} for the creation of a
+     * transformation step before some {@linkplain org.opengis.referencing.operation.MathTransform
+     * math transform}. Example:
+     *
+     * <blockquote><pre>
+     * Matrix step1 = swapAndScaleAxis(sourceCS, standard(sourceCS));
+     * Matrix step2 = ... some transform operating on standard axis ...
+     * Matrix step3 = swapAndScaleAxis(standard(targetCS), targetCS);
+     * </pre></blockquote>
+     * <p>
+     * <strong>Background</strong><br>
+     * Many {@linkplain org.opengis.referencing.crs.GeographicCRS geographic coordinate reference
+     * systems} use axis in (<var>latitude</var>,<var>longitude</var>) order, but not all. Axis
+     * order, orientation and units are CRS-dependent. For example some CRS use longitude values
+     * increasing toward {@linkplain AxisDirection#EAST East}, while some others use longitude
+     * values increasing toward {@linkplain AxisDirection#WEST West}. The axis order must be
+     * specified in all CRS, and any method working with them should take their axis order and
+     * units in account. However, in the few cases where the the coordinates order and units is
+     * hard-coded in the API, we use the convention used for
+     * {@link org.opengis.referencing.operation.MathTransform} projections in OGC 01-009
+     * specification. This specification said (quoting section 10.6 at page 34):
+     *
+     * <blockquote>
+     * "Cartographic projection transforms are used by projected coordinate systems to map
+     * geographic coordinates (e.g. Longitude and Latitude) into (X,Y) coordinates. These
+     * (X,Y) coordinates can be imagined to lie on a plane, such as a paper map or a screen.
+     * All cartographic projection transforms will have the following properties:
+     * <ul>
+     *   <li>Converts from (<var>Longitude</var>, <var>Latitude</var>) coordinates to
+     *       (<var>X</var>,<var>Y</var>).</li>
+     *   <li>All angles are assumed to be degrees, and all distances are assumed to be meters.</li>
+     *   <li>The domain should be a subset of {[-180,180)&times;(-90,90)}.</li>
+     * </ul>
+     * Although all cartographic projection transforms must have the properties listed above, many
+     * projected coordinate systems have different properties. For example, in Europe some projected
+     * coordinate systems use grads instead of degrees, and often the base geographic coordinate
+     * system is (<var>Latitude</var>, <var>Longitude</var>) instead of (<var>Longitude</var>,
+     * <var>Latitude</var>). This means that the cartographic projected transform is often used
+     * as a single step in a series of transforms, where the other steps change units and swap
+     * ordinates."
+     * </blockquote>
+     *
+     * @param  cs The coordinate system.
+     * @return A constant similar to the specified {@code cs} with standard axis.
+     * @throws IllegalArgumentException if the specified {@code cs} is unknow to this method.
+     *
+     * @since 2.2
+     */
+    public static CoordinateSystem standard(final CoordinateSystem cs)
+            throws IllegalArgumentException
+    {
+        final int dimension = cs.getDimension();
+        if (cs instanceof CartesianCS) {
+            switch (dimension) {
+                case 2: return DefaultCartesianCS.GENERIC_2D;
+                case 3: return DefaultCartesianCS.GENERIC_3D;
+            }
+        }
+        if (cs instanceof EllipsoidalCS) {
+            switch (dimension) {
+                case 2: return DefaultEllipsoidalCS.GEODETIC_2D;
+                case 3: return DefaultEllipsoidalCS.GEODETIC_3D;
+            }
+        }
+        if (cs instanceof SphericalCS) {
+            switch (dimension) {
+                case 3: return DefaultSphericalCS.GEOCENTRIC;
+            }
+        }
+        if (cs instanceof VerticalCS) {
+            switch (dimension) {
+                case 1: return DefaultVerticalCS.ELLIPSOIDAL_HEIGHT;
+            }
+        }
+        throw new IllegalArgumentException("Coordinate system \"" + cs.getName().getCode() +
+                                           "\" is not supported."); // TODO: localize
     }
 
     /**

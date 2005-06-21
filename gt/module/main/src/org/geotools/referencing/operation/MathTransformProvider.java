@@ -195,11 +195,15 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * Constructs a parameter group from a set of alias. The parameter group is
      * identified by codes provided by one or more authorities. Common authorities are
      * {@link CitationImpl#OGC OGC} and {@link CitationImpl#EPSG EPSG} for example.
-     *
-     * <P>The first entry in the {@code identifiers} array is both the
-     * {@linkplain ParameterDescriptorGroup#getName main name} and the
-     * {@linkplain ParameterDescriptorGroup#getIdentifiers identifiers}.
-     * All others are {@linkplain ParameterDescriptorGroup#getAlias aliases}.</P>
+     * <P>
+     * Special rules:
+     * <ul>
+     *   <li>The first entry in the {@code identifiers} array is the
+     *       {@linkplain ParameterDescriptorGroup#getName primary name}.</li>
+     *   <li>If a an entry do not implements the {@link GenericName} interface, it is
+     *       an {@linkplain ParameterDescriptorGroup#getIdentifiers identifiers}.</li>
+     *   <li>All others are {@linkplain ParameterDescriptorGroup#getAlias aliases}.</li>
+     * </ul>
      *
      * @param identifiers  The operation identifiers. Most contains at least one entry.
      * @param parameters   The set of parameters, or {@code null} or an empty array if none.
@@ -219,17 +223,23 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         if (identifiers.length == 0) {
             throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_EMPTY_ARRAY));
         }
-        int count = 0;
+        int idCount    = 0;
+        int aliasCount = 0;
+        Identifier [] id    = new Identifier [identifiers.length];
         GenericName[] alias = new GenericName[identifiers.length];
         for (int i=0; i<identifiers.length; i++) {
-            if (identifiers[i] instanceof GenericName) {
-                alias[count++] = (GenericName) identifiers[i];
+            final Identifier candidate = identifiers[i];
+            if (candidate instanceof GenericName) {
+                alias[aliasCount++] = (GenericName) candidate;
+            } else {
+                id[idCount++] = candidate;
             }
         }
-        alias = (GenericName[]) XArray.resize(alias, count);
+        id    = (Identifier []) XArray.resize(id,       idCount);
+        alias = (GenericName[]) XArray.resize(alias, aliasCount);
         final Map properties = new HashMap(4, 0.8f);
         properties.put(NAME_KEY,        identifiers[0]);
-        properties.put(IDENTIFIERS_KEY, identifiers[0]);
+        properties.put(IDENTIFIERS_KEY, id);
         properties.put(ALIAS_KEY,       alias);
         return properties;
     }

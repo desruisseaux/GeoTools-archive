@@ -1013,7 +1013,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             }
         }
         /*
-         * If a record has been found in one table, then delegate to the appripriate method.
+         * If a record has been found in one table, then delegates to the appropriate method.
          */
         if (index >= 0) {
             switch (index) {
@@ -1023,8 +1023,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                 case 3:  return buffered.createDatum                    (code);
                 case 4:  return buffered.createEllipsoid                (code);
                 case 5:  return buffered.createPrimeMeridian            (code);
-                case 6:  break; // TODO return buffered.createCoordinateOperation      (code);
-                case 7:  break; // TODO return buffered.createOperationMethod          (code);
+                case 6:  return buffered.createCoordinateOperation      (code);
+                case 7:  break; // return buffered.createOperationMethod(code);
                 default: throw new AssertionError(index); // Should not happen
             }
         }
@@ -2161,7 +2161,8 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
                     operation = operationFactory.createOperation(sourceCRS, targetCRS);
                 } else {
                     final MathTransform mt;
-                    mt = factories.getMathTransformFactory().createParameterizedTransform(parameters);
+                    mt = factories.createBaseToDerived(sourceCRS, parameters,
+                                                       targetCRS.getCoordinateSystem(), null);
                     if (isTransformation) {
                         // TODO: uses GeoAPI factory method once available.
                         operation = new DefaultTransformation(properties, sourceCRS, targetCRS, mt, method);
@@ -2187,6 +2188,7 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
 
     /**
      * Creates operations from coordinate reference system codes.
+     * The returned set is ordered with the most accurate operations first.
      *
      * @param sourceCode Coded value of source coordinate reference system.
      * @param targetCode Coded value of target coordinate reference system.
@@ -2207,9 +2209,10 @@ public class FactoryUsingSQL extends AbstractAuthorityFactory {
             final String sourceKey = toPrimaryKey(sourceCode);
             final String targetKey = toPrimaryKey(targetCode);
             stmt = prepareStatement("FromCRS", "SELECT COORD_OP_CODE"
-                                             + " FROM [Coordinate_Operation]"
-                                             + " WHERE SOURCE_CRS_CODE = ? "
-                                             +   " AND TARGET_CRS_CODE = ?");
+                                          +    " FROM [Coordinate_Operation]"
+                                          +    " WHERE SOURCE_CRS_CODE = ? "
+                                          +      " AND TARGET_CRS_CODE = ? "
+                                          + " ORDER BY COORD_TFM_VERSION");
             stmt.setString(1, sourceKey);
             stmt.setString(2, targetKey);
             final ResultSet result = stmt.executeQuery();

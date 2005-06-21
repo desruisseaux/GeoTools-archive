@@ -15,15 +15,12 @@
  *    You should have received a copy of the GNU Lesser General Public
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies and extensions
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import javax.units.SI;
 
@@ -42,6 +39,8 @@ import org.opengis.referencing.operation.Transformation;
 import org.geotools.metadata.iso.citation.CitationImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.FloatParameter;
+import org.geotools.parameter.Parameter;
+import org.geotools.parameter.ParameterGroup;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.resources.cts.ResourceKeys;
@@ -204,9 +203,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
      * @return The parameters for this math transform.
      */
     public ParameterValueGroup getParameterValues() {
-        final ParameterValue dim = new org.geotools.parameter.Parameter(Provider.DIM);
+        final ParameterValue dim = new Parameter(Provider.DIM);
         dim.setValue(getSourceDimensions());
-        return new org.geotools.parameter.ParameterGroup(getParameterDescriptors(),
+        return new ParameterGroup(getParameterDescriptors(),
                new ParameterValue[] {
                    dim,
                    new FloatParameter(Provider.DX,             dx),
@@ -268,9 +267,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * would be executed everytime and would hurt performance for normal operations
          * (instead of slowing down during debugging only).
          */
-//        final float error;
-//        assert !(target3D && srcPts!=dstPts &&
-//                (error=maxError(null, srcPts, srcOff, null, dstPts, dstOff, numPts)) > EPS) : error;
+        assert !(target3D && srcPts!=dstPts &&
+                (maxError(null, srcPts, srcOff, null, dstPts, dstOff, numPts)) > EPS);
     }
 
     /**
@@ -308,9 +306,8 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * would be executed everytime and would hurt performance for normal operations
          * (instead of slowing down during debugging only).
          */
-//        final float error;
-//        assert !(target3D && srcPts!=dstPts &&
-//                (error=maxError(null, srcPts, srcOff, null, dstPts, dstOff, numPts)) > EPS) : error;
+        assert !(target3D && srcPts!=dstPts &&
+                (maxError(srcPts, null, srcOff, dstPts, null, dstOff, numPts)) > EPS);
     }
 
     /**
@@ -538,59 +535,61 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         private static final long serialVersionUID = -5332126871499059030L;
 
         /**
-         * The number of geographic dimension (2 or 3). The default value is 2.
+         * The default value for source and target geographic dimensions, which is 2.
+         * NOTE: If this default value is modified, then the handling of the 3D cases
+         * must be adjusted.
+         */
+        static final int DEFAULT_DIM = GeocentricAffineTransform.Provider.DEFAULT_DIM;
+
+        /**
+         * The number of geographic dimension (2 or 3). This argument applies on
+         * both the source and the target dimension. The default value is 2.
          */
         public static final ParameterDescriptor DIM = new DefaultParameterDescriptor(
                     Collections.singletonMap(NAME_KEY,
-                                             new NamedIdentifier(CitationImpl.GEOTOOLS, "dim")),
-                    2, 2, 3, false);
-        /*
-         * NOTE: If the default value (2) is modified, then source and target dimensions
-         *       arguments in the call to super(2,2,PARAMETERS) in Provider() constructor
-         *       must be adjusted accordingly, as well as switch cases in getMethod(...).
-         */
+                        new NamedIdentifier(CitationImpl.OGC, "dim")),
+                    DEFAULT_DIM, 2, 3, false);
 
         /**
-         * The operation parameter descriptor for the "dx" parameter value.
-         * Valid values range from -infinity to infinity.
+         * The number of source geographic dimension (2 or 3).
+         * This is a Geotools-specific argument.
+         *
+         * @todo Not yet used. See GEOT-411.
          */
-        public static final ParameterDescriptor DX = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "dx"),
-                    new NamedIdentifier(CitationImpl.EPSG, "X-axis translation")
-                },
-                Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
-        
+        static final ParameterDescriptor SRC_DIM = GeocentricAffineTransform.Provider.SRC_DIM;
+
         /**
-         * The operation parameter descriptor for the "dy" parameter value.
-         * Valid values range from -infinity to infinity.
+         * The number of target geographic dimension (2 or 3).
+         * This is a Geotools-specific argument.
+         *
+         * @todo Not yet used. See GEOT-411
          */
-        public static final ParameterDescriptor DY = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "dy"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Y-axis translation")
-                },
-                Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
-        
+        static final ParameterDescriptor TGT_DIM = GeocentricAffineTransform.Provider.TGT_DIM;
+
         /**
-         * The operation parameter descriptor for the "dx" parameter value.
-         * Valid values range from -infinity to infinity, default is 0.0.
+         * The operation parameter descriptor for the <cite>X-axis translation</cite> ("dx")
+         * parameter value. Valid values range from -infinity to infinity. Units are meters.
          */
-        public static final ParameterDescriptor DZ = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC,  "dz"),
-                    new NamedIdentifier(CitationImpl.EPSG, "Z-axis translation")
-                },
-                0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, SI.METER);
-        
+        public static final ParameterDescriptor DX = GeocentricAffineTransform.Provider.DX;
+
+        /**
+         * The operation parameter descriptor for the <cite>Y-axis translation</cite> ("dy")
+         * parameter value. Valid values range from -infinity to infinity. Units are meters.
+         */
+        public static final ParameterDescriptor DY = GeocentricAffineTransform.Provider.DY;
+
+        /**
+         * The operation parameter descriptor for the <cite>Z-axis translation</cite> ("dz")
+         * parameter value. Valid values range from -infinity to infinity. Units are meters.
+         */
+        public static final ParameterDescriptor DZ = GeocentricAffineTransform.Provider.DZ;
+
         /**
          * The operation parameter descriptor for the "src_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor SRC_SEMI_MAJOR = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "src_semi_major")
-                },
+                identifiers(GeocentricAffineTransform.Provider.SRC_SEMI_MAJOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
 
         /**
@@ -598,30 +597,30 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor SRC_SEMI_MINOR = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "src_semi_minor"),
-                },
+                identifiers(GeocentricAffineTransform.Provider.SRC_SEMI_MINOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
-        
+
         /**
          * The operation parameter descriptor for the "tgt_semi_major" parameter value.
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor TGT_SEMI_MAJOR = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "tgt_semi_major")
-                },
+                identifiers(GeocentricAffineTransform.Provider.TGT_SEMI_MAJOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
-        
+
         /**
          * The operation parameter descriptor for the "tgt_semi_minor" parameter value.
          * Valid values range from 0 to infinity.
          */
         public static final ParameterDescriptor TGT_SEMI_MINOR = createDescriptor(
-                new NamedIdentifier[] {
-                    new NamedIdentifier(CitationImpl.OGC, "tgt_semi_minor")
-                },
+                identifiers(GeocentricAffineTransform.Provider.TGT_SEMI_MINOR),
                 Double.NaN, 0.0, Double.POSITIVE_INFINITY, SI.METER);
+
+        /** Helper method for parameter descriptor creation. */
+        private static final NamedIdentifier[] identifiers(final ParameterDescriptor parameter) {
+            final Collection id = parameter.getAlias();
+            return (NamedIdentifier[]) id.toArray(new NamedIdentifier[id.size()]);
+        }
 
         /**
          * The parameters group.
@@ -648,7 +647,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Constructs a provider.
          */
         public Provider() {
-            super(2, 2, PARAMETERS);
+            super(DEFAULT_DIM, DEFAULT_DIM, PARAMETERS);
         }
 
         /**
@@ -686,8 +685,9 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
             final boolean hasHeight;
             final int dim = intValue(DIM, values);
             switch (dim) {
-                case 2:  hasHeight=false; break;
-                case 3:  hasHeight=true;  break;
+                case 0:            // Default value: fall through
+                case DEFAULT_DIM:  hasHeight=false; break;
+                case 3:            hasHeight=true;  break;
                 default: throw new IllegalArgumentException(Resources.format(
                                ResourceKeys.ERROR_ILLEGAL_ARGUMENT_$2, "dim", new Integer(dim)));
             }
@@ -717,7 +717,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
                     }
                     return withHeight;
                 }
-                case 2: return this;
+                case DEFAULT_DIM: return this;
                 default: throw new IllegalArgumentException();
             }
         }
@@ -778,7 +778,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
          * Constructs a provider.
          */
         public ProviderAbridged() {
-            super(2, 2, PARAMETERS);
+            super(DEFAULT_DIM, DEFAULT_DIM, PARAMETERS);
         }
         
         /**

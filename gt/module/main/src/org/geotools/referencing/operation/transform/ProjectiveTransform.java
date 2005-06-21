@@ -111,6 +111,11 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * Elements of the matrix. Column indice vary fastest.
      */
     private final double[] elt;
+
+    /**
+     * The inverse transform. Will be created only when first needed.
+     */
+    private transient ProjectiveTransform inverse;
     
     /**
      * Constructs a transform from the specified matrix.
@@ -405,21 +410,33 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
      * Creates the inverse transform of this object.
      */
     public MathTransform inverse() throws NoninvertibleTransformException {
-        if (isIdentity()) {
-            return this;
+        // No need to synchronize. This is not a big deal if the same object is created twice.
+        if (inverse == null) {
+            if (isIdentity()) {
+                inverse = this;
+            } else {
+                final GeneralMatrix matrix = getGeneralMatrix();
+                try {
+                    matrix.invert();
+                } catch (SingularMatrixException exception) {
+                    throw new NoninvertibleTransformException(Resources.format(
+                              ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM), exception);
+                }
+                inverse = new ProjectiveTransform(matrix);
+                inverse.inverse = this;
+            }
         }
-        final GeneralMatrix matrix = getGeneralMatrix();
-        try {
-            matrix.invert();
-        } catch (SingularMatrixException exception) {
-            NoninvertibleTransformException e = new NoninvertibleTransformException(
-                    Resources.format(ResourceKeys.ERROR_NONINVERTIBLE_TRANSFORM));
-            e.initCause(exception);
-            throw e;
-        }
+        return inverse;
+    }
+
+    /**
+     * Creates an inverse transform using the specified matrix.
+     * To be overriden by {@link GeocentricAffineTransform}.
+     */
+    MathTransform createInverse(final Matrix matrix) {
         return new ProjectiveTransform(matrix);
     }
-    
+
     /**
      * Returns a hash value for this transform.
      * This value need not remain consistent between
@@ -452,11 +469,12 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     }
     
     /**
-     * The provider for {@link ProjectiveTransform}. This transform is registered
-     * under the name "Affine", which is a special case of projective transform.
-     * The default matrix size is
+     * The provider for the "<cite>Affine general parametric transformation</cite>" (EPSG 9624).
+     * The OGC's name is {@code "Affine"}. The default matrix size is
      * {@value org.geotools.parameter.MatrixParameterDescriptors#DEFAULT_MATRIX_SIZE}&times;{@value
      * org.geotools.parameter.MatrixParameterDescriptors#DEFAULT_MATRIX_SIZE}.
+     * <p>
+     * Note that affine transform is a special case of projective transform.
      *
      * @version $Id$
      * @author Martin Desruisseaux
