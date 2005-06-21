@@ -17,7 +17,9 @@
 package org.geotools.data.wms.request;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+import org.geotools.data.ows.LatLonBoundingBox;
 
 
 /**
@@ -188,7 +190,7 @@ public interface GetMapRequest extends Request{
      *        "minx,miny,maxx,maxy"
      */
     public void setBBox(String bbox);
-
+    public void setBBox(LatLonBoundingBox box);
     /**
      * From the Web Map Service Implementation Specification: "The required
      * FORMAT parameter states the desired format of the response to an
@@ -217,7 +219,7 @@ public interface GetMapRequest extends Request{
      * @param height
      */
     public void setDimensions(String width, String height);
-
+     public void setDimensions(int width, int height);
     // End required parameters, begin optional ones.
     //TODO Implement optional parameters.
 
@@ -306,4 +308,9 @@ public interface GetMapRequest extends Request{
      * @param value a value to accompany the name
      */
     public void setVendorSpecificParameter(String name, String value);
+    
+    /** 
+     * create a request using a properties file to save time
+     */
+    public void setProperties(Properties p);
 }

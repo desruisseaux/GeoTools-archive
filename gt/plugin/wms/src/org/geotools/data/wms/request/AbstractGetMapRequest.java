@@ -9,10 +9,10 @@ package org.geotools.data.wms.request;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
+import org.apache.commons.lang.StringUtils;
+import org.geotools.data.ows.LatLonBoundingBox;
 
 import org.geotools.data.wms.SimpleLayer;
 
@@ -23,7 +23,7 @@ import org.geotools.data.wms.SimpleLayer;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class AbstractGetMapRequest extends AbstractRequest implements GetMapRequest {
-
+ 
 
     /**
      * Constructs a GetMapRequest. The data passed in represents valid values 
@@ -70,9 +70,9 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
 				layerString = layerString + simpleLayer.getName();
 			}
             try {
-				styleString = styleString + URLEncoder.encode(simpleLayer.getStyle(), "UTF-8");
+				styleString = styleString + URLEncoder.encode(StringUtils.defaultString(simpleLayer.getStyle()), "UTF-8");
 			} catch (UnsupportedEncodingException e1) {
-				styleString = styleString + simpleLayer.getStyle();
+				styleString = styleString + StringUtils.defaultString(simpleLayer.getStyle());
 			}
 
             if (i != (layers.size() - 1)) {
@@ -121,6 +121,15 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
         properties.setProperty(BBOX, bbox);
     }
 
+    public void setBBox(LatLonBoundingBox box){
+        StringBuffer sb = new StringBuffer();
+        sb.append(box.getMinX());
+        sb.append(",");
+        sb.append(box.getMinY()+",");
+        sb.append(box.getMaxX()+",");
+        sb.append(box.getMaxY());
+        setBBox(sb.toString());
+    }
     /**
      * From the Web Map Service Implementation Specification: "The required
      * FORMAT parameter states the desired format of the response to an
@@ -263,4 +272,13 @@ public abstract class AbstractGetMapRequest extends AbstractRequest implements G
     public void setVendorSpecificParameter(String name, String value) {
         properties.setProperty(name, value);
     }
+
+    public void setDimensions(int width, int height) {
+        setDimensions(""+width,""+height);
+    }
+
+    public void setProperties(Properties p) {
+        properties = p;
+    }
+    
 }

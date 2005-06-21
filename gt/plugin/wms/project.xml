@@ -69,7 +69,13 @@
       <id>jdom</id>
       <version>1.0b10</version>
       <url>http://www.jdom.org/</url>
-    </dependency>    
+    </dependency> 
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.0</version>
+      <type>jar</type>
+    </dependency>   
   </dependencies>
   <build>
     <unitTest>
